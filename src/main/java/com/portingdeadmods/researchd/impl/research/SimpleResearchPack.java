@@ -17,6 +17,11 @@ public record SimpleResearchPack(int color, Optional<ResourceLocation> customTex
         this(-1, Optional.of(customTexture));
     }
 
+    @Override
+    public ResearchPackSerializer<?> getSerializer() {
+        return Serializer.INSTANCE;
+    }
+
     public static final class Serializer implements ResearchPackSerializer<SimpleResearchPack> {
         public static final Serializer INSTANCE = new Serializer();
         public static final MapCodec<SimpleResearchPack> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(

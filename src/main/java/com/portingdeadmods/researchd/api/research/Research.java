@@ -2,6 +2,8 @@ package com.portingdeadmods.researchd.api.research;
 
 import com.mojang.serialization.Codec;
 import com.portingdeadmods.researchd.ResearchdRegistries;
+import com.portingdeadmods.researchd.api.research.serializers.ResearchSerializer;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 
 import java.util.Map;
@@ -11,7 +13,7 @@ import java.util.Optional;
  * Represents a single research
  */
 public interface Research {
-    Codec<Research> CODEC = /* TODO */ null;
+    Codec<Research> CODEC = ResearchdRegistries.RESEARCH_SERIALIZER.byNameCodec().dispatch(Research::getSerializer, ResearchSerializer::codec);
     Codec<ResourceKey<Research>> RESOURCE_KEY_CODEC = ResourceKey.codec(ResearchdRegistries.RESEARCH_KEY);
 
     /**
@@ -28,4 +30,6 @@ public interface Research {
      * @return whether the parent needs to researched to research this research
      */
     boolean requiresParent();
+
+    ResearchSerializer<?> getSerializer();
 }
