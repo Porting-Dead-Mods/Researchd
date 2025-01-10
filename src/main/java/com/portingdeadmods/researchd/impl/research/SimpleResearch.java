@@ -15,6 +15,11 @@ import java.util.Map;
 import java.util.Optional;
 
 public record SimpleResearch(Map<ResourceKey<ResearchPack>, Integer> researchPoints, Optional<ResourceKey<Research>> parent, boolean requiresParent) implements Research {
+    @Override
+    public ResearchSerializer<?> getSerializer() {
+        return Serializer.INSTANCE;
+    }
+
     public static class Serializer implements ResearchSerializer<SimpleResearch> {
         public static final Serializer INSTANCE = new Serializer();
         public static final MapCodec<SimpleResearch> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
