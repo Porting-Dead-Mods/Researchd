@@ -1,0 +1,25 @@
+package com.portingdeadmods.researchd.datagen;
+
+import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.ResearchdRegistries;
+import com.portingdeadmods.researchd.registries.ResearchPacks;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistrySetBuilder;
+import net.minecraft.data.PackOutput;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider;
+
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+
+public class DatapackRegistryProvider extends DatapackBuiltinEntriesProvider {
+    public DatapackRegistryProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
+        super(output, registries, BUILDER, Set.of(Researchd.MODID));
+    }
+
+    public static final RegistrySetBuilder BUILDER = new RegistrySetBuilder()
+            // -- RESEARCH PACK --
+            .add(ResearchdRegistries.RESEARCH_PACK_KEY, ResearchPacks::bootstrap);
+
+}

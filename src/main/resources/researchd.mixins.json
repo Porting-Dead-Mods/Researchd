@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "com.portingdeadmods.researchd.mixins",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "PlayerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
