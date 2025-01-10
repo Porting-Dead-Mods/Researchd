@@ -1,5 +1,7 @@
 package com.portingdeadmods.researchd;
 
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -18,10 +20,13 @@ public class Researchd
 
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public Researchd(IEventBus modEventBus, ModContainer modContainer)
-    {
-        NeoForge.EVENT_BUS.register(this);
+    public Researchd(IEventBus modEventBus, ModContainer modContainer) {
+        //NeoForge.EVENT_BUS.register(this);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+    }
+
+    public static ResourceLocation rl(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MODID, path);
     }
 }
