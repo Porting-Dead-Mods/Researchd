@@ -12,16 +12,16 @@ import net.neoforged.neoforge.registries.RegistryBuilder;
 
 public class ResearchdRegistries {
 	public static final ResourceKey<Registry<ResearchPack>> RESEARCH_PACK_KEY =
-			ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(Researchd.MODID, "research_pack"));
+			ResourceKey.createRegistryKey(Researchd.rl("research_pack"));
 	public static final ResourceKey<Registry<Research>> RESEARCH_KEY =
-			ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(Researchd.MODID, "research"));
+			ResourceKey.createRegistryKey(Researchd.rl("research"));
 
 	public static final ResourceKey<Registry<ResearchSerializer<?>>> RESEARCH_SERIALIZER_KEY =
-			ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(Researchd.MODID, "research_serializer"));
+			ResourceKey.createRegistryKey(Researchd.rl("research_serializer"));
 	public static final ResourceKey<Registry<ResearchPackSerializer<?>>> RESEARCH_PACK_SERIALIZER_KEY =
-			ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(Researchd.MODID, "research_pack_serializer"));
+			ResourceKey.createRegistryKey(Researchd.rl("research_pack_serializer"));
 	public static final ResourceKey<Registry<ResearchPredicateSerializer<?>>> RESEARCH_PREDICATE_SERIALIZER_KEY =
-			ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(Researchd.MODID, "research_predicate_serializer"));
+			ResourceKey.createRegistryKey(Researchd.rl("research_predicate_serializer"));
 
 	public static final Registry<ResearchSerializer<?>> RESEARCH_SERIALIZER = new RegistryBuilder<>(RESEARCH_SERIALIZER_KEY).create();
 	public static final Registry<ResearchPackSerializer<?>> RESEARCH_PACK_SERIALIZER = new RegistryBuilder<>(RESEARCH_PACK_SERIALIZER_KEY).create();

@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 public record TransferOwnershipPayload(UUID uuid) implements CustomPacketPayload {
-    public static final Type<TransferOwnershipPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Researchd.MODID, "transfer_ownership_payload"));
+    public static final Type<TransferOwnershipPayload> TYPE = new Type<>(Researchd.rl("transfer_ownership_payload"));
     public static final StreamCodec<RegistryFriendlyByteBuf, TransferOwnershipPayload> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,
             TransferOwnershipPayload::uuid,

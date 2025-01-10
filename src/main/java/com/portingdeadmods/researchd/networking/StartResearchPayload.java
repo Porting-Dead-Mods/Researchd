@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 public record StartResearchPayload(Research research) implements CustomPacketPayload {
-    public static final Type<StartResearchPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Researchd.MODID, "start_research_payload"));
+    public static final Type<StartResearchPayload> TYPE = new Type<>(Researchd.rl("start_research_payload"));
     public static final StreamCodec<RegistryFriendlyByteBuf, StartResearchPayload> STREAM_CODEC = StreamCodec.composite(
             Research.STREAM_CODEC,
             StartResearchPayload::research,

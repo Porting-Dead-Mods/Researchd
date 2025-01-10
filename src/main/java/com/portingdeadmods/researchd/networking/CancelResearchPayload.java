@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 public record CancelResearchPayload(int index) implements CustomPacketPayload {
-    public static final Type<CancelResearchPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Researchd.MODID, "cancel_research_payload"));
+    public static final Type<CancelResearchPayload> TYPE = new Type<>(Researchd.rl("cancel_research_payload"));
     public static final StreamCodec<RegistryFriendlyByteBuf, CancelResearchPayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.INT,
             CancelResearchPayload::index,

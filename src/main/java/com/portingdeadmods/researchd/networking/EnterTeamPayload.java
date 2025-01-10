@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 public record EnterTeamPayload(UUID memberOfTeam) implements CustomPacketPayload {
-    public static final Type<EnterTeamPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Researchd.MODID, "enter_team_payload"));
+    public static final Type<EnterTeamPayload> TYPE = new Type<>(Researchd.rl("enter_team_payload"));
     public static final StreamCodec<RegistryFriendlyByteBuf, EnterTeamPayload> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,
             EnterTeamPayload::memberOfTeam,
