@@ -13,7 +13,7 @@ public class ResearchdRegistries {
 	public static final ResourceKey<Registry<ResearchPredicate>> RESEARCH_PREDICATE_KEY =
 			ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(Researchd.MODID, "research_predicate"));
 
-	public static final Registry<ResearchPredicates> RESEARCH_PREDICATE = new RegistryBuilder<>(RESEARCH_PREDICATE_KEY).create();
+	public static final Registry<ResearchPredicate> RESEARCH_PREDICATE = new RegistryBuilder<>(RESEARCH_PREDICATE_KEY).create();
 	public static final Registry<ResearchPack> RESEARCH_PACK = new RegistryBuilder<>(RESEARCH_PACK_KEY).create();
 	public static final Registry<Research> RESEARCH = new RegistryBuilder<>(RESEARCH_KEY).create();
 
