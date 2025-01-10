@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 public record ManageMemberPayload(UUID member, boolean remove) implements CustomPacketPayload {
-    public static final Type<ManageMemberPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Researchd.MODID, "manage_member_payload"));
+    public static final Type<ManageMemberPayload> TYPE = new Type<>(Researchd.rl("manage_member_payload"));
     public static final StreamCodec<RegistryFriendlyByteBuf, ManageMemberPayload> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,
             ManageMemberPayload::member,
