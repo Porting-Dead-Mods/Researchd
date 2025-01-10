@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.registries.serializers;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchPredicateSerializer;
+import com.portingdeadmods.researchd.content.predicates.CraftingPredicate;
 import com.portingdeadmods.researchd.content.predicates.DimensionPredicate;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -11,5 +12,6 @@ public final class ResearchPredicateSerializers {
 
 	static {
 		SERIALIZERS.register("dimension_predicate", () -> DimensionPredicate.Serializer.INSTANCE);
+		SERIALIZERS.register("crafting_predicate", () -> CraftingPredicate.Serializer.INSTANCE);
 	}
 }

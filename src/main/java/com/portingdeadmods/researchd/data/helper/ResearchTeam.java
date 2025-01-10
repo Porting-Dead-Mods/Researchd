@@ -3,7 +3,6 @@ package com.portingdeadmods.researchd.data.helper;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.UUIDUtil;
-import net.minecraft.server.MinecraftServer;
 
 import java.util.List;
 import java.util.UUID;
