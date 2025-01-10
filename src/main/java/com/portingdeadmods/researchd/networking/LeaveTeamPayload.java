@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 public record LeaveTeamPayload(UUID nextToLead) implements CustomPacketPayload {
-    public static final Type<LeaveTeamPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Researchd.MODID, "manage_member_payload"));
+    public static final Type<LeaveTeamPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Researchd.MODID, "leave_team_payload"));
     public static final StreamCodec<RegistryFriendlyByteBuf, LeaveTeamPayload> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,
             LeaveTeamPayload::nextToLead,
