@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 public record SetNamePayload(String name) implements CustomPacketPayload {
-    public static final Type<SetNamePayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Researchd.MODID, "manage_member_payload"));
+    public static final Type<SetNamePayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Researchd.MODID, "set_name_payload"));
     public static final StreamCodec<RegistryFriendlyByteBuf, SetNamePayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8,
             SetNamePayload::name,
