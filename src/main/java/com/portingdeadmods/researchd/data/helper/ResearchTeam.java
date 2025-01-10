@@ -12,7 +12,8 @@ public class ResearchTeam {
 	private String name;
 	private List<UUID> members;
 	private List<UUID> moderators;
-	private List<UUID> invites;
+	private List<UUID> sentInvites; // Invites sent by this team to other players
+	private List<UUID> receivedInvites; // Invites received by this team from other players
 	private UUID leader;
 	private boolean isFTJ;
 
@@ -20,46 +21,52 @@ public class ResearchTeam {
 			Codec.STRING.fieldOf("name").forGetter(ResearchTeam::getName),
 			Codec.list(UUIDUtil.CODEC).fieldOf("members").forGetter(ResearchTeam::getMembers),
 			Codec.list(UUIDUtil.CODEC).fieldOf("moderators").forGetter(ResearchTeam::getModerators),
-			Codec.list(UUIDUtil.CODEC).fieldOf("invites").forGetter(ResearchTeam::getInvites),
+			Codec.list(UUIDUtil.CODEC).fieldOf("sent_invites").forGetter(ResearchTeam::getSentInvites),
+			Codec.list(UUIDUtil.CODEC).fieldOf("received_invites").forGetter(ResearchTeam::getReceivedInvites),
 			UUIDUtil.CODEC.fieldOf("leader").forGetter(ResearchTeam::getLeader),
 			Codec.BOOL.fieldOf("is_ftj").forGetter(ResearchTeam::isFreeToJoin)
 	).apply(builder, ResearchTeam::new));
 
-	public ResearchTeam(String name, List<UUID> members, List<UUID> moderators, List<UUID> invites, UUID leader, boolean isFTJ) {
+	public ResearchTeam(String name, List<UUID> members, List<UUID> moderators, List<UUID> sentInvites, List<UUID> receivedInvites, UUID leader, boolean isFTJ) {
 		this.name = name;
 		this.members = members;
 		this.moderators = moderators;
-		this.invites = invites;
+		this.sentInvites = sentInvites;
+		this.receivedInvites = receivedInvites;
 		this.leader = leader;
 		this.isFTJ = isFTJ;
 	}
 
 	public ResearchTeam(UUID uuid) {
-		this("New Research Team", List.of(uuid), List.of(), List.of(), uuid, false);
+		this("New Research Team", List.of(uuid), List.of(), List.of(), List.of(), uuid, false);
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public List<UUID> getMembers() {
-		return members;
+		return this.members;
 	}
 
 	public List<UUID> getModerators() {
-		return moderators;
+		return this.moderators;
 	}
 
-	public List<UUID> getInvites() {
-		return invites;
+	public List<UUID> getSentInvites() {
+		return this.sentInvites;
+	}
+
+	public List<UUID> getReceivedInvites() {
+		return this.receivedInvites;
 	}
 
 	public UUID getLeader() {
-		return leader;
+		return this.leader;
 	}
 
 	public boolean isFreeToJoin() {
-		return isFTJ;
+		return this.isFTJ;
 	}
 
 	public void switchFTJ() {
@@ -83,11 +90,11 @@ public class ResearchTeam {
 	}
 
 	public void addInvite(UUID uuid) {
-		invites.add(uuid);
+		sentInvites.add(uuid);
 	}
 
 	public void removeInvite(UUID uuid) {
-		invites.remove(uuid);
+		sentInvites.remove(uuid);
 	}
 
 	public void setLeader(UUID uuid) {
@@ -106,5 +113,13 @@ public class ResearchTeam {
 		} else {
 			return 0;
 		}
+	}
+
+	public boolean isLeader(UUID uuid) {
+		return uuid.equals(leader);
+	}
+
+	public boolean isModerator(UUID uuid) {
+		return moderators.contains(uuid);
 	}
 }

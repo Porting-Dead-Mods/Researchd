@@ -10,6 +10,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -69,7 +70,10 @@ public class ResearchdSavedData extends SavedData {
 		return new ResearchdSavedData();
 	}
 
-	public static ResearchdSavedData get(ServerLevel level) {
+	public static ResearchdSavedData get(Level level) {
+		if (!(level instanceof ServerLevel)) {
+			throw new IllegalArgumentException("ClientSide handling logic not yet implemented...");
+		}
 		return level.getServer().overworld().getDataStorage().computeIfAbsent(factory(), ID);
 	}
 
