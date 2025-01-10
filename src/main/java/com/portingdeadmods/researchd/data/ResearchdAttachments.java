@@ -1,6 +1,7 @@
 package com.portingdeadmods.researchd.data;
 
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.content.predicates.CraftingPredicateData;
 import com.portingdeadmods.researchd.content.predicates.DimensionPredicate;
 import com.portingdeadmods.researchd.content.predicates.DimensionPredicateData;
 import com.portingdeadmods.researchd.impl.capabilities.EntityResearchImpl;
@@ -19,4 +20,6 @@ public final class ResearchdAttachments {
     public static final Supplier<AttachmentType<DimensionPredicateData>> DIMENSION_PREDICATE = ATTACHMENTS.register("dimension_predicate",
             () -> AttachmentType.builder(() -> DimensionPredicateData.EMPTY).serialize(DimensionPredicateData.CODEC).build());
 
+    public static final Supplier<AttachmentType<CraftingPredicateData>> CRAFTING_PREDICATE = ATTACHMENTS.register("crafting_predicate",
+            () -> AttachmentType.builder(() -> CraftingPredicateData.EMPTY).serialize(CraftingPredicateData.CODEC).build());
 }
