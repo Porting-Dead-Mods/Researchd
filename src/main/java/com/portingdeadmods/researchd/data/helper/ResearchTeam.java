@@ -61,4 +61,50 @@ public class ResearchTeam {
 	public boolean isFreeToJoin() {
 		return isFTJ;
 	}
+
+	public void switchFTJ() {
+		isFTJ = !isFTJ;
+	}
+
+	public void addMember(UUID uuid) {
+		members.add(uuid);
+	}
+
+	public void removeMember(UUID uuid) {
+		members.remove(uuid);
+	}
+
+	public void addModerator(UUID uuid) {
+		moderators.add(uuid);
+	}
+
+	public void removeModerator(UUID uuid) {
+		moderators.remove(uuid);
+	}
+
+	public void addInvite(UUID uuid) {
+		invites.add(uuid);
+	}
+
+	public void removeInvite(UUID uuid) {
+		invites.remove(uuid);
+	}
+
+	public void setLeader(UUID uuid) {
+		leader = uuid;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public int getPermissionLevel(UUID uuid) {
+		if (uuid.equals(leader)) {
+			return 2;
+		} else if (moderators.contains(uuid)) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
 }
