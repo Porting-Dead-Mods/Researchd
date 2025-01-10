@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.impl.capabilities;
 
 import com.mojang.serialization.Codec;
 import com.portingdeadmods.researchd.api.capabilties.EntityResearch;
-import com.portingdeadmods.researchd.api.capabilties.Research;
+import com.portingdeadmods.researchd.api.research.Research;
 
 import java.util.Collections;
 import java.util.List;
