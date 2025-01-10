@@ -12,6 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,11 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import java.util.Optional;
 
 @Mixin(CraftingMenu.class)
-public abstract class CraftingMenuMixin extends RecipeBookMenu<CraftingInput, CraftingRecipe> {
-    public CraftingMenuMixin(MenuType<?> menuType, int containerId) {
-        super(menuType, containerId);
-    }
-
+public abstract class CraftingMenuMixin {
     @Inject(
             method = "slotChangedCraftingGrid",
             at = @At(
@@ -35,11 +32,28 @@ public abstract class CraftingMenuMixin extends RecipeBookMenu<CraftingInput, Cr
                     shift = At.Shift.AFTER
             )
     )
-    private static void checkCraftingPredicate(AbstractContainerMenu menu, Level level, Player player, CraftingContainer craftSlots, ResultContainer resultSlots, RecipeHolder<CraftingRecipe> recipe, CallbackInfo ci, @Local ItemStack itemstack, @Local RecipeHolder<CraftingRecipe> recipeholder) {
+    private static void checkCraftingPredicate(AbstractContainerMenu menu, Level level, Player player, CraftingContainer craftSlots, ResultContainer resultSlots, RecipeHolder<CraftingRecipe> recipe, CallbackInfo ci, @Local ItemStack itemstack) {
         CraftingPredicateData data = player.getData(ResearchdAttachments.CRAFTING_PREDICATE);
-        if (data.blockedRecipes().contains(recipeholder)) {
-            itemstack = ItemStack.EMPTY;
+        RecipeHolder<CraftingRecipe> recipeholder = null;
+
+        // Gotta remake recipeholder since for some reason @Local population fails :(((((((((
+        CraftingInput craftinginput = craftSlots.asCraftInput();
+        Optional<RecipeHolder<CraftingRecipe>> optional = level.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftinginput, level, recipe);
+
+        if (optional.isPresent()) {
+            recipeholder = optional.get();
+            if (data != null && recipeholder != null) {
+                if (data.blockedRecipes().contains(recipeholder)) {
+                    itemstack = ItemStack.EMPTY;
+                    System.out.println("Recipe for " + recipeholder + " blocked!");
+                }
+            }
         }
-        System.out.println("CraftingPredicateData: " + data.blockedRecipes());
+
+        if (data == null) System.out.println("CraftingPredicateData: null");
+        else System.out.println("CraftingPredicateData: " + data.blockedRecipes());
+
+        if (recipeholder == null) System.out.println("RecipeHolder: null");
+        else System.out.println("RecipeHolder: " + recipeholder);
     }
 }
