@@ -3,6 +3,7 @@
   "package": "com.portingdeadmods.researchd.mixins",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "CraftingMenuMixin",
     "PlayerMixin"
   ],
   "injectors": {
