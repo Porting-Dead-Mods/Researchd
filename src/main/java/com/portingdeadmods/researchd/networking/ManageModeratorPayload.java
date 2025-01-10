@@ -3,7 +3,6 @@ package com.portingdeadmods.researchd.networking;
 import com.portingdeadmods.researchd.ResearchTeamUtil;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
-import com.portingdeadmods.researchd.data.helper.ResearchTeam;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -17,14 +16,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public record ManageMemberPayload(UUID member, boolean remove) implements CustomPacketPayload {
-    public static final Type<ManageMemberPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Researchd.MODID, "manage_member_payload"));
-    public static final StreamCodec<RegistryFriendlyByteBuf, ManageMemberPayload> STREAM_CODEC = StreamCodec.composite(
+public record ManageModeratorPayload(UUID moderator, boolean remove) implements CustomPacketPayload {
+    public static final Type<ManageModeratorPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Researchd.MODID, "manage_member_payload"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, ManageModeratorPayload> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,
-            ManageMemberPayload::member,
+            ManageModeratorPayload::moderator,
             ByteBufCodecs.BOOL,
-            ManageMemberPayload::remove,
-            ManageMemberPayload::new
+            ManageModeratorPayload::remove,
+            ManageModeratorPayload::new
     );
 
     @Override
@@ -32,18 +31,18 @@ public record ManageMemberPayload(UUID member, boolean remove) implements Custom
         return TYPE;
     }
 
-    public static void manageMemberAction(ManageMemberPayload payload, IPayloadContext context) {
+    public static void manageModeratorAction(ManageModeratorPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             Player sender = context.player();
             UUID senderId = sender.getUUID();
             ResearchdSavedData savedData = ResearchdSavedData.get(sender.level());
 
-            if (ResearchTeamUtil.getPermissionLevel(sender) >= 1) {
-                if (payload.remove() == true) {
-                    ResearchTeamUtil.getResearchTeam(sender).removeMember(payload.member());
+            if (ResearchTeamUtil.getPermissionLevel(sender) == 2) {
+                if (payload.remove()) {
+                    ResearchTeamUtil.getResearchTeam(sender).removeModerator(payload.moderator());
                     savedData.setDirty();
                 } else {
-                    ResearchTeamUtil.getResearchTeam(sender).addInvite(payload.member());
+                    ResearchTeamUtil.getResearchTeam(sender).addModerator(payload.moderator());
                     savedData.setDirty();
                 }
             }
