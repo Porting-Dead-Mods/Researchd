@@ -2,9 +2,10 @@ package com.portingdeadmods.researchd;
 
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.data.helper.ResearchTeam;
-import com.portingdeadmods.researchd.data.helper.ResearchTeamMap;
+import com.portingdeadmods.researchd.networking.TransferOwnershipPayload;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.UUID;
 
@@ -91,5 +92,147 @@ public class ResearchTeamUtil {
 		}
 
 		savedData.setDirty();
+	}
+
+	public static void handleEnterTeam(Player requester, UUID memberOfTeam) {
+		Level level = requester.level();
+		UUID requesterId = requester.getUUID();
+
+		ResearchdSavedData savedData = ResearchdSavedData.get(level);
+		ResearchTeam team = savedData.getTeamForUUID(memberOfTeam);
+
+		if (team != null && team.getReceivedInvites().contains(requesterId)) {
+			team.addMember(requesterId);
+			team.removeSentInvite(requesterId);
+			savedData.setDirty();
+		}
+	}
+
+	public static void handleLeaveTeam(Player requester, UUID nextToLead) {
+		Level level = requester.level();
+		UUID requesterId = requester.getUUID();
+
+		ResearchdSavedData savedData = ResearchdSavedData.get(level);
+
+		// Handle the case of transfering ownership
+		if (ResearchTeamUtil.isResearchTeamLeader(requester)) {
+			PacketDistributor.sendToServer(new TransferOwnershipPayload(nextToLead));
+			savedData.setDirty();
+			return;
+		}
+
+		if (ResearchTeamUtil.getPermissionLevel(requester) == 1) {
+			ResearchTeamUtil.removeModFromTeam(requester);
+		}
+	}
+
+	public static void handleManageMember(Player requester, UUID member, boolean remove) {
+		UUID requesterId = requester.getUUID();
+		ResearchdSavedData savedData = ResearchdSavedData.get(requester.level());
+
+		if (ResearchTeamUtil.getPermissionLevel(requester) >= 1) {
+			if (remove == true) {
+				ResearchTeamUtil.getResearchTeam(requester).removeMember(member);
+				savedData.setDirty();
+			} else {
+				ResearchTeamUtil.getResearchTeam(requester).addSentInvite(member);
+				savedData.setDirty();
+			}
+		}
+	}
+
+	public static void handleManageModerator(Player requester, UUID moderator, boolean remove) {
+		UUID requesterId = requester.getUUID();
+		ResearchdSavedData savedData = ResearchdSavedData.get(requester.level());
+
+		if (ResearchTeamUtil.getPermissionLevel(requester) == 2) {
+			if (remove) {
+				ResearchTeamUtil.getResearchTeam(requester).removeModerator(moderator);
+				savedData.setDirty();
+			} else {
+				ResearchTeamUtil.getResearchTeam(requester).addModerator(moderator);
+				savedData.setDirty();
+			}
+		}
+	}
+
+	public static void handleSetName(Player requester, String name) {
+		UUID requesterId = requester.getUUID();
+		ResearchdSavedData savedData = ResearchdSavedData.get(requester.level());
+
+		if (ResearchTeamUtil.getPermissionLevel(requester) == 2) {
+			ResearchTeamUtil.getResearchTeam(requester).setName(name);
+			savedData.setDirty();
+		}
+	}
+
+	public static void handleTransferOwnership(Player requester, UUID nextToLead) {
+		Level level = requester.level();
+		UUID requesterId = requester.getUUID();
+		ResearchdSavedData savedData = ResearchdSavedData.get(requester.level());
+
+		if (ResearchTeamUtil.getPermissionLevel(requester) == 2) {
+			if (ResearchTeamUtil.arePlayersSameTeam(level, requesterId, nextToLead)) {
+				// Set the new leader
+				ResearchTeamUtil.getResearchTeam(requester).setLeader(nextToLead);
+
+				// If he's moderator remove him from the mod list
+				if (ResearchTeamUtil.getPermissionLevel(level, nextToLead) == 1) {
+					ResearchTeamUtil.getResearchTeam(requester).removeModerator(nextToLead);
+				}
+
+				// Set the old leader as moderator
+				ResearchTeamUtil.getResearchTeam(requester).addModerator(requesterId);
+				savedData.setDirty();
+			}
+		}
+	}
+
+	public static void handleCreateTeam(Player requester, String name) {
+		UUID requesterId = requester.getUUID();
+		ResearchdSavedData savedData = ResearchdSavedData.get(requester.level());
+
+		if (!ResearchTeamUtil.isInATeam(requester)) {
+			ResearchTeam team = new ResearchTeam(requesterId, name);
+			team.addModerator(requesterId);
+			team.addMember(requesterId);
+			savedData.getTeams().put(requesterId, team);
+			savedData.setDirty();
+		}
+	}
+
+	public static void handleListMembers(Player requester) {
+		ResearchTeam team = ResearchTeamUtil.getResearchTeam(requester);
+		if (team != null) {
+			requester.sendSystemMessage(team.parseMembers(requester.level()));
+		}
+	}
+
+	public static void handleSendInviteToPlayer(Player requester, UUID invited, boolean remove) {
+		ResearchTeam team = ResearchTeamUtil.getResearchTeam(requester);
+		if (team != null) {
+			if (remove) {
+                team.removeSentInvite(invited);
+            } else {
+                team.addSentInvite(invited);
+            }
+            ResearchdSavedData.get(requester.level()).setDirty();
+		}
+	}
+
+	public static void handleRequestToJoin(Player requester, UUID teamMember, boolean remove) {
+		Level level = requester.level();
+		Player teamMemberPlayer = level.getPlayerByUUID(teamMember);
+		if (teamMemberPlayer != null) {
+			ResearchTeam team = ResearchTeamUtil.getResearchTeam(teamMemberPlayer);
+			if (team != null) {
+				if (remove) {
+					team.removeReceivedInvite(requester.getUUID());
+				} else {
+					team.addSentInvite(requester.getUUID());
+				}
+				ResearchdSavedData.get(requester.level()).setDirty();
+			}
+		}
 	}
 }
