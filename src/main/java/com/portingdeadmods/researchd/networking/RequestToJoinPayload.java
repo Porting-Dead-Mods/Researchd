@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 public record RequestToJoinPayload(UUID toJoin, boolean remove) implements CustomPacketPayload {
-    public static final Type<RequestToJoinPayload> TYPE = new Type<>(Researchd.rl("set_name_payload"));
+    public static final Type<RequestToJoinPayload> TYPE = new Type<>(Researchd.rl("request_to_join_payload"));
     public static final StreamCodec<RegistryFriendlyByteBuf, RequestToJoinPayload> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,
             RequestToJoinPayload::toJoin,
@@ -28,7 +28,7 @@ public record RequestToJoinPayload(UUID toJoin, boolean remove) implements Custo
         return TYPE;
     }
 
-    public static void setNameAction(RequestToJoinPayload payload, IPayloadContext context) {
+    public static void requestToJoinAction(RequestToJoinPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             ResearchTeamUtil.handleRequestToJoin(context.player(), payload.toJoin, payload.remove);
         }).exceptionally(e -> {

@@ -6,7 +6,6 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ResearchdCommands {
 	private static List<String> aliases = List.of("researchd", "rd", "research", "res");
@@ -17,10 +16,7 @@ public class ResearchdCommands {
 		).toList();
 
 		List<LiteralCommandNode<CommandSourceStack>> subCommands = List.of(
-				OpenCommand().build(),
-				ReloadCommand().build(),
-				DebugCommand().build(),
-				PrintNBTCommand().build()
+				TeamCommands.build()
 		);
 
 		rootCommands.forEach( root -> {
