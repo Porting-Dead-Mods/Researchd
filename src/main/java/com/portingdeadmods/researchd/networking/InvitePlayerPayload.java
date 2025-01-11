@@ -2,29 +2,25 @@ package com.portingdeadmods.researchd.networking;
 
 import com.portingdeadmods.researchd.ResearchTeamUtil;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.data.ResearchdSavedData;
-import com.portingdeadmods.researchd.data.helper.ResearchTeam;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public record ManageMemberPayload(UUID member, boolean remove) implements CustomPacketPayload {
-    public static final Type<ManageMemberPayload> TYPE = new Type<>(Researchd.rl("manage_member_payload"));
-    public static final StreamCodec<RegistryFriendlyByteBuf, ManageMemberPayload> STREAM_CODEC = StreamCodec.composite(
+public record InvitePlayerPayload(UUID invited, boolean remove) implements CustomPacketPayload {
+    public static final Type<InvitePlayerPayload> TYPE = new Type<>(Researchd.rl("set_name_payload"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, InvitePlayerPayload> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,
-            ManageMemberPayload::member,
+            InvitePlayerPayload::invited,
             ByteBufCodecs.BOOL,
-            ManageMemberPayload::remove,
-            ManageMemberPayload::new
+            InvitePlayerPayload::remove,
+            InvitePlayerPayload::new
     );
 
     @Override
@@ -32,9 +28,9 @@ public record ManageMemberPayload(UUID member, boolean remove) implements Custom
         return TYPE;
     }
 
-    public static void manageMemberAction(ManageMemberPayload payload, IPayloadContext context) {
+    public static void setNameAction(InvitePlayerPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
-            ResearchTeamUtil.handleManageMember(context.player(), payload.member(), payload.remove());
+            ResearchTeamUtil.handleSendInviteToPlayer(context.player(), payload.invited, payload.remove);
         }).exceptionally(e -> {
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
             return null;

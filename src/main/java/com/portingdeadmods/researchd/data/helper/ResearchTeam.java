@@ -2,7 +2,11 @@ package com.portingdeadmods.researchd.data.helper;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.level.Level;
 
 import java.util.List;
 import java.util.UUID;
@@ -38,6 +42,10 @@ public class ResearchTeam {
 
 	public ResearchTeam(UUID uuid) {
 		this("New Research Team", List.of(uuid), List.of(), List.of(), List.of(), uuid, false);
+	}
+
+	public ResearchTeam(UUID uuid, String name) {
+		this(name, List.of(uuid), List.of(), List.of(), List.of(), uuid, false);
 	}
 
 	public String getName() {
@@ -88,12 +96,20 @@ public class ResearchTeam {
 		moderators.remove(uuid);
 	}
 
-	public void addInvite(UUID uuid) {
+	public void addSentInvite(UUID uuid) {
 		sentInvites.add(uuid);
 	}
 
-	public void removeInvite(UUID uuid) {
+	public void removeSentInvite(UUID uuid) {
 		sentInvites.remove(uuid);
+	}
+
+	public void addReceivedInvite(UUID uuid) {
+		receivedInvites.add(uuid);
+	}
+
+	public void removeReceivedInvite(UUID uuid) {
+		receivedInvites.remove(uuid);
 	}
 
 	public void setLeader(UUID uuid) {
@@ -120,5 +136,21 @@ public class ResearchTeam {
 
 	public boolean isModerator(UUID uuid) {
 		return moderators.contains(uuid);
+	}
+
+	public Component parseMembers(Level level) {
+		MutableComponent[] components = new MutableComponent[this.members.size() + 1];
+		components[0] = Component.literal("Team " + this.name + " has " + this.members.size() + " members: ").withStyle(ChatFormatting.GREEN);
+
+		for (UUID uuid : this.members) {
+			components[this.members.indexOf(uuid) + 1] = Component.literal(level.getPlayerByUUID(uuid).getName() + " ").withStyle(ChatFormatting.GOLD);
+		}
+
+		MutableComponent ret = Component.empty();
+		for (MutableComponent component : components) {
+			ret.append(component);
+		}
+
+		return ret;
 	}
 }

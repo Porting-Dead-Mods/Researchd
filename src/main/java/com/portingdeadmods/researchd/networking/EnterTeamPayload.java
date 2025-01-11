@@ -32,19 +32,7 @@ public record EnterTeamPayload(UUID memberOfTeam) implements CustomPacketPayload
 
     public static void enterTeamAction(EnterTeamPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
-            Player sender = context.player();
-            Level level = sender.level();
-            UUID senderId = sender.getUUID();
-
-            ResearchdSavedData savedData = ResearchdSavedData.get(level);
-            ResearchTeam team = savedData.getTeamForUUID(payload.memberOfTeam());
-
-            if (team != null && team.getReceivedInvites().contains(senderId)) {
-                team.addMember(senderId);
-                team.removeInvite(senderId);
-                savedData.setDirty();
-            }
-
+            ResearchTeamUtil.handleEnterTeam(context.player(), payload.memberOfTeam());
         }).exceptionally(e -> {
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
             return null;

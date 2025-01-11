@@ -33,19 +33,7 @@ public record ManageModeratorPayload(UUID moderator, boolean remove) implements 
 
     public static void manageModeratorAction(ManageModeratorPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
-            Player sender = context.player();
-            UUID senderId = sender.getUUID();
-            ResearchdSavedData savedData = ResearchdSavedData.get(sender.level());
-
-            if (ResearchTeamUtil.getPermissionLevel(sender) == 2) {
-                if (payload.remove()) {
-                    ResearchTeamUtil.getResearchTeam(sender).removeModerator(payload.moderator());
-                    savedData.setDirty();
-                } else {
-                    ResearchTeamUtil.getResearchTeam(sender).addModerator(payload.moderator());
-                    savedData.setDirty();
-                }
-            }
+            ResearchTeamUtil.handleManageModerator(context.player(), payload.moderator(), payload.remove());
         }).exceptionally(e -> {
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
             return null;

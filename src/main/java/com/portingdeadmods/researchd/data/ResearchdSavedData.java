@@ -15,6 +15,7 @@ import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -47,6 +48,10 @@ public class ResearchdSavedData extends SavedData {
 
 	public @Nullable ResearchTeam getTeamForUUID(UUID uuid) {
 		return this.researchTeamMap.getResearchTeams().get(uuid);
+	}
+
+	public Map<UUID, ResearchTeam> getTeams() {
+		return this.researchTeamMap.getResearchTeams();
 	}
 
 	@Override

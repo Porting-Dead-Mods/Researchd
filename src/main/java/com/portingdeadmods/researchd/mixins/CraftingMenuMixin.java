@@ -54,6 +54,9 @@ public abstract class CraftingMenuMixin {
         //else System.out.println("CraftingPredicateData: " + data.blockedRecipes());
 
         if (recipeholder == null) System.out.println("RecipeHolder: null");
-        //else System.out.println("RecipeHolder: " + recipeholder);
+        else {
+            //System.out.println("RecipeHolder id: " + recipeholder.id());
+            //System.out.println("RecipeHolder value: " + recipeholder.value());
+        }
     }
 }

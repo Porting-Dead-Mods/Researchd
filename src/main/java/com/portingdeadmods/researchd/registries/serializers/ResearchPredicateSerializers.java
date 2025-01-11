@@ -13,5 +13,6 @@ public final class ResearchPredicateSerializers {
 	static {
 		SERIALIZERS.register("dimension_predicate", () -> DimensionPredicate.Serializer.INSTANCE);
 		SERIALIZERS.register("crafting_predicate", () -> CraftingPredicate.Serializer.INSTANCE);
+		SERIALIZERS.register("smelting_predicate", () -> CraftingPredicate.Serializer.INSTANCE);
 	}
 }
