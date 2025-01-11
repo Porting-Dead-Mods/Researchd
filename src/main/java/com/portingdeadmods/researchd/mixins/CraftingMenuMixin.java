@@ -45,15 +45,15 @@ public abstract class CraftingMenuMixin {
             if (data != null && recipeholder != null) {
                 if (data.blockedRecipes().contains(recipeholder)) {
                     itemstack = ItemStack.EMPTY;
-                    System.out.println("Recipe for " + recipeholder + " blocked!");
+                    //System.out.println("Recipe for " + recipeholder + " blocked!");
                 }
             }
         }
 
         if (data == null) System.out.println("CraftingPredicateData: null");
-        else System.out.println("CraftingPredicateData: " + data.blockedRecipes());
+        //else System.out.println("CraftingPredicateData: " + data.blockedRecipes());
 
         if (recipeholder == null) System.out.println("RecipeHolder: null");
-        else System.out.println("RecipeHolder: " + recipeholder);
+        //else System.out.println("RecipeHolder: " + recipeholder);
     }
 }

@@ -21,5 +21,4 @@ public class DatapackRegistryProvider extends DatapackBuiltinEntriesProvider {
     public static final RegistrySetBuilder BUILDER = new RegistrySetBuilder()
             // -- RESEARCH PACK --
             .add(ResearchdRegistries.RESEARCH_PACK_KEY, ResearchPacks::bootstrap);
-
 }

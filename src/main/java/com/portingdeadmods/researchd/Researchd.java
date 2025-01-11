@@ -9,7 +9,11 @@ import com.portingdeadmods.researchd.registries.serializers.ResearchPackSerializ
 import com.portingdeadmods.researchd.registries.serializers.ResearchPredicateSerializers;
 import com.portingdeadmods.researchd.registries.serializers.ResearchSerializers;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
@@ -22,6 +26,8 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+
+import java.util.UUID;
 
 @Mod(Researchd.MODID)
 public class Researchd {
