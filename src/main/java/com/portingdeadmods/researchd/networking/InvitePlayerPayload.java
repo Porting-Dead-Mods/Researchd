@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 public record InvitePlayerPayload(UUID invited, boolean remove) implements CustomPacketPayload {
-    public static final Type<InvitePlayerPayload> TYPE = new Type<>(Researchd.rl("set_name_payload"));
+    public static final Type<InvitePlayerPayload> TYPE = new Type<>(Researchd.rl("invite_player_payload"));
     public static final StreamCodec<RegistryFriendlyByteBuf, InvitePlayerPayload> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,
             InvitePlayerPayload::invited,
@@ -28,7 +28,7 @@ public record InvitePlayerPayload(UUID invited, boolean remove) implements Custo
         return TYPE;
     }
 
-    public static void setNameAction(InvitePlayerPayload payload, IPayloadContext context) {
+    public static void invitePlayerAction(InvitePlayerPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             ResearchTeamUtil.handleSendInviteToPlayer(context.player(), payload.invited, payload.remove);
         }).exceptionally(e -> {

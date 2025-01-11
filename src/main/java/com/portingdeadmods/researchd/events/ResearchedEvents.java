@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.events;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
+import com.portingdeadmods.researchd.commands.ResearchdCommands;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerLevel;
@@ -14,6 +15,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 
 import java.util.UUID;
@@ -41,5 +43,15 @@ public class ResearchedEvents {
                 serverLevel.getBlockEntity(event.getPos()).setData(ResearchdAttachments.PLACED_BY_UUID, uuid);
             }
         }
+
+        @SubscribeEvent
+        private static void onCommandRegister(RegisterCommandsEvent event) {
+            ResearchdCommands.register(event.getDispatcher());
+        }
+    }
+
+    @EventBusSubscriber(modid = Researchd.MODID, value = Dist.DEDICATED_SERVER)
+    public static final class Server {
+
     }
 }

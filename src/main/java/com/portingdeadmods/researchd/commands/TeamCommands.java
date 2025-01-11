@@ -8,10 +8,8 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.server.level.ServerPlayer;
 
-public class TeamCommand implements CommandBase {
-
-	@Override
-	public LiteralCommandNode<CommandSourceStack> build() {
+public class TeamCommands {
+	public static LiteralCommandNode<CommandSourceStack> build() {
 		return Commands.literal("team")
 				.then(Commands.literal("create")
 						.then(Commands.argument("name", StringArgumentType.string())
@@ -45,7 +43,7 @@ public class TeamCommand implements CommandBase {
 									ServerPlayer player = source.getPlayer();
 
 									if (player != null) {
-										// TO CONTINUE ResearchTeamUtil.handleSendInviteToPlayer(player, context.getSource().getLevel().getPlayerByUUID().getString(context, "player"), false);
+										ResearchTeamUtil.handleSendInviteToPlayer(player, context.getSource().getLevel().getServer().getPlayerList().getPlayerByName(StringArgumentType.getString(context, "player")).getUUID(), false);
 									}
 
 									return 1;

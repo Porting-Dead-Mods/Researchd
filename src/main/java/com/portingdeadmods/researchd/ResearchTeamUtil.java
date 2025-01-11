@@ -3,6 +3,8 @@ package com.portingdeadmods.researchd;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.data.helper.ResearchTeam;
 import com.portingdeadmods.researchd.networking.TransferOwnershipPayload;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -114,6 +116,10 @@ public class ResearchTeamUtil {
 
 		ResearchdSavedData savedData = ResearchdSavedData.get(level);
 
+		if (!ResearchTeamUtil.isInATeam(requester)) {
+			requester.sendSystemMessage(Component.literal("You're not in a team!").withStyle(ChatFormatting.RED));
+			return;
+		}
 		// Handle the case of transfering ownership
 		if (ResearchTeamUtil.isResearchTeamLeader(requester)) {
 			PacketDistributor.sendToServer(new TransferOwnershipPayload(nextToLead));
@@ -138,6 +144,8 @@ public class ResearchTeamUtil {
 				ResearchTeamUtil.getResearchTeam(requester).addSentInvite(member);
 				savedData.setDirty();
 			}
+		} else {
+			requester.sendSystemMessage(Component.literal("You don't have the permission to do that!").withStyle(ChatFormatting.RED));
 		}
 	}
 
@@ -153,6 +161,8 @@ public class ResearchTeamUtil {
 				ResearchTeamUtil.getResearchTeam(requester).addModerator(moderator);
 				savedData.setDirty();
 			}
+		} else {
+			requester.sendSystemMessage(Component.literal("You don't have the permission to do that!").withStyle(ChatFormatting.RED));
 		}
 	}
 
@@ -161,7 +171,9 @@ public class ResearchTeamUtil {
 		ResearchdSavedData savedData = ResearchdSavedData.get(requester.level());
 
 		if (ResearchTeamUtil.getPermissionLevel(requester) == 2) {
+			String oldname = ResearchTeamUtil.getResearchTeam(requester).getName();
 			ResearchTeamUtil.getResearchTeam(requester).setName(name);
+			requester.sendSystemMessage(Component.literal("Team name changed from " + oldname + " to " + name).withStyle(ChatFormatting.GREEN));
 			savedData.setDirty();
 		}
 	}
@@ -184,6 +196,9 @@ public class ResearchTeamUtil {
 				// Set the old leader as moderator
 				ResearchTeamUtil.getResearchTeam(requester).addModerator(requesterId);
 				savedData.setDirty();
+				requester.sendSystemMessage(Component.literal("Ownership transfered to " + nextToLead).withStyle(ChatFormatting.GREEN));
+			} else {
+				requester.sendSystemMessage(Component.literal("You can't transfer ownership to someone who's not in your team!").withStyle(ChatFormatting.RED));
 			}
 		}
 	}
@@ -194,8 +209,7 @@ public class ResearchTeamUtil {
 
 		if (!ResearchTeamUtil.isInATeam(requester)) {
 			ResearchTeam team = new ResearchTeam(requesterId, name);
-			team.addModerator(requesterId);
-			team.addMember(requesterId);
+			requester.sendSystemMessage(Component.literal("Team " + name + " created!").withStyle(ChatFormatting.GREEN));
 			savedData.getTeams().put(requesterId, team);
 			savedData.setDirty();
 		}
@@ -217,6 +231,8 @@ public class ResearchTeamUtil {
                 team.addSentInvite(invited);
             }
             ResearchdSavedData.get(requester.level()).setDirty();
+		} else {
+			requester.sendSystemMessage(Component.literal("You got to be in a team to do that! Create one with /researchd team create <name>"));
 		}
 	}
 
@@ -232,7 +248,11 @@ public class ResearchTeamUtil {
 					team.addSentInvite(requester.getUUID());
 				}
 				ResearchdSavedData.get(requester.level()).setDirty();
+			} else {
+				requester.sendSystemMessage(Component.literal("The player you're trying to join is not in a team!").withStyle(ChatFormatting.RED));
 			}
+		} else {
+			requester.sendSystemMessage(Component.literal("The player you're trying to join does not exist!").withStyle(ChatFormatting.RED));
 		}
 	}
 }

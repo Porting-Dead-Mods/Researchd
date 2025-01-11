@@ -8,6 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.level.Level;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,11 +42,11 @@ public class ResearchTeam {
 	}
 
 	public ResearchTeam(UUID uuid) {
-		this("New Research Team", List.of(uuid), List.of(), List.of(), List.of(), uuid, false);
+		this("New Research Team", new ArrayList<UUID>(List.of(uuid)), new ArrayList<UUID>(), new ArrayList<UUID>(), new ArrayList<UUID>(), uuid, false);
 	}
 
 	public ResearchTeam(UUID uuid, String name) {
-		this(name, List.of(uuid), List.of(), List.of(), List.of(), uuid, false);
+		this(name, new ArrayList<UUID>(List.of(uuid)), new ArrayList<UUID>(), new ArrayList<UUID>(), new ArrayList<UUID>(), uuid, false);
 	}
 
 	public String getName() {
