@@ -6,6 +6,7 @@ import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
 import com.portingdeadmods.researchd.client.screens.list.EntryType;
 import com.portingdeadmods.researchd.client.screens.list.TechList;
 import com.portingdeadmods.researchd.client.screens.list.TechListEntry;
+import com.portingdeadmods.researchd.client.screens.queue.ResearchQueue;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -28,11 +29,16 @@ public class ResearchScreen extends Screen {
     public static final ResourceLocation BACKGROUND_TEXTURE = Researchd.rl("textures/gui/research_screen.png");
 
     private final TechList techList;
+    private final ResearchQueue researchQueue;
 
     public ResearchScreen() {
         super(Component.translatable("screen.researchd.research"));
-        this.techList = new TechList(100, 100, 7, 7);
+        this.techList = new TechList(0, 103, 7, 7);
         this.techList.fillList();
+        this.researchQueue = new ResearchQueue(0, 0);
+        this.researchQueue.fillList();
+        int width = Minecraft.getInstance().getWindow().getGuiScaledWidth();
+        Researchd.LOGGER.debug("Width: {}", width);
     }
 
     @Override
@@ -40,6 +46,7 @@ public class ResearchScreen extends Screen {
         super.init();
 
         this.techList.visitWidgets(this::addRenderableWidget);
+        addRenderableWidget(this.researchQueue);
     }
 
     @Override
@@ -50,10 +57,6 @@ public class ResearchScreen extends Screen {
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
-
-        float scale = 1f;
-
-        guiGraphics.blit(BACKGROUND_TEXTURE, 100, 0, (int) (256 * scale), (int) (242 * scale), 0, 0, 256, 242, 256, 242);
     }
 
 }

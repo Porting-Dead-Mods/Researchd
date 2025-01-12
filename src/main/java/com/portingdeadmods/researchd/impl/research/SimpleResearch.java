@@ -13,7 +13,9 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Optional;
@@ -48,6 +50,45 @@ public record SimpleResearch(Item icon, Map<ResourceKey<ResearchPack>, Integer> 
         @Override
         public StreamCodec<RegistryFriendlyByteBuf, SimpleResearch> streamCodec() {
             return null;
+        }
+    }
+
+    public static class Builder implements Research.Builder<SimpleResearch> {
+        private Item icon = Items.AIR;
+        private Map<ResourceKey<ResearchPack>, Integer> researchPacks = Map.of();
+        private ResourceKey<Research> parent = null;
+        private boolean requiresParent = false;
+
+        public static Builder of() {
+            return new Builder();
+        }
+
+        private Builder() {
+        }
+
+        public Builder icon(Item icon) {
+            this.icon = icon;
+            return this;
+        }
+
+        public Builder researchPacks(Map<ResourceKey<ResearchPack>, Integer> researchPacks) {
+            this.researchPacks = researchPacks;
+            return this;
+        }
+
+        public Builder parent(@Nullable ResourceKey<Research> parent) {
+            this.parent = parent;
+            return this;
+        }
+
+        public Builder requiresParent(boolean requiresParent) {
+            this.requiresParent = requiresParent;
+            return this;
+        }
+
+        @Override
+        public SimpleResearch build() {
+            return new SimpleResearch(this.icon, this.researchPacks, Optional.ofNullable(this.parent), this.requiresParent);
         }
     }
 }

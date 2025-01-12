@@ -36,4 +36,8 @@ public interface Research {
     boolean requiresParent();
 
     ResearchSerializer<?> getSerializer();
+
+    interface Builder<T extends Research> {
+        T build();
+    }
 }
