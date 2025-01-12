@@ -52,7 +52,7 @@ public class TechList extends AbstractWidget {
 
         int padding = 15;
         int scrollerX = getX() + cols * TechListEntry.WIDTH + padding;
-        this.button = new ImageButton(scrollerX, y + 6, 14, 14, new WidgetSprites(
+        this.button = new ImageButton(scrollerX, y + 5, 14, 14, new WidgetSprites(
                 Researchd.rl("search_button"),
                 Researchd.rl("search_button_highlighted")
         ), this::onButtonClicked);
@@ -60,7 +60,6 @@ public class TechList extends AbstractWidget {
 
     public void onButtonClicked(Button button) {
         this.hasSearchBar = !this.hasSearchBar;
-        Researchd.LOGGER.debug("Click button");
     }
 
     @Override
@@ -96,8 +95,24 @@ public class TechList extends AbstractWidget {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        Researchd.LOGGER.debug("Clicked");
-        return super.mouseClicked(mouseX, mouseY, button);
+        int paddingX = getX() + 12;
+        int paddingY = 24 + getY();
+        if (mouseX > paddingX && mouseX < paddingX + this.cols * TechListEntry.WIDTH
+                && mouseY > paddingY && mouseY < paddingY + DISPLAY_ROWS * TechListEntry.HEIGHT) {
+            int indexX = ((int) mouseX - paddingX) / TechListEntry.WIDTH;
+            int indexY = ((int) mouseY - paddingY) / TechListEntry.HEIGHT;
+
+            if (this.researches.size() > indexY) {
+                List<TechListEntry> row = this.researches.get(indexY);
+                if (row.size() > indexX) {
+                    TechListEntry entry = row.get(indexX);
+                    entry.getResearch().setResearchStatus(EntryType.RESEARCHED);
+                    return super.mouseClicked(mouseX, mouseY, button);
+                }
+            }
+        }
+
+        return false;
     }
 
     @Override

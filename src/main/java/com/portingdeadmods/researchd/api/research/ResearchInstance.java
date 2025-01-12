@@ -44,6 +44,10 @@ public final class ResearchInstance {
         this.researchStatus = researchStatus;
     }
 
+    public ResearchInstance copy() {
+        return new ResearchInstance(getResearch(), EntryType.values()[getResearchStatus().ordinal()]);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof ResearchInstance that)) return false;
