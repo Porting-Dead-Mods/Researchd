@@ -1,9 +1,0 @@
-{
-  "type": "researchd:simple",
-  "parent": {},
-  "icon": "minecraft:stick",
-  "requires_parent": false,
-  "research_points": {
-    "researchd:overworld": 3
-  }
-}
