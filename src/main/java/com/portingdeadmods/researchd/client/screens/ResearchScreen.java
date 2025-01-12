@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.client.screens;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.client.screens.graph.ResearchGraph;
 import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
 import com.portingdeadmods.researchd.client.screens.list.EntryType;
 import com.portingdeadmods.researchd.client.screens.list.TechList;
@@ -30,6 +31,7 @@ public class ResearchScreen extends Screen {
 
     private final TechList techList;
     private final ResearchQueue researchQueue;
+    private final ResearchGraph researchGraph;
 
     public ResearchScreen() {
         super(Component.translatable("screen.researchd.research"));
@@ -39,14 +41,21 @@ public class ResearchScreen extends Screen {
         this.researchQueue.fillList();
         int width = Minecraft.getInstance().getWindow().getGuiScaledWidth();
         Researchd.LOGGER.debug("Width: {}", width);
+        int x = 174;
+        this.researchGraph = new ResearchGraph(x, 0, 300, 253);
+        ResearchNode node = new ResearchNode(SimpleResearch.debug(Items.IRON_NUGGET), EntryType.RESEARCHED, x + 60, 60);
+        this.researchGraph.setNode(node);
+        node.addNext(new ResearchNode(SimpleResearch.debug(Items.IRON_BARS), EntryType.RESEARCHABLE, x + 70, 100));
     }
 
     @Override
     protected void init() {
         super.init();
 
-        this.techList.visitWidgets(this::addRenderableWidget);
+        addRenderableWidget(this.techList);
         addRenderableWidget(this.researchQueue);
+        addRenderableWidget(this.techList.button);
+        addRenderableWidget(this.researchGraph);
     }
 
     @Override

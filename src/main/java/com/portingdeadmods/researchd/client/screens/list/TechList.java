@@ -35,7 +35,7 @@ public class TechList extends AbstractWidget {
     private final int cols;
     private int curRow;
     private int scrollOffset;
-    private final ImageButton button;
+    public final ImageButton button;
     private boolean hasSearchBar;
 
     // DEBUG
@@ -52,12 +52,7 @@ public class TechList extends AbstractWidget {
         this.button = new ImageButton(scrollerX, y + 6, 14, 14, new WidgetSprites(
                 Researchd.rl("search_button"),
                 Researchd.rl("search_button_highlighted")
-        ), this::onButtonClicked) {
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                onButtonClicked(this);
-            }
-        };
+        ), this::onButtonClicked);
         this.button.active = true;
         this.button.visible = true;
     }
