@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.networking;
 import com.portingdeadmods.researchd.ResearchTeamUtil;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
+import com.portingdeadmods.researchd.data.helper.ResearchTeam;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -31,14 +32,7 @@ public record SetNamePayload(String name) implements CustomPacketPayload {
 
     public static void setNameAction(SetNamePayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
-            Player sender = context.player();
-            UUID senderId = sender.getUUID();
-            ResearchdSavedData savedData = ResearchdSavedData.get(sender.level());
-
-            if (ResearchTeamUtil.getPermissionLevel(sender) == 2) {
-                ResearchTeamUtil.getResearchTeam(sender).setName(payload.name());
-                savedData.setDirty();
-            }
+            ResearchTeamUtil.handleSetName(context.player(), payload.name);
         }).exceptionally(e -> {
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
             return null;
