@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.client.screens.list;
 
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.client.ResearchManager;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -15,6 +16,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.RecipeManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +33,6 @@ public class TechList extends AbstractWidget {
     private static final int DISPLAY_ROWS = 5;
 
     private final List<List<TechListEntry>> researches;
-    private final int rows;
     private final int cols;
     private int curRow;
     private int scrollOffset;
@@ -41,10 +42,12 @@ public class TechList extends AbstractWidget {
     // DEBUG
     private final List<Item> items = List.of(Items.DIAMOND, Items.IRON_AXE, Items.FURNACE, Items.MINECART);
 
-    public TechList(int x, int y, int rows, int cols) {
+    public TechList(ResearchManager manager, int x, int y, int rows, int cols) {
         super(x, y, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, Component.empty());
-        this.researches = new ArrayList<>();
-        this.rows = rows;
+        this.researches = manager.getEntries(cols);
+        int paddingX = 12 + getX();
+        int paddingY = 24 + getY();
+        manager.setEntryCoordinates(this.researches, paddingX, paddingY);
         this.cols = cols;
 
         int padding = 15;
@@ -53,28 +56,11 @@ public class TechList extends AbstractWidget {
                 Researchd.rl("search_button"),
                 Researchd.rl("search_button_highlighted")
         ), this::onButtonClicked);
-        this.button.active = true;
-        this.button.visible = true;
     }
 
     public void onButtonClicked(Button button) {
         this.hasSearchBar = !this.hasSearchBar;
         Researchd.LOGGER.debug("Click button");
-    }
-
-    public void fillList() {
-        int padding = 12;
-        int paddingY = 24;
-        for (int row = 0; row < rows; row++) {
-            List<TechListEntry> entries = new ArrayList<>();
-            for (int col = 0; col < cols; col++) {
-                RandomSource random = Minecraft.getInstance().level.random;
-                int randInt = random.nextInt(0, items.size());
-                int randType = random.nextInt(0, 3);
-                entries.add(new TechListEntry(SimpleResearch.debug(this.items.get(randInt)), EntryType.values()[randType], padding + getX() + col * TechListEntry.WIDTH, paddingY + getY() + row * TechListEntry.HEIGHT));
-            }
-            this.researches.add(entries);
-        }
     }
 
     @Override
@@ -103,7 +89,7 @@ public class TechList extends AbstractWidget {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        this.scrollOffset = Math.min((int) Math.max(this.scrollOffset - scrollY, 0), this.researches.size() + 1);
+        this.scrollOffset = Math.max(Math.min((int) Math.max(this.scrollOffset - scrollY, 0), this.researches.size() - 3), 0);
         this.curRow = this.scrollOffset;
         Researchd.LOGGER.debug("offset: {}, scrollY: {}", scrollOffset, scrollY);
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);

@@ -1,0 +1,11 @@
+{
+  "type": "researchd:simple",
+  "icon": "minecraft:raw_copper",
+  "parents": [
+    "researchd:wooden_pickaxe"
+  ],
+  "requires_parent": true,
+  "research_points": {
+    "researchd:nether": 5
+  }
+}

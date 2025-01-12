@@ -6,6 +6,9 @@ import com.portingdeadmods.researchd.api.research.ResearchPack;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchPredicateSerializer;
 import com.portingdeadmods.researchd.commands.ResearchdCommands;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
+import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
+import com.portingdeadmods.researchd.registries.ResearchdItems;
+import com.portingdeadmods.researchd.registries.ResearchdTab;
 import com.portingdeadmods.researchd.registries.serializers.ResearchPackSerializers;
 import com.portingdeadmods.researchd.registries.serializers.ResearchPredicateSerializers;
 import com.portingdeadmods.researchd.registries.serializers.ResearchSerializers;
@@ -44,6 +47,9 @@ public class Researchd {
         ResearchPackSerializers.SERIALIZERS.register(modEventBus);
         ResearchSerializers.SERIALIZERS.register(modEventBus);
         ResearchPredicateSerializers.SERIALIZERS.register(modEventBus);
+        ResearchdItems.ITEMS.register(modEventBus);
+        ResearchdDataComponents.COMPONENTS.register(modEventBus);
+        ResearchdTab.TABS.register(modEventBus);
 
         modEventBus.addListener(this::registerCapabilities);
         modEventBus.addListener(this::registerRegistries);

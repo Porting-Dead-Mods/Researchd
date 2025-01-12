@@ -1,0 +1,7 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "researchd:item/research_pack_empty",
+    "layer1": "researchd:item/research_pack_fluid"
+  }
+}

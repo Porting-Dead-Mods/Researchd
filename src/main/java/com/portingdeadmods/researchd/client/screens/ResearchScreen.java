@@ -20,20 +20,17 @@ public class ResearchScreen extends Screen {
 
     public ResearchScreen() {
         super(Component.translatable("screen.researchd.research"));
-        this.techList = new TechList(0, 103, 7, 7);
-        this.techList.fillList();
+        Minecraft mc = Minecraft.getInstance();
+        ResearchManager manager = new ResearchManager(mc.level);
+
+        this.techList = new TechList(manager, 0, 103, 7, 7);
+
         this.researchQueue = new ResearchQueue(0, 0);
         this.researchQueue.fillList();
-        Minecraft mc = Minecraft.getInstance();
-        int width = mc.getWindow().getGuiScaledWidth();
-        Researchd.LOGGER.debug("Width: {}", width);
+
         int x = 174;
-        ResearchManager manager = new ResearchManager(mc.level);
         manager.setCoordinates(174, 10);
         this.researchGraph = new ResearchGraph(manager, x, 0, 300, 253);
-        //ResearchNode node = new ResearchNode(SimpleResearch.debug(Items.IRON_NUGGET), EntryType.RESEARCHED, x + 60, 60);
-        //this.researchGraph.setNode(node);
-        //node.addNext(new ResearchNode(SimpleResearch.debug(Items.IRON_BARS), EntryType.RESEARCHABLE, x + 70, 100));
     }
 
     @Override
