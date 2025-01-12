@@ -1,0 +1,9 @@
+{
+  "type": "researchd:simple",
+  "icon": "minecraft:oak_log",
+  "parents": [],
+  "requires_parent": false,
+  "research_points": {
+    "researchd:overworld": 3
+  }
+}

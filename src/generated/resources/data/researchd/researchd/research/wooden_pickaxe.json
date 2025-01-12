@@ -1,0 +1,13 @@
+{
+  "type": "researchd:simple",
+  "icon": "minecraft:wooden_pickaxe",
+  "parents": [
+    "researchd:wood",
+    "researchd:stick"
+  ],
+  "requires_parent": true,
+  "research_points": {
+    "researchd:nether": 3,
+    "researchd:overworld": 6
+  }
+}

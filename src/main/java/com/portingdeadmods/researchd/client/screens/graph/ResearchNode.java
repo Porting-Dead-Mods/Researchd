@@ -12,15 +12,17 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ResearchNode extends TechListEntry {
-    private final List<ResearchNode> next;
+    private final Set<ResearchNode> next;
     private final Holder<Research> holder;
 
     public ResearchNode(Holder<Research> research) {
         super(research.value(), EntryType.LOCKED, 0, 0);
-        this.next = new ArrayList<>();
+        this.next = new HashSet<>();
         this.holder = research;
     }
 
@@ -36,7 +38,7 @@ public class ResearchNode extends TechListEntry {
         this.next.remove(toRemove);
     }
 
-    public List<ResearchNode> getNext() {
+    public Set<ResearchNode> getNext() {
         return next;
     }
 

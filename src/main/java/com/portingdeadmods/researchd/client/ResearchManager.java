@@ -4,10 +4,16 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
+import com.portingdeadmods.researchd.client.screens.list.EntryType;
+import com.portingdeadmods.researchd.client.screens.list.TechList;
+import com.portingdeadmods.researchd.client.screens.list.TechListEntry;
+import com.portingdeadmods.researchd.impl.research.SimpleResearch;
 import com.portingdeadmods.researchd.registries.Researches;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 
 import java.util.*;
@@ -51,24 +57,30 @@ public class ResearchManager {
     }
 
     public void setCoordinates(int paddingX, int paddingY) {
+        Set<ResearchNode> nodes = new HashSet<>(this.nodes);
+
         int i = 0;
         for (ResearchNode node : this.rootNodes) {
             Researchd.LOGGER.debug("root: {}", node.getHolder().getKey().location());
-            setCoordinate(node, paddingX + i * 40, paddingY, 0);
+            setCoordinate(nodes, node, paddingX + i * 40, paddingY, 0);
             i++;
         }
     }
 
-    public void setCoordinate(ResearchNode node, int x, int y, int nesting) {
+    public void setCoordinate(Set<ResearchNode> remaining, ResearchNode node, int x, int y, int nesting) {
         Researchd.LOGGER.debug("node: {}, nesting: {}", node.getHolder().getKey().location(), nesting);
         node.setX(x);
         node.setY(y);
         Researchd.LOGGER.debug("y: {}", y);
-        List<ResearchNode> next = node.getNext();
-        for (int i = 0; i < next.size(); i++) {
-            ResearchNode nextNode = next.get(i);
-            int newNesting = nesting + 1;
-            setCoordinate(nextNode, x + i * 30, y + newNesting * 30, newNesting + 1);
+        Set<ResearchNode> next = node.getNext();
+        int newNesting = nesting + 1;
+        int i = 0;
+        for (ResearchNode nextNode : next) {
+            if (remaining.contains(nextNode)) {
+                remaining.remove(nextNode);
+                setCoordinate(remaining, nextNode, x + i * 30, y + newNesting * 30, newNesting);
+            }
+            i++;
         }
     }
 
@@ -91,5 +103,32 @@ public class ResearchManager {
 
     public Set<ResearchNode> getRootNodes() {
         return rootNodes;
+    }
+
+    public List<List<TechListEntry>> getEntries(int cols) {
+        return chunkList(this.researches.stream()
+                .map(holder -> new TechListEntry(holder.value(), EntryType.RESEARCHABLE, 0, 0))
+                .toList(), cols);
+    }
+
+    public void setEntryCoordinates(List<List<TechListEntry>> entries, int paddingX, int paddingY) {
+        int size = entries.size();
+        for (int row = 0; row < size; row++) {
+            List<TechListEntry> rowList = entries.get(row);
+            for (int col = 0; col < rowList.size(); col++) {
+                TechListEntry entry = rowList.get(col);
+                entry.setX(paddingX + col * TechListEntry.WIDTH);
+                entry.setY(paddingY + row * TechListEntry.HEIGHT);
+            }
+        }
+    }
+
+    public static <T> List<List<T>> chunkList(List<T> list, int chunkSize) {
+        List<List<T>> chunkedList = new ArrayList<>();
+        int size = list.size();
+        for (int i = 0; i < size; i += chunkSize) {
+            chunkedList.add(new ArrayList<>(list.subList(i, Math.min(size, i + chunkSize))));
+        }
+        return chunkedList;
     }
 }

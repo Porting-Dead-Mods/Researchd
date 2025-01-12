@@ -1,0 +1,11 @@
+{
+  "type": "researchd:simple",
+  "icon": "minecraft:stick",
+  "parents": [
+    "researchd:wood"
+  ],
+  "requires_parent": false,
+  "research_points": {
+    "researchd:overworld": 5
+  }
+}

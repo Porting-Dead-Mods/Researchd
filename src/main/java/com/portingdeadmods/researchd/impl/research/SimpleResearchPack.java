@@ -13,6 +13,8 @@ import net.minecraft.util.ExtraCodecs;
 import java.util.Optional;
 
 public record SimpleResearchPack(int color, Optional<ResourceLocation> customTexture) implements ResearchPack {
+    public static final SimpleResearchPack EMPTY = new SimpleResearchPack(-1, Optional.empty());
+
     public SimpleResearchPack(ResourceLocation customTexture) {
         this(-1, Optional.of(customTexture));
     }
