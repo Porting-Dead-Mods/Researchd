@@ -14,6 +14,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ResearchManager {
     private Set<ResearchNode> nodes = new HashSet<>();
@@ -28,6 +29,8 @@ public class ResearchManager {
         playerResearches.forEach(research -> {
             this.nodes.add(new ResearchNode(research));
         });
+
+        this.nodes = this.nodes.stream().map(node -> new ResearchNode(node.getResearch().copy())).collect(Collectors.toSet());
 
         for (ResearchNode node : this.nodes) {
             List<ResourceKey<Research>> parents = ResearchHelper.getResearch(node.getResearch().getResearch(), registryAccess).parents().stream().toList();
@@ -96,7 +99,7 @@ public class ResearchManager {
 
     public List<List<TechListEntry>> getEntries(int cols) {
         return chunkList(this.nodes.stream()
-                .map(node -> new TechListEntry(node.getResearch(), 0, 0))
+                .map(node -> new TechListEntry(node.getResearch().copy(), 0, 0))
                 .toList(), cols);
     }
 
