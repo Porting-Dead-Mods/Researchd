@@ -33,23 +33,7 @@ public record LeaveTeamPayload(UUID nextToLead) implements CustomPacketPayload {
 
     public static void leaveTeamAction(LeaveTeamPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
-            Player sender = context.player();
-            Level level = sender.level();
-            UUID senderId = sender.getUUID();
-
-            ResearchdSavedData savedData = ResearchdSavedData.get(level);
-
-            // Handle the case of transfering ownership
-            if (ResearchTeamUtil.isResearchTeamLeader(sender)) {
-                PacketDistributor.sendToServer(new TransferOwnershipPayload(payload.nextToLead()));
-                savedData.setDirty();
-                return;
-            }
-
-            if (ResearchTeamUtil.getPermissionLevel(sender) == 1) {
-                ResearchTeamUtil.removeModFromTeam(sender);
-            }
-
+            ResearchTeamUtil.handleLeaveTeam(context.player(), payload.nextToLead());
         }).exceptionally(e -> {
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
             return null;

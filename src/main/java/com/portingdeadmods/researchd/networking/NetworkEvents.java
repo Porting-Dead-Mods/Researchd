@@ -43,5 +43,16 @@ public class NetworkEvents {
                 SetNamePayload.STREAM_CODEC,
                 SetNamePayload::setNameAction
         );
+
+        registrar.playToServer(
+                InvitePlayerPayload.TYPE,
+                InvitePlayerPayload.STREAM_CODEC,
+                InvitePlayerPayload::invitePlayerAction
+        );
+        registrar.playToServer(
+                RequestToJoinPayload.TYPE,
+                RequestToJoinPayload.STREAM_CODEC,
+                RequestToJoinPayload::requestToJoinAction
+        );
     }
 }
