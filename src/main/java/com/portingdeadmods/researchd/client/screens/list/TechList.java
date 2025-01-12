@@ -67,7 +67,6 @@ public class TechList extends AbstractWidget {
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
         GuiUtils.drawImg(guiGraphics, hasSearchBar ? BACKGROUND_TEXTURE_SEARCH_BAR : BACKGROUND_TEXTURE, getX(), getY(), BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
 
-        // TODO: Change the y position of the individual researches
         for (int row = curRow; row < curRow + DISPLAY_ROWS; row++) {
             for (int col = 0; col < this.cols; col++) {
                 if (this.researches.size() > row) {
@@ -93,6 +92,12 @@ public class TechList extends AbstractWidget {
         this.curRow = this.scrollOffset;
         Researchd.LOGGER.debug("offset: {}, scrollY: {}", scrollOffset, scrollY);
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        Researchd.LOGGER.debug("Clicked");
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override

@@ -39,7 +39,7 @@ public final class Researches {
             ))
             .parents(WOOD, STICK)
             .requiresParent(true));
-    private static final ResourceKey<Research> STONE = register("stone", builder -> builder
+    public static final ResourceKey<Research> STONE = register("stone", builder -> builder
             .icon(Items.STONE)
             .researchPacks(Map.of(
                     ResearchPacks.OVERWORLD, 3,

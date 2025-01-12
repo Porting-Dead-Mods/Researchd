@@ -3,9 +3,11 @@ package com.portingdeadmods.researchd.client.screens.queue;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.list.EntryType;
 import com.portingdeadmods.researchd.client.screens.list.TechListEntry;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
+import com.portingdeadmods.researchd.registries.Researches;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -34,7 +36,7 @@ public class ResearchQueue extends AbstractWidget {
 
     public void fillList() {
         for (int col = 0; col < 7; col++) {
-            this.queue.add(new TechListEntry(SimpleResearch.debug(Items.OAK_LOG), EntryType.RESEARCHABLE, 12 + col * TechListEntry.WIDTH, 17));
+            this.queue.add(new TechListEntry(new ResearchInstance(Researches.STONE, EntryType.RESEARCHABLE), 12 + col * TechListEntry.WIDTH, 17));
         }
     }
 
@@ -48,7 +50,7 @@ public class ResearchQueue extends AbstractWidget {
 
         PoseStack poseStack = guiGraphics.pose();
 
-        TechListEntry entry = new TechListEntry(SimpleResearch.debug(Items.BELL), EntryType.RESEARCHABLE, 6 + getX(), getY() + 27);
+        TechListEntry entry = new TechListEntry(new ResearchInstance(Researches.WOOD, EntryType.RESEARCHABLE), 6 + getX(), getY() + 27);
 
         poseStack.pushPose();
         {

@@ -21,7 +21,7 @@ public class ResearchScreen extends Screen {
     public ResearchScreen() {
         super(Component.translatable("screen.researchd.research"));
         Minecraft mc = Minecraft.getInstance();
-        ResearchManager manager = new ResearchManager(mc.level);
+        ResearchManager manager = new ResearchManager(mc.player);
 
         this.techList = new TechList(manager, 0, 103, 7, 7);
 
