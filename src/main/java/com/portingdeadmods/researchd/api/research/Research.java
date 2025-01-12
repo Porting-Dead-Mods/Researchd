@@ -7,6 +7,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -28,7 +29,7 @@ public interface Research {
     /**
      * @return An {@link Optional} {@link ResourceKey} which represents the parent of this research.
      */
-    Optional<ResourceKey<Research>> parent();
+    List<ResourceKey<Research>> parents();
 
     /**
      * @return whether the parent needs to researched to research this research

@@ -19,17 +19,16 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 // TODO: Change icon to Ingredient
-public record SimpleResearch(Item icon, Map<ResourceKey<ResearchPack>, Integer> researchPoints, Optional<ResourceKey<Research>> parent, boolean requiresParent) implements Research {
+public record SimpleResearch(Item icon, Map<ResourceKey<ResearchPack>, Integer> researchPoints,
+                             List<ResourceKey<Research>> parents, boolean requiresParent) implements Research {
     public static SimpleResearch debug(ItemLike icon) {
-        return new SimpleResearch(icon.asItem(), Map.of(), Optional.empty(), false);
+        return new SimpleResearch(icon.asItem(), Map.of(), Collections.emptyList(), false);
     }
 
-    private static SimpleResearch fromStringMap(Item icon, Map<String, Integer> researchPoints, Optional<ResourceKey<Research>> parent, boolean requiresParent) {
+    private static SimpleResearch fromStringMap(Item icon, Map<String, Integer> researchPoints, List<ResourceKey<Research>> parent, boolean requiresParent) {
         Map<ResourceKey<ResearchPack>, Integer> map = new HashMap<>();
         for (Map.Entry<String, Integer> researchPoint : researchPoints.entrySet()) {
             ResourceKey<ResearchPack> researchPack = ResourceKey.create(ResearchdRegistries.RESEARCH_PACK_KEY, ResourceLocation.parse(researchPoint.getKey()));
@@ -51,12 +50,23 @@ public record SimpleResearch(Item icon, Map<ResourceKey<ResearchPack>, Integer> 
         return Serializer.INSTANCE;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof SimpleResearch that)) return false;
+        return requiresParent == that.requiresParent && Objects.equals(icon, that.icon) && Objects.equals(parents, that.parents) && Objects.equals(researchPoints, that.researchPoints);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(icon, researchPoints, parents, requiresParent);
+    }
+
     public static class Serializer implements ResearchSerializer<SimpleResearch> {
         public static final Serializer INSTANCE = new Serializer();
         public static final MapCodec<SimpleResearch> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
                 CodecUtils.registryCodec(BuiltInRegistries.ITEM).fieldOf("icon").forGetter(SimpleResearch::icon),
                 Codec.unboundedMap(Codec.STRING, Codec.INT).fieldOf("research_points").forGetter(SimpleResearch::getStringMap),
-                ExtraCodecs.optionalEmptyMap(Research.RESOURCE_KEY_CODEC).fieldOf("parent").forGetter(SimpleResearch::parent),
+                Research.RESOURCE_KEY_CODEC.listOf().fieldOf("parents").forGetter(SimpleResearch::parents),
                 Codec.BOOL.fieldOf("requires_parent").forGetter(SimpleResearch::requiresParent)
         ).apply(instance, SimpleResearch::fromStringMap));
 
@@ -77,7 +87,7 @@ public record SimpleResearch(Item icon, Map<ResourceKey<ResearchPack>, Integer> 
     public static class Builder implements Research.Builder<SimpleResearch> {
         private Item icon = Items.AIR;
         private Map<ResourceKey<ResearchPack>, Integer> researchPacks = Map.of();
-        private ResourceKey<Research> parent = null;
+        private List<ResourceKey<Research>> parents = Collections.emptyList();
         private boolean requiresParent = false;
 
         public static Builder of() {
@@ -97,8 +107,9 @@ public record SimpleResearch(Item icon, Map<ResourceKey<ResearchPack>, Integer> 
             return this;
         }
 
-        public Builder parent(@Nullable ResourceKey<Research> parent) {
-            this.parent = parent;
+        @SafeVarargs
+        public final Builder parents(ResourceKey<Research>... parents) {
+            this.parents = List.of(parents);
             return this;
         }
 
@@ -109,7 +120,7 @@ public record SimpleResearch(Item icon, Map<ResourceKey<ResearchPack>, Integer> 
 
         @Override
         public SimpleResearch build() {
-            return new SimpleResearch(this.icon, this.researchPacks, Optional.ofNullable(this.parent), this.requiresParent);
+            return new SimpleResearch(this.icon, this.researchPacks, this.parents, this.requiresParent);
         }
     }
 }
