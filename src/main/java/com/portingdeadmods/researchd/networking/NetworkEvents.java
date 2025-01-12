@@ -54,5 +54,10 @@ public class NetworkEvents {
                 RequestToJoinPayload.STREAM_CODEC,
                 RequestToJoinPayload::requestToJoinAction
         );
+        registrar.playToClient(
+                SyncEntityResearchPayload.TYPE,
+                SyncEntityResearchPayload.STREAM_CODEC,
+                SyncEntityResearchPayload::handle
+        );
     }
 }

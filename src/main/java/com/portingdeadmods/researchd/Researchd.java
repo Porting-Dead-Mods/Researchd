@@ -6,6 +6,7 @@ import com.portingdeadmods.researchd.api.research.ResearchPack;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchPredicateSerializer;
 import com.portingdeadmods.researchd.commands.ResearchdCommands;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
+import com.portingdeadmods.researchd.impl.capabilities.EntityResearchWrapper;
 import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
 import com.portingdeadmods.researchd.registries.ResearchdItems;
 import com.portingdeadmods.researchd.registries.ResearchdTab;
@@ -59,7 +60,7 @@ public class Researchd {
     }
 
     private void registerCapabilities(RegisterCapabilitiesEvent event) {
-        event.registerEntity(ResearchdCapabilities.ENTITY, EntityType.PLAYER, (player, ctx) -> player.getData(ResearchdAttachments.ENTITY_RESEARCH));
+        event.registerEntity(ResearchdCapabilities.ENTITY, EntityType.PLAYER, (player, ctx) -> new EntityResearchWrapper(player));
     }
 
     private void registerRegistries(NewRegistryEvent event) {

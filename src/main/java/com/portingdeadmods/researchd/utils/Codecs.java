@@ -2,6 +2,9 @@ package com.portingdeadmods.researchd.utils;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -12,4 +15,13 @@ public class Codecs {
 			ResourceLocation.CODEC.fieldOf("id").forGetter(RecipeHolder::id),
 			Recipe.CODEC.fieldOf("recipe").forGetter(RecipeHolder::value)
 	).apply(instance, RecipeHolder::new));
+
+	// TODO: Move to PDL
+	public static <T extends Enum<T>> Codec<T> enumCodec(Class<T> clazz) {
+		return Codec.INT.xmap(i -> clazz.getEnumConstants()[i], Enum::ordinal);
+	}
+
+	public static <T extends Enum<T>> StreamCodec<ByteBuf, T> enumStreamCodec(Class<T> clazz) {
+		return ByteBufCodecs.INT.map(i -> clazz.getEnumConstants()[i], Enum::ordinal);
+	}
 }
