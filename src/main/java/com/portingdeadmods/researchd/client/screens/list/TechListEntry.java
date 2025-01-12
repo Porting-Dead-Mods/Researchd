@@ -11,6 +11,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public class TechListEntry extends AbstractWidget {
     public static final int WIDTH = 20;
     public static final int HEIGHT = 24;
@@ -56,5 +58,16 @@ public class TechListEntry extends AbstractWidget {
 
     @Override
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof TechListEntry entry)) return false;
+        return Objects.equals(research, entry.research) && type == entry.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(research, type);
     }
 }

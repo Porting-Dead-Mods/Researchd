@@ -7,17 +7,25 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ResearchNode extends TechListEntry {
     private final List<ResearchNode> next;
+    private final Holder<Research> holder;
 
-    public ResearchNode(Research research, EntryType type, int x, int y) {
-        super(research, type, x, y);
+    public ResearchNode(Holder<Research> research) {
+        super(research.value(), EntryType.LOCKED, 0, 0);
         this.next = new ArrayList<>();
+        this.holder = research;
+    }
+
+    public Holder<Research> getHolder() {
+        return holder;
     }
 
     public void addNext(ResearchNode next) {
@@ -30,5 +38,13 @@ public class ResearchNode extends TechListEntry {
 
     public List<ResearchNode> getNext() {
         return next;
+    }
+
+    @Override
+    public String toString() {
+        return "ResearchNode{" +
+                "next=" + next +
+                ", holder=" + holder +
+                '}';
     }
 }

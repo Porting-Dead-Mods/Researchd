@@ -63,8 +63,8 @@ public class Researchd {
     }
 
     private void registerDatapackRegistries(DataPackRegistryEvent.NewRegistry event) {
-        event.dataPackRegistry(ResearchdRegistries.RESEARCH_KEY, Research.CODEC);
-        event.dataPackRegistry(ResearchdRegistries.RESEARCH_PACK_KEY, ResearchPack.CODEC);
+        event.dataPackRegistry(ResearchdRegistries.RESEARCH_KEY, Research.CODEC, Research.CODEC);
+        event.dataPackRegistry(ResearchdRegistries.RESEARCH_PACK_KEY, ResearchPack.CODEC, ResearchPack.CODEC);
     }
 
     public static ResourceLocation rl(String path) {
