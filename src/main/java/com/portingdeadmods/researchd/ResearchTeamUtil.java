@@ -3,12 +3,18 @@ package com.portingdeadmods.researchd;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.data.helper.ResearchTeam;
 import com.portingdeadmods.researchd.networking.TransferOwnershipPayload;
+import com.portingdeadmods.researchd.utils.PlayerUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class ResearchTeamUtil {
@@ -103,7 +109,12 @@ public class ResearchTeamUtil {
 		ResearchdSavedData savedData = ResearchdSavedData.get(level);
 		ResearchTeam team = savedData.getTeamForUUID(memberOfTeam);
 
-		if (team != null && team.getReceivedInvites().contains(requesterId)) {
+		if (isInATeam(requester)) {
+			requester.sendSystemMessage(Component.literal("You're already in a team!").withStyle(ChatFormatting.RED));
+			return;
+		}
+		if (team != null && (team.getReceivedInvites().contains(requesterId) || team.isFreeToJoin())) {
+			requester.sendSystemMessage(Component.literal("You successfully joined: " + team.getName() + "!").withStyle(ChatFormatting.GREEN));
 			team.addMember(requesterId);
 			team.removeSentInvite(requesterId);
 			savedData.setDirty();
@@ -122,9 +133,20 @@ public class ResearchTeamUtil {
 		}
 		// Handle the case of transfering ownership
 		if (ResearchTeamUtil.isResearchTeamLeader(requester)) {
-			PacketDistributor.sendToServer(new TransferOwnershipPayload(nextToLead));
-			savedData.setDirty();
-			return;
+			if (ResearchTeamUtil.getResearchTeam(requester).getMembers().size() <= 1) {
+				savedData.getTeams().remove(requesterId);
+				savedData.setDirty();
+				requester.sendSystemMessage(Component.literal("You successfully abandoned your team!").withStyle(ChatFormatting.GREEN));
+				return;
+			} else {
+				if (nextToLead == UUID.fromString("00000000-0000-0000-0000-000000000000")) {
+					requester.sendSystemMessage(Component.literal("You need to specify the next leader!").withStyle(ChatFormatting.RED));
+					return;
+				}
+				PacketDistributor.sendToServer(new TransferOwnershipPayload(nextToLead));
+				savedData.setDirty();
+				return;
+			}
 		}
 
 		if (ResearchTeamUtil.getPermissionLevel(requester) == 1) {
@@ -136,9 +158,15 @@ public class ResearchTeamUtil {
 		UUID requesterId = requester.getUUID();
 		ResearchdSavedData savedData = ResearchdSavedData.get(requester.level());
 
+		if (requester.getUUID() == member) {
+			requester.sendSystemMessage(getIllegalMessage());
+			return;
+		}
+
 		if (ResearchTeamUtil.getPermissionLevel(requester) >= 1) {
-			if (remove == true) {
+			if (remove) {
 				ResearchTeamUtil.getResearchTeam(requester).removeMember(member);
+				requester.sendSystemMessage(Component.literal("Member " + PlayerUtils.getPlayerNameFromUUID(requester.level(), member) + " removed!").withStyle(ChatFormatting.GREEN));
 				savedData.setDirty();
 			} else {
 				ResearchTeamUtil.getResearchTeam(requester).addSentInvite(member);
@@ -153,13 +181,24 @@ public class ResearchTeamUtil {
 		UUID requesterId = requester.getUUID();
 		ResearchdSavedData savedData = ResearchdSavedData.get(requester.level());
 
+		if (requester.getUUID() == moderator) {
+			requester.sendSystemMessage(getIllegalMessage());
+			return;
+		}
+
 		if (ResearchTeamUtil.getPermissionLevel(requester) == 2) {
-			if (remove) {
-				ResearchTeamUtil.getResearchTeam(requester).removeModerator(moderator);
-				savedData.setDirty();
+			if (arePlayersSameTeam(requester, moderator)) {
+				if (remove) {
+					ResearchTeamUtil.getResearchTeam(requester).removeModerator(moderator);
+					requester.sendSystemMessage(Component.literal("Moderator " + PlayerUtils.getPlayerNameFromUUID(requester.level(), moderator) + " removed!").withStyle(ChatFormatting.GREEN));
+					savedData.setDirty();
+				} else {
+					ResearchTeamUtil.getResearchTeam(requester).addModerator(moderator);
+					requester.sendSystemMessage(Component.literal("Moderator " + PlayerUtils.getPlayerNameFromUUID(requester.level(), moderator) + " added!").withStyle(ChatFormatting.GREEN));
+					savedData.setDirty();
+				}
 			} else {
-				ResearchTeamUtil.getResearchTeam(requester).addModerator(moderator);
-				savedData.setDirty();
+				requester.sendSystemMessage(Component.literal("Player is not in the same team with you!").withStyle(ChatFormatting.RED));
 			}
 		} else {
 			requester.sendSystemMessage(Component.literal("You don't have the permission to do that!").withStyle(ChatFormatting.RED));
@@ -175,6 +214,8 @@ public class ResearchTeamUtil {
 			ResearchTeamUtil.getResearchTeam(requester).setName(name);
 			requester.sendSystemMessage(Component.literal("Team name changed from " + oldname + " to " + name).withStyle(ChatFormatting.GREEN));
 			savedData.setDirty();
+		} else {
+			requester.sendSystemMessage(Component.literal("You don't have the permission to do that!").withStyle(ChatFormatting.RED));
 		}
 	}
 
@@ -212,6 +253,8 @@ public class ResearchTeamUtil {
 			requester.sendSystemMessage(Component.literal("Team " + name + " created!").withStyle(ChatFormatting.GREEN));
 			savedData.getTeams().put(requesterId, team);
 			savedData.setDirty();
+		} else {
+			requester.sendSystemMessage(Component.literal("You're already in a team!").withStyle(ChatFormatting.RED));
 		}
 	}
 
@@ -227,8 +270,10 @@ public class ResearchTeamUtil {
 		if (team != null) {
 			if (remove) {
                 team.removeSentInvite(invited);
+				requester.sendSystemMessage(Component.literal("Invite to " + PlayerUtils.getPlayerNameFromUUID(requester.level(), invited) + " removed").withStyle(ChatFormatting.GREEN));
             } else {
                 team.addSentInvite(invited);
+				requester.sendSystemMessage(Component.literal("Invite sent to " + PlayerUtils.getPlayerNameFromUUID(requester.level(), invited)).withStyle(ChatFormatting.GREEN));
             }
             ResearchdSavedData.get(requester.level()).setDirty();
 		} else {
@@ -254,5 +299,102 @@ public class ResearchTeamUtil {
 		} else {
 			requester.sendSystemMessage(Component.literal("The player you're trying to join does not exist!").withStyle(ChatFormatting.RED));
 		}
+	}
+
+	public static ArrayList<String> getTeamMemberNames(Level level, Player player) {
+		return new ArrayList<String>(ResearchTeamUtil.getResearchTeam(player).getMembers().stream().map(
+				member -> level.getPlayerByUUID(member).getName().getString()
+		).toList());
+	}
+
+	public static ArrayList<ResearchTeam> getTeams(Level level) {
+		return new ArrayList<ResearchTeam>(ResearchdSavedData.get(level).getTeams().values());
+	}
+
+	public static ArrayList<String> getTeamNames(Level level) {
+		return new ArrayList<String>(ResearchdSavedData.get(level).getTeams().values().stream().map(
+				team -> team.getName()
+		).toList());
+	}
+
+	public static MutableComponent getFormattedDump(Level level) {
+		ArrayList<MutableComponent> dump = new ArrayList<MutableComponent>();
+		dump.add(Component.literal("---- RESEARCH'D DUMP - TEAMS ----").withStyle(ChatFormatting.AQUA));
+		for (Map.Entry<UUID, ResearchTeam> entry : ResearchdSavedData.get(level).getTeams().entrySet()) {
+			dump.add(
+				Component.literal(PlayerUtils.getPlayerNameFromUUID(level, entry.getKey())).withStyle(ChatFormatting.WHITE)
+				.append(Component.literal(" -> ").withStyle(ChatFormatting.AQUA))
+				.append(Component.literal(entry.getValue().getName()).withStyle(ChatFormatting.WHITE))
+			);
+		}
+		for (ResearchTeam team : ResearchdSavedData.get(level).getTeams().values()) {
+			dump.add(team.parseMembers(level));
+		}
+
+		MutableComponent ret = Component.empty();
+		for (MutableComponent component : dump) {
+			ret.append(component);
+			ret.append("\n");
+		}
+
+		ret.append(Component.literal("--------- END OF DUMP ----------").withStyle(ChatFormatting.AQUA));
+		return ret;
+	}
+
+	public static MutableComponent paramDescription(String param, String description) {
+		MutableComponent paramComp = Component.literal("<" + param + ">").withStyle(ChatFormatting.WHITE, ChatFormatting.ITALIC);
+		return paramComp.append(Component.literal(" - " + description).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+	}
+
+	public static MutableComponent description(String description) {
+		return Component.literal(" - " + description).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
+	}
+
+	public static MutableComponent helpMessage(String categ, String command, Component... description) {
+		MutableComponent ret = Component.literal("/researchd " + categ + " ").withStyle(ChatFormatting.AQUA);
+		ret.append(Component.literal(command).withStyle(ChatFormatting.WHITE));
+
+		for (Component desc : description) {
+			ret.append("\n");
+			ret.append(desc);
+		}
+
+		return ret;
+	}
+
+	public static void handleHelpMessage(Player player, String page) {
+		if (page.equals("team")) {
+			player.sendSystemMessage(Component.literal("> Researchd Teams").withStyle(ChatFormatting.WHITE, ChatFormatting.BOLD));
+			player.sendSystemMessage(helpMessage("team", "create <name>", description("Create a new team with the specified name.")));
+			player.sendSystemMessage(helpMessage("team", "list", description("List all teams.")));
+			player.sendSystemMessage(helpMessage("team", "members", description("List all members of your team.")));
+			player.sendSystemMessage(helpMessage("team", "invite <player>", description("Invite a player to your team.")));
+			player.sendSystemMessage(helpMessage("team", "join <player>", description("Join a team that you have been invited to.")));
+			player.sendSystemMessage(helpMessage("team", "leave <next_to_lead>", paramDescription("next_to_lead", "Put 'none' if there's no-one to lead or you're not the leader."), description("Leave your current team.")));
+			player.sendSystemMessage(helpMessage("team", "promote <player>", description("Promote a player to moderator. You got to be the leader to do this.")));
+			player.sendSystemMessage(helpMessage("team", "demote <player>", description("Demote a player from moderator. You got to be the leader to do this.")));
+			player.sendSystemMessage(helpMessage("team", "kick <player>", description("Kick a player from your team. You got to be a moderator or the leader to do this.")));
+			player.sendSystemMessage(helpMessage("team", "transfer-ownership <player>", description("Transfer ownership of the team to another player.")));
+			player.sendSystemMessage(helpMessage("team", "set-name <name>", description("Set a new name for your team.")));
+		}
+	}
+
+	public static MutableComponent illegalMessage(String message) {
+		return Component.literal(message).withStyle(ChatFormatting.RED);
+	}
+	public static MutableComponent getIllegalMessage() {
+		List<MutableComponent> msgs = new ArrayList<>();
+
+		msgs.add(illegalMessage("No."));
+		msgs.add(illegalMessage("Nope."));
+		msgs.add(illegalMessage("Not happening."));
+		msgs.add(illegalMessage("Nuh uh."));
+		msgs.add(illegalMessage("No chance."));
+		msgs.add(illegalMessage("Stop."));
+		msgs.add(illegalMessage("You gonna keep doin that?"));
+		msgs.add(illegalMessage("You're just spamming the console at this point."));
+		msgs.add(illegalMessage("You're not getting anywhere with this."));
+
+		return msgs.get((int) Math.floor(Math.random() * msgs.size()));
 	}
 }
