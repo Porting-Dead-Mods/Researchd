@@ -1,12 +1,14 @@
 package com.portingdeadmods.researchd.client.screens.list;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 public class TechListEntry extends AbstractWidget {
@@ -47,7 +49,7 @@ public class TechListEntry extends AbstractWidget {
 
             if (isHovered()) {
                 int color = -2130706433;
-                guiGraphics.fillGradient(RenderType.guiOverlay(), getX() + 1, getY() + 1, getX() + 20, getY() + 20, color, color, 0);
+                guiGraphics.fillGradient(RenderType.guiOverlay(), getX(), getY(), getX() + 20, getY() + 20, color, color, 0);
             }
         }
     }
