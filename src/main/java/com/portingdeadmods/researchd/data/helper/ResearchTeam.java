@@ -33,20 +33,20 @@ public class ResearchTeam {
 
 	public ResearchTeam(String name, List<UUID> members, List<UUID> moderators, List<UUID> sentInvites, List<UUID> receivedInvites, UUID leader, boolean isFTJ) {
 		this.name = name;
-		this.members = members;
-		this.moderators = moderators;
-		this.sentInvites = sentInvites;
-		this.receivedInvites = receivedInvites;
+		this.members = new ArrayList<>(members);
+		this.moderators = new ArrayList<>(moderators);
+		this.sentInvites = new ArrayList<>(sentInvites);
+		this.receivedInvites = new ArrayList<>(receivedInvites);
 		this.leader = leader;
 		this.isFTJ = isFTJ;
 	}
 
 	public ResearchTeam(UUID uuid) {
-		this("New Research Team", new ArrayList<UUID>(List.of(uuid)), new ArrayList<UUID>(), new ArrayList<UUID>(), new ArrayList<UUID>(), uuid, false);
+		this("New Research Team", List.of(uuid), List.of(), List.of(), List.of(), uuid, false);
 	}
 
 	public ResearchTeam(UUID uuid, String name) {
-		this(name, new ArrayList<UUID>(List.of(uuid)), new ArrayList<UUID>(), new ArrayList<UUID>(), new ArrayList<UUID>(), uuid, false);
+		this(name, List.of(uuid), List.of(), List.of(), List.of(), uuid, false);
 	}
 
 	public String getName() {
@@ -82,35 +82,43 @@ public class ResearchTeam {
 	}
 
 	public void addMember(UUID uuid) {
-		members.add(uuid);
+		if (!members.contains(uuid))
+			members.add(uuid);
 	}
 
 	public void removeMember(UUID uuid) {
-		members.remove(uuid);
+		if (members.contains(uuid))
+			members.remove(uuid);
 	}
 
 	public void addModerator(UUID uuid) {
-		moderators.add(uuid);
+		if (!moderators.contains(uuid))
+			moderators.add(uuid);
 	}
 
 	public void removeModerator(UUID uuid) {
-		moderators.remove(uuid);
+		if (moderators.contains(uuid))
+			moderators.remove(uuid);
 	}
 
 	public void addSentInvite(UUID uuid) {
-		sentInvites.add(uuid);
+		if (!sentInvites.contains(uuid))
+			sentInvites.add(uuid);
 	}
 
 	public void removeSentInvite(UUID uuid) {
-		sentInvites.remove(uuid);
+		if (sentInvites.contains(uuid))
+			sentInvites.remove(uuid);
 	}
 
 	public void addReceivedInvite(UUID uuid) {
-		receivedInvites.add(uuid);
+		if (!receivedInvites.contains(uuid))
+			receivedInvites.add(uuid);
 	}
 
 	public void removeReceivedInvite(UUID uuid) {
-		receivedInvites.remove(uuid);
+		if (receivedInvites.contains(uuid))
+			receivedInvites.remove(uuid);
 	}
 
 	public void setLeader(UUID uuid) {
@@ -139,12 +147,15 @@ public class ResearchTeam {
 		return moderators.contains(uuid);
 	}
 
-	public Component parseMembers(Level level) {
+	public MutableComponent parseMembers(Level level) {
 		MutableComponent[] components = new MutableComponent[this.members.size() + 1];
-		components[0] = Component.literal("Team " + this.name + " has " + this.members.size() + " members: ").withStyle(ChatFormatting.GREEN);
+		components[0] = members.size() == 1 ?
+				Component.literal("Team " + this.name + " has " + this.members.size() + " member: ").withStyle(ChatFormatting.WHITE)
+				:
+				Component.literal("Team " + this.name + " has " + this.members.size() + " members: ").withStyle(ChatFormatting.WHITE);
 
 		for (UUID uuid : this.members) {
-			components[this.members.indexOf(uuid) + 1] = Component.literal(level.getPlayerByUUID(uuid).getName() + " ").withStyle(ChatFormatting.GOLD);
+			components[this.members.indexOf(uuid) + 1] = Component.literal(level.getPlayerByUUID(uuid).getName().getString() + " ").withStyle(ChatFormatting.AQUA);
 		}
 
 		MutableComponent ret = Component.empty();
