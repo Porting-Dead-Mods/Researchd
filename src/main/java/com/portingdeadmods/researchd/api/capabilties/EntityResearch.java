@@ -1,11 +1,16 @@
 package com.portingdeadmods.researchd.api.capabilties;
 
-import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.ResearchInstance;
 
 import java.util.List;
+import java.util.Set;
 
 public interface EntityResearch {
-    List<Research> researchQueue();
+    Set<ResearchInstance> researchQueue();
 
-    List<Research> research();
+    Set<ResearchInstance> researches();
+
+    void addResearch(ResearchInstance researchInstance);
+
+    void removeResearch(ResearchInstance researchInstance);
 }
