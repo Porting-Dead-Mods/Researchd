@@ -1,6 +1,7 @@
 package com.portingdeadmods.researchd.client.screens.graph;
 
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.list.EntryType;
 import com.portingdeadmods.researchd.client.screens.list.TechListEntry;
 import net.minecraft.client.Minecraft;
@@ -18,16 +19,10 @@ import java.util.Set;
 
 public class ResearchNode extends TechListEntry {
     private final Set<ResearchNode> next;
-    private final Holder<Research> holder;
 
-    public ResearchNode(Holder<Research> research) {
-        super(research.value(), EntryType.LOCKED, 0, 0);
+    public ResearchNode(ResearchInstance instance) {
+        super(instance, 0, 0);
         this.next = new HashSet<>();
-        this.holder = research;
-    }
-
-    public Holder<Research> getHolder() {
-        return holder;
     }
 
     public void addNext(ResearchNode next) {
@@ -46,7 +41,6 @@ public class ResearchNode extends TechListEntry {
     public String toString() {
         return "ResearchNode{" +
                 "next=" + next +
-                ", holder=" + holder +
                 '}';
     }
 }

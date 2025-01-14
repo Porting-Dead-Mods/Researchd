@@ -52,7 +52,7 @@ public class TechList extends AbstractWidget {
 
         int padding = 15;
         int scrollerX = getX() + cols * TechListEntry.WIDTH + padding;
-        this.button = new ImageButton(scrollerX, y + 6, 14, 14, new WidgetSprites(
+        this.button = new ImageButton(scrollerX, y + 5, 14, 14, new WidgetSprites(
                 Researchd.rl("search_button"),
                 Researchd.rl("search_button_highlighted")
         ), this::onButtonClicked);
@@ -60,14 +60,12 @@ public class TechList extends AbstractWidget {
 
     public void onButtonClicked(Button button) {
         this.hasSearchBar = !this.hasSearchBar;
-        Researchd.LOGGER.debug("Click button");
     }
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
         GuiUtils.drawImg(guiGraphics, hasSearchBar ? BACKGROUND_TEXTURE_SEARCH_BAR : BACKGROUND_TEXTURE, getX(), getY(), BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
 
-        // TODO: Change the y position of the individual researches
         for (int row = curRow; row < curRow + DISPLAY_ROWS; row++) {
             for (int col = 0; col < this.cols; col++) {
                 if (this.researches.size() > row) {
@@ -93,6 +91,28 @@ public class TechList extends AbstractWidget {
         this.curRow = this.scrollOffset;
         Researchd.LOGGER.debug("offset: {}, scrollY: {}", scrollOffset, scrollY);
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        int paddingX = getX() + 12;
+        int paddingY = 24 + getY();
+        if (mouseX > paddingX && mouseX < paddingX + this.cols * TechListEntry.WIDTH
+                && mouseY > paddingY && mouseY < paddingY + DISPLAY_ROWS * TechListEntry.HEIGHT) {
+            int indexX = ((int) mouseX - paddingX) / TechListEntry.WIDTH;
+            int indexY = ((int) mouseY - paddingY) / TechListEntry.HEIGHT;
+
+            if (this.researches.size() > indexY) {
+                List<TechListEntry> row = this.researches.get(indexY);
+                if (row.size() > indexX) {
+                    TechListEntry entry = row.get(indexX);
+                    entry.getResearch().setResearchStatus(EntryType.RESEARCHED);
+                    return super.mouseClicked(mouseX, mouseY, button);
+                }
+            }
+        }
+
+        return false;
     }
 
     @Override

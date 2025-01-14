@@ -1,43 +1,41 @@
 package com.portingdeadmods.researchd.client;
 
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.ResearchdRegistries;
+import com.portingdeadmods.researchd.api.capabilties.ResearchdCapabilities;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
 import com.portingdeadmods.researchd.client.screens.list.EntryType;
-import com.portingdeadmods.researchd.client.screens.list.TechList;
 import com.portingdeadmods.researchd.client.screens.list.TechListEntry;
-import com.portingdeadmods.researchd.impl.research.SimpleResearch;
-import com.portingdeadmods.researchd.registries.Researches;
-import net.minecraft.client.Minecraft;
+import com.portingdeadmods.researchd.utils.ResearchHelper;
 import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.Level;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ResearchManager {
-    private Set<Holder<Research>> researches = new HashSet<>();
     private Set<ResearchNode> nodes = new HashSet<>();
     private Set<ResearchNode> rootNodes;
 
-    public ResearchManager(Level level) {
-        RegistryAccess registryAccess = level.registryAccess();
-        HolderLookup.RegistryLookup<Research> registry = registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_KEY);
+    public ResearchManager(Player player) {
+        RegistryAccess registryAccess = player.registryAccess();
+        Set<ResearchInstance> playerResearches = ResearchHelper.getPlayerResearches(player);
 
+        Researchd.LOGGER.debug("player: {}", player.getCapability(ResearchdCapabilities.ENTITY).researches());
         // Collect researches
-        registry.listElements().forEach(research -> {
-            this.researches.add(research);
+        playerResearches.forEach(research -> {
             this.nodes.add(new ResearchNode(research));
         });
 
-        for (ResearchNode node : this.nodes) {
-            List<Holder<Research>> parents = node.getHolder().value().parents().stream()
-                    .map(registryAccess::holderOrThrow).toList();
+        this.nodes = this.nodes.stream().map(node -> new ResearchNode(node.getResearch().copy())).collect(Collectors.toSet());
 
-            for (Holder<Research> parentResearch : parents) {
+        for (ResearchNode node : this.nodes) {
+            List<ResourceKey<Research>> parents = ResearchHelper.getResearch(node.getResearch().getResearch(), registryAccess).parents().stream().toList();
+
+            for (ResourceKey<Research> parentResearch : parents) {
                 ResearchNode parentNode = getNodeByResearch(parentResearch);
                 if (parentNode != null) {
                     parentNode.addNext(node);
@@ -61,14 +59,12 @@ public class ResearchManager {
 
         int i = 0;
         for (ResearchNode node : this.rootNodes) {
-            Researchd.LOGGER.debug("root: {}", node.getHolder().getKey().location());
             setCoordinate(nodes, node, paddingX + i * 40, paddingY, 0);
             i++;
         }
     }
 
     public void setCoordinate(Set<ResearchNode> remaining, ResearchNode node, int x, int y, int nesting) {
-        Researchd.LOGGER.debug("node: {}, nesting: {}", node.getHolder().getKey().location(), nesting);
         node.setX(x);
         node.setY(y);
         Researchd.LOGGER.debug("y: {}", y);
@@ -84,9 +80,9 @@ public class ResearchManager {
         }
     }
 
-    public ResearchNode getNodeByResearch(Holder<Research> research) {
+    public ResearchNode getNodeByResearch(ResourceKey<Research> research) {
         for (ResearchNode node : nodes) {
-            if (node.getHolder().is(research.getKey())) {
+            if (node.getResearch().getResearch().compareTo(research) == 0) {
                 return node;
             }
         }
@@ -97,17 +93,13 @@ public class ResearchManager {
         return nodes;
     }
 
-    public Set<Holder<Research>> getResearches() {
-        return researches;
-    }
-
     public Set<ResearchNode> getRootNodes() {
         return rootNodes;
     }
 
     public List<List<TechListEntry>> getEntries(int cols) {
-        return chunkList(this.researches.stream()
-                .map(holder -> new TechListEntry(holder.value(), EntryType.RESEARCHABLE, 0, 0))
+        return chunkList(this.nodes.stream()
+                .map(node -> new TechListEntry(node.getResearch().copy(), 0, 0))
                 .toList(), cols);
     }
 
