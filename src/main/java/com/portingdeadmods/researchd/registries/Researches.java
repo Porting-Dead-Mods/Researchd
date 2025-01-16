@@ -24,14 +24,14 @@ public final class Researches {
             .researchPacks(Map.of(
                     ResearchPacks.OVERWORLD, 3
             )));
-    private static final ResourceKey<Research> STICK = register("stick", builder -> builder
+    public static final ResourceKey<Research> STICK = register("stick", builder -> builder
             .icon(Items.STICK)
             .researchPacks(Map.of(
                     ResearchPacks.OVERWORLD, 5
             ))
             .parents(Researches.WOOD)
             .requiresParent(false));
-    private static final ResourceKey<Research> WOODEN_PICKAXE = register("wooden_pickaxe", builder -> builder
+    public static final ResourceKey<Research> WOODEN_PICKAXE = register("wooden_pickaxe", builder -> builder
             .icon(Items.WOODEN_PICKAXE)
             .researchPacks(Map.of(
                     ResearchPacks.OVERWORLD, 6,
@@ -47,14 +47,14 @@ public final class Researches {
             ))
             .parents(WOODEN_PICKAXE)
             .requiresParent(true));
-    private static final ResourceKey<Research> COPPER = register("copper", builder -> builder
+    public static final ResourceKey<Research> COPPER = register("copper", builder -> builder
             .icon(Items.RAW_COPPER)
             .researchPacks(Map.of(
                     ResearchPacks.NETHER, 5
             ))
             .parents(WOODEN_PICKAXE)
             .requiresParent(true));
-    private static final ResourceKey<Research> COAL = register("coal", builder -> builder
+    public static final ResourceKey<Research> COAL = register("coal", builder -> builder
             .icon(Items.COAL)
             .researchPacks(Map.of(
                     ResearchPacks.NETHER, 7,

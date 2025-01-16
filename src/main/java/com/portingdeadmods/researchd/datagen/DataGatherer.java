@@ -19,5 +19,6 @@ public class DataGatherer {
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
 
         generator.addProvider(event.includeServer(), new DatapackRegistryProvider(output, lookupProvider));
+        generator.addProvider(event.includeClient(), new LangProvider(output));
     }
 }

@@ -5,6 +5,7 @@ import com.portingdeadmods.researchd.api.capabilties.EntityResearch;
 import com.portingdeadmods.researchd.api.capabilties.ResearchdCapabilities;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.impl.capabilities.EntityResearchImpl;
+import com.portingdeadmods.researchd.utils.researches.ClientResearchCache;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -29,6 +30,7 @@ public record SyncEntityResearchPayload(EntityResearchImpl entityResearch) imple
             for (ResearchInstance r : entityResearch.researches()) {
                 capability.addResearch(r);
             }
+            ClientResearchCache.initialize(context.player());
         }).exceptionally(e -> {
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
             return null;

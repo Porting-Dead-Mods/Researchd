@@ -28,7 +28,7 @@ public record SimpleResearchPack(int color, Optional<ResourceLocation> customTex
         public static final Serializer INSTANCE = new Serializer();
         public static final MapCodec<SimpleResearchPack> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
                 Codec.INT.fieldOf("color").forGetter(SimpleResearchPack::color),
-                ExtraCodecs.optionalEmptyMap(ResourceLocation.CODEC).fieldOf("customTexture").forGetter(SimpleResearchPack::customTexture)
+                ResourceLocation.CODEC.optionalFieldOf("customTexture").forGetter(SimpleResearchPack::customTexture)
         ).apply(instance, SimpleResearchPack::new));
 
         private Serializer() {

@@ -1,7 +1,7 @@
 package com.portingdeadmods.researchd.client.screens.list;
 
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
-import com.portingdeadmods.researchd.utils.ResearchHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;

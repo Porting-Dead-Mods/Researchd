@@ -14,7 +14,7 @@ import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-public class DatapackRegistryProvider extends DatapackBuiltinEntriesProvider {
+public final class DatapackRegistryProvider extends DatapackBuiltinEntriesProvider {
     public DatapackRegistryProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
         super(output, registries, BUILDER, Set.of(Researchd.MODID));
     }
