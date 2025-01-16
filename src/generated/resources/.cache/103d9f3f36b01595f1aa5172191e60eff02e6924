@@ -1,10 +1,10 @@
-// 1.21.1	2025-01-12T11:42:27.249407057	Registries
+// 1.21.1	2025-01-16T20:27:14.07083245	Registries
 1c90d9b45c6886c69a5e05f3b5b8f43ed409246f data/researchd/researchd/research/coal.json
 5675612b592e247a9090712849c235fedca9bcc8 data/researchd/researchd/research/copper.json
 9228586f51e932a81cbe989082a1395abf460d5e data/researchd/researchd/research/stick.json
 5d59ad6b8434e563bab7b543ab6e1b90e1dc5bfc data/researchd/researchd/research/stone.json
 19ef9527cf9f4017e6f1abe9717cbb27ee522af9 data/researchd/researchd/research/wood.json
 aa3e8393680f785192c41c83fc3f389967312dfc data/researchd/researchd/research/wooden_pickaxe.json
-1cdd93f8a6bb79a07d1657ef616b5bd4fbdb247d data/researchd/researchd/research_pack/end.json
-89ac98c63d706e87b221fe288b9947b8018976ca data/researchd/researchd/research_pack/nether.json
-f077b1491836c0ad25f25653e259fb15df317440 data/researchd/researchd/research_pack/overworld.json
+64bb93b112975b1027354f6f82a8c8c7a49287fe data/researchd/researchd/research_pack/end.json
+b845055a6dbe74dda68713879cb1c6065a09fb04 data/researchd/researchd/research_pack/nether.json
+a936cb13a761b5f6e4a92f82727489496414746a data/researchd/researchd/research_pack/overworld.json
