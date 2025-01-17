@@ -5,7 +5,11 @@
     "researchd:wood"
   ],
   "requires_parent": false,
-  "research_points": {
-    "researchd:overworld": 5
-  }
+  "research_methods": [
+    {
+      "count": 5,
+      "method": "researchd:consume_research_pack",
+      "pack": "researchd:overworld"
+    }
+  ]
 }

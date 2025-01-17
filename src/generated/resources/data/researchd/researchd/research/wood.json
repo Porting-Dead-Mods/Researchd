@@ -3,7 +3,11 @@
   "icon": "minecraft:oak_log",
   "parents": [],
   "requires_parent": false,
-  "research_points": {
-    "researchd:overworld": 3
-  }
+  "research_methods": [
+    {
+      "count": 2,
+      "method": "researchd:consume_research_pack",
+      "pack": "researchd:overworld"
+    }
+  ]
 }

@@ -1,8 +1,11 @@
 package com.portingdeadmods.researchd;
 
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
+import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
 import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
 import com.portingdeadmods.researchd.registries.ResearchdItems;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.RegistryAccess;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -25,6 +28,10 @@ public class ResearchdClient {
     }
 
     private void registerColorHandlers(RegisterColorHandlersEvent.Item event) {
-        event.register((stack, layer) -> layer == 1 ? stack.get(ResearchdDataComponents.RESEARCH_PACK).color() : -1, ResearchdItems.RESEARCH_PACK);
+        event.register((stack, layer) -> {
+            ResearchPackComponent researchPackComponent = stack.get(ResearchdDataComponents.RESEARCH_PACK);
+            RegistryAccess access = Minecraft.getInstance().level.registryAccess();
+            return layer == 1 && researchPackComponent.researchPackKey().isPresent() ? access.holderOrThrow(researchPackComponent.researchPackKey().get()).value().color() : -1;
+        }, ResearchdItems.RESEARCH_PACK);
     }
 }

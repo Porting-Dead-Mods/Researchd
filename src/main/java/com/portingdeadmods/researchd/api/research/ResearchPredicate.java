@@ -7,6 +7,9 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
+/**
+ * Used for gating specific content behind research
+ */
 public interface ResearchPredicate {
     Codec<ResearchPredicate> CODEC =
             ResearchdRegistries.RESEARCH_PREDICATE_SERIALIZER.byNameCodec().dispatch(ResearchPredicate::getSerializer, ResearchPredicateSerializer::codec);

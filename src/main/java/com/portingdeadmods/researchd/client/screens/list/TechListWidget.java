@@ -15,9 +15,7 @@ import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 public class TechListWidget extends AbstractWidget {
@@ -35,7 +33,8 @@ public class TechListWidget extends AbstractWidget {
     private final int cols;
     private int curRow;
     private int scrollOffset;
-    public final ImageButton button;
+    public final ImageButton searchButton;
+    public final Button startResearchButton;
     private boolean hasSearchBar;
     private final ResearchScreen screen;
 
@@ -45,10 +44,14 @@ public class TechListWidget extends AbstractWidget {
         int padding = 15;
         int scrollerX = getX() + cols * TechListEntry.WIDTH + padding;
 
-        this.button = new ImageButton(scrollerX, y + 5, 14, 14, new WidgetSprites(
+        this.searchButton = new ImageButton(scrollerX, y + 5, 14, 14, new WidgetSprites(
                 Researchd.rl("search_button"),
                 Researchd.rl("search_button_highlighted")
-        ), this::onButtonClicked);
+        ), this::onSearchButtonClicked);
+
+        this.startResearchButton = Button.builder(Component.literal("Start"), this::onStartResearchButtonClicked)
+                .bounds(11, getY() + 5, 32, 16)
+                .build();
 
         this.screen = screen;
     }
@@ -61,9 +64,11 @@ public class TechListWidget extends AbstractWidget {
         TechListHelper.setEntryCoordinates(this.techList, 7, paddingX, paddingY);
     }
 
-    public void onButtonClicked(Button button) {
+    public void onSearchButtonClicked(Button button) {
         this.hasSearchBar = !this.hasSearchBar;
     }
+
+    public void onStartResearchButtonClicked(Button button) {}
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
@@ -123,7 +128,8 @@ public class TechListWidget extends AbstractWidget {
     @Override
     public void visitWidgets(Consumer<AbstractWidget> consumer) {
         super.visitWidgets(consumer);
-        consumer.accept(this.button);
+        consumer.accept(this.searchButton);
+        consumer.accept(this.startResearchButton);
     }
 
     public TechList getTechList() {

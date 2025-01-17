@@ -3,17 +3,17 @@ package com.portingdeadmods.researchd.registries;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.ResearchPack;
+import com.portingdeadmods.researchd.impl.research.ConsumeItemResearchMethod;
+import com.portingdeadmods.researchd.impl.research.ConsumePackResearchMethod;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
-import com.portingdeadmods.researchd.impl.research.SimpleResearchPack;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.FastColor;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 public final class Researches {
@@ -21,44 +21,44 @@ public final class Researches {
 
     public static final ResourceKey<Research> WOOD = register("wood", builder -> builder
             .icon(Items.OAK_LOG)
-            .researchPacks(Map.of(
-                    ResearchPacks.OVERWORLD, 3
+            .researchMethods(List.of(
+                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 2)
             )));
     public static final ResourceKey<Research> STICK = register("stick", builder -> builder
             .icon(Items.STICK)
-            .researchPacks(Map.of(
-                    ResearchPacks.OVERWORLD, 5
+            .researchMethods(List.of(
+                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 5)
             ))
             .parents(Researches.WOOD)
             .requiresParent(false));
     public static final ResourceKey<Research> WOODEN_PICKAXE = register("wooden_pickaxe", builder -> builder
             .icon(Items.WOODEN_PICKAXE)
-            .researchPacks(Map.of(
-                    ResearchPacks.OVERWORLD, 6,
-                    ResearchPacks.NETHER, 3
+            .researchMethods(List.of(
+                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 6),
+                    new ConsumePackResearchMethod(ResearchPacks.NETHER, 3)
             ))
             .parents(WOOD, STICK)
             .requiresParent(true));
     public static final ResourceKey<Research> STONE = register("stone", builder -> builder
             .icon(Items.STONE)
-            .researchPacks(Map.of(
-                    ResearchPacks.OVERWORLD, 3,
-                    ResearchPacks.END, 4
+            .researchMethods(List.of(
+                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 3),
+                    new ConsumePackResearchMethod(ResearchPacks.END, 4)
             ))
             .parents(WOODEN_PICKAXE)
             .requiresParent(true));
     public static final ResourceKey<Research> COPPER = register("copper", builder -> builder
             .icon(Items.RAW_COPPER)
-            .researchPacks(Map.of(
-                    ResearchPacks.NETHER, 5
+            .researchMethods(List.of(
+                    new ConsumePackResearchMethod(ResearchPacks.NETHER, 5)
             ))
             .parents(WOODEN_PICKAXE)
             .requiresParent(true));
     public static final ResourceKey<Research> COAL = register("coal", builder -> builder
             .icon(Items.COAL)
-            .researchPacks(Map.of(
-                    ResearchPacks.NETHER, 7,
-                    ResearchPacks.END, 4
+            .researchMethods(List.of(
+                    new ConsumePackResearchMethod(ResearchPacks.NETHER, 7),
+                    new ConsumePackResearchMethod(ResearchPacks.END, 4)
             ))
             .parents(WOODEN_PICKAXE)
             .requiresParent(true));

@@ -2,8 +2,8 @@ package com.portingdeadmods.researchd.registries;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
-import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.ResearchPack;
+import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
+import com.portingdeadmods.researchd.impl.research.ResearchPack;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
@@ -15,7 +15,6 @@ import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public class ResearchdTab {
@@ -37,14 +36,11 @@ public class ResearchdTab {
                 .build());
     }
 
-    @SuppressWarnings("OptionalIsPresent")
     private static void addResearchPack(CreativeModeTab.Output output, HolderLookup.Provider lookup, ResourceKey<ResearchPack> elem) {
         ItemStack stack = ResearchdItems.RESEARCH_PACK.toStack();
 
         Optional<Holder.Reference<ResearchPack>> holder = lookup.holder(elem);
-        if (holder.isPresent()) {
-            stack.set(ResearchdDataComponents.RESEARCH_PACK.get(), holder.get().value());
-        }
+        stack.set(ResearchdDataComponents.RESEARCH_PACK.get(), new ResearchPackComponent(holder.map(Holder::getKey)));
         output.accept(stack);
     }
 }

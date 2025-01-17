@@ -4,7 +4,6 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchSerializer;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
-import com.portingdeadmods.researchd.impl.research.SimpleResearchPack;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class ResearchSerializers {

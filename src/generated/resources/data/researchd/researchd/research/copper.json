@@ -5,7 +5,11 @@
     "researchd:wooden_pickaxe"
   ],
   "requires_parent": true,
-  "research_points": {
-    "researchd:nether": 5
-  }
+  "research_methods": [
+    {
+      "count": 5,
+      "method": "researchd:consume_research_pack",
+      "pack": "researchd:nether"
+    }
+  ]
 }

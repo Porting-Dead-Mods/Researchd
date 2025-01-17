@@ -2,7 +2,6 @@ package com.portingdeadmods.researchd.client.screens;
 
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.list.TechListEntry;
 import com.portingdeadmods.researchd.utils.researches.*;
 import com.portingdeadmods.researchd.client.screens.graph.ResearchGraphWidget;
@@ -52,7 +51,8 @@ public class ResearchScreen extends Screen {
 
         addRenderableWidget(this.techList);
         addRenderableWidget(this.researchQueue);
-        addRenderableWidget(this.techList.button);
+        addRenderableWidget(this.techList.searchButton);
+        addRenderableWidget(this.techList.startResearchButton);
         addRenderableWidget(this.researchGraphWidget);
         addRenderableWidget(this.selectedResearchWidget);
     }

@@ -5,8 +5,16 @@
     "researchd:wooden_pickaxe"
   ],
   "requires_parent": true,
-  "research_points": {
-    "researchd:end": 4,
-    "researchd:overworld": 3
-  }
+  "research_methods": [
+    {
+      "count": 3,
+      "method": "researchd:consume_research_pack",
+      "pack": "researchd:overworld"
+    },
+    {
+      "count": 4,
+      "method": "researchd:consume_research_pack",
+      "pack": "researchd:end"
+    }
+  ]
 }
