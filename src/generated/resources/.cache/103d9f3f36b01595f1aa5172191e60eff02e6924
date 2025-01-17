@@ -1,10 +1,10 @@
-// 1.21.1	2025-01-16T20:27:14.07083245	Registries
-1c90d9b45c6886c69a5e05f3b5b8f43ed409246f data/researchd/researchd/research/coal.json
-5675612b592e247a9090712849c235fedca9bcc8 data/researchd/researchd/research/copper.json
-9228586f51e932a81cbe989082a1395abf460d5e data/researchd/researchd/research/stick.json
-5d59ad6b8434e563bab7b543ab6e1b90e1dc5bfc data/researchd/researchd/research/stone.json
-19ef9527cf9f4017e6f1abe9717cbb27ee522af9 data/researchd/researchd/research/wood.json
-aa3e8393680f785192c41c83fc3f389967312dfc data/researchd/researchd/research/wooden_pickaxe.json
-64bb93b112975b1027354f6f82a8c8c7a49287fe data/researchd/researchd/research_pack/end.json
-b845055a6dbe74dda68713879cb1c6065a09fb04 data/researchd/researchd/research_pack/nether.json
-a936cb13a761b5f6e4a92f82727489496414746a data/researchd/researchd/research_pack/overworld.json
+// 1.21.1	2025-01-17T18:41:40.257336517	Registries
+fdd9fb10fe879fb5341bc372a8038881bf03407a data/researchd/researchd/research/coal.json
+6b4352d876a57dd82c14f2059587ab787f98de65 data/researchd/researchd/research/copper.json
+dfb9c07a9a4addee9b7b0c09594b8b3c13a2a9b9 data/researchd/researchd/research/stick.json
+b8be42d5122b3c0d60b7cefbe543e4626a544c2b data/researchd/researchd/research/stone.json
+a4b80b6171d2b59c13332afb2440282b96e83051 data/researchd/researchd/research/wood.json
+26efdc4395e2487fc425ab88eb57d1d506646d02 data/researchd/researchd/research/wooden_pickaxe.json
+7bc16133f8925d0226d65ce18d72cff00f21b4fe data/researchd/researchd/research_pack/end.json
+10ab03df72793a1a19830601c3d0f611e3d62385 data/researchd/researchd/research_pack/nether.json
+23968bb70d1a421ccdb87434b42c19e65ebf08da data/researchd/researchd/research_pack/overworld.json

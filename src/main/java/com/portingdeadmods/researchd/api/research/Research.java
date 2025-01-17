@@ -4,15 +4,11 @@ import com.mojang.serialization.Codec;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchSerializer;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -28,7 +24,7 @@ public interface Research {
     /**
      * @return A map that maps the possible research packs that can be used and the quantity required
      */
-    Map<ResourceKey<ResearchPack>, Integer> researchPoints();
+    List<ResearchMethod> researchMethods();
 
     /**
      * @return An {@link Optional} {@link ResourceKey} which represents the parent of this research.

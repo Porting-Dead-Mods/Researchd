@@ -6,8 +6,16 @@
     "researchd:stick"
   ],
   "requires_parent": true,
-  "research_points": {
-    "researchd:nether": 3,
-    "researchd:overworld": 6
-  }
+  "research_methods": [
+    {
+      "count": 6,
+      "method": "researchd:consume_research_pack",
+      "pack": "researchd:overworld"
+    },
+    {
+      "count": 3,
+      "method": "researchd:consume_research_pack",
+      "pack": "researchd:nether"
+    }
+  ]
 }
