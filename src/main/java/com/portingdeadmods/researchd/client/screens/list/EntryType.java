@@ -5,14 +5,14 @@ import net.minecraft.resources.ResourceLocation;
 
 // TODO: Rename to ResearchStatus
 public enum EntryType {
-    RESEARCHED(Researchd.rl("entry_green")),
-    RESEARCHABLE(Researchd.rl("entry_yellow")),
-    LOCKED(Researchd.rl("entry_red"));
+    RESEARCHED("entry_green"),
+    RESEARCHABLE("entry_yellow"),
+    LOCKED("entry_red");
 
     private final ResourceLocation spriteTexture;
 
-    EntryType(ResourceLocation spriteTexture) {
-        this.spriteTexture = spriteTexture;
+    EntryType(String spriteTexture) {
+        this.spriteTexture = Researchd.rl("textures/gui/sprites/" + spriteTexture + ".png");
     }
 
     public ResourceLocation getSpriteTexture() {

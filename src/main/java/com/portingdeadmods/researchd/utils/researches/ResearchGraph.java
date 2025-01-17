@@ -38,7 +38,7 @@ public record ResearchGraph(ResearchNode rootNode, Set<ResearchNode> parents, Se
 
         for (ResourceKey<Research> parent : researchHolder.value().parents()) {
             // TODO: Set coordinates
-            parents.add(new ResearchNode(ResearchHelper.getInstanceByResearch(researches, parent)));
+            parents.add(ClientResearchCache.getNodeByResearch(parent));
         }
 
         return new ResearchGraph(rootNode, parents);

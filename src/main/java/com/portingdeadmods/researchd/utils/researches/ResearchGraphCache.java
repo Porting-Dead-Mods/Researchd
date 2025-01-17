@@ -29,9 +29,7 @@ public final class ResearchGraphCache {
     }
 
     private static @NotNull ResearchGraph computeGraph(Player player, ResourceKey<Research> key) {
-        Set<ResearchInstance> playerResearches = ResearchHelper.getPlayerResearches(player);
-        ResearchInstance instance = ResearchHelper.getInstanceByResearch(playerResearches, key);
-        return ResearchGraph.fromRootNode(player, new ResearchNode(instance));
+        return ResearchGraph.fromRootNode(player, ClientResearchCache.getNodeByResearch(key));
     }
 
 }
