@@ -12,7 +12,6 @@ import net.minecraft.world.entity.player.Player;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public final class ClientResearchCache {
     public static Set<ResearchNode> NODES = new HashSet<>();
@@ -23,15 +22,15 @@ public final class ClientResearchCache {
         Set<ResearchInstance> playerResearches = ResearchHelper.getPlayerResearches(player);
 
         Researchd.LOGGER.debug("player: {}", player.getCapability(ResearchdCapabilities.ENTITY).researches());
+
         // Collect researches
         playerResearches.forEach(research -> {
-            NODES.add(new ResearchNode(research));
+            NODES.add(new ResearchNode(research.copy()));
         });
 
-        NODES = NODES.stream().map(node -> new ResearchNode(node.getResearch().copy())).collect(Collectors.toSet());
-
+        // Add next nodes
         for (ResearchNode node : NODES) {
-            List<ResourceKey<Research>> parents = ResearchHelper.getResearch(node.getResearch().getResearch(), registryAccess).parents().stream().toList();
+            List<ResourceKey<Research>> parents = ResearchHelper.getResearch(node.getResearch().getResearch(), registryAccess).parents();
 
             for (ResourceKey<Research> parentResearch : parents) {
                 ResearchNode parentNode = getNodeByResearch(parentResearch);
@@ -61,7 +60,6 @@ public final class ClientResearchCache {
     public static void setCoordinate(Set<ResearchNode> remaining, ResearchNode node, int x, int y, int nesting) {
         node.setX(x);
         node.setY(y);
-        Researchd.LOGGER.debug("y: {}", y);
         Set<ResearchNode> next = node.getNext();
         int newNesting = nesting + 1;
         int i = 0;

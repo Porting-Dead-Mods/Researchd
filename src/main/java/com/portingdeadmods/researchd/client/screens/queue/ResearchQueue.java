@@ -25,7 +25,7 @@ import java.util.List;
 public class ResearchQueue extends AbstractWidget {
     private static final ResourceLocation BACKGROUND_TEXTURE = Researchd.rl("textures/gui/research_queue.png");
     private static final int BACKGROUND_WIDTH = 174;
-    private static final int BACKGROUND_HEIGHT = 103;
+    private static final int BACKGROUND_HEIGHT = 42;
 
     private final List<TechListEntry> queue;
 
@@ -47,23 +47,6 @@ public class ResearchQueue extends AbstractWidget {
         for (TechListEntry entry : this.queue) {
             entry.render(guiGraphics, i, i1, v);
         }
-
-        PoseStack poseStack = guiGraphics.pose();
-
-        TechListEntry entry = new TechListEntry(new ResearchInstance(Researches.WOOD, EntryType.RESEARCHABLE), 6 + getX(), getY() + 27);
-
-        poseStack.pushPose();
-        {
-            poseStack.translate(0, 1, 0);
-            poseStack.scale(2, 2, 2);
-            entry.render(guiGraphics, i, i1, v);
-        }
-        poseStack.popPose();
-
-        Font font = Minecraft.getInstance().font;
-        guiGraphics.drawString(font, Component.literal("Cost"), 56, 57, -1, false);
-        int lineHeight = font.lineHeight + 2;
-        guiGraphics.drawString(font, Component.literal("Red, Green x10"), 56, 57+ lineHeight, -1, false);
     }
 
     @Override

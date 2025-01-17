@@ -22,14 +22,15 @@ public class ResearchScreen extends Screen {
     private final TechListWidget techList;
     private final ResearchQueue researchQueue;
     private final ResearchGraphWidget researchGraphWidget;
+    private final SelectedResearchWidget selectedResearchWidget;
 
     public ResearchScreen() {
         super(Component.translatable("screen.researchd.research"));
 
         // TECH LIST
-        this.techList = new TechListWidget(0, 103, 7, 7);
+        this.techList = new TechListWidget(this, 0, 103, 7);
         this.techList.setTechList(new TechList(ClientResearchCache.NODES.stream()
-                .map(n -> new TechListEntry(n.getResearch().copy(), 0, 0)).toList()));
+                .map(n -> new TechListEntry(n.getResearch(), 0, 0)).toList()));
 
         // QUEUE
         this.researchQueue = new ResearchQueue(0, 0);
@@ -40,6 +41,9 @@ public class ResearchScreen extends Screen {
         this.researchGraphWidget = new ResearchGraphWidget(x, 0, 300, 253);
         Minecraft mc = Minecraft.getInstance();
         this.researchGraphWidget.setGraph(ResearchGraph.fromRootNode(mc.player, ClientResearchCache.ROOT_NODE));
+
+        this.selectedResearchWidget = new SelectedResearchWidget(0, 42, SelectedResearchWidget.BACKGROUND_WIDTH, SelectedResearchWidget.BACKGROUND_HEIGHT);
+        this.selectedResearchWidget.setEntry(this.techList.getTechList().entries().getFirst());
     }
 
     @Override
@@ -50,6 +54,7 @@ public class ResearchScreen extends Screen {
         addRenderableWidget(this.researchQueue);
         addRenderableWidget(this.techList.button);
         addRenderableWidget(this.researchGraphWidget);
+        addRenderableWidget(this.selectedResearchWidget);
     }
 
     @Override
@@ -65,4 +70,11 @@ public class ResearchScreen extends Screen {
         GuiUtils.drawImg(guiGraphics, TOP_BAR_TEXTURE, 103, Minecraft.getInstance().getWindow().getGuiScaledHeight() - TOP_BAR_HEIGHT, TOP_BAR_WIDTH, TOP_BAR_HEIGHT);
     }
 
+    public ResearchGraphWidget getResearchGraphWidget() {
+        return researchGraphWidget;
+    }
+
+    public SelectedResearchWidget getSelectedResearchWidget() {
+        return selectedResearchWidget;
+    }
 }
