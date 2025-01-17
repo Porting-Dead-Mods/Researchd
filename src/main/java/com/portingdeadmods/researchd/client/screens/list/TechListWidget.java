@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.client.screens.list;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
+import com.portingdeadmods.researchd.client.screens.queue.ResearchQueue;
 import com.portingdeadmods.researchd.utils.researches.ResearchGraphCache;
 import com.portingdeadmods.researchd.utils.researches.TechList;
 import com.portingdeadmods.researchd.utils.researches.TechListHelper;
@@ -68,7 +69,11 @@ public class TechListWidget extends AbstractWidget {
         this.hasSearchBar = !this.hasSearchBar;
     }
 
-    public void onStartResearchButtonClicked(Button button) {}
+    public void onStartResearchButtonClicked(Button button) {
+        ResearchQueue queue = this.screen.getResearchQueue();
+        queue.addEntry(this.screen.getSelectedResearchWidget().getEntry());
+        System.out.println("Research started");
+    }
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
