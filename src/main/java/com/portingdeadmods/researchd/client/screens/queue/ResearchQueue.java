@@ -34,6 +34,13 @@ public class ResearchQueue extends AbstractWidget {
         this.queue = new ArrayList<>();
     }
 
+    public void addEntry(TechListEntry entry) {
+        if (this.queue.size() >= 7) return;
+        if (entry.getResearch().getResearchStatus() == EntryType.RESEARCHED) return;
+
+        this.queue.add(entry);
+    }
+
     public void fillList() {
         for (int col = 0; col < 7; col++) {
             this.queue.add(new TechListEntry(new ResearchInstance(Researches.STONE, EntryType.RESEARCHABLE), 12 + col * TechListEntry.WIDTH, 17));

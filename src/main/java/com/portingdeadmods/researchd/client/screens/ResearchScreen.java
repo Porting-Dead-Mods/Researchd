@@ -33,7 +33,7 @@ public class ResearchScreen extends Screen {
 
         // QUEUE
         this.researchQueue = new ResearchQueue(0, 0);
-        this.researchQueue.fillList();
+        // this.researchQueue.fillList();
 
         // GRAPH
         int x = 174;
@@ -76,5 +76,9 @@ public class ResearchScreen extends Screen {
 
     public SelectedResearchWidget getSelectedResearchWidget() {
         return selectedResearchWidget;
+    }
+
+    public ResearchQueue getResearchQueue() {
+        return researchQueue;
     }
 }
