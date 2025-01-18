@@ -72,7 +72,6 @@ public class TechListWidget extends AbstractWidget {
     public void onStartResearchButtonClicked(Button button) {
         ResearchQueue queue = this.screen.getResearchQueue();
         queue.addEntry(this.screen.getSelectedResearchWidget().getEntry());
-        System.out.println("Research started");
     }
 
     @Override
