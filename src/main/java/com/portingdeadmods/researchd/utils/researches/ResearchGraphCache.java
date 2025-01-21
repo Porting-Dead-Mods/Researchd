@@ -1,8 +1,7 @@
 package com.portingdeadmods.researchd.utils.researches;
 
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.ResearchInstance;
-import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
+import com.portingdeadmods.researchd.utils.researches.data.ResearchGraph;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
@@ -10,8 +9,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
 
 public final class ResearchGraphCache {
     private static final Map<ResourceKey<Research>, ResearchGraph> GRAPH_CACHE = new HashMap<>();

@@ -41,9 +41,9 @@ public class SelectedResearchWidget extends AbstractWidget {
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
-        guiGraphics.enableScissor(53, 55, 53 + 115, 55 + 48);
-
         GuiUtils.drawImg(guiGraphics, BACKGROUND_TEXTURE, getX(), getY(), width, height);
+
+        guiGraphics.enableScissor(53, 55, 53 + 115, 55 + 48);
 
         if (entry != null) {
             entry.renderWidget(guiGraphics, mouseX, mouseY, v, 2);
