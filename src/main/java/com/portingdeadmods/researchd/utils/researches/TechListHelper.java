@@ -1,8 +1,7 @@
 package com.portingdeadmods.researchd.utils.researches;
 
 import com.portingdeadmods.researchd.client.screens.list.TechListEntry;
-
-import java.util.*;
+import com.portingdeadmods.researchd.utils.researches.data.TechList;
 
 public class TechListHelper {
     public static void setEntryCoordinates(TechList list, int cols, int paddingX, int paddingY) {

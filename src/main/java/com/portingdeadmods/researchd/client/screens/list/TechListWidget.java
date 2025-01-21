@@ -3,9 +3,9 @@ package com.portingdeadmods.researchd.client.screens.list;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
-import com.portingdeadmods.researchd.client.screens.queue.ResearchQueue;
+import com.portingdeadmods.researchd.client.screens.queue.ResearchQueueWidget;
 import com.portingdeadmods.researchd.utils.researches.ResearchGraphCache;
-import com.portingdeadmods.researchd.utils.researches.TechList;
+import com.portingdeadmods.researchd.utils.researches.data.TechList;
 import com.portingdeadmods.researchd.utils.researches.TechListHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -70,7 +70,7 @@ public class TechListWidget extends AbstractWidget {
     }
 
     public void onStartResearchButtonClicked(Button button) {
-        ResearchQueue queue = this.screen.getResearchQueue();
+        ResearchQueueWidget queue = this.screen.getResearchQueue();
         queue.addEntry(this.screen.getSelectedResearchWidget().getEntry());
     }
 

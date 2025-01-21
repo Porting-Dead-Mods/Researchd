@@ -6,16 +6,14 @@ import com.portingdeadmods.researchd.client.screens.list.TechListEntry;
 import com.portingdeadmods.researchd.utils.researches.*;
 import com.portingdeadmods.researchd.client.screens.graph.ResearchGraphWidget;
 import com.portingdeadmods.researchd.client.screens.list.TechListWidget;
-import com.portingdeadmods.researchd.client.screens.queue.ResearchQueue;
+import com.portingdeadmods.researchd.client.screens.queue.ResearchQueueWidget;
+import com.portingdeadmods.researchd.utils.researches.data.ResearchGraph;
+import com.portingdeadmods.researchd.utils.researches.data.TechList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Renderable;
-import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.NotNull;
 
 public class ResearchScreen extends Screen {
     public static final ResourceLocation TOP_BAR_TEXTURE = Researchd.rl("textures/gui/top_bar.png");
@@ -23,7 +21,7 @@ public class ResearchScreen extends Screen {
     private static final int TOP_BAR_HEIGHT = 8;
 
     private final TechListWidget techList;
-    private final ResearchQueue researchQueue;
+    private final ResearchQueueWidget researchQueueWidget;
     private final ResearchGraphWidget researchGraphWidget;
     private final SelectedResearchWidget selectedResearchWidget;
 
@@ -36,7 +34,7 @@ public class ResearchScreen extends Screen {
                 .map(n -> new TechListEntry(n.getResearch(), 0, 0)).toList()));
 
         // QUEUE
-        this.researchQueue = new ResearchQueue(this, 0, 0);
+        this.researchQueueWidget = new ResearchQueueWidget(this, 0, 0);
         // this.researchQueue.fillList();
 
         // GRAPH
@@ -54,14 +52,14 @@ public class ResearchScreen extends Screen {
         super.init();
 
         addRenderableWidget(this.techList);
-        addRenderableWidget(this.researchQueue);
+        addRenderableWidget(this.researchQueueWidget);
         addRenderableWidget(this.techList.searchButton);
         addRenderableWidget(this.techList.startResearchButton);
         addRenderableWidget(this.researchGraphWidget);
         addRenderableWidget(this.selectedResearchWidget);
-        addRenderableWidget(this.researchQueue.leftButton);
-        addRenderableWidget(this.researchQueue.rightButton);
-        addRenderableWidget(this.researchQueue.removeButton);
+        addRenderableWidget(this.researchQueueWidget.leftButton);
+        addRenderableWidget(this.researchQueueWidget.rightButton);
+        addRenderableWidget(this.researchQueueWidget.removeButton);
     }
 
     @Override
@@ -85,7 +83,7 @@ public class ResearchScreen extends Screen {
         return selectedResearchWidget;
     }
 
-    public ResearchQueue getResearchQueue() {
-        return researchQueue;
+    public ResearchQueueWidget getResearchQueue() {
+        return researchQueueWidget;
     }
 }

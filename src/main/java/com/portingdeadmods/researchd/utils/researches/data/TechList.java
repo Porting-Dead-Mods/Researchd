@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.utils.researches;
+package com.portingdeadmods.researchd.utils.researches.data;
 
 import com.portingdeadmods.researchd.client.screens.list.TechListEntry;
 

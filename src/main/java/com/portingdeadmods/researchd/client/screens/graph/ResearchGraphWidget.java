@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.client.screens.graph;
 
 import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.utils.researches.ResearchGraph;
+import com.portingdeadmods.researchd.utils.researches.data.ResearchGraph;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
