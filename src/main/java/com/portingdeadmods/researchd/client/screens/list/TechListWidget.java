@@ -114,7 +114,8 @@ public class TechListWidget extends AbstractWidget {
             int indexX = ((int) mouseX - paddingX) / TechListEntry.WIDTH;
             int indexY = ((int) mouseY - paddingY) / TechListEntry.HEIGHT;
 
-            if (Math.floor((double) this.techList.entries().size() / this.cols) >= indexY) {
+            if (Math.floor((double) this.techList.entries().size() / this.cols) >= indexY
+                && this.techList.entries().size() % this.cols > indexX) {
                 TechListEntry entry = this.techList.entries().get(indexY * this.cols + indexX);
                 this.screen.getResearchGraphWidget().setGraph(ResearchGraphCache.computeIfAbsent(Minecraft.getInstance().player, entry.getResearch().getResearch()));
                 this.screen.getSelectedResearchWidget().setEntry(entry);

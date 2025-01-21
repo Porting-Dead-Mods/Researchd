@@ -3,12 +3,16 @@ package com.portingdeadmods.researchd.impl.research;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.client.research.ClientResearchMethod;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -16,6 +20,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 
 public record ConsumeItemResearchMethod(Ingredient toConsume, int count) implements ResearchMethod {
     public static final ConsumeItemResearchMethod EMPTY = new ConsumeItemResearchMethod(Ingredient.EMPTY, 0);
+    public static final ResourceLocation ID = Researchd.rl("consume_item");
 
     @Override
     public boolean canResearch(Player player, ResourceKey<Research> research) {
@@ -45,7 +50,17 @@ public record ConsumeItemResearchMethod(Ingredient toConsume, int count) impleme
     }
 
     @Override
-    public ResearchMethodSerializer<?> getSerializer() {
+    public ResourceLocation id() {
+        return ID;
+    }
+
+    @Override
+    public ClientResearchMethod getClientMethod() {
+        return null;
+    }
+
+    @Override
+    public ResearchMethodSerializer<ConsumeItemResearchMethod> getSerializer() {
         return Serializer.INSTANCE;
     }
 

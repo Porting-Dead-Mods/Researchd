@@ -1,4 +1,12 @@
 {
   "research.researchd.coal": "Coal",
-  "research_desc.researchdResourceKey[researchd:research / researchd:coal]": "Powerful Fuel for improving furnace factory capabilities"
+  "research.researchd.copper": "Copper",
+  "research.researchd.stick": "Stick",
+  "research.researchd.stone": "Stone",
+  "research.researchd.wood": "Wood",
+  "research.researchd.wooden_pickaxe": "Wooden Pickaxe",
+  "research_desc.researchd.coal": "Powerful Fuel for improving furnace factory capabilities",
+  "research_desc.researchd.wood": "Allows you to punch those nasty Trees!",
+  "research_method.researchd.consume_item": "Submit",
+  "research_method.researchd.consume_pack": "Submit"
 }
