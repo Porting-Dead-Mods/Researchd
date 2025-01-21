@@ -1,5 +1,7 @@
 package com.portingdeadmods.researchd;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.api.capabilties.ResearchdCapabilities;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
