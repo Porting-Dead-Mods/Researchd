@@ -6,6 +6,7 @@ import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
 import com.portingdeadmods.researchd.api.capabilties.EntityResearch;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.utils.researches.data.ResearchQueue;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -13,11 +14,11 @@ import net.minecraft.network.codec.StreamCodec;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public record EntityResearchImpl(Set<ResearchInstance> researchQueue, Set<ResearchInstance> researches) {
-    public static final EntityResearchImpl EMPTY = new EntityResearchImpl(Collections.emptySet(), Collections.emptySet());
+public record EntityResearchImpl(ResearchQueue researchQueue, Set<ResearchInstance> researches) {
+    public static final EntityResearchImpl EMPTY = new EntityResearchImpl(ResearchQueue.EMPTY, Collections.emptySet());
 
     public static final Codec<EntityResearchImpl> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            CodecUtils.set(ResearchInstance.CODEC).fieldOf("researchQueue").forGetter(EntityResearchImpl::researchQueue),
+            ResearchQueue.CODEC.fieldOf("researchQueue").forGetter(EntityResearchImpl::researchQueue),
             CodecUtils.set(ResearchInstance.CODEC).fieldOf("research").forGetter(EntityResearchImpl::researches)
     ).apply(instance, EntityResearchImpl::new));
 
@@ -30,7 +31,7 @@ public record EntityResearchImpl(Set<ResearchInstance> researchQueue, Set<Resear
     );
 
     private static EntityResearchImpl fromLists(List<ResearchInstance> researchQueue, List<ResearchInstance> researches) {
-        return new EntityResearchImpl(new HashSet<>(researchQueue), new HashSet<>(researches));
+        return new EntityResearchImpl(new ResearchQueue(researchQueue), new HashSet<>(researches));
     }
 
     private List<ResearchInstance> researchesAsList() {
@@ -38,6 +39,6 @@ public record EntityResearchImpl(Set<ResearchInstance> researchQueue, Set<Resear
     }
 
     private List<ResearchInstance> queueAsList() {
-        return researchQueue().stream().toList();
+        return researchQueue().entries();
     }
 }

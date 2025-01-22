@@ -2,12 +2,11 @@ package com.portingdeadmods.researchd.client.screens.queue;
 
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.list.EntryType;
 import com.portingdeadmods.researchd.client.screens.list.TechListEntry;
 import com.portingdeadmods.researchd.client.screens.widgets.QueueControllsButton;
-import com.portingdeadmods.researchd.registries.Researches;
+import com.portingdeadmods.researchd.utils.researches.data.ResearchQueue;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.ImageButton;
@@ -25,7 +24,9 @@ public class ResearchQueueWidget extends AbstractWidget {
     private static final int BACKGROUND_WIDTH = 174;
     private static final int BACKGROUND_HEIGHT = 42;
 
-    private final List<QueueEntryWidget> queue;
+    private final List<QueueEntryWidget> widgetQueue;
+    private final ResearchQueue queue;
+    private final ResearchScreen screen;
 
     public ImageButton leftButton;
     public ImageButton rightButton;
@@ -33,28 +34,34 @@ public class ResearchQueueWidget extends AbstractWidget {
 
     public ResearchQueueWidget(ResearchScreen screen, int x, int y) {
         super(x, y, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, Component.empty());
-        this.queue = new ArrayList<>();
+        this.screen = screen;
+        this.widgetQueue = new ArrayList<>();
         setLeftButton(-1);
         setRightButton(-1);
         setRemoveButton(-1);
+        this.queue = new ResearchQueue();
     }
 
     public void addEntry(TechListEntry entry) {
-        if (this.queue.size() >= 7) return;
+        if (this.widgetQueue.size() >= 7) return;
         if (entry.getResearch().getResearchStatus() == EntryType.RESEARCHED) return;
 
-        for (QueueEntryWidget e : this.queue) {
-            if (e.getResearch().equals(entry.getResearch())) return;
+        for (QueueEntryWidget e : this.widgetQueue) {
+            if (e.getResearch().equals(entry.getResearch().getResearch())) return;
         }
 
-        this.queue.add(new QueueEntryWidget(entry, 12 + this.queue.size() * TechListEntry.WIDTH, 17));
+        int index = this.queue.entries().size();
+        QueueEntryWidget widget = new QueueEntryWidget(this.screen, entry, 12 + this.widgetQueue.size() * TechListEntry.WIDTH, 17, index);
+        this.queue.add(entry.getResearch());
+        this.widgetQueue.add(widget);
+        widget.setQueue(this.queue);
     }
 
     public void removeEntry(int index) {
         System.out.println("Removing entry at index: " + index);
-        List<QueueEntryWidget> copy = new ArrayList<>(this.queue);
+        List<QueueEntryWidget> copy = new ArrayList<>(this.widgetQueue);
 
-        this.queue.clear();
+        this.widgetQueue.clear();
         copy.remove(index);
 
         for (QueueEntryWidget entry : copy) {
@@ -64,14 +71,14 @@ public class ResearchQueueWidget extends AbstractWidget {
 
     public void moveEntry(int index, boolean left) {
         if (left && index == 0) return;
-        if (!left && index == this.queue.size() - 1) return;
+        if (!left && index == this.widgetQueue.size() - 1) return;
 
         if (!left) index++;
 
         String direction = left ? "left" : "right";
         System.out.println("Moving entry at index " + index + " to the " + direction);
 
-        List<QueueEntryWidget> copy = new ArrayList<>(this.queue);
+        List<QueueEntryWidget> copy = new ArrayList<>(this.widgetQueue);
 
         QueueEntryWidget entry1 = copy.get(index - 1);
         QueueEntryWidget entry2 = copy.get(index);
@@ -79,7 +86,7 @@ public class ResearchQueueWidget extends AbstractWidget {
         copy.set(index - 1, entry2);
         copy.set(index, entry1);
 
-        this.queue.clear();
+        this.widgetQueue.clear();
         for (QueueEntryWidget entry : copy) {
             addEntry(entry.getEntry());
         }
@@ -89,7 +96,7 @@ public class ResearchQueueWidget extends AbstractWidget {
     protected void renderWidget(GuiGraphics guiGraphics, int i, int i1, float v) {
         GuiUtils.drawImg(guiGraphics, BACKGROUND_TEXTURE, getX(), getY(), width, height);
 
-        for (QueueEntryWidget entry : this.queue) {
+        for (QueueEntryWidget entry : this.widgetQueue) {
             entry.render(guiGraphics, i, i1, v);
         }
     }
@@ -101,21 +108,19 @@ public class ResearchQueueWidget extends AbstractWidget {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        int paddingX = getX() + 12;
-        int paddingY = 17 + getY();
-        if (
-            mouseX > paddingX &&
-            mouseX < paddingX + this.queue.size() * TechListEntry.WIDTH &&
-            mouseY > paddingY &&
-            mouseY < paddingY + TechListEntry.HEIGHT
-        ) {
-            int indexX = ((int) mouseX - paddingX) / TechListEntry.WIDTH;
-            setLeftButton(indexX);
-            setRightButton(indexX);
-            setRemoveButton(indexX);
+        for (QueueEntryWidget widget : this.widgetQueue) {
+            if (widget.isHovered()) {
+                return widget.mouseClicked(mouseX, mouseY, button);
+            }
         }
-
         return false;
+    }
+
+    public void removeResearch(int index) {
+        if (this.queue.entries().size() > index) {
+            this.queue.remove(index);
+            this.widgetQueue.remove(index);
+        }
     }
 
     private void setLeftButton(int index) {

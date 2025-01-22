@@ -43,10 +43,10 @@ public class SelectedResearchWidget extends AbstractWidget {
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
         GuiUtils.drawImg(guiGraphics, BACKGROUND_TEXTURE, getX(), getY(), width, height);
 
-        guiGraphics.enableScissor(53, 55, 53 + 115, 55 + 48);
-
         if (entry != null) {
             entry.renderWidget(guiGraphics, mouseX, mouseY, v, 2);
+
+            guiGraphics.enableScissor(53, 55, 53 + 115, 55 + 48);
 
             Font font = Minecraft.getInstance().font;
             guiGraphics.drawString(font, Utils.registryTranslation(this.entry.getResearch().getResearch()), 12, 45, -1, false);
@@ -62,10 +62,10 @@ public class SelectedResearchWidget extends AbstractWidget {
                 height += methodEntry.getValue().isEmpty() ? 0 : methodEntry.getValue().getFirst().getClientMethod().height();
             }
 
-            guiGraphics.drawString(font, "Effects", 56, 57 + height + 6, -1, false);
-        }
+            guiGraphics.drawString(font, "Effects", 56, 57 + height + 14, -1, false);
 
-        guiGraphics.disableScissor();
+            guiGraphics.disableScissor();
+        }
     }
 
     @Override

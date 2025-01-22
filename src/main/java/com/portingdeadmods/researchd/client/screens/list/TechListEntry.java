@@ -34,7 +34,7 @@ public class TechListEntry extends AbstractWidget {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         GuiUtils.drawImg(guiGraphics, getResearch().getResearchStatus().getSpriteTexture(), getX(), getY(), WIDTH, HEIGHT);
 
         RegistryAccess lookup = Minecraft.getInstance().level.registryAccess();
