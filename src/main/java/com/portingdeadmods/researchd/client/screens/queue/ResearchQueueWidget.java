@@ -36,9 +36,9 @@ public class ResearchQueueWidget extends AbstractWidget {
         super(x, y, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, Component.empty());
         this.screen = screen;
         this.widgetQueue = new ArrayList<>();
-        setLeftButton(-1);
-        setRightButton(-1);
-        setRemoveButton(-1);
+//        setLeftButton(-1);
+//        setRightButton(-1);
+//        setRemoveButton(-1);
         this.queue = new ResearchQueue();
     }
 
@@ -52,17 +52,28 @@ public class ResearchQueueWidget extends AbstractWidget {
 
         int index = this.queue.entries().size();
         QueueEntryWidget widget = new QueueEntryWidget(this.screen, entry, 12 + this.widgetQueue.size() * TechListEntry.WIDTH, 17, index);
+
         this.queue.add(entry.getResearch());
         this.widgetQueue.add(widget);
         widget.setQueue(this.queue);
     }
 
+    /**
+     * Copy the list, clear everything and reinitialize the lists with the element removed.
+     * <br>
+     * <br>
+     * Since every instance has different X and index values on creation, the calculations need to be redone
+     *
+     *
+     * @param index index of the entry to be removed
+     */
     public void removeEntry(int index) {
-        System.out.println("Removing entry at index: " + index);
         List<QueueEntryWidget> copy = new ArrayList<>(this.widgetQueue);
+        copy.remove(index);
 
         this.widgetQueue.clear();
-        copy.remove(index);
+        this.queue.entries().clear();
+
 
         for (QueueEntryWidget entry : copy) {
             addEntry(entry.getEntry());

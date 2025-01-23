@@ -61,8 +61,7 @@ public class QueueEntryWidget extends AbstractWidget {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (this.isHovering(null, (int) mouseX, (int) mouseY, getX(), getY() + 17, getWidth(), getHeight() - 17)) {
-            Researchd.LOGGER.debug("removing");
-            this.screen.getResearchQueue().removeResearch(index);
+            this.screen.getResearchQueue().removeEntry(index);
             return super.mouseClicked(mouseX, mouseY, button);
         } else if (this.isHovered()) {
             this.screen.getSelectedResearchWidget().setEntry(this.getEntry());
