@@ -1,17 +1,17 @@
-package com.portingdeadmods.researchd.client.screens.list;
+package com.portingdeadmods.researchd.api.research;
 
 import com.portingdeadmods.researchd.Researchd;
 import net.minecraft.resources.ResourceLocation;
 
 // TODO: Rename to ResearchStatus
-public enum EntryType {
+public enum ResearchStatus {
     RESEARCHED("entry_green"),
     RESEARCHABLE("entry_yellow"),
     LOCKED("entry_red");
 
     private final ResourceLocation spriteTexture;
 
-    EntryType(String spriteTexture) {
+    ResearchStatus(String spriteTexture) {
         this.spriteTexture = Researchd.rl("textures/gui/sprites/" + spriteTexture + ".png");
     }
 

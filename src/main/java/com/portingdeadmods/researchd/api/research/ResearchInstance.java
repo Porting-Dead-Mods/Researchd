@@ -2,8 +2,6 @@ package com.portingdeadmods.researchd.api.research;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
-import com.portingdeadmods.researchd.client.screens.list.EntryType;
 import com.portingdeadmods.researchd.utils.Codecs;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -14,20 +12,20 @@ import java.util.Objects;
 public final class ResearchInstance {
     public static final Codec<ResearchInstance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Research.RESOURCE_KEY_CODEC.fieldOf("research").forGetter(ResearchInstance::getResearch),
-            Codecs.enumCodec(EntryType.class).fieldOf("research_status").forGetter(ResearchInstance::getResearchStatus)
+            Codecs.enumCodec(ResearchStatus.class).fieldOf("research_status").forGetter(ResearchInstance::getResearchStatus)
     ).apply(instance, ResearchInstance::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, ResearchInstance> STREAM_CODEC = StreamCodec.composite(
             Research.RESOURCE_KEY_STREAM_CODEC,
             ResearchInstance::getResearch,
-            Codecs.enumStreamCodec(EntryType.class),
+            Codecs.enumStreamCodec(ResearchStatus.class),
             ResearchInstance::getResearchStatus,
             ResearchInstance::new
     );
 
     private final ResourceKey<Research> research;
-    private EntryType researchStatus;
+    private ResearchStatus researchStatus;
 
-    public ResearchInstance(ResourceKey<Research> research, EntryType researchStatus) {
+    public ResearchInstance(ResourceKey<Research> research, ResearchStatus researchStatus) {
         this.research = research;
         this.researchStatus = researchStatus;
     }
@@ -36,16 +34,16 @@ public final class ResearchInstance {
         return research;
     }
 
-    public EntryType getResearchStatus() {
+    public ResearchStatus getResearchStatus() {
         return researchStatus;
     }
 
-    public void setResearchStatus(EntryType researchStatus) {
+    public void setResearchStatus(ResearchStatus researchStatus) {
         this.researchStatus = researchStatus;
     }
 
     public ResearchInstance copy() {
-        return new ResearchInstance(getResearch(), EntryType.values()[getResearchStatus().ordinal()]);
+        return new ResearchInstance(getResearch(), ResearchStatus.values()[getResearchStatus().ordinal()]);
     }
 
     @Override

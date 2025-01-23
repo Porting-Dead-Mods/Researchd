@@ -26,7 +26,9 @@ public class ResearchGraphWidget extends AbstractWidget {
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int i, int i1, float v) {
         guiGraphics.enableScissor(getX(), getY(), getX() + getWidth(), getY() + getHeight());
-        renderNode(graph.rootNode(), guiGraphics, i, i1, v);
+        ResearchNode node = graph.rootNode();
+        renderNode(node, guiGraphics, i, i1, v);
+        guiGraphics.vLine(node.getX() + (node.getWidth() / 2), node.getY() + node.getWidth(), node.getNext().stream().findFirst().get().getY(), -1);
         guiGraphics.disableScissor();
     }
 
@@ -36,8 +38,8 @@ public class ResearchGraphWidget extends AbstractWidget {
         if (node.isHovered()) {
             Minecraft minecraft = Minecraft.getInstance();
             guiGraphics.renderComponentTooltip(minecraft.font, List.of(
-                    Utils.registryTranslation(node.getResearch().getResearch()),
-                    Component.translatable("research_desc." + Researchd.MODID + "." + node.getResearch().getResearch().location().getPath())
+                    Utils.registryTranslation(node.getInstance().getResearch()),
+                    Component.translatable("research_desc." + Researchd.MODID + "." + node.getInstance().getResearch().location().getPath())
             ), mouseX, mouseY);
         }
 

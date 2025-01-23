@@ -2,11 +2,12 @@ package com.portingdeadmods.researchd.client.screens.list;
 
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
+import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.screens.queue.ResearchQueueWidget;
 import com.portingdeadmods.researchd.utils.researches.ResearchGraphCache;
 import com.portingdeadmods.researchd.utils.researches.data.TechList;
-import com.portingdeadmods.researchd.utils.researches.TechListHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -19,7 +20,7 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.function.Consumer;
 
-public class TechListWidget extends AbstractWidget {
+public class TechListWidget extends ResearchScreenWidget {
     private static final ResourceLocation SCROLLER_SPRITE = ResourceLocation.withDefaultNamespace("container/creative_inventory/scroller");
     private static final int SCROLLER_WIDTH = 12;
     private static final int SCROLLER_HEIGHT = 15;
@@ -40,10 +41,10 @@ public class TechListWidget extends AbstractWidget {
     private final ResearchScreen screen;
 
     public TechListWidget(ResearchScreen screen, int x, int y, int cols) {
-        super(x, y, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, Component.empty());
+        super(x, y, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
         this.cols = cols;
         int padding = 15;
-        int scrollerX = getX() + cols * TechListEntry.WIDTH + padding;
+        int scrollerX = getX() + cols * ResearchScreenWidget.PANEL_WIDTH + padding;
 
         this.searchButton = new ImageButton(scrollerX, y + 5, 14, 14, new WidgetSprites(
                 Researchd.rl("search_button"),
@@ -59,10 +60,6 @@ public class TechListWidget extends AbstractWidget {
 
     public void setTechList(TechList techList) {
         this.techList = techList;
-
-        int paddingX = 12 + getX();
-        int paddingY = 24 + getY();
-        TechListHelper.setEntryCoordinates(this.techList, 7, paddingX, paddingY);
     }
 
     public void onSearchButtonClicked(Button button) {
@@ -71,30 +68,26 @@ public class TechListWidget extends AbstractWidget {
 
     public void onStartResearchButtonClicked(Button button) {
         ResearchQueueWidget queue = this.screen.getResearchQueue();
-        queue.addEntry(this.screen.getSelectedResearchWidget().getEntry());
+        queue.getQueue().add(this.screen.getSelectedResearchWidget().getInstance());
     }
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
         GuiUtils.drawImg(guiGraphics, hasSearchBar ? BACKGROUND_TEXTURE_SEARCH_BAR : BACKGROUND_TEXTURE, getX(), getY(), BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
 
-        int col = 0;
-        int row = 0;
-        for (TechListEntry entry : this.techList.entries()) {
-            int paddingY = 24;
-            entry.setY(paddingY + getY() + (row - curRow) * TechListEntry.HEIGHT);
-            entry.render(guiGraphics, mouseX, mouseY, v);
-            if (col < cols) {
-                col++;
-            } else {
-                col = 0;
-                row++;
+        int paddingX = 12;
+        int paddingY = 24;
+
+        for (int y = curRow; y < DISPLAY_ROWS; y++) {
+            for (int x = 0; x < this.cols; x++) {
+                int index = y * this.cols + x;
+                if (index < this.techList.entries().size()) {
+                    renderResearchPanel(guiGraphics, this.techList.entries().get(index), paddingX + getX() + x * PANEL_WIDTH, paddingY + getY() + y * PANEL_HEIGHT, mouseX, mouseY);
+                }
             }
         }
 
-        int padding = 16;
-        int paddingY = 24;
-        int scrollerX = getX() + cols * TechListEntry.WIDTH + padding;
+        int scrollerX = getX() + cols * ResearchScreenWidget.PANEL_WIDTH + paddingX + 4;
         guiGraphics.blitSprite(SCROLLER_SPRITE, scrollerX, getY() + paddingY, SCROLLER_WIDTH, SCROLLER_HEIGHT);
     }
 
@@ -109,16 +102,16 @@ public class TechListWidget extends AbstractWidget {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         int paddingX = getX() + 12;
         int paddingY = 24 + getY();
-        if (mouseX > paddingX && mouseX < paddingX + this.cols * TechListEntry.WIDTH
-                && mouseY > paddingY && mouseY < paddingY + DISPLAY_ROWS * TechListEntry.HEIGHT) {
-            int indexX = ((int) mouseX - paddingX) / TechListEntry.WIDTH;
-            int indexY = ((int) mouseY - paddingY) / TechListEntry.HEIGHT;
+        if (mouseX > paddingX && mouseX < paddingX + this.cols * ResearchScreenWidget.PANEL_WIDTH
+                && mouseY > paddingY && mouseY < paddingY + DISPLAY_ROWS * ResearchScreenWidget.PANEL_HEIGHT) {
+            int indexX = ((int) mouseX - paddingX) / ResearchScreenWidget.PANEL_WIDTH;
+            int indexY = ((int) mouseY - paddingY) / ResearchScreenWidget.PANEL_HEIGHT;
 
             if (Math.floor((double) this.techList.entries().size() / this.cols) >= indexY
                 && this.techList.entries().size() % this.cols > indexX) {
-                TechListEntry entry = this.techList.entries().get(indexY * this.cols + indexX);
-                this.screen.getResearchGraphWidget().setGraph(ResearchGraphCache.computeIfAbsent(Minecraft.getInstance().player, entry.getResearch().getResearch()));
-                this.screen.getSelectedResearchWidget().setEntry(entry);
+                ResearchInstance instance = this.techList.entries().get(indexY * this.cols + indexX);
+                this.screen.getResearchGraphWidget().setGraph(ResearchGraphCache.computeIfAbsent(Minecraft.getInstance().player, instance.getResearch()));
+                this.screen.getSelectedResearchWidget().setSelectedResearch(instance);
             }
         }
 
@@ -126,18 +119,9 @@ public class TechListWidget extends AbstractWidget {
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-
-    }
-
-    @Override
     public void visitWidgets(Consumer<AbstractWidget> consumer) {
         super.visitWidgets(consumer);
         consumer.accept(this.searchButton);
         consumer.accept(this.startResearchButton);
-    }
-
-    public TechList getTechList() {
-        return techList;
     }
 }

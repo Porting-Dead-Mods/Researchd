@@ -1,18 +1,19 @@
 package com.portingdeadmods.researchd.utils.researches.data;
 
 import com.mojang.serialization.Codec;
-import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
-import io.netty.buffer.ByteBuf;
+import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
-public record ResearchQueue(List<ResearchInstance> entries) {
+public record ResearchQueue(List<ResearchInstance> entries) implements Iterable<ResearchInstance> {
     public static final ResearchQueue EMPTY = new ResearchQueue(Collections.emptyList());
     public static final Codec<ResearchQueue> CODEC = ResearchInstance.CODEC.listOf().xmap(ResearchQueue::new, ResearchQueue::entries);
     public static final StreamCodec<RegistryFriendlyByteBuf, ResearchQueue> STREAM_CODEC = ResearchInstance.STREAM_CODEC.apply(ByteBufCodecs.list()).map(ResearchQueue::new, ResearchQueue::entries);
@@ -43,6 +44,12 @@ public record ResearchQueue(List<ResearchInstance> entries) {
      * @return whether it was possible to add the element to the queue
      */
     public boolean add(ResearchInstance researchInstance) {
+        if (researchInstance.getResearchStatus() == ResearchStatus.RESEARCHED) return false;
+
+        for (ResearchInstance instance : this.entries) {
+            if (instance.getResearch().equals(researchInstance.getResearch())) return false;
+        }
+
         if (this.entries.size() < QUEUE_LENGTH) {
             this.entries.add(researchInstance);
             return true;
@@ -62,4 +69,8 @@ public record ResearchQueue(List<ResearchInstance> entries) {
         return false;
     }
 
+    @Override
+    public @NotNull Iterator<ResearchInstance> iterator() {
+        return entries.stream().iterator();
+    }
 }

@@ -2,8 +2,7 @@ package com.portingdeadmods.researchd.client.screens;
 
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.client.screens.list.TechListEntry;
-import com.portingdeadmods.researchd.client.screens.queue.QueueEntryWidget;
+import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
 import com.portingdeadmods.researchd.utils.researches.*;
 import com.portingdeadmods.researchd.client.screens.graph.ResearchGraphWidget;
 import com.portingdeadmods.researchd.client.screens.list.TechListWidget;
@@ -31,8 +30,7 @@ public class ResearchScreen extends Screen {
 
         // TECH LIST
         this.techList = new TechListWidget(this, 0, 103, 7);
-        this.techList.setTechList(new TechList(ClientResearchCache.NODES.stream()
-                .map(n -> new TechListEntry(n.getResearch(), 0, 0)).toList()));
+        this.techList.setTechList(new TechList(ClientResearchCache.NODES.stream().map(ResearchNode::getInstance).toList()));
 
         // QUEUE
         this.researchQueueWidget = new ResearchQueueWidget(this, 0, 0);
@@ -45,7 +43,7 @@ public class ResearchScreen extends Screen {
         this.researchGraphWidget.setGraph(ResearchGraph.fromRootNode(mc.player, ClientResearchCache.ROOT_NODE));
 
         this.selectedResearchWidget = new SelectedResearchWidget(0, 42, SelectedResearchWidget.BACKGROUND_WIDTH, SelectedResearchWidget.BACKGROUND_HEIGHT);
-        this.selectedResearchWidget.setEntry(this.techList.getTechList().entries().getFirst());
+        //this.selectedResearchWidget.setEntry(this.techList.getTechList().entries().getFirst());
     }
 
     @Override
@@ -58,9 +56,6 @@ public class ResearchScreen extends Screen {
         addRenderableWidget(this.techList.startResearchButton);
         addRenderableWidget(this.researchGraphWidget);
         addRenderableWidget(this.selectedResearchWidget);
-        //addRenderableWidget(this.researchQueueWidget.leftButton);
-        //addRenderableWidget(this.researchQueueWidget.rightButton);
-        //addRenderableWidget(this.researchQueueWidget.removeButton);
 
     }
 
