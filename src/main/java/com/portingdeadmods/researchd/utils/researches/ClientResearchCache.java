@@ -30,7 +30,7 @@ public final class ClientResearchCache {
 
         // Add next nodes
         for (ResearchNode node : NODES) {
-            List<ResourceKey<Research>> parents = ResearchHelper.getResearch(node.getResearch().getResearch(), registryAccess).parents();
+            List<ResourceKey<Research>> parents = ResearchHelper.getResearch(node.getInstance().getResearch(), registryAccess).parents();
 
             for (ResourceKey<Research> parentResearch : parents) {
                 ResearchNode parentNode = getNodeByResearch(parentResearch);
@@ -74,7 +74,7 @@ public final class ClientResearchCache {
 
     public static ResearchNode getNodeByResearch(ResourceKey<Research> research) {
         for (ResearchNode node : NODES) {
-            if (node.getResearch().getResearch().compareTo(research) == 0) {
+            if (node.getInstance().getResearch().compareTo(research) == 0) {
                 return node;
             }
         }

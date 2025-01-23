@@ -33,7 +33,7 @@ public record ResearchGraph(ResearchNode rootNode, Set<ResearchNode> parents, Se
         Set<ResearchInstance> researches = capability.researches();
 
         RegistryAccess lookup = player.registryAccess();
-        Holder<Research> researchHolder = lookup.holderOrThrow(rootNode.getResearch().getResearch());
+        Holder<Research> researchHolder = lookup.holderOrThrow(rootNode.getInstance().getResearch());
 
         Set<ResearchNode> parents = new HashSet<>();
 

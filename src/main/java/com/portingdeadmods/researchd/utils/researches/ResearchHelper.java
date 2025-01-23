@@ -6,8 +6,7 @@ import com.portingdeadmods.researchd.api.capabilties.EntityResearch;
 import com.portingdeadmods.researchd.api.capabilties.ResearchdCapabilities;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
-import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
-import com.portingdeadmods.researchd.client.screens.list.EntryType;
+import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
@@ -34,7 +33,7 @@ public final class ResearchHelper {
         Researchd.LOGGER.debug("level: {}", levelResearches);
         levelResearches.removeAll(playerResearches);
         for (Holder<Research> research : levelResearches) {
-            capability.addResearch(new ResearchInstance(research.getKey(), EntryType.LOCKED));
+            capability.addResearch(new ResearchInstance(research.getKey(), ResearchStatus.LOCKED));
         }
         Researchd.LOGGER.debug("player: {}", player.getCapability(ResearchdCapabilities.ENTITY).researches());
     }
