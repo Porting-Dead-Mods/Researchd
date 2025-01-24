@@ -29,9 +29,6 @@ public record ResearchGraph(ResearchNode rootNode, Set<ResearchNode> parents, Se
     }
 
     public static ResearchGraph fromRootNode(Player player, ResearchNode rootNode) {
-        EntityResearch capability = player.getCapability(ResearchdCapabilities.ENTITY);
-        Set<ResearchInstance> researches = capability.researches();
-
         RegistryAccess lookup = player.registryAccess();
         Holder<Research> researchHolder = lookup.holderOrThrow(rootNode.getInstance().getResearch());
 

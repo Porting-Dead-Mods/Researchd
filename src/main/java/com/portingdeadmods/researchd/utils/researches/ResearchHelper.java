@@ -18,7 +18,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-// Will be merged with research manager eventually
 public final class ResearchHelper {
     public static void initResearches(Player player) {
         Level level = player.level();

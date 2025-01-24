@@ -34,7 +34,6 @@ public class ResearchScreen extends Screen {
 
         // QUEUE
         this.researchQueueWidget = new ResearchQueueWidget(this, 0, 0);
-        // this.researchQueue.fillList();
 
         // GRAPH
         int x = 174;
@@ -43,7 +42,7 @@ public class ResearchScreen extends Screen {
         this.researchGraphWidget.setGraph(ResearchGraph.fromRootNode(mc.player, ClientResearchCache.ROOT_NODE));
 
         this.selectedResearchWidget = new SelectedResearchWidget(0, 42, SelectedResearchWidget.BACKGROUND_WIDTH, SelectedResearchWidget.BACKGROUND_HEIGHT);
-        //this.selectedResearchWidget.setEntry(this.techList.getTechList().entries().getFirst());
+        //this.selectedResearchWidget.setSelectedResearch(this.techList.getTechList().entries().getFirst());
     }
 
     @Override
