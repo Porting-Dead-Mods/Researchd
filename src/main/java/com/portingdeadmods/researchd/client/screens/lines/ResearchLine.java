@@ -1,14 +1,12 @@
 package com.portingdeadmods.researchd.client.screens.lines;
 
-import com.portingdeadmods.researchd.events.ResearchedEvents;
+import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class ResearchLine extends AbstractWidget {
 
@@ -26,19 +24,77 @@ public class ResearchLine extends AbstractWidget {
 		}
 	}
 
-	public static ResearchLine INPUT_RESEARCH_HEAD(int x, int y) {
-		return new ResearchLine(new LineCoordinates(x, y - 20, x + 4, y));
+	/**
+	 * @param node - ResearchNode to get input heads for
+	 * @return Set of LineCoordinates for every input head
+	 */
+	public static Set<LineCoordinates> getInputHeadPositions(ResearchNode node) {
+		Set<LineCoordinates> positions = new HashSet<>();
+		int width = node.getWidth();   // Node width
+		int height = node.getHeight(); // Node height
+		int lineWidth = 4;             // Line width
+		int inputs = 1;                // TODO: Number of parents
+
+		if (inputs == 1) {
+			int x = node.getX() + node.getWidth() / 2;
+			int y = node.getY();
+
+			positions.add(new LineCoordinates(x, y + 20,x + 4, y));
+			return positions;
+		}
+
+		for (int i = 0; i < inputs; i++) {
+			int x = node.getX() + (i * (width - lineWidth) / (inputs - 1)) + (lineWidth / 2);
+			int y = node.getY();
+
+			positions.add(new LineCoordinates(x, y + 20, x + 4, y));
+		}
+
+		return positions;
 	}
 
-	public static ResearchLine OUTPUT_RESEARCH_HEAD(int x, int y) {
-		return new ResearchLine(new LineCoordinates(x, y, x + 4, y + 20));
+	/**
+	 * @param node - ResearchNode to get output heads for
+	 * @return Set of LineCoordinates for every output head
+	 */
+	public static Set<LineCoordinates> getOutputHeadPositions(ResearchNode node) {
+		Set<LineCoordinates> positions = new HashSet<>();
+		int width = node.getWidth();   // Node width
+		int height = node.getHeight(); // Node height
+		int lineWidth = 4;             // Line width
+		int inputs = 1;                // TODO: Number of parents
+
+		if (inputs == 1) {
+			int x = node.getX() + node.getWidth() / 2;
+			int y = node.getY() + height;
+
+			positions.add(new LineCoordinates(x, y,x + 4, y + 20));
+			return positions;
+		}
+
+		for (int i = 0; i < inputs; i++) {
+			int x = node.getX() + (i * (width - lineWidth) / (inputs - 1)) + (lineWidth / 2);
+			int y = node.getY() + height;
+
+			positions.add(new LineCoordinates(x, y, x + 4, y + 20));
+		}
+
+		return positions;
+	}
+
+	public static ResearchLine getInputResearchHead(ResearchNode node) {
+		return new ResearchLine(getInputHeadPositions(node));
+	}
+
+	public static ResearchLine getOutputResearchHead(ResearchNode node) {
+		return new ResearchLine(getOutputHeadPositions(node));
 	}
 
 	public ArrayList<LineCoordinates> lines;
 
-	public ResearchLine(LineCoordinates... lines) {
+	public ResearchLine(Collection<LineCoordinates> lines) {
 		super(getX(lines), getY(lines), getWidth(lines), getHeight(lines), CommonComponents.EMPTY);
-		this.lines = new ArrayList<>();
+		this.lines = new ArrayList<>(lines);
 	}
 
 	@Override
@@ -103,7 +159,7 @@ public class ResearchLine extends AbstractWidget {
 	}
 
 	// Static methods
-	public static int getWidth(LineCoordinates... lines) {
+	public static int getWidth(Iterable<LineCoordinates> lines) {
 		int xLeft = Integer.MAX_VALUE;
 		int xRight = Integer.MIN_VALUE;
 
@@ -115,7 +171,7 @@ public class ResearchLine extends AbstractWidget {
 		return xRight - xLeft;
 	}
 
-	public static int getHeight(LineCoordinates... lines) {
+	public static int getHeight(Iterable<LineCoordinates> lines) {
 		int yTop = Integer.MAX_VALUE;
 		int yBottom = Integer.MIN_VALUE;
 
@@ -127,7 +183,7 @@ public class ResearchLine extends AbstractWidget {
 		return yBottom - yTop;
 	}
 
-	public static int getX(LineCoordinates... lines) {
+	public static int getX(Iterable<LineCoordinates> lines) {
 		int xLeft = Integer.MAX_VALUE;
 
 		for (LineCoordinates line : lines) {
@@ -137,7 +193,7 @@ public class ResearchLine extends AbstractWidget {
 		return xLeft;
 	}
 
-	public static int getY(LineCoordinates... lines) {
+	public static int getY(Iterable<LineCoordinates> lines) {
 		int yTop = Integer.MAX_VALUE;
 
 		for (LineCoordinates line : lines) {
