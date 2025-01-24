@@ -9,7 +9,6 @@ import net.minecraft.world.entity.player.Player;
 import java.util.HashSet;
 import java.util.Set;
 
-// TODO: Use ObjectSet cuz it is more optimized
 public class EntityResearchWrapper implements EntityResearch {
     private final Player player;
 

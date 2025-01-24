@@ -62,6 +62,54 @@ public final class Researches {
             ))
             .parents(WOODEN_PICKAXE)
             .requiresParent(true));
+    public static final ResourceKey<Research> DIAMOND = register("diamond", builder -> builder
+            .icon(Items.DIAMOND)
+            .researchMethods(List.of(
+                    new ConsumePackResearchMethod(ResearchPacks.NETHER, 7),
+                    new ConsumePackResearchMethod(ResearchPacks.END, 4)
+            ))
+            .parents(COPPER)
+            .requiresParent(true));
+    public static final ResourceKey<Research> IRON_INGOT = register("iron_ingot", builder -> builder
+            .icon(Items.IRON_INGOT)
+            .researchMethods(List.of(
+                    new ConsumePackResearchMethod(ResearchPacks.NETHER, 7),
+                    new ConsumePackResearchMethod(ResearchPacks.END, 4)
+            ))
+            .parents(COPPER)
+            .requiresParent(true));
+    public static final ResourceKey<Research> COPPER_INGOT = register("copper_ingot", builder -> builder
+            .icon(Items.COPPER_INGOT)
+            .researchMethods(List.of(
+                    new ConsumePackResearchMethod(ResearchPacks.NETHER, 7),
+                    new ConsumePackResearchMethod(ResearchPacks.END, 4)
+            ))
+            .parents(COPPER)
+            .requiresParent(true));
+    public static final ResourceKey<Research> IRON_BLOCK = register("iron_block", builder -> builder
+            .icon(Items.IRON_BLOCK)
+            .researchMethods(List.of(
+                    new ConsumePackResearchMethod(ResearchPacks.NETHER, 7),
+                    new ConsumePackResearchMethod(ResearchPacks.END, 4)
+            ))
+            .parents(COPPER)
+            .requiresParent(true));
+    public static final ResourceKey<Research> GOLD_HOE = register("gold_hoe", builder -> builder
+            .icon(Items.GOLDEN_HOE)
+            .researchMethods(List.of(
+                    new ConsumePackResearchMethod(ResearchPacks.NETHER, 7),
+                    new ConsumePackResearchMethod(ResearchPacks.END, 4)
+            ))
+            .parents(COPPER)
+            .requiresParent(true));
+    public static final ResourceKey<Research> COAL_BLOCK = register("coal_block", builder -> builder
+            .icon(Items.COAL_BLOCK)
+            .researchMethods(List.of(
+                    new ConsumePackResearchMethod(ResearchPacks.NETHER, 7),
+                    new ConsumePackResearchMethod(ResearchPacks.END, 4)
+            ))
+            .parents(COAL)
+            .requiresParent(true));
 
     public static void bootstrap(BootstrapContext<Research> context) {
         for (Map.Entry<ResourceKey<Research>, Research.Builder<?>> research : RESEARCHES.entrySet()) {

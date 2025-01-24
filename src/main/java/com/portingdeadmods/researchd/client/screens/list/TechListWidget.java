@@ -62,6 +62,10 @@ public class TechListWidget extends ResearchScreenWidget {
         this.techList = techList;
     }
 
+    public TechList getTechList() {
+        return techList;
+    }
+
     public void onSearchButtonClicked(Button button) {
         this.hasSearchBar = !this.hasSearchBar;
     }

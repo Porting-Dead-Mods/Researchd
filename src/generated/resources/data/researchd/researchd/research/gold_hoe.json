@@ -1,0 +1,20 @@
+{
+  "type": "researchd:simple",
+  "icon": "minecraft:golden_hoe",
+  "parents": [
+    "researchd:copper"
+  ],
+  "requires_parent": true,
+  "research_methods": [
+    {
+      "count": 7,
+      "method": "researchd:consume_research_pack",
+      "pack": "researchd:nether"
+    },
+    {
+      "count": 4,
+      "method": "researchd:consume_research_pack",
+      "pack": "researchd:end"
+    }
+  ]
+}

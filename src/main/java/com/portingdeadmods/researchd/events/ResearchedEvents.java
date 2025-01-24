@@ -62,8 +62,4 @@ public class ResearchedEvents {
         }
     }
 
-    @EventBusSubscriber(modid = Researchd.MODID, value = Dist.DEDICATED_SERVER)
-    public static final class Server {
-
-    }
 }
