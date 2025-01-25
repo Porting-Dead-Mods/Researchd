@@ -2,15 +2,12 @@ package com.portingdeadmods.researchd.client.screens.lines;
 
 import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.client.gui.components.Renderable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public class ResearchLine extends AbstractWidget {
-
+public class ResearchLine implements Renderable {
 	/**
 	 * A dirty fix for custom lines consisting of a fill between 2 points
 	 */
@@ -25,6 +22,16 @@ public class ResearchLine extends AbstractWidget {
 			this.y1 = y1;
 			this.x2 = x2;
 			this.y2 = y2;
+		}
+
+		public void translateX(int dx) {
+			this.x1 += dx;
+			this.x2 += dx;
+		}
+
+		public void translateY(int dy) {
+			this.y1 += dy;
+			this.y2 += dy;
 		}
 
 		public String toString() {
@@ -46,7 +53,7 @@ public class ResearchLine extends AbstractWidget {
 		int width = node.getWidth();   // Node width
 		int height = node.getHeight(); // Node height
 		int lineWidth = 4;             // Line width
-		int inputs = 2;                // TODO: Number of parents
+		int inputs = 2;                // TODO: Number of parents, set to 2 for testing
 
 		if (inputs == 1) {
 			int x = node.getX() + node.getWidth() / 2;
@@ -75,7 +82,7 @@ public class ResearchLine extends AbstractWidget {
 		int width = node.getWidth();   // Node width
 		int height = node.getHeight(); // Node height
 		int lineWidth = 4;             // Line width
-		int outputs = 2;                // TODO: Number of children
+		int outputs = 2;               // TODO: Number of children, set to 2 for testing
 
 		if (outputs == 1) {
 			int x = node.getX() + node.getWidth() / 2;
@@ -114,22 +121,16 @@ public class ResearchLine extends AbstractWidget {
 	public ArrayList<LineCoordinates> lines;
 
 	public ResearchLine(Collection<LineCoordinates> lines) {
-		super(getX(lines), getY(lines), getWidth(lines), getHeight(lines), CommonComponents.EMPTY);
 		this.lines = new ArrayList<>(lines);
 	}
 
 	@Override
-	protected void renderWidget(@NotNull GuiGraphics guiGraphics, int i, int i1, float v) {
+	public void render(@NotNull GuiGraphics guiGraphics, int i, int i1, float v) {
 		for (LineCoordinates line : lines) {
-			// TODO: Fix lines not rendering even though they are in the correct position
+			// TODO: Fix lines not rendering even though they are in the correct position (debugging shows correct pos :p)
 			//System.out.printf("Rendering line: %d:%d -> %d:%d\n", line.x1, line.y1, line.x2, line.y2);
 			guiGraphics.fill(line.x1, line.y1, line.x2, line.y2, 0xFFFFFFFF);
 		}
-	}
-
-	@Override
-	protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-
 	}
 
 	public List<LineCoordinates> getLineComponents() {
@@ -179,6 +180,18 @@ public class ResearchLine extends AbstractWidget {
 		}
 
 		return yTop;
+	}
+
+	public void translateX(int dx) {
+		for (LineCoordinates line : lines) {
+			line.translateX(dx);
+		}
+	}
+
+	public void translateY(int dy) {
+		for (LineCoordinates line : lines) {
+			line.translateY(dy);
+		}
 	}
 
 	// Static methods

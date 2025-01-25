@@ -11,6 +11,11 @@ import net.minecraft.network.chat.CommonComponents;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Drawable widget for researches <br>
+ * For X and Y setting, use {@link #setXExt(int)} and {@link #setYExt(int)} <br>
+ * @see ResearchInstance
+ */
 public class ResearchNode extends AbstractWidget {
     private final Set<ResearchNode> next;
     private final ResearchInstance instance;
@@ -58,5 +63,31 @@ public class ResearchNode extends AbstractWidget {
     @Override
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
 
+    }
+
+    /**
+     * Extension of {@link #setX(int)} to update the input and output lines <br>
+     *
+     * @param x1 x coordinate to set
+     */
+    public void setXExt(int x1) {
+        int dx = x1 - getX();
+        setX(x1);
+
+        this.inputs.translateX(dx);
+        this.outputs.translateX(dx);
+    }
+
+    /**
+     * Extension of {@link #setY(int)} to update the input and output lines <br>
+     *
+     * @param y1 y coordinate to set
+     */
+    public void setYExt(int y1) {
+        int dy = y1 - getY();
+        setY(y1);
+
+        this.inputs.translateY(dy);
+        this.outputs.translateY(dy);
     }
 }
