@@ -5,11 +5,15 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.CommonComponents;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 public class ResearchLine extends AbstractWidget {
 
+	/**
+	 * A dirty fix for custom lines consisting of a fill between 2 points
+	 */
 	public static class LineCoordinates {
 		public int x1;
 		public int y1;
@@ -22,18 +26,27 @@ public class ResearchLine extends AbstractWidget {
 			this.x2 = x2;
 			this.y2 = y2;
 		}
+
+		public String toString() {
+			return "LineCoordinates{" +
+					"x1=" + x1 +
+					", y1=" + y1 +
+					", x2=" + x2 +
+					", y2=" + y2 +
+					'}';
+		}
 	}
 
 	/**
-	 * @param node - ResearchNode to get input heads for
-	 * @return Set of LineCoordinates for every input head
+	 * @param node {@link ResearchNode} to get input heads for
+	 * @return Set of {@link LineCoordinates} for every input head
 	 */
 	public static Set<LineCoordinates> getInputHeadPositions(ResearchNode node) {
 		Set<LineCoordinates> positions = new HashSet<>();
 		int width = node.getWidth();   // Node width
 		int height = node.getHeight(); // Node height
 		int lineWidth = 4;             // Line width
-		int inputs = 1;                // TODO: Number of parents
+		int inputs = 2;                // TODO: Number of parents
 
 		if (inputs == 1) {
 			int x = node.getX() + node.getWidth() / 2;
@@ -54,17 +67,17 @@ public class ResearchLine extends AbstractWidget {
 	}
 
 	/**
-	 * @param node - ResearchNode to get output heads for
-	 * @return Set of LineCoordinates for every output head
+	 * @param node {@link ResearchNode} to get output heads for
+	 * @return Set of {@link LineCoordinates} for every output head
 	 */
 	public static Set<LineCoordinates> getOutputHeadPositions(ResearchNode node) {
 		Set<LineCoordinates> positions = new HashSet<>();
 		int width = node.getWidth();   // Node width
 		int height = node.getHeight(); // Node height
 		int lineWidth = 4;             // Line width
-		int inputs = 1;                // TODO: Number of parents
+		int outputs = 2;                // TODO: Number of children
 
-		if (inputs == 1) {
+		if (outputs == 1) {
 			int x = node.getX() + node.getWidth() / 2;
 			int y = node.getY() + height;
 
@@ -72,8 +85,8 @@ public class ResearchLine extends AbstractWidget {
 			return positions;
 		}
 
-		for (int i = 0; i < inputs; i++) {
-			int x = node.getX() + (i * (width - lineWidth) / (inputs - 1)) + (lineWidth / 2);
+		for (int i = 0; i < outputs; i++) {
+			int x = node.getX() + (i * (width - lineWidth) / (outputs - 1)) + (lineWidth / 2);
 			int y = node.getY() + height;
 
 			positions.add(new LineCoordinates(x, y, x + 4, y + 20));
@@ -82,11 +95,19 @@ public class ResearchLine extends AbstractWidget {
 		return positions;
 	}
 
-	public static ResearchLine getInputResearchHead(ResearchNode node) {
+	/**
+	 * @param node {@link ResearchNode} to get input heads for
+	 * @return {@link ResearchLine} object consisting of every input head
+	 */
+	public static ResearchLine getInputResearchHeads(ResearchNode node) {
 		return new ResearchLine(getInputHeadPositions(node));
 	}
 
-	public static ResearchLine getOutputResearchHead(ResearchNode node) {
+	/**
+	 * @param node {@link ResearchNode} to get output heads for
+	 * @return {@link ResearchLine} object consisting of every output head
+	 */
+	public static ResearchLine getOutputResearchHeads(ResearchNode node) {
 		return new ResearchLine(getOutputHeadPositions(node));
 	}
 
@@ -98,9 +119,11 @@ public class ResearchLine extends AbstractWidget {
 	}
 
 	@Override
-	protected void renderWidget(GuiGraphics guiGraphics, int i, int i1, float v) {
+	protected void renderWidget(@NotNull GuiGraphics guiGraphics, int i, int i1, float v) {
 		for (LineCoordinates line : lines) {
-			guiGraphics.fill(line.x1, line.y1, line.x2, line.y2, 0xFF000000);
+			// TODO: Fix lines not rendering even though they are in the correct position
+			//System.out.printf("Rendering line: %d:%d -> %d:%d\n", line.x1, line.y1, line.x2, line.y2);
+			guiGraphics.fill(line.x1, line.y1, line.x2, line.y2, 0xFFFFFFFF);
 		}
 	}
 
@@ -159,6 +182,11 @@ public class ResearchLine extends AbstractWidget {
 	}
 
 	// Static methods
+
+	/**
+	 * @param lines Collection of {@link LineCoordinates}
+	 * @return The "width" of the collection of lines, the distance between the leftmost and rightmost points
+	 */
 	public static int getWidth(Iterable<LineCoordinates> lines) {
 		int xLeft = Integer.MAX_VALUE;
 		int xRight = Integer.MIN_VALUE;
@@ -171,6 +199,10 @@ public class ResearchLine extends AbstractWidget {
 		return xRight - xLeft;
 	}
 
+	/**
+	 * @param lines Collection of {@link LineCoordinates}
+	 * @return The "height" of the collection of lines, the distance between the topmost and bottommost points
+	 */
 	public static int getHeight(Iterable<LineCoordinates> lines) {
 		int yTop = Integer.MAX_VALUE;
 		int yBottom = Integer.MIN_VALUE;
@@ -183,6 +215,10 @@ public class ResearchLine extends AbstractWidget {
 		return yBottom - yTop;
 	}
 
+	/**
+	 * @param lines Collection of {@link LineCoordinates}
+	 * @return The leftmost x coordinate of the collection of lines
+	 */
 	public static int getX(Iterable<LineCoordinates> lines) {
 		int xLeft = Integer.MAX_VALUE;
 
@@ -193,6 +229,10 @@ public class ResearchLine extends AbstractWidget {
 		return xLeft;
 	}
 
+	/**
+	 * @param lines Collection of {@link LineCoordinates}
+	 * @return The topmost y coordinate of the collection of lines
+	 */
 	public static int getY(Iterable<LineCoordinates> lines) {
 		int yTop = Integer.MAX_VALUE;
 
