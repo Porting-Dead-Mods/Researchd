@@ -63,8 +63,8 @@ public class ResearchGraphWidget extends AbstractWidget {
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
         for (ResearchNode node : this.graph.nodes()) {
-            node.setX((int) (node.getX() + dragX));
-            node.setY((int) (node.getY() + dragY));
+            node.setXExt((int) (node.getX() + dragX));
+            node.setYExt((int) (node.getY() + dragY));
         }
 
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
