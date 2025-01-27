@@ -45,7 +45,7 @@ public final class Researches {
                     new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 3),
                     new ConsumePackResearchMethod(ResearchPacks.END, 4)
             ))
-            .parents(WOODEN_PICKAXE)
+            .parents(WOOD, STICK)
             .requiresParent(true));
     public static final ResourceKey<Research> COPPER = register("copper", builder -> builder
             .icon(Items.RAW_COPPER)
