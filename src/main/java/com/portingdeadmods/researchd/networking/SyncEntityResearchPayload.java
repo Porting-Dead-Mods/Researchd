@@ -31,7 +31,7 @@ public record SyncEntityResearchPayload(EntityResearchImpl entityResearch) imple
                 capability.addResearch(r);
             }
             ClientResearchCache.initialize(context.player());
-            ClientResearchCache.setCoordinates(174, 10);
+            //ClientResearchCache.setCoordinates(174, 10);
         }).exceptionally(e -> {
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
             return null;

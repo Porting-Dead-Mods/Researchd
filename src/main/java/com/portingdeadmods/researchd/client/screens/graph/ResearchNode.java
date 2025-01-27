@@ -1,5 +1,6 @@
 package com.portingdeadmods.researchd.client.screens.graph;
 
+import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.screens.lines.ResearchLine;
@@ -17,33 +18,49 @@ import java.util.Set;
  * @see ResearchInstance
  */
 public class ResearchNode extends AbstractWidget {
-    private final Set<ResearchNode> next;
+    private final Set<ResearchNode> parents;
+    private final Set<ResearchNode> children;
     private final ResearchInstance instance;
     private final ResearchLine inputs;
     private final ResearchLine outputs;
+    private boolean rootNode;
 
     public ResearchNode(ResearchInstance instance) {
         super(0, 0, ResearchScreenWidget.PANEL_WIDTH, ResearchScreenWidget.PANEL_HEIGHT, CommonComponents.EMPTY);
         this.instance = instance;
-        this.next = new HashSet<>();
+        this.children = new HashSet<>();
+        this.parents = new HashSet<>();
         this.inputs = ResearchLine.getInputResearchHeads(this);
         this.outputs = ResearchLine.getOutputResearchHeads(this);
+        this.rootNode = false;
     }
 
-    public void addNext(ResearchNode next) {
-        this.next.add(next);
+    public void addChild(ResearchNode child) {
+        this.children.add(child);
     }
 
-    public void removeNext(ResearchNode toRemove) {
-        this.next.remove(toRemove);
+    public void addParent(ResearchNode parent) {
+        this.parents.add(parent);
     }
 
-    public Set<ResearchNode> getNext() {
-        return next;
+    public Set<ResearchNode> getChildren() {
+        return children;
+    }
+
+    public Set<ResearchNode> getParents() {
+        return parents;
     }
 
     public ResearchInstance getInstance() {
         return instance;
+    }
+
+    public boolean isRootNode() {
+        return rootNode;
+    }
+
+    public void setRootNode(boolean rootNode) {
+        this.rootNode = rootNode;
     }
 
     @Override
@@ -56,7 +73,7 @@ public class ResearchNode extends AbstractWidget {
     @Override
     public String toString() {
         return "ResearchNode{" +
-                "next=" + next +
+                "next=" + children +
                 '}';
     }
 

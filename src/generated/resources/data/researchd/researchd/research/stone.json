@@ -2,7 +2,8 @@
   "type": "researchd:simple",
   "icon": "minecraft:stone",
   "parents": [
-    "researchd:wooden_pickaxe"
+    "researchd:wood",
+    "researchd:stick"
   ],
   "requires_parent": true,
   "research_methods": [

@@ -1,9 +1,6 @@
 package com.portingdeadmods.researchd.utils.researches.data;
 
-import com.portingdeadmods.researchd.api.capabilties.EntityResearch;
-import com.portingdeadmods.researchd.api.capabilties.ResearchdCapabilities;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
 import com.portingdeadmods.researchd.utils.researches.ClientResearchCache;
 import net.minecraft.core.Holder;
@@ -23,7 +20,7 @@ public record ResearchGraph(ResearchNode rootNode, Set<ResearchNode> parents, Se
 
     private void collectNodes(ResearchNode node) {
         this.nodes.add(node);
-        for (ResearchNode node1 : node.getNext()) {
+        for (ResearchNode node1 : node.getChildren()) {
             collectNodes(node1);
         }
     }
