@@ -55,6 +55,14 @@ public class ResearchNode extends AbstractWidget {
         return instance;
     }
 
+    public ResearchLine getInputs() {
+        return inputs;
+    }
+
+    public ResearchLine getOutputs() {
+        return outputs;
+    }
+
     public boolean isRootNode() {
         return rootNode;
     }
