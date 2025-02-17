@@ -1,13 +1,13 @@
 {
   "type": "researchd:simple",
-  "icon": "minecraft:stone",
+  "icon": "minecraft:copper_block",
   "parents": [
-    "researchd:wood"
+    "researchd:copper"
   ],
   "requires_parent": false,
   "research_methods": [
     {
-      "count": 4,
+      "count": 8,
       "method": "researchd:consume_research_pack",
       "pack": "researchd:overworld"
     }

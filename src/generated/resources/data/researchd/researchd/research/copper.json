@@ -1,15 +1,15 @@
 {
   "type": "researchd:simple",
-  "icon": "minecraft:raw_copper",
+  "icon": "minecraft:copper_ingot",
   "parents": [
-    "researchd:wooden_pickaxe"
+    "researchd:stone"
   ],
-  "requires_parent": true,
+  "requires_parent": false,
   "research_methods": [
     {
-      "count": 5,
+      "count": 6,
       "method": "researchd:consume_research_pack",
-      "pack": "researchd:nether"
+      "pack": "researchd:overworld"
     }
   ]
 }

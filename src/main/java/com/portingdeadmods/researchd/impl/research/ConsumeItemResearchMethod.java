@@ -8,6 +8,7 @@ import com.portingdeadmods.researchd.api.client.research.ClientResearchMethod;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
+import com.portingdeadmods.researchd.impl.client.research.ClientConsumeItemResearchMethod;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
@@ -55,12 +56,12 @@ public record ConsumeItemResearchMethod(Ingredient toConsume, int count) impleme
     }
 
     @Override
-    public ClientResearchMethod getClientMethod() {
-        return null;
+    public ClientConsumeItemResearchMethod getClientMethod() {
+        return ClientConsumeItemResearchMethod.INSTANCE;
     }
 
     @Override
-    public ResearchMethodSerializer<ConsumeItemResearchMethod> getSerializer() {
+    public Serializer getSerializer() {
         return Serializer.INSTANCE;
     }
 

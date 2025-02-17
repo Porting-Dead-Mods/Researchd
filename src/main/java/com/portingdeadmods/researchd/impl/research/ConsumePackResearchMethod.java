@@ -66,12 +66,12 @@ public record ConsumePackResearchMethod(ResourceKey<ResearchPack> pack, int coun
     }
 
     @Override
-    public ClientResearchMethod getClientMethod() {
+    public ClientConsumePackResearchMethod getClientMethod() {
         return ClientConsumePackResearchMethod.INSTANCE;
     }
 
     @Override
-    public ResearchMethodSerializer<ConsumePackResearchMethod> getSerializer() {
+    public Serializer getSerializer() {
         return Serializer.INSTANCE;
     }
 

@@ -25,7 +25,7 @@ public interface ResearchMethod {
         return Component.translatable("research_method." + id.getNamespace() + "." + id.getPath());
     }
 
-    ClientResearchMethod getClientMethod();
+    ClientResearchMethod<?> getClientMethod();
 
-    ResearchMethodSerializer getSerializer();
+    ResearchMethodSerializer<?> getSerializer();
 }

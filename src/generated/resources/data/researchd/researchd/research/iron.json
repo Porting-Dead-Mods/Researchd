@@ -1,13 +1,13 @@
 {
   "type": "researchd:simple",
-  "icon": "minecraft:stone",
+  "icon": "minecraft:iron_ingot",
   "parents": [
-    "researchd:wood"
+    "researchd:stone"
   ],
   "requires_parent": false,
   "research_methods": [
     {
-      "count": 4,
+      "count": 6,
       "method": "researchd:consume_research_pack",
       "pack": "researchd:overworld"
     }

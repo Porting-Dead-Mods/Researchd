@@ -6,7 +6,6 @@ import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchQueue;
 import net.minecraft.world.entity.player.Player;
 
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 

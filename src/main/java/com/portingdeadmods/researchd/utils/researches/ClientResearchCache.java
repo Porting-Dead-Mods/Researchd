@@ -11,7 +11,6 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
 
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,6 +21,8 @@ public final class ClientResearchCache {
     public static ResearchNode ROOT_NODE;
 
     public static void initialize(Player player) {
+        NODES.clear();
+
         RegistryAccess registryAccess = player.registryAccess();
         Set<ResearchInstance> playerResearches = ResearchHelper.getPlayerResearches(player);
 

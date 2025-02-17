@@ -2,17 +2,17 @@ package com.portingdeadmods.researchd.impl.client.research;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.api.client.research.ClientResearchMethod;
-import com.portingdeadmods.researchd.api.research.ResearchMethod;
 import com.portingdeadmods.researchd.impl.research.ConsumeItemResearchMethod;
 import com.portingdeadmods.researchd.impl.research.ConsumePackResearchMethod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.List;
 
-public class ClientConsumeItemResearchMethod implements ClientResearchMethod {
+public class ClientConsumeItemResearchMethod implements ClientResearchMethod<ConsumeItemResearchMethod> {
     public static final ClientConsumeItemResearchMethod INSTANCE = new ClientConsumeItemResearchMethod();
 
     // TODO: Make dynamic
@@ -23,11 +23,9 @@ public class ClientConsumeItemResearchMethod implements ClientResearchMethod {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void renderMethodTooltip(GuiGraphics guiGraphics, List<? extends ResearchMethod> rawMethods, int x, int y, int mouseX, int mouseY) {
-        List<ConsumePackResearchMethod> methods = (List<ConsumePackResearchMethod>) rawMethods;
-
+    public void renderMethodTooltip(GuiGraphics guiGraphics, List<ConsumeItemResearchMethod> methods, int x, int y, int mouseX, int mouseY) {
         Font font = Minecraft.getInstance().font;
-        ConsumePackResearchMethod method = methods.getFirst();
+        ConsumeItemResearchMethod method = methods.getFirst();
         Component methodType = method.getTranslation();
 
         PoseStack poseStack = guiGraphics.pose();
@@ -42,7 +40,7 @@ public class ClientConsumeItemResearchMethod implements ClientResearchMethod {
             guiGraphics.drawString(font, methodType, x + xMargin, y + yMargin, -1, false);
 
             for (int i = 0; i < methods.size(); i++) {
-                renderPack(font, guiGraphics, methods.get(i), i, x + 35 + xMargin, y + yMargin);
+                renderItem(font, guiGraphics, methods.get(i), i, x + 35 + xMargin, y + yMargin);
             }
         }
         poseStack.popPose();
@@ -58,7 +56,7 @@ public class ClientConsumeItemResearchMethod implements ClientResearchMethod {
         return height;
     }
 
-    private void renderPack(Font font, GuiGraphics guiGraphics, ConsumePackResearchMethod method, int i, int x, int y) {
+    private void renderItem(Font font, GuiGraphics guiGraphics, ConsumeItemResearchMethod method, int i, int x, int y) {
         PoseStack poseStack = guiGraphics.pose();
         int w = 24;
 
@@ -67,7 +65,8 @@ public class ClientConsumeItemResearchMethod implements ClientResearchMethod {
         poseStack.pushPose();
         {
             poseStack.scale(0.65f, 0.65f, 1);
-            guiGraphics.renderItem(method.asStack(), x + 64 + i * w, y + 44);
+            Ingredient consume = method.toConsume();
+            guiGraphics.renderItem(consume.getItems()[0], x + 64 + i * w, y + 44);
         }
         poseStack.popPose();
     }
