@@ -8,7 +8,6 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
 
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 

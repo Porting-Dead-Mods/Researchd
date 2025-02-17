@@ -5,9 +5,11 @@
   "requires_parent": false,
   "research_methods": [
     {
-      "count": 2,
-      "method": "researchd:consume_research_pack",
-      "pack": "researchd:overworld"
+      "count": 8,
+      "item": {
+        "item": "minecraft:dirt"
+      },
+      "method": "researchd:consume_item"
     }
   ]
 }

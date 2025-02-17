@@ -47,7 +47,6 @@ public class ResearchGraphWidget extends AbstractWidget {
         guiGraphics.enableScissor(getX(), getY(), getX() + getWidth(), getY() + getHeight());
         ResearchNode node = graph.rootNode();
         renderNode(node, guiGraphics, i, i1, v);
-        //guiGraphics.vLine(node.getX() + (node.getWidth() / 2), node.getY() + node.getWidth(), node.getNext().stream().findFirst().get().getY(), -1);
         guiGraphics.disableScissor();
         renderNodeTooltip(node, guiGraphics, i, i1, v);
     }
@@ -55,8 +54,9 @@ public class ResearchGraphWidget extends AbstractWidget {
     private void renderNode(ResearchNode node, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         node.render(guiGraphics, mouseX, mouseY, partialTick);
 
-        for (ResearchNode rNode : node.getChildren()) {
-            renderNode(rNode, guiGraphics, mouseX, mouseY, partialTick);
+        for (ResearchNode childNode : node.getChildren()) {
+            ResearchLineHelper.drawLineBetweenNodes(guiGraphics, node, childNode);
+            renderNode(childNode, guiGraphics, mouseX, mouseY, partialTick);
         }
     }
 
@@ -99,6 +99,7 @@ public class ResearchGraphWidget extends AbstractWidget {
             Layer layer = this.layers.get(i);
 
             int x = getX();
+
             for (Map.Entry<List<ResourceKey<Research>>, Group> entry : layer.nodes().entrySet()) {
                 x += setGroupCoordinates(entry.getValue().entries(), x, getY() + i * (ResearchScreenWidget.PANEL_HEIGHT + 10));
                 x += 20;
@@ -142,12 +143,32 @@ public class ResearchGraphWidget extends AbstractWidget {
         return i * (ResearchScreenWidget.PANEL_WIDTH + 10);
     }
 
-    private List<ResearchNode> getChildNodes(ResearchNode parentNode) {
+    private Nodes getChildNodes(ResearchNode parentNode) {
         List<ResearchNode> nodes = new ArrayList<>();
-        for (ResearchNode childNode : parentNode.getChildren()) {
-            nodes.add(childNode);
+        collectNodes(nodes, parentNode);
+        return new Nodes(nodes);
+    }
+
+    private void collectNodes(List<ResearchNode> nodes, ResearchNode node) {
+        nodes.add(node);
+
+        for (ResearchNode childNode : node.getChildren()) {
+            collectNodes(nodes, childNode);
         }
-        return nodes;
+    }
+
+    private record Nodes(List<ResearchNode> nodes) {
+        public void offsetX(int offsetX) {
+            for (ResearchNode node : nodes) {
+                node.setX(node.getX() + offsetX);
+            }
+        }
+
+        public void offsetY(int offsetY) {
+            for (ResearchNode node : nodes) {
+                node.setX(node.getY() + offsetY);
+            }
+        }
     }
 
     private record Layer(Map<List<ResourceKey<Research>>, Group> nodes) {

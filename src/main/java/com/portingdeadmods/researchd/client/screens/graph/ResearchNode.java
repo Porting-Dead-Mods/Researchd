@@ -9,7 +9,6 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.CommonComponents;
 
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -75,8 +74,8 @@ public class ResearchNode extends AbstractWidget {
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
         ResearchScreenWidget.renderResearchPanel(guiGraphics, instance,  getX(), getY(), mouseX, mouseY);
-        this.inputs.render(guiGraphics, mouseX, mouseY, v);
-        this.outputs.render(guiGraphics, mouseX, mouseY, v);
+        //this.inputs.render(guiGraphics, mouseX, mouseY, v);
+        //this.outputs.render(guiGraphics, mouseX, mouseY, v);
     }
 
     @Override

@@ -6,8 +6,8 @@ import net.minecraft.client.gui.GuiGraphics;
 
 import java.util.List;
 
-public interface ClientResearchMethod {
-    void renderMethodTooltip(GuiGraphics guiGraphics, List<? extends ResearchMethod> rawMethods, int x, int y, int mouseX, int mouseY);
+public interface ClientResearchMethod<T extends ResearchMethod> {
+    void renderMethodTooltip(GuiGraphics guiGraphics, List<T> rawMethods, int x, int y, int mouseX, int mouseY);
 
     int height();
 }

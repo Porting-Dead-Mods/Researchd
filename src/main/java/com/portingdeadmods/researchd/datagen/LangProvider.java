@@ -19,10 +19,21 @@ public final class LangProvider extends LanguageProvider {
     protected void addTranslations() {
         addResearch(Researches.WOOD, "Wood");
         addResearch(Researches.STONE, "Stone");
+        addResearch(Researches.COPPER, "Copper");
         addResearch(Researches.IRON, "Iron");
+        addResearch(Researches.IRON_TOOLS, "Iron Tools");
+        addResearch(Researches.IRON_ARMOR, "Iron Armor");
+        addResearch(Researches.LIGHTNING_ROD, "Lightning Rod");
+        addResearch(Researches.COPPER_BLOCK, "Copper Block");
 
         addResearchDesc(Researches.WOOD, "Punch those nasty trees");
-        addResearchDesc(Researches.WOOD, "Allows you to punch those nasty Trees!");
+        addResearchDesc(Researches.STONE, "Ooga booga cave man");
+        addResearchDesc(Researches.COPPER, "A decent conductor");
+        addResearchDesc(Researches.IRON, "Speedrunning human history");
+        addResearchDesc(Researches.IRON_TOOLS, "Gearing up");
+        addResearchDesc(Researches.IRON_ARMOR, "Isn't this an achievement already?");
+        addResearchDesc(Researches.LIGHTNING_ROD, "I told ya it's a great conductor!");
+        addResearchDesc(Researches.COPPER_BLOCK, "Efficient Storage");
 
         addResearchMethod(ConsumePackResearchMethod.ID, "Submit");
         addResearchMethod(ConsumeItemResearchMethod.ID, "Submit");

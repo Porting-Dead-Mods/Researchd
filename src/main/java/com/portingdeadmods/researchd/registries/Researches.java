@@ -36,6 +36,36 @@ public final class Researches {
             .researchMethods(List.of(
                     new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 6)
             )));
+    public static final ResourceKey<Research> COPPER = register("copper", builder -> builder
+            .icon(Items.COPPER_INGOT)
+            .parents(STONE)
+            .researchMethods(List.of(
+                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 6)
+            )));
+    public static final ResourceKey<Research> IRON_TOOLS = register("iron_tools", builder -> builder
+            .icon(Items.IRON_SWORD)
+            .parents(IRON)
+            .researchMethods(List.of(
+                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 8)
+            )));
+    public static final ResourceKey<Research> IRON_ARMOR = register("iron_armor", builder -> builder
+            .icon(Items.IRON_CHESTPLATE)
+            .parents(IRON)
+            .researchMethods(List.of(
+                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 8)
+            )));
+    public static final ResourceKey<Research> LIGHTNING_ROD = register("lightning_rod", builder -> builder
+            .icon(Items.LIGHTNING_ROD)
+            .parents(COPPER)
+            .researchMethods(List.of(
+                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 8)
+            )));
+    public static final ResourceKey<Research> COPPER_BLOCK = register("copper_block", builder -> builder
+            .icon(Items.COPPER_BLOCK)
+            .parents(COPPER)
+            .researchMethods(List.of(
+                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 8)
+            )));
 
     public static void bootstrap(BootstrapContext<Research> context) {
         for (Map.Entry<ResourceKey<Research>, Research.Builder<?>> research : RESEARCHES.entrySet()) {

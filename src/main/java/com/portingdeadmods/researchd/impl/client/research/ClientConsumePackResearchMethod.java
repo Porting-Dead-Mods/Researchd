@@ -15,7 +15,7 @@ import net.minecraft.world.item.ItemStack;
 import java.util.List;
 
 // Can be a singleton cuz its client only and therefore only needs to exist once at a time
-public class ClientConsumePackResearchMethod implements ClientResearchMethod {
+public class ClientConsumePackResearchMethod implements ClientResearchMethod<ConsumePackResearchMethod> {
     public static final ClientConsumePackResearchMethod INSTANCE = new ClientConsumePackResearchMethod();
 
     // TODO: Make dynamic
@@ -26,7 +26,7 @@ public class ClientConsumePackResearchMethod implements ClientResearchMethod {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void renderMethodTooltip(GuiGraphics guiGraphics, List<? extends ResearchMethod> rawMethods, int x, int y, int mouseX, int mouseY) {
+    public void renderMethodTooltip(GuiGraphics guiGraphics, List<ConsumePackResearchMethod> rawMethods, int x, int y, int mouseX, int mouseY) {
         List<ConsumePackResearchMethod> methods = (List<ConsumePackResearchMethod>) rawMethods;
 
         Font font = Minecraft.getInstance().font;

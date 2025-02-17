@@ -1,18 +1,12 @@
-// 1.21.1	2025-01-27T16:22:07.713376467	Registries
-fdd9fb10fe879fb5341bc372a8038881bf03407a data/researchd/researchd/research/coal.json
-f5cca37493b05fba41f90fe8e3a7b816bc0de0da data/researchd/researchd/research/coal_block.json
-6b4352d876a57dd82c14f2059587ab787f98de65 data/researchd/researchd/research/copper.json
-12426a90237bfccac36da36f0985d3d0a6597457 data/researchd/researchd/research/copper_ingot.json
-61011d113dc93ba485106b30709aea26554832af data/researchd/researchd/research/diamond.json
-87f63c224ed13a9da15781070c4efbd942cd6c8d data/researchd/researchd/research/gold_hoe.json
-54c12f77f444a9bb353364221f2dde4e5e08c7ec data/researchd/researchd/research/iron_block.json
-9021c885c591cefc40902aa4ea88ad658c67414e data/researchd/researchd/research/iron_ingot.json
-9522ebb8d737a2ad92b754f7f0c05a09198055d7 data/researchd/researchd/research/iron_sword.json
-ee9ff6de49540ca58a731f88075725bf951bd12b data/researchd/researchd/research/minecart.json
-dfb9c07a9a4addee9b7b0c09594b8b3c13a2a9b9 data/researchd/researchd/research/stick.json
-c240afbaba0b82ccf3def716962c5fec63ebf331 data/researchd/researchd/research/stone.json
-a4b80b6171d2b59c13332afb2440282b96e83051 data/researchd/researchd/research/wood.json
-26efdc4395e2487fc425ab88eb57d1d506646d02 data/researchd/researchd/research/wooden_pickaxe.json
+// 1.21.1	2025-02-17T16:44:09.917609161	Registries
+f1c6f605d38eb604fab8ad7fdcce433574e33f34 data/researchd/researchd/research/copper.json
+50089f554619f823b100711603d3c2859daebb67 data/researchd/researchd/research/copper_block.json
+055ae1c551201893c42a60ecb85bf23134ddb10b data/researchd/researchd/research/iron.json
+bb35b8315a26f5358d23c26fd8d8e7e12ceedef8 data/researchd/researchd/research/iron_armor.json
+aba3d2745f24a9c4a4e7db14661ba94036f93eb3 data/researchd/researchd/research/iron_tools.json
+8166130181c95f4745c961e37f7154db44cb375f data/researchd/researchd/research/lightning_rod.json
+3aca8a2185e8f4e059541c718fbcac5c54479ecd data/researchd/researchd/research/stone.json
+d6a7eb262d9a7e84c71bb401b8cd63d6e48f075d data/researchd/researchd/research/wood.json
 7bc16133f8925d0226d65ce18d72cff00f21b4fe data/researchd/researchd/research_pack/end.json
 10ab03df72793a1a19830601c3d0f611e3d62385 data/researchd/researchd/research_pack/nether.json
 23968bb70d1a421ccdb87434b42c19e65ebf08da data/researchd/researchd/research_pack/overworld.json
