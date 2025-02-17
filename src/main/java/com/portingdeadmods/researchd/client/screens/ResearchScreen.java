@@ -17,8 +17,11 @@ import net.minecraft.resources.ResourceLocation;
 
 public class ResearchScreen extends Screen {
     public static final ResourceLocation TOP_BAR_TEXTURE = Researchd.rl("textures/gui/top_bar.png");
+    public static final ResourceLocation SIDE_BAR_RIGHT_TEXTURE = Researchd.rl("textures/gui/side_bar_right.png");
     private static final int TOP_BAR_WIDTH = 377;
     private static final int TOP_BAR_HEIGHT = 8;
+    private static final int SIDE_BAR_WIDTH = 8;
+    private static final int SIDE_BAR_HEIGHT = 253;
 
     private final TechListWidget techList;
     private final ResearchQueueWidget researchQueueWidget;
@@ -37,7 +40,7 @@ public class ResearchScreen extends Screen {
 
         // GRAPH
         int x = 174;
-        this.researchGraphWidget = new ResearchGraphWidget(x, 0, 300, 253);
+        this.researchGraphWidget = new ResearchGraphWidget(x, 8, 300, 253 - 16);
         Minecraft mc = Minecraft.getInstance();
         this.researchGraphWidget.setGraph(ResearchGraph.fromRootNode(mc.player, ClientResearchCache.ROOT_NODE));
 
@@ -68,7 +71,8 @@ public class ResearchScreen extends Screen {
         super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
 
         GuiUtils.drawImg(guiGraphics, TOP_BAR_TEXTURE, 103, 0, TOP_BAR_WIDTH, TOP_BAR_HEIGHT);
-        GuiUtils.drawImg(guiGraphics, TOP_BAR_TEXTURE, 103, Minecraft.getInstance().getWindow().getGuiScaledHeight() - TOP_BAR_HEIGHT, TOP_BAR_WIDTH, TOP_BAR_HEIGHT);
+        GuiUtils.drawImg(guiGraphics, TOP_BAR_TEXTURE, 103, height - TOP_BAR_HEIGHT, TOP_BAR_WIDTH, TOP_BAR_HEIGHT);
+        GuiUtils.drawImg(guiGraphics, SIDE_BAR_RIGHT_TEXTURE, width - 8, 0, SIDE_BAR_WIDTH, SIDE_BAR_HEIGHT);
     }
 
     public ResearchGraphWidget getResearchGraphWidget() {

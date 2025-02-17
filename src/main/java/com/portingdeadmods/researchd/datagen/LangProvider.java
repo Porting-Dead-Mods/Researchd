@@ -17,14 +17,11 @@ public final class LangProvider extends LanguageProvider {
 
     @Override
     protected void addTranslations() {
-        addResearch(Researches.COAL, "Coal");
         addResearch(Researches.WOOD, "Wood");
-        addResearch(Researches.COPPER, "Copper");
-        addResearch(Researches.STICK, "Stick");
-        addResearch(Researches.WOODEN_PICKAXE, "Wooden Pickaxe");
         addResearch(Researches.STONE, "Stone");
+        addResearch(Researches.IRON, "Iron");
 
-        addResearchDesc(Researches.COAL, "Powerful Fuel for improving furnace factory capabilities");
+        addResearchDesc(Researches.WOOD, "Punch those nasty trees");
         addResearchDesc(Researches.WOOD, "Allows you to punch those nasty Trees!");
 
         addResearchMethod(ConsumePackResearchMethod.ID, "Submit");

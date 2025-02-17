@@ -12,12 +12,13 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 // TODO: We should just store a set of ResearchInstance
 public final class ClientResearchCache {
-    public static Set<ResearchNode> NODES = new HashSet<>();
+    public static Set<ResearchNode> NODES = new LinkedHashSet<>();
     public static ResearchNode ROOT_NODE;
 
     public static void initialize(Player player) {
@@ -51,52 +52,17 @@ public final class ClientResearchCache {
             }
         }
 
-        Set<ResearchNode> referencedNodes = new HashSet<>();
+        Set<ResearchNode> referencedNodes = new LinkedHashSet<>();
         for (ResearchNode node : NODES) {
             referencedNodes.addAll(node.getChildren());
         }
 
-        HashSet<ResearchNode> researchNodesCopy = new HashSet<>(NODES);
+        Set<ResearchNode> researchNodesCopy = new LinkedHashSet<>(NODES);
         researchNodesCopy.removeAll(referencedNodes);
 
         ROOT_NODE = researchNodesCopy.stream().findFirst().orElse(null);
         if (ROOT_NODE != null) {
             ROOT_NODE.setRootNode(true);
-        }
-    }
-
-    private static int findNestingWithHighestAmount(Int2IntMap map) {
-        int nesting = 0;
-        int highest = 0;
-        for (Int2IntMap.Entry entry : map.int2IntEntrySet()) {
-            if (entry.getIntValue() > highest) {
-                highest = entry.getIntValue();
-                nesting = entry.getIntKey();
-            }
-        }
-
-        return nesting;
-    }
-
-    private static Int2IntMap getChildrenAmount() {
-        // maps the level of nesting to the amount of children
-        Int2IntMap map = new Int2IntOpenHashMap();
-
-        Set<ResearchNode> nodes = new HashSet<>(NODES);
-
-        traverseTree(map, nodes, ROOT_NODE, 0);
-
-        return map;
-    }
-
-    private static void traverseTree(Int2IntMap map, Set<ResearchNode> remaining, ResearchNode node, int nesting) {
-        map.put(nesting, map.get(nesting) + 1);
-
-        for (ResearchNode nextNode : node.getChildren()) {
-            if (remaining.contains(nextNode)) {
-                remaining.remove(nextNode);
-                traverseTree(map, remaining, nextNode, nesting + 1);
-            }
         }
     }
 

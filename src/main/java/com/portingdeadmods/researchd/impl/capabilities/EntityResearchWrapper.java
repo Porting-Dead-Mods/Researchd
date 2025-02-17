@@ -7,6 +7,7 @@ import com.portingdeadmods.researchd.utils.researches.data.ResearchQueue;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class EntityResearchWrapper implements EntityResearch {
@@ -28,14 +29,14 @@ public class EntityResearchWrapper implements EntityResearch {
 
     @Override
     public void addResearch(ResearchInstance instance) {
-        Set<ResearchInstance> set = new HashSet<>(researches());
+        Set<ResearchInstance> set = new LinkedHashSet<>(researches());
         set.add(instance);
         player.setData(ResearchdAttachments.ENTITY_RESEARCH, new EntityResearchImpl(researchQueue(), set));
     }
 
     @Override
     public void removeResearch(ResearchInstance instance) {
-        Set<ResearchInstance> set = new HashSet<>(researches());
+        Set<ResearchInstance> set = new LinkedHashSet<>(researches());
         set.remove(instance);
         player.setData(ResearchdAttachments.ENTITY_RESEARCH, new EntityResearchImpl(researchQueue(), set));
     }

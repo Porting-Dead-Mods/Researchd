@@ -9,11 +9,12 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public record ResearchGraph(ResearchNode rootNode, Set<ResearchNode> parents, Set<ResearchNode> nodes) {
     public ResearchGraph(ResearchNode rootNode, Set<ResearchNode> parents) {
-        this(rootNode, parents, new HashSet<>());
+        this(rootNode, parents, new LinkedHashSet<>());
         collectNodes(rootNode);
         this.nodes.addAll(this.parents);
     }
@@ -29,7 +30,7 @@ public record ResearchGraph(ResearchNode rootNode, Set<ResearchNode> parents, Se
         RegistryAccess lookup = player.registryAccess();
         Holder<Research> researchHolder = lookup.holderOrThrow(rootNode.getInstance().getResearch());
 
-        Set<ResearchNode> parents = new HashSet<>();
+        Set<ResearchNode> parents = new LinkedHashSet<>();
 
         for (ResourceKey<Research> parent : researchHolder.value().parents()) {
             // TODO: Set coordinates

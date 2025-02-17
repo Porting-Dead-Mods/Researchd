@@ -10,6 +10,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.CommonComponents;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -28,8 +29,8 @@ public class ResearchNode extends AbstractWidget {
     public ResearchNode(ResearchInstance instance) {
         super(0, 0, ResearchScreenWidget.PANEL_WIDTH, ResearchScreenWidget.PANEL_HEIGHT, CommonComponents.EMPTY);
         this.instance = instance;
-        this.children = new HashSet<>();
-        this.parents = new HashSet<>();
+        this.children = new LinkedHashSet<>();
+        this.parents = new LinkedHashSet<>();
         this.inputs = ResearchLine.getInputResearchHeads(this);
         this.outputs = ResearchLine.getOutputResearchHeads(this);
         this.rootNode = false;

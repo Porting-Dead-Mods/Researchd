@@ -25,9 +25,12 @@ public class TechListWidget extends ResearchScreenWidget {
     private static final int SCROLLER_WIDTH = 12;
     private static final int SCROLLER_HEIGHT = 15;
     private static final ResourceLocation BACKGROUND_TEXTURE = Researchd.rl("textures/gui/tech_list_screen.png");
+    private static final ResourceLocation BOTTOM_TEXTURE = Researchd.rl("textures/gui/tech_list_bottom.png");
     private static final ResourceLocation BACKGROUND_TEXTURE_SEARCH_BAR = Researchd.rl("textures/gui/tech_list_screen_search_bar.png");
     private static final int BACKGROUND_WIDTH = 174;
-    private static final int BACKGROUND_HEIGHT = 150;
+    private static final int BACKGROUND_HEIGHT = 142;
+    private static final int BOTTOM_WIDTH = 174;
+    private static final int BOTTOM_HEIGHT = 8;
     private static final int DISPLAY_ROWS = 5;
 
     private TechList techList;
@@ -78,6 +81,7 @@ public class TechListWidget extends ResearchScreenWidget {
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
         GuiUtils.drawImg(guiGraphics, hasSearchBar ? BACKGROUND_TEXTURE_SEARCH_BAR : BACKGROUND_TEXTURE, getX(), getY(), BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
+        GuiUtils.drawImg(guiGraphics, BOTTOM_TEXTURE, getX(), getY() + BACKGROUND_HEIGHT, BOTTOM_WIDTH, BOTTOM_HEIGHT);
 
         int paddingX = 12;
         int paddingY = 24;
@@ -111,15 +115,20 @@ public class TechListWidget extends ResearchScreenWidget {
             int indexX = ((int) mouseX - paddingX) / ResearchScreenWidget.PANEL_WIDTH;
             int indexY = ((int) mouseY - paddingY) / ResearchScreenWidget.PANEL_HEIGHT;
 
-            if (Math.floor((double) this.techList.entries().size() / this.cols) >= indexY
-                && this.techList.entries().size() % this.cols > indexX) {
-                ResearchInstance instance = this.techList.entries().get(indexY * this.cols + indexX);
+            int index = indexY * this.cols + indexX;
+            if (index < this.techList.entries().size()) {
+                ResearchInstance instance = this.techList.entries().get(index);
                 this.screen.getResearchGraphWidget().setGraph(ResearchGraphCache.computeIfAbsent(Minecraft.getInstance().player, instance.getResearch()));
                 this.screen.getSelectedResearchWidget().setSelectedResearch(instance);
+                return true;
             }
         }
 
         return false;
+    }
+
+    private boolean isHovered(double mouseX, double mouseY, int x, int y, int width, int height) {
+        return mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
     }
 
     @Override
