@@ -38,6 +38,10 @@ public class ResearchGraphWidget extends AbstractWidget {
         setCoordinates();
     }
 
+    public ResearchGraph getCurrentGraph() {
+        return this.graph;
+    }
+
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int i, int i1, float v) {
         guiGraphics.enableScissor(getX(), getY(), getX() + getWidth(), getY() + getHeight());

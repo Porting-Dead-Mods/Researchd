@@ -59,6 +59,7 @@ public class ResearchScreen extends Screen {
         addRenderableWidget(this.researchGraphWidget);
         addRenderableWidget(this.selectedResearchWidget);
 
+        //addResearchLines(this.researchGraphWidget.getCurrentGraph().rootNode());
     }
 
     @Override
@@ -85,5 +86,14 @@ public class ResearchScreen extends Screen {
 
     public ResearchQueueWidget getResearchQueue() {
         return researchQueueWidget;
+    }
+
+    public void addResearchLines(ResearchNode rootNode) {
+        for (ResearchNode node : rootNode.getChildren()) {
+            addRenderableOnly(node.getInputs());
+            addRenderableOnly(node.getOutputs());
+
+            addResearchLines(node);
+        }
     }
 }
