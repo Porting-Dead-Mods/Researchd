@@ -8,10 +8,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public final class ResearchGraphCache {
-    private static final Map<ResourceKey<Research>, ResearchGraph> GRAPH_CACHE = new HashMap<>();
+    private static final Map<ResourceKey<Research>, ResearchGraph> GRAPH_CACHE = new LinkedHashMap<>();
 
     public static void add(ResourceKey<Research> key, ResearchGraph graph) {
         GRAPH_CACHE.put(key, graph);

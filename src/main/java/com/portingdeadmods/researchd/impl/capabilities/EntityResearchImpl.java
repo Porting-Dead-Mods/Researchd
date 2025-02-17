@@ -19,19 +19,19 @@ public record EntityResearchImpl(ResearchQueue researchQueue, Set<ResearchInstan
 
     public static final Codec<EntityResearchImpl> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             ResearchQueue.CODEC.fieldOf("researchQueue").forGetter(EntityResearchImpl::researchQueue),
-            CodecUtils.set(ResearchInstance.CODEC).fieldOf("research").forGetter(EntityResearchImpl::researches)
-    ).apply(instance, EntityResearchImpl::new));
+            ResearchInstance.CODEC.listOf().fieldOf("research").forGetter(EntityResearchImpl::researchesAsList)
+    ).apply(instance, EntityResearchImpl::fromLists));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, EntityResearchImpl> STREAM_CODEC = StreamCodec.composite(
-            ResearchInstance.STREAM_CODEC.apply(ByteBufCodecs.list()),
-            EntityResearchImpl::queueAsList,
+            ResearchQueue.STREAM_CODEC,
+            EntityResearchImpl::researchQueue,
             ResearchInstance.STREAM_CODEC.apply(ByteBufCodecs.list()),
             EntityResearchImpl::researchesAsList,
             EntityResearchImpl::fromLists
     );
 
-    private static EntityResearchImpl fromLists(List<ResearchInstance> researchQueue, List<ResearchInstance> researches) {
-        return new EntityResearchImpl(new ResearchQueue(researchQueue), new HashSet<>(researches));
+    private static EntityResearchImpl fromLists(ResearchQueue researchQueue, List<ResearchInstance> researches) {
+        return new EntityResearchImpl(researchQueue, new LinkedHashSet<>(researches));
     }
 
     private List<ResearchInstance> researchesAsList() {

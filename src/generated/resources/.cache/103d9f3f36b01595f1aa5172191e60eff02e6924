@@ -1,4 +1,4 @@
-// 1.21.1	2025-01-27T15:08:46.559048645	Registries
+// 1.21.1	2025-01-27T16:22:07.713376467	Registries
 fdd9fb10fe879fb5341bc372a8038881bf03407a data/researchd/researchd/research/coal.json
 f5cca37493b05fba41f90fe8e3a7b816bc0de0da data/researchd/researchd/research/coal_block.json
 6b4352d876a57dd82c14f2059587ab787f98de65 data/researchd/researchd/research/copper.json
@@ -7,6 +7,8 @@ f5cca37493b05fba41f90fe8e3a7b816bc0de0da data/researchd/researchd/research/coal_
 87f63c224ed13a9da15781070c4efbd942cd6c8d data/researchd/researchd/research/gold_hoe.json
 54c12f77f444a9bb353364221f2dde4e5e08c7ec data/researchd/researchd/research/iron_block.json
 9021c885c591cefc40902aa4ea88ad658c67414e data/researchd/researchd/research/iron_ingot.json
+9522ebb8d737a2ad92b754f7f0c05a09198055d7 data/researchd/researchd/research/iron_sword.json
+ee9ff6de49540ca58a731f88075725bf951bd12b data/researchd/researchd/research/minecart.json
 dfb9c07a9a4addee9b7b0c09594b8b3c13a2a9b9 data/researchd/researchd/research/stick.json
 c240afbaba0b82ccf3def716962c5fec63ebf331 data/researchd/researchd/research/stone.json
 a4b80b6171d2b59c13332afb2440282b96e83051 data/researchd/researchd/research/wood.json

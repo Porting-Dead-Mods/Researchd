@@ -22,94 +22,20 @@ public final class Researches {
     public static final ResourceKey<Research> WOOD = register("wood", builder -> builder
             .icon(Items.OAK_LOG)
             .researchMethods(List.of(
-                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 2)
+                    new ConsumeItemResearchMethod(Ingredient.of(Items.DIRT), 8)
             )));
-    public static final ResourceKey<Research> STICK = register("stick", builder -> builder
-            .icon(Items.STICK)
-            .researchMethods(List.of(
-                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 5)
-            ))
-            .parents(Researches.WOOD)
-            .requiresParent(false));
-    public static final ResourceKey<Research> WOODEN_PICKAXE = register("wooden_pickaxe", builder -> builder
-            .icon(Items.WOODEN_PICKAXE)
-            .researchMethods(List.of(
-                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 6),
-                    new ConsumePackResearchMethod(ResearchPacks.NETHER, 3)
-            ))
-            .parents(WOOD, STICK)
-            .requiresParent(true));
     public static final ResourceKey<Research> STONE = register("stone", builder -> builder
             .icon(Items.STONE)
+            .parents(WOOD)
             .researchMethods(List.of(
-                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 3),
-                    new ConsumePackResearchMethod(ResearchPacks.END, 4)
-            ))
-            .parents(WOOD, STICK)
-            .requiresParent(true));
-    public static final ResourceKey<Research> COPPER = register("copper", builder -> builder
-            .icon(Items.RAW_COPPER)
-            .researchMethods(List.of(
-                    new ConsumePackResearchMethod(ResearchPacks.NETHER, 5)
-            ))
-            .parents(WOODEN_PICKAXE)
-            .requiresParent(true));
-    public static final ResourceKey<Research> COAL = register("coal", builder -> builder
-            .icon(Items.COAL)
-            .researchMethods(List.of(
-                    new ConsumePackResearchMethod(ResearchPacks.NETHER, 7),
-                    new ConsumePackResearchMethod(ResearchPacks.END, 4)
-            ))
-            .parents(WOODEN_PICKAXE)
-            .requiresParent(true));
-    public static final ResourceKey<Research> DIAMOND = register("diamond", builder -> builder
-            .icon(Items.DIAMOND)
-            .researchMethods(List.of(
-                    new ConsumePackResearchMethod(ResearchPacks.NETHER, 7),
-                    new ConsumePackResearchMethod(ResearchPacks.END, 4)
-            ))
-            .parents(COPPER)
-            .requiresParent(true));
-    public static final ResourceKey<Research> IRON_INGOT = register("iron_ingot", builder -> builder
+                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 4)
+            )));
+    public static final ResourceKey<Research> IRON = register("iron", builder -> builder
             .icon(Items.IRON_INGOT)
+            .parents(STONE)
             .researchMethods(List.of(
-                    new ConsumePackResearchMethod(ResearchPacks.NETHER, 7),
-                    new ConsumePackResearchMethod(ResearchPacks.END, 4)
-            ))
-            .parents(COPPER)
-            .requiresParent(true));
-    public static final ResourceKey<Research> COPPER_INGOT = register("copper_ingot", builder -> builder
-            .icon(Items.COPPER_INGOT)
-            .researchMethods(List.of(
-                    new ConsumePackResearchMethod(ResearchPacks.NETHER, 7),
-                    new ConsumePackResearchMethod(ResearchPacks.END, 4)
-            ))
-            .parents(COPPER)
-            .requiresParent(true));
-    public static final ResourceKey<Research> IRON_BLOCK = register("iron_block", builder -> builder
-            .icon(Items.IRON_BLOCK)
-            .researchMethods(List.of(
-                    new ConsumePackResearchMethod(ResearchPacks.NETHER, 7),
-                    new ConsumePackResearchMethod(ResearchPacks.END, 4)
-            ))
-            .parents(COPPER)
-            .requiresParent(true));
-    public static final ResourceKey<Research> GOLD_HOE = register("gold_hoe", builder -> builder
-            .icon(Items.GOLDEN_HOE)
-            .researchMethods(List.of(
-                    new ConsumePackResearchMethod(ResearchPacks.NETHER, 7),
-                    new ConsumePackResearchMethod(ResearchPacks.END, 4)
-            ))
-            .parents(COPPER)
-            .requiresParent(true));
-    public static final ResourceKey<Research> COAL_BLOCK = register("coal_block", builder -> builder
-            .icon(Items.COAL_BLOCK)
-            .researchMethods(List.of(
-                    new ConsumePackResearchMethod(ResearchPacks.NETHER, 7),
-                    new ConsumePackResearchMethod(ResearchPacks.END, 4)
-            ))
-            .parents(COAL)
-            .requiresParent(true));
+                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 6)
+            )));
 
     public static void bootstrap(BootstrapContext<Research> context) {
         for (Map.Entry<ResourceKey<Research>, Research.Builder<?>> research : RESEARCHES.entrySet()) {

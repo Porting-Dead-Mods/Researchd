@@ -5,8 +5,10 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
+import com.portingdeadmods.researchd.registries.Researches;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchGraph;
+import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
@@ -43,11 +45,18 @@ public class ResearchGraphWidget extends AbstractWidget {
         renderNode(node, guiGraphics, i, i1, v);
         //guiGraphics.vLine(node.getX() + (node.getWidth() / 2), node.getY() + node.getWidth(), node.getNext().stream().findFirst().get().getY(), -1);
         guiGraphics.disableScissor();
+        renderNodeTooltip(node, guiGraphics, i, i1, v);
     }
 
     private void renderNode(ResearchNode node, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         node.render(guiGraphics, mouseX, mouseY, partialTick);
 
+        for (ResearchNode rNode : node.getChildren()) {
+            renderNode(rNode, guiGraphics, mouseX, mouseY, partialTick);
+        }
+    }
+
+    private void renderNodeTooltip(ResearchNode node, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         if (node.isHovered()) {
             Minecraft minecraft = Minecraft.getInstance();
             guiGraphics.renderComponentTooltip(minecraft.font, List.of(
@@ -57,7 +66,7 @@ public class ResearchGraphWidget extends AbstractWidget {
         }
 
         for (ResearchNode rNode : node.getChildren()) {
-            renderNode(rNode, guiGraphics, mouseX, mouseY, partialTick);
+            renderNodeTooltip(rNode, guiGraphics, mouseX, mouseY, partialTick);
         }
     }
 
@@ -82,70 +91,72 @@ public class ResearchGraphWidget extends AbstractWidget {
     }
 
     public void setCoordinates() {
-        int startY = getY() + 10;
         for (int i = 0; i < this.layers.size(); i++) {
             Layer layer = this.layers.get(i);
 
-            for (Map.Entry<List<ResourceKey<Research>>, List<ResearchNode>> entry : layer.nodes().entrySet()) {
-                for (ResearchNode node : entry.getValue()) {
-                    // If the node is the root node
-                    if (node.isRootNode()) {
-                        node.setX(getX() + getWidth() / 2);
-                        node.setY(startY);
-                        break;
-                    }
-
-                    Set<ResearchNode> children = node.getChildren();
-                    Set<ResearchNode> parents = node.getParents();
-
-                    // Check if one of the parents is in same layer
-                    for (ResearchNode parentNode : parents) {
-                        if (layer.flatten().contains(parentNode)) {
-                            // If both the parent and the child are in the same layer.
-                            // This means that child has more than one parent, otherwise
-                            // the child would be on different layer
-
-                            // Parents of the child without the node that is in same line
-                            List<ResearchNode> sortedParents = new ArrayList<>(parents.stream()
-                                    .sorted(Comparator.comparingInt(ResearchNode::getX))
-                                    .toList());
-                            sortedParents.remove(parentNode);
-
-                            int firstX = sortedParents.getFirst().getX();
-                            Researchd.LOGGER.debug("first: {} x: {}", firstX, sortedParents.getFirst().getInstance().getResearch());
-                            int distance = sortedParents.getLast().getX() - firstX;
-                            Researchd.LOGGER.debug("distance: {}", distance);
-                            node.setX(firstX + distance / 2);
-                            node.setY(i * (ResearchScreenWidget.PANEL_HEIGHT + 20));
-                            break;
-                        }
-                    }
-
-
-                }
+            int x = getX();
+            for (Map.Entry<List<ResourceKey<Research>>, Group> entry : layer.nodes().entrySet()) {
+                x += setGroupCoordinates(entry.getValue().entries(), x, getY() + i * (ResearchScreenWidget.PANEL_HEIGHT + 10));
+                x += 20;
             }
         }
+
+        for (int i = 0; i < this.layers.size(); i++) {
+            Layer layer = this.layers.get(i);
+            for (Map.Entry<List<ResourceKey<Research>>, Group> entry : layer.nodes().entrySet()) {
+                centerGroupUnderGroup(entry.getValue(), entry.getValue().entries().getFirst().getParents().stream()
+                        .sorted(Comparator.comparingInt(ResearchNode::getX)).toList(), getY() + i * (ResearchScreenWidget.PANEL_HEIGHT + 10));
+            }
+        }
+
     }
 
-    private void setGroupCoordinates(List<ResearchNode> researches, int x, int y) {
-        for (int i = 0; i < researches.size(); i++) {
-            ResearchNode node = researches.get(i);
-            node.setX(x + i * (ResearchScreenWidget.PANEL_WIDTH + 10));
+    private void centerGroupUnderGroup(Group toCenter, List<ResearchNode> target, int y) {
+        if (target.isEmpty()) return;
+
+        int targetWidth = target.size() * (ResearchScreenWidget.PANEL_WIDTH + 10) - 10;
+        List<ResearchNode> entries = toCenter.entries();
+        int toCenterWidth = entries.size() * (ResearchScreenWidget.PANEL_WIDTH + 10) - 10;
+
+        int x = target.stream().min(Comparator.comparingInt(ResearchNode::getX)).get().getX();
+        int startX = x + (targetWidth / 2) - (toCenterWidth / 2);
+
+        for (int i = 0; i < entries.size(); i++) {
+            ResearchNode node = entries.get(i);
+            node.setX(startX + i * (ResearchScreenWidget.PANEL_WIDTH + 10));
             node.setY(y);
         }
     }
 
-    private record Layer(Map<List<ResourceKey<Research>>, List<ResearchNode>> nodes) {
+    private int setGroupCoordinates(List<ResearchNode> researches, int x, int y) {
+        int i;
+        for (i = 0; i < researches.size(); i++) {
+            ResearchNode node = researches.get(i);
+            node.setX(x + i * (ResearchScreenWidget.PANEL_WIDTH + 10));
+            node.setY(y);
+        }
+        return i * (ResearchScreenWidget.PANEL_WIDTH + 10);
+    }
+
+    private List<ResearchNode> getChildNodes(ResearchNode parentNode) {
+        List<ResearchNode> nodes = new ArrayList<>();
+        for (ResearchNode childNode : parentNode.getChildren()) {
+            nodes.add(childNode);
+        }
+        return nodes;
+    }
+
+    private record Layer(Map<List<ResourceKey<Research>>, Group> nodes) {
         public static Int2ObjectMap<Layer> calculate(ResearchGraph graph) {
-            Int2ObjectMap<Layer> nodes = new Int2ObjectOpenHashMap<>();
-            traverseTree(graph.rootNode(), nodes, new HashSet<>(graph.nodes()), 0);
+            Int2ObjectMap<Layer> nodes = new Int2ObjectLinkedOpenHashMap<>();
+            traverseTree(graph.rootNode(), nodes, new LinkedHashSet<>(graph.nodes()), 0);
 
             return nodes;
         }
 
         private static void traverseTree(ResearchNode node, Int2ObjectMap<Layer> nodes, Set<ResearchNode> remaining, int nesting) {
             nodes.computeIfAbsent(nesting, key -> new Layer(new LinkedHashMap<>())).nodes()
-                    .computeIfAbsent(getResearch(node).parents(), k -> new ArrayList<>())
+                    .computeIfAbsent(getResearch(node).parents(), k -> new Group())
                     .add(node);
 
             for (ResearchNode nextNode : node.getChildren()) {
@@ -157,8 +168,79 @@ public class ResearchGraphWidget extends AbstractWidget {
         }
 
         public List<ResearchNode> flatten() {
-            return this.nodes.values().stream().flatMap(List::stream).toList();
+            return this.nodes.values().stream().flatMap(e -> e.entries.stream()).toList();
         }
+    }
+
+    private static final class Group {
+        private final List<ResearchNode> entries;
+        private int x;
+        private int y;
+
+        private Group(List<ResearchNode> entries, int x, int y) {
+            this.entries = entries;
+            this.x = x;
+            this.y = y;
+        }
+
+        public Group() {
+            this(new ArrayList<>(), 0, 0);
+        }
+
+        public void add(ResearchNode node) {
+            this.entries.add(node);
+            this.x = this.entries.getFirst().getX();
+            this.y = this.entries.getFirst().getY();
+        }
+
+        public List<ResearchNode> entries() {
+            return entries;
+        }
+
+        public void setX(int x) {
+            this.x = x;
+            List<ResearchNode> researchNodes = this.entries;
+            for (int i = 0; i < researchNodes.size(); i++) {
+                ResearchNode node = researchNodes.get(i);
+                node.setX(x + i * (ResearchScreenWidget.PANEL_WIDTH + 10));
+            }
+        }
+
+        public int x() {
+            return x;
+        }
+
+        public int y() {
+            return y;
+        }
+
+        public int width() {
+            return this.entries.size() * (ResearchScreenWidget.PANEL_WIDTH + 10) - 10;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj == null || obj.getClass() != this.getClass()) return false;
+            var that = (Group) obj;
+            return Objects.equals(this.entries, that.entries) &&
+                    this.x == that.x &&
+                    this.y == that.y;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(entries, x, y);
+        }
+
+        @Override
+        public String toString() {
+            return "Group[" +
+                    "entries=" + entries + ", " +
+                    "x=" + x + ", " +
+                    "y=" + y + ']';
+        }
+
     }
 
     private static @NotNull Research getResearch(ResearchNode node) {
