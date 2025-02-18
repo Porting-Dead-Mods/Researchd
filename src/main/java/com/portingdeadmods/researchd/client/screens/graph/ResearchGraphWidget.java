@@ -3,11 +3,13 @@ package com.portingdeadmods.researchd.client.screens.graph;
 import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.registries.Researches;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchGraph;
+import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -114,6 +116,18 @@ public class ResearchGraphWidget extends AbstractWidget {
             }
         }
 
+        for (int i = 0; i < this.layers.size(); i++) {
+            Layer layer = this.layers.get(i);
+            for (Map.Entry<List<ResourceKey<Research>>, Group> entry0 : layer.nodes().entrySet()) {
+                for (Map.Entry<List<ResourceKey<Research>>, Group> entry1 : layer.nodes().entrySet()) {
+                    Pair<ResearchNode, ResearchNode> result = doNodesIntersect(entry0.getValue(), entry1.getValue());
+                    if (result != null) {
+                        Researchd.LOGGER.debug("Node 0: {}, Node 1: {}", result.first(), result.second());
+                    }
+                }
+            }
+        }
+
     }
 
     private void centerGroupUnderGroup(Group toCenter, List<ResearchNode> target, int y) {
@@ -157,6 +171,38 @@ public class ResearchGraphWidget extends AbstractWidget {
         }
     }
 
+    private @Nullable Pair<ResearchNode, ResearchNode> doNodesIntersect(Group nodes0, Group nodes1) {
+        for (ResearchNode node0 : nodes0) {
+            for (ResearchNode node1 : nodes1) {
+                if (doNodesIntersect(node0, node1)) {
+                    return Pair.of(node0, node1);
+                }
+            }
+        }
+        return null;
+    }
+
+    private boolean doNodesIntersect(ResearchNode node0, ResearchNode node1) {
+        return doNodesIntersect(node0.getX(), node0.getX() + ResearchScreenWidget.PANEL_WIDTH, node1.getX(), node1.getX() + ResearchScreenWidget.PANEL_WIDTH);
+    }
+
+    boolean doNodesIntersect(int x1, int x2, int x3, int x4) {
+        // Ensure x1 < x2 and x3 < x4 by sorting
+        if (x1 > x2) {
+            int temp = x1;
+            x1 = x2;
+            x2 = temp;
+        }
+        if (x3 > x4) {
+            int temp = x3;
+            x3 = x4;
+            x4 = temp;
+        }
+
+        // Check if the lines overlap or touch
+        return Math.max(x1, x3) <= Math.min(x2, x4);
+    }
+
     private record Nodes(List<ResearchNode> nodes) {
         public void offsetX(int offsetX) {
             for (ResearchNode node : nodes) {
@@ -197,7 +243,7 @@ public class ResearchGraphWidget extends AbstractWidget {
         }
     }
 
-    private static final class Group {
+    private static final class Group implements Iterable<ResearchNode> {
         private final List<ResearchNode> entries;
         private int x;
         private int y;
@@ -266,6 +312,10 @@ public class ResearchGraphWidget extends AbstractWidget {
                     "y=" + y + ']';
         }
 
+        @Override
+        public @NotNull Iterator<ResearchNode> iterator() {
+            return this.entries.iterator();
+        }
     }
 
     private static @NotNull Research getResearch(ResearchNode node) {
