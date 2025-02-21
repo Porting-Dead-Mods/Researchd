@@ -1,258 +1,172 @@
 package com.portingdeadmods.researchd.client.screens.lines;
 
-import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
-public class ResearchLine implements Renderable {
-	/**
-	 * A dirty fix for custom lines consisting of a fill between 2 points
-	 */
-	public static class LineCoordinates {
-		public int x1;
-		public int y1;
-		public int x2;
-		public int y2;
+public class ResearchLine {
+	private final LinkedList<Point> points;
 
-		public LineCoordinates(int x1, int y1, int x2, int y2) {
-			this.x1 = x1;
-			this.y1 = y1;
-			this.x2 = x2;
-			this.y2 = y2;
-		}
-
-		public void translateX(int dx) {
-			this.x1 += dx;
-			this.x2 += dx;
-		}
-
-		public void translateY(int dy) {
-			this.y1 += dy;
-			this.y2 += dy;
-		}
-
-		public String toString() {
-			return "LineCoordinates{" +
-					"x1=" + x1 +
-					", y1=" + y1 +
-					", x2=" + x2 +
-					", y2=" + y2 +
-					'}';
-		}
+	private ResearchLine() {
+		this.points = new LinkedList<>();
 	}
 
 	/**
-	 * @param node {@link ResearchNode} to get input heads for
-	 * @return Set of {@link LineCoordinates} for every input head
+	 * Creates a new line builder starting at the given point
 	 */
-	public static Set<LineCoordinates> getInputHeadPositions(ResearchNode node) {
-		Set<LineCoordinates> positions = new HashSet<>();
-		int width = node.getWidth();   // Node width
-		int height = node.getHeight(); // Node height
-		int lineWidth = 4;             // Line width
-		int inputs = 2;                // TODO: Number of parents, set to 2 for testing
-
-		if (inputs == 1) {
-			int x = node.getX() + node.getWidth() / 2;
-			int y = node.getY();
-
-			positions.add(new LineCoordinates(x, y + 20,x + 4, y));
-			return positions;
-		}
-
-		for (int i = 0; i < inputs; i++) {
-			int x = node.getX() + (i * (width - lineWidth) / (inputs - 1)) + (lineWidth / 2);
-			int y = node.getY();
-
-			positions.add(new LineCoordinates(x, y + 20, x + 4, y));
-		}
-
-		return positions;
+	public static ResearchLine start(Point start) {
+		ResearchLine line = new ResearchLine();
+		line.points.add(start);
+		return line;
 	}
 
 	/**
-	 * @param node {@link ResearchNode} to get output heads for
-	 * @return Set of {@link LineCoordinates} for every output head
+	 * Creates a new line builder starting at the given coordinates
 	 */
-	public static Set<LineCoordinates> getOutputHeadPositions(ResearchNode node) {
-		Set<LineCoordinates> positions = new HashSet<>();
-		int width = node.getWidth();   // Node width
-		int height = node.getHeight(); // Node height
-		int lineWidth = 4;             // Line width
-		int outputs = 2;               // TODO: Number of children, set to 2 for testing
-
-		if (outputs == 1) {
-			int x = node.getX() + node.getWidth() / 2;
-			int y = node.getY() + height;
-
-			positions.add(new LineCoordinates(x, y,x + 4, y + 20));
-			return positions;
-		}
-
-		for (int i = 0; i < outputs; i++) {
-			int x = node.getX() + (i * (width - lineWidth) / (outputs - 1)) + (lineWidth / 2);
-			int y = node.getY() + height;
-
-			positions.add(new LineCoordinates(x, y, x + 4, y + 20));
-		}
-
-		return positions;
+	public static ResearchLine start(int x, int y) {
+		return start(new Point(x, y));
 	}
 
 	/**
-	 * @param node {@link ResearchNode} to get input heads for
-	 * @return {@link ResearchLine} object consisting of every input head
+	 * Adds a point to the line path
 	 */
-	public static ResearchLine getInputResearchHeads(ResearchNode node) {
-		return new ResearchLine(getInputHeadPositions(node));
+	public ResearchLine then(Point point) {
+		points.add(point);
+		return this;
 	}
 
 	/**
-	 * @param node {@link ResearchNode} to get output heads for
-	 * @return {@link ResearchLine} object consisting of every output head
+	 * Adds a point to the line path using coordinates
 	 */
-	public static ResearchLine getOutputResearchHeads(ResearchNode node) {
-		return new ResearchLine(getOutputHeadPositions(node));
-	}
-
-	public ArrayList<LineCoordinates> lines;
-
-	public ResearchLine(Collection<LineCoordinates> lines) {
-		this.lines = new ArrayList<>(lines);
-	}
-
-	@Override
-	public void render(@NotNull GuiGraphics guiGraphics, int i, int i1, float v) {
-		for (LineCoordinates line : lines) {
-			// TODO: Fix lines not rendering even though they are in the correct position (debugging shows correct pos :p)
-			//System.out.printf("Rendering line: %d:%d -> %d:%d\n", line.x1, line.y1, line.x2, line.y2);
-			guiGraphics.fill(line.x1, line.y1, line.x2, line.y2, 0xFFFFFFFF);
-		}
-	}
-
-	public List<LineCoordinates> getLineComponents() {
-		return this.lines;
-	}
-
-	// Instance methods
-	public int getWidth() {
-		int xLeft = Integer.MAX_VALUE;
-		int xRight = Integer.MIN_VALUE;
-
-		for (LineCoordinates line : lines) {
-			xLeft = Math.min(xLeft, line.x1);
-			xRight = Math.max(xRight, line.x2);
-		}
-
-		return xRight - xLeft;
-	}
-
-	public int getHeight() {
-		int yTop = Integer.MAX_VALUE;
-		int yBottom = Integer.MIN_VALUE;
-
-		for (LineCoordinates line : lines) {
-			yTop = Math.min(yTop, line.y1);
-			yBottom = Math.max(yBottom, line.y2);
-		}
-
-		return yBottom - yTop;
-	}
-
-	public int getX() {
-		int xLeft = Integer.MAX_VALUE;
-
-		for (LineCoordinates line : lines) {
-			xLeft = Math.min(xLeft, line.x1);
-		}
-
-		return xLeft;
-	}
-
-	public int getY() {
-		int yTop = Integer.MAX_VALUE;
-
-		for (LineCoordinates line : lines) {
-			yTop = Math.min(yTop, line.y1);
-		}
-
-		return yTop;
-	}
-
-	public void translateX(int dx) {
-		for (LineCoordinates line : lines) {
-			line.translateX(dx);
-		}
-	}
-
-	public void translateY(int dy) {
-		for (LineCoordinates line : lines) {
-			line.translateY(dy);
-		}
-	}
-
-	// Static methods
-
-	/**
-	 * @param lines Collection of {@link LineCoordinates}
-	 * @return The "width" of the collection of lines, the distance between the leftmost and rightmost points
-	 */
-	public static int getWidth(Iterable<LineCoordinates> lines) {
-		int xLeft = Integer.MAX_VALUE;
-		int xRight = Integer.MIN_VALUE;
-
-		for (LineCoordinates line : lines) {
-			xLeft = Math.min(xLeft, line.x1);
-			xRight = Math.max(xRight, line.x2);
-		}
-
-		return xRight - xLeft;
+	public ResearchLine then(int x, int y) {
+		return then(new Point(x, y));
 	}
 
 	/**
-	 * @param lines Collection of {@link LineCoordinates}
-	 * @return The "height" of the collection of lines, the distance between the topmost and bottommost points
+	 * Adds a relative horizontal line segment
 	 */
-	public static int getHeight(Iterable<LineCoordinates> lines) {
-		int yTop = Integer.MAX_VALUE;
-		int yBottom = Integer.MIN_VALUE;
-
-		for (LineCoordinates line : lines) {
-			yTop = Math.min(yTop, line.y1);
-			yBottom = Math.max(yBottom, line.y2);
-		}
-
-		return yBottom - yTop;
+	public ResearchLine horizontal(int dx) {
+		Point last = points.getLast();
+		return then(last.x + dx, last.y);
 	}
 
 	/**
-	 * @param lines Collection of {@link LineCoordinates}
-	 * @return The leftmost x coordinate of the collection of lines
+	 * Adds a relative vertical line segment
 	 */
-	public static int getX(Iterable<LineCoordinates> lines) {
-		int xLeft = Integer.MAX_VALUE;
-
-		for (LineCoordinates line : lines) {
-			xLeft = Math.min(xLeft, line.x1);
-		}
-
-		return xLeft;
+	public ResearchLine vertical(int dy) {
+		Point last = points.getLast();
+		return then(last.x, last.y + dy);
 	}
 
 	/**
-	 * @param lines Collection of {@link LineCoordinates}
-	 * @return The topmost y coordinate of the collection of lines
+	 * Builds a simple L-shaped connection between two points.
+	 * Goes vertical first, then horizontal.
 	 */
-	public static int getY(Iterable<LineCoordinates> lines) {
-		int yTop = Integer.MAX_VALUE;
+	public static ResearchLine createLConnection(Point start, Point end) {
+		return ResearchLine.start(start)
+				.then(start.x, end.y)
+				.then(end);
+	}
 
-		for (LineCoordinates line : lines) {
-			yTop = Math.min(yTop, line.y1);
+	/**
+	 * Builds a connection between input and output points of research nodes
+	 * with an L-shaped path.
+	 */
+	public static ResearchLine connectNodes(Point outputPoint, Point inputPoint) {
+		// Creates path from output -> input with a vertical segment followed by horizontal
+		return createLConnection(outputPoint, inputPoint);
+	}
+
+	public void render(@NotNull GuiGraphics guiGraphics) {
+		if (points.size() < 2) return;
+
+		Point prev = points.getFirst();
+		for (Point curr : points.stream().skip(1).toList()) {
+			new LineSegment(prev, curr).render(guiGraphics);
+			prev = curr;
+		}
+	}
+
+	/**
+	 * Gets all points in this line
+	 */
+	public LinkedList<Point> getPoints() {
+		return new LinkedList<>(points);
+	}
+
+	/**
+	 * Translates all points in this line by the given amounts
+	 */
+	public ResearchLine translate(int dx, int dy) {
+		points.replaceAll(p -> new Point(p.x + dx, p.y + dy));
+		return this;
+	}
+
+	/**
+	 * Returns the start point of this line
+	 */
+	public Point getStart() {
+		return points.getFirst();
+	}
+
+	/**
+	 * Returns the end point of this line
+	 */
+	public Point getEnd() {
+		return points.getLast();
+	}
+
+	/**
+	 * Finds all intersections/overlaps between this line and another line
+	 * @param other The other ResearchLine to check against
+	 * @return Set of PotentialOverlaps where the lines intersect or overlap
+	 */
+	public Set<PotentialOverlap> getOverlaps(ResearchLine other) {
+		return getOverlaps(this, other);
+	}
+	
+	/**
+	 * Extracts all the line segments from a research line
+	 */
+	private static List<LineSegment> getLineSegments(ResearchLine line) {
+		List<LineSegment> segments = new ArrayList<>();
+		List<Point> points = line.getPoints().stream().toList();
+
+		for (int i = 0; i < points.size() - 1; i++) {
+			segments.add(new LineSegment(points.get(i), points.get(i + 1)));
 		}
 
-		return yTop;
+		return segments;
+	}
+	
+	/**
+	 * Finds all intersections/overlaps between two research lines
+	 * @param line1 First ResearchLine
+	 * @param line2 Second ResearchLine
+	 * @return Set of PotentialOverlaps where the lines intersect or overlap
+	 */
+	public static Set<PotentialOverlap> getOverlaps(ResearchLine line1, ResearchLine line2) {
+		Set<PotentialOverlap> overlaps = new HashSet<>();
+
+		List<LineSegment> segments1 = getLineSegments(line1);
+		List<LineSegment> segments2 = getLineSegments(line2);
+
+		for (LineSegment seg1 : segments1) {
+			for (LineSegment seg2 : segments2) {
+				PotentialOverlap overlap = PotentialOverlap.of(seg1, seg2);
+				if (overlap != null) {
+					overlaps.add(overlap);
+				}
+			}
+		}
+
+		return overlaps;
 	}
 }
