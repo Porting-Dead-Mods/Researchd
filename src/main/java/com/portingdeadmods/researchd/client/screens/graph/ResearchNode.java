@@ -3,12 +3,18 @@ package com.portingdeadmods.researchd.client.screens.graph;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
+import com.portingdeadmods.researchd.client.screens.lines.ResearchHead;
 import com.portingdeadmods.researchd.client.screens.lines.ResearchLine;
+import com.portingdeadmods.researchd.utils.UniqueArray;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.CommonComponents;
 
+import java.awt.*;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -18,36 +24,39 @@ import java.util.Set;
  * @see ResearchInstance
  */
 public class ResearchNode extends AbstractWidget {
-    private final Set<ResearchNode> parents;
-    private final Set<ResearchNode> children;
+    private final UniqueArray<ResearchNode> parents;
+    private final UniqueArray<ResearchNode> children;
     private final ResearchInstance instance;
-    private final ResearchLine inputs;
-    private final ResearchLine outputs;
+
+    private final UniqueArray<ResearchHead> inputs;
+    private final UniqueArray<ResearchHead> outputs;
+
     private boolean rootNode;
+    private boolean wasRefreshed = false;
 
     public ResearchNode(ResearchInstance instance) {
         super(0, 0, ResearchScreenWidget.PANEL_WIDTH, ResearchScreenWidget.PANEL_HEIGHT, CommonComponents.EMPTY);
         this.instance = instance;
-        this.children = new LinkedHashSet<>();
-        this.parents = new LinkedHashSet<>();
-        this.inputs = ResearchLine.getInputResearchHeads(this);
-        this.outputs = ResearchLine.getOutputResearchHeads(this);
+        this.children = new UniqueArray<>();
+        this.parents = new UniqueArray<>();
+        this.inputs = new UniqueArray<>();
+        this.outputs = new UniqueArray<>();
         this.rootNode = false;
     }
 
     public void addChild(ResearchNode child) {
-        this.children.add(child);
+        this.children.addLast(child);
     }
 
     public void addParent(ResearchNode parent) {
-        this.parents.add(parent);
+        this.parents.addLast(parent);
     }
 
-    public Set<ResearchNode> getChildren() {
+    public UniqueArray<ResearchNode> getChildren() {
         return children;
     }
 
-    public Set<ResearchNode> getParents() {
+    public UniqueArray<ResearchNode> getParents() {
         return parents;
     }
 
@@ -55,12 +64,20 @@ public class ResearchNode extends AbstractWidget {
         return instance;
     }
 
-    public ResearchLine getInputs() {
+    public UniqueArray<ResearchHead> getInputs() {
         return inputs;
     }
 
-    public ResearchLine getOutputs() {
+    public UniqueArray<ResearchHead> getOutputs() {
         return outputs;
+    }
+
+    public void refreshHeads() {
+        this.inputs.clear();
+        this.inputs.addAll(ResearchHead.inputsOf(this));
+
+        this.outputs.clear();
+        this.outputs.addAll(ResearchHead.outputsOf(this));
     }
 
     public boolean isRootNode() {
@@ -74,8 +91,26 @@ public class ResearchNode extends AbstractWidget {
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
         ResearchScreenWidget.renderResearchPanel(guiGraphics, instance,  getX(), getY(), mouseX, mouseY);
-        //this.inputs.render(guiGraphics, mouseX, mouseY, v);
-        //this.outputs.render(guiGraphics, mouseX, mouseY, v);
+        if (wasRefreshed) {
+            refreshHeads();
+        }
+
+        for (ResearchHead input : inputs) {
+            input.render(guiGraphics);
+        }
+        for (ResearchHead output : outputs) {
+            output.render(guiGraphics);
+        }
+
+        // Render connections to children
+        // Connect the parent's output to all the children's inputs for the sake of demonstration (even though it is wrong xd)
+        for (int i = 0; i < children.size(); i++) {
+            Point outputConnPoint = outputs.get(i).getConnectionPoint();
+            children.get(i).getInputs().forEach(input -> {
+                Point inputConnPoint = input.getConnectionPoint();
+                ResearchLine.connectNodes(outputConnPoint, inputConnPoint).render(guiGraphics);
+            });
+        }
     }
 
     @Override
@@ -99,8 +134,8 @@ public class ResearchNode extends AbstractWidget {
         int dx = x1 - getX();
         setX(x1);
 
-        this.inputs.translateX(dx);
-        this.outputs.translateX(dx);
+        this.wasRefreshed = true;
+        refreshHeads();
     }
 
     /**
@@ -112,7 +147,7 @@ public class ResearchNode extends AbstractWidget {
         int dy = y1 - getY();
         setY(y1);
 
-        this.inputs.translateY(dy);
-        this.outputs.translateY(dy);
+        this.wasRefreshed = true;
+        refreshHeads();
     }
 }

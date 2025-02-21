@@ -43,6 +43,8 @@ public final class ClientResearchCache {
                     parentNode.addChild(node);
                 }
             }
+
+            node.refreshHeads();
         }
 
         for (ResearchNode node : NODES) {
@@ -51,6 +53,8 @@ public final class ClientResearchCache {
             for (ResourceKey<Research> parent : parents) {
                 node.addParent(getNodeByResearch(parent));
             }
+
+            node.refreshHeads();
         }
 
         Set<ResearchNode> referencedNodes = new LinkedHashSet<>();

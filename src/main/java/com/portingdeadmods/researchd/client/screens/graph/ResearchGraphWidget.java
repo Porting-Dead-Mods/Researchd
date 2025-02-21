@@ -47,8 +47,10 @@ public class ResearchGraphWidget extends AbstractWidget {
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int i, int i1, float v) {
         guiGraphics.enableScissor(getX(), getY(), getX() + getWidth(), getY() + getHeight());
+
         ResearchNode node = graph.rootNode();
         renderNode(node, guiGraphics, i, i1, v);
+
         guiGraphics.disableScissor();
         renderNodeTooltip(node, guiGraphics, i, i1, v);
     }
@@ -57,7 +59,7 @@ public class ResearchGraphWidget extends AbstractWidget {
         node.render(guiGraphics, mouseX, mouseY, partialTick);
 
         for (ResearchNode childNode : node.getChildren()) {
-            ResearchLineHelper.drawLineBetweenNodes(guiGraphics, node, childNode);
+            //ResearchLineHelper.drawLineBetweenNodes(guiGraphics, node, childNode);
             renderNode(childNode, guiGraphics, mouseX, mouseY, partialTick);
         }
     }
