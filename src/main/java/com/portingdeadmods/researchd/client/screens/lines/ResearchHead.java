@@ -63,8 +63,10 @@ public class ResearchHead {
 		int parentCount = node.getParents().size();
 		int width = ResearchScreenWidget.PANEL_WIDTH; // Node width
 
-		// If no parents or just one, create a centered head
-		if (parentCount == 0 || parentCount == 1) {
+		if (parentCount == 0) return positions;
+
+		// If one, create a centered head
+		if (parentCount == 1) {
 			int x = node.getX() + width / 2;
 			int y = node.getY();
 			positions.add(new ResearchHead(x, y, true));
@@ -91,8 +93,10 @@ public class ResearchHead {
 		int childCount = node.getChildren().size();
 		int width = ResearchScreenWidget.PANEL_WIDTH; // Node width
 
-		// If no children or just one, create a centered head
-		if (childCount == 0 || childCount == 1) {
+		if (childCount == 0) return positions;
+
+		// If one, create a centered head
+		if (childCount == 1) {
 			int x = node.getX() + width / 2;
 			int y = node.getY() + ResearchScreenWidget.PANEL_HEIGHT - 1;
 			positions.add(new ResearchHead(x, y, false));
