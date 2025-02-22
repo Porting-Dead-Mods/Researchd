@@ -1,11 +1,18 @@
-// 1.21.1	2025-02-17T16:44:09.917609161	Registries
+// 1.21.1	2025-02-22T18:38:07.531311984	Registries
+48d76844fccc2af4df3ac06249f44ff84daaf5fb data/researchd/researchd/research/charged_creeper.json
+a066d3f1d256392f70382b6535f6b3e20021aa96 data/researchd/researchd/research/chiseled_copper.json
 f1c6f605d38eb604fab8ad7fdcce433574e33f34 data/researchd/researchd/research/copper.json
 50089f554619f823b100711603d3c2859daebb67 data/researchd/researchd/research/copper_block.json
+26018ef7f7f07a165e6549680e09daccd7699f89 data/researchd/researchd/research/diamond_armor.json
+518a1c3f3ed15ec0b2fad53ccc560f6c05526762 data/researchd/researchd/research/diamond_sword.json
 055ae1c551201893c42a60ecb85bf23134ddb10b data/researchd/researchd/research/iron.json
 bb35b8315a26f5358d23c26fd8d8e7e12ceedef8 data/researchd/researchd/research/iron_armor.json
 aba3d2745f24a9c4a4e7db14661ba94036f93eb3 data/researchd/researchd/research/iron_tools.json
 8166130181c95f4745c961e37f7154db44cb375f data/researchd/researchd/research/lightning_rod.json
+cb596a0a4c7efda55c29140763f73e7c88f399c3 data/researchd/researchd/research/oxidized_copper.json
+0d99ff30473c66c1b5869c352ec529a5b8e281b0 data/researchd/researchd/research/skeleton_horse.json
 3aca8a2185e8f4e059541c718fbcac5c54479ecd data/researchd/researchd/research/stone.json
+e5e082950fe8d251fdab286dcbcf47485c6b8d1c data/researchd/researchd/research/trident.json
 d6a7eb262d9a7e84c71bb401b8cd63d6e48f075d data/researchd/researchd/research/wood.json
 7bc16133f8925d0226d65ce18d72cff00f21b4fe data/researchd/researchd/research_pack/end.json
 10ab03df72793a1a19830601c3d0f611e3d62385 data/researchd/researchd/research_pack/nether.json
