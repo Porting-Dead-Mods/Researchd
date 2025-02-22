@@ -118,18 +118,54 @@ public class ResearchGraphWidget extends AbstractWidget {
             }
         }
 
+        Int2ObjectMap<Pair<ResearchNode, ResearchNode>> intersectingNodePairs = new Int2ObjectOpenHashMap<>();
         for (int i = 0; i < this.layers.size(); i++) {
             Layer layer = this.layers.get(i);
+            int x = 0;
             for (Map.Entry<List<ResourceKey<Research>>, Group> entry0 : layer.nodes().entrySet()) {
                 for (Map.Entry<List<ResourceKey<Research>>, Group> entry1 : layer.nodes().entrySet()) {
                     Pair<ResearchNode, ResearchNode> result = doNodesIntersect(entry0.getValue(), entry1.getValue());
-                    if (result != null) {
-                        Researchd.LOGGER.debug("Node 0: {}, Node 1: {}", result.first(), result.second());
+                    if (result != null && !intersectingNodePairs.containsValue(Pair.of(result.second(), result.first()))) {
+                        ResearchNode node1 = result.second();
+                        ResearchNode first = node1.getParents().getFirst();
+                        ResearchNode intersection = canPlaceNode(node1.getX() + ResearchScreenWidget.PANEL_WIDTH + 10, i);
+                        // TODO: After checking for intersections and moving the nodes accordingly, we also need to move the nodes coming next
+                        if (intersection == null) {
+                            List<Layer> children = getChildNodes(node1);
+                            Nodes nodes = new Nodes(children.stream().flatMap(l -> l.flatten().stream()).toList());
+                            nodes.offsetX(ResearchScreenWidget.PANEL_WIDTH + 10);
+                        }
+                        intersectingNodePairs.put(i, result);
                     }
                 }
             }
         }
 
+    }
+
+    /**
+     * @return null if we can place the node, otherwise it will return the node that intersects
+     */
+    private @Nullable ResearchNode canPlaceNode(int x, int layerIndex) {
+        List<Map.Entry<List<ResourceKey<Research>>, Group>> layer = this.layers.get(layerIndex).nodes.entrySet().stream().sorted(Comparator.comparingInt(e0 -> e0.getValue().x)).toList();
+        for (int i = 0; i < layer.size(); i++) {
+            Map.Entry<List<ResourceKey<Research>>, Group> group = layer.get(i);
+            if (x > group.getValue().x) {
+                boolean valid = true;
+                if (i + 1 < layer.size()) {
+                    Map.Entry<List<ResourceKey<Research>>, Group> nextGroup = layer.get(i + 1);
+                    valid = x < nextGroup.getValue().x();
+                }
+                if (valid) {
+                    for (ResearchNode node : group.getValue().entries()) {
+                        if (doNodesIntersect(x, x + ResearchScreenWidget.PANEL_WIDTH, node.getX(), node.getX() + ResearchScreenWidget.PANEL_WIDTH)) {
+                            return node;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     private void centerGroupUnderGroup(Group toCenter, List<ResearchNode> target, int y) {
@@ -159,13 +195,15 @@ public class ResearchGraphWidget extends AbstractWidget {
         return i * (ResearchScreenWidget.PANEL_WIDTH + 10);
     }
 
-    private Nodes getChildNodes(ResearchNode parentNode) {
+    private static List<Layer> getChildNodes(ResearchNode parentNode) {
         List<ResearchNode> nodes = new ArrayList<>();
         collectNodes(nodes, parentNode);
-        return new Nodes(nodes);
+        return Layer.calculate(parentNode, new LinkedHashSet<>(nodes)).int2ObjectEntrySet()
+                .stream().sorted(Comparator.comparingInt(Int2ObjectMap.Entry::getIntKey))
+                .map(Map.Entry::getValue).toList();
     }
 
-    private void collectNodes(List<ResearchNode> nodes, ResearchNode node) {
+    private static void collectNodes(List<ResearchNode> nodes, ResearchNode node) {
         nodes.add(node);
 
         for (ResearchNode childNode : node.getChildren()) {
@@ -173,22 +211,31 @@ public class ResearchGraphWidget extends AbstractWidget {
         }
     }
 
-    private @Nullable Pair<ResearchNode, ResearchNode> doNodesIntersect(Group nodes0, Group nodes1) {
+    private static @Nullable Pair<ResearchNode, ResearchNode> doNodesIntersect(Group nodes0, Group nodes1) {
         for (ResearchNode node0 : nodes0) {
             for (ResearchNode node1 : nodes1) {
-                if (doNodesIntersect(node0, node1)) {
-                    return Pair.of(node0, node1);
+                if (node0 != node1 && doNodesIntersect(node0, node1)) {
+                    ResearchNode newNode0;
+                    ResearchNode newNode1;
+                    if (node0.getX() < node1.getX()) {
+                        newNode0 = node1;
+                        newNode1 = node0;
+                    } else {
+                        newNode0 = node0;
+                        newNode1 = node1;
+                    }
+                    return Pair.of(newNode0, newNode1);
                 }
             }
         }
         return null;
     }
 
-    private boolean doNodesIntersect(ResearchNode node0, ResearchNode node1) {
+    private static boolean doNodesIntersect(ResearchNode node0, ResearchNode node1) {
         return doNodesIntersect(node0.getX(), node0.getX() + ResearchScreenWidget.PANEL_WIDTH, node1.getX(), node1.getX() + ResearchScreenWidget.PANEL_WIDTH);
     }
 
-    boolean doNodesIntersect(int x1, int x2, int x3, int x4) {
+    private static boolean doNodesIntersect(int x1, int x2, int x3, int x4) {
         // Ensure x1 < x2 and x3 < x4 by sorting
         if (x1 > x2) {
             int temp = x1;
@@ -205,6 +252,18 @@ public class ResearchGraphWidget extends AbstractWidget {
         return Math.max(x1, x3) <= Math.min(x2, x4);
     }
 
+    private static int getWidestLayerWidth(List<Layer> layers) {
+        int widestLayerWidth = 0;
+        for (Layer layer : layers) {
+            int size = layer.flatten().size();
+            int width = size * 30 - 10;
+            if (width > widestLayerWidth) {
+                widestLayerWidth = width;
+            }
+        }
+        return widestLayerWidth;
+    }
+
     private record Nodes(List<ResearchNode> nodes) {
         public void offsetX(int offsetX) {
             for (ResearchNode node : nodes) {
@@ -217,14 +276,19 @@ public class ResearchGraphWidget extends AbstractWidget {
                 node.setX(node.getY() + offsetY);
             }
         }
+
     }
 
     private record Layer(Map<List<ResourceKey<Research>>, Group> nodes) {
-        public static Int2ObjectMap<Layer> calculate(ResearchGraph graph) {
-            Int2ObjectMap<Layer> nodes = new Int2ObjectLinkedOpenHashMap<>();
-            traverseTree(graph.rootNode(), nodes, new LinkedHashSet<>(graph.nodes()), 0);
+        public static Int2ObjectMap<Layer> calculate(ResearchNode rootNode, Set<ResearchNode> nodes) {
+            Int2ObjectMap<Layer> layers = new Int2ObjectLinkedOpenHashMap<>();
+            traverseTree(rootNode, layers, new LinkedHashSet<>(nodes), 0);
 
-            return nodes;
+            return layers;
+        }
+
+        public static Int2ObjectMap<Layer> calculate(ResearchGraph graph) {
+            return calculate(graph.rootNode(), graph.nodes());
         }
 
         private static void traverseTree(ResearchNode node, Int2ObjectMap<Layer> nodes, Set<ResearchNode> remaining, int nesting) {

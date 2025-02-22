@@ -1,0 +1,15 @@
+{
+  "type": "researchd:simple",
+  "icon": "minecraft:creeper_head",
+  "parents": [
+    "researchd:lightning_rod"
+  ],
+  "requires_parent": false,
+  "research_methods": [
+    {
+      "count": 12,
+      "method": "researchd:consume_research_pack",
+      "pack": "researchd:overworld"
+    }
+  ]
+}

@@ -66,6 +66,48 @@ public final class Researches {
             .researchMethods(List.of(
                     new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 8)
             )));
+    public static final ResourceKey<Research> CHARGED_CREEPER = register("charged_creeper", builder -> builder
+            .icon(Items.CREEPER_HEAD)
+            .parents(LIGHTNING_ROD)
+            .researchMethods(List.of(
+                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 12)
+            )));
+    public static final ResourceKey<Research> SKELETON_HORSE = register("skeleton_horse", builder -> builder
+            .icon(Items.SKELETON_SKULL)
+            .parents(LIGHTNING_ROD)
+            .researchMethods(List.of(
+                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 12)
+            )));
+    public static final ResourceKey<Research> CHISELED_COPPER = register("chiseled_copper", builder -> builder
+            .icon(Items.CHISELED_COPPER)
+            .parents(COPPER_BLOCK)
+            .researchMethods(List.of(
+                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 12)
+            )));
+    public static final ResourceKey<Research> OXIDIZED_COPPER = register("oxidized_copper", builder -> builder
+            .icon(Items.OXIDIZED_COPPER)
+            .parents(COPPER_BLOCK)
+            .researchMethods(List.of(
+                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 12)
+            )));
+    public static final ResourceKey<Research> DIAMOND_SWORD = register("diamond_sword", builder -> builder
+            .icon(Items.DIAMOND_SWORD)
+            .parents(IRON_TOOLS)
+            .researchMethods(List.of(
+                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 12)
+            )));
+    public static final ResourceKey<Research> TRIDENT = register("trident", builder -> builder
+            .icon(Items.TRIDENT)
+            .parents(IRON_TOOLS)
+            .researchMethods(List.of(
+                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 12)
+            )));
+    public static final ResourceKey<Research> DIAMOND_ARMOR = register("diamond_armor", builder -> builder
+            .icon(Items.DIAMOND_CHESTPLATE)
+            .parents(IRON_ARMOR)
+            .researchMethods(List.of(
+                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 12)
+            )));
 
     public static void bootstrap(BootstrapContext<Research> context) {
         for (Map.Entry<ResourceKey<Research>, Research.Builder<?>> research : RESEARCHES.entrySet()) {
