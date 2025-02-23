@@ -108,7 +108,7 @@ public class ResearchNode extends AbstractWidget {
             Point outputConnPoint = outputs.get(i).getConnectionPoint();
             children.get(i).getInputs().forEach(input -> {
                 Point inputConnPoint = input.getConnectionPoint();
-                ResearchLine.connectNodes(outputConnPoint, inputConnPoint).render(guiGraphics);
+                ResearchLine.createLConnection(outputConnPoint, inputConnPoint, true).render(guiGraphics);
             });
         }
     }

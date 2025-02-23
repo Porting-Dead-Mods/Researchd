@@ -69,19 +69,47 @@ public class ResearchLine {
 	 * Builds a simple L-shaped connection between two points.
 	 * Goes vertical first, then horizontal.
 	 */
-	public static ResearchLine createLConnection(Point start, Point end) {
-		return ResearchLine.start(start)
-				.then(start.x, end.y)
-				.then(end);
+	public static ResearchLine createLConnection(Point start, Point end, boolean verticalFirst) {
+		if (verticalFirst) {
+			return ResearchLine.start(start)
+					.then(start.x, end.y)
+					.then(end);
+		} else {
+			return ResearchLine.start(start)
+					.then(end.x, start.y)
+					.then(end);
+		}
+	}
+
+	/**
+	 * The same as the L connection but with a vertical offset.
+	 * Goes vertical first (verticalOffset), then horizontal, then the remaining vertical distance.
+	 */
+	public static ResearchLine createSConnection(Point start, Point end, int verticalOffset) {
+		if (verticalOffset < 0 || verticalOffset > Math.abs(start.y - end.y)) {
+			throw new IllegalArgumentException("Vertical offset must be between 0 and the vertical distance between the points");
+		}
+
+		if (start.y < end.y) {
+			return ResearchLine.start(start)
+					.then(start.x, start.y + verticalOffset)
+					.then(end.x, start.y + verticalOffset)
+					.then(end);
+		} else {
+			return ResearchLine.start(start)
+					.then(start.x, start.y - verticalOffset)
+					.then(end.x, start.y - verticalOffset)
+					.then(end);
+		}
 	}
 
 	/**
 	 * Builds a connection between input and output points of research nodes
 	 * with an L-shaped path.
 	 */
-	public static ResearchLine connectNodes(Point outputPoint, Point inputPoint) {
+	public static ResearchLine connectNodes(Point outputPoint, Point inputPoint, boolean verticalFirst) {
 		// Creates path from output -> input with a vertical segment followed by horizontal
-		return createLConnection(outputPoint, inputPoint);
+		return createLConnection(outputPoint, inputPoint, verticalFirst);
 	}
 
 	public void render(@NotNull GuiGraphics guiGraphics) {
