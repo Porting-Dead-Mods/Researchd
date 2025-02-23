@@ -1,9 +1,11 @@
 package com.portingdeadmods.researchd.client.screens.lines;
 
+import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
 import com.portingdeadmods.researchd.utils.UniqueArray;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceKey;
 
 import java.awt.*;
 import java.util.HashSet;
@@ -14,17 +16,27 @@ public class ResearchHead {
 	private int x;
 	private int y;
 	private final boolean isInput;
+	private final ResearchNode research;
 
 	/**
 	 *
 	 * @param x Should be based on the x position of the node, split evenly if there are multiple heads
 	 * @param y Should be the y position of the node <br>(+ Node height if it's output)
 	 * @param isInput Should be true if it's an input head, false if it's an output head
+	 * @param research {@link ResearchNode} the research this head is linked to. If the head is made through {@link #inputsOf(ResearchNode)} it will be linked to each of the children of the node, and vice versa
 	 */
+	public ResearchHead(int x, int y, boolean isInput, ResearchNode research) {
+		this.x = x;
+		this.y = y;
+		this.isInput = isInput;
+		this.research = research;
+	}
+
 	public ResearchHead(int x, int y, boolean isInput) {
 		this.x = x;
 		this.y = y;
 		this.isInput = isInput;
+		this.research = null;
 	}
 
 	public int getX() { return this.x; }
@@ -60,7 +72,8 @@ public class ResearchHead {
 	 */
 	public static UniqueArray<ResearchHead> inputsOf(ResearchNode node) {
 		UniqueArray<ResearchHead> positions = new UniqueArray<>();
-		int parentCount = node.getParents().size();
+		UniqueArray<ResearchNode> parents = node.getParents();
+		int parentCount = parents.size();
 		int width = ResearchScreenWidget.PANEL_WIDTH; // Node width
 
 		if (parentCount == 0) return positions;
@@ -69,7 +82,7 @@ public class ResearchHead {
 		if (parentCount == 1) {
 			int x = node.getX() + width / 2;
 			int y = node.getY();
-			positions.add(new ResearchHead(x, y, true));
+			positions.add(new ResearchHead(x, y, true, parents.get(0)));
 			return positions;
 		}
 
@@ -78,7 +91,11 @@ public class ResearchHead {
 		startingX -= ((parentCount - 1) / 2) * 3; // 3 px per pair of heads
 
 		for (int i = 0; i < parentCount; i++) {
-			positions.addLast(new ResearchHead(startingX + i * 3, node.getY(), true));
+			positions.addLast(new ResearchHead(startingX + i * 3,
+					node.getY(),
+					true,
+					parents.get(i))
+			);
 		}
 
 		return positions;
@@ -90,7 +107,8 @@ public class ResearchHead {
 	 */
 	public static UniqueArray<ResearchHead> outputsOf(ResearchNode node) {
 		UniqueArray<ResearchHead> positions = new UniqueArray<>();
-		int childCount = node.getChildren().size();
+		UniqueArray<ResearchNode> children = node.getChildren();
+		int childCount = children.size();
 		int width = ResearchScreenWidget.PANEL_WIDTH; // Node width
 
 		if (childCount == 0) return positions;
@@ -99,7 +117,7 @@ public class ResearchHead {
 		if (childCount == 1) {
 			int x = node.getX() + width / 2;
 			int y = node.getY() + ResearchScreenWidget.PANEL_HEIGHT - 1;
-			positions.add(new ResearchHead(x, y, false));
+			positions.add(new ResearchHead(x, y, false, children.get(0)));
 			return positions;
 		}
 
@@ -108,7 +126,12 @@ public class ResearchHead {
 		startingX -= ((childCount - 1) / 2) * 3; // 2 px per pair of heads
 
 		for (int i = 0; i < childCount; i++) {
-			positions.addLast(new ResearchHead(startingX + i * 3, node.getY() + ResearchScreenWidget.PANEL_HEIGHT - 1, false));
+			positions.addLast(new ResearchHead(
+					startingX + i * 3,
+					node.getY() + ResearchScreenWidget.PANEL_HEIGHT - 1,
+					false,
+					children.get(i)
+			));
 		}
 
 		return positions;
