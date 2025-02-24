@@ -90,7 +90,7 @@ public class ResearchNode extends AbstractWidget {
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
-        ResearchScreenWidget.renderResearchPanel(guiGraphics, instance,  getX(), getY(), mouseX, mouseY);
+        ResearchScreenWidget.renderResearchPanel(guiGraphics, instance, getX(), getY(), mouseX, mouseY);
         if (wasRefreshed) {
             refreshHeads();
         }
@@ -102,15 +102,17 @@ public class ResearchNode extends AbstractWidget {
             output.render(guiGraphics);
         }
 
-        // Render connections to children
-        // Connect the parent's output to all the children's inputs for the sake of demonstration (even though it is wrong xd)
-        for (int i = 0; i < children.size(); i++) {
-            Point outputConnPoint = outputs.get(i).getConnectionPoint();
-            children.get(i).getInputs().forEach(input -> {
-                Point inputConnPoint = input.getConnectionPoint();
-                ResearchLine.createLConnection(outputConnPoint, inputConnPoint, true).render(guiGraphics);
-            });
-        }
+        // Remove or comment out this code block that draws connections:
+    /*
+    // Render connections to children
+    for (int i = 0; i < children.size(); i++) {
+        Point outputConnPoint = outputs.get(i).getConnectionPoint();
+        children.get(i).getInputs().forEach(input -> {
+            Point inputConnPoint = input.getConnectionPoint();
+            ResearchLine.createLConnection(outputConnPoint, inputConnPoint, true).render(guiGraphics);
+        });
+    }
+    */
     }
 
     @Override

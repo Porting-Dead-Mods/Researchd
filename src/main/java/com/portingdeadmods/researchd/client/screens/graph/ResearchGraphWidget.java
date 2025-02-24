@@ -6,6 +6,7 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
+import com.portingdeadmods.researchd.clown.NodeConnectionRenderer;
 import com.portingdeadmods.researchd.registries.Researches;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchGraph;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 public class ResearchGraphWidget extends AbstractWidget {
     private @Nullable ResearchGraph graph;
     private List<Layer> layers;
+    private ResearchNode selectedNode = null;
 
     public ResearchGraphWidget(int x, int y, int width, int height) {
         super(x, y, width, height, Component.empty());
@@ -45,22 +47,146 @@ public class ResearchGraphWidget extends AbstractWidget {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int i, int i1, float v) {
+    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         guiGraphics.enableScissor(getX(), getY(), getX() + getWidth(), getY() + getHeight());
 
-        ResearchNode node = graph.rootNode();
-        renderNode(node, guiGraphics, i, i1, v);
+        if (graph != null) {
+            // First render connections
+            renderNodeConnections(graph.rootNode(), guiGraphics);
+
+            // Then render nodes (so they appear on top of connections)
+            renderNode(graph.rootNode(), guiGraphics, mouseX, mouseY, partialTick);
+        }
 
         guiGraphics.disableScissor();
-        renderNodeTooltip(node, guiGraphics, i, i1, v);
+
+        // Render tooltips last
+        if (graph != null) {
+            renderNodeTooltip(graph.rootNode(), guiGraphics, mouseX, mouseY, partialTick);
+        }
     }
 
     private void renderNode(ResearchNode node, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        // Render the research panel itself
         node.render(guiGraphics, mouseX, mouseY, partialTick);
 
+        // Recursively render all children nodes
         for (ResearchNode childNode : node.getChildren()) {
-            //ResearchLineHelper.drawLineBetweenNodes(guiGraphics, node, childNode);
             renderNode(childNode, guiGraphics, mouseX, mouseY, partialTick);
+        }
+    }
+
+    private void renderNodeConnections(ResearchNode node, GuiGraphics guiGraphics) {
+        // Draw connections to children first
+        List<ResearchNode> children = node.getChildren();
+        if (!children.isEmpty()) {
+            drawConnectionTree(guiGraphics, node, children);
+        }
+
+        // Then recurse for each child
+        for (ResearchNode child : children) {
+            renderNodeConnections(child, guiGraphics);
+        }
+    }
+
+    private void drawConnectionTree(GuiGraphics guiGraphics, ResearchNode parent, List<ResearchNode> children) {
+        if (children.isEmpty()) return;
+
+        int parentX = parent.getX() + ResearchScreenWidget.PANEL_WIDTH / 2;
+        int parentY = parent.getY() + ResearchScreenWidget.PANEL_HEIGHT / 2;
+
+        if (children.size() == 1) {
+            ResearchNode child = children.get(0);
+            int childX = child.getX() + ResearchScreenWidget.PANEL_WIDTH / 2;
+            int childY = child.getY() + ResearchScreenWidget.PANEL_HEIGHT / 2;
+            drawConnection(guiGraphics, parentX, parentY, childX, childY);
+            return;
+        }
+
+        List<ResearchNode> sortedChildren = new ArrayList<>(children);
+        sortedChildren.sort(Comparator.comparingInt(ResearchNode::getX));
+
+        int leftmostX = sortedChildren.get(0).getX() + ResearchScreenWidget.PANEL_WIDTH / 2;
+        int rightmostX = sortedChildren.get(sortedChildren.size() - 1).getX() + ResearchScreenWidget.PANEL_WIDTH / 2;
+
+        int junctionY = parentY + 20;
+
+        guiGraphics.vLine(parentX, parentY, junctionY, -1);
+
+        guiGraphics.hLine(leftmostX, rightmostX, junctionY, -1);
+
+        for (ResearchNode child : sortedChildren) {
+            int childX = child.getX() + ResearchScreenWidget.PANEL_WIDTH / 2;
+            int childY = child.getY() + ResearchScreenWidget.PANEL_HEIGHT / 2;
+
+            guiGraphics.vLine(childX, junctionY, childY, -1);
+        }
+    }
+
+    private void drawConnection(GuiGraphics guiGraphics, int parentX, int parentY, int childX, int childY) {
+        if (parentX == childX) {
+            guiGraphics.vLine(parentX, parentY, childY, -1);
+        } else {
+            int midY = parentY + (childY - parentY) / 2;
+
+            guiGraphics.vLine(parentX, parentY, midY, -1);
+
+            guiGraphics.hLine(Math.min(parentX, childX), Math.max(parentX, childX), midY, -1);
+
+            guiGraphics.vLine(childX, midY, childY, -1);
+        }
+    }
+
+    /* Fix for the immutable collection error */
+    private void resolveOverlaps() {
+        // Process each layer
+        for (int i = 0; i < this.layers.size(); i++) {
+            Layer layer = this.layers.get(i);
+
+            // Create a mutable copy of the nodes
+            List<ResearchNode> nodes = new ArrayList<>(layer.flatten());
+
+            // Sort by X position
+            nodes.sort(Comparator.comparingInt(ResearchNode::getX));
+
+            // Check for overlaps between adjacent nodes
+            for (int j = 0; j < nodes.size() - 1; j++) {
+                ResearchNode current = nodes.get(j);
+                ResearchNode next = nodes.get(j + 1);
+
+                int minDistance = ResearchScreenWidget.PANEL_WIDTH + 10;
+                int actualDistance = next.getX() - (current.getX() + ResearchScreenWidget.PANEL_WIDTH);
+
+                if (actualDistance < minDistance) {
+                    int offset = minDistance - actualDistance;
+
+                    // Shift all subsequent nodes
+                    for (int k = j + 1; k < nodes.size(); k++) {
+                        ResearchNode nodeToShift = nodes.get(k);
+                        nodeToShift.setX(nodeToShift.getX() + offset);
+
+                        // Cascade shift to descendants
+                        shiftDescendants(nodeToShift, offset);
+                    }
+                }
+            }
+        }
+    }
+
+    private void shiftDescendants(ResearchNode node, int xOffset) {
+        for (ResearchNode child : node.getChildren()) {
+            child.setX(child.getX() + xOffset);
+            shiftDescendants(child, xOffset);
+        }
+    }
+
+    private void renderAllNodes(ResearchNode node, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        // Render this node
+        node.render(guiGraphics, mouseX, mouseY, partialTick);
+
+        // Recursively render all children
+        for (ResearchNode child : node.getChildren()) {
+            renderAllNodes(child, guiGraphics, mouseX, mouseY, partialTick);
         }
     }
 
@@ -99,48 +225,170 @@ public class ResearchGraphWidget extends AbstractWidget {
     }
 
     public void setCoordinates() {
+        // First pass: Set initial positions
+        positionNodesInLayers();
+
+        // Second pass: Fix overlaps
+        preventOverlaps();
+
+        // Third pass: Center children under parents
+        alignChildrenWithParents();
+    }
+
+    private void positionNodesInLayers() {
+        int ySpacing = ResearchScreenWidget.PANEL_HEIGHT + 20;
+        int xSpacing = ResearchScreenWidget.PANEL_WIDTH + 15;
+
         for (int i = 0; i < this.layers.size(); i++) {
             Layer layer = this.layers.get(i);
+            int y = getY() + i * ySpacing;
 
-            int x = getX();
+            // Start from left side with some padding
+            int x = getX() + 20;
 
-            for (Map.Entry<List<ResourceKey<Research>>, Group> entry : layer.nodes().entrySet()) {
-                x += setGroupCoordinates(entry.getValue().entries(), x, getY() + i * (ResearchScreenWidget.PANEL_HEIGHT + 10));
-                x += 20;
+            // Use ArrayList to create a mutable copy we can sort
+            ArrayList<Map.Entry<List<ResourceKey<Research>>, Group>> groupEntries =
+                    new ArrayList<>(layer.nodes().entrySet());
+
+            // Sort groups by parent count (can help with better initial positioning)
+            groupEntries.sort((a, b) -> {
+                int parentsA = a.getValue().entries().stream()
+                        .mapToInt(node -> node.getParents().size()).sum();
+                int parentsB = b.getValue().entries().stream()
+                        .mapToInt(node -> node.getParents().size()).sum();
+                return Integer.compare(parentsA, parentsB);
+            });
+
+            // Position each group
+            for (Map.Entry<List<ResourceKey<Research>>, Group> entry : groupEntries) {
+                Group group = entry.getValue();
+                List<ResearchNode> nodes = group.entries();
+
+                // Position each node in group
+                for (int j = 0; j < nodes.size(); j++) {
+                    ResearchNode node = nodes.get(j);
+                    node.setX(x);
+                    node.setY(y);
+                    x += xSpacing;
+                }
+
+                // Add extra space between groups
+                x += 10;
             }
         }
+    }
 
+    private void preventOverlaps() {
+        // Process each layer
         for (int i = 0; i < this.layers.size(); i++) {
             Layer layer = this.layers.get(i);
-            for (Map.Entry<List<ResourceKey<Research>>, Group> entry : layer.nodes().entrySet()) {
-                centerGroupUnderGroup(entry.getValue(), entry.getValue().entries().getFirst().getParents().stream()
-                        .sorted(Comparator.comparingInt(ResearchNode::getX)).toList(), getY() + i * (ResearchScreenWidget.PANEL_HEIGHT + 10));
-            }
-        }
 
-        Int2ObjectMap<Pair<ResearchNode, ResearchNode>> intersectingNodePairs = new Int2ObjectOpenHashMap<>();
-        for (int i = 0; i < this.layers.size(); i++) {
-            Layer layer = this.layers.get(i);
-            int x = 0;
-            for (Map.Entry<List<ResourceKey<Research>>, Group> entry0 : layer.nodes().entrySet()) {
-                for (Map.Entry<List<ResourceKey<Research>>, Group> entry1 : layer.nodes().entrySet()) {
-                    Pair<ResearchNode, ResearchNode> result = doNodesIntersect(entry0.getValue(), entry1.getValue());
-                    if (result != null && !intersectingNodePairs.containsValue(Pair.of(result.second(), result.first()))) {
-                        ResearchNode node1 = result.second();
-                        ResearchNode first = node1.getParents().getFirst();
-                        ResearchNode intersection = canPlaceNode(node1.getX() + ResearchScreenWidget.PANEL_WIDTH + 10, i);
-                        // TODO: After checking for intersections and moving the nodes accordingly, we also need to move the nodes coming next
-                        if (intersection == null) {
-                            List<Layer> children = getChildNodes(node1);
-                            Nodes nodes = new Nodes(children.stream().flatMap(l -> l.flatten().stream()).toList());
-                            nodes.offsetX(ResearchScreenWidget.PANEL_WIDTH + 10);
-                        }
-                        intersectingNodePairs.put(i, result);
+            // Get all nodes in this layer and make a mutable copy
+            List<ResearchNode> nodesInLayer = new ArrayList<>(layer.flatten());
+
+            // Sort by X position for easier overlap detection
+            nodesInLayer.sort(Comparator.comparingInt(ResearchNode::getX));
+
+            // Check each node against its next neighbor
+            for (int j = 0; j < nodesInLayer.size() - 1; j++) {
+                ResearchNode current = nodesInLayer.get(j);
+                ResearchNode next = nodesInLayer.get(j + 1);
+
+                int currentRight = current.getX() + ResearchScreenWidget.PANEL_WIDTH;
+                int nextLeft = next.getX();
+
+                // Minimum gap between nodes
+                int minGap = 10;
+
+                // If nodes overlap or are too close
+                if (nextLeft - currentRight < minGap) {
+                    // Calculate how much to move the next node
+                    int offset = minGap - (nextLeft - currentRight);
+
+                    // Move this node and all nodes to its right
+                    for (int k = j + 1; k < nodesInLayer.size(); k++) {
+                        ResearchNode nodeToShift = nodesInLayer.get(k);
+                        shiftNodeAndDescendants(nodeToShift, offset, 0);
                     }
                 }
             }
         }
+    }
 
+    private void shiftNodeAndDescendants(ResearchNode node, int xOffset, int yOffset) {
+        // Move this node
+        node.setX(node.getX() + xOffset);
+        if (yOffset != 0) {
+            node.setY(node.getY() + yOffset);
+        }
+
+        // Recursively move all children
+        for (ResearchNode child : node.getChildren()) {
+            shiftNodeAndDescendants(child, xOffset, yOffset);
+        }
+    }
+
+    private void alignChildrenWithParents() {
+        // Process from bottom up to handle multi-level alignments correctly
+        for (int i = this.layers.size() - 2; i >= 0; i--) {
+            Layer parentLayer = this.layers.get(i);
+
+            for (Group group : parentLayer.nodes().values()) {
+                for (ResearchNode parent : group) {
+                    List<ResearchNode> children = new ArrayList<>(parent.getChildren());
+
+                    if (children.size() > 1) {
+                        // Find the bounding box of all children
+                        int leftmostChild = Integer.MAX_VALUE;
+                        int rightmostChild = Integer.MIN_VALUE;
+
+                        for (ResearchNode child : children) {
+                            leftmostChild = Math.min(leftmostChild, child.getX());
+                            rightmostChild = Math.max(rightmostChild,
+                                    child.getX() + ResearchScreenWidget.PANEL_WIDTH);
+                        }
+
+                        // Calculate ideal center position for parent
+                        int childrenCenter = (leftmostChild + rightmostChild) / 2;
+                        int parentCenter = parent.getX() + ResearchScreenWidget.PANEL_WIDTH / 2;
+                        int offset = childrenCenter - parentCenter;
+
+                        // Only move if it would make a significant improvement and won't create overlaps
+                        if (Math.abs(offset) > 15 && canMoveNode(parent, parent.getX() + offset, i)) {
+                            parent.setX(parent.getX() + offset);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private boolean canMoveNode(ResearchNode node, int newX, int layerIndex) {
+        // Get all other nodes in this layer
+        List<ResearchNode> otherNodes = new ArrayList<>();
+        Layer layer = this.layers.get(layerIndex);
+
+        for (Group group : layer.nodes().values()) {
+            for (ResearchNode otherNode : group) {
+                if (otherNode != node) {
+                    otherNodes.add(otherNode);
+                }
+            }
+        }
+
+        // Check if the new position would overlap with any other node
+        int nodeRight = newX + ResearchScreenWidget.PANEL_WIDTH;
+        for (ResearchNode other : otherNodes) {
+            int otherLeft = other.getX();
+            int otherRight = otherLeft + ResearchScreenWidget.PANEL_WIDTH;
+
+            // Add a small padding
+            if (Math.max(newX, otherLeft) < Math.min(nodeRight, otherRight) + 5) {
+                return false;  // Would overlap
+            }
+        }
+
+        return true;  // No overlaps
     }
 
     /**
@@ -382,6 +630,48 @@ public class ResearchGraphWidget extends AbstractWidget {
         public @NotNull Iterator<ResearchNode> iterator() {
             return this.entries.iterator();
         }
+    }
+
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        // Check if any node was clicked
+        if (graph != null) {
+            ResearchNode clicked = findClickedNode(graph.rootNode(), mouseX, mouseY);
+            if (clicked != null) {
+                // Update selection
+                selectedNode = clicked;
+                return true;
+            }
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    private ResearchNode findClickedNode(ResearchNode node, double mouseX, double mouseY) {
+        // Check if this node was clicked
+        if (mouseX >= node.getX() && mouseX < node.getX() + ResearchScreenWidget.PANEL_WIDTH &&
+                mouseY >= node.getY() && mouseY < node.getY() + ResearchScreenWidget.PANEL_HEIGHT) {
+            return node;
+        }
+
+        // Check children
+        for (ResearchNode child : node.getChildren()) {
+            ResearchNode result = findClickedNode(child, mouseX, mouseY);
+            if (result != null) {
+                return result;
+            }
+        }
+
+        return null; // No node clicked
+    }
+
+    public void clearSelection() {
+        selectedNode = null;
+    }
+
+    // Method to set selection
+    public void selectNode(ResearchNode node) {
+        selectedNode = node;
     }
 
     private static @NotNull Research getResearch(ResearchNode node) {
