@@ -1,13 +1,14 @@
 package com.portingdeadmods.researchd.client.screens.lines;
 
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Renderable;
 
 import java.awt.*;
 
 /**
  * Represents a line segment between two points
  */
-public class LineSegment {
+public class LineSegment implements Renderable {
 	private final Point start;
 	private final Point end;
 
@@ -48,5 +49,10 @@ public class LineSegment {
 		} else if (isHorizontal()) {
 			guiGraphics.hLine(Math.min(start.x, end.x), Math.max(start.x, end.x), start.y, -1);
 		}
+	}
+
+	@Override
+	public void render(GuiGraphics guiGraphics, int i, int i1, float v) {
+		render(guiGraphics);
 	}
 }

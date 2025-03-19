@@ -6,6 +6,7 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
+import com.portingdeadmods.researchd.client.screens.lines.ResearchLine;
 import com.portingdeadmods.researchd.registries.Researches;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchGraph;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 public class ResearchGraphWidget extends AbstractWidget {
     private @Nullable ResearchGraph graph;
     private List<Layer> layers;
+    private Map<ResearchNode, ArrayList<ResearchLine>> researchLines = new HashMap<>();
 
     public ResearchGraphWidget(int x, int y, int width, int height) {
         super(x, y, width, height, Component.empty());
@@ -38,7 +40,19 @@ public class ResearchGraphWidget extends AbstractWidget {
         this.graph = graph;
         calculateLayers();
         setCoordinates();
+        calculateLines();
     }
+
+    private void calculateLines() {
+        this.researchLines = new HashMap<>();
+
+        // Proceed only if we have nodes to connect
+        if (graph == null || graph.nodes().isEmpty()) return;
+
+        // Implementation of connection algorithm
+        // ...
+    }
+
 
     public ResearchGraph getCurrentGraph() {
         return this.graph;
@@ -47,6 +61,14 @@ public class ResearchGraphWidget extends AbstractWidget {
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int i, int i1, float v) {
         guiGraphics.enableScissor(getX(), getY(), getX() + getWidth(), getY() + getHeight());
+
+        if (researchLines != null) {
+            for (List<ResearchLine> lines : researchLines.values()) {
+                for (ResearchLine line : lines) {
+                    line.render(guiGraphics);
+                }
+            }
+        }
 
         ResearchNode node = graph.rootNode();
         renderNode(node, guiGraphics, i, i1, v);
@@ -87,6 +109,12 @@ public class ResearchGraphWidget extends AbstractWidget {
         for (ResearchNode node : this.graph.nodes()) {
             node.setXExt((int) (node.getX() + dragX));
             node.setYExt((int) (node.getY() + dragY));
+        }
+
+        for (List<ResearchLine> lines : researchLines.values()) {
+            for (ResearchLine line : lines) {
+                line.translate((int) dragX, (int) dragY);
+            }
         }
 
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
