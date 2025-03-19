@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-public class ResearchLine {
+public class ResearchLine implements Renderable {
 	private final LinkedList<Point> points;
 
 	private ResearchLine() {
@@ -120,6 +120,11 @@ public class ResearchLine {
 			new LineSegment(prev, curr).render(guiGraphics);
 			prev = curr;
 		}
+	}
+
+	@Override
+	public void render(GuiGraphics guiGraphics, int i, int i1, float v) {
+		render(guiGraphics);
 	}
 
 	/**

@@ -104,13 +104,14 @@ public class ResearchNode extends AbstractWidget {
 
         // Render connections to children
         // Connect the parent's output to all the children's inputs for the sake of demonstration (even though it is wrong xd)
-        for (int i = 0; i < children.size(); i++) {
-            Point outputConnPoint = outputs.get(i).getConnectionPoint();
-            children.get(i).getInputs().forEach(input -> {
-                Point inputConnPoint = input.getConnectionPoint();
-                ResearchLine.createLConnection(outputConnPoint, inputConnPoint, true).render(guiGraphics);
-            });
-        }
+//        for (int i = 0; i < children.size(); i++) {
+//            Point outputConnPoint = outputs.get(i).getConnectionPoint();
+//            children.get(i).getInputs().forEach(input -> {
+//                Point inputConnPoint = input.getConnectionPoint();
+//                ResearchLine.createLConnection(outputConnPoint, inputConnPoint, true).render(guiGraphics);
+//            });
+//        }
+        // Rendering of lines is now done in Research Graph Widget ^
     }
 
     @Override
