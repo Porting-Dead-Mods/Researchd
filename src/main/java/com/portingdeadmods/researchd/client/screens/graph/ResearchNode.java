@@ -32,7 +32,6 @@ public class ResearchNode extends AbstractWidget {
     private final UniqueArray<ResearchHead> outputs;
 
     private boolean rootNode;
-    private boolean wasRefreshed = false;
 
     public ResearchNode(ResearchInstance instance) {
         super(0, 0, ResearchScreenWidget.PANEL_WIDTH, ResearchScreenWidget.PANEL_HEIGHT, CommonComponents.EMPTY);
@@ -91,9 +90,7 @@ public class ResearchNode extends AbstractWidget {
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
         ResearchScreenWidget.renderResearchPanel(guiGraphics, instance,  getX(), getY(), mouseX, mouseY);
-        if (wasRefreshed) {
-            refreshHeads();
-        }
+        refreshHeads();
 
         for (ResearchHead input : inputs) {
             input.render(guiGraphics);
@@ -132,10 +129,8 @@ public class ResearchNode extends AbstractWidget {
      * @param x1 x coordinate to set
      */
     public void setXExt(int x1) {
-        int dx = x1 - getX();
         setX(x1);
 
-        this.wasRefreshed = true;
         refreshHeads();
     }
 
@@ -145,10 +140,13 @@ public class ResearchNode extends AbstractWidget {
      * @param y1 y coordinate to set
      */
     public void setYExt(int y1) {
-        int dy = y1 - getY();
         setY(y1);
 
-        this.wasRefreshed = true;
         refreshHeads();
+    }
+
+    public void translate(int dx, int dy) {
+        setXExt(getX() + dx);
+        setYExt(getY() + dy);
     }
 }
