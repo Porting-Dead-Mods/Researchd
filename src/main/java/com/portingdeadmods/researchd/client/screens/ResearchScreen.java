@@ -85,4 +85,14 @@ public class ResearchScreen extends Screen {
     public ResearchQueueWidget getResearchQueue() {
         return researchQueueWidget;
     }
+
+    @Override
+    public void onClose() {
+        super.onClose();
+
+        // Save graph state on close
+        if (this.researchGraphWidget != null) {
+            this.researchGraphWidget.onClose();
+        }
+    }
 }
