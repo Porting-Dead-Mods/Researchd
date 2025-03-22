@@ -12,6 +12,7 @@ import com.portingdeadmods.researchd.client.screens.lines.ResearchLine;
 import com.portingdeadmods.researchd.registries.Researches;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchGraph;
+import com.portingdeadmods.researchd.utils.researches.layout.ResearchLayoutManager;
 import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -43,24 +44,31 @@ public class ResearchGraphWidget extends AbstractWidget {
         this.layers = new ArrayList<>();
     }
 
+    /**
+     * Set the graph to be displayed, applying layout if needed and calculating connection lines
+     */
     public void setGraph(ResearchGraph graph) {
         this.graph = graph;
 
-        // Try to restore node positions from cache first
-        boolean positionsRestored = GraphStateManager.getInstance().restoreGraphPositions(graph);
-
-        if (!positionsRestored) {
-            // Only calculate layers and set coordinates if positions weren't restored
-            calculateLayers();
-            setCoordinates();
+        if (graph == null || graph.nodes().isEmpty()) {
+            this.researchLines.clear();
+            return;
         }
 
-        // Always calculate lines after positions are finalized
-        calculateLines();
+        // Try to restore the complete layout for this exact graph view
+        boolean layoutRestored = GraphStateManager.getInstance().restoreGraphLayout(graph);
 
-        // Save the graph and its positions for future use
-        GraphStateManager.getInstance().cacheGraph(graph);
-        GraphStateManager.getInstance().saveGraphPositions(graph);
+        if (!layoutRestored) {
+            // If we don't have a cached layout for this exact view,
+            // apply our layout manager to position all nodes
+            ResearchLayoutManager.applyLayout(graph, getX() + 10, getY() + 10);
+
+            // Save the newly created layout
+            GraphStateManager.getInstance().saveGraphLayout(graph);
+        }
+
+        // Always calculate connection lines after positions are finalized
+        calculateLines();
     }
 
     private void calculateLines() {
@@ -528,7 +536,7 @@ public class ResearchGraphWidget extends AbstractWidget {
         }
 
         // Save updated positions
-        GraphStateManager.getInstance().saveGraphPositions(graph);
+        GraphStateManager.getInstance().saveGraphLayout(graph);
 
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
@@ -832,7 +840,7 @@ public class ResearchGraphWidget extends AbstractWidget {
     public void onClose() {
         if (graph != null) {
             // Make sure we save the final state
-            GraphStateManager.getInstance().saveGraphPositions(graph);
+            GraphStateManager.getInstance().saveGraphLayout(graph);
         }
     }
 }
