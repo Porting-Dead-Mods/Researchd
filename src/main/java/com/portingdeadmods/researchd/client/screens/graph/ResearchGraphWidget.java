@@ -49,9 +49,9 @@ public class ResearchGraphWidget extends AbstractWidget {
      */
     public void setGraph(ResearchGraph graph) {
         this.graph = graph;
+        this.researchLines.clear();
 
         if (graph == null || graph.nodes().isEmpty()) {
-            this.researchLines.clear();
             return;
         }
 
@@ -62,6 +62,10 @@ public class ResearchGraphWidget extends AbstractWidget {
             // If we don't have a cached layout for this exact view,
             // apply our layout manager to position all nodes
             ResearchLayoutManager.applyLayout(graph, getX() + 10, getY() + 10);
+        }
+
+        for (ResearchNode node : graph.nodes()) {
+            node.refreshHeads(graph.nodes());
         }
 
         // Always calculate connection lines after positions are finalized
