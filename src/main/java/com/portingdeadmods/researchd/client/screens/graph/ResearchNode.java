@@ -2,10 +2,13 @@ package com.portingdeadmods.researchd.client.screens.graph;
 
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.screens.lines.ResearchHead;
 import com.portingdeadmods.researchd.client.screens.lines.ResearchLine;
+import com.portingdeadmods.researchd.utils.Spaghetti;
 import com.portingdeadmods.researchd.utils.UniqueArray;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -71,12 +74,12 @@ public class ResearchNode extends AbstractWidget {
         return outputs;
     }
 
-    public void refreshHeads() {
+    public void refreshHeads(Set<ResearchNode> visibleNodes) {
         this.inputs.clear();
-        this.inputs.addAll(ResearchHead.inputsOf(this));
+        this.inputs.addAll(ResearchHead.inputsOf(this, visibleNodes));
 
         this.outputs.clear();
-        this.outputs.addAll(ResearchHead.outputsOf(this));
+        this.outputs.addAll(ResearchHead.outputsOf(this, visibleNodes));
     }
 
     public boolean isRootNode() {
@@ -90,7 +93,7 @@ public class ResearchNode extends AbstractWidget {
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
         ResearchScreenWidget.renderResearchPanel(guiGraphics, instance,  getX(), getY(), mouseX, mouseY);
-        refreshHeads();
+        refreshHeads(Spaghetti.getNodesFromScreen());
 
         for (ResearchHead input : inputs) {
             input.render(guiGraphics);
@@ -98,17 +101,6 @@ public class ResearchNode extends AbstractWidget {
         for (ResearchHead output : outputs) {
             output.render(guiGraphics);
         }
-
-        // Render connections to children
-        // Connect the parent's output to all the children's inputs for the sake of demonstration (even though it is wrong xd)
-//        for (int i = 0; i < children.size(); i++) {
-//            Point outputConnPoint = outputs.get(i).getConnectionPoint();
-//            children.get(i).getInputs().forEach(input -> {
-//                Point inputConnPoint = input.getConnectionPoint();
-//                ResearchLine.createLConnection(outputConnPoint, inputConnPoint, true).render(guiGraphics);
-//            });
-//        }
-        // Rendering of lines is now done in Research Graph Widget ^
     }
 
     @Override
@@ -131,7 +123,7 @@ public class ResearchNode extends AbstractWidget {
     public void setXExt(int x1) {
         setX(x1);
 
-        refreshHeads();
+        refreshHeads(Spaghetti.getNodesFromScreen());
     }
 
     /**
@@ -142,7 +134,7 @@ public class ResearchNode extends AbstractWidget {
     public void setYExt(int y1) {
         setY(y1);
 
-        refreshHeads();
+        refreshHeads(Spaghetti.getNodesFromScreen());
     }
 
     public void translate(int dx, int dy) {
