@@ -56,15 +56,12 @@ public class ResearchGraphWidget extends AbstractWidget {
         }
 
         // Try to restore the complete layout for this exact graph view
-        boolean layoutRestored = GraphStateManager.getInstance().restoreGraphLayout(graph);
+        boolean layoutRestored = GraphStateManager.getInstance().tryRestoreLastSessionState(graph);
 
         if (!layoutRestored) {
             // If we don't have a cached layout for this exact view,
             // apply our layout manager to position all nodes
             ResearchLayoutManager.applyLayout(graph, getX() + 10, getY() + 10);
-
-            // Save the newly created layout
-            GraphStateManager.getInstance().saveGraphLayout(graph);
         }
 
         // Always calculate connection lines after positions are finalized
@@ -535,9 +532,6 @@ public class ResearchGraphWidget extends AbstractWidget {
             }
         }
 
-        // Save updated positions
-        GraphStateManager.getInstance().saveGraphLayout(graph);
-
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 
@@ -840,7 +834,7 @@ public class ResearchGraphWidget extends AbstractWidget {
     public void onClose() {
         if (graph != null) {
             // Make sure we save the final state
-            GraphStateManager.getInstance().saveGraphLayout(graph);
+            GraphStateManager.getInstance().saveLastSessionState(graph);
         }
     }
 }
