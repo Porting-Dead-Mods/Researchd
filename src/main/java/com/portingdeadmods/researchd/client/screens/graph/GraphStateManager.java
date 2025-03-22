@@ -4,20 +4,21 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchGraph;
 import net.minecraft.resources.ResourceKey;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Manages caching of different graph views and their layouts
+ * Simplified state manager that only caches the most recent graph layout
  */
 public class GraphStateManager {
     // Singleton instance
     private static final GraphStateManager INSTANCE = new GraphStateManager();
 
-    // Cache of complete graph layouts, keyed by a unique identifier
-    private final Map<String, GraphLayout> graphLayouts = new HashMap<>();
+    // Map from research key to node position and scale
+    private final Map<ResourceKey<Research>, NodeState> lastSessionState = new HashMap<>();
 
-    // Limit to prevent excessive memory usage
-    private static final int MAX_CACHED_LAYOUTS = 30;
+    // Root node of last graph (for identification purposes)
+    private ResourceKey<Research> lastGraphRoot = null;
 
     private GraphStateManager() {}
 
@@ -26,135 +27,75 @@ public class GraphStateManager {
     }
 
     /**
-     * Generate a unique key for a specific graph view based on its visible nodes
+     * Save the current graph state when closing the window
      */
-    private String generateGraphKey(ResearchGraph graph) {
-        if (graph == null || graph.nodes().isEmpty()) {
-            return "";
-        }
-
-        // Include the root node in the key
-        StringBuilder keyBuilder = new StringBuilder("root:");
-        keyBuilder.append(graph.rootNode().getInstance().getResearch().location().toString());
-
-        // Add all node IDs in a consistent order
-        List<String> nodeKeys = new ArrayList<>();
-        for (ResearchNode node : graph.nodes()) {
-            nodeKeys.add(node.getInstance().getResearch().location().toString());
-        }
-
-        // Sort to ensure consistent ordering
-        Collections.sort(nodeKeys);
-
-        // Add to key
-        keyBuilder.append(";nodes:");
-        for (String nodeKey : nodeKeys) {
-            keyBuilder.append(nodeKey).append(",");
-        }
-
-        return keyBuilder.toString();
-    }
-
-    /**
-     * Save the layout of a complete graph
-     */
-    public void saveGraphLayout(ResearchGraph graph) {
-        if (graph == null || graph.nodes().isEmpty()) {
+    public void saveLastSessionState(ResearchGraph graph) {
+        if (graph == null || graph.nodes().isEmpty() || graph.rootNode() == null) {
             return;
         }
 
-        // Generate the unique key for this graph view
-        String graphKey = generateGraphKey(graph);
+        // Clear previous state
+        lastSessionState.clear();
 
-        // Create a layout object with node positions
-        GraphLayout layout = new GraphLayout();
+        // Save the root node for identification
+        lastGraphRoot = graph.rootNode().getInstance().getResearch();
+
+        // Save position and scale for each node
         for (ResearchNode node : graph.nodes()) {
-            ResourceKey<Research> researchKey = node.getInstance().getResearch();
-            layout.nodePositions.put(researchKey, new NodePosition(node.getX(), node.getY()));
-        }
-
-        // Store layout in cache
-        graphLayouts.put(graphKey, layout);
-
-        // Clean up cache if it gets too large
-        if (graphLayouts.size() > MAX_CACHED_LAYOUTS) {
-            // Just remove the first entry - could be more sophisticated
-            String firstKey = graphLayouts.keySet().iterator().next();
-            graphLayouts.remove(firstKey);
+            ResourceKey<Research> key = node.getInstance().getResearch();
+            lastSessionState.put(key, new NodeState(
+                    node.getX(),
+                    node.getY()
+            ));
         }
     }
 
     /**
-     * Attempt to restore a previously saved graph layout
+     * Try to restore the previous session state if this is the same graph
      *
-     * @return true if layout was fully restored, false otherwise
+     * @return true if state was restored, false otherwise
      */
-    public boolean restoreGraphLayout(ResearchGraph graph) {
-        if (graph == null || graph.nodes().isEmpty()) {
+    public boolean tryRestoreLastSessionState(ResearchGraph graph) {
+        if (graph == null || graph.nodes().isEmpty() || graph.rootNode() == null ||
+                lastGraphRoot == null || lastSessionState.isEmpty()) {
             return false;
         }
 
-        // Generate the unique key for this graph view
-        String graphKey = generateGraphKey(graph);
-
-        // Look up the saved layout
-        GraphLayout layout = graphLayouts.get(graphKey);
-        if (layout == null) {
+        // Check if this is the same graph as last time (by root node)
+        if (!graph.rootNode().getInstance().getResearch().equals(lastGraphRoot)) {
             return false;
         }
 
-        // Restore positions for all nodes
-        boolean allRestored = true;
+        // Restore positions for nodes that exist in both graphs
         for (ResearchNode node : graph.nodes()) {
-            ResourceKey<Research> researchKey = node.getInstance().getResearch();
-            NodePosition position = layout.nodePositions.get(researchKey);
+            ResourceKey<Research> key = node.getInstance().getResearch();
+            NodeState state = lastSessionState.get(key);
 
-            if (position != null) {
-                node.setXExt(position.x);
-                node.setYExt(position.y);
-            } else {
-                allRestored = false;
+            if (state != null) {
+                node.setXExt(state.x);
+                node.setYExt(state.y);
             }
         }
 
-        return allRestored;
+        return true;
     }
 
     /**
-     * Check if we have a cached layout for this exact graph view
+     * Clear cached state
      */
-    public boolean hasLayoutForGraph(ResearchGraph graph) {
-        if (graph == null) {
-            return false;
-        }
-
-        String graphKey = generateGraphKey(graph);
-        return graphLayouts.containsKey(graphKey);
+    public void clearState() {
+        lastSessionState.clear();
+        lastGraphRoot = null;
     }
 
     /**
-     * Clear all cached layouts
+     * Simple class to store a node's state
      */
-    public void clearCache() {
-        graphLayouts.clear();
-    }
-
-    /**
-     * Represents a complete graph layout
-     */
-    private static class GraphLayout {
-        // Map from research key to position
-        final Map<ResourceKey<Research>, NodePosition> nodePositions = new HashMap<>();
-    }
-
-    /**
-     * Simple class to store node position
-     */
-    private static class NodePosition {
+    private static class NodeState {
         final int x;
         final int y;
 
-        NodePosition(int x, int y) {
+        NodeState(int x, int y) {
             this.x = x;
             this.y = y;
         }
