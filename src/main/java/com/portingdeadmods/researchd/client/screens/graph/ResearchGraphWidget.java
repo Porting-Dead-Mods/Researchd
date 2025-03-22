@@ -209,50 +209,21 @@ public class ResearchGraphWidget extends AbstractWidget {
             }
         }
 
-        // Still nothing? Use first available
         if (availableOutputHeads.isEmpty() || availableInputHeads.isEmpty()) {
             ResearchHead outputHead = !parent.getOutputs().isEmpty() ? parent.getOutputs().getFirst() : null;
             ResearchHead inputHead = !child.getInputs().isEmpty() ? child.getInputs().getFirst() : null;
             return Pair.of(outputHead, inputHead);
         }
 
-        // Determine relative position (left/right)
-        boolean parentIsLeft = parent.getX() < child.getX();
-
-        // Sort by X position (left-to-right)
+        // Sort both output and input heads by X position
         availableOutputHeads.sort(Comparator.comparingInt(ResearchHead::getX));
         availableInputHeads.sort(Comparator.comparingInt(ResearchHead::getX));
 
-        // Select appropriate head based on child's position in sequence
-        ResearchHead outputHead;
-        ResearchHead inputHead;
-
-        // Calculate normalized position (0 to 1) representing where this child is in the sequence
-        float normalizedPosition = (float)childIndex / Math.max(1, totalChildren - 1);
-
-        if (parentIsLeft) {
-            // If parent is on left, match left-to-right order
-            // For leftmost child (index 0), use leftmost output and leftmost input
-            // For rightmost child (index totalChildren-1), use rightmost output and rightmost input
-            int outputIndex = Math.min(availableOutputHeads.size() - 1,
-                    Math.round(normalizedPosition * (availableOutputHeads.size() - 1)));
-            int inputIndex = Math.min(availableInputHeads.size() - 1,
-                    Math.round(normalizedPosition * (availableInputHeads.size() - 1)));
-
-            outputHead = availableOutputHeads.get(outputIndex);
-            inputHead = availableInputHeads.get(inputIndex);
-        } else {
-            // If parent is on right, use reverse matching
-            // For leftmost child, use rightmost output and rightmost input
-            // For rightmost child, use leftmost output and leftmost input
-            int outputIndex = Math.min(availableOutputHeads.size() - 1,
-                    Math.round((1 - normalizedPosition) * (availableOutputHeads.size() - 1)));
-            int inputIndex = Math.min(availableInputHeads.size() - 1,
-                    Math.round((1 - normalizedPosition) * (availableInputHeads.size() - 1)));
-
-            outputHead = availableOutputHeads.get(outputIndex);
-            inputHead = availableInputHeads.get(inputIndex);
-        }
+        // Get the closest output head to the input head's X position
+        ResearchHead inputHead = availableInputHeads.getFirst();
+        ResearchHead outputHead = availableOutputHeads.stream()
+                .min(Comparator.comparingInt(head -> Math.abs(head.getX() - inputHead.getX())))
+                .orElse(availableOutputHeads.getFirst());
 
         return Pair.of(outputHead, inputHead);
     }
