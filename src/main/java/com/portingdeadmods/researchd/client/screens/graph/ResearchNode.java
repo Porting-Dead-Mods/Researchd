@@ -22,7 +22,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * Drawable widget for researches <br>
+ * Drawable widget for completedResearches <br>
  * For X and Y setting, use {@link #setXExt(int)} and {@link #setYExt(int)} <br>
  * @see ResearchInstance
  */

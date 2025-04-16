@@ -29,6 +29,7 @@ public final class ResearchQueue implements Iterable<ResearchInstance> {
 
     private final List<ResearchInstance> entries;
     private int researchProgress;
+    private int maxResearchProgress;
 
     public ResearchQueue(List<ResearchInstance> entries, int researchProgress) {
         this.entries = entries;
@@ -77,7 +78,7 @@ public final class ResearchQueue implements Iterable<ResearchInstance> {
      * @return whether it was possible to remove the element
      */
     public boolean remove(ResearchInstance instance) {
-        return this.entries.remove(instance);
+        return remove(this.entries.indexOf(instance));
     }
 
     /**
@@ -85,11 +86,21 @@ public final class ResearchQueue implements Iterable<ResearchInstance> {
      * @return whether it was possible to remove the element
      */
     public boolean remove(int index) {
+        // TODO: Move all forward by one
         if (this.entries.size() > index) {
             this.entries.remove(index);
+            for (int i = index; i < this.entries.size(); i++) {
+                if (i + 1 < this.entries.size()) {
+                    this.entries.set(i, this.entries.get(i + 1));
+                }
+            }
             return true;
         }
         return false;
+    }
+
+    public boolean isEmpty() {
+        return this.entries.isEmpty();
     }
 
     @Override
@@ -97,16 +108,24 @@ public final class ResearchQueue implements Iterable<ResearchInstance> {
         return entries.iterator();
     }
 
+    public int getResearchProgress() {
+        return researchProgress;
+    }
+
     public void setResearchProgress(int researchProgress) {
         this.researchProgress = researchProgress;
     }
 
-    public List<ResearchInstance> getEntries() {
-        return entries;
+    public int getMaxResearchProgress() {
+        return maxResearchProgress;
     }
 
-    public int getResearchProgress() {
-        return researchProgress;
+    public void setMaxResearchProgress(int maxResearchProgress) {
+        this.maxResearchProgress = maxResearchProgress;
+    }
+
+    public List<ResearchInstance> getEntries() {
+        return entries;
     }
 
     @Override

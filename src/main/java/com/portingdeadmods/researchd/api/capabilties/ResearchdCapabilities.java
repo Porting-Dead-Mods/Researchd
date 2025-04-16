@@ -4,5 +4,6 @@ import com.portingdeadmods.researchd.Researchd;
 import net.neoforged.neoforge.capabilities.EntityCapability;
 
 public final class ResearchdCapabilities {
+    @Deprecated
     public static final EntityCapability<EntityResearch, Void> ENTITY = EntityCapability.createVoid(Researchd.rl("entity_research"), EntityResearch.class);
 }

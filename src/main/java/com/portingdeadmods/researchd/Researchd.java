@@ -3,7 +3,6 @@ package com.portingdeadmods.researchd;
 import com.portingdeadmods.researchd.api.capabilties.ResearchdCapabilities;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
-import com.portingdeadmods.researchd.impl.capabilities.EntityResearchWrapper;
 import com.portingdeadmods.researchd.impl.research.ResearchPack;
 import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
 import com.portingdeadmods.researchd.registries.ResearchdItems;
@@ -51,7 +50,7 @@ public class Researchd {
     }
 
     private void registerCapabilities(RegisterCapabilitiesEvent event) {
-        event.registerEntity(ResearchdCapabilities.ENTITY, EntityType.PLAYER, (player, ctx) -> new EntityResearchWrapper(player));
+        //event.registerEntity(ResearchdCapabilities.ENTITY, EntityType.PLAYER, (player, ctx) -> new EntityResearchWrapper(player));
     }
 
     private void registerRegistries(NewRegistryEvent event) {

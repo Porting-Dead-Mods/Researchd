@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.api.data;
 import com.mojang.serialization.Codec;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
@@ -23,12 +24,14 @@ public final class PDLSavedData<T> {
     private final Codec<T> codec;
     private final StreamCodec<? super RegistryFriendlyByteBuf, T> streamCodec;
     private final Consumer<Player> onSyncFunction;
+    private final boolean global;
 
     private PDLSavedData(Builder<T> builder) {
         this.codec = builder.codec;
         this.streamCodec = builder.streamCodec;
         this.defaultValueSupplier = builder.defaultValueSupplier;
         this.onSyncFunction = builder.onSyncFunction;
+        this.global = builder.global;
     }
 
     public Codec<T> codec() {
@@ -47,12 +50,22 @@ public final class PDLSavedData<T> {
         return onSyncFunction;
     }
 
+    public boolean isGlobal() {
+        return global;
+    }
+
     public boolean isSynced() {
         return streamCodec != null;
     }
 
     public void setData(Level level, T data) {
-        if (level instanceof ServerLevel serverLevel) {
+        if (level instanceof ServerLevel serverLevel0) {
+            ServerLevel serverLevel;
+            if (isGlobal()) {
+                serverLevel = serverLevel0.getServer().overworld();
+            } else {
+                serverLevel = serverLevel0;
+            }
             ResourceLocation location = ResearchdRegistries.SAVED_DATA.getKey(this);
             if (location != null) {
                 SavedDataWrapper.setData(new SavedDataHolder<>(location, this), serverLevel, data);
@@ -66,19 +79,24 @@ public final class PDLSavedData<T> {
     }
 
     public T getData(Level level) {
-        if (level instanceof ServerLevel serverLevel) {
+        if (level instanceof ServerLevel serverLevel0) {
+            ServerLevel serverLevel;
+            if (isGlobal()) {
+                serverLevel = serverLevel0.getServer().overworld();
+            } else {
+                serverLevel = serverLevel0;
+            }
             ResourceLocation location = ResearchdRegistries.SAVED_DATA.getKey(this);
             if (location != null) {
                 return SavedDataWrapper.getData(new SavedDataHolder<>(location, this), serverLevel);
             }
-            return null;
         } else {
             ResourceLocation location = ResearchdRegistries.SAVED_DATA.getKey(this);
             if (location != null) {
                 return (T) PDLClientSavedData.CLIENT_SAVED_DATA_CACHE.get(location);
             }
-            return null;
         }
+        return null;
     }
 
     public static <T> Builder<T> builder(Codec<T> codec, Supplier<T> defaultValueSupplier) {
@@ -90,6 +108,7 @@ public final class PDLSavedData<T> {
         private final Codec<T> codec;
         private Consumer<Player> onSyncFunction;
         private StreamCodec<? super RegistryFriendlyByteBuf, T> streamCodec;
+        private boolean global = false;
 
         private Builder(Codec<T> codec, Supplier<T> defaultValueSupplier) {
             this.defaultValueSupplier = defaultValueSupplier;
@@ -110,15 +129,21 @@ public final class PDLSavedData<T> {
             return this;
         }
 
+        /**
+         * Makes the saved data global, instead of dimension based
+         */
+        public Builder<T> global() {
+            this.global = true;
+            return this;
+        }
+
         public PDLSavedData<T> build() {
             if (this.onSyncFunction != null && this.streamCodec == null) {
                 throw new RuntimeException("Cannot provide a onSync function for a saved data without a stream coded");
             }
 
             if (this.streamCodec != null && this.onSyncFunction == null) {
-                this.onSyncFunction = p -> {
-                    Researchd.LOGGER.debug("SYNCING NOTHIN");
-                };
+                this.onSyncFunction = p -> {};
             }
 
             return new PDLSavedData<>(this);
