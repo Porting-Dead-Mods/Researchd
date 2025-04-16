@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.data.helper;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.portingdeadmods.researchd.data.TeamSavedData;
 import net.minecraft.core.UUIDUtil;
 
 import java.util.AbstractMap;
@@ -11,11 +12,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class ResearchTeamMap {
+	public static final ResearchTeamMap EMPTY = new ResearchTeamMap();
 	public static final Codec<ResearchTeamMap> CODEC = RecordCodecBuilder.create(builder -> builder.group(
 			Codec.unboundedMap(Codec.STRING, ResearchTeam.CODEC).fieldOf("research_teams").forGetter(ResearchTeamMap::teamMapToString)
 	).apply(builder, ResearchTeamMap::teamMapFromString));
 
-	private final Map<UUID, ResearchTeam> researchTeams;
+    private final Map<UUID, ResearchTeam> researchTeams;
 
 	public ResearchTeamMap() {
 		this.researchTeams = new HashMap<>();

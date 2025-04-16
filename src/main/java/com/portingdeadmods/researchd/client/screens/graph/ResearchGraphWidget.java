@@ -151,27 +151,30 @@ public class ResearchGraphWidget extends AbstractWidget {
                     // Remove the used heads from available lists to ensure they're not picked again
                     availableOutputHeads.remove(bestHeads.left());
 
-                    // Generate the best path
-                    ResearchLine bestLine = generateOptimalPath(
-                            bestHeads.left().getConnectionPoint(),
-                            bestHeads.right().getConnectionPoint(),
-                            allLines,
-                            verticalPathXCoords,
-                            preferVerticalFirst
-                    );
+                    // FIXME: Why could these two be null
+                    if (bestHeads.left() != null && bestHeads.right() != null) {
+                        // Generate the best path
+                        ResearchLine bestLine = generateOptimalPath(
+                                bestHeads.left().getConnectionPoint(),
+                                bestHeads.right().getConnectionPoint(),
+                                allLines,
+                                verticalPathXCoords,
+                                preferVerticalFirst
+                        );
 
-                    // Update vertical path zones with any new vertical segments
-                    for (int j = 0; j < bestLine.getPoints().size() - 1; j++) {
-                        Point p1 = bestLine.getPoints().get(j);
-                        Point p2 = bestLine.getPoints().get(j + 1);
-                        if (p1.x == p2.x) {
-                            verticalPathXCoords.add(p1.x);
+                        // Update vertical path zones with any new vertical segments
+                        for (int j = 0; j < bestLine.getPoints().size() - 1; j++) {
+                            Point p1 = bestLine.getPoints().get(j);
+                            Point p2 = bestLine.getPoints().get(j + 1);
+                            if (p1.x == p2.x) {
+                                verticalPathXCoords.add(p1.x);
+                            }
                         }
-                    }
 
-                    // Store the line
-                    nodeLines.add(bestLine);
-                    allLines.add(bestLine);
+                        // Store the line
+                        nodeLines.add(bestLine);
+                        allLines.add(bestLine);
+                    }
                 }
             }
 
@@ -522,6 +525,10 @@ public class ResearchGraphWidget extends AbstractWidget {
 
     @Override
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
+    }
+
+    @Override
+    public void onClick(double mouseX, double mouseY, int button) {
     }
 
     @Override

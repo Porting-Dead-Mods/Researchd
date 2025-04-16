@@ -20,15 +20,15 @@ import java.util.Optional;
 import java.util.UUID;
 
 
-public class ResearchdSavedData extends SavedData {
+public class TeamSavedData extends SavedData {
 	public static final String ID = "researchd_saved_data";
 
 	private final ResearchTeamMap researchTeamMap;
 
-	public ResearchdSavedData(ResearchTeamMap researchTeamMap) {
+	public TeamSavedData(ResearchTeamMap researchTeamMap) {
 		this.researchTeamMap = researchTeamMap;
 	}
-	public ResearchdSavedData() {
+	public TeamSavedData() {
 		this(new ResearchTeamMap());
 	}
 
@@ -63,27 +63,27 @@ public class ResearchdSavedData extends SavedData {
 		return compoundTag;
 	}
 
-	private static ResearchdSavedData load(CompoundTag compoundTag) {
+	private static TeamSavedData load(CompoundTag compoundTag) {
 		DataResult<Pair<ResearchTeamMap, Tag>> dataResult = ResearchTeamMap.CODEC.decode(NbtOps.INSTANCE, compoundTag.get(ID));
 		Optional<Pair<ResearchTeamMap, Tag>> mapTagPair = dataResult
 				.resultOrPartial(err -> Researchd.LOGGER.error("Decoding error: {}", err));
 
 		if (mapTagPair.isPresent()) {
 			ResearchTeamMap researchTeamMap1 = mapTagPair.get().getFirst();
-			return new ResearchdSavedData(researchTeamMap1);
+			return new TeamSavedData(researchTeamMap1);
 		}
-		return new ResearchdSavedData();
+		return new TeamSavedData();
 	}
 
-	public static ResearchdSavedData get(Level level) {
+	public static TeamSavedData get(Level level) {
 		if (!(level instanceof ServerLevel)) {
 			throw new IllegalArgumentException("ClientSide handling logic not yet implemented...");
 		}
 		return level.getServer().overworld().getDataStorage().computeIfAbsent(factory(), ID);
 	}
 
-	private static SavedData.Factory<ResearchdSavedData> factory() {
-		return new SavedData.Factory<>(ResearchdSavedData::new, (tag, provider) -> load(tag));
+	private static SavedData.Factory<TeamSavedData> factory() {
+		return new SavedData.Factory<>(TeamSavedData::new, (tag, provider) -> load(tag));
 	}
 
 	@Override

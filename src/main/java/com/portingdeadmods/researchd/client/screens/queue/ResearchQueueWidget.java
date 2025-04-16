@@ -36,7 +36,7 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
         int paddingX = 12;
         int paddingY = 17;
 
-        List<ResearchInstance> entries = this.queue.entries();
+        List<ResearchInstance> entries = this.queue.getEntries();
         for (int i = 0; i < entries.size(); i++) {
             renderQueuePanel(guiGraphics, entries.get(i), paddingX + i * PANEL_WIDTH, paddingY, mouseX, mouseY);
         }
@@ -48,8 +48,8 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
         int paddingY = 17;
 
         int index = (int) (mouseX - paddingX) / PANEL_WIDTH;
-        if (mouseX > paddingX && mouseY > paddingY && index < this.queue.entries().size()) {
-            ResearchInstance instance = this.queue.entries().get(index);
+        if (mouseX > paddingX && mouseY > paddingY && index < this.queue.getEntries().size()) {
+            ResearchInstance instance = this.queue.getEntries().get(index);
             if (this.isHovering(null, (int) mouseX, (int) mouseY, index, paddingY + 17, getWidth(), getHeight() - 17)) {
                 Researchd.LOGGER.debug("removing");
                 this.screen.getResearchQueue().removeResearch(index);
@@ -64,7 +64,7 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
     }
 
     public void removeResearch(int index) {
-        if (this.queue.entries().size() > index) {
+        if (this.queue.getEntries().size() > index) {
             this.queue.remove(index);
         }
     }

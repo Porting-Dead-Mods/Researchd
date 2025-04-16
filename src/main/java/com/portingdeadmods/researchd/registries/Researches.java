@@ -108,6 +108,12 @@ public final class Researches {
             .researchMethods(List.of(
                     new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 12)
             )));
+    public static final ResourceKey<Research> DIAMOND_HOE = register("diamond_hoe", builder -> builder
+            .icon(Items.DIAMOND_HOE)
+            .parents(DIAMOND_ARMOR, TRIDENT)
+            .researchMethods(List.of(
+                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 12)
+            )));
 
     public static void bootstrap(BootstrapContext<Research> context) {
         for (Map.Entry<ResourceKey<Research>, Research.Builder<?>> research : RESEARCHES.entrySet()) {
