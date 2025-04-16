@@ -22,6 +22,10 @@ public final class ResearchGraphCache {
         return GRAPH_CACHE.get(key);
     }
 
+    public static void clearCache() {
+        GRAPH_CACHE.clear();
+    }
+
     public static ResearchGraph computeIfAbsent(Player player, ResourceKey<Research> key) {
         return GRAPH_CACHE.computeIfAbsent(key, k -> computeGraph(player, k));
     }

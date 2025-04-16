@@ -20,7 +20,8 @@ public class GraphStateManager {
     // Root node of last graph (for identification purposes)
     private ResourceKey<Research> lastGraphRoot = null;
 
-    private GraphStateManager() {}
+    private GraphStateManager() {
+    }
 
     public static GraphStateManager getInstance() {
         return INSTANCE;
@@ -91,13 +92,6 @@ public class GraphStateManager {
     /**
      * Simple class to store a node's state
      */
-    private static class NodeState {
-        final int x;
-        final int y;
-
-        NodeState(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
+    private record NodeState(int x, int y) {
     }
 }

@@ -33,19 +33,20 @@ public class ResearchScreen extends Screen {
 
         // TECH LIST
         this.techList = new TechListWidget(this, 0, 103, 7);
-        this.techList.setTechList(new TechList(ClientResearchCache.NODES.stream().map(ResearchNode::getInstance).toList()));
+        this.techList.setTechList(new TechList(ClientResearchCache.RESEARCHES.stream().toList()));
+
+        // THIS NEEDS TO BE BEFORE THE GRAPH
+        this.selectedResearchWidget = new SelectedResearchWidget(0, 42, SelectedResearchWidget.BACKGROUND_WIDTH, SelectedResearchWidget.BACKGROUND_HEIGHT);
+        this.selectedResearchWidget.setSelectedResearch(this.techList.getTechList().entries().getFirst());
 
         // QUEUE
         this.researchQueueWidget = new ResearchQueueWidget(this, 0, 0);
 
         // GRAPH
         int x = 174;
-        this.researchGraphWidget = new ResearchGraphWidget(x, 8, 300, 253 - 16);
+        this.researchGraphWidget = new ResearchGraphWidget(selectedResearchWidget, x, 8, 300, 253 - 16);
         Minecraft mc = Minecraft.getInstance();
         this.researchGraphWidget.setGraph(ResearchGraph.fromRootNode(mc.player, ClientResearchCache.ROOT_NODE));
-
-        this.selectedResearchWidget = new SelectedResearchWidget(0, 42, SelectedResearchWidget.BACKGROUND_WIDTH, SelectedResearchWidget.BACKGROUND_HEIGHT);
-        //this.selectedResearchWidget.setSelectedResearch(this.techList.getTechList().entries().getFirst());
     }
 
     @Override

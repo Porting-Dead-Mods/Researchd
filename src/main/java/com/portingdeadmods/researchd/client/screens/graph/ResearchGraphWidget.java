@@ -3,13 +3,11 @@ package com.portingdeadmods.researchd.client.screens.graph;
 import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.ResearchInstance;
-import com.portingdeadmods.researchd.client.screens.ResearchScreen;
-import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
+import com.portingdeadmods.researchd.client.screens.SelectedResearchWidget;
 import com.portingdeadmods.researchd.client.screens.lines.PotentialOverlap;
 import com.portingdeadmods.researchd.client.screens.lines.ResearchHead;
 import com.portingdeadmods.researchd.client.screens.lines.ResearchLine;
-import com.portingdeadmods.researchd.registries.Researches;
+import com.portingdeadmods.researchd.utils.researches.ResearchGraphCache;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchGraph;
 import com.portingdeadmods.researchd.utils.researches.layout.ResearchLayoutManager;
@@ -39,9 +37,12 @@ public class ResearchGraphWidget extends AbstractWidget {
     private List<Layer> layers;
     private Map<ResearchNode, ArrayList<ResearchLine>> researchLines = new HashMap<>();
 
-    public ResearchGraphWidget(int x, int y, int width, int height) {
+    private final SelectedResearchWidget selectedResearchWidget;
+
+    public ResearchGraphWidget(SelectedResearchWidget selectedResearchWidget, int x, int y, int width, int height) {
         super(x, y, width, height, Component.empty());
         this.layers = new ArrayList<>();
+        this.selectedResearchWidget = selectedResearchWidget;
     }
 
     /**
@@ -496,6 +497,10 @@ public class ResearchGraphWidget extends AbstractWidget {
         ResearchNode node = graph.rootNode();
         renderNode(node, guiGraphics, i, i1, v);
 
+        for (ResearchNode parentNode : graph.parents()) {
+            parentNode.render(guiGraphics, i ,i1, v);
+        }
+
         guiGraphics.disableScissor();
         renderNodeTooltip(node, guiGraphics, i, i1, v);
     }
@@ -529,6 +534,13 @@ public class ResearchGraphWidget extends AbstractWidget {
 
     @Override
     public void onClick(double mouseX, double mouseY, int button) {
+        for (ResearchNode node : this.graph.nodes()) {
+            if (node.isHovered()) {
+                this.selectedResearchWidget.setSelectedResearch(node.getInstance());
+                this.setGraph(ResearchGraphCache.computeIfAbsent(Minecraft.getInstance().player, node.getInstance().getResearch()));
+                break;
+            }
+        }
     }
 
     @Override

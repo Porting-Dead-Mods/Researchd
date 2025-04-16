@@ -3,12 +3,15 @@ package com.portingdeadmods.researchd.impl.capabilities;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.api.capabilties.EntityResearch;
+import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.utils.researches.ClientResearchCache;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchQueue;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.*;
@@ -48,12 +51,17 @@ public record EntityResearchImpl(ResearchQueue researchQueue, Set<ResearchInstan
     }
 
     @Override
-    public Set<ResearchInstance> completedResearches() {
-        return Set.of();
+    public void completeResearch(ResearchInstance researchInstance) {
+        this.completedResearches.add(new ResearchInstance(researchInstance.getResearch(), ResearchStatus.RESEARCHED));
     }
 
-    @Override
-    public void completeResearch(ResearchInstance researchInstance) {
-        this.completedResearches.add(researchInstance);
+    public boolean isCompleted(ResourceKey<Research> resourceKey) {
+        for (ResearchInstance researchInstance : this.completedResearches) {
+            if (researchInstance.getResearch().compareTo(resourceKey) == 0) {
+                return true;
+            }
+        }
+        return false;
     }
+
 }
