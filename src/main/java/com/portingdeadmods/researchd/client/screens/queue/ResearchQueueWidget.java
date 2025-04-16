@@ -6,12 +6,15 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
+import com.portingdeadmods.researchd.networking.research.ResearchQueueAddPayload;
+import com.portingdeadmods.researchd.networking.research.ResearchQueueRemovePayload;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchQueue;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 
@@ -65,7 +68,9 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
 
     public void removeResearch(int index) {
         if (this.queue.getEntries().size() > index) {
+            ResearchInstance instance = this.queue.getEntries().get(index);
             this.queue.remove(index);
+            PacketDistributor.sendToServer(new ResearchQueueRemovePayload(instance));
         }
     }
 

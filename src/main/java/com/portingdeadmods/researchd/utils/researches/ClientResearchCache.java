@@ -4,7 +4,9 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.capabilties.ResearchdCapabilities;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
+import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.utils.Spaghetti;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
@@ -23,9 +25,9 @@ public final class ClientResearchCache {
         NODES.clear();
 
         RegistryAccess registryAccess = player.registryAccess();
-        Set<ResearchInstance> playerResearches = ResearchHelper.getPlayerResearches(player);
+        Set<ResearchInstance> playerResearches = ResearchdSavedData.PLAYER_RESEARCH.get().getData(player.level()).researches();
 
-        Researchd.LOGGER.debug("player: {}", player.getCapability(ResearchdCapabilities.ENTITY).researches());
+        Researchd.LOGGER.debug("player: {}", playerResearches);
 
         // Collect researches
         playerResearches.forEach(research -> {

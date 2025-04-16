@@ -67,6 +67,7 @@ public final class ResearchedEvents {
                     PDLSavedData<?> value = savedData.getValue();
                     if (value.isSynced()) {
                         sendSavedDataSyncPayload(serverPlayer, savedData.getKey().location(), value);
+                        value.onSyncFunction().accept(serverPlayer);
                     }
                 }
             }

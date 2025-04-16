@@ -48,13 +48,13 @@ public final class ResearchInstance {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof ResearchInstance that)) return false;
-        return Objects.equals(research, that.research);
+        if (!(o instanceof ResearchInstance instance)) return false;
+        return Objects.equals(research, instance.research) && researchStatus == instance.researchStatus;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(research);
+        return Objects.hash(research, researchStatus);
     }
 
     @Override

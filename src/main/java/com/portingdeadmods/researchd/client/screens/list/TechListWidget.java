@@ -6,6 +6,8 @@ import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.screens.queue.ResearchQueueWidget;
+import com.portingdeadmods.researchd.networking.research.ResearchQueueAddPayload;
+import com.portingdeadmods.researchd.networking.research.ResearchQueueRemovePayload;
 import com.portingdeadmods.researchd.utils.researches.ResearchGraphCache;
 import com.portingdeadmods.researchd.utils.researches.data.TechList;
 import net.minecraft.client.Minecraft;
@@ -17,6 +19,7 @@ import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.function.Consumer;
 
@@ -76,7 +79,9 @@ public class TechListWidget extends ResearchScreenWidget {
 
     public void onStartResearchButtonClicked(Button button) {
         ResearchQueueWidget queue = this.screen.getResearchQueue();
-        queue.getQueue().add(this.screen.getSelectedResearchWidget().getInstance());
+        ResearchInstance instance = this.screen.getSelectedResearchWidget().getInstance();
+        queue.getQueue().add(instance);
+        PacketDistributor.sendToServer(new ResearchQueueAddPayload(instance));
     }
 
     @Override

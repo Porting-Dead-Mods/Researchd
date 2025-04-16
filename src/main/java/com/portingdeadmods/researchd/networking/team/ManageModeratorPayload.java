@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.networking;
+package com.portingdeadmods.researchd.networking.team;
 
 import com.portingdeadmods.researchd.ResearchTeamUtil;
 import com.portingdeadmods.researchd.Researchd;
@@ -13,14 +13,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public record RequestToJoinPayload(UUID toJoin, boolean remove) implements CustomPacketPayload {
-    public static final Type<RequestToJoinPayload> TYPE = new Type<>(Researchd.rl("request_to_join_payload"));
-    public static final StreamCodec<RegistryFriendlyByteBuf, RequestToJoinPayload> STREAM_CODEC = StreamCodec.composite(
+public record ManageModeratorPayload(UUID moderator, boolean remove) implements CustomPacketPayload {
+    public static final Type<ManageModeratorPayload> TYPE = new Type<>(Researchd.rl("manage_moderator_payload"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, ManageModeratorPayload> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,
-            RequestToJoinPayload::toJoin,
+            ManageModeratorPayload::moderator,
             ByteBufCodecs.BOOL,
-            RequestToJoinPayload::remove,
-            RequestToJoinPayload::new
+            ManageModeratorPayload::remove,
+            ManageModeratorPayload::new
     );
 
     @Override
@@ -28,9 +28,9 @@ public record RequestToJoinPayload(UUID toJoin, boolean remove) implements Custo
         return TYPE;
     }
 
-    public static void requestToJoinAction(RequestToJoinPayload payload, IPayloadContext context) {
+    public static void manageModeratorAction(ManageModeratorPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
-            ResearchTeamUtil.handleRequestToJoin(context.player(), payload.toJoin, payload.remove);
+            ResearchTeamUtil.handleManageModerator(context.player(), payload.moderator(), payload.remove());
         }).exceptionally(e -> {
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
             return null;

@@ -1,10 +1,11 @@
-package com.portingdeadmods.researchd.networking;
+package com.portingdeadmods.researchd.networking.team;
 
 import com.portingdeadmods.researchd.ResearchTeamUtil;
 import com.portingdeadmods.researchd.Researchd;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -12,12 +13,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public record LeaveTeamPayload(UUID nextToLead) implements CustomPacketPayload {
-    public static final Type<LeaveTeamPayload> TYPE = new Type<>(Researchd.rl("leave_team_payload"));
-    public static final StreamCodec<RegistryFriendlyByteBuf, LeaveTeamPayload> STREAM_CODEC = StreamCodec.composite(
+public record InvitePlayerPayload(UUID invited, boolean remove) implements CustomPacketPayload {
+    public static final Type<InvitePlayerPayload> TYPE = new Type<>(Researchd.rl("invite_player_payload"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, InvitePlayerPayload> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,
-            LeaveTeamPayload::nextToLead,
-            LeaveTeamPayload::new
+            InvitePlayerPayload::invited,
+            ByteBufCodecs.BOOL,
+            InvitePlayerPayload::remove,
+            InvitePlayerPayload::new
     );
 
     @Override
@@ -25,9 +28,9 @@ public record LeaveTeamPayload(UUID nextToLead) implements CustomPacketPayload {
         return TYPE;
     }
 
-    public static void leaveTeamAction(LeaveTeamPayload payload, IPayloadContext context) {
+    public static void invitePlayerAction(InvitePlayerPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
-            ResearchTeamUtil.handleLeaveTeam(context.player(), payload.nextToLead());
+            ResearchTeamUtil.handleSendInviteToPlayer(context.player(), payload.invited, payload.remove);
         }).exceptionally(e -> {
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
             return null;

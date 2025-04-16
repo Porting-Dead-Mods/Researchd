@@ -1,7 +1,5 @@
 package com.portingdeadmods.researchd;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.api.capabilties.ResearchdCapabilities;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
@@ -9,7 +7,7 @@ import com.portingdeadmods.researchd.impl.capabilities.EntityResearchWrapper;
 import com.portingdeadmods.researchd.impl.research.ResearchPack;
 import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
 import com.portingdeadmods.researchd.registries.ResearchdItems;
-import com.portingdeadmods.researchd.registries.ResearchdSavedData;
+import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.registries.ResearchdTab;
 import com.portingdeadmods.researchd.registries.serializers.ResearchMethodSerializers;
 import com.portingdeadmods.researchd.registries.serializers.ResearchPredicateSerializers;

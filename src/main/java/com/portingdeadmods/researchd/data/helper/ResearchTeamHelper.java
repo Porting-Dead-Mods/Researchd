@@ -1,6 +1,6 @@
 package com.portingdeadmods.researchd.data.helper;
 
-import com.portingdeadmods.researchd.registries.ResearchdSavedData;
+import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.NotNull;
 
