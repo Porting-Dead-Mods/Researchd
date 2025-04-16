@@ -81,6 +81,8 @@ public class TechListWidget extends ResearchScreenWidget {
         ResearchQueueWidget queue = this.screen.getResearchQueue();
         ResearchInstance instance = this.screen.getSelectedResearchWidget().getInstance();
         queue.getQueue().add(instance);
+        // TODO: Make this dynamic
+        queue.getQueue().setMaxResearchProgress(100);
         PacketDistributor.sendToServer(new ResearchQueueAddPayload(instance));
     }
 

@@ -2,17 +2,24 @@ package com.portingdeadmods.researchd.events;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
+import com.portingdeadmods.researchd.api.data.PDLClientSavedData;
 import com.portingdeadmods.researchd.api.data.PDLSavedData;
 import com.portingdeadmods.researchd.api.data.SavedDataHolder;
+import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.commands.ResearchdCommands;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
+import com.portingdeadmods.researchd.data.ResearchdSavedData;
+import com.portingdeadmods.researchd.impl.capabilities.EntityResearchImpl;
 import com.portingdeadmods.researchd.networking.SyncSavedDataPayload;
+import com.portingdeadmods.researchd.networking.research.ResearchFinishedPayload;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
+import com.portingdeadmods.researchd.utils.researches.data.ResearchQueue;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -25,12 +32,13 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.Map;
 import java.util.UUID;
 
-public final class ResearchedEvents {
+public final class ResearchdEvents {
     @EventBusSubscriber(modid = Researchd.MODID, value = Dist.CLIENT)
     public static final class Client {
         @SubscribeEvent
@@ -73,10 +81,52 @@ public final class ResearchedEvents {
             }
         }
 
+        @SubscribeEvent
+        private static void onLeaveWorld(PlayerEvent.PlayerLoggedOutEvent event) {
+            PDLClientSavedData.CLIENT_SAVED_DATA_CACHE.clear();
+        }
+
         private static <T> void sendSavedDataSyncPayload(ServerPlayer serverPlayer, ResourceLocation id, PDLSavedData<?> savedData) {
             PDLSavedData<T> savedData1 = (PDLSavedData<T>) savedData;
             T data = savedData1.getData(serverPlayer.serverLevel());
             PacketDistributor.sendToPlayer(serverPlayer, new SyncSavedDataPayload<>(new SavedDataHolder<>(id, savedData1), data));
+        }
+
+        @SubscribeEvent
+        public static void onClientTick(ClientTickEvent.Post event) {
+            Level level = Minecraft.getInstance().level;
+            EntityResearchImpl data = ResearchdSavedData.PLAYER_RESEARCH.get().getData(level);
+            if (data != null) {
+                ResearchQueue queue = data.researchQueue();
+                if (!queue.isEmpty()) {
+                    if (queue.getMaxResearchProgress() > queue.getResearchProgress()) {
+                        queue.setResearchProgress(queue.getResearchProgress() + 1);
+                    } else {
+                        queue.setResearchProgress(0);
+                    }
+                }
+            }
+        }
+
+        @SubscribeEvent
+        public static void onServerTick(ServerTickEvent.Post event) {
+            MinecraftServer server = event.getServer();
+            ServerLevel level = server.overworld();
+            EntityResearchImpl data = ResearchdSavedData.PLAYER_RESEARCH.get().getData(level);
+            if (data != null) {
+                ResearchQueue queue = data.researchQueue();
+                if (!queue.isEmpty()) {
+                    if (queue.getMaxResearchProgress() > queue.getResearchProgress()) {
+                        queue.setResearchProgress(queue.getResearchProgress() + 1);
+                    } else {
+                        queue.setResearchProgress(0);
+                        ResearchInstance first = data.researchQueue().getEntries().getFirst();
+                        data.researchQueue().remove(0);
+                        data.completeResearch(first);
+                        PacketDistributor.sendToAllPlayers(ResearchFinishedPayload.INSTANCE);
+                    }
+                }
+            }
         }
     }
 

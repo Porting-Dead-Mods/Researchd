@@ -17,9 +17,6 @@ import java.util.function.Supplier;
 public final class ResearchdAttachments {
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENTS = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, Researchd.MODID);
 
-    public static final Supplier<AttachmentType<EntityResearchImpl>> ENTITY_RESEARCH = ATTACHMENTS.register("entity_research",
-            () -> AttachmentType.builder(() -> EntityResearchImpl.EMPTY).serialize(EntityResearchImpl.CODEC).copyOnDeath().build());
-
     public static final Supplier<AttachmentType<DimensionPredicateData>> DIMENSION_PREDICATE = ATTACHMENTS.register("dimension_predicate",
             () -> AttachmentType.builder(() -> DimensionPredicateData.EMPTY).serialize(DimensionPredicateData.CODEC).build());
 
