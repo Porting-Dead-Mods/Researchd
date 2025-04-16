@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.ResearchdRegistries;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
@@ -17,6 +18,7 @@ public record ResearchPack(int color, Optional<ResourceLocation> customTexture) 
             ResourceLocation.CODEC.optionalFieldOf("customTexture").forGetter(ResearchPack::customTexture)
     ).apply(instance, ResearchPack::new));
     public static final Codec<ResourceKey<ResearchPack>> RESOURCE_KEY_CODEC = ResourceKey.codec(ResearchdRegistries.RESEARCH_PACK_KEY);
+    public static final StreamCodec<ByteBuf, ResourceKey<ResearchPack>> RESOURCE_KEY_STREAM_CODEC = ResourceKey.streamCodec(ResearchdRegistries.RESEARCH_PACK_KEY);
     public static final ResearchPack EMPTY = new ResearchPack(-1, Optional.empty());
 
     public ResearchPack(ResourceLocation customTexture) {

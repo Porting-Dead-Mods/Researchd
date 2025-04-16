@@ -2,8 +2,6 @@ package com.portingdeadmods.researchd.data.helper;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.portingdeadmods.researchd.data.TeamSavedData;
-import net.minecraft.core.UUIDUtil;
 
 import java.util.AbstractMap;
 import java.util.HashMap;
@@ -29,6 +27,10 @@ public class ResearchTeamMap {
 
 	public Map<UUID, ResearchTeam> getResearchTeams() {
 		return this.researchTeams;
+	}
+
+	public ResearchTeam getTeamForUUID(UUID uuid) {
+		return getResearchTeams().get(uuid);
 	}
 
 	public Map<String, ResearchTeam> teamMapToString() {

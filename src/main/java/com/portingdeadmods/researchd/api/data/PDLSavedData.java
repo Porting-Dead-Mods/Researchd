@@ -5,9 +5,12 @@ import com.portingdeadmods.researchd.ResearchdRegistries;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 // TODO: This should be moved to pdl
@@ -34,19 +37,38 @@ public final class PDLSavedData<T> {
         return defaultValueSupplier;
     }
 
-    public void setData(ServerLevel serverLevel, T data) {
-        ResourceLocation location = ResearchdRegistries.SAVED_DATA.getKey(this);
-        if (location != null) {
-            SavedDataWrapper.setData(new SavedDataHolder<>(location, this), serverLevel, data);
+    public boolean isSynced() {
+        return streamCodec != null;
+    }
+
+    public void setData(Level level, T data) {
+        if (level instanceof ServerLevel serverLevel) {
+            ResourceLocation location = ResearchdRegistries.SAVED_DATA.getKey(this);
+            if (location != null) {
+                SavedDataWrapper.setData(new SavedDataHolder<>(location, this), serverLevel, data);
+            }
+        } else {
+            ResourceLocation key = ResearchdRegistries.SAVED_DATA.getKey(this);
+            if (key != null){
+                PDLClientSavedData.DATA.put(key, data);
+            }
         }
     }
 
-    public T getData(ServerLevel serverLevel) {
-        ResourceLocation location = ResearchdRegistries.SAVED_DATA.getKey(this);
-        if (location != null) {
-            return SavedDataWrapper.getData(new SavedDataHolder<>(location, this), serverLevel);
+    public T getData(Level level) {
+        if (level instanceof ServerLevel serverLevel) {
+            ResourceLocation location = ResearchdRegistries.SAVED_DATA.getKey(this);
+            if (location != null) {
+                return SavedDataWrapper.getData(new SavedDataHolder<>(location, this), serverLevel);
+            }
+            return null;
+        } else {
+            ResourceLocation location = ResearchdRegistries.SAVED_DATA.getKey(this);
+            if (location != null) {
+                return (T) PDLClientSavedData.DATA.get(location);
+            }
+            return null;
         }
-        return null;
     }
 
     public static <T> Builder<T> builder(Codec<T> codec, Supplier<T> defaultValueSupplier) {

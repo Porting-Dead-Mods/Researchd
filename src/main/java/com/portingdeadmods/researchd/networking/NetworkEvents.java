@@ -57,11 +57,6 @@ public class NetworkEvents {
                 RequestToJoinPayload.STREAM_CODEC,
                 RequestToJoinPayload::requestToJoinAction
         );
-        registrar.playToClient(
-                SyncEntityResearchPayload.TYPE,
-                SyncEntityResearchPayload.STREAM_CODEC,
-                SyncEntityResearchPayload::handle
-        );
 
         for (PDLSavedData<?> savedData : ResearchdRegistries.SAVED_DATA) {
             SavedDataHolder<?> holder = SavedDataHolder.fromValue(savedData);

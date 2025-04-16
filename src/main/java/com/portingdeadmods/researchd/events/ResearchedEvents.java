@@ -1,13 +1,18 @@
 package com.portingdeadmods.researchd.events;
 
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.ResearchdRegistries;
+import com.portingdeadmods.researchd.api.data.PDLSavedData;
+import com.portingdeadmods.researchd.api.data.SavedDataHolder;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.commands.ResearchdCommands;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
-import com.portingdeadmods.researchd.networking.SyncEntityResearchPayload;
+import com.portingdeadmods.researchd.networking.SyncSavedDataPayload;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -22,9 +27,10 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
+import java.util.Map;
 import java.util.UUID;
 
-public class ResearchedEvents {
+public final class ResearchedEvents {
     @EventBusSubscriber(modid = Researchd.MODID, value = Dist.CLIENT)
     public static final class Client {
         @SubscribeEvent
@@ -57,8 +63,19 @@ public class ResearchedEvents {
         private static void onJoinWorld(PlayerEvent.PlayerLoggedInEvent event) {
             if (event.getEntity() instanceof ServerPlayer serverPlayer) {
                 ResearchHelper.initResearches(serverPlayer);
-                PacketDistributor.sendToPlayer(serverPlayer, new SyncEntityResearchPayload(serverPlayer.getData(ResearchdAttachments.ENTITY_RESEARCH)));
+                for (Map.Entry<ResourceKey<PDLSavedData<?>>, PDLSavedData<?>> savedData : ResearchdRegistries.SAVED_DATA.entrySet()) {
+                    PDLSavedData<?> value = savedData.getValue();
+                    if (value.isSynced()) {
+                        sendSavedDataSyncPayload(serverPlayer, savedData.getKey().location(), value);
+                    }
+                }
             }
+        }
+
+        private static <T> void sendSavedDataSyncPayload(ServerPlayer serverPlayer, ResourceLocation id, PDLSavedData<?> savedData) {
+            PDLSavedData<T> savedData1 = (PDLSavedData<T>) savedData;
+            T data = savedData1.getData(serverPlayer.serverLevel());
+            PacketDistributor.sendToPlayer(serverPlayer, new SyncSavedDataPayload<>(new SavedDataHolder<>(id, savedData1), data));
         }
     }
 
