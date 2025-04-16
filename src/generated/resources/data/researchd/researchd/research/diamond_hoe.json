@@ -1,0 +1,16 @@
+{
+  "type": "researchd:simple",
+  "icon": "minecraft:diamond_hoe",
+  "parents": [
+    "researchd:diamond_armor",
+    "researchd:trident"
+  ],
+  "requires_parent": false,
+  "research_methods": [
+    {
+      "count": 12,
+      "method": "researchd:consume_research_pack",
+      "pack": "researchd:overworld"
+    }
+  ]
+}

@@ -1,6 +1,9 @@
 package com.portingdeadmods.researchd.networking;
 
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.ResearchdRegistries;
+import com.portingdeadmods.researchd.api.data.PDLSavedData;
+import com.portingdeadmods.researchd.api.data.SavedDataHolder;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -59,5 +62,11 @@ public class NetworkEvents {
                 SyncEntityResearchPayload.STREAM_CODEC,
                 SyncEntityResearchPayload::handle
         );
+
+        for (PDLSavedData<?> savedData : ResearchdRegistries.SAVED_DATA) {
+            SavedDataHolder<?> holder = SavedDataHolder.fromValue(savedData);
+            registrar.playToClient(SyncSavedDataPayload.type(holder), SyncSavedDataPayload.streamCodec(holder), SyncSavedDataPayload::handle);
+        }
+
     }
 }

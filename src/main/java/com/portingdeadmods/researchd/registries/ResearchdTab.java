@@ -17,7 +17,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class ResearchdTab {
+public final class ResearchdTab {
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Researchd.MODID);
 
     static {

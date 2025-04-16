@@ -16,5 +16,5 @@ public final class ResearchdDataComponents {
 
     // TODO: Sync component
     public static final Supplier<DataComponentType<ResearchPackComponent>> RESEARCH_PACK = COMPONENTS.registerComponentType("research_pack", builder -> builder
-            .persistent(ResearchPackComponent.CODEC));
+            .persistent(ResearchPackComponent.CODEC).networkSynchronized());
 }

@@ -14,7 +14,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public record SyncEntityResearchPayload(EntityResearchImpl entityResearch) implements CustomPacketPayload {
+public record SyncEntityResearchPayload(Sav) implements CustomPacketPayload {
     public static final StreamCodec<RegistryFriendlyByteBuf, SyncEntityResearchPayload> STREAM_CODEC =
             EntityResearchImpl.STREAM_CODEC.map(SyncEntityResearchPayload::new, SyncEntityResearchPayload::entityResearch);
     public static final Type<SyncEntityResearchPayload> TYPE = new Type<>(Researchd.rl("sync_entity_research"));

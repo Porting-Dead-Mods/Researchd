@@ -1,5 +1,6 @@
 package com.portingdeadmods.researchd;
 
+import com.portingdeadmods.researchd.api.data.PDLSavedData;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchPredicateSerializer;
@@ -25,5 +26,9 @@ public class ResearchdRegistries {
 	public static final Registry<ResearchSerializer<?>> RESEARCH_SERIALIZER = new RegistryBuilder<>(RESEARCH_SERIALIZER_KEY).sync(true).create();
 	public static final Registry<ResearchMethodSerializer<?>> RESEARCH_METHOD_SERIALIZER = new RegistryBuilder<>(RESEARCH_METHOD_SERIALIZER_KEY).create();
 	public static final Registry<ResearchPredicateSerializer<?>> RESEARCH_PREDICATE_SERIALIZER = new RegistryBuilder<>(RESEARCH_PREDICATE_SERIALIZER_KEY).create();
+
+	public static final ResourceKey<Registry<PDLSavedData<?>>> SAVED_DATA_KEY =
+			ResourceKey.createRegistryKey(Researchd.rl("saved_data"));
+	public static final Registry<PDLSavedData<?>> SAVED_DATA = new RegistryBuilder<>(SAVED_DATA_KEY).create();
 
 }

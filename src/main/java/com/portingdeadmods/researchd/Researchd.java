@@ -9,6 +9,7 @@ import com.portingdeadmods.researchd.impl.capabilities.EntityResearchWrapper;
 import com.portingdeadmods.researchd.impl.research.ResearchPack;
 import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
 import com.portingdeadmods.researchd.registries.ResearchdItems;
+import com.portingdeadmods.researchd.registries.ResearchdSavedData;
 import com.portingdeadmods.researchd.registries.ResearchdTab;
 import com.portingdeadmods.researchd.registries.serializers.ResearchMethodSerializers;
 import com.portingdeadmods.researchd.registries.serializers.ResearchPredicateSerializers;
@@ -42,6 +43,7 @@ public class Researchd {
         ResearchdItems.ITEMS.register(modEventBus);
         ResearchdDataComponents.COMPONENTS.register(modEventBus);
         ResearchdTab.TABS.register(modEventBus);
+        ResearchdSavedData.SAVED_DATA.register(modEventBus);
 
         modEventBus.addListener(this::registerCapabilities);
         modEventBus.addListener(this::registerRegistries);
@@ -58,6 +60,7 @@ public class Researchd {
         event.register(ResearchdRegistries.RESEARCH_SERIALIZER);
         event.register(ResearchdRegistries.RESEARCH_PREDICATE_SERIALIZER);
         event.register(ResearchdRegistries.RESEARCH_METHOD_SERIALIZER);
+        event.register(ResearchdRegistries.SAVED_DATA);
     }
 
     private void registerDatapackRegistries(DataPackRegistryEvent.NewRegistry event) {

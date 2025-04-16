@@ -1,6 +1,7 @@
 package com.portingdeadmods.researchd.utils.researches.data;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -8,20 +9,34 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
-public record ResearchQueue(List<ResearchInstance> entries) implements Iterable<ResearchInstance> {
-    public static final ResearchQueue EMPTY = new ResearchQueue(Collections.emptyList());
-    public static final Codec<ResearchQueue> CODEC = ResearchInstance.CODEC.listOf().xmap(ResearchQueue::new, ResearchQueue::entries);
-    public static final StreamCodec<RegistryFriendlyByteBuf, ResearchQueue> STREAM_CODEC = ResearchInstance.STREAM_CODEC.apply(ByteBufCodecs.list()).map(ResearchQueue::new, ResearchQueue::entries);
+public final class ResearchQueue implements Iterable<ResearchInstance> {
+    public static final ResearchQueue EMPTY = new ResearchQueue(Collections.emptyList(), 0);
+    public static final Codec<ResearchQueue> CODEC = RecordCodecBuilder.create(inst -> inst.group(
+            ResearchInstance.CODEC.listOf().fieldOf("entries").forGetter(ResearchQueue::getEntries),
+            Codec.INT.fieldOf("researchProgress").forGetter(ResearchQueue::getResearchProgress)
+    ).apply(inst, ResearchQueue::new));
+    public static final StreamCodec<RegistryFriendlyByteBuf, ResearchQueue> STREAM_CODEC = StreamCodec.composite(
+            ResearchInstance.STREAM_CODEC.apply(ByteBufCodecs.list()),
+            ResearchQueue::getEntries,
+            ByteBufCodecs.INT,
+            ResearchQueue::getResearchProgress,
+            ResearchQueue::new
+    );
     // TODO: Make this configurable
     public static final int QUEUE_LENGTH = 7;
 
+    private final List<ResearchInstance> entries;
+    private int researchProgress;
+
+    public ResearchQueue(List<ResearchInstance> entries, int researchProgress) {
+        this.entries = entries;
+        this.researchProgress = researchProgress;
+    }
+
     public ResearchQueue() {
-        this(new ArrayList<>(QUEUE_LENGTH));
+        this(new ArrayList<>(QUEUE_LENGTH), 0);
     }
 
     /**
@@ -71,6 +86,40 @@ public record ResearchQueue(List<ResearchInstance> entries) implements Iterable<
 
     @Override
     public @NotNull Iterator<ResearchInstance> iterator() {
-        return entries.stream().iterator();
+        return entries.iterator();
     }
+
+    public void setResearchProgress(int researchProgress) {
+        this.researchProgress = researchProgress;
+    }
+
+    public List<ResearchInstance> getEntries() {
+        return entries;
+    }
+
+    public int getResearchProgress() {
+        return researchProgress;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj == null || obj.getClass() != this.getClass()) return false;
+        var that = (ResearchQueue) obj;
+        return Objects.equals(this.entries, that.entries) &&
+                this.researchProgress == that.researchProgress;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(entries, researchProgress);
+    }
+
+    @Override
+    public String toString() {
+        return "ResearchQueue[" +
+                "entries=" + entries + ", " +
+                "researchProgress=" + researchProgress + ']';
+    }
+
 }

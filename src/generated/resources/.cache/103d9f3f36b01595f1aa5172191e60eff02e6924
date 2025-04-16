@@ -1,9 +1,10 @@
-// 1.21.1	2025-02-22T18:38:07.531311984	Registries
+// 1.21.1	2025-03-22T19:45:48.752599549	Registries
 48d76844fccc2af4df3ac06249f44ff84daaf5fb data/researchd/researchd/research/charged_creeper.json
 a066d3f1d256392f70382b6535f6b3e20021aa96 data/researchd/researchd/research/chiseled_copper.json
 f1c6f605d38eb604fab8ad7fdcce433574e33f34 data/researchd/researchd/research/copper.json
 50089f554619f823b100711603d3c2859daebb67 data/researchd/researchd/research/copper_block.json
 26018ef7f7f07a165e6549680e09daccd7699f89 data/researchd/researchd/research/diamond_armor.json
+bdbb1f6f2b52d380601887f04553091eb651d8b4 data/researchd/researchd/research/diamond_hoe.json
 518a1c3f3ed15ec0b2fad53ccc560f6c05526762 data/researchd/researchd/research/diamond_sword.json
 055ae1c551201893c42a60ecb85bf23134ddb10b data/researchd/researchd/research/iron.json
 bb35b8315a26f5358d23c26fd8d8e7e12ceedef8 data/researchd/researchd/research/iron_armor.json

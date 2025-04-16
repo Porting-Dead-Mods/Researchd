@@ -1,6 +1,6 @@
 package com.portingdeadmods.researchd;
 
-import com.portingdeadmods.researchd.data.ResearchdSavedData;
+import com.portingdeadmods.researchd.data.TeamSavedData;
 import com.portingdeadmods.researchd.data.helper.ResearchTeam;
 import com.portingdeadmods.researchd.networking.TransferOwnershipPayload;
 import com.portingdeadmods.researchd.utils.PlayerUtils;
@@ -11,7 +11,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,20 +25,20 @@ public class ResearchTeamUtil {
 	 */
 	public static boolean isResearchTeamLeader(Player player) {
 		UUID uuid = player.getUUID();
-		ResearchTeam team = ResearchdSavedData.get(player.level()).getTeamForUUID(uuid);
+		ResearchTeam team = TeamSavedData.get(player.level()).getTeamForUUID(uuid);
 
 		return team.isLeader(uuid);
 	}
 
 	public static int getPermissionLevel(Player player) {
 		UUID uuid = player.getUUID();
-		ResearchTeam team = ResearchdSavedData.get(player.level()).getTeamForUUID(uuid);
+		ResearchTeam team = TeamSavedData.get(player.level()).getTeamForUUID(uuid);
 
 		return team.getPermissionLevel(uuid);
 	}
 
 	public static int getPermissionLevel(Level level, UUID uuid) {
-		ResearchTeam team = ResearchdSavedData.get(level).getTeamForUUID(uuid);
+		ResearchTeam team = TeamSavedData.get(level).getTeamForUUID(uuid);
 
 		return team.getPermissionLevel(uuid);
 	}
@@ -47,26 +46,26 @@ public class ResearchTeamUtil {
 
 	public static ResearchTeam getResearchTeam(Player player) {
 		UUID uuid = player.getUUID();
-		return ResearchdSavedData.get(player.level()).getTeamForUUID(uuid);
+		return TeamSavedData.get(player.level()).getTeamForUUID(uuid);
 	}
 
 	public static boolean isInATeam(Player player) {
 		UUID uuid = player.getUUID();
-		return ResearchdSavedData.get(player.level()).getTeamForUUID(uuid) != null;
+		return TeamSavedData.get(player.level()).getTeamForUUID(uuid) != null;
 	}
 
 	public static boolean arePlayersSameTeam(Player player1, Player player2) {
 		UUID uuid1 = player1.getUUID();
 		UUID uuid2 = player2.getUUID();
-		ResearchTeam team1 = ResearchdSavedData.get(player1.level()).getTeamForUUID(uuid1);
-		ResearchTeam team2 = ResearchdSavedData.get(player2.level()).getTeamForUUID(uuid2);
+		ResearchTeam team1 = TeamSavedData.get(player1.level()).getTeamForUUID(uuid1);
+		ResearchTeam team2 = TeamSavedData.get(player2.level()).getTeamForUUID(uuid2);
 
 		return team1.equals(team2);
 	}
 
 	public static boolean arePlayersSameTeam(Player player1, UUID uuid2) {
 		UUID uuid1 = player1.getUUID();
-		ResearchdSavedData savedData = ResearchdSavedData.get(player1.level());
+		TeamSavedData savedData = TeamSavedData.get(player1.level());
 
 		ResearchTeam team1 = savedData.getTeamForUUID(uuid1);
 		ResearchTeam team2 = savedData.getTeamForUUID(uuid2);
@@ -75,7 +74,7 @@ public class ResearchTeamUtil {
 	}
 
 	public static boolean arePlayersSameTeam(Level level, UUID uuid1, UUID uuid2) {
-		ResearchdSavedData savedData = ResearchdSavedData.get(level);
+		TeamSavedData savedData = TeamSavedData.get(level);
 
 		ResearchTeam team1 = savedData.getTeamForUUID(uuid1);
 		ResearchTeam team2 = savedData.getTeamForUUID(uuid2);
@@ -91,7 +90,7 @@ public class ResearchTeamUtil {
 	 */
 	public static void removeModFromTeam(Player player) {
 		UUID uuid = player.getUUID();
-		ResearchdSavedData savedData = ResearchdSavedData.get(player.level());
+		TeamSavedData savedData = TeamSavedData.get(player.level());
 		ResearchTeam team = savedData.getTeamForUUID(uuid);
 
 		if (team != null) {
@@ -106,7 +105,7 @@ public class ResearchTeamUtil {
 		Level level = requester.level();
 		UUID requesterId = requester.getUUID();
 
-		ResearchdSavedData savedData = ResearchdSavedData.get(level);
+		TeamSavedData savedData = TeamSavedData.get(level);
 		ResearchTeam team = savedData.getTeamForUUID(memberOfTeam);
 
 		if (isInATeam(requester)) {
@@ -125,7 +124,7 @@ public class ResearchTeamUtil {
 		Level level = requester.level();
 		UUID requesterId = requester.getUUID();
 
-		ResearchdSavedData savedData = ResearchdSavedData.get(level);
+		TeamSavedData savedData = TeamSavedData.get(level);
 
 		if (!ResearchTeamUtil.isInATeam(requester)) {
 			requester.sendSystemMessage(Component.literal("You're not in a team!").withStyle(ChatFormatting.RED));
@@ -156,7 +155,7 @@ public class ResearchTeamUtil {
 
 	public static void handleManageMember(Player requester, UUID member, boolean remove) {
 		UUID requesterId = requester.getUUID();
-		ResearchdSavedData savedData = ResearchdSavedData.get(requester.level());
+		TeamSavedData savedData = TeamSavedData.get(requester.level());
 
 		if (requester.getUUID() == member) {
 			requester.sendSystemMessage(getIllegalMessage());
@@ -179,7 +178,7 @@ public class ResearchTeamUtil {
 
 	public static void handleManageModerator(Player requester, UUID moderator, boolean remove) {
 		UUID requesterId = requester.getUUID();
-		ResearchdSavedData savedData = ResearchdSavedData.get(requester.level());
+		TeamSavedData savedData = TeamSavedData.get(requester.level());
 
 		if (requester.getUUID() == moderator) {
 			requester.sendSystemMessage(getIllegalMessage());
@@ -207,7 +206,7 @@ public class ResearchTeamUtil {
 
 	public static void handleSetName(Player requester, String name) {
 		UUID requesterId = requester.getUUID();
-		ResearchdSavedData savedData = ResearchdSavedData.get(requester.level());
+		TeamSavedData savedData = TeamSavedData.get(requester.level());
 
 		if (ResearchTeamUtil.getPermissionLevel(requester) == 2) {
 			String oldname = ResearchTeamUtil.getResearchTeam(requester).getName();
@@ -222,7 +221,7 @@ public class ResearchTeamUtil {
 	public static void handleTransferOwnership(Player requester, UUID nextToLead) {
 		Level level = requester.level();
 		UUID requesterId = requester.getUUID();
-		ResearchdSavedData savedData = ResearchdSavedData.get(requester.level());
+		TeamSavedData savedData = TeamSavedData.get(requester.level());
 
 		if (ResearchTeamUtil.getPermissionLevel(requester) == 2) {
 			if (ResearchTeamUtil.arePlayersSameTeam(level, requesterId, nextToLead)) {
@@ -246,7 +245,7 @@ public class ResearchTeamUtil {
 
 	public static void handleCreateTeam(Player requester, String name) {
 		UUID requesterId = requester.getUUID();
-		ResearchdSavedData savedData = ResearchdSavedData.get(requester.level());
+		TeamSavedData savedData = TeamSavedData.get(requester.level());
 
 		if (!ResearchTeamUtil.isInATeam(requester)) {
 			ResearchTeam team = new ResearchTeam(requesterId, name);
@@ -275,7 +274,7 @@ public class ResearchTeamUtil {
                 team.addSentInvite(invited);
 				requester.sendSystemMessage(Component.literal("Invite sent to " + PlayerUtils.getPlayerNameFromUUID(requester.level(), invited)).withStyle(ChatFormatting.GREEN));
             }
-            ResearchdSavedData.get(requester.level()).setDirty();
+            TeamSavedData.get(requester.level()).setDirty();
 		} else {
 			requester.sendSystemMessage(Component.literal("You got to be in a team to do that! Create one with /researchd team create <name>"));
 		}
@@ -292,7 +291,7 @@ public class ResearchTeamUtil {
 				} else {
 					team.addSentInvite(requester.getUUID());
 				}
-				ResearchdSavedData.get(requester.level()).setDirty();
+				TeamSavedData.get(requester.level()).setDirty();
 			} else {
 				requester.sendSystemMessage(Component.literal("The player you're trying to join is not in a team!").withStyle(ChatFormatting.RED));
 			}
@@ -308,11 +307,11 @@ public class ResearchTeamUtil {
 	}
 
 	public static ArrayList<ResearchTeam> getTeams(Level level) {
-		return new ArrayList<ResearchTeam>(ResearchdSavedData.get(level).getTeams().values());
+		return new ArrayList<ResearchTeam>(TeamSavedData.get(level).getTeams().values());
 	}
 
 	public static ArrayList<String> getTeamNames(Level level) {
-		return new ArrayList<String>(ResearchdSavedData.get(level).getTeams().values().stream().map(
+		return new ArrayList<String>(TeamSavedData.get(level).getTeams().values().stream().map(
 				team -> team.getName()
 		).toList());
 	}
@@ -320,14 +319,14 @@ public class ResearchTeamUtil {
 	public static MutableComponent getFormattedDump(Level level) {
 		ArrayList<MutableComponent> dump = new ArrayList<MutableComponent>();
 		dump.add(Component.literal("---- RESEARCH'D DUMP - TEAMS ----").withStyle(ChatFormatting.AQUA));
-		for (Map.Entry<UUID, ResearchTeam> entry : ResearchdSavedData.get(level).getTeams().entrySet()) {
+		for (Map.Entry<UUID, ResearchTeam> entry : TeamSavedData.get(level).getTeams().entrySet()) {
 			dump.add(
 				Component.literal(PlayerUtils.getPlayerNameFromUUID(level, entry.getKey())).withStyle(ChatFormatting.WHITE)
 				.append(Component.literal(" -> ").withStyle(ChatFormatting.AQUA))
 				.append(Component.literal(entry.getValue().getName()).withStyle(ChatFormatting.WHITE))
 			);
 		}
-		for (ResearchTeam team : ResearchdSavedData.get(level).getTeams().values()) {
+		for (ResearchTeam team : TeamSavedData.get(level).getTeams().values()) {
 			dump.add(team.parseMembers(level));
 		}
 
