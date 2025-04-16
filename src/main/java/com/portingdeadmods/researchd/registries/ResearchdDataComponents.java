@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 public final class ResearchdDataComponents {
     public static final DeferredRegister.DataComponents COMPONENTS = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, Researchd.MODID);
 
-    // TODO: Sync component
     public static final Supplier<DataComponentType<ResearchPackComponent>> RESEARCH_PACK = COMPONENTS.registerComponentType("research_pack", builder -> builder
-            .persistent(ResearchPackComponent.CODEC).networkSynchronized());
+            .persistent(ResearchPackComponent.CODEC)
+            .networkSynchronized(ResearchPackComponent.STREAM_CODEC));
 }
