@@ -50,8 +50,9 @@ public final class PDLSavedData<T> {
         return onSyncFunction;
     }
 
+    // TODO: FIXME
     public boolean isGlobal() {
-        return global;
+        return false;
     }
 
     public boolean isSynced() {

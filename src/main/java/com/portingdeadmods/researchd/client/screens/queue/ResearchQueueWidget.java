@@ -6,6 +6,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
+import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.networking.research.ResearchQueueAddPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchQueueRemovePayload;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchQueue;
@@ -29,7 +30,7 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
     public ResearchQueueWidget(ResearchScreen screen, int x, int y) {
         super(x, y, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
         this.screen = screen;
-        this.queue = new ResearchQueue();
+        this.queue = ResearchdSavedData.PLAYER_RESEARCH.get().getData(Minecraft.getInstance().level).researchQueue();
     }
 
     @Override

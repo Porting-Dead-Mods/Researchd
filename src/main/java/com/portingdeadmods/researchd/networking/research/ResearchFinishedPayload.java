@@ -2,8 +2,13 @@ package com.portingdeadmods.researchd.networking.research;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.api.research.ResearchStatus;
+import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.capabilities.EntityResearchImpl;
+import com.portingdeadmods.researchd.utils.UniqueArray;
+import com.portingdeadmods.researchd.utils.researches.ClientResearchCache;
+import com.portingdeadmods.researchd.utils.researches.data.ResearchQueue;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -25,9 +30,17 @@ public record ResearchFinishedPayload() implements CustomPacketPayload {
         context.enqueueWork(() -> {
             Player player = context.player();
             EntityResearchImpl data = ResearchdSavedData.PLAYER_RESEARCH.get().getData(player.level());
-            ResearchInstance first = data.researchQueue().getEntries().getFirst();
-            data.researchQueue().remove(0);
-            data.completeResearch(first);
+            ResearchQueue queue = data.researchQueue();
+            if (!queue.isEmpty()) {
+                ResearchInstance first = queue.getEntries().getFirst();
+                first.setResearchStatus(ResearchStatus.RESEARCHED);
+                queue.remove(0);
+                UniqueArray<ResearchNode> children = ClientResearchCache.getNodeByResearch(first.getResearch()).getChildren();
+                for (ResearchNode child : children) {
+                    child.getInstance().setResearchStatus(ResearchStatus.RESEARCHABLE);
+                }
+                data.completeResearch(first);
+            }
         }).exceptionally(err -> {
             Researchd.LOGGER.error("Failed to handle ResearchFinishPayload", err);
             return null;

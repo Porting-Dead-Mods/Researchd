@@ -5,7 +5,9 @@ import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.data.PDLClientSavedData;
 import com.portingdeadmods.researchd.api.data.PDLSavedData;
 import com.portingdeadmods.researchd.api.data.SavedDataHolder;
+import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.commands.ResearchdCommands;
@@ -17,6 +19,8 @@ import com.portingdeadmods.researchd.networking.research.ResearchFinishedPayload
 import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchQueue;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -35,6 +39,8 @@ import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -120,14 +126,34 @@ public final class ResearchdEvents {
                         queue.setResearchProgress(queue.getResearchProgress() + 1);
                     } else {
                         queue.setResearchProgress(0);
-                        ResearchInstance first = data.researchQueue().getEntries().getFirst();
-                        data.researchQueue().remove(0);
+                        ResearchInstance first = queue.getEntries().getFirst();
+                        first.setResearchStatus(ResearchStatus.RESEARCHED);
+                        queue.remove(0);
                         data.completeResearch(first);
+                        ResearchdSavedData.PLAYER_RESEARCH.get().setData(level, data);
                         PacketDistributor.sendToAllPlayers(ResearchFinishedPayload.INSTANCE);
                     }
                 }
             }
         }
+//
+//        private static List<ResearchInstance> getChildren(Level level, ResearchInstance instance) {
+//            List<ResearchInstance> children = new ArrayList<>();
+//            for (Holder<Research> levelResearch : ResearchHelper.getLevelResearches(level)) {
+//                if (levelResearch.value().parents().contains(instance.getResearch())) {
+//                    ResearchStatus status;
+//                    if (instance.getResearchStatus() == ResearchStatus.RESEARCHED) {
+//                        status = ResearchStatus.RESEARCHABLE;
+//                    } else if (ResearchdSavedData.PLAYER_RESEARCH.get().getData(level).isCompleted(levelResearch.getKey())) {
+//                        status = ResearchStatus.RESEARCHED;
+//                    }else {
+//                        status = ResearchStatus.LOCKED;
+//                    }
+//                    children.add(new ResearchInstance(levelResearch.getKey(), status));
+//                }
+//            }
+//            return children;
+//        }
     }
 
 }

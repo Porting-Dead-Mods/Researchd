@@ -21,7 +21,9 @@ public final class ClientResearchCache {
     public static ResearchNode ROOT_NODE;
 
     public static void initialize(Player player) {
+        RESEARCHES.clear();
         NODES.clear();
+        ResearchGraphCache.clearCache();
 
         Set<ResearchInstance> completedResearches = ResearchdSavedData.PLAYER_RESEARCH.get().getData(player.level()).completedResearches();
 
@@ -40,7 +42,21 @@ public final class ClientResearchCache {
 
         // Collect completedResearches
         RESEARCHES.forEach(research -> {
-            NODES.add(new ResearchNode(research.copy()));
+            if (research.getResearchStatus() == ResearchStatus.LOCKED) {
+                List<ResourceKey<Research>> parents = registryAccess.holderOrThrow(research.getResearch()).value().parents();
+                boolean allParentsUnlocked = true;
+                for (ResourceKey<Research> parent : parents) {
+                    ResearchInstance researchByKey = getResearchByKey(RESEARCHES, parent);
+                    if (researchByKey.getResearchStatus() == ResearchStatus.LOCKED || researchByKey.getResearchStatus() == ResearchStatus.RESEARCHABLE) {
+                        allParentsUnlocked = false;
+                        break;
+                    }
+                }
+                if (allParentsUnlocked) {
+                    research.setResearchStatus(ResearchStatus.RESEARCHABLE);
+                }
+            }
+            NODES.add(new ResearchNode(research));
         });
 
         // Add next nodes
