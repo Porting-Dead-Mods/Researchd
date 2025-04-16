@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.networking;
+package com.portingdeadmods.researchd.networking.team;
 
 import com.portingdeadmods.researchd.ResearchTeamUtil;
 import com.portingdeadmods.researchd.Researchd;

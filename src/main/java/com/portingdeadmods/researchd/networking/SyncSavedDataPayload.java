@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.networking;
 import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
+import com.portingdeadmods.researchd.api.data.PDLClientSavedData;
 import com.portingdeadmods.researchd.api.data.PDLSavedData;
 import com.portingdeadmods.researchd.api.data.SavedDataHolder;
 import io.netty.buffer.ByteBuf;
@@ -19,9 +20,10 @@ public record SyncSavedDataPayload<T>(SavedDataHolder<T> holder, T value) implem
         return type(holder);
     }
 
-    public static <T> void handle(T payload, IPayloadContext context) {
+    public void handle(IPayloadContext context) {
         context.enqueueWork(() -> {
-
+            PDLClientSavedData.CLIENT_SAVED_DATA_CACHE.put(holder.key(), value);
+            holder.value().onSyncFunction().accept(context.player());
         }).exceptionally(err -> {
             Researchd.LOGGER.error("Failed to handle SyncSavedDataPayload", err);
             return null;

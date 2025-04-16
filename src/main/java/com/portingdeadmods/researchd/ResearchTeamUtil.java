@@ -2,8 +2,8 @@ package com.portingdeadmods.researchd;
 
 import com.portingdeadmods.researchd.data.helper.ResearchTeam;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamMap;
-import com.portingdeadmods.researchd.networking.TransferOwnershipPayload;
-import com.portingdeadmods.researchd.registries.ResearchdSavedData;
+import com.portingdeadmods.researchd.networking.team.TransferOwnershipPayload;
+import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.utils.PlayerUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;

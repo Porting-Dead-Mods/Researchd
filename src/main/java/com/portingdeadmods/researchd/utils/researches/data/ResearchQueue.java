@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 public final class ResearchQueue implements Iterable<ResearchInstance> {
-    public static final ResearchQueue EMPTY = new ResearchQueue(Collections.emptyList(), 0);
+    public static final ResearchQueue EMPTY = new ResearchQueue(new ArrayList<>(), 0);
     public static final Codec<ResearchQueue> CODEC = RecordCodecBuilder.create(inst -> inst.group(
             ResearchInstance.CODEC.listOf().fieldOf("entries").forGetter(ResearchQueue::getEntries),
             Codec.INT.fieldOf("researchProgress").forGetter(ResearchQueue::getResearchProgress)
@@ -70,6 +70,14 @@ public final class ResearchQueue implements Iterable<ResearchInstance> {
             return true;
         }
         return false;
+    }
+
+    /**
+     * @param instance the element to be removed
+     * @return whether it was possible to remove the element
+     */
+    public boolean remove(ResearchInstance instance) {
+        return this.entries.remove(instance);
     }
 
     /**

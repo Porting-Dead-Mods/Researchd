@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.networking;
+package com.portingdeadmods.researchd.networking.team;
 
 import com.portingdeadmods.researchd.ResearchTeamUtil;
 import com.portingdeadmods.researchd.Researchd;
@@ -12,12 +12,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public record EnterTeamPayload(UUID memberOfTeam) implements CustomPacketPayload {
-    public static final Type<EnterTeamPayload> TYPE = new Type<>(Researchd.rl("enter_team_payload"));
-    public static final StreamCodec<RegistryFriendlyByteBuf, EnterTeamPayload> STREAM_CODEC = StreamCodec.composite(
+public record LeaveTeamPayload(UUID nextToLead) implements CustomPacketPayload {
+    public static final Type<LeaveTeamPayload> TYPE = new Type<>(Researchd.rl("leave_team_payload"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, LeaveTeamPayload> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,
-            EnterTeamPayload::memberOfTeam,
-            EnterTeamPayload::new
+            LeaveTeamPayload::nextToLead,
+            LeaveTeamPayload::new
     );
 
     @Override
@@ -25,9 +25,9 @@ public record EnterTeamPayload(UUID memberOfTeam) implements CustomPacketPayload
         return TYPE;
     }
 
-    public static void enterTeamAction(EnterTeamPayload payload, IPayloadContext context) {
+    public static void leaveTeamAction(LeaveTeamPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
-            ResearchTeamUtil.handleEnterTeam(context.player(), payload.memberOfTeam());
+            ResearchTeamUtil.handleLeaveTeam(context.player(), payload.nextToLead());
         }).exceptionally(e -> {
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
             return null;

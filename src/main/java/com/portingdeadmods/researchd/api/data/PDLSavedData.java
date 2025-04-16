@@ -1,28 +1,34 @@
 package com.portingdeadmods.researchd.api.data;
 
 import com.mojang.serialization.Codec;
+import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
-import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 // TODO: This should be moved to pdl
+// TODO: Migration codecs
 public final class PDLSavedData<T> {
     private final Supplier<T> defaultValueSupplier;
     private final Codec<T> codec;
     private final StreamCodec<? super RegistryFriendlyByteBuf, T> streamCodec;
+    private final Consumer<Player> onSyncFunction;
 
     private PDLSavedData(Builder<T> builder) {
         this.codec = builder.codec;
         this.streamCodec = builder.streamCodec;
         this.defaultValueSupplier = builder.defaultValueSupplier;
+        this.onSyncFunction = builder.onSyncFunction;
     }
 
     public Codec<T> codec() {
@@ -35,6 +41,10 @@ public final class PDLSavedData<T> {
 
     public Supplier<T> defaultValueSupplier() {
         return defaultValueSupplier;
+    }
+
+    public Consumer<Player> onSyncFunction() {
+        return onSyncFunction;
     }
 
     public boolean isSynced() {
@@ -50,7 +60,7 @@ public final class PDLSavedData<T> {
         } else {
             ResourceLocation key = ResearchdRegistries.SAVED_DATA.getKey(this);
             if (key != null){
-                PDLClientSavedData.DATA.put(key, data);
+                PDLClientSavedData.CLIENT_SAVED_DATA_CACHE.put(key, data);
             }
         }
     }
@@ -65,7 +75,7 @@ public final class PDLSavedData<T> {
         } else {
             ResourceLocation location = ResearchdRegistries.SAVED_DATA.getKey(this);
             if (location != null) {
-                return (T) PDLClientSavedData.DATA.get(location);
+                return (T) PDLClientSavedData.CLIENT_SAVED_DATA_CACHE.get(location);
             }
             return null;
         }
@@ -78,6 +88,7 @@ public final class PDLSavedData<T> {
     public static final class Builder<T> {
         private final Supplier<T> defaultValueSupplier;
         private final Codec<T> codec;
+        private Consumer<Player> onSyncFunction;
         private StreamCodec<? super RegistryFriendlyByteBuf, T> streamCodec;
 
         private Builder(Codec<T> codec, Supplier<T> defaultValueSupplier) {
@@ -90,7 +101,26 @@ public final class PDLSavedData<T> {
             return this;
         }
 
+        /**
+         * The supplied method gets ran after saved data was synced.
+         * This method gets executed on both sides
+         */
+        public Builder<T> onSync(Consumer<Player> onSyncFunction) {
+            this.onSyncFunction = onSyncFunction;
+            return this;
+        }
+
         public PDLSavedData<T> build() {
+            if (this.onSyncFunction != null && this.streamCodec == null) {
+                throw new RuntimeException("Cannot provide a onSync function for a saved data without a stream coded");
+            }
+
+            if (this.streamCodec != null && this.onSyncFunction == null) {
+                this.onSyncFunction = p -> {
+                    Researchd.LOGGER.debug("SYNCING NOTHIN");
+                };
+            }
+
             return new PDLSavedData<>(this);
         }
 

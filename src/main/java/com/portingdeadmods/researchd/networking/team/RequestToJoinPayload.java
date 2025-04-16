@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.networking;
+package com.portingdeadmods.researchd.networking.team;
 
 import com.portingdeadmods.researchd.ResearchTeamUtil;
 import com.portingdeadmods.researchd.Researchd;
@@ -13,14 +13,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public record InvitePlayerPayload(UUID invited, boolean remove) implements CustomPacketPayload {
-    public static final Type<InvitePlayerPayload> TYPE = new Type<>(Researchd.rl("invite_player_payload"));
-    public static final StreamCodec<RegistryFriendlyByteBuf, InvitePlayerPayload> STREAM_CODEC = StreamCodec.composite(
+public record RequestToJoinPayload(UUID toJoin, boolean remove) implements CustomPacketPayload {
+    public static final Type<RequestToJoinPayload> TYPE = new Type<>(Researchd.rl("request_to_join_payload"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, RequestToJoinPayload> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,
-            InvitePlayerPayload::invited,
+            RequestToJoinPayload::toJoin,
             ByteBufCodecs.BOOL,
-            InvitePlayerPayload::remove,
-            InvitePlayerPayload::new
+            RequestToJoinPayload::remove,
+            RequestToJoinPayload::new
     );
 
     @Override
@@ -28,9 +28,9 @@ public record InvitePlayerPayload(UUID invited, boolean remove) implements Custo
         return TYPE;
     }
 
-    public static void invitePlayerAction(InvitePlayerPayload payload, IPayloadContext context) {
+    public static void requestToJoinAction(RequestToJoinPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
-            ResearchTeamUtil.handleSendInviteToPlayer(context.player(), payload.invited, payload.remove);
+            ResearchTeamUtil.handleRequestToJoin(context.player(), payload.toJoin, payload.remove);
         }).exceptionally(e -> {
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
             return null;

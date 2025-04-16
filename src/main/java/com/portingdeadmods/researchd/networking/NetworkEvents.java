@@ -4,6 +4,9 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.data.PDLSavedData;
 import com.portingdeadmods.researchd.api.data.SavedDataHolder;
+import com.portingdeadmods.researchd.networking.research.ResearchQueueAddPayload;
+import com.portingdeadmods.researchd.networking.research.ResearchQueueRemovePayload;
+import com.portingdeadmods.researchd.networking.team.*;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -56,6 +59,17 @@ public class NetworkEvents {
                 RequestToJoinPayload.TYPE,
                 RequestToJoinPayload.STREAM_CODEC,
                 RequestToJoinPayload::requestToJoinAction
+        );
+
+        registrar.playToServer(
+                ResearchQueueAddPayload.TYPE,
+                ResearchQueueAddPayload.STREAM_CODEC,
+                ResearchQueueAddPayload::handle
+        );
+        registrar.playToServer(
+                ResearchQueueRemovePayload.TYPE,
+                ResearchQueueRemovePayload.STREAM_CODEC,
+                ResearchQueueRemovePayload::handle
         );
 
         for (PDLSavedData<?> savedData : ResearchdRegistries.SAVED_DATA) {
