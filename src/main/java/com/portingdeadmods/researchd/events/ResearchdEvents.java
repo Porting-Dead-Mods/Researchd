@@ -135,6 +135,9 @@ public final class ResearchdEvents {
                         PacketDistributor.sendToAllPlayers(ResearchFinishedPayload.INSTANCE);
                     }
                 }
+                if (level.getGameTime() % 10 == 0) {
+                    ResearchdSavedData.PLAYER_RESEARCH.get().setData(level, data);
+                }
             }
         }
 //

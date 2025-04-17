@@ -4,15 +4,19 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.networking.research.ResearchQueueAddPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchQueueRemovePayload;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchQueue;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -42,7 +46,7 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
 
         List<ResearchInstance> entries = this.queue.getEntries();
         for (int i = 0; i < entries.size(); i++) {
-            renderQueuePanel(guiGraphics, entries.get(i), paddingX + i * PANEL_WIDTH, paddingY, mouseX, mouseY);
+            renderQueuePanel(guiGraphics, entries.get(i), paddingX + i * PANEL_WIDTH, paddingY, mouseX, mouseY, i);
         }
     }
 
@@ -71,14 +75,19 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
         if (this.queue.getEntries().size() > index) {
             ResearchInstance instance = this.queue.getEntries().get(index);
             this.queue.remove(index);
+            this.queue.setResearchProgress(0);
             PacketDistributor.sendToServer(new ResearchQueueRemovePayload(instance));
         }
     }
 
-    private void renderQueuePanel(GuiGraphics guiGraphics, ResearchInstance instance, int x, int y, int mouseX, int mouseY) {
+    private void renderQueuePanel(GuiGraphics guiGraphics, ResearchInstance instance, int x, int y, int mouseX, int mouseY, int index) {
         if (instance == null) return;
 
-        renderResearchPanel(guiGraphics, instance, x, y, mouseX, mouseY, false);
+        if (index == 0) {
+            renderResearchingResearchPanel(guiGraphics, instance, x, y, mouseX, mouseY, false);
+        } else {
+            renderResearchPanel(guiGraphics, instance, x, y, mouseX, mouseY, false, PanelSpriteType.NORMAL);
+        }
 
         if (this.isHovering(guiGraphics, mouseX, mouseY, x, y + 17, PANEL_WIDTH, PANEL_HEIGHT - 17)) {
             Font font = Minecraft.getInstance().font;
@@ -94,6 +103,23 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
                 guiGraphics.drawString(font, "x", x + 10 - (font.width("x") / 2), y + 16, -1, false);
             }
             poseStack.popPose();
+        }
+    }
+
+    private void renderResearchingResearchPanel(GuiGraphics guiGraphics, ResearchInstance instance, int x, int y, int mouseX, int mouseY, boolean hoverable) {
+        PanelSpriteType spriteType = PanelSpriteType.NORMAL;
+        ResearchStatus status = instance.getResearchStatus();
+        GuiUtils.drawImg(guiGraphics, status.getSpriteTexture(spriteType), x, y, PANEL_WIDTH, spriteType.getHeight());
+        float progress = (float) queue.getResearchProgress() / queue.getMaxResearchProgress();
+
+        guiGraphics.blit(ResearchStatus.RESEARCHED.getSpriteTexture(spriteType), x, y, 0, 0, (int) (progress * PANEL_WIDTH), spriteType.getHeight(), PANEL_WIDTH, spriteType.getHeight());
+
+        RegistryAccess lookup = Minecraft.getInstance().level.registryAccess();
+        guiGraphics.renderItem(ResearchHelper.getResearch(instance.getResearch(), lookup).icon().getDefaultInstance(), x + 2, y + 2);
+
+        if (isHovering(guiGraphics, x, y, mouseX, mouseY) && hoverable) {
+            int color = -2130706433;
+            guiGraphics.fillGradient(RenderType.guiOverlay(), x, y, x + 20, y + 20, color, color, 0);
         }
     }
 

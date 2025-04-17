@@ -19,6 +19,7 @@ import java.util.function.Supplier;
 
 // TODO: This should be moved to pdl
 // TODO: Migration codecs
+// TODO: Pre and post sync methods
 public final class PDLSavedData<T> {
     private final Supplier<T> defaultValueSupplier;
     private final Codec<T> codec;
@@ -52,7 +53,7 @@ public final class PDLSavedData<T> {
 
     // TODO: FIXME
     public boolean isGlobal() {
-        return false;
+        return global;
     }
 
     public boolean isSynced() {

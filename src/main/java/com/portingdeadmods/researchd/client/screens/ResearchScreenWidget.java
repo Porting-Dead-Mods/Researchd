@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.client.screens;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -16,7 +17,9 @@ import javax.annotation.Nullable;
 
 public abstract class ResearchScreenWidget extends AbstractWidget {
     public static final int PANEL_WIDTH = 20;
+    public static final int SMALL_PANEL_HEIGHT = 22;
     public static final int PANEL_HEIGHT = 24;
+    public static final int TALL_PANEL_HEIGHT = 32;
     
     public ResearchScreenWidget(int x, int y, int width, int height) {
         super(x, y, width, height, CommonComponents.EMPTY);
@@ -31,9 +34,14 @@ public abstract class ResearchScreenWidget extends AbstractWidget {
     }
 
     public static void renderResearchPanel(GuiGraphics guiGraphics, ResearchInstance instance, int x, int y, int mouseX, int mouseY, int scale, boolean hoverable) {
+        renderResearchPanel(guiGraphics, instance, x, y, mouseX, mouseY, scale, hoverable, false);
+    }
+
+    public static void renderResearchPanel(GuiGraphics guiGraphics, ResearchInstance instance, int x, int y, int mouseX, int mouseY, int scale, boolean hoverable, boolean tall) {
         int width = PANEL_WIDTH;
         int height = PANEL_HEIGHT;
-        guiGraphics.blit(instance.getResearchStatus().getSpriteTexture(), x, y, width * scale, height * scale, 0, 0, width, height, width, height);
+        ResearchStatus status = instance.getResearchStatus();
+        guiGraphics.blit(status.getSpriteTexture(), x, y, width * scale, height * scale, 0, 0, width, height, width, height);
 
         RegistryAccess lookup = Minecraft.getInstance().level.registryAccess();
 
@@ -52,12 +60,21 @@ public abstract class ResearchScreenWidget extends AbstractWidget {
         }
     }
 
-    public static void renderResearchPanel(GuiGraphics guiGraphics, ResearchInstance instance, int x, int y, int mouseX, int mouseY) {
-        renderResearchPanel(guiGraphics, instance, x, y, mouseX, mouseY, true);
+    public static void renderSmallResearchPanel(GuiGraphics guiGraphics, ResearchInstance instance, int x, int y, int mouseX, int mouseY) {
+        renderResearchPanel(guiGraphics, instance, x, y, mouseX, mouseY, true, PanelSpriteType.SMALL);
     }
 
-    public static void renderResearchPanel(GuiGraphics guiGraphics, ResearchInstance instance, int x, int y, int mouseX, int mouseY, boolean hoverable) {
-        GuiUtils.drawImg(guiGraphics, instance.getResearchStatus().getSpriteTexture(), x, y, PANEL_WIDTH, PANEL_HEIGHT);
+    public static void renderResearchPanel(GuiGraphics guiGraphics, ResearchInstance instance, int x, int y, int mouseX, int mouseY) {
+        renderResearchPanel(guiGraphics, instance, x, y, mouseX, mouseY, true, PanelSpriteType.NORMAL);
+    }
+
+    public static void renderTallResearchPanel(GuiGraphics guiGraphics, ResearchInstance instance, int x, int y, int mouseX, int mouseY) {
+        renderResearchPanel(guiGraphics, instance, x, y, mouseX, mouseY, true, PanelSpriteType.TALL);
+    }
+
+    public static void renderResearchPanel(GuiGraphics guiGraphics, ResearchInstance instance, int x, int y, int mouseX, int mouseY, boolean hoverable, PanelSpriteType spriteType) {
+        ResearchStatus status = instance.getResearchStatus();
+        GuiUtils.drawImg(guiGraphics, status.getSpriteTexture(spriteType), x, y, PANEL_WIDTH, spriteType.getHeight());
 
         RegistryAccess lookup = Minecraft.getInstance().level.registryAccess();
         guiGraphics.renderItem(ResearchHelper.getResearch(instance.getResearch(), lookup).icon().getDefaultInstance(), x + 2, y + 2);
@@ -78,6 +95,22 @@ public abstract class ResearchScreenWidget extends AbstractWidget {
                 && mouseY >= y
                 && mouseX < x + PANEL_WIDTH * scale
                 && mouseY < y + PANEL_HEIGHT * scale;
+    }
+
+    public enum PanelSpriteType {
+        TALL(TALL_PANEL_HEIGHT),
+        NORMAL(PANEL_HEIGHT),
+        SMALL(SMALL_PANEL_HEIGHT);
+
+        private final int height;
+
+        PanelSpriteType(int height) {
+            this.height = height;
+        }
+
+        public int getHeight() {
+            return height;
+        }
     }
 
 }

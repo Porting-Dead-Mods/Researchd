@@ -31,6 +31,7 @@ public record ResearchQueueRemovePayload(ResearchInstance researchInstance) impl
                 Level level = serverPlayer.level();
                 EntityResearchImpl data = ResearchdSavedData.PLAYER_RESEARCH.get().getData(level);
                 data.researchQueue().remove(researchInstance);
+                data.researchQueue().setResearchProgress(0);
                 ResearchdSavedData.PLAYER_RESEARCH.get().setData(level, data);
             }
         }).exceptionally(err -> {
