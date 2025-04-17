@@ -64,7 +64,8 @@ public final class ResearchdEvents {
 
             if (entity instanceof Player player && level instanceof ServerLevel serverLevel) {
                 UUID uuid = player.getUUID();
-                serverLevel.getBlockEntity(event.getPos()).setData(ResearchdAttachments.PLACED_BY_UUID, uuid);
+                if (serverLevel.getBlockEntity(event.getPos()) != null)
+                    serverLevel.getBlockEntity(event.getPos()).setData(ResearchdAttachments.PLACED_BY_UUID, uuid);
             }
         }
 
