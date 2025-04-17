@@ -34,7 +34,7 @@ public final class ResearchQueue implements Iterable<ResearchInstance> {
     public ResearchQueue(List<ResearchInstance> entries, int researchProgress) {
         this.entries = new ArrayList<>(entries);
         this.researchProgress = researchProgress;
-        this.maxResearchProgress = 100;
+        this.maxResearchProgress = 1000;
     }
 
     public ResearchQueue() {

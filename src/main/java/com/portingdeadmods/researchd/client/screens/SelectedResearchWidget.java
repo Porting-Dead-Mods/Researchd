@@ -22,7 +22,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
     private static final ResourceLocation BACKGROUND_TEXTURE = Researchd.rl("textures/gui/selected_research.png");
     public static final int BACKGROUND_WIDTH = 174;
     public static final int BACKGROUND_HEIGHT = 61;
-    private ResearchInstance instance;
+    private ResearchInstance selectedInstance;
     private final Map<ResourceLocation, List<ResearchMethod>> methods;
 
     public SelectedResearchWidget(int x, int y, int width, int height) {
@@ -35,13 +35,13 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
         GuiUtils.drawImg(guiGraphics, BACKGROUND_TEXTURE, getX(), getY(), width, height);
 
-        if (instance != null) {
-            renderResearchPanel(guiGraphics, instance, 12, 55, mouseX, mouseY, 2, false);
+        if (selectedInstance != null) {
+            renderResearchPanel(guiGraphics, selectedInstance, 12, 55, mouseX, mouseY, 2, false);
 
             guiGraphics.enableScissor(53, 55, 53 + 115, 55 + 48);
 
             Font font = Minecraft.getInstance().font;
-            guiGraphics.drawString(font, Utils.registryTranslation(this.instance.getResearch()), 12, 45, -1, false);
+            guiGraphics.drawString(font, Utils.registryTranslation(this.selectedInstance.getResearch()), 12, 45, -1, false);
             int lineHeight = font.lineHeight + 2;
 
             int height = 0;
@@ -60,17 +60,22 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
         }
     }
 
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        return false;
+    }
+
     public void setSelectedResearch(ResearchInstance instance) {
-        this.instance = instance;
+        this.selectedInstance = instance;
 
         this.methods.clear();
-        List<ResearchMethod> methods = ResearchHelper.getResearch(this.instance.getResearch(), Minecraft.getInstance().level.registryAccess()).researchMethods();
+        List<ResearchMethod> methods = ResearchHelper.getResearch(this.selectedInstance.getResearch(), Minecraft.getInstance().level.registryAccess()).researchMethods();
         for (ResearchMethod method : methods) {
             this.methods.computeIfAbsent(method.id(), key -> new ArrayList<>()).add(method);
         }
     }
 
-    public ResearchInstance getInstance() {
-        return instance;
+    public ResearchInstance getSelectedInstance() {
+        return selectedInstance;
     }
 }

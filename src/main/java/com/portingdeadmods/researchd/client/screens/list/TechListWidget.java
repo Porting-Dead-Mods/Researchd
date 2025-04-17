@@ -7,7 +7,6 @@ import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.screens.queue.ResearchQueueWidget;
 import com.portingdeadmods.researchd.networking.research.ResearchQueueAddPayload;
-import com.portingdeadmods.researchd.networking.research.ResearchQueueRemovePayload;
 import com.portingdeadmods.researchd.utils.researches.ResearchGraphCache;
 import com.portingdeadmods.researchd.utils.researches.data.TechList;
 import net.minecraft.client.Minecraft;
@@ -16,7 +15,6 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.WidgetSprites;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -79,10 +77,10 @@ public class TechListWidget extends ResearchScreenWidget {
 
     public void onStartResearchButtonClicked(Button button) {
         ResearchQueueWidget queue = this.screen.getResearchQueue();
-        ResearchInstance instance = this.screen.getSelectedResearchWidget().getInstance();
+        ResearchInstance instance = this.screen.getSelectedResearchWidget().getSelectedInstance();
         queue.getQueue().add(instance);
         // TODO: Make this dynamic
-        queue.getQueue().setMaxResearchProgress(100);
+        queue.getQueue().setMaxResearchProgress(1000);
         PacketDistributor.sendToServer(new ResearchQueueAddPayload(instance));
     }
 
@@ -98,7 +96,21 @@ public class TechListWidget extends ResearchScreenWidget {
             for (int x = 0; x < this.cols; x++) {
                 int index = y * this.cols + x;
                 if (index < this.techList.entries().size()) {
-                    renderResearchPanel(guiGraphics, this.techList.entries().get(index), paddingX + getX() + x * PANEL_WIDTH, paddingY + getY() + y * PANEL_HEIGHT, mouseX, mouseY);
+                    ResearchInstance instance = this.techList.entries().get(index);
+                    int y1 = paddingY + getY() + y * PANEL_HEIGHT;
+                    boolean selected = instance == this.screen.getSelectedResearchWidget().getSelectedInstance();
+                    if (selected) {
+                        y1 += 2;
+                    }
+                    if (index >= this.techList.entries().size() - this.cols) {
+                        if (selected) {
+                            renderSmallResearchPanel(guiGraphics, instance, paddingX + getX() + x * PANEL_WIDTH, y1, mouseX, mouseY);
+                        } else {
+                            renderResearchPanel(guiGraphics, instance, paddingX + getX() + x * PANEL_WIDTH, y1, mouseX, mouseY);
+                        }
+                    } else {
+                        renderTallResearchPanel(guiGraphics, instance, paddingX + getX() + x * PANEL_WIDTH, y1, mouseX, mouseY);
+                    }
                 }
             }
         }
@@ -128,7 +140,7 @@ public class TechListWidget extends ResearchScreenWidget {
                 ResearchInstance instance = this.techList.entries().get(index);
                 this.screen.getResearchGraphWidget().setGraph(ResearchGraphCache.computeIfAbsent(Minecraft.getInstance().player, instance.getResearch()));
                 this.screen.getSelectedResearchWidget().setSelectedResearch(instance);
-                return true;
+                return super.mouseClicked(mouseX, mouseY, button);
             }
         }
 
