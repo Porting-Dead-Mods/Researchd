@@ -30,8 +30,11 @@ public record ResearchQueueRemovePayload(ResearchInstance researchInstance) impl
             if (context.player() instanceof ServerPlayer serverPlayer) {
                 Level level = serverPlayer.level();
                 EntityResearchImpl data = ResearchdSavedData.PLAYER_RESEARCH.get().getData(level);
+                int index = data.researchQueue().getEntries().indexOf(researchInstance);
                 data.researchQueue().remove(researchInstance);
-                data.researchQueue().setResearchProgress(0);
+                if (index == 0) {
+                    data.researchQueue().setResearchProgress(0);
+                }
                 ResearchdSavedData.PLAYER_RESEARCH.get().setData(level, data);
             }
         }).exceptionally(err -> {

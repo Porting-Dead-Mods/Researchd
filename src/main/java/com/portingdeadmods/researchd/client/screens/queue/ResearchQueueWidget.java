@@ -31,6 +31,10 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
     private final ResearchScreen screen;
     private final ResearchQueue queue;
 
+    private ResearchInstance selected;
+    private float selectedX;
+    private float selectedY;
+
     public ResearchQueueWidget(ResearchScreen screen, int x, int y) {
         super(x, y, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
         this.screen = screen;
@@ -46,8 +50,34 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
 
         List<ResearchInstance> entries = this.queue.getEntries();
         for (int i = 0; i < entries.size(); i++) {
-            renderQueuePanel(guiGraphics, entries.get(i), paddingX + i * PANEL_WIDTH, paddingY, mouseX, mouseY, i);
+            ResearchInstance instance = entries.get(i);
+            if (instance != selected) {
+                renderQueuePanel(guiGraphics, instance, paddingX + i * PANEL_WIDTH, paddingY, mouseX, mouseY, i);
+            }
         }
+
+        if (selected != null) {
+            renderQueuePanel(guiGraphics, selected, (int) selectedX, (int) selectedY, mouseX, mouseY, this.queue.getEntries().indexOf(selected));
+        }
+    }
+
+    @Override
+    protected void onDrag(double mouseX, double mouseY, double dragX, double dragY) {
+        if (selected == null) {
+            int paddingX = 12;
+            int paddingY = 17;
+
+            int index = (int) (mouseX - paddingX) / PANEL_WIDTH;
+            if (mouseX > paddingX && mouseY > paddingY && index < this.queue.getEntries().size()) {
+                this.selected = this.queue.getEntries().get(index);
+                this.selectedX = paddingX + index * PANEL_WIDTH;
+                this.selectedY = paddingY;
+            }
+        }
+        this.selectedX += dragX;
+        this.selectedY += dragY;
+        Researchd.LOGGER.debug("Drag x: {}, Drag y: {}, mouse x: {}, mouse y: {}", dragX, dragY, mouseX, mouseY);
+        super.onDrag(mouseX, mouseY, dragX, dragY);
     }
 
     @Override
@@ -68,14 +98,16 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
             }
         }
 
-        return false;
+        return this.isHovered();
     }
 
     public void removeResearch(int index) {
         if (this.queue.getEntries().size() > index) {
             ResearchInstance instance = this.queue.getEntries().get(index);
             this.queue.remove(index);
-            this.queue.setResearchProgress(0);
+            if (index == 0) {
+                this.queue.setResearchProgress(0);
+            }
             PacketDistributor.sendToServer(new ResearchQueueRemovePayload(instance));
         }
     }

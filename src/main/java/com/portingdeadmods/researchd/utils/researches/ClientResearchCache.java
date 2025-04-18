@@ -1,6 +1,5 @@
 package com.portingdeadmods.researchd.utils.researches;
 
-import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
@@ -14,7 +13,6 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.*;
 
-// TODO: We should just store a set of ResearchInstance
 public final class ClientResearchCache {
     public static final Set<ResearchNode> NODES = new LinkedHashSet<>();
     public static final Set<ResearchInstance> RESEARCHES = new LinkedHashSet<>();

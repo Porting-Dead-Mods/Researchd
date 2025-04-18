@@ -1,6 +1,5 @@
 package com.portingdeadmods.researchd;
 
-import com.portingdeadmods.researchd.api.capabilties.ResearchdCapabilities;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.impl.research.ResearchPack;
@@ -12,7 +11,6 @@ import com.portingdeadmods.researchd.registries.serializers.ResearchMethodSerial
 import com.portingdeadmods.researchd.registries.serializers.ResearchPredicateSerializers;
 import com.portingdeadmods.researchd.registries.serializers.ResearchSerializers;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.EntityType;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
@@ -46,7 +44,7 @@ public class Researchd {
         modEventBus.addListener(this::registerRegistries);
         modEventBus.addListener(this::registerDatapackRegistries);
 
-        modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+        modContainer.registerConfig(ModConfig.Type.COMMON, ResearchdConfig.SPEC);
     }
 
     private void registerCapabilities(RegisterCapabilitiesEvent event) {

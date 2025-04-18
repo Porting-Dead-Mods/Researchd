@@ -484,7 +484,7 @@ public class ResearchGraphWidget extends AbstractWidget {
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int i, int i1, float v) {
-        guiGraphics.enableScissor(getX(), getY(), getX() + getWidth(), getY() + getHeight());
+        guiGraphics.enableScissor(getX(), getY(), getX() + getWidth() - 1, getY() + getHeight());
 
         if (researchLines != null) {
             for (List<ResearchLine> lines : researchLines.values()) {
