@@ -40,7 +40,7 @@ public class SavedDataWrapper<T> extends SavedData {
     }
 
     private static <T> String getName(SavedDataHolder<T> registeredSavedDataHolder) {
-        return registeredSavedDataHolder.key().toString();
+        return registeredSavedDataHolder.key().toString().replace(':', '_');
     }
 
     private static <T> SavedData.Factory<SavedDataWrapper<T>> factory(SavedDataHolder<T> registeredSavedDataHolder) {
