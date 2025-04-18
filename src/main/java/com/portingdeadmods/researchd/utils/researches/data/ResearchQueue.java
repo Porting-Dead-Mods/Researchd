@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.utils.researches.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.portingdeadmods.researchd.ResearchdConfig;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -10,6 +11,7 @@ import net.minecraft.network.codec.StreamCodec;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.function.IntSupplier;
 
 public final class ResearchQueue implements Iterable<ResearchInstance> {
     public static final ResearchQueue EMPTY = new ResearchQueue(new ArrayList<>(), 0);
@@ -25,7 +27,7 @@ public final class ResearchQueue implements Iterable<ResearchInstance> {
             ResearchQueue::new
     );
     // TODO: Make this configurable
-    public static final int QUEUE_LENGTH = 7;
+    public static final IntSupplier QUEUE_LENGTH = () -> ResearchdConfig.researchQueueLength;
 
     private final List<ResearchInstance> entries;
     private int researchProgress;
@@ -38,7 +40,7 @@ public final class ResearchQueue implements Iterable<ResearchInstance> {
     }
 
     public ResearchQueue() {
-        this(new ArrayList<>(QUEUE_LENGTH), 0);
+        this(new ArrayList<>(QUEUE_LENGTH.getAsInt()), 0);
     }
 
     /**
@@ -67,7 +69,7 @@ public final class ResearchQueue implements Iterable<ResearchInstance> {
             if (instance.getResearch().equals(researchInstance.getResearch())) return false;
         }
 
-        if (this.entries.size() < QUEUE_LENGTH) {
+        if (this.entries.size() < QUEUE_LENGTH.getAsInt()) {
             this.entries.add(researchInstance);
             return true;
         }
@@ -87,14 +89,13 @@ public final class ResearchQueue implements Iterable<ResearchInstance> {
      * @return whether it was possible to remove the element
      */
     public boolean remove(int index) {
-        // TODO: Move all forward by one
         if (this.entries.size() > index) {
-            this.entries.remove(index);
             for (int i = index; i < this.entries.size(); i++) {
                 if (i + 1 < this.entries.size()) {
                     this.entries.set(i, this.entries.get(i + 1));
                 }
             }
+            this.entries.removeLast();
             return true;
         }
         return false;

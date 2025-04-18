@@ -51,7 +51,7 @@ public class TechListWidget extends ResearchScreenWidget {
         int padding = 15;
         int scrollerX = getX() + cols * ResearchScreenWidget.PANEL_WIDTH + padding;
 
-        this.searchButton = new ImageButton(scrollerX, y + 5, 14, 14, new WidgetSprites(
+        this.searchButton = new ImageButton(scrollerX, y + 8, 14, 14, new WidgetSprites(
                 Researchd.rl("search_button"),
                 Researchd.rl("search_button_highlighted")
         ), this::onSearchButtonClicked);

@@ -24,11 +24,8 @@ public class ClientConsumePackResearchMethod implements ClientResearchMethod<Con
     private ClientConsumePackResearchMethod() {
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public void renderMethodTooltip(GuiGraphics guiGraphics, List<ConsumePackResearchMethod> rawMethods, int x, int y, int mouseX, int mouseY) {
-        List<ConsumePackResearchMethod> methods = (List<ConsumePackResearchMethod>) rawMethods;
-
+    public void renderMethodTooltip(GuiGraphics guiGraphics, List<ConsumePackResearchMethod> methods, int x, int y, int mouseX, int mouseY) {
         Font font = Minecraft.getInstance().font;
         ConsumePackResearchMethod method = methods.getFirst();
         Component methodType = method.getTranslation();

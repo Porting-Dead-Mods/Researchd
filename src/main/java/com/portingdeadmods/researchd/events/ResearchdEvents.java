@@ -77,7 +77,6 @@ public final class ResearchdEvents {
         @SubscribeEvent
         private static void onJoinWorld(PlayerEvent.PlayerLoggedInEvent event) {
             if (event.getEntity() instanceof ServerPlayer serverPlayer) {
-                ResearchHelper.initResearches(serverPlayer);
                 for (Map.Entry<ResourceKey<PDLSavedData<?>>, PDLSavedData<?>> savedData : ResearchdRegistries.SAVED_DATA.entrySet()) {
                     PDLSavedData<?> value = savedData.getValue();
                     if (value.isSynced()) {
