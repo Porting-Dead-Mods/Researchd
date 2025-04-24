@@ -22,9 +22,10 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
     private static final ResourceLocation BACKGROUND_TEXTURE = Researchd.rl("textures/gui/selected_research.png");
     private static final ResourceLocation SMALL_SCROLLER_SPRITE = Researchd.rl("scroller_small");
     public static final int BACKGROUND_WIDTH = 174;
-    public static final int BACKGROUND_HEIGHT = 61;
+    public static final int BACKGROUND_HEIGHT = 72;
     private ResearchInstance selectedInstance;
     private final Map<ResourceLocation, ResearchMethod> methods;
+    private int scrollOffset;
 
     public SelectedResearchWidget(int x, int y, int width, int height) {
         super(x, y, width, height);
@@ -35,16 +36,19 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
         GuiUtils.drawImg(guiGraphics, BACKGROUND_TEXTURE, getX(), getY(), width, height);
-        guiGraphics.blitSprite(SMALL_SCROLLER_SPRITE, getX() + getWidth() - 9, getY() + 13, 4, 7);
+        guiGraphics.blitSprite(SMALL_SCROLLER_SPRITE, getX() + getWidth() - 9, getY() + 20, 4, 7);
 
+        int offsetY = (int) -(this.scrollOffset * 1.5f);
+
+        Font font = Minecraft.getInstance().font;
+        guiGraphics.drawString(font, Utils.registryTranslation(this.selectedInstance.getResearch()), 11, 49, -1);
         if (selectedInstance != null) {
-            renderResearchPanel(guiGraphics, selectedInstance, 12, 55, mouseX, mouseY, 2, false);
+            renderResearchPanel(guiGraphics, selectedInstance, 12, 60, mouseX, mouseY, 2, false);
 
-            guiGraphics.enableScissor(53, 55, 53 + 115, 55 + 48);
+            guiGraphics.enableScissor(53, 60, 53 + 115, 55 + 48);
 
-            Font font = Minecraft.getInstance().font;
-            guiGraphics.drawString(font, Utils.registryTranslation(this.selectedInstance.getResearch()), 12, 45, -1, false);
             int lineHeight = font.lineHeight + 2;
+            guiGraphics.drawString(font, "Researched by", 56, offsetY + 62, -1, false);
 
             int height = 0;
             for (Map.Entry<ResourceLocation, ResearchMethod> entry : this.methods.entrySet()) {
@@ -54,10 +58,16 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
 //                height += entry.getValue().isEmpty() ? 0 : entry.getValue().getFirst().getClientMethod().height();
             }
 
-            guiGraphics.drawString(font, "Effects", 56, 57 + height + 14, -1, false);
+            guiGraphics.drawString(font, "Effects", 56, offsetY + 57 + height + 32, -1, false);
 
             guiGraphics.disableScissor();
         }
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        this.scrollOffset = (int) Math.max(Math.max(this.scrollOffset - scrollY, 0), 0);
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
 
     @Override
@@ -69,6 +79,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
         this.selectedInstance = instance;
 
         this.methods.clear();
+        this.scrollOffset = 0;
         ResearchMethod method = ResearchHelper.getResearch(this.selectedInstance.getResearch(), Minecraft.getInstance().level.registryAccess()).researchMethods();
         this.methods.put(method.id(), method);
     }

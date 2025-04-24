@@ -21,9 +21,8 @@ public class ClientConsumePackResearchMethod implements ClientResearchMethod<Con
     }
 
     @Override
-    public void renderMethodTooltip(GuiGraphics guiGraphics, List<ConsumePackResearchMethod> methods, int x, int y, int mouseX, int mouseY) {
+    public void renderMethodInfo(GuiGraphics guiGraphics, ConsumePackResearchMethod method, int x, int y, int mouseX, int mouseY) {
         Font font = Minecraft.getInstance().font;
-        ConsumePackResearchMethod method = methods.getFirst();
         Component methodType = method.getTranslation();
 
         PoseStack poseStack = guiGraphics.pose();
@@ -37,9 +36,7 @@ public class ClientConsumePackResearchMethod implements ClientResearchMethod<Con
 
             guiGraphics.drawString(font, methodType, x + xMargin, y + yMargin, -1, false);
 
-            for (int i = 0; i < methods.size(); i++) {
-                renderPack(font, guiGraphics, methods.get(i), i, x + 35 + xMargin, y + yMargin);
-            }
+            renderPack(font, guiGraphics, method, 0, x + 35 + xMargin, y + yMargin);
         }
         poseStack.popPose();
 
