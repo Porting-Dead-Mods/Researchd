@@ -5,11 +5,10 @@
     "researchd:iron"
   ],
   "requires_parent": false,
-  "research_methods": [
-    {
-      "count": 8,
-      "method": "researchd:consume_research_pack",
-      "pack": "researchd:overworld"
-    }
-  ]
+  "research_effects": [],
+  "research_methods": {
+    "type": "researchd:consume_research_pack",
+    "count": 8,
+    "pack": "researchd:overworld"
+  }
 }

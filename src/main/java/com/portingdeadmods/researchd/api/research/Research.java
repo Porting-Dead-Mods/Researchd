@@ -22,9 +22,14 @@ public interface Research {
     Item icon();
 
     /**
-     * @return A map that maps the possible research packs that can be used and the quantity required
+     * @return The research method that is required for this research
      */
-    List<ResearchMethod> researchMethods();
+    ResearchMethod researchMethods();
+
+    /**
+     * @return The research effects that happen after researching this
+     */
+    List<ResearchEffect> researchEffects();
 
     /**
      * @return An {@link Optional} {@link ResourceKey} which represents the parent of this research.

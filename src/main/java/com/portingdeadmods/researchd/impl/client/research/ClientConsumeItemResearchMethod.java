@@ -2,8 +2,7 @@ package com.portingdeadmods.researchd.impl.client.research;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.api.client.research.ClientResearchMethod;
-import com.portingdeadmods.researchd.impl.research.ConsumeItemResearchMethod;
-import com.portingdeadmods.researchd.impl.research.ConsumePackResearchMethod;
+import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -21,7 +20,6 @@ public class ClientConsumeItemResearchMethod implements ClientResearchMethod<Con
     private ClientConsumeItemResearchMethod() {
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void renderMethodTooltip(GuiGraphics guiGraphics, List<ConsumeItemResearchMethod> methods, int x, int y, int mouseX, int mouseY) {
         Font font = Minecraft.getInstance().font;
@@ -37,10 +35,10 @@ public class ClientConsumeItemResearchMethod implements ClientResearchMethod<Con
             int xMargin = 14;
             int yMargin = 16;
 
-            guiGraphics.drawString(font, methodType, x + xMargin, y + yMargin, -1, false);
+            guiGraphics.drawString(font, methodType, (int) ((x + xMargin) / 0.8), (int) ((y + yMargin) / 0.8), -1, false);
 
             for (int i = 0; i < methods.size(); i++) {
-                renderItem(font, guiGraphics, methods.get(i), i, x + 35 + xMargin, y + yMargin);
+                renderItem(font, guiGraphics, methods.get(i), i, (int) ((x + 35 + xMargin) / 0.8), (int) ((y + yMargin) / 0.8));
             }
         }
         poseStack.popPose();

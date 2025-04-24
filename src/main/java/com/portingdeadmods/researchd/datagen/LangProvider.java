@@ -2,8 +2,8 @@ package com.portingdeadmods.researchd.datagen;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.impl.research.ConsumeItemResearchMethod;
-import com.portingdeadmods.researchd.impl.research.ConsumePackResearchMethod;
+import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
+import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
 import com.portingdeadmods.researchd.registries.Researches;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceKey;

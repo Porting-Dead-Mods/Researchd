@@ -3,8 +3,6 @@ package com.portingdeadmods.researchd.registries;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.content.items.ResearchPackItem;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
-import com.portingdeadmods.researchd.impl.research.ConsumeItemResearchMethod;
-import com.portingdeadmods.researchd.impl.research.ResearchPack;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;

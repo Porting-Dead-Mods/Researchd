@@ -5,6 +5,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchSerializer;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -17,7 +18,7 @@ import net.minecraft.world.item.Items;
 import java.util.*;
 
 // TODO: Change icon to Ingredient
-public record SimpleResearch(Item icon, List<ResearchMethod> researchMethods,
+public record SimpleResearch(Item icon, ResearchMethod researchMethods, List<ResearchEffect> researchEffects,
                              List<ResourceKey<Research>> parents, boolean requiresParent) implements Research {
     @Override
     public ResearchSerializer<?> getSerializer() {
@@ -39,7 +40,8 @@ public record SimpleResearch(Item icon, List<ResearchMethod> researchMethods,
         public static final Serializer INSTANCE = new Serializer();
         public static final MapCodec<SimpleResearch> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
                 CodecUtils.registryCodec(BuiltInRegistries.ITEM).fieldOf("icon").forGetter(SimpleResearch::icon),
-                ResearchMethod.CODEC.listOf().fieldOf("research_methods").forGetter(SimpleResearch::researchMethods),
+                ResearchMethod.CODEC.fieldOf("research_methods").forGetter(SimpleResearch::researchMethods),
+                ResearchEffect.CODEC.listOf().fieldOf("research_effects").forGetter(SimpleResearch::researchEffects),
                 Research.RESOURCE_KEY_CODEC.listOf().fieldOf("parents").forGetter(SimpleResearch::parents),
                 Codec.BOOL.fieldOf("requires_parent").forGetter(SimpleResearch::requiresParent)
         ).apply(instance, SimpleResearch::new));
@@ -60,7 +62,8 @@ public record SimpleResearch(Item icon, List<ResearchMethod> researchMethods,
 
     public static class Builder implements Research.Builder<SimpleResearch> {
         private Item icon = Items.AIR;
-        private List<ResearchMethod> researchMethods = Collections.emptyList();
+        private ResearchMethod researchMethods;
+        private List<ResearchEffect> researchEffects = Collections.emptyList();
         private List<ResourceKey<Research>> parents = Collections.emptyList();
         private boolean requiresParent = false;
 
@@ -76,8 +79,13 @@ public record SimpleResearch(Item icon, List<ResearchMethod> researchMethods,
             return this;
         }
 
-        public Builder researchMethods(List<ResearchMethod> researchPacks) {
-            this.researchMethods = researchPacks;
+        public Builder researchMethods(ResearchMethod researchMethods) {
+            this.researchMethods = researchMethods;
+            return this;
+        }
+
+        public Builder researchEffects(ResearchEffect... researchEffects) {
+            this.researchEffects = List.of(researchEffects);
             return this;
         }
 
@@ -94,7 +102,7 @@ public record SimpleResearch(Item icon, List<ResearchMethod> researchMethods,
 
         @Override
         public SimpleResearch build() {
-            return new SimpleResearch(this.icon, this.researchMethods, this.parents, this.requiresParent);
+            return new SimpleResearch(this.icon, this.researchMethods, this.researchEffects, this.parents, this.requiresParent);
         }
     }
 }

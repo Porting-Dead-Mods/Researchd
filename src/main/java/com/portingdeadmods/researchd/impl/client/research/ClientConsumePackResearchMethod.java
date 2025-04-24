@@ -2,15 +2,11 @@ package com.portingdeadmods.researchd.impl.client.research;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.api.client.research.ClientResearchMethod;
-import com.portingdeadmods.researchd.api.research.ResearchMethod;
-import com.portingdeadmods.researchd.impl.research.ConsumePackResearchMethod;
-import com.portingdeadmods.researchd.utils.GuiUtils;
+import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.FastColor;
-import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
