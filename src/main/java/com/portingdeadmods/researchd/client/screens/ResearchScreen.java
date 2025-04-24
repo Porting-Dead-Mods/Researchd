@@ -32,11 +32,11 @@ public class ResearchScreen extends Screen {
         super(Component.translatable("screen.researchd.research"));
 
         // TECH LIST
-        this.techList = new TechListWidget(this, 0, 103, 7);
+        this.techList = new TechListWidget(this, 0, 109, 7);
         this.techList.setTechList(new TechList(ClientResearchCache.RESEARCHES.stream().toList()));
 
         // THIS NEEDS TO BE BEFORE THE GRAPH
-        this.selectedResearchWidget = new SelectedResearchWidget(0, 42, SelectedResearchWidget.BACKGROUND_WIDTH, SelectedResearchWidget.BACKGROUND_HEIGHT);
+        this.selectedResearchWidget = new SelectedResearchWidget(0, 40, SelectedResearchWidget.BACKGROUND_WIDTH, SelectedResearchWidget.BACKGROUND_HEIGHT);
         this.selectedResearchWidget.setSelectedResearch(this.techList.getTechList().entries().getFirst());
 
         // QUEUE

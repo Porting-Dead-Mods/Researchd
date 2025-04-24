@@ -50,7 +50,7 @@ public abstract class ResearchScreenWidget extends AbstractWidget {
         poseStack.pushPose();
         {
             poseStack.scale(scale, scale, scale);
-            guiGraphics.renderItem(ResearchHelper.getResearch(instance.getResearch(), lookup).icon().getDefaultInstance(), x - scale / 2 - 3, y - (height * scale) / (2 * scale) - 13);
+            guiGraphics.renderItem(ResearchHelper.getResearch(instance.getResearch(), lookup).icon().getDefaultInstance(), x - scale / 2 - 3, y - (height * scale) / (2 * scale) - 16);
         }
         poseStack.popPose();
 

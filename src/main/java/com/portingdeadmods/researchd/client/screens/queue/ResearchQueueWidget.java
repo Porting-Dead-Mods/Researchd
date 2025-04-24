@@ -26,7 +26,7 @@ import java.util.List;
 public class ResearchQueueWidget extends ResearchScreenWidget {
     private static final ResourceLocation BACKGROUND_TEXTURE = Researchd.rl("textures/gui/research_queue.png");
     private static final int BACKGROUND_WIDTH = 174;
-    private static final int BACKGROUND_HEIGHT = 42;
+    private static final int BACKGROUND_HEIGHT = 40;
 
     private final ResearchScreen screen;
     private final ResearchQueue queue;
@@ -46,7 +46,9 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
         GuiUtils.drawImg(guiGraphics, BACKGROUND_TEXTURE, getX(), getY(), width, height);
 
         int paddingX = 12;
-        int paddingY = 17;
+        int paddingY = 14;
+
+        guiGraphics.drawString(Minecraft.getInstance().font, "Research Queue", paddingX - 1, 4, -1);
 
         List<ResearchInstance> entries = this.queue.getEntries();
         for (int i = 0; i < entries.size(); i++) {
