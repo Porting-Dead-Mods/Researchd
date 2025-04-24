@@ -3,7 +3,7 @@ package com.portingdeadmods.researchd;
 import com.portingdeadmods.researchd.api.data.PDLSavedData;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
-import com.portingdeadmods.researchd.api.research.serializers.ResearchPredicateSerializer;
+import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectSerializer;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchSerializer;
 import com.portingdeadmods.researchd.impl.research.ResearchPack;
 import net.minecraft.core.Registry;
@@ -20,12 +20,12 @@ public class ResearchdRegistries {
 			ResourceKey.createRegistryKey(Researchd.rl("research_serializer"));
 	public static final ResourceKey<Registry<ResearchMethodSerializer<?>>> RESEARCH_METHOD_SERIALIZER_KEY =
 			ResourceKey.createRegistryKey(Researchd.rl("research_method_serializer"));
-	public static final ResourceKey<Registry<ResearchPredicateSerializer<?>>> RESEARCH_PREDICATE_SERIALIZER_KEY =
-			ResourceKey.createRegistryKey(Researchd.rl("research_predicate_serializer"));
+	public static final ResourceKey<Registry<ResearchEffectSerializer<?>>> RESEARCH_EFFECT_SERIALIZER_KEY =
+			ResourceKey.createRegistryKey(Researchd.rl("research_effect_serializer"));
 
 	public static final Registry<ResearchSerializer<?>> RESEARCH_SERIALIZER = new RegistryBuilder<>(RESEARCH_SERIALIZER_KEY).sync(true).create();
 	public static final Registry<ResearchMethodSerializer<?>> RESEARCH_METHOD_SERIALIZER = new RegistryBuilder<>(RESEARCH_METHOD_SERIALIZER_KEY).create();
-	public static final Registry<ResearchPredicateSerializer<?>> RESEARCH_PREDICATE_SERIALIZER = new RegistryBuilder<>(RESEARCH_PREDICATE_SERIALIZER_KEY).create();
+	public static final Registry<ResearchEffectSerializer<?>> RESEARCH_EFFECT_SERIALIZER = new RegistryBuilder<>(RESEARCH_EFFECT_SERIALIZER_KEY).create();
 
 	public static final ResourceKey<Registry<PDLSavedData<?>>> SAVED_DATA_KEY =
 			ResourceKey.createRegistryKey(Researchd.rl("saved_data"));

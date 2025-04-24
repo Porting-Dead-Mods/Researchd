@@ -12,7 +12,7 @@ import net.minecraft.world.entity.player.Player;
 
 public interface ResearchMethod {
     Codec<ResearchMethod> CODEC =
-            ResearchdRegistries.RESEARCH_METHOD_SERIALIZER.byNameCodec().dispatch("method", ResearchMethod::getSerializer, ResearchMethodSerializer::codec);
+            ResearchdRegistries.RESEARCH_METHOD_SERIALIZER.byNameCodec().dispatch(ResearchMethod::getSerializer, ResearchMethodSerializer::codec);
 
     boolean canResearch(Player player, ResourceKey<Research> research);
 

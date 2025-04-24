@@ -3,13 +3,29 @@
   "icon": "minecraft:oak_log",
   "parents": [],
   "requires_parent": false,
-  "research_methods": [
+  "research_effects": [
     {
-      "count": 8,
-      "item": {
-        "item": "minecraft:dirt"
-      },
-      "method": "researchd:consume_item"
+      "type": "researchd:unlock_crafting_recipe",
+      "recipe": "minecraft:"
     }
-  ]
+  ],
+  "research_methods": {
+    "type": "researchd:or",
+    "methods": [
+      {
+        "type": "researchd:consume_item",
+        "count": 8,
+        "item": {
+          "item": "minecraft:dirt"
+        }
+      },
+      {
+        "type": "researchd:consume_item",
+        "count": 2,
+        "item": {
+          "item": "minecraft:wheat_seeds"
+        }
+      }
+    ]
+  }
 }

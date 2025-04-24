@@ -1,15 +1,15 @@
-package com.portingdeadmods.researchd.impl.research;
+package com.portingdeadmods.researchd.impl.research.method;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.client.research.ClientResearchMethod;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
 import com.portingdeadmods.researchd.impl.client.research.ClientConsumePackResearchMethod;
+import com.portingdeadmods.researchd.impl.research.ResearchPack;
 import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
 import com.portingdeadmods.researchd.registries.ResearchdItems;
 import net.minecraft.network.RegistryFriendlyByteBuf;

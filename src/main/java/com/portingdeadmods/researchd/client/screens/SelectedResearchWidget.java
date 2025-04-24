@@ -20,10 +20,11 @@ import java.util.Map;
 
 public class SelectedResearchWidget extends ResearchScreenWidget {
     private static final ResourceLocation BACKGROUND_TEXTURE = Researchd.rl("textures/gui/selected_research.png");
+    private static final ResourceLocation SMALL_SCROLLER_SPRITE = Researchd.rl("scroller_small");
     public static final int BACKGROUND_WIDTH = 174;
     public static final int BACKGROUND_HEIGHT = 61;
     private ResearchInstance selectedInstance;
-    private final Map<ResourceLocation, List<ResearchMethod>> methods;
+    private final Map<ResourceLocation, ResearchMethod> methods;
 
     public SelectedResearchWidget(int x, int y, int width, int height) {
         super(x, y, width, height);
@@ -34,6 +35,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
         GuiUtils.drawImg(guiGraphics, BACKGROUND_TEXTURE, getX(), getY(), width, height);
+        guiGraphics.blitSprite(SMALL_SCROLLER_SPRITE, getX() + getWidth() - 9, getY() + 13, 4, 7);
 
         if (selectedInstance != null) {
             renderResearchPanel(guiGraphics, selectedInstance, 12, 55, mouseX, mouseY, 2, false);
@@ -45,13 +47,11 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
             int lineHeight = font.lineHeight + 2;
 
             int height = 0;
-            for (Map.Entry<ResourceLocation, List<ResearchMethod>> methodEntry : this.methods.entrySet()) {
-                for (ResearchMethod method : methodEntry.getValue()) {
-                    guiGraphics.drawString(font, Component.literal("Researched by"), 56, 57, -1, false);
-                    ClientResearchMethod clientMethod = method.getClientMethod();
-                    clientMethod.renderMethodTooltip(guiGraphics, methodEntry.getValue(), 56, 57 + lineHeight, mouseX, mouseY);
-                }
-                height += methodEntry.getValue().isEmpty() ? 0 : methodEntry.getValue().getFirst().getClientMethod().height();
+            for (Map.Entry<ResourceLocation, ResearchMethod> entry : this.methods.entrySet()) {
+//                guiGraphics.drawString(font, Component.literal("Researched by"), 56, 57, -1, false);
+//                ClientResearchMethod clientMethod = method.getClientMethod();
+//                clientMethod.renderMethodTooltip(guiGraphics, entry.getValue(), 56, 57 + lineHeight, mouseX, mouseY);
+//                height += entry.getValue().isEmpty() ? 0 : entry.getValue().getFirst().getClientMethod().height();
             }
 
             guiGraphics.drawString(font, "Effects", 56, 57 + height + 14, -1, false);
@@ -69,10 +69,8 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
         this.selectedInstance = instance;
 
         this.methods.clear();
-        List<ResearchMethod> methods = ResearchHelper.getResearch(this.selectedInstance.getResearch(), Minecraft.getInstance().level.registryAccess()).researchMethods();
-        for (ResearchMethod method : methods) {
-            this.methods.computeIfAbsent(method.id(), key -> new ArrayList<>()).add(method);
-        }
+        ResearchMethod method = ResearchHelper.getResearch(this.selectedInstance.getResearch(), Minecraft.getInstance().level.registryAccess()).researchMethods();
+        this.methods.put(method.id(), method);
     }
 
     public ResearchInstance getSelectedInstance() {

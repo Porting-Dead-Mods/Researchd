@@ -8,7 +8,7 @@ import com.portingdeadmods.researchd.registries.ResearchdItems;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.registries.ResearchdTab;
 import com.portingdeadmods.researchd.registries.serializers.ResearchMethodSerializers;
-import com.portingdeadmods.researchd.registries.serializers.ResearchPredicateSerializers;
+import com.portingdeadmods.researchd.registries.serializers.ResearchEffectSerializers;
 import com.portingdeadmods.researchd.registries.serializers.ResearchSerializers;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
@@ -33,7 +33,7 @@ public class Researchd {
     public Researchd(IEventBus modEventBus, ModContainer modContainer) {
         ResearchdAttachments.ATTACHMENTS.register(modEventBus);
         ResearchSerializers.SERIALIZERS.register(modEventBus);
-        ResearchPredicateSerializers.SERIALIZERS.register(modEventBus);
+        ResearchEffectSerializers.SERIALIZERS.register(modEventBus);
         ResearchMethodSerializers.SERIALIZERS.register(modEventBus);
         ResearchdItems.ITEMS.register(modEventBus);
         ResearchdDataComponents.COMPONENTS.register(modEventBus);
@@ -53,7 +53,7 @@ public class Researchd {
 
     private void registerRegistries(NewRegistryEvent event) {
         event.register(ResearchdRegistries.RESEARCH_SERIALIZER);
-        event.register(ResearchdRegistries.RESEARCH_PREDICATE_SERIALIZER);
+        event.register(ResearchdRegistries.RESEARCH_EFFECT_SERIALIZER);
         event.register(ResearchdRegistries.RESEARCH_METHOD_SERIALIZER);
         event.register(ResearchdRegistries.SAVED_DATA);
     }
