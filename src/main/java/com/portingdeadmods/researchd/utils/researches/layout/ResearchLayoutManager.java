@@ -13,8 +13,8 @@ import java.util.*;
  */
 public class ResearchLayoutManager {
 	// Layout constants
-	private static final int HORIZONTAL_SPACING = 20;
-	private static final int VERTICAL_SPACING = 30;
+	private static final int HORIZONTAL_SPACING = 10;
+	private static final int VERTICAL_SPACING = 20;
 	private static final int NODE_WIDTH = ResearchScreenWidget.PANEL_WIDTH;
 	private static final int NODE_HEIGHT = ResearchScreenWidget.PANEL_HEIGHT;
 
