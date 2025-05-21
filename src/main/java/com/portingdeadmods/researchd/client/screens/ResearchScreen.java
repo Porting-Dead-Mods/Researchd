@@ -2,8 +2,7 @@ package com.portingdeadmods.researchd.client.screens;
 
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
-import com.portingdeadmods.researchd.utils.researches.*;
+import com.portingdeadmods.researchd.client.cache.ClientResearchCache;
 import com.portingdeadmods.researchd.client.screens.graph.ResearchGraphWidget;
 import com.portingdeadmods.researchd.client.screens.list.TechListWidget;
 import com.portingdeadmods.researchd.client.screens.queue.ResearchQueueWidget;

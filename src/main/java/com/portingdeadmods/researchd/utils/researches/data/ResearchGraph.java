@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.utils.researches.data;
 
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
-import com.portingdeadmods.researchd.utils.researches.ClientResearchCache;
+import com.portingdeadmods.researchd.client.cache.ClientResearchCache;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;

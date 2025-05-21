@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.utils.researches;
+package com.portingdeadmods.researchd.client.cache;
 
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchGraph;
@@ -7,7 +7,6 @@ import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 

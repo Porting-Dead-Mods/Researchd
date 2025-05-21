@@ -7,10 +7,9 @@ import com.portingdeadmods.researchd.client.screens.SelectedResearchWidget;
 import com.portingdeadmods.researchd.client.screens.lines.PotentialOverlap;
 import com.portingdeadmods.researchd.client.screens.lines.ResearchHead;
 import com.portingdeadmods.researchd.client.screens.lines.ResearchLine;
-import com.portingdeadmods.researchd.utils.researches.ResearchGraphCache;
+import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchGraph;
-import com.portingdeadmods.researchd.utils.researches.layout.ResearchLayoutManager;
 import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -57,20 +56,22 @@ public class ResearchGraphWidget extends AbstractWidget {
         }
 
         // Try to restore the complete layout for this exact graph view
-        boolean layoutRestored = GraphStateManager.getInstance().tryRestoreLastSessionState(graph);
+        // TODO: RE-ENABLE boolean layoutRestored = GraphStateManager.getInstance().tryRestoreLastSessionState(graph);
 
-        if (!layoutRestored) {
-            // If we don't have a cached layout for this exact view,
-            // apply our layout manager to position all nodes
-            ResearchLayoutManager.applyLayout(graph, getX() + 10, getY() + 10);
-        }
+//        if (!layoutRestored) {
+//            // If we don't have a cached layout for this exact view,
+//            // apply our layout manager to position all nodes
+//            GraphLayoutManager.applyLayout(graph, getX() + 10, getY() + 10);
+//        }
+
+        GraphLayoutManager.applyLayout(graph, getX() + 10, getY() + 10);
 
         for (ResearchNode node : graph.nodes()) {
-            node.refreshHeads(graph.nodes());
+            node.refreshHeads();
         }
 
         // Always calculate connection lines after positions are finalized
-        calculateLines();
+        //TODO: REWORK AND REENABLE LINE GENERATION AFTER FINISHING NODE POSITIONING calculateLines();
     }
 
     private void calculateLines() {
