@@ -7,7 +7,7 @@ import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.screens.queue.ResearchQueueWidget;
 import com.portingdeadmods.researchd.networking.research.ResearchQueueAddPayload;
-import com.portingdeadmods.researchd.utils.researches.ResearchGraphCache;
+import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.utils.researches.data.TechList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;

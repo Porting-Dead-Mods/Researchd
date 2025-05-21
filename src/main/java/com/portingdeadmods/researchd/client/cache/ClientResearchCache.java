@@ -1,11 +1,11 @@
-package com.portingdeadmods.researchd.utils.researches;
+package com.portingdeadmods.researchd.client.cache;
 
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
-import com.portingdeadmods.researchd.utils.Spaghetti;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
@@ -68,7 +68,7 @@ public final class ClientResearchCache {
                 }
             }
 
-            node.refreshHeads(Spaghetti.getNodesFromScreen());
+            node.refreshHeads();
         }
 
         for (ResearchNode node : NODES) {
@@ -78,7 +78,7 @@ public final class ClientResearchCache {
                 node.addParent(getNodeByResearch(parent));
             }
 
-            node.refreshHeads(Spaghetti.getNodesFromScreen());
+            node.refreshHeads();
         }
 
         Set<ResearchNode> referencedNodes = new LinkedHashSet<>();
