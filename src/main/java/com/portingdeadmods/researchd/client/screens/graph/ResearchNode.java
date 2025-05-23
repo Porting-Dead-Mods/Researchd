@@ -1,26 +1,15 @@
 package com.portingdeadmods.researchd.client.screens.graph;
 
-import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
-import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.screens.lines.ResearchHead;
-import com.portingdeadmods.researchd.client.screens.lines.ResearchLine;
 import com.portingdeadmods.researchd.utils.Spaghetti;
 import com.portingdeadmods.researchd.utils.UniqueArray;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.CommonComponents;
-import org.openjdk.nashorn.internal.objects.annotations.Getter;
-import org.openjdk.nashorn.internal.objects.annotations.Setter;
 
-import java.awt.*;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -78,6 +67,17 @@ public class ResearchNode extends AbstractWidget {
     public void lockNodeTo(ResearchNode node) {
         this.addPositionLock(node);
         this.doMovementLogic = false;
+    }
+
+    public void lockNode() {
+        this.doMovementLogic = false;
+    }
+
+    public Integer getLayer() {
+        if (GraphLayoutManager.nodeLayerMap.get(this) == null) {
+            return -1;
+        }
+        return GraphLayoutManager.nodeLayerMap.get(this);
     }
 
     public UniqueArray<ResearchNode> getChildren() {
@@ -181,5 +181,15 @@ public class ResearchNode extends AbstractWidget {
             child.translate(dx, dy);
             child.downStream(dx, dy);
         }
+    }
+
+    public void downStreamSetX(int x) {
+        int dx = x - getX();
+        downStream(dx, 0);
+    }
+
+    public void downStreamSetY(int y) {
+        int dy = y - getY();
+        downStream(0, dy);
     }
 }

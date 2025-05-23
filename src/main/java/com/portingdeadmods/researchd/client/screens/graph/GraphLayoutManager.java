@@ -6,7 +6,10 @@ import com.portingdeadmods.researchd.utils.researches.data.ResearchGraph;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Handles layout calculations for research graphs with parents centered over children.
@@ -19,10 +22,10 @@ public class GraphLayoutManager {
 	private static final int NODE_HEIGHT = ResearchScreenWidget.PANEL_HEIGHT;
 
 	// Map from layer number to list of nodes in that layer (0 = bottom layer)
-	private static Int2ObjectMap<List<ResearchNode>> layerMap = new Int2ObjectOpenHashMap<>();
+	public static Int2ObjectMap<List<ResearchNode>> layerMap = new Int2ObjectOpenHashMap<>();
 
 	// Map to track which layer each node is assigned to
-	private static Map<ResearchNode, Integer> nodeLayerMap = new HashMap<>();
+	public static Map<ResearchNode, Integer> nodeLayerMap = new HashMap<>();
 
 	/**
 	 * Apply layout to a research graph
@@ -59,6 +62,10 @@ public class GraphLayoutManager {
 		return _calculateDepth(node, 0);
 	}
 
+	public static Point centerOf2Nodes(ResearchNode node1, ResearchNode node2) {
+		return new Point((node1.getX() + node2.getX() + NODE_WIDTH) / 2, (node1.getY() + node2.getY() + NODE_HEIGHT) / 2);
+	}
+
 	private static int _calculateDepth(ResearchNode node, int depth) {
 		if (node.getParents().isEmpty()) {
 			return depth;
@@ -74,11 +81,13 @@ public class GraphLayoutManager {
 	// Thinking that [0] would be leftMost and [.length - 1] would be rightMost
 	private static void _addLeftToLayer(int layer, ResearchNode node) {
 		layerMap.computeIfAbsent(layer, k -> new ArrayList<>()).addLast(node);
+		nodeLayerMap.put(node, layer);
 	}
 
 	// Thinking that [0] would be leftMost and [.length - 1] would be rightMost
 	private static void _addRightToLayer(int layer, ResearchNode node) {
 		layerMap.computeIfAbsent(layer, k -> new ArrayList<>()).addFirst(node);
+		nodeLayerMap.put(node, layer);
 	}
 
 	/**
@@ -180,13 +189,7 @@ public class GraphLayoutManager {
 	}
 
 	/**
-	 * General node movement for better coherent layout following the 𝒫𝑜𝓈𝒾𝓉𝒾𝑜𝓃𝒾𝓃𝑔 𝓇𝓊𝓁𝑒𝓈:<br><br>
-	 *
-	 * A: If children nodes have only one parent the parent should move centred to the children not otherwise (see Fig1) <br><br>
-	 *
-	 * B: If the node doesn't have any children the node should move centred to its parents (see Fig2) <br><br>
-	 *
-	 * C: If the node has only 1 parent and the parent has only 1 child, the parent should move to the child (see Fig3) <br><br>
+	 * General node movement for better coherent layout following the 𝒫𝑜𝓈𝒾𝓉𝒾𝑜𝓃𝒾𝓃𝑔 𝓇𝓊𝓁𝑒𝓈<br><br>
 	 *
 	 * Note: Any change made to a node's position should be downstreamed to all the other nodes
 	 * locked to the node's position per the other 𝒫𝑜𝓈𝒾𝓉𝒾𝑜𝓃𝒾𝓃𝑔 𝓇𝓊𝓁𝑒𝓈. (So if a node is linked
@@ -205,54 +208,105 @@ public class GraphLayoutManager {
 			for (ResearchNode node : nodes) {
 				if (!node.shouldMove()) continue;
 
-				// A:
-				if (node.getParents().size() == 1) {
-					ResearchNode parent = node.getParents().get(0);
-					UniqueArray<ResearchNode> children = parent.getChildren();
+				// Calculations
+				System.out.println("Checking: " + node.getInstance().getResearch());
 
-					boolean checkA = true;
-					for (ResearchNode child : children) {
-						if (!(child.getParents().size() == 1 && child.getChildren().isEmpty())) {
-							checkA = false;
-						}
-					}
-					if (checkA) {
-						parent.setXExt(children.stream().mapToInt(ResearchNode::getX).sum() / children.size());
-						for (ResearchNode child : children) {
-							child.lockNodeTo(parent);
-						}
-						continue;
-					}
+				UniqueArray<ResearchNode> parents = node.getParents();
+				UniqueArray<ResearchNode> children = node.getChildren();
+
+				HashMap<Integer, UniqueArray<ResearchNode>> parentToSubsequentChildren = new HashMap<>();
+				UniqueArray<ResearchNode> parentsOnLayerAbove = parents.stream().filter(parent -> parent.getLayer() == node.getLayer() + 1).collect(Collectors.toCollection(UniqueArray::new));
+
+				int _parentIndex = 0;
+				for (ResearchNode parent : parents) {
+					UniqueArray<ResearchNode> _children = new UniqueArray<>(parent.getChildren());
+					UniqueArray<ResearchNode> _subsequentChildren = new UniqueArray<>(_children.stream().filter(child -> child.getLayer() == parent.getLayer() + 1).toList());
+
+					parentToSubsequentChildren.put(_parentIndex, _subsequentChildren);
+					_parentIndex++;
 				}
 
-				// B:
-				if (node.getChildren().isEmpty()) {
-					UniqueArray<ResearchNode> parents = node.getParents();
-					node.setXExt(parents.stream().mapToInt(ResearchNode::getX).sum() / parents.size());
-					for (ResearchNode parent : parents) {
-						parent.lockNodeTo(node);
-					}
-					continue;
+				// Apply
+
+				if (children.isEmpty()) {
+					
 				}
 
-				// C:
-				if (node.getParents().size() == 1) {
-					if (node.getParents().get(0).getChildren().size() == 1) {
-						ResearchNode parent = node.getParents().get(0);
-						ResearchNode child = parent.getChildren().get(0);
-						parent.setXExt(child.getX());
-						child.lockNodeTo(parent);
-						continue;
-					}
-				}
+//				// A: If the node doesn't have children, move the node to the parents - APPLIES ONLY TO SUBSEQUENT LAYERS
+//				if (!parentsOnLayerAbove.isEmpty() && children.isEmpty()) {
+//					parentsOnLayerAbove.sort(Comparator.comparingInt(ResearchNode::getX));
+//					node.downStreamSetX(centerOf2Nodes(parentsOnLayerAbove.getFirst(), parentsOnLayerAbove.getLast()).x - NODE_WIDTH / 2);
+//					for (ResearchNode parent : parentsOnLayerAbove) {
+//						parent.lockNodeTo(node);
+//					}
+//				}
+//
+//				// B: If the node has only one parent and child, lock to the child
+//				if (parents.size() == 1 && children.size() == 1) {
+//					node.downStreamSetX(children.get(0).getX());
+//					node.lockNodeTo(children.get(0));
+//				}
+//
+//				if (parents.size() == 1) {
+//					ResearchNode parent = parents.get(0);
+//					List<ResearchNode> subsequentChildren = parentToSubsequentChildren.get(0);
+//					subsequentChildren.sort(Comparator.comparingInt(ResearchNode::getX));
+//
+//					boolean checkA = true;
+//					for (ResearchNode child : subsequentChildren) {
+//						if (!(child.getParents().size() == 1)) {
+//							checkA = false;
+//							break;
+//						}
+//					}
+//					if (checkA) {
+//						int childrenWidth = subsequentChildren.size() * NODE_WIDTH + (subsequentChildren.size() - 1) * HORIZONTAL_SPACING;
+//						int startX = parent.getX() + (NODE_WIDTH / 2) - (childrenWidth / 2);
+//
+//						for (ResearchNode child : subsequentChildren) {
+//							child.lockNodeTo(parent);
+//						}
+//						for (int i = 0; i < subsequentChildren.size(); i++) {
+//							ResearchNode child = subsequentChildren.get(i);
+//							child.setXExt(startX + (i * (NODE_WIDTH + HORIZONTAL_SPACING)));
+//							System.out.println("A: Moved child: " + child.getInstance().getResearch() + " to parent: " + parent.getInstance().getResearch());
+//						}
+//						continue;
+//					}
+//				}
+//
+//				// B:
+//				if (parents.size() == 1) {
+//					parents.sort(Comparator.comparingInt(ResearchNode::getX));
+//
+//					node.setXExt(centerOf2Nodes(parents.getFirst(), parents.getLast()).x - NODE_WIDTH / 2);
+//
+//					for (ResearchNode parent : parents) {
+//						parent.lockNodeTo(node);
+//					}
+//					node.lockNode();
+//					System.out.println("B: Moved node: " + node.getInstance().getResearch() + " to parents: " + parents.getFirst().getInstance().getResearch() + " and " + parents.getLast().getInstance().getResearch());
+//					continue;
+//				}
+//
+//				// C:
+//				if (node.getParents().size() == 1) {
+//					if (node.getParents().get(0).getChildren())
+//					ResearchNode parent = node.getParents().get(0);
+//					node.setXExt(parent.getX());
+//					node.lockNodeTo(parent);
+//
+//					System.out.println("Moved child: " + node.getInstance().getResearch() + " to parent: " + parent.getInstance().getResearch());
+//					continue;
+//				}
 			}
 		}
 
-		for (Map.Entry<Integer, List<ResearchNode>> layer : layerMap.int2ObjectEntrySet()) {
-			for (ResearchNode node : layer.getValue()) {
-				System.out.println("Node: " + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY() + " Pos locks: " + node.getPositionLocks().size());
-			}
-		}
+//		for (Map.Entry<Integer, List<ResearchNode>> layer : layerMap.int2ObjectEntrySet()) {
+//			for (ResearchNode node : layer.getValue()) {
+//				System.out.println("Node: " + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY() + " Pos locks: " + node.getPositionLocks().size());
+//			}
+//		}
 	}
 
 	/**
