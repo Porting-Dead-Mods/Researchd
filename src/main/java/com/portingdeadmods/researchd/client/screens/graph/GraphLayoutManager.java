@@ -174,7 +174,7 @@ public class GraphLayoutManager {
 				// Set node position
 				node.setYExt(startY + (layer.getKey() * (VERTICAL_SPACING + NODE_HEIGHT)));
 				node.setXExt(startX + ((layer.getValue().indexOf(node) + 1) * (NODE_WIDTH + HORIZONTAL_SPACING)));
-				System.out.println("Node: " + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY());
+				System.out.println("Node@1: " + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY());
 			}
 		}
 	}
@@ -212,7 +212,7 @@ public class GraphLayoutManager {
 
 		for (Map.Entry<Integer, List<ResearchNode>> layer : layerMap.int2ObjectEntrySet()) {
 			for (ResearchNode node : layer.getValue()) {
-				System.out.println("Node: " + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY());
+				System.out.println("Node@2: " + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY());
 			}
 		}
 	}
@@ -226,6 +226,8 @@ public class GraphLayoutManager {
 		System.out.println("Step 2.5 - Sorting nodes based on parents");
 
 		List<Integer> layerNumbers = new ArrayList<>(layerMap.keySet());
+		if (layerNumbers.size() < 3) return;
+
 		layerNumbers.sort(Comparator.naturalOrder()); // Ascending order
 		layerNumbers.removeLast(); // Remove the last layer since it has no children
 
@@ -233,6 +235,7 @@ public class GraphLayoutManager {
 			System.out.println("Sorting layer: " + (layer + 1));
 			List<ResearchNode> layerNodes = layerMap.get(layer);
 			HashMap<ResearchNode, UniqueArray<ResearchNode>> subsequentChildrenMap = new HashMap<>();
+			UniqueArray<ResearchNode> allSubsequentChildren = new UniqueArray<>();
 
 			for (ResearchNode node : layerNodes) {
 				// Calculations
@@ -243,12 +246,36 @@ public class GraphLayoutManager {
 				// One layer below, sorted by X position
 				UniqueArray<ResearchNode> subsequentChildren = children.stream().filter((child) -> child.getLayer() == node.getLayer() + 1).collect(Collectors.toCollection(UniqueArray::new));
 				subsequentChildren.sort(Comparator.comparingInt(ResearchNode::getX));
+
+				allSubsequentChildren.addAll(subsequentChildren);
 				subsequentChildrenMap.put(node, subsequentChildren);
 			}
 
 			int currentNodeIdx = 0;
-			int firstNodeX = layerMap.get(layer + 1).getFirst().getX();
+			int firstNodeX = layerMap.get(layer + 1).stream().mapToInt(ResearchNode::getX).min().orElse(0);
 
+			for (ResearchNode node : layerNodes) {
+				// Get the subsequent children for this node
+				UniqueArray<ResearchNode> subsequentChildren = subsequentChildrenMap.get(node);
+
+				if (subsequentChildren.isEmpty()) {
+					continue; // No children to sort
+				}
+
+				for (ResearchNode child : subsequentChildren) {
+					// Calculate the new X position based on the first child's position
+					int newX = firstNodeX + (currentNodeIdx * (NODE_WIDTH + HORIZONTAL_SPACING));
+					child.setXExt(newX);
+
+					currentNodeIdx++;
+				}
+			}
+		}
+
+		for (Map.Entry<Integer, List<ResearchNode>> layer : layerMap.int2ObjectEntrySet()) {
+			for (ResearchNode node : layer.getValue()) {
+				System.out.println("Node@2.5: " + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY());
+			}
 		}
 	}
 
@@ -285,7 +312,7 @@ public class GraphLayoutManager {
 				// Apply
 
 				// If the node's subsequent children only have this one node as parent, we shift the node to their center
-				if (subsequentChildren.stream().filter(child -> child.getParents().size() != 1).toList().isEmpty()) {
+				if (!subsequentChildren.isEmpty() && subsequentChildren.stream().filter(child -> child.getParents().size() != 1).toList().isEmpty()) {
 					node.setXExt(centerOf2Nodes(subsequentChildren).x - NODE_WIDTH / 2);
 
 					subsequentChildren.forEach(child -> child.lockNodeTo(node));
@@ -298,7 +325,7 @@ public class GraphLayoutManager {
 
 		for (Map.Entry<Integer, List<ResearchNode>> layer : layerMap.int2ObjectEntrySet()) {
 			for (ResearchNode node : layer.getValue()) {
-				System.out.println("Node: " + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY() + " Pos locks: " + node.getPositionLocks().size());
+				System.out.println("Node@3: " + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY() + " Pos locks: " + node.getPositionLocks().size());
 			}
 		}
 	}
@@ -326,7 +353,7 @@ public class GraphLayoutManager {
 				UniqueArray<ResearchNode> children = node.getChildren();
 
 				HashMap<Integer, UniqueArray<ResearchNode>> parentToSubsequentChildren = new HashMap<>();
-				UniqueArray<ResearchNode> parentsOnLayerBelow = parents.stream().filter(parent -> parent.getLayer() == node.getLayer() - 1).collect(Collectors.toCollection(UniqueArray::new));
+				UniqueArray<ResearchNode> parentsOnLayerAbove = parents.stream().filter(parent -> parent.getLayer() == node.getLayer() - 1).collect(Collectors.toCollection(UniqueArray::new));
 
 				int _parentIndex = 0;
 				for (ResearchNode parent : parents) {
@@ -345,7 +372,7 @@ public class GraphLayoutManager {
 
 		for (Map.Entry<Integer, List<ResearchNode>> layer : layerMap.int2ObjectEntrySet()) {
 			for (ResearchNode node : layer.getValue()) {
-				System.out.println("Node: " + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY() + " Pos locks: " + node.getPositionLocks().size());
+				System.out.println("Node@4: " + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY() + " Pos locks: " + node.getPositionLocks().size());
 			}
 		}
 	}
@@ -358,7 +385,7 @@ public class GraphLayoutManager {
 
 		for (Map.Entry<Integer, List<ResearchNode>> layer : layerMap.int2ObjectEntrySet()) {
 			for (ResearchNode node : layer.getValue()) {
-				System.out.println("Node: " + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY() + " Pos locks: " + node.getPositionLocks().size());
+				System.out.println("Node@%d: ".formatted(step) + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY() + " Pos locks: " + node.getPositionLocks().size());
 			}
 		}
 	}
