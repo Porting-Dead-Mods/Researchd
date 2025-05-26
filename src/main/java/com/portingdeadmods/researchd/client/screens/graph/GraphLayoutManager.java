@@ -123,44 +123,50 @@ public class GraphLayoutManager {
 	 * Start from root, every child should be placed from center outwards on layer - 1.
 	 */
 	private static void calculateLayers(ResearchGraph graph, ResearchNode node) {
-		UniqueArray<ResearchNode> children = node.getChildren();
-		int size = children.size();
+//		UniqueArray<ResearchNode> children = node.getChildren();
+//		int size = children.size();
+//
+//		/*
+//		* Logic here is to work from the center outwards by adding child by child recursively (down the tree first).
+//		*
+//		* If the children are even, we go directly to the left and right of the center splitting evenly,
+//		* otherwise take the center node out then resume the same logic as the even route.
+//		*/
+//		if (size % 2 == 0 ) {
+//			// Even number of children
+//			for (int i = 0; i < size / 2; i++) {
+//				ResearchNode child = children.get(size / 2 - 1 - i);
+//				_addRightToLayer(calculateDepth(child), child);
+//				calculateLayers(graph, child);
+//			}
+//			for (int i = size / 2; i < size; i++) {
+//				ResearchNode child = children.get(i);
+//				_addLeftToLayer(calculateDepth(child), child);
+//				calculateLayers(graph, child);
+//			}
+//		} else {
+//			// Odd number of children
+//			int center = size / 2;
+//			ResearchNode centerChild = children.get(center);
+//			_addLeftToLayer(calculateDepth(centerChild), centerChild); // Or Right doesn't matter
+//			calculateLayers(graph, centerChild);
+//
+//			for (int i = 0; i < size / 2; i++) {
+//				ResearchNode child = children.get(size / 2 - 1 - i);
+//				_addRightToLayer(calculateDepth(child), child);
+//				calculateLayers(graph, child);
+//			}
+//			for (int i = size / 2 + 1; i < size; i++) {
+//				ResearchNode child = children.get(i);
+//				_addLeftToLayer(calculateDepth(child), child);
+//				calculateLayers(graph, child);
+//			}
+//		}
 
-		/*
-		* Logic here is to work from the center outwards by adding child by child recursively (down the tree first).
-		*
-		* If the children are even, we go directly to the left and right of the center splitting evenly,
-		* otherwise take the center node out then resume the same logic as the even route.
-		*/
-		if (size % 2 == 0 ) {
-			// Even number of children
-			for (int i = 0; i < size / 2; i++) {
-				ResearchNode child = children.get(size / 2 - 1 - i);
-				_addRightToLayer(calculateDepth(child), child);
-				calculateLayers(graph, child);
-			}
-			for (int i = size / 2; i < size; i++) {
-				ResearchNode child = children.get(i);
-				_addLeftToLayer(calculateDepth(child), child);
-				calculateLayers(graph, child);
-			}
-		} else {
-			// Odd number of children
-			int center = size / 2;
-			ResearchNode centerChild = children.get(center);
-			_addLeftToLayer(calculateDepth(centerChild), centerChild); // Or Right doesn't matter
-			calculateLayers(graph, centerChild);
-
-			for (int i = 0; i < size / 2; i++) {
-				ResearchNode child = children.get(size / 2 - 1 - i);
-				_addRightToLayer(calculateDepth(child), child);
-				calculateLayers(graph, child);
-			}
-			for (int i = size / 2 + 1; i < size; i++) {
-				ResearchNode child = children.get(i);
-				_addLeftToLayer(calculateDepth(child), child);
-				calculateLayers(graph, child);
-			}
+		// TODO: Remake this method to use the above logic, but with the : graph.nodes() instead of recursively going through the children.
+		// PS: It works, but the positioning gets *a bit messed up* and all the nodes are shifted to a direction and it looks weird imo
+		for (ResearchNode gNode : graph.nodes()) {
+			_addRightToLayer(calculateDepth(gNode), gNode);
 		}
 	}
 
@@ -229,9 +235,11 @@ public class GraphLayoutManager {
 		if (layerNumbers.size() < 3) return;
 
 		layerNumbers.sort(Comparator.naturalOrder()); // Ascending order
-		layerNumbers.removeLast(); // Remove the last layer since it has no children
 
 		for (Integer layer : layerNumbers) {
+			if (layerNumbers.indexOf(layer) == layerNumbers.size() - 1) break;
+			int nextLayer = layerNumbers.get(layerNumbers.indexOf(layer) + 1);
+
 			System.out.println("Sorting layer: " + (layer + 1));
 			List<ResearchNode> layerNodes = layerMap.get(layer);
 			HashMap<ResearchNode, UniqueArray<ResearchNode>> subsequentChildrenMap = new HashMap<>();
@@ -252,7 +260,7 @@ public class GraphLayoutManager {
 			}
 
 			int currentNodeIdx = 0;
-			int firstNodeX = layerMap.get(layer + 1).stream().mapToInt(ResearchNode::getX).min().orElse(0);
+			int firstNodeX = layerMap.get(nextLayer).stream().mapToInt(ResearchNode::getX).min().orElse(0);
 
 			for (ResearchNode node : layerNodes) {
 				// Get the subsequent children for this node

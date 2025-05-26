@@ -11,17 +11,27 @@ import net.minecraft.world.entity.player.Player;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public record ResearchGraph(ResearchNode rootNode, Set<ResearchNode> parents, Set<ResearchNode> nodes) {
-    public ResearchGraph(ResearchNode rootNode, Set<ResearchNode> parents) {
-        this(rootNode, parents, new LinkedHashSet<>());
-        collectNodes(rootNode);
+public record ResearchGraph(ResearchNode rootNode, Set<ResearchNode> parents, Set<ResearchNode> children, Set<ResearchNode> nodes) {
+    public ResearchGraph(ResearchNode rootNode, Set<ResearchNode> parents, Set<ResearchNode> children) {
+        this(rootNode, parents, children, new LinkedHashSet<>());
+        collectUpwards(rootNode);
+        collectDownwards(rootNode);
+
         this.nodes.addAll(this.parents);
+        this.nodes.addAll(this.children);
     }
 
-    private void collectNodes(ResearchNode node) {
+    private void collectUpwards(ResearchNode node) {
         this.nodes.add(node);
-        for (ResearchNode node1 : node.getChildren()) {
-            collectNodes(node1);
+        for (ResearchNode node2 : node.getParents()) {
+            collectUpwards(node2);
+        }
+    }
+
+    private void collectDownwards(ResearchNode node) {
+        this.nodes.add(node);
+        for (ResearchNode node2 : node.getChildren()) {
+            collectDownwards(node2);
         }
     }
 
@@ -30,12 +40,10 @@ public record ResearchGraph(ResearchNode rootNode, Set<ResearchNode> parents, Se
         Holder<Research> researchHolder = lookup.holderOrThrow(rootNode.getInstance().getResearch());
 
         Set<ResearchNode> parents = new LinkedHashSet<>();
-
         for (ResourceKey<Research> parent : researchHolder.value().parents()) {
-            // TODO: Set coordinates
             parents.add(ClientResearchCache.getNodeByResearch(parent));
         }
 
-        return new ResearchGraph(rootNode, parents);
+        return new ResearchGraph(rootNode, parents, new LinkedHashSet<>());
     }
 }

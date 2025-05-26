@@ -106,6 +106,8 @@ public class ResearchGraphWidget extends AbstractWidget {
             // Group children by layer for consistent path styles
             Map<Integer, List<ResearchNode>> childrenByLayer = new HashMap<>();
             for (ResearchNode child : parent.getChildren()) {
+                if (!this.graph.nodes().contains(child)) continue;
+
                 childrenByLayer
                         .computeIfAbsent(child.getY(), k -> new ArrayList<>())
                         .add(child);
@@ -497,15 +499,12 @@ public class ResearchGraphWidget extends AbstractWidget {
             }
         }
 
-        ResearchNode node = graph.rootNode();
-        renderNode(node, guiGraphics, i, i1, v);
-
-        for (ResearchNode parentNode : graph.parents()) {
-            parentNode.render(guiGraphics, i ,i1, v);
+        for (ResearchNode node : this.graph.nodes()) {
+            node.render(guiGraphics, i, i1, v);
         }
 
         guiGraphics.disableScissor();
-        renderNodeTooltip(node, guiGraphics, i, i1, v);
+        renderNodeTooltips(guiGraphics, i, i1, v);
     }
 
     private void renderNode(ResearchNode node, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
@@ -517,17 +516,15 @@ public class ResearchGraphWidget extends AbstractWidget {
         }
     }
 
-    private void renderNodeTooltip(ResearchNode node, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        if (node.isHovered()) {
-            Minecraft minecraft = Minecraft.getInstance();
-            guiGraphics.renderComponentTooltip(minecraft.font, List.of(
-                    Utils.registryTranslation(node.getInstance().getResearch()),
-                    Component.translatable("research_desc." + Researchd.MODID + "." + node.getInstance().getResearch().location().getPath())
-            ), mouseX, mouseY);
-        }
-
-        for (ResearchNode rNode : node.getChildren()) {
-            renderNodeTooltip(rNode, guiGraphics, mouseX, mouseY, partialTick);
+    private void renderNodeTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        for (ResearchNode node : this.graph.nodes()) {
+            if (node.isHovered()) {
+                Minecraft minecraft = Minecraft.getInstance();
+                guiGraphics.renderComponentTooltip(minecraft.font, List.of(
+                        Utils.registryTranslation(node.getInstance().getResearch()),
+                        Component.translatable("research_desc." + Researchd.MODID + "." + node.getInstance().getResearch().location().getPath())
+                ), mouseX, mouseY);
+            }
         }
     }
 
