@@ -7,6 +7,7 @@ import com.portingdeadmods.researchd.client.screens.graph.ResearchGraphWidget;
 import com.portingdeadmods.researchd.client.screens.list.TechListWidget;
 import com.portingdeadmods.researchd.client.screens.queue.ResearchQueueWidget;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchGraph;
+import com.portingdeadmods.researchd.utils.researches.data.ResearchQueue;
 import com.portingdeadmods.researchd.utils.researches.data.TechList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -22,7 +23,7 @@ public class ResearchScreen extends Screen {
     private static final int SIDE_BAR_WIDTH = 8;
     private static final int SIDE_BAR_HEIGHT = 253;
 
-    private final TechListWidget techList;
+    private final TechListWidget techListWidget;
     private final ResearchQueueWidget researchQueueWidget;
     private final ResearchGraphWidget researchGraphWidget;
     private final SelectedResearchWidget selectedResearchWidget;
@@ -31,12 +32,12 @@ public class ResearchScreen extends Screen {
         super(Component.translatable("screen.researchd.research"));
 
         // TECH LIST
-        this.techList = new TechListWidget(this, 0, 109, 7);
-        this.techList.setTechList(new TechList(ClientResearchCache.RESEARCHES.stream().toList()));
+        this.techListWidget = new TechListWidget(this, 0, 109, 7);
+        this.techListWidget.setTechList(new TechList(ClientResearchCache.RESEARCHES.stream().toList()));
 
         // THIS NEEDS TO BE BEFORE THE GRAPH
         this.selectedResearchWidget = new SelectedResearchWidget(0, 40, SelectedResearchWidget.BACKGROUND_WIDTH, SelectedResearchWidget.BACKGROUND_HEIGHT);
-        this.selectedResearchWidget.setSelectedResearch(this.techList.getTechList().entries().getFirst());
+        this.selectedResearchWidget.setSelectedResearch(this.techListWidget.getTechList().entries().getFirst());
 
         // QUEUE
         this.researchQueueWidget = new ResearchQueueWidget(this, 0, 0);
@@ -52,10 +53,10 @@ public class ResearchScreen extends Screen {
     protected void init() {
         super.init();
 
-        addRenderableWidget(this.techList);
+        addRenderableWidget(this.techListWidget);
         addRenderableWidget(this.researchQueueWidget);
-        addRenderableWidget(this.techList.searchButton);
-        addRenderableWidget(this.techList.startResearchButton);
+        addRenderableWidget(this.techListWidget.searchButton);
+        addRenderableWidget(this.techListWidget.startResearchButton);
         addRenderableWidget(this.researchGraphWidget);
         addRenderableWidget(this.selectedResearchWidget);
     }
@@ -82,8 +83,22 @@ public class ResearchScreen extends Screen {
         return selectedResearchWidget;
     }
 
-    public ResearchQueueWidget getResearchQueue() {
+    public ResearchQueueWidget getResearchQueueWidget() {
         return researchQueueWidget;
+    }
+
+    public TechListWidget getTechListWidget() { return techListWidget; }
+
+    public ResearchGraph getResearchGraph() {
+        return this.researchGraphWidget.getCurrentGraph();
+    }
+
+    public ResearchQueue getResearchQueue() {
+        return this.researchQueueWidget.getQueue();
+    }
+
+    public TechList getTechList() {
+        return this.techListWidget.getTechList();
     }
 
     @Override
