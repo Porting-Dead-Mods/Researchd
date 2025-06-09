@@ -8,6 +8,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Spaghetti {
+	/**
+	 * <span style="color:red;">CLIENT SIDE ONLY</span>
+	 *
+	 * <br>
+	 * Returns the set of {@link ResearchNode} currently displayed on the screen.
+	 */
 	public static Set<ResearchNode> getNodesFromScreen() {
 		return Minecraft.getInstance().screen instanceof ResearchScreen ? ((ResearchScreen) Minecraft.getInstance().screen).getResearchGraphWidget().getCurrentGraph().nodes() : new HashSet<>();
 	}

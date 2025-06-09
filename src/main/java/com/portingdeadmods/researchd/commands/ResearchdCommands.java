@@ -18,7 +18,8 @@ public class ResearchdCommands {
 		List<LiteralCommandNode<CommandSourceStack>> subCommands = List.of(
 				TeamCommands.build(),
 				DumpCommand.build(),
-				HelpCommand.build()
+				HelpCommand.build(),
+				HandCommand.build()
 		);
 
 		rootCommands.forEach( root -> {
