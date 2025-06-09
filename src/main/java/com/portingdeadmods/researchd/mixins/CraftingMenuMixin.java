@@ -1,11 +1,8 @@
 package com.portingdeadmods.researchd.mixins;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import com.portingdeadmods.researchd.content.predicates.CraftingPredicateData;
-import com.portingdeadmods.researchd.content.predicates.DimensionPredicateData;
+import com.portingdeadmods.researchd.content.predicates.RecipePredicateData;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
@@ -33,7 +30,7 @@ public abstract class CraftingMenuMixin {
             )
     )
     private static void checkCraftingPredicate(AbstractContainerMenu menu, Level level, Player player, CraftingContainer craftSlots, ResultContainer resultSlots, RecipeHolder<CraftingRecipe> recipe, CallbackInfo ci, @Local ItemStack itemstack) {
-        CraftingPredicateData data = player.getData(ResearchdAttachments.CRAFTING_PREDICATE);
+        RecipePredicateData data = player.getData(ResearchdAttachments.RECIPE_PREDICATE);
         RecipeHolder<CraftingRecipe> recipeholder = null;
 
         // Gotta remake recipeholder since for some reason @Local population fails :(((((((((

@@ -1,29 +1,19 @@
 package com.portingdeadmods.researchd.mixins;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import com.portingdeadmods.researchd.content.predicates.CraftingPredicateData;
-import com.portingdeadmods.researchd.content.predicates.SmeltingPredicateData;
+import com.portingdeadmods.researchd.content.predicates.RecipePredicateData;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.Container;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.*;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Mixin(AbstractFurnaceBlockEntity.class)
@@ -43,7 +33,7 @@ public class FurnaceMenuMixin {
             Player player = level.getPlayerByUUID(playerUUID);
 
             if (player != null) {
-                SmeltingPredicateData data = player.getData(ResearchdAttachments.SMELTING_PREDICATE);
+                RecipePredicateData data = player.getData(ResearchdAttachments.RECIPE_PREDICATE);
                 if (data != null) {
                     //System.out.println("SmeltingPredicateData: " + data.blockedRecipes());
                     if (data.blockedRecipes().contains(recipeholder)) {

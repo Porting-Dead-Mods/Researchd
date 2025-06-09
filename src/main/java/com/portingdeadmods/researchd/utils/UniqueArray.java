@@ -90,6 +90,24 @@ public class UniqueArray<E> extends ArrayList<E> implements Set<E> {
 	}
 
 	/**
+	 * Adds all of the elements in the specified varargs to this UniqueArray
+	 * if they're not already present.
+	 *
+	 * @param c elements to be added to this UniqueArray
+	 * @return true if this UniqueArray changed as a result of the call
+	 */
+	@SafeVarargs
+    public final boolean addAll(E... c) {
+		boolean modified = false;
+		for (E e : c) {
+			if (add(e)) {
+				modified = true;
+			}
+		}
+		return modified;
+	}
+
+	/**
 	 * Inserts all of the elements in the specified collection into this
 	 * UniqueArray at the specified position, if they're not already present.
 	 *
