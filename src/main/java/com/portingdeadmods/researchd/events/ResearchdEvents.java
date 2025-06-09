@@ -11,16 +11,22 @@ import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.commands.ResearchdCommands;
+import com.portingdeadmods.researchd.content.predicates.CraftingPredicateData;
+import com.portingdeadmods.researchd.content.predicates.SmeltingPredicateData;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.capabilities.EntityResearchImpl;
 import com.portingdeadmods.researchd.networking.SyncSavedDataPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchFinishedPayload;
+import com.portingdeadmods.researchd.utils.UniqueArray;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchQueue;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -28,12 +34,14 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
@@ -51,6 +59,29 @@ public final class ResearchdEvents {
         public static void clientTick(ClientTickEvent.Pre event) {
             if (ResearchdKeybinds.OPEN_RESEARCH_SCREEN.get().consumeClick()) {
                 Minecraft.getInstance().setScreen(new ResearchScreen());
+            }
+        }
+
+        @SubscribeEvent
+        public static void onToolTipEvent(ItemTooltipEvent event) {
+            if (event.getEntity() == null) return;
+            LocalPlayer player = (LocalPlayer) event.getEntity();
+            Item item = event.getItemStack().getItem();
+
+            CraftingPredicateData craftingData = player.getData(ResearchdAttachments.CRAFTING_PREDICATE.get());
+            SmeltingPredicateData smeltingData = player.getData(ResearchdAttachments.SMELTING_PREDICATE.get());
+            UniqueArray<Item> blockedItems = new UniqueArray<>();
+
+            craftingData.blockedRecipes().forEach(recipe -> {
+                blockedItems.add(recipe.value().getResultItem(player.registryAccess()).getItem());
+            });
+            smeltingData.blockedRecipes().forEach(recipe -> {
+                blockedItems.add(recipe.value().getResultItem(player.registryAccess()).getItem());
+            });
+
+            if (blockedItems.contains(item)) {
+                event.getToolTip().clear();
+                event.getToolTip().add(Component.literal("This item is blocked by a research").withStyle(ChatFormatting.RED, ChatFormatting.ITALIC));
             }
         }
     }
