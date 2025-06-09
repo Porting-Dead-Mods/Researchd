@@ -4,7 +4,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchMethod;
-import com.portingdeadmods.researchd.impl.research.effect.CraftingUnlockResearchEffect;
+import com.portingdeadmods.researchd.content.predicates.RecipePredicate;
 import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
@@ -30,7 +30,7 @@ public final class Researches {
                     or(new ConsumeItemResearchMethod(Ingredient.of(Items.DIRT), 8), new ConsumeItemResearchMethod(Ingredient.of(Items.WHEAT_SEEDS), 2))
             )
             .researchEffects(
-                    new CraftingUnlockResearchEffect(ResourceLocation.withDefaultNamespace("anvil"))
+                    new RecipePredicate(ResourceLocation.withDefaultNamespace("anvil"))
             ));
     public static final ResourceKey<Research> STONE = register("stone", builder -> builder
             .icon(Items.STONE)
@@ -125,7 +125,7 @@ public final class Researches {
     public static final ResourceKey<Research> DIAMOND_PICKAXE = register("diamond_pickaxe", builder -> builder
             .icon(Items.DIAMOND_PICKAXE)
             .parents(DIAMOND_ARMOR, TRIDENT)
-            .researchEffects(new CraftingUnlockResearchEffect(ResourceLocation.withDefaultNamespace("diamond_pickaxe")))
+            .researchEffects(new RecipePredicate(ResourceLocation.withDefaultNamespace("diamond_pickaxe")))
             .researchMethods(
                     new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 12)
             ));

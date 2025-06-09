@@ -8,6 +8,7 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchSerializer;
+import com.portingdeadmods.researchd.utils.UniqueArray;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -63,8 +64,8 @@ public record SimpleResearch(Item icon, ResearchMethod researchMethods, List<Res
     public static class Builder implements Research.Builder<SimpleResearch> {
         private Item icon = Items.AIR;
         private ResearchMethod researchMethods;
-        private List<ResearchEffect> researchEffects = Collections.emptyList();
-        private List<ResourceKey<Research>> parents = Collections.emptyList();
+        private UniqueArray<ResearchEffect> researchEffects = new UniqueArray<>();
+        private UniqueArray<ResourceKey<Research>> parents = new UniqueArray<>();
         private boolean requiresParent = false;
 
         public static Builder of() {
@@ -85,13 +86,13 @@ public record SimpleResearch(Item icon, ResearchMethod researchMethods, List<Res
         }
 
         public Builder researchEffects(ResearchEffect... researchEffects) {
-            this.researchEffects = List.of(researchEffects);
+            this.researchEffects.addAll(List.of(researchEffects));
             return this;
         }
 
         @SafeVarargs
         public final Builder parents(ResourceKey<Research>... parents) {
-            this.parents = List.of(parents);
+            this.parents.addAll(List.of(parents));
             return this;
         }
 

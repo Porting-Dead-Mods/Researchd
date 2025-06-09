@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.impl.research.effect;
+package com.portingdeadmods.researchd.content.predicates;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -7,9 +7,7 @@ import com.portingdeadmods.researchd.api.client.research.ClientResearchEffect;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectSerializer;
-import com.portingdeadmods.researchd.content.predicates.CraftingPredicateData;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
-import com.portingdeadmods.researchd.utils.Codecs;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
@@ -19,17 +17,16 @@ import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 
-// TODO: Validate the recipe
-public record CraftingUnlockResearchEffect(ResourceLocation recipe) implements ResearchEffect {
+public record RecipePredicate(ResourceLocation recipe) implements ResearchEffect {
     @Override
     public void onUnlock(Level level, Player player, ResourceKey<Research> research) {
-        CraftingPredicateData data = player.getData(ResearchdAttachments.CRAFTING_PREDICATE.get());
-        player.setData(ResearchdAttachments.CRAFTING_PREDICATE.get(), data.removeBlockedRecipe(this.getRecipe(level)));
+        RecipePredicateData data = player.getData(ResearchdAttachments.RECIPE_PREDICATE.get());
+        player.setData(ResearchdAttachments.RECIPE_PREDICATE.get(), data.removeBlockedRecipe(this.getRecipe(level)));
     }
 
     @Override
     public ResourceLocation id() {
-        return Researchd.rl("crafting_recipe_unlock");
+        return Researchd.rl("unlock_recipe");
     }
 
     public RecipeHolder<? extends CraftingRecipe> getRecipe(Level level) {
@@ -37,31 +34,31 @@ public record CraftingUnlockResearchEffect(ResourceLocation recipe) implements R
     }
 
     @Override
-    public ClientResearchEffect<?> getClientResearchEffect() {
+    public ClientResearchEffect<RecipePredicate> getClientResearchEffect() {
         return null;
     }
 
     @Override
-    public ResearchEffectSerializer<?> getSerializer() {
-        return Serializer.INSTANCE;
+    public ResearchEffectSerializer<RecipePredicate> getSerializer() {
+        return RecipePredicate.Serializer.INSTANCE;
     }
 
-    public static final class Serializer implements ResearchEffectSerializer<CraftingUnlockResearchEffect> {
-        public static final Serializer INSTANCE = new Serializer();
-        public static final MapCodec<CraftingUnlockResearchEffect> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                ResourceLocation.CODEC.fieldOf("recipe").forGetter(CraftingUnlockResearchEffect::recipe)
-        ).apply(instance, CraftingUnlockResearchEffect::new));
+    public static final class Serializer implements ResearchEffectSerializer<RecipePredicate> {
+        public static final RecipePredicate.Serializer INSTANCE = new RecipePredicate.Serializer();
+        public static final MapCodec<RecipePredicate> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                ResourceLocation.CODEC.fieldOf("recipe").forGetter(RecipePredicate::recipe)
+        ).apply(instance, RecipePredicate::new));
 
         private Serializer() {
         }
 
         @Override
-        public MapCodec<CraftingUnlockResearchEffect> codec() {
+        public MapCodec<RecipePredicate> codec() {
             return CODEC;
         }
 
         @Override
-        public StreamCodec<RegistryFriendlyByteBuf, CraftingUnlockResearchEffect> streamCodec() {
+        public StreamCodec<RegistryFriendlyByteBuf, RecipePredicate> streamCodec() {
             return null;
         }
     }

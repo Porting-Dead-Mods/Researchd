@@ -5,27 +5,22 @@ import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.data.PDLClientSavedData;
 import com.portingdeadmods.researchd.api.data.PDLSavedData;
 import com.portingdeadmods.researchd.api.data.SavedDataHolder;
-import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.commands.ResearchdCommands;
-import com.portingdeadmods.researchd.content.predicates.CraftingPredicateData;
-import com.portingdeadmods.researchd.content.predicates.SmeltingPredicateData;
+import com.portingdeadmods.researchd.content.predicates.RecipePredicateData;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.capabilities.EntityResearchImpl;
 import com.portingdeadmods.researchd.networking.SyncSavedDataPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchFinishedPayload;
 import com.portingdeadmods.researchd.utils.UniqueArray;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchQueue;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -47,8 +42,6 @@ import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -68,14 +61,10 @@ public final class ResearchdEvents {
             LocalPlayer player = (LocalPlayer) event.getEntity();
             Item item = event.getItemStack().getItem();
 
-            CraftingPredicateData craftingData = player.getData(ResearchdAttachments.CRAFTING_PREDICATE.get());
-            SmeltingPredicateData smeltingData = player.getData(ResearchdAttachments.SMELTING_PREDICATE.get());
+            RecipePredicateData recipeData = player.getData(ResearchdAttachments.RECIPE_PREDICATE.get());
             UniqueArray<Item> blockedItems = new UniqueArray<>();
 
-            craftingData.blockedRecipes().forEach(recipe -> {
-                blockedItems.add(recipe.value().getResultItem(player.registryAccess()).getItem());
-            });
-            smeltingData.blockedRecipes().forEach(recipe -> {
+            recipeData.blockedRecipes().forEach(recipe -> {
                 blockedItems.add(recipe.value().getResultItem(player.registryAccess()).getItem());
             });
 

@@ -3,8 +3,7 @@ package com.portingdeadmods.researchd.registries.serializers;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectSerializer;
-import com.portingdeadmods.researchd.content.predicates.SmeltingPredicate;
-import com.portingdeadmods.researchd.impl.research.effect.CraftingUnlockResearchEffect;
+import com.portingdeadmods.researchd.content.predicates.RecipePredicate;
 import com.portingdeadmods.researchd.content.predicates.DimensionPredicate;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -13,7 +12,6 @@ public final class ResearchEffectSerializers {
 
 	static {
 		SERIALIZERS.register("unlock_dimension", () -> DimensionPredicate.Serializer.INSTANCE);
-		SERIALIZERS.register("unlock_crafting_recipe", () -> CraftingUnlockResearchEffect.Serializer.INSTANCE);
-		SERIALIZERS.register("unlock_smelting_recipe", () -> SmeltingPredicate.Serializer.INSTANCE);
+		SERIALIZERS.register("unlock_recipe", () -> RecipePredicate.Serializer.INSTANCE);
 	}
 }
