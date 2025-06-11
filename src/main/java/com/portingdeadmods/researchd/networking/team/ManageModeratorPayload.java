@@ -1,6 +1,6 @@
 package com.portingdeadmods.researchd.networking.team;
 
-import com.portingdeadmods.researchd.ResearchTeamUtil;
+import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
 import com.portingdeadmods.researchd.Researchd;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -8,6 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +31,8 @@ public record ManageModeratorPayload(UUID moderator, boolean remove) implements 
 
     public static void manageModeratorAction(ManageModeratorPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
-            ResearchTeamUtil.handleManageModerator(context.player(), payload.moderator(), payload.remove());
+            if (context.player() instanceof ServerPlayer sp)
+                ResearchTeamHelper.handleManageModerator(sp, payload.moderator(), payload.remove());
         }).exceptionally(e -> {
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
             return null;

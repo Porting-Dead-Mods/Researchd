@@ -90,6 +90,11 @@ public record SimpleResearch(Item icon, ResearchMethod researchMethods, List<Res
             return this;
         }
 
+        public Builder researchEffects(List<? extends ResearchEffect> researchEffects) {
+            this.researchEffects.addAll(researchEffects);
+            return this;
+        }
+
         @SafeVarargs
         public final Builder parents(ResourceKey<Research>... parents) {
             this.parents.addAll(List.of(parents));

@@ -1,6 +1,11 @@
 package com.portingdeadmods.researchd.utils;
 
-import org.jetbrains.annotations.NotNull;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 
 import java.util.*;
 
@@ -186,5 +191,41 @@ public class UniqueArray<E> extends ArrayList<E> implements Set<E> {
 	@Override
 	public <T> T[] toArray(T[] a) {
 		return super.toArray(a);
+	}
+
+	public List<E> toList() {
+		return new ArrayList<>(this);
+	}
+
+	public Set<E> toSet() {
+		return new HashSet<>(this);
+	}
+
+	/**
+	 * Returns a Codec for serializing and deserializing UniqueArray instances
+	 *
+	 * @param elementCodec The Codec for the elements of the array
+	 * @param <T> The type of elements in the UniqueArray
+	 */
+	public static <T> Codec<UniqueArray<T>> CODEC(Codec<T> elementCodec) {
+		return RecordCodecBuilder.create(instance -> instance.group(
+				Codec.list(elementCodec).fieldOf("elements").forGetter(UniqueArray::toList)
+		).apply(instance, UniqueArray::new));
+	}
+
+	/**
+	 * Returns a StreamCodec for serializing and deserializing UniqueArray instances
+	 * using a ByteBuf.
+	 *
+	 * @param elementStreamCodec The StreamCodec for the elements of the array
+	 * @param <B> The type of ByteBuf used for serialization
+	 * @param <T> The type of elements inthe UniqueArray
+	 */
+	public static <B extends ByteBuf, T> StreamCodec<B, UniqueArray<T>> STREAM_CODEC(StreamCodec<B, T> elementStreamCodec) {
+		return StreamCodec.composite(
+				elementStreamCodec.apply(ByteBufCodecs.list()),
+				UniqueArray::toList,
+				UniqueArray::new
+		);
 	}
 }

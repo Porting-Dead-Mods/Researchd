@@ -13,7 +13,6 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 
@@ -29,8 +28,8 @@ public record RecipePredicate(ResourceLocation recipe) implements ResearchEffect
         return Researchd.rl("unlock_recipe");
     }
 
-    public RecipeHolder<? extends CraftingRecipe> getRecipe(Level level) {
-        return (RecipeHolder<? extends CraftingRecipe>) level.getRecipeManager().byKey(this.recipe).orElse(null);
+    public RecipeHolder<?> getRecipe(Level level) {
+        return level.getRecipeManager().byKey(this.recipe).orElse(null);
     }
 
     @Override

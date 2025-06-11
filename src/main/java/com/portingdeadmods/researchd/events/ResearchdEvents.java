@@ -13,10 +13,12 @@ import com.portingdeadmods.researchd.commands.ResearchdCommands;
 import com.portingdeadmods.researchd.content.predicates.RecipePredicateData;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
+import com.portingdeadmods.researchd.data.helper.ResearchTeamMap;
 import com.portingdeadmods.researchd.impl.capabilities.EntityResearchImpl;
 import com.portingdeadmods.researchd.networking.SyncSavedDataPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchFinishedPayload;
 import com.portingdeadmods.researchd.utils.UniqueArray;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchQueue;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -97,6 +99,11 @@ public final class ResearchdEvents {
         @SubscribeEvent
         private static void onJoinWorld(PlayerEvent.PlayerLoggedInEvent event) {
             if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+                MinecraftServer server = serverPlayer.server;
+                ServerLevel level = server.overworld();
+                ResearchTeamMap researchData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
+                researchData.initPlayer(serverPlayer);
+
                 for (Map.Entry<ResourceKey<PDLSavedData<?>>, PDLSavedData<?>> savedData : ResearchdRegistries.SAVED_DATA.entrySet()) {
                     PDLSavedData<?> value = savedData.getValue();
                     if (value.isSynced()) {
@@ -104,6 +111,9 @@ public final class ResearchdEvents {
                         value.onSyncFunction().accept(serverPlayer);
                     }
                 }
+
+                // v Research Predicate Attachment v
+                ResearchHelper.refreshResearches(serverPlayer);
             }
         }
 
@@ -138,8 +148,14 @@ public final class ResearchdEvents {
         public static void onServerTick(ServerTickEvent.Post event) {
             MinecraftServer server = event.getServer();
             ServerLevel level = server.overworld();
+
             EntityResearchImpl data = ResearchdSavedData.PLAYER_RESEARCH.get().getData(level);
+            ResearchTeamMap researchData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
+
             if (data != null) {
+                // Player Data is Initialized
+
+                // v Research Queue Logic v
                 ResearchQueue queue = data.researchQueue();
                 if (!queue.isEmpty()) {
                     if (queue.getMaxResearchProgress() > queue.getResearchProgress()) {

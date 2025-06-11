@@ -2,13 +2,21 @@ package com.portingdeadmods.researchd;
 
 import com.portingdeadmods.researchd.api.data.PDLSavedData;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectSerializer;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchSerializer;
 import com.portingdeadmods.researchd.impl.research.ResearchPack;
+import com.portingdeadmods.researchd.utils.UniqueArray;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.registries.RegistryBuilder;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ResearchdRegistries {
 	public static final ResourceKey<Registry<Research>> RESEARCH_KEY =
@@ -30,5 +38,4 @@ public class ResearchdRegistries {
 	public static final ResourceKey<Registry<PDLSavedData<?>>> SAVED_DATA_KEY =
 			ResourceKey.createRegistryKey(Researchd.rl("saved_data"));
 	public static final Registry<PDLSavedData<?>> SAVED_DATA = new RegistryBuilder<>(SAVED_DATA_KEY).create();
-
 }

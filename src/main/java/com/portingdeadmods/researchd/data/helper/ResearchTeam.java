@@ -4,10 +4,15 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -19,7 +24,8 @@ public class ResearchTeam {
 	private List<UUID> sentInvites; // Invites sent by this team to other players
 	private List<UUID> receivedInvites; // Invites received by this team from other players
 	private UUID leader;
-	private boolean isFTJ;
+
+	private ResearchProgress researchProgress;
 
 	public static final Codec<ResearchTeam> CODEC = RecordCodecBuilder.create(builder -> builder.group(
 			Codec.STRING.fieldOf("name").forGetter(ResearchTeam::getName),
@@ -28,25 +34,43 @@ public class ResearchTeam {
 			Codec.list(UUIDUtil.CODEC).fieldOf("sent_invites").forGetter(ResearchTeam::getSentInvites),
 			Codec.list(UUIDUtil.CODEC).fieldOf("received_invites").forGetter(ResearchTeam::getReceivedInvites),
 			UUIDUtil.CODEC.fieldOf("leader").forGetter(ResearchTeam::getLeader),
-			Codec.BOOL.fieldOf("is_ftj").forGetter(ResearchTeam::isFreeToJoin)
+			ResearchProgress.CODEC.fieldOf("research_progress").forGetter(ResearchTeam::getResearchProgress)
 	).apply(builder, ResearchTeam::new));
 
-	public ResearchTeam(String name, List<UUID> members, List<UUID> moderators, List<UUID> sentInvites, List<UUID> receivedInvites, UUID leader, boolean isFTJ) {
+	public static final StreamCodec<RegistryFriendlyByteBuf, ResearchTeam> STREAM_CODEC = NeoForgeStreamCodecs.composite(
+			ByteBufCodecs.STRING_UTF8,
+			ResearchTeam::getName,
+			UUIDUtil.STREAM_CODEC.apply(ByteBufCodecs.list()),
+			ResearchTeam::getMembers,
+			UUIDUtil.STREAM_CODEC.apply(ByteBufCodecs.list()),
+			ResearchTeam::getModerators,
+			UUIDUtil.STREAM_CODEC.apply(ByteBufCodecs.list()),
+			ResearchTeam::getSentInvites,
+			UUIDUtil.STREAM_CODEC.apply(ByteBufCodecs.list()),
+			ResearchTeam::getReceivedInvites,
+			UUIDUtil.STREAM_CODEC,
+			ResearchTeam::getLeader,
+			ResearchProgress.STREAM_CODEC,
+			ResearchTeam::getResearchProgress,
+			ResearchTeam::new
+	);
+
+	public ResearchTeam(String name, List<UUID> members, List<UUID> moderators, List<UUID> sentInvites, List<UUID> receivedInvites, UUID leader, @Nullable ResearchProgress researchProgress) {
 		this.name = name;
 		this.members = new ArrayList<>(members);
 		this.moderators = new ArrayList<>(moderators);
 		this.sentInvites = new ArrayList<>(sentInvites);
 		this.receivedInvites = new ArrayList<>(receivedInvites);
 		this.leader = leader;
-		this.isFTJ = isFTJ;
+		this.researchProgress = researchProgress != null ? researchProgress : ResearchProgress.EMPTY;
 	}
 
 	public ResearchTeam(UUID uuid) {
-		this("New Research Team", List.of(uuid), List.of(), List.of(), List.of(), uuid, false);
+		this("New Research Team", List.of(uuid), List.of(), List.of(), List.of(), uuid, ResearchProgress.EMPTY);
 	}
 
 	public ResearchTeam(UUID uuid, String name) {
-		this(name, List.of(uuid), List.of(), List.of(), List.of(), uuid, false);
+		this(name, List.of(uuid), List.of(), List.of(), List.of(), uuid, ResearchProgress.EMPTY);
 	}
 
 	public String getName() {
@@ -73,12 +97,8 @@ public class ResearchTeam {
 		return this.leader;
 	}
 
-	public boolean isFreeToJoin() {
-		return this.isFTJ;
-	}
-
-	public void switchFTJ() {
-		isFTJ = !isFTJ;
+	public ResearchProgress getResearchProgress() {
+		return this.researchProgress;
 	}
 
 	public void addMember(UUID uuid) {
