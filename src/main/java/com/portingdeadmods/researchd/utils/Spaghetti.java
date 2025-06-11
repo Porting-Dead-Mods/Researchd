@@ -1,11 +1,14 @@
 package com.portingdeadmods.researchd.utils;
 
+import com.portingdeadmods.researchd.ResearchdRegistries;
+import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.ResearchEffect;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.level.Level;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class Spaghetti {
 	/**
@@ -18,3 +21,4 @@ public class Spaghetti {
 		return Minecraft.getInstance().screen instanceof ResearchScreen ? ((ResearchScreen) Minecraft.getInstance().screen).getResearchGraphWidget().getCurrentGraph().nodes() : new HashSet<>();
 	}
 }
+

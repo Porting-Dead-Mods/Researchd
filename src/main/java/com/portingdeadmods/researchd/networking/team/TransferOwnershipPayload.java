@@ -1,12 +1,13 @@
 package com.portingdeadmods.researchd.networking.team;
 
-import com.portingdeadmods.researchd.ResearchTeamUtil;
+import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
 import com.portingdeadmods.researchd.Researchd;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,7 +28,8 @@ public record TransferOwnershipPayload(UUID nextToLead) implements CustomPacketP
 
     public static void transferOwnershipAction(TransferOwnershipPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
-            ResearchTeamUtil.handleTransferOwnership(context.player(), payload.nextToLead());
+            if (context.player() instanceof ServerPlayer sp)
+                ResearchTeamHelper.handleTransferOwnership(sp, payload.nextToLead());
         }).exceptionally(e -> {
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
             return null;

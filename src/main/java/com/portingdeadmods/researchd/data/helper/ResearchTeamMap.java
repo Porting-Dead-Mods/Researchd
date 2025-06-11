@@ -2,6 +2,12 @@ package com.portingdeadmods.researchd.data.helper;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.portingdeadmods.researchd.Researchd;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.server.level.ServerPlayer;
 
 import java.util.AbstractMap;
 import java.util.HashMap;
@@ -14,6 +20,15 @@ public class ResearchTeamMap {
 	public static final Codec<ResearchTeamMap> CODEC = RecordCodecBuilder.create(builder -> builder.group(
 			Codec.unboundedMap(Codec.STRING, ResearchTeam.CODEC).fieldOf("research_teams").forGetter(ResearchTeamMap::teamMapToString)
 	).apply(builder, ResearchTeamMap::teamMapFromString));
+	public static final StreamCodec<RegistryFriendlyByteBuf, ResearchTeamMap> STREAM_CODEC = StreamCodec.composite(
+			ByteBufCodecs.map(
+				Object2ObjectOpenHashMap::new,
+				ByteBufCodecs.STRING_UTF8,
+				ResearchTeam.STREAM_CODEC
+			),
+			ResearchTeamMap::teamMapToString,
+			ResearchTeamMap::teamMapFromString
+	);
 
     private final Map<UUID, ResearchTeam> researchTeams;
 
@@ -29,8 +44,30 @@ public class ResearchTeamMap {
 		return this.researchTeams;
 	}
 
-	public ResearchTeam getTeamForUUID(UUID uuid) {
-		return getResearchTeams().get(uuid);
+	public ResearchTeam getTeam(UUID uuid) {
+		return getResearchTeams().computeIfAbsent(uuid, ResearchTeam::new);
+	}
+
+	public ResearchTeam getTeam(ServerPlayer player) {
+		return getTeam(player.getUUID());
+	}
+
+	/**
+	 * Creates a team for the player if it doesn't exist.
+	 * Does nothing if the player is already in a team.
+	 *
+	 * Returns false if an error occurred, true otherwise.
+	 *
+	 * @return a map with team UUIDs as strings
+	 */
+	public boolean initPlayer(ServerPlayer player) {
+		try {
+			getTeam(player);
+			return true;
+		} catch (Exception e) {
+			Researchd.LOGGER.error(e.getMessage());
+			return false;
+		}
 	}
 
 	public Map<String, ResearchTeam> teamMapToString() {
