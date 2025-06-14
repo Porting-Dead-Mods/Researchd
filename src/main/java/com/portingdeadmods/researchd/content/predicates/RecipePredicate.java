@@ -20,7 +20,7 @@ public record RecipePredicate(ResourceLocation recipe) implements ResearchEffect
     @Override
     public void onUnlock(Level level, Player player, ResourceKey<Research> research) {
         RecipePredicateData data = player.getData(ResearchdAttachments.RECIPE_PREDICATE.get());
-        player.setData(ResearchdAttachments.RECIPE_PREDICATE.get(), data.removeBlockedRecipe(this.getRecipe(level)));
+        player.setData(ResearchdAttachments.RECIPE_PREDICATE.get(), data.remove(this, level));
     }
 
     @Override

@@ -10,6 +10,9 @@ import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.data.helper.ResearchTeam;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamMap;
 import com.portingdeadmods.researchd.utils.UniqueArray;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
@@ -17,12 +20,16 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.attachment.AttachmentType;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -60,26 +67,44 @@ public final class ResearchHelper {
         return null;
     }
 
-    public static void refreshResearches(ServerPlayer serverPlayer) {
+    public static List<ResearchEffectData<?>> getResearchEffectData(ServerPlayer serverPlayer) {
         MinecraftServer server = serverPlayer.server;
         ServerLevel level = server.overworld();
-        ResearchTeamMap researchData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
+        List<ResearchEffectData<?>> effData = new UniqueArray<>();
 
-        ResearchTeam team = researchData.getTeam(serverPlayer);
         NeoForgeRegistries.ATTACHMENT_TYPES.entrySet().forEach(entry -> {
             Object data = serverPlayer.getData(entry.getValue());
-            if (data instanceof ResearchEffectData effectData) {
-                serverPlayer.setData((AttachmentType<ResearchEffectData>) entry.getValue(), effectData.getDefault(level));
-                Researchd.LOGGER.info("Refreshing Research Data for effect type {} for player {}", data.getClass().getSimpleName(), serverPlayer.getScoreboardName());
+            if (data instanceof ResearchEffectData<?> effectData) {
+                effData.add(effectData);
+            }
+        });
+
+        return effData.stream().sorted(Comparator.comparing(a -> a.getClass().getName())).toList();
+    }
+
+    public static void refreshResearches(Player player) {
+        Level level;
+        if (player instanceof ServerPlayer serverPlayer) {
+            MinecraftServer server = serverPlayer.server;
+            level = server.overworld();
+        } else {
+            level = Minecraft.getInstance().level;
+        }
+
+        ResearchTeamMap researchData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
+
+        ResearchTeam team = researchData.getTeam(player.getUUID());
+        NeoForgeRegistries.ATTACHMENT_TYPES.entrySet().forEach(entry -> {
+            Object data = player.getData(entry.getValue());
+            if (data instanceof ResearchEffectData<?> effectData) {
+                player.setData((AttachmentType<ResearchEffectData<?>>) entry.getValue(), effectData.getDefault(level));
             }
         });
 
         team.getResearchProgress().completedResearches().forEach(res -> {
             ResearchHelper.getResearch(res.getResearch(), level.registryAccess()).researchEffects().forEach(
-                    eff -> eff.onUnlock(level, serverPlayer, res.getResearch())
+                    eff -> eff.onUnlock(level, player, res.getResearch())
             );
-
-            Researchd.LOGGER.info("Reunlocking research {} for player {}", res.getResearch(), serverPlayer.getScoreboardName());
         });
     }
 }

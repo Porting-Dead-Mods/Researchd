@@ -16,16 +16,20 @@ public record DimensionPredicateData(Set<ResourceKey<DimensionType>> blockedDime
     public static final DimensionPredicateData EMPTY = new DimensionPredicateData(Collections.emptySet());
     public static final Codec<DimensionPredicateData> CODEC = CodecUtils.set(ResourceKey.codec(Registries.DIMENSION_TYPE)).xmap(DimensionPredicateData::new, DimensionPredicateData::blockedDimensions);
 
-    public DimensionPredicateData addBlockedDimension(ResourceKey<DimensionType> dimension) {
+    public DimensionPredicateData add(DimensionPredicate predicate, Level level) {
         Set<ResourceKey<DimensionType>> dimensions = new HashSet<>(this.blockedDimensions());
-        dimensions.add(dimension);
+        dimensions.add(predicate.getDimension());
         return new DimensionPredicateData(dimensions);
     }
 
-    public DimensionPredicateData removeBlockedDimension(ResourceKey<DimensionType> dimension) {
+    public DimensionPredicateData remove(DimensionPredicate predicate, Level level) {
         Set<ResourceKey<DimensionType>> dimensions = new HashSet<>(this.blockedDimensions());
-        dimensions.remove(dimension);
+        dimensions.remove(predicate.getDimension());
         return new DimensionPredicateData(dimensions);
+    }
+
+    public Set<ResourceKey<DimensionType>> getAll() {
+        return this.blockedDimensions();
     }
 
     public DimensionPredicateData getDefault(Level level) {
@@ -33,7 +37,7 @@ public record DimensionPredicateData(Set<ResourceKey<DimensionType>> blockedDime
 
         Set<ResourceKey<DimensionType>> blockedDimensions = new UniqueArray<>();
         for (DimensionPredicate predicate : dps) {
-            blockedDimensions.add(predicate.dimension());
+            blockedDimensions.add(predicate.getDimension());
         }
         return new DimensionPredicateData(blockedDimensions);
     }
