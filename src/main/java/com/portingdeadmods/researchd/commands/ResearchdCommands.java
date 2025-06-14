@@ -19,7 +19,8 @@ public class ResearchdCommands {
 				TeamCommands.build(),
 				DumpCommand.build(),
 				HelpCommand.build(),
-				HandCommand.build()
+				HandCommand.build(),
+				DataCommand.build()
 		);
 
 		rootCommands.forEach( root -> {

@@ -3,11 +3,14 @@ package com.portingdeadmods.researchd.data.helper;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.AbstractMap;
 import java.util.HashMap;
@@ -50,6 +53,12 @@ public class ResearchTeamMap {
 
 	public ResearchTeam getTeam(ServerPlayer player) {
 		return getTeam(player.getUUID());
+	}
+
+	public static void onSync(Player player) {
+		if (player instanceof LocalPlayer) {
+			ResearchHelper.refreshResearches(player);
+		}
 	}
 
 	/**

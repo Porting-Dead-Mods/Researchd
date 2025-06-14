@@ -13,6 +13,7 @@ import com.portingdeadmods.researchd.commands.ResearchdCommands;
 import com.portingdeadmods.researchd.content.predicates.RecipePredicateData;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
+import com.portingdeadmods.researchd.data.helper.ResearchProgress;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamMap;
 import com.portingdeadmods.researchd.impl.capabilities.EntityResearchImpl;
 import com.portingdeadmods.researchd.networking.SyncSavedDataPayload;
@@ -38,6 +39,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
@@ -71,8 +73,7 @@ public final class ResearchdEvents {
             });
 
             if (blockedItems.contains(item)) {
-                event.getToolTip().clear();
-                event.getToolTip().add(Component.literal("This item is blocked by a research").withStyle(ChatFormatting.RED, ChatFormatting.ITALIC));
+                event.getToolTip().add(Component.literal("This item is blocked by a research!").withStyle(ChatFormatting.RED, ChatFormatting.ITALIC));
             }
         }
     }
@@ -131,14 +132,18 @@ public final class ResearchdEvents {
         @SubscribeEvent
         public static void onClientTick(ClientTickEvent.Post event) {
             Level level = Minecraft.getInstance().level;
-            EntityResearchImpl data = ResearchdSavedData.PLAYER_RESEARCH.get().getData(level);
-            if (data != null) {
-                ResearchQueue queue = data.researchQueue();
-                if (!queue.isEmpty()) {
-                    if (queue.getMaxResearchProgress() > queue.getResearchProgress()) {
-                        queue.setResearchProgress(queue.getResearchProgress() + 1);
-                    } else {
-                        queue.setResearchProgress(0);
+            LocalPlayer player = Minecraft.getInstance().player;
+
+            if (player != null && level != null) {
+                ResearchProgress researchProgress = ResearchdSavedData.TEAM_RESEARCH.get().getData(level).getTeam(player.getUUID()).getResearchProgress();
+                if (researchProgress != null) {
+                    ResearchQueue queue = researchProgress.researchQueue();
+                    if (!queue.isEmpty()) {
+                        if (queue.getMaxResearchProgress() > queue.getResearchProgress()) {
+                            queue.setResearchProgress(queue.getResearchProgress() + 1);
+                        } else {
+                            queue.setResearchProgress(0);
+                        }
                     }
                 }
             }
@@ -174,6 +179,10 @@ public final class ResearchdEvents {
                     ResearchdSavedData.PLAYER_RESEARCH.get().setData(level, data);
                 }
             }
+        }
+
+        public static void onJoinLevel(EntityJoinLevelEvent entity) {
+
         }
 //
 //        private static List<ResearchInstance> getChildren(Level level, ResearchInstance instance) {

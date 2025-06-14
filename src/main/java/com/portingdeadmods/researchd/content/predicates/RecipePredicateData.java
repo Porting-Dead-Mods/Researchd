@@ -4,10 +4,8 @@ import com.mojang.serialization.Codec;
 import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
 import com.portingdeadmods.researchd.api.research.ResearchEffectData;
 import com.portingdeadmods.researchd.utils.Codecs;
-import com.portingdeadmods.researchd.utils.UniqueArray;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
 
 import java.util.Collection;
@@ -20,16 +18,20 @@ public record RecipePredicateData(Set<RecipeHolder<?>> blockedRecipes) implement
 
     public static final Codec<RecipePredicateData> CODEC = CodecUtils.set(Codecs.RECIPE_HOLDER_CODEC).xmap(RecipePredicateData::new, RecipePredicateData::blockedRecipes);
 
-    public RecipePredicateData addBlockedRecipe(RecipeHolder<?> recipe) {
+    public RecipePredicateData add(RecipePredicate recipe, Level level) {
         Set<RecipeHolder<?>> recipes = new HashSet<>(this.blockedRecipes());
-        recipes.add(recipe);
+        recipes.add(recipe.getRecipe(level));
         return new RecipePredicateData(recipes);
     }
 
-    public RecipePredicateData removeBlockedRecipe(RecipeHolder<?> recipe) {
+    public RecipePredicateData remove(RecipePredicate recipe, Level level) {
         Set<RecipeHolder<?>> recipes = new HashSet<>(this.blockedRecipes());
-        recipes.remove(recipe);
+        recipes.remove(recipe.getRecipe(level));
         return new RecipePredicateData(recipes);
+    }
+
+    public Set<RecipeHolder<?>> getAll() {
+        return this.blockedRecipes;
     }
 
     /**
