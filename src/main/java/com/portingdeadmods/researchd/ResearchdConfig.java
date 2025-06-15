@@ -10,22 +10,22 @@ public class ResearchdConfig
 {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
-    private static final ModConfigSpec.BooleanValue EXAMPLE_RESEARCH = BUILDER
-            .comment("Whether to enable the example research provided by Researchd")
-            .define("enable_example_research", true);
     private static final ModConfigSpec.IntValue RESEARCH_QUEUE_LENGTH = BUILDER
             .comment("The length of the research queue")
             .defineInRange("research_queue_length", 7, 1, 99);
+    private static final ModConfigSpec.BooleanValue CONSOLE_DEBUG = BUILDER
+            .comment("Whether to enable console debug messages for Researchd")
+            .define("enable_console_debug", false);
 
     static final ModConfigSpec SPEC = BUILDER.build();
 
-    public static boolean exampleResearch;
     public static int researchQueueLength;
+    public static boolean consoleDebug;
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event)
     {
-        exampleResearch = EXAMPLE_RESEARCH.get();
         researchQueueLength = RESEARCH_QUEUE_LENGTH.get();
+        consoleDebug = CONSOLE_DEBUG.get();
     }
 }
