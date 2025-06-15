@@ -73,6 +73,7 @@ public final class ResearchdEvents {
             });
 
             if (blockedItems.contains(item)) {
+                event.getToolTip().add(Component.literal("")); // Add a blank line for spacing
                 event.getToolTip().add(Component.literal("This item is blocked by a research!").withStyle(ChatFormatting.RED, ChatFormatting.ITALIC));
             }
         }

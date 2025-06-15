@@ -32,6 +32,25 @@ public final class Researches {
             .researchEffects(
                     new RecipePredicate(ResourceLocation.withDefaultNamespace("anvil"))
             ));
+    public static final ResourceKey<Research> STICK = register("stick", builder -> builder
+            .icon(Items.STICK)
+            .researchMethods(
+                    new ConsumeItemResearchMethod(Ingredient.of(Items.OAK_LOG), 2)
+            )
+            .researchEffects(
+                    /** All the recipes resulting in minecraft:stick containing the following components:
+                     * minecraft:max_stack_size -> 64
+                     * minecraft:lore -> ItemLore[lines=[], styledLines=[]]
+                     * minecraft:enchantments -> ItemEnchantments{enchantments={}, showInTooltip=true}
+                     * minecraft:repair_cost -> 0
+                     * minecraft:attribute_modifiers -> ItemAttributeModifiers[modifiers=[], showInTooltip=true]
+                     * minecraft:rarity -> COMMON
+                     */
+                    List.of(
+                            new RecipePredicate(ResourceLocation.parse("minecraft:stick_from_bamboo_item")),
+                            new RecipePredicate(ResourceLocation.parse("minecraft:stick"))
+                    ))
+            .parents(WOOD));
     public static final ResourceKey<Research> STONE = register("stone", builder -> builder
             .icon(Items.STONE)
             .parents(WOOD)
@@ -41,6 +60,25 @@ public final class Researches {
     public static final ResourceKey<Research> IRON = register("iron", builder -> builder
             .icon(Items.IRON_INGOT)
             .parents(STONE)
+            .researchEffects(
+                    /** All the recipes resulting in minecraft:iron_ingot containing the following components:
+                     * minecraft:max_stack_size -> 64
+                     * minecraft:lore -> ItemLore[lines=[], styledLines=[]]
+                     * minecraft:enchantments -> ItemEnchantments{enchantments={}, showInTooltip=true}
+                     * minecraft:repair_cost -> 0
+                     * minecraft:attribute_modifiers -> ItemAttributeModifiers[modifiers=[], showInTooltip=true]
+                     * minecraft:rarity -> COMMON
+                     */
+                    List.of(
+                            new RecipePredicate(ResourceLocation.parse("minecraft:iron_ingot_from_iron_block")),
+                            new RecipePredicate(ResourceLocation.parse("minecraft:iron_ingot_from_nuggets")),
+                            new RecipePredicate(ResourceLocation.parse("minecraft:iron_ingot_from_blasting_deepslate_iron_ore")),
+                            new RecipePredicate(ResourceLocation.parse("minecraft:iron_ingot_from_smelting_deepslate_iron_ore")),
+                            new RecipePredicate(ResourceLocation.parse("minecraft:iron_ingot_from_blasting_iron_ore")),
+                            new RecipePredicate(ResourceLocation.parse("minecraft:iron_ingot_from_smelting_iron_ore")),
+                            new RecipePredicate(ResourceLocation.parse("minecraft:iron_ingot_from_blasting_raw_iron")),
+                            new RecipePredicate(ResourceLocation.parse("minecraft:iron_ingot_from_smelting_raw_iron"))
+                    ))
             .researchMethods(
                     new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 6)
             ));
