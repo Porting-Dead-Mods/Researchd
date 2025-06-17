@@ -66,7 +66,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        this.scrollOffset = (int) Math.max(Math.max(this.scrollOffset - scrollY, 0), 0);
+        this.scrollOffset = (int) Math.max(Math.max(this.scrollOffset - scrollY * 2, 0), 0);
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
 

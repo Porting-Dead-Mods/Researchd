@@ -15,6 +15,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 public class ResearchScreen extends Screen {
+    public static final ResourceLocation SCREEN_TEXTURE = Researchd.rl("textures/gui/screen.png");
     public static final ResourceLocation TOP_BAR_TEXTURE = Researchd.rl("textures/gui/top_bar.png");
     public static final ResourceLocation SIDE_BAR_RIGHT_TEXTURE = Researchd.rl("textures/gui/side_bar_right.png");
     private static final int TOP_BAR_WIDTH = 377;
@@ -36,7 +37,9 @@ public class ResearchScreen extends Screen {
 
         // THIS NEEDS TO BE BEFORE THE GRAPH
         this.selectedResearchWidget = new SelectedResearchWidget(0, 40, SelectedResearchWidget.BACKGROUND_WIDTH, SelectedResearchWidget.BACKGROUND_HEIGHT);
-        this.selectedResearchWidget.setSelectedResearch(this.techList.getTechList().entries().getFirst());
+        if (!this.techList.getTechList().entries().isEmpty()) {
+            this.selectedResearchWidget.setSelectedResearch(this.techList.getTechList().entries().getFirst());
+        }
 
         // QUEUE
         this.researchQueueWidget = new ResearchQueueWidget(this, 0, 0);
@@ -45,7 +48,9 @@ public class ResearchScreen extends Screen {
         int x = 174;
         this.researchGraphWidget = new ResearchGraphWidget(selectedResearchWidget, x, 8, 300, 253 - 16);
         Minecraft mc = Minecraft.getInstance();
-        this.researchGraphWidget.setGraph(ResearchGraph.fromRootNode(mc.player, ClientResearchCache.ROOT_NODE));
+        if (ClientResearchCache.ROOT_NODE != null) {
+            this.researchGraphWidget.setGraph(ResearchGraph.fromRootNode(mc.player, ClientResearchCache.ROOT_NODE));
+        }
     }
 
     @Override
@@ -69,9 +74,7 @@ public class ResearchScreen extends Screen {
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
 
-        GuiUtils.drawImg(guiGraphics, TOP_BAR_TEXTURE, 103, 0, TOP_BAR_WIDTH, TOP_BAR_HEIGHT);
-        GuiUtils.drawImg(guiGraphics, TOP_BAR_TEXTURE, 103, height - TOP_BAR_HEIGHT, TOP_BAR_WIDTH, TOP_BAR_HEIGHT);
-        GuiUtils.drawImg(guiGraphics, SIDE_BAR_RIGHT_TEXTURE, width - 8, 0, SIDE_BAR_WIDTH, SIDE_BAR_HEIGHT);
+        guiGraphics.blit(SCREEN_TEXTURE, 0, 0, guiGraphics.guiWidth() + 3, guiGraphics.guiHeight() + 5, 0, 0, 480, 264, 480, 264);
     }
 
     public ResearchGraphWidget getResearchGraphWidget() {
