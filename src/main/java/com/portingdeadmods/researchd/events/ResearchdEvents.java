@@ -9,11 +9,13 @@ import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
+import com.portingdeadmods.researchd.client.screens.ResearchTeamScreen;
 import com.portingdeadmods.researchd.commands.ResearchdCommands;
 import com.portingdeadmods.researchd.content.predicates.RecipePredicateData;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.data.helper.ResearchProgress;
+import com.portingdeadmods.researchd.data.helper.ResearchTeam;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamMap;
 import com.portingdeadmods.researchd.impl.capabilities.EntityResearchImpl;
 import com.portingdeadmods.researchd.networking.SyncSavedDataPayload;
@@ -56,6 +58,10 @@ public final class ResearchdEvents {
         public static void clientTick(ClientTickEvent.Pre event) {
             if (ResearchdKeybinds.OPEN_RESEARCH_SCREEN.get().consumeClick()) {
                 Minecraft.getInstance().setScreen(new ResearchScreen());
+            }
+
+            if (ResearchdKeybinds.OPEN_RESEARCH_TEAM_SCREEN.get().consumeClick()) {
+                Minecraft.getInstance().setScreen(new ResearchTeamScreen());
             }
         }
 

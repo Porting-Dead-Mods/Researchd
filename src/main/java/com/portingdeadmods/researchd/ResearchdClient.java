@@ -25,6 +25,7 @@ public class ResearchdClient {
 
     private void registerKeybinds(RegisterKeyMappingsEvent event) {
         event.register(ResearchdKeybinds.OPEN_RESEARCH_SCREEN.get());
+        event.register(ResearchdKeybinds.OPEN_RESEARCH_TEAM_SCREEN.get());
     }
 
     private void registerColorHandlers(RegisterColorHandlersEvent.Item event) {
