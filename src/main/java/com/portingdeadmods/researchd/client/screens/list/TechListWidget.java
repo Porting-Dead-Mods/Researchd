@@ -76,7 +76,7 @@ public class TechListWidget extends ResearchScreenWidget {
     }
 
     public void onStartResearchButtonClicked(Button button) {
-        ResearchQueueWidget queue = this.screen.getResearchQueueWidget();
+        ResearchQueueWidget queue = this.screen.getResearchQueue();
         ResearchInstance instance = this.screen.getSelectedResearchWidget().getSelectedInstance();
         queue.getQueue().add(instance);
         // TODO: Make this dynamic
