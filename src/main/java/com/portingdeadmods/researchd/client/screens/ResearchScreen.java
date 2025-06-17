@@ -7,7 +7,6 @@ import com.portingdeadmods.researchd.client.screens.graph.ResearchGraphWidget;
 import com.portingdeadmods.researchd.client.screens.list.TechListWidget;
 import com.portingdeadmods.researchd.client.screens.queue.ResearchQueueWidget;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchGraph;
-import com.portingdeadmods.researchd.utils.researches.data.ResearchQueue;
 import com.portingdeadmods.researchd.utils.researches.data.TechList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -84,7 +83,7 @@ public class ResearchScreen extends Screen {
         return selectedResearchWidget;
     }
 
-    public ResearchQueueWidget getResearchQueue() {
+    public ResearchQueueWidget getResearchQueueWidget() {
         return researchQueueWidget;
     }
 
