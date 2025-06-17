@@ -3,8 +3,8 @@
   "package": "com.portingdeadmods.researchd.mixins",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "AbstractFurnaceBlockEntityMixin",
     "CraftingMenuMixin",
-    "FurnaceMenuMixin",
     "PlayerMixin"
   ],
   "injectors": {

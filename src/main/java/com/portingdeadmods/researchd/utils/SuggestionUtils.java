@@ -3,7 +3,7 @@ package com.portingdeadmods.researchd.utils;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import com.portingdeadmods.researchd.ResearchTeamUtil;
+import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
 
@@ -17,7 +17,7 @@ public class SuggestionUtils {
     }
 
     public static CompletableFuture<Suggestions> teamMemberNames(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
-        List<String> members = ResearchTeamUtil.getTeamMemberNames(context.getSource().getLevel(), context.getSource().getPlayer());
+        List<String> members = ResearchTeamHelper.getTeamMemberNames(context.getSource().getLevel(), context.getSource().getPlayer());
         members.add("none");
         return SharedSuggestionProvider.suggest(members, builder);
     }

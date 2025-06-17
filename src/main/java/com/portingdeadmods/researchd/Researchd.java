@@ -29,6 +29,15 @@ public class Researchd {
     public static final String MODNAME = "Researchd";
 
     public static final Logger LOGGER = LogUtils.getLogger();
+    public static void debug(Object... message) {
+        StringBuilder sb = new StringBuilder();
+        for (Object msg : message) {
+            sb.append(msg.toString());
+        }
+        if (ResearchdConfig.consoleDebug) {
+            LOGGER.debug(sb.toString());
+        }
+    }
 
     public Researchd(IEventBus modEventBus, ModContainer modContainer) {
         ResearchdAttachments.ATTACHMENTS.register(modEventBus);

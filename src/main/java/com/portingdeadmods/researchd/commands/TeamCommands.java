@@ -2,16 +2,11 @@ package com.portingdeadmods.researchd.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import com.portingdeadmods.researchd.ResearchTeamUtil;
-import com.portingdeadmods.researchd.data.helper.ResearchTeam;
+import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
 import com.portingdeadmods.researchd.utils.PlayerUtils;
 import com.portingdeadmods.researchd.utils.SuggestionUtils;
-import com.sun.jdi.connect.Connector;
-import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -20,13 +15,23 @@ public class TeamCommands {
 	public static LiteralCommandNode<CommandSourceStack> build() {
 		return Commands.literal("team")
 				.then(Commands.literal("create")
-						.then(Commands.argument("name", StringArgumentType.string())
+						.executes(context -> {
+							CommandSourceStack source = context.getSource();
+							ServerPlayer player = source.getPlayer();
+
+							if (player != null) {
+								ResearchTeamHelper.handleCreateTeam(player, player.getName() + "'s Team");
+							}
+
+							return 1;
+						})
+						.then(Commands.argument("name", StringArgumentType.greedyString())
 								.executes(context -> {
 									CommandSourceStack source = context.getSource();
 									ServerPlayer player = source.getPlayer();
 
 									if (player != null) {
-										ResearchTeamUtil.handleCreateTeam(player, StringArgumentType.getString(context, "name"));
+										ResearchTeamHelper.handleCreateTeam(player, StringArgumentType.getString(context, "name"));
 									}
 
 									return 1;
@@ -38,7 +43,7 @@ public class TeamCommands {
 							ServerPlayer player = source.getPlayer();
 
 							if (player != null) {
-								ResearchTeamUtil.handleListMembers(player);
+								ResearchTeamHelper.handleListMembers(player);
 							}
 
 							return 1;
@@ -51,13 +56,23 @@ public class TeamCommands {
 									ServerPlayer player = source.getPlayer();
 
 									if (player != null) {
-										ResearchTeamUtil.handleSendInviteToPlayer(player, PlayerUtils.getPlayerUUIDFromName(context.getSource().getLevel(), StringArgumentType.getString(context, "player")), false);
+										ResearchTeamHelper.handleSendInviteToPlayer(player, PlayerUtils.getPlayerUUIDFromName(context.getSource().getLevel(), StringArgumentType.getString(context, "player")), false);
 									}
 
 									return 1;
 								})
 						))
 				.then(Commands.literal("leave")
+						.executes(context -> {
+							CommandSourceStack source = context.getSource();
+							ServerPlayer player = source.getPlayer();
+
+							if (player != null) {
+								ResearchTeamHelper.handleLeaveTeam(player, PlayerUtils.EmptyUUID);
+							}
+
+							return 1;
+						})
 						.then(Commands.argument("nextToLead", StringArgumentType.string())
 							.suggests(SuggestionUtils::teamMemberNames)
 							.executes(context -> {
@@ -66,9 +81,9 @@ public class TeamCommands {
 
 								if (player != null) {
 									if (StringArgumentType.getString(context, "nextToLead").equals("none"))
-										ResearchTeamUtil.handleLeaveTeam(player, PlayerUtils.EmptyUUID);
+										ResearchTeamHelper.handleLeaveTeam(player, PlayerUtils.EmptyUUID);
 									else {
-										ResearchTeamUtil.handleLeaveTeam(player, PlayerUtils.getPlayerUUIDFromName(context.getSource().getLevel(), StringArgumentType.getString(context, "nextToLead")));
+										ResearchTeamHelper.handleLeaveTeam(player, PlayerUtils.getPlayerUUIDFromName(context.getSource().getLevel(), StringArgumentType.getString(context, "nextToLead")));
 									}
 								}
 
@@ -83,7 +98,7 @@ public class TeamCommands {
 							ServerPlayer player = source.getPlayer();
 
 							if (player != null) {
-								ResearchTeamUtil.handleEnterTeam(player, PlayerUtils.getPlayerUUIDFromName(context.getSource().getLevel(), StringArgumentType.getString(context, "memberOfTeam")));
+								ResearchTeamHelper.handleEnterTeam(player, PlayerUtils.getPlayerUUIDFromName(context.getSource().getLevel(), StringArgumentType.getString(context, "memberOfTeam")));
 							}
 
 							return 1;
@@ -99,7 +114,7 @@ public class TeamCommands {
 									ServerLevel level = source.getLevel();
 
 									if (player != null) {
-										ResearchTeamUtil.handleManageModerator(player, otherPlayer.getUUID(), false);
+										ResearchTeamHelper.handleManageModerator(player, otherPlayer.getUUID(), false);
 									}
 
 									return 1;
@@ -115,7 +130,7 @@ public class TeamCommands {
 									ServerLevel level = source.getLevel();
 
 									if (player != null) {
-										ResearchTeamUtil.handleManageModerator(player, otherPlayer.getUUID(), true);
+										ResearchTeamHelper.handleManageModerator(player, otherPlayer.getUUID(), true);
 									}
 
 									return 1;
@@ -131,7 +146,7 @@ public class TeamCommands {
 									ServerLevel level = source.getLevel();
 
 									if (player != null) {
-										ResearchTeamUtil.handleManageMember(player, otherPlayer.getUUID(), true);
+										ResearchTeamHelper.handleManageMember(player, otherPlayer.getUUID(), true);
 									}
 
 									return 1;
@@ -147,9 +162,9 @@ public class TeamCommands {
 
 									if (player != null) {
 										if (StringArgumentType.getString(context, "nextToLead").equals("none"))
-											source.sendSystemMessage(ResearchTeamUtil.getIllegalMessage());
+											source.sendSystemMessage(ResearchTeamHelper.getIllegalMessage());
 										else
-											ResearchTeamUtil.handleTransferOwnership(player, PlayerUtils.getPlayerUUIDFromName(context.getSource().getLevel(), StringArgumentType.getString(context, "nextToLead")));
+											ResearchTeamHelper.handleTransferOwnership(player, PlayerUtils.getPlayerUUIDFromName(context.getSource().getLevel(), StringArgumentType.getString(context, "nextToLead")));
 									}
 
 									return 1;
@@ -163,7 +178,7 @@ public class TeamCommands {
 									ServerPlayer player = source.getPlayer();
 
 									if (player != null) {
-										ResearchTeamUtil.handleSetName(player, StringArgumentType.getString(context, "name"));
+										ResearchTeamHelper.handleSetName(player, StringArgumentType.getString(context, "name"));
 									}
 
 									return 1;
@@ -172,4 +187,6 @@ public class TeamCommands {
 				)
 				.build();
 	}
+
+
 }

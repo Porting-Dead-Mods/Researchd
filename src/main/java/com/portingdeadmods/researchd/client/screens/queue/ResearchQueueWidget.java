@@ -8,7 +8,6 @@ import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
-import com.portingdeadmods.researchd.networking.research.ResearchQueueAddPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchQueueRemovePayload;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchQueue;
@@ -92,7 +91,7 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
             ResearchInstance instance = this.queue.getEntries().get(index);
             if (this.isHovering(null, (int) mouseX, (int) mouseY, index, paddingY + 17, getWidth(), getHeight() - 17)) {
                 Researchd.LOGGER.debug("removing");
-                this.screen.getResearchQueue().removeResearch(index);
+                this.screen.getResearchQueueWidget().removeResearch(index);
                 return super.mouseClicked(mouseX, mouseY, button);
             } else if (isHovering(null, index, paddingY, (int) mouseX, (int) mouseY)) {
                 this.screen.getSelectedResearchWidget().setSelectedResearch(instance);
