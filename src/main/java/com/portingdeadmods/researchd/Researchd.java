@@ -1,27 +1,25 @@
 package com.portingdeadmods.researchd;
 
+import com.mojang.logging.LogUtils;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
+import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.research.ResearchPack;
 import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
 import com.portingdeadmods.researchd.registries.ResearchdItems;
-import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.registries.ResearchdTab;
-import com.portingdeadmods.researchd.registries.serializers.ResearchMethodSerializers;
 import com.portingdeadmods.researchd.registries.serializers.ResearchEffectSerializers;
+import com.portingdeadmods.researchd.registries.serializers.ResearchMethodSerializers;
 import com.portingdeadmods.researchd.registries.serializers.ResearchSerializers;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.registries.DataPackRegistryEvent;
-import net.neoforged.neoforge.registries.NewRegistryEvent;
-import org.slf4j.Logger;
-
-import com.mojang.logging.LogUtils;
-
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.registries.DataPackRegistryEvent;
+import net.neoforged.neoforge.registries.NewRegistryEvent;
+import org.slf4j.Logger;
 
 @Mod(Researchd.MODID)
 public class Researchd {
@@ -34,7 +32,7 @@ public class Researchd {
         for (Object msg : message) {
             sb.append(msg.toString());
         }
-        if (ResearchdConfig.consoleDebug) {
+        if (ResearchdCommonConfig.consoleDebug) {
             LOGGER.debug(sb.toString());
         }
     }
@@ -53,7 +51,8 @@ public class Researchd {
         modEventBus.addListener(this::registerRegistries);
         modEventBus.addListener(this::registerDatapackRegistries);
 
-        modContainer.registerConfig(ModConfig.Type.COMMON, ResearchdConfig.SPEC);
+        //modContainer.registerConfig(ModConfig.Type.CLIENT, ResearchdClientConfig.SPEC);
+        modContainer.registerConfig(ModConfig.Type.COMMON, ResearchdCommonConfig.SPEC);
     }
 
     private void registerCapabilities(RegisterCapabilitiesEvent event) {
