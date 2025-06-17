@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import com.portingdeadmods.researchd.ResearchTeamUtil;
+import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -16,7 +16,7 @@ public class HelpCommand {
                         .suggests((context, builder) -> SharedSuggestionProvider.suggest(List.of("team"), builder))
                         .executes(context -> {
                             CommandSourceStack source = context.getSource();
-                            ResearchTeamUtil.handleHelpMessage(source.getPlayer(), StringArgumentType.getString(context, "page"));
+                            ResearchTeamHelper.handleHelpMessage(source.getPlayer(), StringArgumentType.getString(context, "page"));
                             return 1;
                         })
                 )

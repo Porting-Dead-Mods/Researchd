@@ -1,7 +1,7 @@
 package com.portingdeadmods.researchd.commands;
 
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import com.portingdeadmods.researchd.ResearchTeamUtil;
+import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 
@@ -10,7 +10,7 @@ public class DumpCommand {
         return Commands.literal("dump")
                 .executes(context -> {
                     CommandSourceStack source = context.getSource();
-                    source.sendSystemMessage(ResearchTeamUtil.getFormattedDump(source.getLevel()));
+                    source.sendSystemMessage(ResearchTeamHelper.getFormattedDump(source.getLevel()));
                     return 1;
                 })
                 .build();

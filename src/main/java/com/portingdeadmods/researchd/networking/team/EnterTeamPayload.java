@@ -1,6 +1,6 @@
 package com.portingdeadmods.researchd.networking.team;
 
-import com.portingdeadmods.researchd.ResearchTeamUtil;
+import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
 import com.portingdeadmods.researchd.Researchd;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -27,7 +27,7 @@ public record EnterTeamPayload(UUID memberOfTeam) implements CustomPacketPayload
 
     public static void enterTeamAction(EnterTeamPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
-            ResearchTeamUtil.handleEnterTeam(context.player(), payload.memberOfTeam());
+            ResearchTeamHelper.handleEnterTeam(context.player(), payload.memberOfTeam());
         }).exceptionally(e -> {
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
             return null;
