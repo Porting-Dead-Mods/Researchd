@@ -1,6 +1,7 @@
 package com.portingdeadmods.researchd.client.screens.team;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.BaseScreen;
@@ -49,20 +50,7 @@ public class ResearchTeamScreen extends BaseScreen {
 
         String name = researchTeam.getName();
 
-        List<GameProfile> players;
-        if (!mc.isSingleplayer()){
-            players = mc.getCurrentServer().players.sample();
-        } else {
-            players = List.of(mc.player.getGameProfile());
-        }
-        List<GameProfile> members = researchTeam.getMembers().stream().map(uuid -> {
-            for (GameProfile profile : players) {
-                if (profile.getId().equals(uuid)) {
-                    return profile;
-                }
-            }
-            return null;
-        }).toList();
+        List<GameProfile> members = this.researchTeamHelper.getPlayers();
 
         List<ResearchInstance> recentResearches = ResearchHelper.getRecentResearches(researchTeam);
 
