@@ -14,29 +14,6 @@ import net.minecraft.world.entity.player.Player;
 public class TeamCommands {
 	public static LiteralCommandNode<CommandSourceStack> build() {
 		return Commands.literal("team")
-				.then(Commands.literal("create")
-						.executes(context -> {
-							CommandSourceStack source = context.getSource();
-							ServerPlayer player = source.getPlayer();
-
-							if (player != null) {
-								ResearchTeamHelper.handleCreateTeam(player, player.getName() + "'s Team");
-							}
-
-							return 1;
-						})
-						.then(Commands.argument("name", StringArgumentType.greedyString())
-								.executes(context -> {
-									CommandSourceStack source = context.getSource();
-									ServerPlayer player = source.getPlayer();
-
-									if (player != null) {
-										ResearchTeamHelper.handleCreateTeam(player, StringArgumentType.getString(context, "name"));
-									}
-
-									return 1;
-								})
-						))
 				.then(Commands.literal("members")
 						.executes(context -> {
 							CommandSourceStack source = context.getSource();
