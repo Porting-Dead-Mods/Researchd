@@ -6,6 +6,7 @@ import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.BaseScreen;
 import com.portingdeadmods.researchd.client.screens.team.widgets.RecentResearchWidget;
 import com.portingdeadmods.researchd.client.screens.team.widgets.TeamMemberWidget;
+import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.data.helper.ResearchTeam;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
@@ -30,15 +31,12 @@ public class ResearchTeamScreen extends BaseScreen {
     public static final WidgetSprites INVITE_BUTTON_SPRITES = new WidgetSprites(Researchd.rl("invite_button"), Researchd.rl("invite_button_focused"));
     public static final WidgetSprites RECENT_RESEARCH_SPRITES = new WidgetSprites(Researchd.rl("recent_research"), Researchd.rl("recent_research_focused"));
     private HeaderAndFooterLayout layout;
-    private final Map<Component, Vec2> noTeamText;
+    private final ClientResearchTeamHelper researchTeamHelper;
 
     public ResearchTeamScreen() {
         super(Component.translatable("screen.researchd.research_team"), 480, 264, 480 - 64 * 2, 264 - 32 * 2);
-        this.noTeamText = new LinkedHashMap<>();
 
-        this.noTeamText.put(Component.literal("Not in a team yet?"), new Vec2(1.5f, 0));
-        this.noTeamText.put(Component.literal("Join one through an invite link"), new Vec2(1, 0));
-        this.noTeamText.put(Component.literal("or"), new Vec2(1, 0));
+        this.researchTeamHelper = new ClientResearchTeamHelper();
     }
 
     @Override
@@ -72,7 +70,9 @@ public class ResearchTeamScreen extends BaseScreen {
         LinearLayout layout = this.layout.addToContents(LinearLayout.vertical()).spacing(5);
 
         LinearLayout headerLayout = layout.addChild(LinearLayout.horizontal().spacing(4));
-        EditBox teamNameEdit = headerLayout.addChild(new EditBox(this.font, 208, 16, Component.empty()));
+        EditBox teamNameEdit = headerLayout.addChild(new EditBox(this.font, 208, 16, Component.empty()) {
+
+        });
         teamNameEdit.setValue(name);
         teamNameEdit.setTextColor(FastColor.ARGB32.color(255, 140, 140, 140));
         teamNameEdit.setMaxLength(32);

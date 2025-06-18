@@ -44,16 +44,6 @@ public record EntityResearchImpl(ResearchQueue researchQueue, Set<ResearchInstan
         return researchQueue().getEntries();
     }
 
-    public static void onSync(Player player) {
-        if (player.level().isClientSide()) {
-            ClientResearchCache.initialize(player);
-
-            return; // Separate client side method logic from server side
-        }
-
-        // Server side
-    }
-
     @Override
     public void completeResearch(ResearchInstance researchInstance) {
         this.completedResearches.add(new ResearchInstance(researchInstance.getResearch(), ResearchStatus.RESEARCHED));

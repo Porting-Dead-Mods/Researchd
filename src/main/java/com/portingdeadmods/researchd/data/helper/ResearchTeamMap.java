@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.data.helper;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.client.cache.ClientResearchCache;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.player.LocalPlayer;
@@ -58,6 +59,7 @@ public class ResearchTeamMap {
 	public static void onSync(Player player) {
 		if (player instanceof LocalPlayer) {
 			ResearchHelper.refreshResearches(player);
+			ClientResearchCache.initialize(player);
 		}
 	}
 

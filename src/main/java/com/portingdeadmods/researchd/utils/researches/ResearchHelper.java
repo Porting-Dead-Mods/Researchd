@@ -27,10 +27,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public final class ResearchHelper {
@@ -99,17 +96,17 @@ public final class ResearchHelper {
         ResearchTeamMap researchData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
 
         ResearchTeam team = researchData.getTeam(player.getUUID());
-        NeoForgeRegistries.ATTACHMENT_TYPES.entrySet().forEach(entry -> {
+        for (Map.Entry<ResourceKey<AttachmentType<?>>, AttachmentType<?>> entry : NeoForgeRegistries.ATTACHMENT_TYPES.entrySet()) {
             Object data = player.getData(entry.getValue());
             if (data instanceof ResearchEffectData<?> effectData) {
                 player.setData((AttachmentType<ResearchEffectData<?>>) entry.getValue(), effectData.getDefault(level));
             }
-        });
+        }
 
-        team.getResearchProgress().completedResearches().forEach(res -> {
+        for (ResearchInstance res : team.getResearchProgress().completedResearches()) {
             ResearchHelper.getResearch(res.getResearch(), level.registryAccess()).researchEffects().forEach(
                     eff -> eff.onUnlock(level, player, res.getResearch())
             );
-        });
+        }
     }
 }

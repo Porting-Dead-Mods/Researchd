@@ -37,7 +37,7 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
     public ResearchQueueWidget(ResearchScreen screen, int x, int y) {
         super(x, y, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
         this.screen = screen;
-        this.queue = ResearchdSavedData.PLAYER_RESEARCH.get().getData(Minecraft.getInstance().level).researchQueue();
+        this.queue = ResearchdSavedData.TEAM_RESEARCH.get().getData(Minecraft.getInstance().level).getTeam(Minecraft.getInstance().player.getUUID()).getResearchProgress().researchQueue();
     }
 
     @Override

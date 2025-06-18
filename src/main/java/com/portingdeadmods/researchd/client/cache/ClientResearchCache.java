@@ -23,7 +23,7 @@ public final class ClientResearchCache {
         NODES.clear();
         ResearchGraphCache.clearCache();
 
-        Set<ResearchInstance> completedResearches = ResearchdSavedData.PLAYER_RESEARCH.get().getData(player.level()).completedResearches();
+        Set<ResearchInstance> completedResearches = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeam(player.getUUID()).getResearchProgress().completedResearches();
 
         RegistryAccess registryAccess = player.registryAccess();
         Set<Holder<Research>> levelResearches = ResearchHelper.getLevelResearches(player.level());

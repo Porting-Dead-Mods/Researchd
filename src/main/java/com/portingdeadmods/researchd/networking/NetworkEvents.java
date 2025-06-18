@@ -46,9 +46,9 @@ public class NetworkEvents {
         );
 
         registrar.playToServer(
-                SetNamePayload.TYPE,
-                SetNamePayload.STREAM_CODEC,
-                SetNamePayload::setNameAction
+                TeamSetNamePayload.TYPE,
+                TeamSetNamePayload.STREAM_CODEC,
+                TeamSetNamePayload::setNameAction
         );
 
         registrar.playToServer(
