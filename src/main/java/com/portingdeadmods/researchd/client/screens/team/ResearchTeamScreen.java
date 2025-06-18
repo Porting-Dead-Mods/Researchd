@@ -2,10 +2,13 @@ package com.portingdeadmods.researchd.client.screens.team;
 
 import com.mojang.authlib.GameProfile;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.BaseScreen;
-import com.portingdeadmods.researchd.client.screens.TeamMemberButton;
+import com.portingdeadmods.researchd.client.screens.team.widgets.RecentResearchWidget;
+import com.portingdeadmods.researchd.client.screens.team.widgets.TeamMemberWidget;
 import com.portingdeadmods.researchd.data.helper.ResearchTeam;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
@@ -45,7 +48,9 @@ public class ResearchTeamScreen extends BaseScreen {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         ResearchTeam researchTeam = ResearchTeamHelper.getResearchTeam(Objects.requireNonNull(player));
+
         String name = researchTeam.getName();
+
         List<GameProfile> players;
         if (!mc.isSingleplayer()){
             players = mc.getCurrentServer().players.sample();
@@ -60,6 +65,8 @@ public class ResearchTeamScreen extends BaseScreen {
             }
             return null;
         }).toList();
+
+        List<ResearchInstance> recentResearches = ResearchHelper.getRecentResearches(researchTeam);
 
         this.layout = new HeaderAndFooterLayout(this);
         LinearLayout layout = this.layout.addToContents(LinearLayout.vertical()).spacing(5);
@@ -82,14 +89,14 @@ public class ResearchTeamScreen extends BaseScreen {
         teamMembersLayout.addChild(new StringWidget(Component.literal("Members"), this.font));
         teamMembersLayout.addChild(new SpacerElement(0, 2));
         for (GameProfile member : members) {
-            teamMembersLayout.addChild(new TeamMemberButton(94, 22, member, TEAM_MEMBER_BUTTON_SPRITES, btn -> {
+            teamMembersLayout.addChild(new TeamMemberWidget(94, 22, member, TEAM_MEMBER_BUTTON_SPRITES, btn -> {
             }));
         }
         recentResearchesLayout.addChild(new StringWidget(Component.literal("Recently Researched"), this.font));
         recentResearchesLayout.addChild(new SpacerElement(0, 2));
-        for (int i = 0; i < 3; i++) {
-            recentResearchesLayout.addChild(new ImageButton(223, 32, RECENT_RESEARCH_SPRITES, (btn1) -> {
-            }, Component.literal("Recent Research")));
+        for (ResearchInstance instance : recentResearches) {
+            recentResearchesLayout.addChild(new RecentResearchWidget(223, 32, instance, RECENT_RESEARCH_SPRITES, (btn1) -> {
+            }));
         }
         this.layout.arrangeElements();
         layout.setX(this.leftPos + 10);

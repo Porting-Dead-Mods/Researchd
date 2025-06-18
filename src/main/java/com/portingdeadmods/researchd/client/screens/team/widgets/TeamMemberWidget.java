@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.client.screens;
+package com.portingdeadmods.researchd.client.screens.team.widgets;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.ChatFormatting;
@@ -8,16 +8,15 @@ import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 
-public class TeamMemberButton extends ImageButton {
+public class TeamMemberWidget extends ImageButton {
     private GameProfile gameProfile;
 
-    public TeamMemberButton(int width, int height, GameProfile gameProfile, WidgetSprites sprites, OnPress onPress) {
+    public TeamMemberWidget(int width, int height, GameProfile gameProfile, WidgetSprites sprites, OnPress onPress) {
         this(0, 0, width, height, gameProfile, sprites, onPress);
     }
-    public TeamMemberButton(int x, int y, int width, int height, GameProfile gameProfile, WidgetSprites sprites, OnPress onPress) {
+    public TeamMemberWidget(int x, int y, int width, int height, GameProfile gameProfile, WidgetSprites sprites, OnPress onPress) {
         super(x, y, width, height, sprites, onPress);
         this.gameProfile = gameProfile;
     }

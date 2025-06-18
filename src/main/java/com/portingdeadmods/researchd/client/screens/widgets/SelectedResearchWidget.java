@@ -1,21 +1,18 @@
-package com.portingdeadmods.researchd.client.screens;
+package com.portingdeadmods.researchd.client.screens.widgets;
 
 import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.client.research.ClientResearchMethod;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchMethod;
+import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class SelectedResearchWidget extends ResearchScreenWidget {
