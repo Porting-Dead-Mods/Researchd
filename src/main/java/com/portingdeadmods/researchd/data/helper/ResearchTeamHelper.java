@@ -1,9 +1,9 @@
 package com.portingdeadmods.researchd.data.helper;
 
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
+import com.portingdeadmods.researchd.networking.team.RefreshResearchesPayload;
 import com.portingdeadmods.researchd.networking.team.TransferOwnershipPayload;
 import com.portingdeadmods.researchd.utils.PlayerUtils;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -98,7 +98,7 @@ public final class ResearchTeamHelper {
         ResearchdSavedData.TEAM_RESEARCH.get().setData(player.level(), savedData);
     }
 
-    public static void handleEnterTeam(Player requester, UUID memberOfTeam) {
+    public static void handleEnterTeam(ServerPlayer requester, UUID memberOfTeam) {
         Level level = requester.level();
         UUID requesterId = requester.getUUID();
 
@@ -114,6 +114,8 @@ public final class ResearchTeamHelper {
             team.addMember(requesterId);
             team.removeSentInvite(requesterId);
             ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
+
+            PacketDistributor.sendToPlayer(requester, new RefreshResearchesPayload());
         }
     }
 
@@ -122,7 +124,7 @@ public final class ResearchTeamHelper {
      * @param requester
      * @param memberOfTeam
      */
-    public static void handleEnterTeam(Player requester, Player memberOfTeam) {
+    public static void handleEnterTeam(ServerPlayer requester, Player memberOfTeam) {
         handleEnterTeam(requester, memberOfTeam.getUUID());
     }
 
@@ -137,23 +139,25 @@ public final class ResearchTeamHelper {
             requester.sendSystemMessage(Component.literal("You're not in a team!").withStyle(ChatFormatting.RED));
             return;
         }
+
         // Handle the case of transfering ownership
         if (isResearchTeamLeader(requester)) {
             if (getResearchTeam(requester).getMembers().size() <= 1) {
                 savedData.getResearchTeams().remove(requesterId);
-                ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
                 requester.sendSystemMessage(Component.literal("You successfully abandoned your team!").withStyle(ChatFormatting.GREEN));
-                ResearchHelper.refreshResearches(requester);
-                return;
+
+                savedData.getResearchTeams().put(requesterId, ResearchTeam.createDefaultTeam(requester));
             } else {
                 if (nextToLead == null) {
                     requester.sendSystemMessage(Component.literal("You need to specify the next leader!").withStyle(ChatFormatting.RED));
                     return;
                 }
                 PacketDistributor.sendToServer(new TransferOwnershipPayload(nextToLead));
-                ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
-                return;
             }
+
+            ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
+            PacketDistributor.sendToPlayer(requester, new RefreshResearchesPayload());
+            return;
         }
 
         if (getPermissionLevel(requester) == 1) {
@@ -294,26 +298,6 @@ public final class ResearchTeamHelper {
      */
     public static void handleTransferOwnership(ServerPlayer requester, Player nextToLead) {
         handleTransferOwnership(requester, nextToLead.getUUID());
-    }
-
-    public static void handleCreateTeam(ServerPlayer requester, String name) {
-        UUID requesterId = requester.getUUID();
-        MinecraftServer server = requester.getServer();
-        ServerLevel level = server.overworld();
-        ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
-
-        if (!isInATeam(requester)) {
-            ResearchTeam team = new ResearchTeam(requesterId, name);
-            MutableComponent msg = Component.literal("")
-                            .append(Component.literal("Team '").withStyle(ChatFormatting.WHITE))
-                            .append(Component.literal(name).withStyle(ChatFormatting.GREEN))
-                            .append(Component.literal("' created!").withStyle(ChatFormatting.WHITE));
-            requester.sendSystemMessage(msg);
-            savedData.getResearchTeams().put(requesterId, team);
-            ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
-        } else {
-            requester.sendSystemMessage(Component.literal("You're already in a team!").withStyle(ChatFormatting.RED));
-        }
     }
 
     public static void handleListMembers(ServerPlayer requester) {

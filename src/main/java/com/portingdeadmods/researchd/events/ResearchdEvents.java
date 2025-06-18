@@ -17,7 +17,6 @@ import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.data.helper.ResearchProgress;
 import com.portingdeadmods.researchd.data.helper.ResearchTeam;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamMap;
-import com.portingdeadmods.researchd.impl.capabilities.EntityResearchImpl;
 import com.portingdeadmods.researchd.networking.SyncSavedDataPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchFinishedPayload;
 import com.portingdeadmods.researchd.utils.UniqueArray;
@@ -111,6 +110,7 @@ public final class ResearchdEvents {
                 ServerLevel level = server.overworld();
                 ResearchTeamMap researchData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
                 researchData.initPlayer(serverPlayer);
+                ResearchdSavedData.TEAM_RESEARCH.get().setData(level, researchData);
 
                 for (Map.Entry<ResourceKey<PDLSavedData<?>>, PDLSavedData<?>> savedData : ResearchdRegistries.SAVED_DATA.entrySet()) {
                     PDLSavedData<?> value = savedData.getValue();
@@ -168,6 +168,7 @@ public final class ResearchdEvents {
                     ResearchTeam team = entry.getValue();
                     ResearchProgress researchProgress = team.getResearchProgress();
 
+                    // TODO: Uh... this needs to be remade asap since its just a placeholder
                     // v Research Queue Logic v
                     ResearchQueue queue = researchProgress.researchQueue();
                     if (!queue.isEmpty()) {
@@ -180,7 +181,7 @@ public final class ResearchdEvents {
                             queue.remove(0);
                             team.getResearchProgress().completeResearch(first);
                             ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
-                            PacketDistributor.sendToAllPlayers(ResearchFinishedPayload.INSTANCE);
+                            PacketDistributor.sendToAllPlayers(new ResearchFinishedPayload(server.getTickCount() * 50));
                         }
                     }
                     if (level.getGameTime() % 10 == 0) {

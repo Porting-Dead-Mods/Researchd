@@ -7,6 +7,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,7 +28,8 @@ public record EnterTeamPayload(UUID memberOfTeam) implements CustomPacketPayload
 
     public static void enterTeamAction(EnterTeamPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
-            ResearchTeamHelper.handleEnterTeam(context.player(), payload.memberOfTeam());
+            if (context.player() instanceof ServerPlayer sp)
+                ResearchTeamHelper.handleEnterTeam(sp, payload.memberOfTeam());
         }).exceptionally(e -> {
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
             return null;
