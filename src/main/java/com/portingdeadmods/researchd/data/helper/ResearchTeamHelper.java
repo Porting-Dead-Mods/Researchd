@@ -274,7 +274,7 @@ public final class ResearchTeamHelper {
         if (getPermissionLevel(requester) == 2) {
             if (arePlayersSameTeam(level, requesterId, nextToLead)) {
                 // Set the new leader
-                getResearchTeam(requester).setLeader(nextToLead);
+                getResearchTeam(requester).setOwner(nextToLead);
 
                 // If he's moderator remove him from the mod list
                 if (getPermissionLevel(level, nextToLead) == 1) {
