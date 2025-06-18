@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.utils.researches.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.portingdeadmods.researchd.ResearchdConfig;
+import com.portingdeadmods.researchd.ResearchdCommonConfig;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -27,7 +27,7 @@ public final class ResearchQueue implements Iterable<ResearchInstance> {
             ResearchQueue::new
     );
     // TODO: Make this configurable
-    public static final IntSupplier QUEUE_LENGTH = () -> ResearchdConfig.researchQueueLength;
+    public static final IntSupplier QUEUE_LENGTH = () -> ResearchdCommonConfig.researchQueueLength;
 
     private final List<ResearchInstance> entries;
     private int researchProgress;

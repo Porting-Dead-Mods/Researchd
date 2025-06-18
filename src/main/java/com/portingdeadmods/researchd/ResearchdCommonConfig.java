@@ -6,13 +6,15 @@ import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 @EventBusSubscriber(modid = Researchd.MODID, bus = EventBusSubscriber.Bus.MOD)
-public class ResearchdConfig
+public class ResearchdCommonConfig
 {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
     private static final ModConfigSpec.IntValue RESEARCH_QUEUE_LENGTH = BUILDER
             .comment("The length of the research queue")
             .defineInRange("research_queue_length", 7, 1, 99);
+
+    // To be moved to client
     private static final ModConfigSpec.BooleanValue CONSOLE_DEBUG = BUILDER
             .comment("Whether to enable console debug messages for Researchd")
             .define("enable_console_debug", false);
