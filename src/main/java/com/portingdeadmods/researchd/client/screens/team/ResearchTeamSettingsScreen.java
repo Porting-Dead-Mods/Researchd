@@ -16,7 +16,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.Objects;
 
@@ -25,7 +24,8 @@ public class ResearchTeamSettingsScreen extends BaseScreen {
     private LinearLayout layout;
     private final ClientResearchTeamHelper researchTeamHelper;
     private final Screen prevScreen;
-    private PlayerManagementDraggableWidget window;
+    private PlayerManagementDraggableWidget playerManagementWindow;
+    private PlayerManagementDraggableWidget transferOwnershipWindow;
 
     public ResearchTeamSettingsScreen() {
         super(Component.literal("Team Settings"), 480, 264, 128, 195);
@@ -47,15 +47,20 @@ public class ResearchTeamSettingsScreen extends BaseScreen {
         EditBox editBox = this.layout.addChild(new EditBox(this.font, 112, 16, Component.empty()));
         editBox.setValue(researchTeam.getName());
         this.layout.addChild(Button.builder(Component.literal("Manage Members"), btn -> {
-            this.window.visible = true;
+            this.playerManagementWindow.visible = true;
         }).size(112, 16).build());
-        this.layout.addChild(Button.builder(Component.literal("Transfer Ownership"), btn -> {}).size(112, 16).build());
+        this.layout.addChild(Button.builder(Component.literal("Transfer Ownership"), btn -> {
+            this.transferOwnershipWindow.visible = true;
+        }).size(112, 16).build());
         this.layout.addChild(Button.builder(Component.literal("Leave"), btn -> {}).size(112, 16).build());
         this.layout.arrangeElements();
         this.layout.visitWidgets(this::addRenderableWidget);
 
-        this.window = this.addRenderableWidget(new PlayerManagementDraggableWidget(this.leftPos, this.topPos, Component.empty()));
-        this.window.visible = false;
+        this.playerManagementWindow = this.addRenderableWidget(new PlayerManagementDraggableWidget(this.leftPos, this.topPos, Component.empty()));
+        this.playerManagementWindow.visible = false;
+
+        this.transferOwnershipWindow = this.addRenderableWidget(new PlayerManagementDraggableWidget(this.leftPos + this.width / 2, this.topPos + height / 2, Component.empty()));
+        this.transferOwnershipWindow.visible = false;
     }
 
     @Override
