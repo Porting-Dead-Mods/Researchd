@@ -17,15 +17,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+// TODO: Move to api
 public class ResearchTeam {
 	private String name;
-	private List<UUID> members;
-	private List<UUID> moderators;
-	private List<UUID> sentInvites; // Invites sent by this team to other players
-	private List<UUID> receivedInvites; // Invites received by this team from other players
+	private final List<UUID> members;
+	private final List<UUID> moderators;
+	private final List<UUID> sentInvites; // Invites sent by this team to other players
+	private final List<UUID> receivedInvites; // Invites received by this team from other players
 	private UUID leader;
 
-	private ResearchProgress researchProgress;
+	private final ResearchProgress researchProgress;
 
 	public static final Codec<ResearchTeam> CODEC = RecordCodecBuilder.create(builder -> builder.group(
 			Codec.STRING.fieldOf("name").forGetter(ResearchTeam::getName),
@@ -33,7 +34,7 @@ public class ResearchTeam {
 			Codec.list(UUIDUtil.CODEC).fieldOf("moderators").forGetter(ResearchTeam::getModerators),
 			Codec.list(UUIDUtil.CODEC).fieldOf("sent_invites").forGetter(ResearchTeam::getSentInvites),
 			Codec.list(UUIDUtil.CODEC).fieldOf("received_invites").forGetter(ResearchTeam::getReceivedInvites),
-			UUIDUtil.CODEC.fieldOf("leader").forGetter(ResearchTeam::getLeader),
+			UUIDUtil.CODEC.fieldOf("owner").forGetter(ResearchTeam::getOwner),
 			ResearchProgress.CODEC.fieldOf("research_progress").forGetter(ResearchTeam::getResearchProgress)
 	).apply(builder, ResearchTeam::new));
 
@@ -49,7 +50,7 @@ public class ResearchTeam {
 			UUIDUtil.STREAM_CODEC.apply(ByteBufCodecs.list()),
 			ResearchTeam::getReceivedInvites,
 			UUIDUtil.STREAM_CODEC,
-			ResearchTeam::getLeader,
+			ResearchTeam::getOwner,
 			ResearchProgress.STREAM_CODEC,
 			ResearchTeam::getResearchProgress,
 			ResearchTeam::new
@@ -93,7 +94,7 @@ public class ResearchTeam {
 		return this.receivedInvites;
 	}
 
-	public UUID getLeader() {
+	public UUID getOwner() {
 		return this.leader;
 	}
 
@@ -159,7 +160,7 @@ public class ResearchTeam {
 		}
 	}
 
-	public boolean isLeader(UUID uuid) {
+	public boolean isOwner(UUID uuid) {
 		return uuid.equals(leader);
 	}
 
