@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.client.screens.graph;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
+import com.portingdeadmods.researchd.client.screens.widgets.ResearchGraphWidget;
 import com.portingdeadmods.researchd.utils.Spaghetti;
 import com.portingdeadmods.researchd.utils.UniqueArray;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchGraph;

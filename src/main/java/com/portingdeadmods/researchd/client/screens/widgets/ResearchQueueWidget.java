@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.client.screens.queue;
+package com.portingdeadmods.researchd.client.screens.widgets;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;

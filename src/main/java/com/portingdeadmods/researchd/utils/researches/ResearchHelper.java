@@ -54,6 +54,11 @@ public final class ResearchHelper {
         return effects;
     }
 
+    public static List<ResearchInstance> getRecentResearches(ResearchTeam team) {
+        UniqueArray<ResearchInstance> researchInstances = team.getResearchProgress().completedResearches();
+        return researchInstances.stream().sorted(Comparator.comparingLong(ResearchInstance::getResearchedTime)).toList();
+    }
+
     public static Research getResearch(ResourceKey<Research> resourceKey, HolderLookup.Provider lookup) {
         return lookup.holderOrThrow(resourceKey).value();
     }

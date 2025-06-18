@@ -1,10 +1,10 @@
-package com.portingdeadmods.researchd.client.screens.list;
+package com.portingdeadmods.researchd.client.screens.widgets;
 
+import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
-import com.portingdeadmods.researchd.client.screens.queue.ResearchQueueWidget;
 import com.portingdeadmods.researchd.networking.research.ResearchQueueAddPayload;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.utils.researches.data.TechList;
@@ -77,6 +77,8 @@ public class TechListWidget extends ResearchScreenWidget {
     public void onStartResearchButtonClicked(Button button) {
         ResearchQueueWidget queue = this.screen.getResearchQueueWidget();
         ResearchInstance instance = this.screen.getSelectedResearchWidget().getSelectedInstance();
+        instance.setResearchedPlayer(Minecraft.getInstance().player.getUUID());
+        instance.setResearchedTime(Minecraft.getInstance().level.getGameTime());
         queue.getQueue().add(instance);
         // TODO: Make this dynamic
         queue.getQueue().setMaxResearchProgress(1000);
@@ -85,8 +87,8 @@ public class TechListWidget extends ResearchScreenWidget {
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
-        //GuiUtils.drawImg(guiGraphics, hasSearchBar ? BACKGROUND_TEXTURE_SEARCH_BAR : BACKGROUND_TEXTURE, getX(), getY() + 3, BACKGROUND_WIDTH, BACKGROUND_HEIGHT - 3);
-        //GuiUtils.drawImg(guiGraphics, BOTTOM_TEXTURE, getX(), getY() + BACKGROUND_HEIGHT, BOTTOM_WIDTH, BOTTOM_HEIGHT);
+        GuiUtils.drawImg(guiGraphics, hasSearchBar ? BACKGROUND_TEXTURE_SEARCH_BAR : BACKGROUND_TEXTURE, getX(), getY() + 3, BACKGROUND_WIDTH, BACKGROUND_HEIGHT - 3);
+        GuiUtils.drawImg(guiGraphics, BOTTOM_TEXTURE, getX(), getY() + BACKGROUND_HEIGHT, BOTTOM_WIDTH, BOTTOM_HEIGHT);
 
         int paddingX = 12;
         int paddingY = 21;

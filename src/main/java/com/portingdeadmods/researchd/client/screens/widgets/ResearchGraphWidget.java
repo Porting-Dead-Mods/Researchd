@@ -1,9 +1,11 @@
-package com.portingdeadmods.researchd.client.screens.graph;
+package com.portingdeadmods.researchd.client.screens.widgets;
 
 import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.client.screens.SelectedResearchWidget;
+import com.portingdeadmods.researchd.client.screens.graph.GraphLayoutManager;
+import com.portingdeadmods.researchd.client.screens.graph.GraphStateManager;
+import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
 import com.portingdeadmods.researchd.client.screens.lines.PotentialOverlap;
 import com.portingdeadmods.researchd.client.screens.lines.ResearchHead;
 import com.portingdeadmods.researchd.client.screens.lines.ResearchLine;
