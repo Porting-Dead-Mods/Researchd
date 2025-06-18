@@ -65,18 +65,23 @@ public class NetworkEvents {
         registrar.playToServer(
                 ResearchQueueAddPayload.TYPE,
                 ResearchQueueAddPayload.STREAM_CODEC,
-                ResearchQueueAddPayload::handle
+                ResearchQueueAddPayload::researchQueueAddAction
         );
         registrar.playToServer(
                 ResearchQueueRemovePayload.TYPE,
                 ResearchQueueRemovePayload.STREAM_CODEC,
-                ResearchQueueRemovePayload::handle
+                ResearchQueueRemovePayload::researchQueueRemoveAction
         );
 
         registrar.playToClient(
                 ResearchFinishedPayload.TYPE,
                 ResearchFinishedPayload.STREAM_CODEC,
-                ResearchFinishedPayload::handle
+                ResearchFinishedPayload::researchFinishedAction
+        );
+        registrar.playToClient(
+                RefreshResearchesPayload.TYPE,
+                RefreshResearchesPayload.STREAM_CODEC,
+                RefreshResearchesPayload::refreshResearchesAction
         );
 
         for (PDLSavedData<?> savedData : ResearchdRegistries.SAVED_DATA) {

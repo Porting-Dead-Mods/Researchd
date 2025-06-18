@@ -5,7 +5,6 @@ import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.data.helper.ResearchProgress;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamMap;
-import com.portingdeadmods.researchd.impl.capabilities.EntityResearchImpl;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -27,7 +26,7 @@ public record ResearchQueueRemovePayload(ResearchInstance researchInstance) impl
         return TYPE;
     }
 
-    public void handle(IPayloadContext context) {
+    public void researchQueueRemoveAction(IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer serverPlayer) {
                 Level level = serverPlayer.level();

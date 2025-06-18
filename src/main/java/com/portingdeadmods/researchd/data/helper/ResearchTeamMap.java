@@ -49,7 +49,7 @@ public class ResearchTeamMap {
 	}
 
 	public ResearchTeam getTeam(UUID uuid) {
-		return getResearchTeams().computeIfAbsent(uuid, ResearchTeam::new);
+		return getResearchTeams().get(uuid);
 	}
 
 	public ResearchTeam getTeam(ServerPlayer player) {
@@ -67,13 +67,16 @@ public class ResearchTeamMap {
 	 * Creates a team for the player if it doesn't exist.
 	 * Does nothing if the player is already in a team.
 	 *
-	 * Returns false if an error occurred, true otherwise.
+	 * Returns true if a team was created, false if not.
 	 *
 	 * @return a map with team UUIDs as strings
 	 */
 	public boolean initPlayer(ServerPlayer player) {
 		try {
-			getTeam(player);
+			if (getTeam(player) != null) return false;
+
+			researchTeams.put(player.getUUID(), ResearchTeam.createDefaultTeam(player));
+
 			return true;
 		} catch (Exception e) {
 			Researchd.LOGGER.error(e.getMessage());

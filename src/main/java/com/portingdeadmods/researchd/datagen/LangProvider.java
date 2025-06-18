@@ -17,6 +17,12 @@ public final class LangProvider extends LanguageProvider {
 
     @Override
     protected void addTranslations() {
+        add("researchd.research.queue.added", "%s added %s to the research queue!");
+        add("researchd.research.queue.finished", "%s finished researching (%s)!");
+
+        // Errors
+        add("researchd.error.research_queue_desync", "Small desync happened, please relog. A research complete packed was emitted but your queue was empty");
+
         addResearch(Researches.WOOD, "Wood");
         addResearch(Researches.STONE, "Stone");
         addResearch(Researches.COPPER, "Copper");
