@@ -19,12 +19,4 @@ public final class ResearchdSavedData {
                     .onSync(ResearchTeamMap::onSync)
                     .build());
 
-
-    @Deprecated
-    public static final Supplier<PDLSavedData<EntityResearchImpl>> PLAYER_RESEARCH = SAVED_DATA.register("entity_research",
-            () -> PDLSavedData.builder(EntityResearchImpl.CODEC, () -> EntityResearchImpl.EMPTY)
-                    .synced(EntityResearchImpl.STREAM_CODEC)
-                    .onSync(EntityResearchImpl::onSync)
-                    .build());
-
 }

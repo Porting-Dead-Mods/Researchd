@@ -3,6 +3,8 @@ package com.portingdeadmods.researchd.networking.research;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
+import com.portingdeadmods.researchd.data.helper.ResearchProgress;
+import com.portingdeadmods.researchd.data.helper.ResearchTeamMap;
 import com.portingdeadmods.researchd.impl.capabilities.EntityResearchImpl;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -29,13 +31,14 @@ public record ResearchQueueRemovePayload(ResearchInstance researchInstance) impl
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer serverPlayer) {
                 Level level = serverPlayer.level();
-                EntityResearchImpl data = ResearchdSavedData.PLAYER_RESEARCH.get().getData(level);
-                int index = data.researchQueue().getEntries().indexOf(researchInstance);
-                data.researchQueue().remove(researchInstance);
+                ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
+                ResearchProgress researchProgress = data.getTeam(serverPlayer).getResearchProgress();
+                int index = researchProgress.researchQueue().getEntries().indexOf(researchInstance);
+                researchProgress.researchQueue().remove(researchInstance);
                 if (index == 0) {
-                    data.researchQueue().setResearchProgress(0);
+                    researchProgress.researchQueue().setResearchProgress(0);
                 }
-                ResearchdSavedData.PLAYER_RESEARCH.get().setData(level, data);
+                ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
             }
         }).exceptionally(err -> {
             Researchd.LOGGER.error("Failed to handle ResearchQueueRemove payload", err);

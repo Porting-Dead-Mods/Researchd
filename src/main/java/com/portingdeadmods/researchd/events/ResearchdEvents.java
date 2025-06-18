@@ -15,6 +15,7 @@ import com.portingdeadmods.researchd.content.predicates.RecipePredicateData;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.data.helper.ResearchProgress;
+import com.portingdeadmods.researchd.data.helper.ResearchTeam;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamMap;
 import com.portingdeadmods.researchd.impl.capabilities.EntityResearchImpl;
 import com.portingdeadmods.researchd.networking.SyncSavedDataPayload;
@@ -160,29 +161,31 @@ public final class ResearchdEvents {
             MinecraftServer server = event.getServer();
             ServerLevel level = server.overworld();
 
-            EntityResearchImpl data = ResearchdSavedData.PLAYER_RESEARCH.get().getData(level);
-            ResearchTeamMap researchData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
+            ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
 
             if (data != null) {
-                // Player Data is Initialized
+                for (Map.Entry<UUID, ResearchTeam> entry : data.getResearchTeams().entrySet()) {
+                    ResearchTeam team = entry.getValue();
+                    ResearchProgress researchProgress = team.getResearchProgress();
 
-                // v Research Queue Logic v
-                ResearchQueue queue = data.researchQueue();
-                if (!queue.isEmpty()) {
-                    if (queue.getMaxResearchProgress() > queue.getResearchProgress()) {
-                        queue.setResearchProgress(queue.getResearchProgress() + 1);
-                    } else {
-                        queue.setResearchProgress(0);
-                        ResearchInstance first = queue.getEntries().getFirst();
-                        first.setResearchStatus(ResearchStatus.RESEARCHED);
-                        queue.remove(0);
-                        data.completeResearch(first);
-                        ResearchdSavedData.PLAYER_RESEARCH.get().setData(level, data);
-                        PacketDistributor.sendToAllPlayers(ResearchFinishedPayload.INSTANCE);
+                    // v Research Queue Logic v
+                    ResearchQueue queue = researchProgress.researchQueue();
+                    if (!queue.isEmpty()) {
+                        if (queue.getMaxResearchProgress() > queue.getResearchProgress()) {
+                            queue.setResearchProgress(queue.getResearchProgress() + 1);
+                        } else {
+                            queue.setResearchProgress(0);
+                            ResearchInstance first = queue.getEntries().getFirst();
+                            first.setResearchStatus(ResearchStatus.RESEARCHED);
+                            queue.remove(0);
+                            team.getResearchProgress().completeResearch(first);
+                            ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
+                            PacketDistributor.sendToAllPlayers(ResearchFinishedPayload.INSTANCE);
+                        }
                     }
-                }
-                if (level.getGameTime() % 10 == 0) {
-                    ResearchdSavedData.PLAYER_RESEARCH.get().setData(level, data);
+                    if (level.getGameTime() % 10 == 0) {
+                        ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
+                    }
                 }
             }
         }

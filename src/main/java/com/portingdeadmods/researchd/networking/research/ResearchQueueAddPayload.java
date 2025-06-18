@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.networking.research;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
+import com.portingdeadmods.researchd.data.helper.ResearchTeamMap;
 import com.portingdeadmods.researchd.impl.capabilities.EntityResearchImpl;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -29,9 +30,9 @@ public record ResearchQueueAddPayload(ResearchInstance researchInstance) impleme
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer serverPlayer) {
                 Level level = serverPlayer.level();
-                EntityResearchImpl data = ResearchdSavedData.PLAYER_RESEARCH.get().getData(level);
-                data.researchQueue().add(researchInstance);
-                ResearchdSavedData.PLAYER_RESEARCH.get().setData(level, data);
+                ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
+                data.getTeam(serverPlayer).getResearchProgress().researchQueue().add(researchInstance);
+                ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
             }
         }).exceptionally(err -> {
             Researchd.LOGGER.error("Failed to handle ResearchQueueAdd payload", err);

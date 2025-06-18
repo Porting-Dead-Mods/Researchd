@@ -11,12 +11,12 @@ import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
-public record SetNamePayload(String name) implements CustomPacketPayload {
-    public static final Type<SetNamePayload> TYPE = new Type<>(Researchd.rl("set_name_payload"));
-    public static final StreamCodec<RegistryFriendlyByteBuf, SetNamePayload> STREAM_CODEC = StreamCodec.composite(
+public record TeamSetNamePayload(String name) implements CustomPacketPayload {
+    public static final Type<TeamSetNamePayload> TYPE = new Type<>(Researchd.rl("set_name_payload"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, TeamSetNamePayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8,
-            SetNamePayload::name,
-            SetNamePayload::new
+            TeamSetNamePayload::name,
+            TeamSetNamePayload::new
     );
 
     @Override
@@ -24,7 +24,7 @@ public record SetNamePayload(String name) implements CustomPacketPayload {
         return TYPE;
     }
 
-    public static void setNameAction(SetNamePayload payload, IPayloadContext context) {
+    public static void setNameAction(TeamSetNamePayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer sp)
                 ResearchTeamHelper.handleSetName(sp, payload.name);
