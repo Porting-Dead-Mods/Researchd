@@ -71,17 +71,27 @@ public class ResearchTeamScreen extends BaseScreen {
 
         LinearLayout headerLayout = layout.addChild(LinearLayout.horizontal().spacing(4));
         EditBox teamNameEdit = headerLayout.addChild(new EditBox(this.font, 208, 16, Component.empty()) {
-
+            @Override
+            public void setValue(String text) {
+                String oldValue = this.getValue();
+                super.setValue(text);
+                String newValue = this.getValue();
+                if (!oldValue.equals(newValue)) {
+                    ResearchTeamScreen.this.researchTeamHelper.setTeamNameSynced(newValue);
+                }
+            }
         });
+
         teamNameEdit.setValue(name);
         teamNameEdit.setTextColor(FastColor.ARGB32.color(255, 140, 140, 140));
         teamNameEdit.setMaxLength(32);
         teamNameEdit.setTextShadow(false);
         teamNameEdit.setBordered(false);
         headerLayout.addChild(new SpacerElement(77, 0));
-        headerLayout.addChild(new ImageButton(14, 14, INVITE_BUTTON_SPRITES, (btn1) -> {
+        headerLayout.addChild(new ImageButton(14, 14, INVITE_BUTTON_SPRITES, (btn) -> {
         }, Component.literal("Invite Player")));
-        headerLayout.addChild(new ImageButton(14, 14, SETTINGS_BUTTON_SPRITES, (btn1) -> {
+        headerLayout.addChild(new ImageButton(14, 14, SETTINGS_BUTTON_SPRITES, (btn) -> {
+            Minecraft.getInstance().setScreen(new ResearchTeamSettingsScreen());
         }, Component.literal("Team Settings")));
         LinearLayout linearLayout = layout.addChild(LinearLayout.horizontal().spacing(12));
         LinearLayout teamMembersLayout = linearLayout.addChild(LinearLayout.vertical());
@@ -102,11 +112,6 @@ public class ResearchTeamScreen extends BaseScreen {
         layout.setX(this.leftPos + 10);
         layout.setY(this.topPos + 11);
         this.layout.visitWidgets(this::addRenderableWidget);
-    }
-
-    private void onCreateTeamButtonPressed(Button button) {
-        Minecraft mc = Minecraft.getInstance();
-        mc.setScreen(new CreateResearchTeamScreen());
     }
 
     @Override

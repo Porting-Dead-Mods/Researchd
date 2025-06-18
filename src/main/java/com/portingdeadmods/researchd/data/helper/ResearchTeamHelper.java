@@ -25,7 +25,7 @@ public final class ResearchTeamHelper {
         UUID uuid = player.getUUID();
         ResearchTeam team = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeam(uuid);
 
-        return team.isLeader(uuid);
+        return team.isOwner(uuid);
     }
 
     public static int getPermissionLevel(Player player) {

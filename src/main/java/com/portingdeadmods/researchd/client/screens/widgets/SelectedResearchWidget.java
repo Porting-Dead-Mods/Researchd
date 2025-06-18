@@ -29,7 +29,6 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
         this.methods = new Object2ObjectArrayMap<>();
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
         GuiUtils.drawImg(guiGraphics, BACKGROUND_TEXTURE, getX(), getY(), width, height);
