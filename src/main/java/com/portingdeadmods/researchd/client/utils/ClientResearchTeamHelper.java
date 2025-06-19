@@ -37,7 +37,7 @@ public class ClientResearchTeamHelper {
         return ResearchTeamRole.MEMBER;
     }
 
-    public List<GameProfile> getPlayers() {
+    public List<GameProfile> getTeamMembers() {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         ResearchTeam researchTeam = ResearchTeamHelper.getResearchTeam(Objects.requireNonNull(player));

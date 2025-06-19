@@ -32,8 +32,12 @@ public abstract class AbstractDraggableWidget extends AbstractWidget {
 
         if (this.isHovered) {
             this.setPosition(getX() + (int) dragX, getY() + (int) dragY);
+            this.onMoved();
         }
 
+    }
+
+    protected void onMoved() {
     }
 
     @Override
