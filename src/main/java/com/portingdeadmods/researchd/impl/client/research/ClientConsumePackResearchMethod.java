@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
@@ -36,7 +37,9 @@ public class ClientConsumePackResearchMethod implements ClientResearchMethod<Con
 
             guiGraphics.drawString(font, methodType, x + xMargin, y + yMargin, -1, false);
 
-            renderPack(font, guiGraphics, method, 0, x + 35 + xMargin, y + yMargin);
+            renderPacks(font, guiGraphics, method, 0, x + 35 + xMargin, y + yMargin);
+            
+            guiGraphics.drawString(font,  method.duration() + "t", x + xMargin, y + yMargin, -1, false);
         }
         poseStack.popPose();
 
@@ -51,7 +54,7 @@ public class ClientConsumePackResearchMethod implements ClientResearchMethod<Con
         return height;
     }
 
-    private void renderPack(Font font, GuiGraphics guiGraphics, ConsumePackResearchMethod method, int i, int x, int y) {
+    private void renderPacks(Font font, GuiGraphics guiGraphics, ConsumePackResearchMethod method, int i, int x, int y) {
         PoseStack poseStack = guiGraphics.pose();
         int w = 24;
 
@@ -60,7 +63,13 @@ public class ClientConsumePackResearchMethod implements ClientResearchMethod<Con
         poseStack.pushPose();
         {
             poseStack.scale(0.65f, 0.65f, 1);
-            guiGraphics.renderItem(method.asStack(), x + 64 + i * w, y + 44);
+
+            List<ItemStack> packs = method.asStacks();
+
+            for (int j = 0; j < packs.size(); j++) {
+                ItemStack pack = packs.get(j);
+                guiGraphics.renderItem(pack, x + 64 + i * w + j * (w / 2), y + 44);
+            }
         }
         poseStack.popPose();
     }

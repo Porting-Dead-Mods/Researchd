@@ -76,7 +76,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
 
         this.methods.clear();
         this.scrollOffset = 0;
-        ResearchMethod method = ResearchHelper.getResearch(this.selectedInstance.getResearch(), Minecraft.getInstance().level.registryAccess()).researchMethods();
+        ResearchMethod method = ResearchHelper.getResearch(this.selectedInstance.getResearch(), Minecraft.getInstance().level.registryAccess()).researchMethod();
         this.methods.put(method.id(), method);
     }
 

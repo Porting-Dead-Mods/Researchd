@@ -9,6 +9,7 @@ import com.portingdeadmods.researchd.api.research.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
 import com.portingdeadmods.researchd.impl.client.research.ClientConsumePackResearchMethod;
+import com.portingdeadmods.researchd.impl.research.ResearchCompletionProgress;
 import com.portingdeadmods.researchd.impl.research.ResearchPack;
 import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
 import com.portingdeadmods.researchd.registries.ResearchdItems;
@@ -16,42 +17,32 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
-public record ConsumePackResearchMethod(ResourceKey<ResearchPack> pack, int count) implements ResearchMethod {
+/**
+ * A 1:1 to the Factorio research. All the listed packs start getting consumed at once.
+ * For researching to start, all the required packs must be present in the machine's inventory.'
+ *
+ * @param packs All the packs that get used in the research
+ * @param count The amount of packs that will be used
+ * @param duration The duration in ticks for a *base speed* machine to use 1 packs o' packs.
+ */
+public record ConsumePackResearchMethod(List<ResourceKey<ResearchPack>> packs, int count, int duration) implements ResearchMethod {
     public static final ResourceLocation ID = Researchd.rl("consume_pack");
 
     @Override
     public boolean canResearch(Player player, ResourceKey<Research> research) {
-        int amount = 0;
-        for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
-            ItemStack item = player.getInventory().getItem(i);
-            Optional<ResourceKey<ResearchPack>> researchPackResourceKey = item.get(ResearchdDataComponents.RESEARCH_PACK).researchPackKey();
-            if (item.has(ResearchdDataComponents.RESEARCH_PACK) && researchPackResourceKey.isPresent() && researchPackResourceKey.get().compareTo(this.pack) == 0) {
-                amount += item.getCount();
-                if (amount >= this.count) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return true; // Not player based
     }
 
     @Override
     public void onResearchStart(Player player, ResourceKey<Research> research) {
-        Inventory inventory = player.getInventory();
-        for (int i = 0; i < inventory.getContainerSize(); i++) {
-            ItemStack item = inventory.getItem(i);
-            Optional<ResourceKey<ResearchPack>> researchPackResourceKey = item.get(ResearchdDataComponents.RESEARCH_PACK).researchPackKey();
-            if (item.has(ResearchdDataComponents.RESEARCH_PACK) && researchPackResourceKey.isPresent() && researchPackResourceKey.get().compareTo(this.pack) == 0) {
-                int toRemove = Math.min(this.count, item.getMaxStackSize());
-                inventory.removeItem(i, toRemove);
-            }
-        }
+        return; // Not player based
     }
 
     @Override
@@ -59,10 +50,14 @@ public record ConsumePackResearchMethod(ResourceKey<ResearchPack> pack, int coun
         return ID;
     }
 
-    public ItemStack asStack() {
-        ItemStack stack = ResearchdItems.RESEARCH_PACK.toStack();
-        stack.set(ResearchdDataComponents.RESEARCH_PACK, new ResearchPackComponent(Optional.of(pack)));
-        return stack;
+    public List<ItemStack> asStacks() {
+        List<ItemStack> stacks = new ArrayList<>();
+        for (ResourceKey<ResearchPack> pack : this.packs) {
+            ItemStack stack = ResearchdItems.RESEARCH_PACK.toStack();
+            stack.set(ResearchdDataComponents.RESEARCH_PACK, new ResearchPackComponent(Optional.of(pack)));
+            stacks.add(stack);
+        }
+        return stacks;
     }
 
     @Override
@@ -75,11 +70,17 @@ public record ConsumePackResearchMethod(ResourceKey<ResearchPack> pack, int coun
         return Serializer.INSTANCE;
     }
 
+    @Override
+    public ResearchCompletionProgress getDefaultProgress() {
+        return new ResearchCompletionProgress(this.count);
+    }
+
     public static final class Serializer implements ResearchMethodSerializer<ConsumePackResearchMethod> {
         public static final Serializer INSTANCE = new ConsumePackResearchMethod.Serializer();
         public static final MapCodec<ConsumePackResearchMethod> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                ResearchPack.RESOURCE_KEY_CODEC.fieldOf("pack").forGetter(ConsumePackResearchMethod::pack),
-                Codec.INT.fieldOf("count").forGetter(ConsumePackResearchMethod::count)
+                Codec.list(ResearchPack.RESOURCE_KEY_CODEC).fieldOf("packs").forGetter(ConsumePackResearchMethod::packs),
+                Codec.INT.fieldOf("count").forGetter(ConsumePackResearchMethod::count),
+                Codec.INT.fieldOf("duration").forGetter(ConsumePackResearchMethod::duration)
         ).apply(instance, ConsumePackResearchMethod::new));
 
         private Serializer() {

@@ -19,7 +19,7 @@ import net.minecraft.world.item.Items;
 import java.util.*;
 
 // TODO: Change icon to Ingredient
-public record SimpleResearch(Item icon, ResearchMethod researchMethods, List<ResearchEffect> researchEffects,
+public record SimpleResearch(Item icon, ResearchMethod researchMethod, List<ResearchEffect> researchEffects,
                              List<ResourceKey<Research>> parents, boolean requiresParent) implements Research {
     @Override
     public ResearchSerializer<?> getSerializer() {
@@ -29,19 +29,19 @@ public record SimpleResearch(Item icon, ResearchMethod researchMethods, List<Res
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof SimpleResearch that)) return false;
-        return requiresParent == that.requiresParent && Objects.equals(icon, that.icon) && Objects.equals(parents, that.parents) && Objects.equals(researchMethods, that.researchMethods);
+        return requiresParent == that.requiresParent && Objects.equals(icon, that.icon) && Objects.equals(parents, that.parents) && Objects.equals(researchMethod, that.researchMethod);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(icon, researchMethods, parents, requiresParent);
+        return Objects.hash(icon, researchMethod, parents, requiresParent);
     }
 
     public static class Serializer implements ResearchSerializer<SimpleResearch> {
         public static final Serializer INSTANCE = new Serializer();
         public static final MapCodec<SimpleResearch> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
                 CodecUtils.registryCodec(BuiltInRegistries.ITEM).fieldOf("icon").forGetter(SimpleResearch::icon),
-                ResearchMethod.CODEC.fieldOf("research_methods").forGetter(SimpleResearch::researchMethods),
+                ResearchMethod.CODEC.fieldOf("research_methods").forGetter(SimpleResearch::researchMethod),
                 ResearchEffect.CODEC.listOf().fieldOf("research_effects").forGetter(SimpleResearch::researchEffects),
                 Research.RESOURCE_KEY_CODEC.listOf().fieldOf("parents").forGetter(SimpleResearch::parents),
                 Codec.BOOL.fieldOf("requires_parent").forGetter(SimpleResearch::requiresParent)

@@ -5,6 +5,7 @@ import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.client.research.ClientResearchMethod;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
+import com.portingdeadmods.researchd.impl.research.ResearchCompletionProgress;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -28,4 +29,6 @@ public interface ResearchMethod {
     ClientResearchMethod<?> getClientMethod();
 
     ResearchMethodSerializer<?> getSerializer();
+
+    ResearchCompletionProgress getDefaultProgress();
 }
