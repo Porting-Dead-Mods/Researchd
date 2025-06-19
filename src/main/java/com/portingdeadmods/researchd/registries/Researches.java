@@ -55,7 +55,7 @@ public final class Researches {
             .icon(Items.STONE)
             .parents(WOOD)
             .researchMethods(
-                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 4)
+                    new ConsumePackResearchMethod(List.of(ResearchPacks.OVERWORLD), 4, 10)
             ));
     public static final ResourceKey<Research> IRON = register("iron", builder -> builder
             .icon(Items.IRON_INGOT)
@@ -80,92 +80,92 @@ public final class Researches {
                             new RecipePredicate(ResourceLocation.parse("minecraft:iron_ingot_from_smelting_raw_iron"))
                     ))
             .researchMethods(
-                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 6)
+                    new ConsumePackResearchMethod(List.of(ResearchPacks.OVERWORLD), 6, 10)
             ));
     public static final ResourceKey<Research> COPPER = register("copper", builder -> builder
             .icon(Items.COPPER_INGOT)
             .parents(STONE)
             .researchMethods(
-                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 6)
+                    new ConsumePackResearchMethod(List.of(ResearchPacks.OVERWORLD), 6, 10)
             ));
     public static final ResourceKey<Research> IRON_TOOLS = register("iron_tools", builder -> builder
             .icon(Items.IRON_SWORD)
             .parents(IRON)
             .researchMethods(
-                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 8)
+                    new ConsumePackResearchMethod(List.of(ResearchPacks.OVERWORLD), 8, 10)
             ));
     public static final ResourceKey<Research> IRON_ARMOR = register("iron_armor", builder -> builder
             .icon(Items.IRON_CHESTPLATE)
             .parents(IRON)
             .researchMethods(
-                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 8)
+                    new ConsumePackResearchMethod(List.of(ResearchPacks.OVERWORLD), 8, 10)
             ));
     public static final ResourceKey<Research> LIGHTNING_ROD = register("lightning_rod", builder -> builder
             .icon(Items.LIGHTNING_ROD)
             .parents(COPPER)
             .researchMethods(
-                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 8)
+                    new ConsumePackResearchMethod(List.of(ResearchPacks.OVERWORLD), 8, 10)
             ));
     public static final ResourceKey<Research> COPPER_BLOCK = register("copper_block", builder -> builder
             .icon(Items.COPPER_BLOCK)
             .parents(COPPER)
             .researchMethods(
-                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 8)
+                    new ConsumePackResearchMethod(List.of(ResearchPacks.OVERWORLD), 8, 10)
             ));
     public static final ResourceKey<Research> CHARGED_CREEPER = register("charged_creeper", builder -> builder
             .icon(Items.CREEPER_HEAD)
             .parents(LIGHTNING_ROD)
             .researchMethods(
-                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 12)
+                    new ConsumePackResearchMethod(List.of(ResearchPacks.OVERWORLD), 12, 10)
             ));
     public static final ResourceKey<Research> SKELETON_HORSE = register("skeleton_horse", builder -> builder
             .icon(Items.SKELETON_SKULL)
             .parents(LIGHTNING_ROD)
             .researchMethods(
-                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 12)
+                    new ConsumePackResearchMethod(List.of(ResearchPacks.OVERWORLD), 12, 10)
             ));
     public static final ResourceKey<Research> CHISELED_COPPER = register("chiseled_copper", builder -> builder
             .icon(Items.CHISELED_COPPER)
             .parents(COPPER_BLOCK)
             .researchMethods(
-                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 12)
+                    new ConsumePackResearchMethod(List.of(ResearchPacks.OVERWORLD), 12, 10)
             ));
     public static final ResourceKey<Research> OXIDIZED_COPPER = register("oxidized_copper", builder -> builder
             .icon(Items.OXIDIZED_COPPER)
             .parents(COPPER_BLOCK)
             .researchMethods(
-                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 12)
+                    new ConsumePackResearchMethod(List.of(ResearchPacks.OVERWORLD), 12, 10)
             ));
     public static final ResourceKey<Research> DIAMOND_SWORD = register("diamond_sword", builder -> builder
             .icon(Items.DIAMOND_SWORD)
             .parents(IRON_TOOLS)
             .researchMethods(
-                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 12)
+                    new ConsumePackResearchMethod(List.of(ResearchPacks.OVERWORLD), 12, 10)
             ));
     public static final ResourceKey<Research> TRIDENT = register("trident", builder -> builder
             .icon(Items.TRIDENT)
             .parents(IRON_TOOLS)
             .researchMethods(
-                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 12)
+                    new ConsumePackResearchMethod(List.of(ResearchPacks.OVERWORLD), 12, 10)
             ));
     public static final ResourceKey<Research> DIAMOND_ARMOR = register("diamond_armor", builder -> builder
             .icon(Items.DIAMOND_CHESTPLATE)
             .parents(IRON_ARMOR)
             .researchMethods(
-                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 12)
+                    new ConsumePackResearchMethod(List.of(ResearchPacks.OVERWORLD), 12, 10)
             ));
     public static final ResourceKey<Research> DIAMOND_HOE = register("diamond_hoe", builder -> builder
             .icon(Items.DIAMOND_HOE)
             .parents(DIAMOND_ARMOR, TRIDENT)
             .researchMethods(
-                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 12)
+                    new ConsumePackResearchMethod(List.of(ResearchPacks.OVERWORLD), 12, 10)
             ));
     public static final ResourceKey<Research> DIAMOND_PICKAXE = register("diamond_pickaxe", builder -> builder
             .icon(Items.DIAMOND_PICKAXE)
             .parents(DIAMOND_ARMOR, TRIDENT)
             .researchEffects(new RecipePredicate(ResourceLocation.withDefaultNamespace("diamond_pickaxe")))
             .researchMethods(
-                    new ConsumePackResearchMethod(ResearchPacks.OVERWORLD, 12)
+                    new ConsumePackResearchMethod(List.of(ResearchPacks.OVERWORLD), 12, 10)
             ));
 
     public static void bootstrap(BootstrapContext<Research> context) {

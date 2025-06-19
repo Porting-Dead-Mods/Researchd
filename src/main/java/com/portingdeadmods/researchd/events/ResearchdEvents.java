@@ -5,6 +5,7 @@ import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.data.PDLClientSavedData;
 import com.portingdeadmods.researchd.api.data.PDLSavedData;
 import com.portingdeadmods.researchd.api.data.SavedDataHolder;
+import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
@@ -171,22 +172,17 @@ public final class ResearchdEvents {
                     ResearchTeam team = entry.getValue();
                     ResearchProgress researchProgress = team.getResearchProgress();
 
-                    // TODO: Uh... this needs to be remade asap since its just a placeholder
                     // v Research Queue Logic v
                     ResearchQueue queue = researchProgress.researchQueue();
+
                     if (!queue.isEmpty()) {
-                        if (queue.getMaxResearchProgress() > queue.getResearchProgress()) {
-                            queue.setResearchProgress(queue.getResearchProgress() + 1);
-                        } else {
-                            queue.setResearchProgress(0);
-                            ResearchInstance first = queue.getEntries().getFirst();
-                            first.setResearchStatus(ResearchStatus.RESEARCHED);
-                            queue.remove(0);
-                            team.getResearchProgress().completeResearch(first);
-                            ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
-                            PacketDistributor.sendToAllPlayers(new ResearchFinishedPayload(server.getTickCount() * 50));
-                        }
+                        ResearchInstance instance = queue.getEntries().getFirst();
+                        Research research = ResearchHelper.getResearch(instance.getResearch(), server.registryAccess());
+
+                        // TODO: Continue when the ground basis is set n done
                     }
+
+
                     if (level.getGameTime() % 10 == 0) {
                         ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
                     }

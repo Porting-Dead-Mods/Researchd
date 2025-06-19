@@ -8,6 +8,7 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
 import com.portingdeadmods.researchd.impl.client.research.ClientConsumeItemResearchMethod;
+import com.portingdeadmods.researchd.impl.research.ResearchCompletionProgress;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
@@ -63,6 +64,11 @@ public record ConsumeItemResearchMethod(Ingredient toConsume, int count) impleme
         return Serializer.INSTANCE;
     }
 
+    @Override
+    public ResearchCompletionProgress getDefaultProgress() {
+        return new ResearchCompletionProgress(this.count);
+    }
+
     public static final class Serializer implements ResearchMethodSerializer<ConsumeItemResearchMethod> {
         public static final Serializer INSTANCE = new Serializer();
         public static final MapCodec<ConsumeItemResearchMethod> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -83,4 +89,5 @@ public record ConsumeItemResearchMethod(Ingredient toConsume, int count) impleme
             return null;
         }
     }
+
 }

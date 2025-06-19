@@ -8,6 +8,7 @@ import com.portingdeadmods.researchd.api.client.research.ClientResearchMethod;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
+import com.portingdeadmods.researchd.impl.research.ResearchCompletionProgress;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
@@ -53,5 +54,10 @@ public record OrResearchMethod(List<ResearchMethod> methods) implements Research
     @Override
     public ResearchMethodSerializer<?> getSerializer() {
         return SERIALIZER;
+    }
+
+    @Override
+    public ResearchCompletionProgress getDefaultProgress() {
+        return ResearchCompletionProgress.ONE();
     }
 }

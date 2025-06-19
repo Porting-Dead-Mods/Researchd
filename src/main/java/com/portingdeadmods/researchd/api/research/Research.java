@@ -24,7 +24,7 @@ public interface Research {
     /**
      * @return The research method that is required for this research
      */
-    ResearchMethod researchMethods();
+    ResearchMethod researchMethod();
 
     /**
      * @return The research effects that happen after researching this
