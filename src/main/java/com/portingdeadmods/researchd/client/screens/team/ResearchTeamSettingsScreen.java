@@ -26,6 +26,8 @@ public class ResearchTeamSettingsScreen extends BaseScreen {
     private final Screen prevScreen;
     private PlayerManagementDraggableWidget playerManagementWindow;
     private PlayerManagementDraggableWidget transferOwnershipWindow;
+    private EditBox teamNameEdit;
+    private String tempTeamName;
 
     public ResearchTeamSettingsScreen() {
         super(Component.literal("Team Settings"), 480, 264, 128, 195);
@@ -44,23 +46,47 @@ public class ResearchTeamSettingsScreen extends BaseScreen {
         this.layout = LinearLayout.vertical().spacing(8);
         this.layout.setPosition(this.leftPos + 8, this.topPos + 6);
         this.layout.addChild(new StringWidget(this.title, this.font));
-        EditBox editBox = this.layout.addChild(new EditBox(this.font, 112, 16, Component.empty()));
-        editBox.setValue(researchTeam.getName());
+        this.teamNameEdit = this.layout.addChild(new EditBox(this.font, 112, 16, Component.empty()));
+        if (this.tempTeamName == null) {
+            this.teamNameEdit.setValue(researchTeam.getName());
+        } else {
+            this.teamNameEdit.setValue(this.tempTeamName);
+            this.tempTeamName = null;
+        }
         this.layout.addChild(Button.builder(Component.literal("Manage Members"), btn -> {
             this.playerManagementWindow.visible = true;
         }).size(112, 16).build());
         this.layout.addChild(Button.builder(Component.literal("Transfer Ownership"), btn -> {
             this.transferOwnershipWindow.visible = true;
         }).size(112, 16).build());
-        this.layout.addChild(Button.builder(Component.literal("Leave"), btn -> {}).size(112, 16).build());
+        this.layout.addChild(Button.builder(Component.literal("Leave"), btn -> {
+        }).size(112, 16).build());
         this.layout.arrangeElements();
         this.layout.visitWidgets(this::addRenderableWidget);
 
-        this.playerManagementWindow = this.addRenderableWidget(new PlayerManagementDraggableWidget(this.leftPos, this.topPos, Component.empty()));
+        this.playerManagementWindow = new PlayerManagementDraggableWidget(
+                this.leftPos,
+                this.topPos,
+                this.researchTeamHelper.getTeamMembers(),
+                new PlayerManagementDraggableWidget.PlayerManagementButtons(true, true, true, false),
+                Component.empty()
+        );
         this.playerManagementWindow.visible = false;
+        this.playerManagementWindow.visitWidgets(this::addRenderableWidget);
 
-        this.transferOwnershipWindow = this.addRenderableWidget(new PlayerManagementDraggableWidget(this.leftPos + this.width / 2, this.topPos + height / 2, Component.empty()));
+        this.transferOwnershipWindow = new PlayerManagementDraggableWidget(
+                this.leftPos + this.width / 2,
+                this.topPos + this.height / 2,
+                this.researchTeamHelper.getTeamMembers(),
+                new PlayerManagementDraggableWidget.PlayerManagementButtons(false, false, false, true),
+                Component.empty()
+        );
         this.transferOwnershipWindow.visible = false;
+        this.transferOwnershipWindow.visitWidgets(this::addRenderableWidget);
+    }
+
+    public void setTempTeamName(String tempTeamName) {
+        this.tempTeamName = tempTeamName;
     }
 
     @Override

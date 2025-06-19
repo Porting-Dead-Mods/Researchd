@@ -142,14 +142,17 @@ public final class ResearchdEvents {
             LocalPlayer player = Minecraft.getInstance().player;
 
             if (player != null && level != null) {
-                ResearchProgress researchProgress = ResearchdSavedData.TEAM_RESEARCH.get().getData(level).getTeam(player.getUUID()).getResearchProgress();
-                if (researchProgress != null) {
-                    ResearchQueue queue = researchProgress.researchQueue();
-                    if (!queue.isEmpty()) {
-                        if (queue.getMaxResearchProgress() > queue.getResearchProgress()) {
-                            queue.setResearchProgress(queue.getResearchProgress() + 1);
-                        } else {
-                            queue.setResearchProgress(0);
+                ResearchTeamMap map = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
+                if (map != null) {
+                    ResearchProgress researchProgress = map.getTeam(player.getUUID()).getResearchProgress();
+                    if (researchProgress != null) {
+                        ResearchQueue queue = researchProgress.researchQueue();
+                        if (!queue.isEmpty()) {
+                            if (queue.getMaxResearchProgress() > queue.getResearchProgress()) {
+                                queue.setResearchProgress(queue.getResearchProgress() + 1);
+                            } else {
+                                queue.setResearchProgress(0);
+                            }
                         }
                     }
                 }

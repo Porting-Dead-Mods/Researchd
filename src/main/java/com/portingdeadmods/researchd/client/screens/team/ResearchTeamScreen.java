@@ -1,7 +1,6 @@
 package com.portingdeadmods.researchd.client.screens.team;
 
 import com.mojang.authlib.GameProfile;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.BaseScreen;
@@ -14,14 +13,12 @@ import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
-import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.layouts.SpacerElement;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
-import net.minecraft.world.phys.Vec2;
 
 import java.util.*;
 
@@ -31,7 +28,8 @@ public class ResearchTeamScreen extends BaseScreen {
     public static final WidgetSprites SETTINGS_BUTTON_SPRITES = new WidgetSprites(Researchd.rl("settings_button"), Researchd.rl("settings_button_focused"));
     public static final WidgetSprites INVITE_BUTTON_SPRITES = new WidgetSprites(Researchd.rl("invite_button"), Researchd.rl("invite_button_focused"));
     public static final WidgetSprites RECENT_RESEARCH_SPRITES = new WidgetSprites(Researchd.rl("recent_research"), Researchd.rl("recent_research_focused"));
-    private HeaderAndFooterLayout layout;
+    private LinearLayout layout;
+    private EditBox teamNameEdit;
     private final ClientResearchTeamHelper researchTeamHelper;
 
     public ResearchTeamScreen() {
@@ -50,36 +48,37 @@ public class ResearchTeamScreen extends BaseScreen {
 
         String name = researchTeam.getName();
 
-        List<GameProfile> members = this.researchTeamHelper.getPlayers();
+        List<GameProfile> members = this.researchTeamHelper.getTeamMembers();
 
         List<ResearchInstance> recentResearches = ResearchHelper.getRecentResearches(researchTeam);
 
-        this.layout = new HeaderAndFooterLayout(this);
-        LinearLayout layout = this.layout.addToContents(LinearLayout.vertical()).spacing(5);
+        this.layout = LinearLayout.vertical().spacing(5);
+
 
         LinearLayout headerLayout = layout.addChild(LinearLayout.horizontal().spacing(4));
-        EditBox teamNameEdit = headerLayout.addChild(new EditBox(this.font, 208, 16, Component.empty()) {
+        this.teamNameEdit = headerLayout.addChild(new EditBox(this.font, 208, 16, Component.empty()) {
             @Override
-            public void setValue(String text) {
-                String oldValue = this.getValue();
-                super.setValue(text);
-                String newValue = this.getValue();
-                if (!oldValue.equals(newValue)) {
-                    ResearchTeamScreen.this.researchTeamHelper.setTeamNameSynced(newValue);
+            public void setFocused(boolean focused) {
+                super.setFocused(focused);
+
+                if (!focused) {
+                    ResearchTeamScreen.this.researchTeamHelper.setTeamNameSynced(this.getValue());
                 }
             }
         });
 
-        teamNameEdit.setValue(name);
-        teamNameEdit.setTextColor(FastColor.ARGB32.color(255, 140, 140, 140));
-        teamNameEdit.setMaxLength(32);
-        teamNameEdit.setTextShadow(false);
-        teamNameEdit.setBordered(false);
+        this.teamNameEdit.setValue(name);
+        this.teamNameEdit.setTextColor(FastColor.ARGB32.color(255, 140, 140, 140));
+        this.teamNameEdit.setMaxLength(32);
+        this.teamNameEdit.setTextShadow(false);
+        this.teamNameEdit.setBordered(false);
         headerLayout.addChild(new SpacerElement(77, 0));
         headerLayout.addChild(new ImageButton(14, 14, INVITE_BUTTON_SPRITES, (btn) -> {
         }, Component.literal("Invite Player")));
         headerLayout.addChild(new ImageButton(14, 14, SETTINGS_BUTTON_SPRITES, (btn) -> {
-            Minecraft.getInstance().setScreen(new ResearchTeamSettingsScreen());
+            ResearchTeamSettingsScreen screen = new ResearchTeamSettingsScreen();
+            screen.setTempTeamName(this.teamNameEdit.getValue());
+            Minecraft.getInstance().setScreen(screen);
         }, Component.literal("Team Settings")));
         LinearLayout linearLayout = layout.addChild(LinearLayout.horizontal().spacing(12));
         LinearLayout teamMembersLayout = linearLayout.addChild(LinearLayout.vertical());
@@ -100,6 +99,14 @@ public class ResearchTeamScreen extends BaseScreen {
         layout.setX(this.leftPos + 10);
         layout.setY(this.topPos + 11);
         this.layout.visitWidgets(this::addRenderableWidget);
+    }
+
+    @Override
+    public void onClose() {
+        super.onClose();
+
+        this.researchTeamHelper.setTeamNameSynced(this.teamNameEdit.getValue());
+
     }
 
     @Override
