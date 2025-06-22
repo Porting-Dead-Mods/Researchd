@@ -5,7 +5,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Supplier;
 
 
-// TODO: Move to PDL
 /**
  * A thread-safe write-once lazy container that starts with null value
  * and can be initialized exactly once.

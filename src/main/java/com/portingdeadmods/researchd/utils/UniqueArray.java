@@ -3,13 +3,11 @@ package com.portingdeadmods.researchd.utils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
 import java.util.*;
 
-//TODO: Add this to PDL
 /**
  * A collection that maintains unique elements (like a Set) while providing
  * indexed access (like an ArrayList).
