@@ -87,7 +87,7 @@ public class TeamCommands {
 								.executes(context -> {
 									CommandSourceStack source = context.getSource();
 									ServerPlayer player = source.getPlayer();
-									Player otherPlayer = PlayerUtils.getPlayerFromString(source.getLevel(), StringArgumentType.getString(context, "player"));
+									Player otherPlayer = PlayerUtils.getPlayerFromName(source.getLevel(), StringArgumentType.getString(context, "player"));
 									ServerLevel level = source.getLevel();
 
 									if (player != null) {
@@ -103,7 +103,7 @@ public class TeamCommands {
 								.executes(context -> {
 									CommandSourceStack source = context.getSource();
 									ServerPlayer player = source.getPlayer();
-									Player otherPlayer = PlayerUtils.getPlayerFromString(source.getLevel(), StringArgumentType.getString(context, "player"));
+									Player otherPlayer = PlayerUtils.getPlayerFromName(source.getLevel(), StringArgumentType.getString(context, "player"));
 									ServerLevel level = source.getLevel();
 
 									if (player != null) {
@@ -119,7 +119,7 @@ public class TeamCommands {
 								.executes(context -> {
 									CommandSourceStack source = context.getSource();
 									ServerPlayer player = source.getPlayer();
-									Player otherPlayer = PlayerUtils.getPlayerFromString(source.getLevel(), StringArgumentType.getString(context, "player"));
+									Player otherPlayer = PlayerUtils.getPlayerFromName(source.getLevel(), StringArgumentType.getString(context, "player"));
 									ServerLevel level = source.getLevel();
 
 									if (player != null) {
