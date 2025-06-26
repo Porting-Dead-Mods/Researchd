@@ -70,13 +70,16 @@ jobs:
         run: |
           MOD_VERSION=$(sed -n 's/^mod_version=//p' gradle.properties | tr -d ' \r\n')
           MC_VERSION=$(sed -n 's/^minecraft_version=//p' gradle.properties | tr -d ' \r\n')
+          NEO_VERSION=$(sed -n 's/^neo_version=//p' gradle.properties | tr -d ' \r\n')
           
           echo "Mod version: $MOD_VERSION"
           echo "Minecraft version: $MC_VERSION"
+          echo "NeoForge Build version: $NEO_VERSION"
           
           cat >> $GITHUB_OUTPUT << EOF
           MOD_VERSION=${MOD_VERSION}
           MC_VERSION=${MC_VERSION}
+          NEO_VERSION=${NEO_VERSION}
           EOF
 
       - name: Find built JAR files
@@ -93,6 +96,23 @@ jobs:
           
           echo "JAR_NAME=$(basename $(find build/libs -name "*.jar" -not -name "*-sources.jar" -not -name "*-javadoc.jar" | head -1))"
           echo "JAR_NAME=$(basename $(find build/libs -name "*.jar" -not -name "*-sources.jar" -not -name "*-javadoc.jar" | head -1))" >> $GITHUB_OUTPUT
+
+      - name: Get previous tag
+        id: prev_tag
+        run: |
+          tag=$(git tag --sort=-creatordate | sed -n 2p || true)
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Get commit log
+        id: commit_log
+        run: |
+          if [ -z "${{ steps.prev_tag.outputs.tag }}" ]; then
+            echo "log=- First release" >> "$GITHUB_OUTPUT"
+          else
+            echo "log<<EOF" >> "$GITHUB_OUTPUT"
+            git log ${{ steps.prev_tag.outputs.tag }}..HEAD --pretty=format:"- %s (%an)" >> "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
+          fi
 
       # Only create tag and release if version was found in commit message
       - name: Create tag
@@ -116,11 +136,11 @@ jobs:
             ## Researchd ${{ steps.check_version.outputs.TAG }}
             
             ### Changes
-            ${{ github.event.head_commit.message }}
+            ${{ steps.commit_log.outputs.log }}
             
             ### Build Information
             - **Minecraft Version:** ${{ steps.mod_info.outputs.MC_VERSION }}
-            - **NeoForge Version:** 21.1.93+
+            - **NeoForge Version:** ${{ steps.mod_info.outputs.NEO_VERSION }}
             - **Mod Version:** ${{ steps.mod_info.outputs.MOD_VERSION }}
             
             ### Download
