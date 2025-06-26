@@ -23,7 +23,7 @@ jobs:
         id: check_version
         run: |
           COMMIT_MSG=$(git log -1 --pretty=%B)
-          echo "Commit message: $COMMIT_MSG" >> $GITHUB_OUTPUT
+          echo "Commit message: $COMMIT_MSG"
           
           # Check if commit message contains a semver pattern
           if [[ $COMMIT_MSG =~ v?([0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?) ]]; then
