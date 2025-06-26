@@ -65,10 +65,13 @@ jobs:
       - name: Get mod info
         id: mod_info
         run: |
-          MOD_VERSION=$(grep "mod_version" gradle.properties | cut -d'=' -f2 | tr -d ' ')
-          MC_VERSION=$(grep "minecraft_version" gradle.properties | cut -d'=' -f2 | tr -d ' ')
-          echo "MOD_VERSION=$MOD_VERSION" >> $GITHUB_OUTPUT
-          echo "MC_VERSION=$MC_VERSION" >> $GITHUB_OUTPUT
+          MOD_VERSION=$(sed -n 's/^mod_version=//p' gradle.properties | tr -d ' \r\n')
+          MC_VERSION=$(sed -n 's/^minecraft_version=//p' gradle.properties | tr -d ' \r\n')
+          
+          cat >> $GITHUB_OUTPUT << EOF
+          MOD_VERSION=${MOD_VERSION}
+          MC_VERSION=${MC_VERSION}
+          EOF
 
       - name: Find built JAR files
         id: find_jars
