@@ -3,6 +3,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'net.neoforged.moddev' version '1.0.23'
+    id 'com.matthewprenger.cursegradle' version '1.4.0'
 }
 
 tasks.named('wrapper', Wrapper).configure {
@@ -131,12 +132,44 @@ tasks.withType(JavaCompile).configureEach {
 
 java {
     withSourcesJar()
+    withJavadocJar()
 }
-
 
 idea {
     module {
         downloadSources = true
         downloadJavadoc = true
+    }
+}
+
+if (System.getenv('CURSEFORGE_TOKEN')) {
+    curseforge {
+        apiKey = System.getenv('CURSEFORGE_TOKEN')
+
+        project {
+            id = 1283539
+            changelog = System.getenv('CHANGELOG') ?: 'See GitHub for changes'
+            changelogType = 'markdown'
+            releaseType = System.getenv('RELEASE_TYPE') ?: 'release'
+
+            addGameVersion '1.21.1'
+            addGameVersion 'NeoForge'
+
+            mainArtifact(jar) {
+                displayName = "Researchd ${System.getenv('MOD_VERSION')}-${System.getenv('MC_VERSION')}"
+            }
+            addArtifact sourcesJar
+            addArtifact javadocJar
+
+            relations {
+                requiredDependency 'porting-dead-libs'
+            }
+        }
+
+        options {
+            javaVersionAutoDetect = false
+            javaIntegration = false
+            forgeGradleIntegration = false
+        }
     }
 }
