@@ -1,0 +1,144 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Check for version in commit message
+        id: check_version
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          echo "Commit message: $COMMIT_MSG"
+          
+          # Check if commit message contains a semver pattern
+          if [[ $COMMIT_MSG =~ v?([0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?) ]]; then
+            VERSION="${BASH_REMATCH[1]}"
+            TAG="v$VERSION"
+            echo "Found version: $VERSION"
+            echo "SHOULD_RELEASE=true" >> $GITHUB_OUTPUT
+            echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+            echo "TAG=$TAG" >> $GITHUB_OUTPUT
+          
+            # Determine release type
+            if [[ "$VERSION" == *"-alpha"* ]]; then
+              echo "RELEASE_TYPE=alpha" >> $GITHUB_OUTPUT
+            elif [[ "$VERSION" == *"-beta"* ]]; then
+              echo "RELEASE_TYPE=beta" >> $GITHUB_OUTPUT
+            else
+              echo "RELEASE_TYPE=release" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "No version found in commit message"
+            echo "SHOULD_RELEASE=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      - name: Get mod info
+        id: mod_info
+        run: |
+          MOD_VERSION=$(grep "mod_version" gradle.properties | cut -d'=' -f2 | tr -d ' ')
+          MC_VERSION=$(grep "minecraft_version" gradle.properties | cut -d'=' -f2 | tr -d ' ')
+          echo "MOD_VERSION=$MOD_VERSION" >> $GITHUB_OUTPUT
+          echo "MC_VERSION=$MC_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Find built JAR files
+        id: find_jars
+        run: |
+          echo "JAR_PATH=$(find build/libs -name "*.jar" -not -name "*-sources.jar" -not -name "*-javadoc.jar" | head -1)" >> $GITHUB_OUTPUT
+          echo "SOURCES_JAR_PATH=$(find build/libs -name "*-sources.jar" | head -1)" >> $GITHUB_OUTPUT
+          echo "JAVADOC_JAR_PATH=$(find build/libs -name "*-javadoc.jar" | head -1)" >> $GITHUB_OUTPUT
+          echo "JAR_NAME=$(basename $(find build/libs -name "*.jar" -not -name "*-sources.jar" -not -name "*-javadoc.jar" | head -1))" >> $GITHUB_OUTPUT
+
+      # Only create tag and release if version was found in commit message
+      - name: Create tag
+        if: steps.check_version.outputs.SHOULD_RELEASE == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git tag -a ${{ steps.check_version.outputs.TAG }} -m "Release ${{ steps.check_version.outputs.TAG }}"
+          git push origin ${{ steps.check_version.outputs.TAG }}
+
+      - name: Create Release
+        if: steps.check_version.outputs.SHOULD_RELEASE == 'true'
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.check_version.outputs.TAG }}
+          release_name: Researchd ${{ steps.check_version.outputs.TAG }}
+          body: |
+            ## Researchd ${{ steps.check_version.outputs.TAG }}
+            
+            ### Changes
+            ${{ github.event.head_commit.message }}
+            
+            ### Build Information
+            - **Minecraft Version:** ${{ steps.mod_info.outputs.MC_VERSION }}
+            - **NeoForge Version:** 21.1.93+
+            - **Mod Version:** ${{ steps.mod_info.outputs.MOD_VERSION }}
+            
+            ### Download
+            Available on [CurseForge](https://www.curseforge.com/minecraft/mc-mods/researchd) and below.
+          draft: false
+          prerelease: ${{ contains(steps.check_version.outputs.VERSION, '-') }}
+
+      - name: Upload all JARs to Release
+        if: steps.check_version.outputs.SHOULD_RELEASE == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UPLOAD_URL: ${{ steps.create_release.outputs.upload_url }}
+        run: |
+          for file in build/libs/*.jar; do
+            echo "Uploading $file"
+            curl -sSL \
+              -X POST \
+              -H "Authorization: token $GITHUB_TOKEN" \
+              -H "Content-Type: application/java-archive" \
+              --data-binary @"$file" \
+              "$UPLOAD_URL?name=$(basename $file)"
+          done
+
+      - name: Upload to CurseForge
+        if: steps.check_version.outputs.SHOULD_RELEASE == 'true' && env.CURSEFORGE_TOKEN != ''
+        env:
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+          RELEASE_TYPE: ${{ steps.check_version.outputs.RELEASE_TYPE }}
+          CHANGELOG: ${{ github.event.head_commit.message }}
+        run: ./gradlew curseforge
+
+      # Always upload artifacts for every build (even without release)
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: build/libs/*.jar
