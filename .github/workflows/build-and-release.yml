@@ -23,12 +23,13 @@ jobs:
         id: check_version
         run: |
           COMMIT_MSG=$(git log -1 --pretty=%B)
-          echo "Commit message: $COMMIT_MSG"
+          echo "Commit message: $COMMIT_MSG" >> $GITHUB_OUTPUT
           
           # Check if commit message contains a semver pattern
           if [[ $COMMIT_MSG =~ v?([0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?) ]]; then
             VERSION="${BASH_REMATCH[1]}"
             TAG="v$VERSION"
+  
             echo "Found version: $VERSION"
             echo "SHOULD_RELEASE=true" >> $GITHUB_OUTPUT
             echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
@@ -42,6 +43,8 @@ jobs:
             else
               echo "RELEASE_TYPE=release" >> $GITHUB_OUTPUT
             fi
+          
+            echo "Release type: $RELEASE_TYPE"
           else
             echo "No version found in commit message"
             echo "SHOULD_RELEASE=false" >> $GITHUB_OUTPUT
@@ -68,6 +71,9 @@ jobs:
           MOD_VERSION=$(sed -n 's/^mod_version=//p' gradle.properties | tr -d ' \r\n')
           MC_VERSION=$(sed -n 's/^minecraft_version=//p' gradle.properties | tr -d ' \r\n')
           
+          echo "Mod version: $MOD_VERSION"
+          echo "Minecraft version: $MC_VERSION"
+          
           cat >> $GITHUB_OUTPUT << EOF
           MOD_VERSION=${MOD_VERSION}
           MC_VERSION=${MC_VERSION}
@@ -76,9 +82,16 @@ jobs:
       - name: Find built JAR files
         id: find_jars
         run: |
+          echo "JAR_PATH=$(find build/libs -name "*.jar" -not -name "*-sources.jar" -not -name "*-javadoc.jar" | head -1)"
           echo "JAR_PATH=$(find build/libs -name "*.jar" -not -name "*-sources.jar" -not -name "*-javadoc.jar" | head -1)" >> $GITHUB_OUTPUT
+          
+          echo "SOURCES_JAR_PATH=$(find build/libs -name "*-sources.jar" | head -1)"
           echo "SOURCES_JAR_PATH=$(find build/libs -name "*-sources.jar" | head -1)" >> $GITHUB_OUTPUT
+          
+          echo "JAVADOC_JAR_PATH=$(find build/libs -name "*-javadoc.jar" | head -1)"
           echo "JAVADOC_JAR_PATH=$(find build/libs -name "*-javadoc.jar" | head -1)" >> $GITHUB_OUTPUT
+          
+          echo "JAR_NAME=$(basename $(find build/libs -name "*.jar" -not -name "*-sources.jar" -not -name "*-javadoc.jar" | head -1))"
           echo "JAR_NAME=$(basename $(find build/libs -name "*.jar" -not -name "*-sources.jar" -not -name "*-javadoc.jar" | head -1))" >> $GITHUB_OUTPUT
 
       # Only create tag and release if version was found in commit message
