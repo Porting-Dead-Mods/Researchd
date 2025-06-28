@@ -28,7 +28,6 @@ public class ResearchTeamScreen extends BaseScreen {
     public static final WidgetSprites SETTINGS_BUTTON_SPRITES = new WidgetSprites(Researchd.rl("settings_button"), Researchd.rl("settings_button_disabled"), Researchd.rl("settings_button_focused"));
     public static final WidgetSprites INVITE_BUTTON_SPRITES = new WidgetSprites(Researchd.rl("invite_button"), Researchd.rl("invite_button_disabled"), Researchd.rl("invite_button_focused"));
     public static final WidgetSprites RECENT_RESEARCH_SPRITES = new WidgetSprites(Researchd.rl("recent_research"), Researchd.rl("recent_research_focused"));
-    private final ClientResearchTeamHelper researchTeamHelper;
     private LocalPlayer player;
 
     // Widgets n Layouts
@@ -38,9 +37,7 @@ public class ResearchTeamScreen extends BaseScreen {
     private ImageButton settingsButton;
 
     public ResearchTeamScreen() {
-        super(Component.translatable("screen.researchd.research_team"), 480, 264, 480 - 64 * 2, 264 - 32 * 2);
-
-        this.researchTeamHelper = new ClientResearchTeamHelper();
+        super(Component.translatable("screen.researchd.research_team.title"), 480, 264, 480 - 64 * 2, 264 - 32 * 2);
     }
 
     @Override
@@ -83,14 +80,14 @@ public class ResearchTeamScreen extends BaseScreen {
         headerLayout.addChild(new SpacerElement(77, 0));
 
         this.inviteButton = new ImageButton(14, 14, INVITE_BUTTON_SPRITES, (btn) -> {
-        }, Component.literal("Invite Player"));
+        }, Component.translatable("screen.researchd.research_team.buttons.invite"));
         headerLayout.addChild(this.inviteButton);
 
         this.settingsButton = new ImageButton(14, 14, SETTINGS_BUTTON_SPRITES, (btn) -> {
             ResearchTeamSettingsScreen screen = new ResearchTeamSettingsScreen();
             screen.setTempTeamName(this.teamNameEdit.getValue());
             Minecraft.getInstance().setScreen(screen);
-        }, Component.literal("Team Settings"));
+        }, Component.translatable("screen.researchd.research_team.buttons.team_settings"));
         headerLayout.addChild(this.settingsButton);
 
         // Layout - Elements
@@ -98,7 +95,7 @@ public class ResearchTeamScreen extends BaseScreen {
 
         // Layout - Elements - Team Information
         LinearLayout teamMembersLayout = linearLayout.addChild(LinearLayout.vertical());
-        teamMembersLayout.addChild(new StringWidget(Component.literal("Members"), this.font));
+        teamMembersLayout.addChild(new StringWidget(Component.translatable("screen.researchd.research_team.titles.members"), this.font));
         teamMembersLayout.addChild(new SpacerElement(0, 2));
         for (GameProfile member : members) {
             teamMembersLayout.addChild(new TeamMemberWidget(94, 22, member, TEAM_MEMBER_BUTTON_SPRITES, btn -> {
@@ -107,7 +104,7 @@ public class ResearchTeamScreen extends BaseScreen {
 
         // Layout - Elements - Recent Researches
         LinearLayout recentResearchesLayout = linearLayout.addChild(LinearLayout.vertical());
-        recentResearchesLayout.addChild(new StringWidget(Component.literal("Recently Researched"), this.font));
+        recentResearchesLayout.addChild(new StringWidget(Component.translatable("screen.researchd.research_team.titles.recently_researched"), this.font));
         recentResearchesLayout.addChild(new SpacerElement(0, 2));
         for (ResearchInstance instance : recentResearches) {
             recentResearchesLayout.addChild(new RecentResearchWidget(223, 32, instance, RECENT_RESEARCH_SPRITES, (btn1) -> {
