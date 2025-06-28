@@ -51,8 +51,8 @@ public class ClientResearchTeamHelper {
      * <span color="yellow">1 - Moderator</span> <br>
      * <span color="green">2 - Owner</span> <br>
      */
-    public int getPlayerPermissionLevel(UUID uuid) {
-        return this.getPlayerRole(uuid).getPermissionLevel();
+    public static int getPlayerPermissionLevel(UUID uuid) {
+        return getPlayerRole(uuid).getPermissionLevel();
     }
 
     /**
@@ -61,8 +61,8 @@ public class ClientResearchTeamHelper {
      * <span color="yellow">1 - Moderator</span> <br>
      * <span color="green">2 - Owner</span> <br>
      */
-    public int getPlayerPermissionLevel(Player player) {
-        return this.getPlayerRole(player.getUUID()).getPermissionLevel();
+    public static int getPlayerPermissionLevel(Player player) {
+        return getPlayerRole(player.getUUID()).getPermissionLevel();
     }
 
     public static List<GameProfile> getTeamMembers() {
