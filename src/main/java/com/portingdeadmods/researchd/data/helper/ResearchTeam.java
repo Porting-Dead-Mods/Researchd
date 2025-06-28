@@ -1,5 +1,6 @@
 package com.portingdeadmods.researchd.data.helper;
 
+import com.mojang.authlib.GameProfile;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.utils.LazyFinal;
@@ -22,6 +23,8 @@ import java.util.UUID;
 
 // TODO: Move to api
 public class ResearchTeam {
+	public static GameProfile DEBUG_MEMBER = new GameProfile(UUID.randomUUID(), "Test player");
+
 	private String name;
 	private final List<UUID> members;
 	private final List<UUID> moderators;
@@ -84,7 +87,8 @@ public class ResearchTeam {
 	 * @param player The Owner
 	 */
 	public static ResearchTeam createDefaultTeam(ServerPlayer player) {
-		ResearchTeam team = new ResearchTeam(player.getDisplayName().getString() + "'s Team", List.of(player.getUUID()), java.util.List.of(), java.util.List.of(), java.util.List.of(), player.getUUID(), ResearchProgress.EMPTY);
+		// FIXME: Remove debugging here
+		ResearchTeam team = new ResearchTeam(player.getDisplayName().getString() + "'s Team", List.of(player.getUUID(), DEBUG_MEMBER.getId()), List.of(), List.of(), List.of(), player.getUUID(), ResearchProgress.EMPTY);
 		team.setCreationTime(player.getServer().getTickCount() * 50);
 		return team;
 	}

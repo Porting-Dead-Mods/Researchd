@@ -3,6 +3,9 @@ package com.portingdeadmods.researchd.client.screens.widgets;
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
+import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
+import com.portingdeadmods.researchd.data.helper.ResearchTeamRole;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -11,25 +14,33 @@ import net.minecraft.client.gui.components.PlayerFaceRenderer;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class PlayerManagementList extends ContainerObjectSelectionList<PlayerManagementList.Entry> {
     public static final ResourceLocation PLAYER_ENTRY_TEXTURE = Researchd.rl("player");
     private int scrollBarPos;
+    private final ClientResearchTeamHelper researchTeamHelper;
 
     public PlayerManagementList(int width, int height, int y, int itemHeight) {
         super(Minecraft.getInstance(), width, height, y, itemHeight);
+        this.researchTeamHelper = new ClientResearchTeamHelper();
     }
 
     @Override
     public void setPosition(int x, int y) {
         super.setPosition(x, y);
         this.scrollBarPos = x + width;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
     }
 
     @Override
@@ -61,33 +72,44 @@ public class PlayerManagementList extends ContainerObjectSelectionList<PlayerMan
 
     @Override
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        PoseStack poseStack = guiGraphics.pose();
+        if (this.visible) {
+            PoseStack poseStack = guiGraphics.pose();
 
-        poseStack.pushPose();
-        {
-            poseStack.translate(0, 0, 500);
-            super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+            poseStack.pushPose();
+            {
+                poseStack.translate(0, 0, 500);
+                super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+                Entry entry = this.getEntryAtPosition(mouseX, mouseY);
+                if (entry != null) {
+                    poseStack.translate(0, 0, 502);
+                    guiGraphics.renderTooltip(Minecraft.getInstance().font, ClientResearchTeamHelper.getPlayerRole(entry.memberProfile.getId()).getDisplayName(), mouseX, mouseY);
+                }
+            }
+            poseStack.popPose();
         }
-        poseStack.popPose();
     }
 
     public static class Entry extends ContainerObjectSelectionList.Entry<Entry> {
         private final GameProfile memberProfile;
-        private final PlayerManagementDraggableWidget.PlayerManagementButtons buttonSettings;
         private final List<DraggableWidgetImageButton> buttonWidgets;
 
         private final AbstractWidget parent;
 
         public Entry(GameProfile memberProfile, PlayerManagementDraggableWidget.PlayerManagementButtons buttonSettings, AbstractWidget parent) {
             this.memberProfile = memberProfile;
-            this.buttonSettings = buttonSettings;
             this.buttonWidgets = new ArrayList<>();
             this.parent = parent;
 
-            for (WidgetSprites sprites : this.buttonSettings.getSprites()) {
-                this.buttonWidgets.add(new DraggableWidgetImageButton(0, 0, 12, 12, sprites, btn -> {
-                    Researchd.LOGGER.debug("HEllo :3");
-                }));
+            if (ClientResearchTeamHelper.getPlayerRole(memberProfile.getId()) != ResearchTeamRole.OWNER) {
+                for (Map.Entry<PlayerManagementDraggableWidget.PlayerManagementButtonType, WidgetSprites> entry : buttonSettings.getSprites().entrySet()) {
+                    this.buttonWidgets.add(new DraggableWidgetImageButton(0, 0, 12, 12, entry.getValue(), btn -> {
+                        switch (entry.getKey()) {
+                            case PROMOTE -> ClientResearchTeamHelper.promoteTeamMemberSynced(this.memberProfile);
+                            case DEMOTE -> ClientResearchTeamHelper.demoteTeamMemberSynced(this.memberProfile);
+                            case REMOVE -> ClientResearchTeamHelper.removeTeamMemberSynced(this.memberProfile);
+                        }
+                    }));
+                }
             }
         }
 

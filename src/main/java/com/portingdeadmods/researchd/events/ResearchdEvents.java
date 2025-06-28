@@ -109,9 +109,9 @@ public final class ResearchdEvents {
             if (event.getEntity() instanceof ServerPlayer serverPlayer) {
                 MinecraftServer server = serverPlayer.server;
                 ServerLevel level = server.overworld();
-                ResearchTeamMap researchData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
-                researchData.initPlayer(serverPlayer);
-                ResearchdSavedData.TEAM_RESEARCH.get().setData(level, researchData);
+                ResearchTeamMap researchTeamMap = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
+                researchTeamMap.initPlayer(serverPlayer);
+                ResearchdSavedData.TEAM_RESEARCH.get().setData(level, researchTeamMap);
 
                 for (Map.Entry<ResourceKey<PDLSavedData<?>>, PDLSavedData<?>> savedData : ResearchdRegistries.SAVED_DATA.entrySet()) {
                     PDLSavedData<?> value = savedData.getValue();

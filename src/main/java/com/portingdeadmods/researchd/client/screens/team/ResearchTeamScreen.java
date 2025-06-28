@@ -48,7 +48,7 @@ public class ResearchTeamScreen extends BaseScreen {
 
         String name = researchTeam.getName();
 
-        List<GameProfile> members = this.researchTeamHelper.getTeamMembers();
+        List<GameProfile> members = ClientResearchTeamHelper.getTeamMembers();
 
         List<ResearchInstance> recentResearches = ResearchHelper.getRecentResearches(researchTeam);
 
@@ -62,7 +62,7 @@ public class ResearchTeamScreen extends BaseScreen {
                 super.setFocused(focused);
 
                 if (!focused) {
-                    ResearchTeamScreen.this.researchTeamHelper.setTeamNameSynced(this.getValue());
+                    ClientResearchTeamHelper.setTeamNameSynced(this.getValue());
                 }
             }
         });
@@ -105,7 +105,7 @@ public class ResearchTeamScreen extends BaseScreen {
     public void onClose() {
         super.onClose();
 
-        this.researchTeamHelper.setTeamNameSynced(this.teamNameEdit.getValue());
+        ClientResearchTeamHelper.setTeamNameSynced(this.teamNameEdit.getValue());
 
     }
 
