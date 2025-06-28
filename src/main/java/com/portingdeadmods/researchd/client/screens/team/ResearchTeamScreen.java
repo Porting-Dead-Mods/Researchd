@@ -25,12 +25,17 @@ import java.util.*;
 public class ResearchTeamScreen extends BaseScreen {
     public static final ResourceLocation SCREEN_TEXTURE = Researchd.rl("textures/gui/team_screen.png");
     public static final WidgetSprites TEAM_MEMBER_BUTTON_SPRITES = new WidgetSprites(Researchd.rl("team_member"), Researchd.rl("team_member_focused"));
-    public static final WidgetSprites SETTINGS_BUTTON_SPRITES = new WidgetSprites(Researchd.rl("settings_button"), Researchd.rl("settings_button_focused"));
-    public static final WidgetSprites INVITE_BUTTON_SPRITES = new WidgetSprites(Researchd.rl("invite_button"), Researchd.rl("invite_button_focused"));
+    public static final WidgetSprites SETTINGS_BUTTON_SPRITES = new WidgetSprites(Researchd.rl("settings_button"), Researchd.rl("settings_button_disabled"), Researchd.rl("settings_button_focused"));
+    public static final WidgetSprites INVITE_BUTTON_SPRITES = new WidgetSprites(Researchd.rl("invite_button"), Researchd.rl("invite_button_disabled"), Researchd.rl("invite_button_focused"));
     public static final WidgetSprites RECENT_RESEARCH_SPRITES = new WidgetSprites(Researchd.rl("recent_research"), Researchd.rl("recent_research_focused"));
+    private final ClientResearchTeamHelper researchTeamHelper;
+    private LocalPlayer player;
+
+    // Widgets n Layouts
     private LinearLayout layout;
     private EditBox teamNameEdit;
-    private final ClientResearchTeamHelper researchTeamHelper;
+    private ImageButton inviteButton;
+    private ImageButton settingsButton;
 
     public ResearchTeamScreen() {
         super(Component.translatable("screen.researchd.research_team"), 480, 264, 480 - 64 * 2, 264 - 32 * 2);
@@ -43,19 +48,21 @@ public class ResearchTeamScreen extends BaseScreen {
         super.init();
 
         Minecraft mc = Minecraft.getInstance();
-        LocalPlayer player = mc.player;
+        this.player = mc.player;
+
+        // Team information
         ResearchTeam researchTeam = ResearchTeamHelper.getResearchTeam(Objects.requireNonNull(player));
-
         String name = researchTeam.getName();
-
         List<GameProfile> members = ClientResearchTeamHelper.getTeamMembers();
-
         List<ResearchInstance> recentResearches = ResearchHelper.getRecentResearches(researchTeam);
 
+        // Layout setup
         this.layout = LinearLayout.vertical().spacing(5);
 
-
+        // Layout - Header
         LinearLayout headerLayout = layout.addChild(LinearLayout.horizontal().spacing(4));
+
+        // Layout - Header - Team Name
         this.teamNameEdit = headerLayout.addChild(new EditBox(this.font, 208, 16, Component.empty()) {
             @Override
             public void setFocused(boolean focused) {
@@ -66,35 +73,48 @@ public class ResearchTeamScreen extends BaseScreen {
                 }
             }
         });
-
         this.teamNameEdit.setValue(name);
         this.teamNameEdit.setTextColor(FastColor.ARGB32.color(255, 140, 140, 140));
         this.teamNameEdit.setMaxLength(32);
         this.teamNameEdit.setTextShadow(false);
         this.teamNameEdit.setBordered(false);
+
+        // Layout - Header - Buttons
         headerLayout.addChild(new SpacerElement(77, 0));
-        headerLayout.addChild(new ImageButton(14, 14, INVITE_BUTTON_SPRITES, (btn) -> {
-        }, Component.literal("Invite Player")));
-        headerLayout.addChild(new ImageButton(14, 14, SETTINGS_BUTTON_SPRITES, (btn) -> {
+
+        this.inviteButton = new ImageButton(14, 14, INVITE_BUTTON_SPRITES, (btn) -> {
+        }, Component.literal("Invite Player"));
+        headerLayout.addChild(this.inviteButton);
+
+        this.settingsButton = new ImageButton(14, 14, SETTINGS_BUTTON_SPRITES, (btn) -> {
             ResearchTeamSettingsScreen screen = new ResearchTeamSettingsScreen();
             screen.setTempTeamName(this.teamNameEdit.getValue());
             Minecraft.getInstance().setScreen(screen);
-        }, Component.literal("Team Settings")));
+        }, Component.literal("Team Settings"));
+        headerLayout.addChild(this.settingsButton);
+
+        // Layout - Elements
         LinearLayout linearLayout = layout.addChild(LinearLayout.horizontal().spacing(12));
+
+        // Layout - Elements - Team Information
         LinearLayout teamMembersLayout = linearLayout.addChild(LinearLayout.vertical());
-        LinearLayout recentResearchesLayout = linearLayout.addChild(LinearLayout.vertical());
         teamMembersLayout.addChild(new StringWidget(Component.literal("Members"), this.font));
         teamMembersLayout.addChild(new SpacerElement(0, 2));
         for (GameProfile member : members) {
             teamMembersLayout.addChild(new TeamMemberWidget(94, 22, member, TEAM_MEMBER_BUTTON_SPRITES, btn -> {
             }));
         }
+
+        // Layout - Elements - Recent Researches
+        LinearLayout recentResearchesLayout = linearLayout.addChild(LinearLayout.vertical());
         recentResearchesLayout.addChild(new StringWidget(Component.literal("Recently Researched"), this.font));
         recentResearchesLayout.addChild(new SpacerElement(0, 2));
         for (ResearchInstance instance : recentResearches) {
             recentResearchesLayout.addChild(new RecentResearchWidget(223, 32, instance, RECENT_RESEARCH_SPRITES, (btn1) -> {
             }));
         }
+
+        // Layout - Final
         this.layout.arrangeElements();
         layout.setX(this.leftPos + 10);
         layout.setY(this.topPos + 11);
@@ -119,6 +139,9 @@ public class ResearchTeamScreen extends BaseScreen {
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
+
+        this.settingsButton.active = (ClientResearchTeamHelper.getPlayerPermissionLevel(this.player) >= 1);
+        this.inviteButton.active = (ClientResearchTeamHelper.getPlayerPermissionLevel(this.player) > 0);
     }
 
     @Override
