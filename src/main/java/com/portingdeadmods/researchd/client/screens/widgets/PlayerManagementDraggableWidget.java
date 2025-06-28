@@ -19,6 +19,7 @@ import java.util.function.Consumer;
 public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
     public static final ResourceLocation WINDOW_TEXTURE = Researchd.rl("textures/gui/player_management_window.png");
     private final List<GameProfile> members;
+
     private final PlayerManagementButtons buttonSettings;
     private final List<DraggableWidgetImageButton> buttonWidgets;
     private final PlayerManagementList managementList;
@@ -36,7 +37,7 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
         this.managementList = new PlayerManagementList(84, 116, 0, 16);
         this.managementList.setPosition(x + 6, y + 6);
         for (GameProfile member : members) {
-            this.managementList.addEntry(new PlayerManagementList.Entry(member, buttonSettings));
+            this.managementList.addEntry(new PlayerManagementList.Entry(member, buttonSettings, this));
         }
     }
 

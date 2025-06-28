@@ -7,6 +7,7 @@ import com.portingdeadmods.researchd.data.helper.ResearchTeamRole;
 import com.portingdeadmods.researchd.networking.team.TeamSetNamePayload;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
@@ -35,6 +36,26 @@ public class ClientResearchTeamHelper {
             return ResearchTeamRole.MODERATOR;
         }
         return ResearchTeamRole.MEMBER;
+    }
+
+    /**
+     * Returns the permission level of the player. <br>
+     * <span color="red">0 - Member</span> <br>
+     * <span color="yellow">1 - Moderator</span> <br>
+     * <span color="green">2 - Owner</span> <br>
+     */
+    public int getPlayerPermissionLevel(UUID uuid) {
+        return this.getPlayerRole(uuid).getPermissionLevel();
+    }
+
+    /**
+     * Returns the permission level of the player. <br>
+     * <span color="red">0 - Member</span> <br>
+     * <span color="yellow">1 - Moderator</span> <br>
+     * <span color="green">2 - Owner</span> <br>
+     */
+    public int getPlayerPermissionLevel(Player player) {
+        return this.getPlayerRole(player.getUUID()).getPermissionLevel();
     }
 
     public List<GameProfile> getTeamMembers() {

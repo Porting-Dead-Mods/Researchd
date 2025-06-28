@@ -76,10 +76,14 @@ public class PlayerManagementList extends ContainerObjectSelectionList<PlayerMan
         private final PlayerManagementDraggableWidget.PlayerManagementButtons buttonSettings;
         private final List<DraggableWidgetImageButton> buttonWidgets;
 
-        public Entry(GameProfile memberProfile, PlayerManagementDraggableWidget.PlayerManagementButtons buttonSettings) {
+        private final AbstractWidget parent;
+
+        public Entry(GameProfile memberProfile, PlayerManagementDraggableWidget.PlayerManagementButtons buttonSettings, AbstractWidget parent) {
             this.memberProfile = memberProfile;
             this.buttonSettings = buttonSettings;
             this.buttonWidgets = new ArrayList<>();
+            this.parent = parent;
+
             for (WidgetSprites sprites : this.buttonSettings.getSprites()) {
                 this.buttonWidgets.add(new DraggableWidgetImageButton(0, 0, 12, 12, sprites, btn -> {
                     Researchd.LOGGER.debug("HEllo :3");
@@ -98,6 +102,8 @@ public class PlayerManagementList extends ContainerObjectSelectionList<PlayerMan
 
         @Override
         public void render(GuiGraphics guiGraphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean hovered, float partialTicks) {
+            if (!this.parent.visible) return;
+
             PoseStack poseStack = guiGraphics.pose();
             guiGraphics.blitSprite(PLAYER_ENTRY_TEXTURE, left + 66, top - 4, 84, 16);
             poseStack.pushPose();
