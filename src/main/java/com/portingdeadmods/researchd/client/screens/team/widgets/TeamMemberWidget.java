@@ -15,7 +15,6 @@ import net.minecraft.util.Mth;
 public class TeamMemberWidget extends ImageButton {
     private final GameProfile gameProfile;
     private final ResearchTeamRole role;
-    private final ClientResearchTeamHelper researchTeamHelper;
 
     public TeamMemberWidget(int width, int height, GameProfile gameProfile, WidgetSprites sprites, OnPress onPress) {
         this(0, 0, width, height, gameProfile, sprites, onPress);
@@ -23,8 +22,7 @@ public class TeamMemberWidget extends ImageButton {
     public TeamMemberWidget(int x, int y, int width, int height, GameProfile gameProfile, WidgetSprites sprites, OnPress onPress) {
         super(x, y, width, height, sprites, onPress);
         this.gameProfile = gameProfile;
-        this.researchTeamHelper = new ClientResearchTeamHelper();
-        this.role = this.researchTeamHelper.getPlayerRole(Minecraft.getInstance().player.getUUID());
+        this.role = ClientResearchTeamHelper.getPlayerRole(gameProfile.getId());
     }
 
     @Override

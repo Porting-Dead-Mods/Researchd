@@ -1,5 +1,6 @@
 package com.portingdeadmods.researchd.client.screens.team.widgets;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
@@ -29,6 +30,13 @@ public class RecentResearchWidget extends ImageButton {
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
 
-        guiGraphics.renderFakeItem(researchIcon, getX(), getY());
+        PoseStack poseStack = guiGraphics.pose();
+        float scale = 2;
+        poseStack.pushPose();
+        {
+            poseStack.scale(scale, scale, scale);
+            guiGraphics.renderFakeItem(researchIcon, (int) ((getX() + this.height / 2f) / scale), (int) ((getY() + this.height / 2f) / scale));
+        }
+        poseStack.popPose();
     }
 }

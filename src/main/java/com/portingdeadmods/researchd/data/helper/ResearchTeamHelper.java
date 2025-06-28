@@ -46,6 +46,10 @@ public final class ResearchTeamHelper {
         return ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeam(uuid);
     }
 
+    public static ResearchTeam getResearchTeamByUUID(Level level, UUID uuid) {
+        return ResearchdSavedData.TEAM_RESEARCH.get().getData(level).getTeam(uuid);
+    }
+
     public static boolean isInATeam(Player player) {
         UUID uuid = player.getUUID();
         return ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeam(uuid) != null;

@@ -13,13 +13,14 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
     public static final ResourceLocation WINDOW_TEXTURE = Researchd.rl("textures/gui/player_management_window.png");
     private final List<GameProfile> members;
-
     private final PlayerManagementButtons buttonSettings;
     private final List<DraggableWidgetImageButton> buttonWidgets;
     private final PlayerManagementList managementList;
@@ -30,8 +31,8 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
         this.buttonSettings = buttonSettings;
         this.buttonWidgets = new ArrayList<>();
         int i = 0;
-        for (WidgetSprites sprites : this.buttonSettings.getSprites()) {
-            this.buttonWidgets.add(new DraggableWidgetImageButton(getX() + 6 + i * (12 + 2), getY() + 6, 12, 12, sprites, btn -> {}));
+        for (Map.Entry<PlayerManagementButtonType, WidgetSprites> entry : this.buttonSettings.getSprites().entrySet()) {
+            this.buttonWidgets.add(new DraggableWidgetImageButton(getX() + 6 + i * (12 + 2), getY() + 6, 12, 12, entry.getValue(), btn -> {}));
             i++;
         }
         this.managementList = new PlayerManagementList(84, 116, 0, 16);
@@ -39,6 +40,11 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
         for (GameProfile member : members) {
             this.managementList.addEntry(new PlayerManagementList.Entry(member, buttonSettings, this));
         }
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+        this.managementList.setVisible(visible);
     }
 
     @Override
@@ -91,23 +97,30 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
         public static final WidgetSprites DEMOTE_MEMBERS_SPRITES = new WidgetSprites(Researchd.rl("demote_member"), Researchd.rl("demote_member_focused"));
         public static final WidgetSprites TRANSFER_OWNERSHIP_SPRITES = new WidgetSprites(Researchd.rl("transfer_ownership"), Researchd.rl("transfer_ownership_focused"));
 
-        public List<WidgetSprites> getSprites() {
-            List<WidgetSprites> sprites = new ArrayList<>(4);
+        public Map<PlayerManagementButtonType, WidgetSprites> getSprites() {
+            Map<PlayerManagementButtonType, WidgetSprites> sprites = new LinkedHashMap<>(4);
             if (this.removeMembers()) {
-                sprites.add(REMOVE_MEMBERS_SPRITES);
+                sprites.put(PlayerManagementButtonType.REMOVE, REMOVE_MEMBERS_SPRITES);
             }
             if (this.demoteMembers()) {
-                sprites.add(DEMOTE_MEMBERS_SPRITES);
+                sprites.put(PlayerManagementButtonType.DEMOTE, DEMOTE_MEMBERS_SPRITES);
             }
             if (this.promoteMembers()) {
-                sprites.add(PROMOTE_MEMBERS_SPRITES);
+                sprites.put(PlayerManagementButtonType.PROMOTE, PROMOTE_MEMBERS_SPRITES);
             }
             if (this.transferOwnership()) {
-                sprites.add(TRANSFER_OWNERSHIP_SPRITES);
+                sprites.put(PlayerManagementButtonType.TRANSFER_OWNERSHIP, TRANSFER_OWNERSHIP_SPRITES);
             }
             return sprites;
         }
 
+    }
+
+    public enum PlayerManagementButtonType {
+        REMOVE,
+        DEMOTE,
+        PROMOTE,
+        TRANSFER_OWNERSHIP,
     }
 
 }
