@@ -27,9 +27,11 @@ public class PlayerManagementList extends ContainerObjectSelectionList<PlayerMan
     public static final ResourceLocation PLAYER_ENTRY_TEXTURE = Researchd.rl("player");
     private int scrollBarPos;
     private final ClientResearchTeamHelper researchTeamHelper;
+    private AbstractWidget parent;
 
-    public PlayerManagementList(int width, int height, int y, int itemHeight) {
+    public PlayerManagementList(int width, int height, int y, int itemHeight, AbstractWidget parent) {
         super(Minecraft.getInstance(), width, height, y, itemHeight);
+        this.parent = parent;
         this.researchTeamHelper = new ClientResearchTeamHelper();
     }
 
