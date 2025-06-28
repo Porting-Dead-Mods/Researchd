@@ -80,7 +80,7 @@ public class PlayerManagementList extends ContainerObjectSelectionList<PlayerMan
                 poseStack.translate(0, 0, 500);
                 super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
                 Entry entry = this.getEntryAtPosition(mouseX, mouseY);
-                if (entry != null) {
+                if (entry != null && entry.parent.visible) {
                     poseStack.translate(0, 0, 502);
                     guiGraphics.renderTooltip(Minecraft.getInstance().font, ClientResearchTeamHelper.getPlayerRole(entry.memberProfile.getId()).getDisplayName(), mouseX, mouseY);
                 }

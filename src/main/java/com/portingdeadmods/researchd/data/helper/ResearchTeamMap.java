@@ -76,6 +76,7 @@ public class ResearchTeamMap {
 			if (getTeam(player) != null) return false;
 
 			researchTeams.put(player.getUUID(), ResearchTeam.createDefaultTeam(player));
+			researchTeams.put(ResearchTeam.DEBUG_MEMBER.getId(), researchTeams.get(player.getUUID()));
 
 			return true;
 		} catch (Exception e) {

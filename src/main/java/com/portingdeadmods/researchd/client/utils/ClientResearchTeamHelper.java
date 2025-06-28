@@ -82,7 +82,7 @@ public class ClientResearchTeamHelper {
                 }
             }
             return null;
-        }).collect(Collectors.toList());
+        }).filter(Objects::nonNull).collect(Collectors.toList());
         profiles.add(ResearchTeam.DEBUG_MEMBER);
         return profiles;
     }
