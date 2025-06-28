@@ -1,10 +1,12 @@
 package com.portingdeadmods.researchd.client.screens.widgets;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 
+// TODO: Move to PDL
 public abstract class AbstractDraggableWidget extends AbstractWidget {
     private boolean isHovered;
     private boolean updateIsHovered = true;
@@ -45,6 +47,7 @@ public abstract class AbstractDraggableWidget extends AbstractWidget {
         super.onRelease(mouseX, mouseY);
 
         this.updateIsHovered = true;
+        this.isHovered = false;
     }
 
     protected boolean isRectHovered(GuiGraphics guiGraphics, int mouseX, int mouseY, int width, int height) {
