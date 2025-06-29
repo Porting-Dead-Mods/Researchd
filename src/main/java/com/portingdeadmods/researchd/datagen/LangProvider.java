@@ -23,6 +23,14 @@ public final class LangProvider extends LanguageProvider {
         // Errors
         add("researchd.error.research_queue_desync", "Small desync happened, please relog. A research complete packed was emitted but your queue was empty");
 
+        // Screen and contents
+        add("screen.researchd.research_team.title", "Research Team");
+        add("screen.researchd.research_team.buttons.invite", "Invite Player");
+        add("screen.researchd.research_team.buttons.team_settings", "Team Settings");
+        add("screen.researchd.research_team.buttons.leave_team", "Leave Team");
+        add("screen.researchd.research_team.titles.members", "Members");
+        add("screen.researchd.research_team.titles.recently_researched", "Recently Researched");
+
         addResearch(Researches.WOOD, "Wood");
         addResearch(Researches.STONE, "Stone");
         addResearch(Researches.COPPER, "Copper");
