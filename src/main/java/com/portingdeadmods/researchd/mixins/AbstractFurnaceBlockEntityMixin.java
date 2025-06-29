@@ -34,10 +34,10 @@ public class AbstractFurnaceBlockEntityMixin {
             if (player != null) {
                 RecipePredicateData data = player.getData(ResearchdAttachments.RECIPE_PREDICATE);
                 if (!data.getAll().isEmpty()) {
-                    Researchd.debug("RecipePredicateData: " + data.blockedRecipes());
-                    Researchd.debug("RecipeHolder id: " + recipeholder.id());
+                    Researchd.debug("Furnace Mixin", "RecipePredicateData: " + data.blockedRecipes());
+                    Researchd.debug("Furnace Mixin","RecipeHolder id: " + recipeholder.id());
                     if (data.blockedRecipes().contains(recipeholder)) {
-                        Researchd.debug("Recipe for " + recipeholder.value().getResultItem(level.registryAccess()) + " blocked!");
+                        Researchd.debug("Furnace Mixin","Recipe for " + recipeholder.value().getResultItem(level.registryAccess()) + " blocked!");
                         return null;
                     }
                 }

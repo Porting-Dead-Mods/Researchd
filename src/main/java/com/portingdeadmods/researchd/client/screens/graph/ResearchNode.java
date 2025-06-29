@@ -1,10 +1,12 @@
 package com.portingdeadmods.researchd.client.screens.graph;
 
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.client.cache.ClientResearchCache;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.screens.lines.ResearchHead;
 import com.portingdeadmods.researchd.utils.Spaghetti;
 import com.portingdeadmods.researchd.utils.UniqueArray;
+import com.portingdeadmods.researchd.utils.researches.data.ResearchGraph;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -105,7 +107,7 @@ public class ResearchNode extends AbstractWidget {
     }
 
     public void refreshHeads() {
-        Set<ResearchNode> visibleNodes = Spaghetti.getNodesFromScreen();
+        Set<ResearchNode> visibleNodes = ClientResearchCache.NODES;
 
         this.inputs.clear();
         this.inputs.addAll(ResearchHead.inputsOf(this, visibleNodes));

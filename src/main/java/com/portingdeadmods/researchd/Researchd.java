@@ -27,8 +27,17 @@ public class Researchd {
     public static final String MODNAME = "Researchd";
 
     public static final Logger LOGGER = LogUtils.getLogger();
-    public static void debug(Object... message) {
+
+    /**
+     * Prints a debug message to the console if the 'consoleDebug' config option is enabled.
+     *
+     * @param category The 'category' of the debug message, used to filter messages in the console
+     * @param message Any number of objects that will be concatenated into a single message
+     */
+    public static void debug(String category, Object... message) {
         StringBuilder sb = new StringBuilder();
+        sb.append("[").append(category).append("] ");
+
         for (Object msg : message) {
             sb.append(msg.toString());
         }

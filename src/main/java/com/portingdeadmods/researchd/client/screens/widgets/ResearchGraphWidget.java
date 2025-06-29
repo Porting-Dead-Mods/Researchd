@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.client.screens.widgets;
 import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.client.cache.ClientResearchCache;
 import com.portingdeadmods.researchd.client.screens.graph.GraphLayoutManager;
 import com.portingdeadmods.researchd.client.screens.graph.GraphStateManager;
 import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
@@ -10,6 +11,7 @@ import com.portingdeadmods.researchd.client.screens.lines.PotentialOverlap;
 import com.portingdeadmods.researchd.client.screens.lines.ResearchHead;
 import com.portingdeadmods.researchd.client.screens.lines.ResearchLine;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
+import com.portingdeadmods.researchd.utils.UniqueArray;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchGraph;
 import it.unimi.dsi.fastutil.Pair;
@@ -58,16 +60,15 @@ public class ResearchGraphWidget extends AbstractWidget {
         }
 
         // Try to restore the complete layout for this exact graph view
-        // TODO: RE-ENABLE
         boolean layoutRestored = GraphStateManager.getInstance().tryRestoreLastSessionState(graph);
 
         if (!layoutRestored) {
             // If we don't have a cached layout for this exact view,
             // apply our layout manager to position all nodes
             GraphLayoutManager.applyLayout(graph, getX() + 10, getY() + 10);
+        } else {
+            // Don't do anything if we restored the layout
         }
-
-        GraphLayoutManager.applyLayout(graph, getX() + 10, getY() + 10);
 
         for (ResearchNode node : graph.nodes()) {
             node.refreshHeads();
@@ -79,10 +80,19 @@ public class ResearchGraphWidget extends AbstractWidget {
     }
 
     private void calculateLines() {
-        this.researchLines = new HashMap<>();
+        this.researchLines.clear();
+        Researchd.debug("Research lines" ,  "Calculating connection lines for graph with ", this.graph.nodes().size(), " nodes.");
 
         // Proceed only if we have nodes to connect
-        if (graph == null || graph.nodes().isEmpty()) return;
+        if (this.graph == null) {
+            Researchd.debug("Research lines", "Graph is null, skipping line calculation.");
+            return;
+        }
+
+        if (this.graph.nodes().isEmpty()) {
+            Researchd.debug("Research lines" , "No nodes in graph, skipping line calculation.");
+            return;
+        }
 
         // Process nodes layer by layer, bottom to top, then left to right
         List<ResearchNode> sortedNodes = new ArrayList<>(graph.nodes());
@@ -90,6 +100,8 @@ public class ResearchGraphWidget extends AbstractWidget {
                 .comparingInt(ResearchNode::getY)  // First by Y (layer)
                 .reversed()                        // Reverse to start from bottom
                 .thenComparingInt(ResearchNode::getX)); // Then by X position
+
+        Researchd.debug("Research lines", "Sorted ", sortedNodes.size(), " nodes for processing");
 
         // Track all generated lines
         List<ResearchLine> allLines = new ArrayList<>();
@@ -103,6 +115,8 @@ public class ResearchGraphWidget extends AbstractWidget {
 
         // Process each node
         for (ResearchNode parent : sortedNodes) {
+            Researchd.debug("Research lines", "Processing parent node: ", parent.getInstance().getResearch().location());
+
             ArrayList<ResearchLine> nodeLines = new ArrayList<>();
 
             // Group children by layer for consistent path styles
@@ -111,13 +125,17 @@ public class ResearchGraphWidget extends AbstractWidget {
                 if (!this.graph.nodes().contains(child)) continue;
 
                 childrenByLayer
-                        .computeIfAbsent(child.getY(), k -> new ArrayList<>())
+                        .computeIfAbsent(GraphLayoutManager.calculateDepth(child), k -> new ArrayList<>())
                         .add(child);
             }
+
+            Researchd.debug("Research lines", "Parent has ", childrenByLayer.size(), " child layers with total children: ", parent.getChildren().size());
 
             // Process each layer of children
             for (Map.Entry<Integer, List<ResearchNode>> entry : childrenByLayer.entrySet()) {
                 List<ResearchNode> layerChildren = entry.getValue();
+                Researchd.debug("Research lines", "Processing layer ", entry.getKey(), " with ", layerChildren.size(), " children");
+
 
                 // Sort children left to right
                 layerChildren.sort(Comparator.comparingInt(ResearchNode::getX));
@@ -130,15 +148,22 @@ public class ResearchGraphWidget extends AbstractWidget {
                                         .average()
                                         .orElse(0));
 
+                Researchd.debug("Research lines", "Path style for this layer: ", preferVerticalFirst ? "vertical-first" : "horizontal-first");
+
                 // Get all available output heads for this parent
                 List<ResearchHead> availableOutputHeads = parent.getOutputs().stream()
                         .filter(head -> !usedOutputHeads.contains(head))
                         .sorted(Comparator.comparingInt(ResearchHead::getX))
                         .collect(Collectors.toList());
 
+                Researchd.debug("Research lines", "Available output heads: ", availableOutputHeads.size(), " out of ", parent.getOutputs().size());
+
                 // Process each child and assign heads in positional order
                 for (int i = 0; i < layerChildren.size(); i++) {
                     ResearchNode child = layerChildren.get(i);
+
+                    Researchd.debug("Research lines", "Processing child ", (i + 1), "/", layerChildren.size(), ": ", child.getInstance().getResearch().location());
+                    Researchd.debug("Research lines", "Total input heads: ", child.getInputs().size());
 
                     // Get available input heads for this child
                     List<ResearchHead> availableInputHeads = child.getInputs().stream()
@@ -146,11 +171,15 @@ public class ResearchGraphWidget extends AbstractWidget {
                             .sorted(Comparator.comparingInt(ResearchHead::getX))
                             .collect(Collectors.toList());
 
+                    Researchd.debug("Research lines", "Available input heads: ", availableInputHeads.size(), " out of ", child.getInputs().size());
+
                     // Find the best head pair based on position
                     Pair<ResearchHead, ResearchHead> bestHeads = findBestHeadPairByPosition(
                             parent, child, availableOutputHeads, availableInputHeads,
                             i, layerChildren.size(), usedOutputHeads, usedInputHeads
                     );
+
+                    Researchd.debug("Research lines", "Selected head pair - Output: ", (bestHeads.left() != null ? "found" : "null"), ", Input: ", (bestHeads.right() != null ? "found" : "null"));
 
                     // Mark these heads as used
                     usedOutputHeads.add(bestHeads.left());
@@ -161,6 +190,8 @@ public class ResearchGraphWidget extends AbstractWidget {
 
                     // FIXME: Why could these two be null
                     if (bestHeads.left() != null && bestHeads.right() != null) {
+                        Researchd.debug("Research lines", "Generating optimal path between connection points");
+
                         // Generate the best path
                         ResearchLine bestLine = generateOptimalPath(
                                 bestHeads.left().getConnectionPoint(),
@@ -170,27 +201,39 @@ public class ResearchGraphWidget extends AbstractWidget {
                                 preferVerticalFirst
                         );
 
+                        Researchd.debug("Research lines", "Generated path with ", bestLine.getPoints().size(), " points");
+
                         // Update vertical path zones with any new vertical segments
+                        int verticalSegments = 0;
                         for (int j = 0; j < bestLine.getPoints().size() - 1; j++) {
                             Point p1 = bestLine.getPoints().get(j);
                             Point p2 = bestLine.getPoints().get(j + 1);
                             if (p1.x == p2.x) {
                                 verticalPathXCoords.add(p1.x);
+                                verticalSegments++;
                             }
                         }
+
+                        Researchd.debug("Research lines", "Added ", verticalSegments, " vertical segments to path tracking");
 
                         // Store the line
                         nodeLines.add(bestLine);
                         allLines.add(bestLine);
+                    } else {
+                        Researchd.debug("Research lines", "Skipping line generation due to null heads");
                     }
                 }
             }
 
             // Add all lines for this parent
             if (!nodeLines.isEmpty()) {
-                researchLines.put(parent, nodeLines);
+                this.researchLines.put(parent, nodeLines);
+                Researchd.debug("Research lines", "Added ", nodeLines.size(), " lines for parent node");
+            } else {
+                Researchd.debug("Research lines", "No lines generated for parent node");
             }
         }
+        Researchd.debug("Research lines", "Line calculation complete. Generated ", researchLines.size(), " line groups with total lines: ", allLines.size());
     }
 
     /**
@@ -493,8 +536,8 @@ public class ResearchGraphWidget extends AbstractWidget {
     protected void renderWidget(GuiGraphics guiGraphics, int i, int i1, float v) {
         guiGraphics.enableScissor(getX(), getY(), getX() + getWidth() - 1, getY() + getHeight());
 
-        if (researchLines != null) {
-            for (List<ResearchLine> lines : researchLines.values()) {
+        if (this.researchLines != null) {
+            for (List<ResearchLine> lines : this.researchLines.values()) {
                 for (ResearchLine line : lines) {
                     line.render(guiGraphics);
                 }
@@ -551,7 +594,7 @@ public class ResearchGraphWidget extends AbstractWidget {
             node.translate((int) dragX, (int) dragY);
         }
 
-        for (List<ResearchLine> lines : researchLines.values()) {
+        for (List<ResearchLine> lines : this.researchLines.values()) {
             for (ResearchLine line : lines) {
                 line.translate((int) dragX, (int) dragY);
             }
@@ -860,6 +903,8 @@ public class ResearchGraphWidget extends AbstractWidget {
         if (graph != null) {
             // Make sure we save the final state
             GraphStateManager.getInstance().saveLastSessionState(graph);
+
+            ClientResearchCache.ROOT_NODE = graph.rootNode();
         }
     }
 }

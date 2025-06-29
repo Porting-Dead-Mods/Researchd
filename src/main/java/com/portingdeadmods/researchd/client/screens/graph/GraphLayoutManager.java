@@ -183,13 +183,13 @@ public class GraphLayoutManager {
 	 * Position nodes in their layers (initial positioning)
 	 */
 	private static void positionNodesInLayers(int startX, int startY) {
-		Researchd.debug("Step 1 - Positioning nodes in layers");
+		Researchd.debug("Layout", "Step 1 - Positioning nodes in layers");
 		for (Map.Entry<Integer, List<ResearchNode>> layer : layerMap.int2ObjectEntrySet()) {
 			for (ResearchNode node : layer.getValue()) {
 				// Set node position
 				node.setYExt(startY + (layer.getKey() * (VERTICAL_SPACING + NODE_HEIGHT)));
 				node.setXExt(startX + ((layer.getValue().indexOf(node) + 1) * (NODE_WIDTH + HORIZONTAL_SPACING)));
-				Researchd.debug("Node@1: " + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY());
+				Researchd.debug("Layout", "Node@1: " + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY());
 			}
 		}
 	}
@@ -198,7 +198,7 @@ public class GraphLayoutManager {
 	 * Center parents over their children
 	 */
 	private static void centerNodesBasedOnLayers() {
-		Researchd.debug("Step 2 - Repositioning nodes in layers");
+		Researchd.debug("Layout", "Step 2 - Repositioning nodes in layers");
 
 		// Calculations
 		int _maxNodes = 0;
@@ -227,7 +227,7 @@ public class GraphLayoutManager {
 
 		for (Map.Entry<Integer, List<ResearchNode>> layer : layerMap.int2ObjectEntrySet()) {
 			for (ResearchNode node : layer.getValue()) {
-				Researchd.debug("Node@2: " + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY());
+				Researchd.debug("Layout", "Node@2: " + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY());
 			}
 		}
 	}
@@ -238,7 +238,7 @@ public class GraphLayoutManager {
 	 * Iteration #11: 25-May-2025 - Please God, may this be the last refactor of this method.<br>
 	 */
 	private static void sortNodesBasedOnParents() {
-		Researchd.debug("Step 2.5 - Sorting nodes based on parents");
+		Researchd.debug("Layout", "Step 2.5 - Sorting nodes based on parents");
 
 		List<Integer> layerNumbers = new ArrayList<>(layerMap.keySet());
 		if (layerNumbers.size() < 3) return;
@@ -249,14 +249,14 @@ public class GraphLayoutManager {
 			if (layerNumbers.indexOf(layer) == layerNumbers.size() - 1) break;
 			int nextLayer = layerNumbers.get(layerNumbers.indexOf(layer) + 1);
 
-			Researchd.debug("Sorting layer: " + (layer + 1));
+			Researchd.debug("Layout", "Sorting layer: " + (layer + 1));
 			List<ResearchNode> layerNodes = layerMap.get(layer);
 			HashMap<ResearchNode, UniqueArray<ResearchNode>> subsequentChildrenMap = new HashMap<>();
 			UniqueArray<ResearchNode> allSubsequentChildren = new UniqueArray<>();
 
 			for (ResearchNode node : layerNodes) {
 				// Calculations
-				Researchd.debug("Checking: " + node.getInstance().getResearch());
+				Researchd.debug("Layout", "Checking: " + node.getInstance().getResearch());
 
 				UniqueArray<ResearchNode> children = node.getChildren();
 
@@ -291,7 +291,7 @@ public class GraphLayoutManager {
 
 		for (Map.Entry<Integer, List<ResearchNode>> layer : layerMap.int2ObjectEntrySet()) {
 			for (ResearchNode node : layer.getValue()) {
-				Researchd.debug("Node@2.5: " + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY());
+				Researchd.debug("Layout", "Node@2.5: " + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY());
 			}
 		}
 	}
@@ -302,7 +302,7 @@ public class GraphLayoutManager {
 	 * Iteration #11: 25-May-2025 - Please God, may this be the last refactor of this method.<br>
 	 */
 	private static void handleNodeShiftingFromAbove() {
-		Researchd.debug("Step 3 - Node shifting from above");
+		Researchd.debug("Layout", "Step 3 - Node shifting from above");
 		List<Integer> layerNumbers = new ArrayList<>(layerMap.keySet());
 		layerNumbers.sort(Comparator.naturalOrder()); // Start from the top
 
@@ -313,7 +313,7 @@ public class GraphLayoutManager {
 				if (!node.shouldMove()) continue;
 
 				// Calculations
-				Researchd.debug("Checking: " + node.getInstance().getResearch());
+				Researchd.debug("Layout", "Checking: " + node.getInstance().getResearch());
 
 				UniqueArray<ResearchNode> parents = node.getParents();
 				UniqueArray<ResearchNode> children = node.getChildren();
@@ -334,7 +334,7 @@ public class GraphLayoutManager {
 
 					subsequentChildren.forEach(child -> child.lockNodeTo(node));
 
-					Researchd.debug("Shifted node: " + node.getInstance().getResearch() + " to center of its children: " + subsequentChildren.stream().map(ResearchNode::getInstance).map(instance -> instance.getResearch().toString()).collect(Collectors.joining(", ")));
+					Researchd.debug("Layout", "Shifted node: " + node.getInstance().getResearch() + " to center of its children: " + subsequentChildren.stream().map(ResearchNode::getInstance).map(instance -> instance.getResearch().toString()).collect(Collectors.joining(", ")));
 					continue;
 				}
 			}
@@ -342,7 +342,7 @@ public class GraphLayoutManager {
 
 		for (Map.Entry<Integer, List<ResearchNode>> layer : layerMap.int2ObjectEntrySet()) {
 			for (ResearchNode node : layer.getValue()) {
-				Researchd.debug("Node@3: " + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY() + " Pos locks: " + node.getPositionLocks().size());
+				Researchd.debug("Layout", "Node@3: " + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY() + " Pos locks: " + node.getPositionLocks().size());
 			}
 		}
 	}
@@ -353,7 +353,7 @@ public class GraphLayoutManager {
 	 * Iteration #11: 25-May-2025 - Please God, may this be the last refactor of this method.<br>
 	 */
 	private static void handleNodeShiftingFromBelow() {
-		Researchd.debug("Step 5 - Node shifting from below");
+		Researchd.debug("Layout", "Step 5 - Node shifting from below");
 		List<Integer> layerNumbers = new ArrayList<>(layerMap.keySet());
 		layerNumbers.sort((a, b) -> Integer.compare(b, a)); // Start from the bottom layer
 
@@ -364,7 +364,7 @@ public class GraphLayoutManager {
 				if (!node.shouldMove()) continue;
 
 				// Calculations
-				Researchd.debug("Checking: " + node.getInstance().getResearch());
+				Researchd.debug("Layout", "Checking: " + node.getInstance().getResearch());
 
 				UniqueArray<ResearchNode> parents = node.getParents();
 				UniqueArray<ResearchNode> children = node.getChildren();
@@ -389,7 +389,7 @@ public class GraphLayoutManager {
 
 		for (Map.Entry<Integer, List<ResearchNode>> layer : layerMap.int2ObjectEntrySet()) {
 			for (ResearchNode node : layer.getValue()) {
-				Researchd.debug("Node@4: " + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY() + " Pos locks: " + node.getPositionLocks().size());
+				Researchd.debug("Layout", "Node@4: " + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY() + " Pos locks: " + node.getPositionLocks().size());
 			}
 		}
 	}
@@ -398,23 +398,23 @@ public class GraphLayoutManager {
 	 * Resolve node overlaps by shifting
 	 */
 	private static void resolveOverlaps(int step) {
-		Researchd.debug("Step %d - Resolving overlaps".formatted(step));
+		Researchd.debug("Layout", "Step %d - Resolving overlaps".formatted(step));
 
 		for (Map.Entry<Integer, List<ResearchNode>> layer : layerMap.int2ObjectEntrySet()) {
 			for (ResearchNode node : layer.getValue()) {
-				Researchd.debug("Node@%d: ".formatted(step) + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY() + " Pos locks: " + node.getPositionLocks().size());
+				Researchd.debug("Layout", "Node@%d: ".formatted(step) + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY() + " Pos locks: " + node.getPositionLocks().size());
 			}
 		}
 	}
 
 	private static void centerGraph(ResearchGraph graph, int step) {
-		Researchd.debug("Step %d - Centering graph".formatted(step));
+		Researchd.debug("Layout", "Step %d - Centering graph".formatted(step));
 
 		ResearchNode root = graph.rootNode();
 		ResearchScreen screen = Spaghetti.tryGetResearchScreen();
 
 		if (screen == null) {
-			Researchd.debug("Cannot center graph, ResearchScreen is not open.");
+			Researchd.debug("Layout", "Cannot center graph, ResearchScreen is not open.");
 			return;
 		}
 
@@ -427,7 +427,7 @@ public class GraphLayoutManager {
 
 		for (ResearchNode node : graph.nodes()) {
 			node.translate(dx, dy);
-			Researchd.debug("Node@%d: ".formatted(step) + node.getInstance().getResearch() + " Layer: " + node.getLayer() + " X: " + node.getX() + " Y: " + node.getY() + " Pos locks: " + node.getPositionLocks().size());
+			Researchd.debug("Layout", "Node@%d: ".formatted(step) + node.getInstance().getResearch() + " Layer: " + node.getLayer() + " X: " + node.getX() + " Y: " + node.getY() + " Pos locks: " + node.getPositionLocks().size());
 		}
 	}
 }

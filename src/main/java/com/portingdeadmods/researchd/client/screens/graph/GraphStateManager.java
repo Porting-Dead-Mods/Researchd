@@ -2,10 +2,15 @@ package com.portingdeadmods.researchd.client.screens.graph;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.client.screens.lines.ResearchLine;
+import com.portingdeadmods.researchd.utils.Spaghetti;
+import com.portingdeadmods.researchd.utils.UniqueArray;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchGraph;
 import net.minecraft.resources.ResourceKey;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,7 +38,7 @@ public class GraphStateManager {
      */
     public void saveLastSessionState(ResearchGraph graph) {
         if (graph == null || graph.nodes().isEmpty() || graph.rootNode() == null) {
-            Researchd.debug("No graph to save state for");
+            Researchd.debug("Graph State Cache", "No graph to save state for");
             return;
         }
 
@@ -51,9 +56,8 @@ public class GraphStateManager {
                     node.getY()
             ));
         }
-        Researchd.debug("Saved last session state for graph: " + lastGraphRoot);
+        Researchd.debug("Graph State Cache","Saved last session state for graph: " + lastGraphRoot);
     }
-
     /**
      * Try to restore the previous session state if this is the same graph
      *
@@ -62,18 +66,18 @@ public class GraphStateManager {
     public boolean tryRestoreLastSessionState(ResearchGraph graph) {
         if (graph == null || graph.nodes().isEmpty() || graph.rootNode() == null ||
                 lastGraphRoot == null || lastSessionState.isEmpty()) {
-            Researchd.debug("No previous session state to restore");
+            Researchd.debug("Graph State Cache","No previous session state to restore");
             return false;
         }
 
         // Check if this is the same graph as last time (by root node)
         if (!graph.rootNode().getInstance().getResearch().equals(lastGraphRoot)) {
-            Researchd.debug("Graph root has changed, not restoring last session state");
+            Researchd.debug("Graph State Cache","Graph root has changed, not restoring last session state");
             return false;
         }
 
         // Restore positions for nodes that exist in both graphs
-        Researchd.debug("Restoring last session");
+        Researchd.debug("Graph State Cache","Restoring last session");
         for (ResearchNode node : graph.nodes()) {
             ResourceKey<Research> key = node.getInstance().getResearch();
             NodeState state = lastSessionState.get(key);
