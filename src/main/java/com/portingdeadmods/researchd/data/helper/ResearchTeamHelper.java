@@ -23,43 +23,43 @@ import java.util.UUID;
 public final class ResearchTeamHelper {
     public static boolean isResearchTeamLeader(Player player) {
         UUID uuid = player.getUUID();
-        ResearchTeam team = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeam(uuid);
+        ResearchTeam team = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeamByMember(uuid);
 
         return team.isOwner(uuid);
     }
 
     public static int getPermissionLevel(Player player) {
         UUID uuid = player.getUUID();
-        ResearchTeam team = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeam(uuid);
+        ResearchTeam team = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeamByMember(uuid);
 
         return team.getPermissionLevel(uuid);
     }
 
     public static int getPermissionLevel(Level level, UUID uuid) {
-        ResearchTeam team = ResearchdSavedData.TEAM_RESEARCH.get().getData(level).getTeam(uuid);
+        ResearchTeam team = ResearchdSavedData.TEAM_RESEARCH.get().getData(level).getTeamByMember(uuid);
 
         return team.getPermissionLevel(uuid);
     }
 
     public static ResearchTeam getResearchTeam(Player player) {
         UUID uuid = player.getUUID();
-        return ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeam(uuid);
+        return ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeamByMember(uuid);
     }
 
     public static ResearchTeam getResearchTeamByUUID(Level level, UUID uuid) {
-        return ResearchdSavedData.TEAM_RESEARCH.get().getData(level).getTeam(uuid);
+        return ResearchdSavedData.TEAM_RESEARCH.get().getData(level).getTeamByMember(uuid);
     }
 
     public static boolean isInATeam(Player player) {
         UUID uuid = player.getUUID();
-        return ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeam(uuid) != null;
+        return ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeamByMember(uuid) != null;
     }
 
     public static boolean arePlayersSameTeam(Player player1, Player player2) {
         UUID uuid1 = player1.getUUID();
         UUID uuid2 = player2.getUUID();
-        ResearchTeam team1 = ResearchdSavedData.TEAM_RESEARCH.get().getData(player1.level()).getTeam(uuid1);
-        ResearchTeam team2 = ResearchdSavedData.TEAM_RESEARCH.get().getData(player2.level()).getTeam(uuid2);
+        ResearchTeam team1 = ResearchdSavedData.TEAM_RESEARCH.get().getData(player1.level()).getTeamByMember(uuid1);
+        ResearchTeam team2 = ResearchdSavedData.TEAM_RESEARCH.get().getData(player2.level()).getTeamByMember(uuid2);
 
         return team1.equals(team2);
     }
@@ -68,8 +68,8 @@ public final class ResearchTeamHelper {
         UUID uuid1 = player1.getUUID();
         ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(player1.level());
 
-        ResearchTeam team1 = savedData.getTeam(uuid1);
-        ResearchTeam team2 = savedData.getTeam(uuid2);
+        ResearchTeam team1 = savedData.getTeamByMember(uuid1);
+        ResearchTeam team2 = savedData.getTeamByMember(uuid2);
 
         return team1.equals(team2);
     }
@@ -77,8 +77,8 @@ public final class ResearchTeamHelper {
     public static boolean arePlayersSameTeam(Level level, UUID uuid1, UUID uuid2) {
         ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
 
-        ResearchTeam team1 = savedData.getTeam(uuid1);
-        ResearchTeam team2 = savedData.getTeam(uuid2);
+        ResearchTeam team1 = savedData.getTeamByMember(uuid1);
+        ResearchTeam team2 = savedData.getTeamByMember(uuid2);
 
         return team1.equals(team2);
     }
@@ -92,7 +92,7 @@ public final class ResearchTeamHelper {
     public static void removeModFromTeam(ServerPlayer player) {
         UUID uuid = player.getUUID();
         ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level());
-        ResearchTeam team = savedData.getTeam(uuid);
+        ResearchTeam team = savedData.getTeamByMember(uuid);
 
         if (team != null) {
             team.removeModerator(uuid);
@@ -107,7 +107,7 @@ public final class ResearchTeamHelper {
         UUID requesterId = requester.getUUID();
 
         ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
-        ResearchTeam team = savedData.getTeam(memberOfTeam);
+        ResearchTeam team = savedData.getTeamByMember(memberOfTeam);
 
         if (isInATeam(requester)) {
             requester.sendSystemMessage(Component.literal("You're already in a team!").withStyle(ChatFormatting.RED));

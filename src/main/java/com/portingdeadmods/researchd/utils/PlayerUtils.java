@@ -1,5 +1,6 @@
 package com.portingdeadmods.researchd.utils;
 
+import com.portingdeadmods.researchd.data.helper.ResearchTeam;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
@@ -17,6 +18,6 @@ public class PlayerUtils {
     }
 
     public static String getPlayerNameFromUUID(Level level, UUID uuid) {
-        return level.getPlayerByUUID(uuid).getName().getString();
+        return uuid == ResearchTeam.DEBUG_MEMBER.getId() ? ResearchTeam.DEBUG_MEMBER.getName() : level.getPlayerByUUID(uuid).getName().getString();
     }
 }

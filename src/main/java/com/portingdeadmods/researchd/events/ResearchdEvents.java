@@ -145,7 +145,7 @@ public final class ResearchdEvents {
             if (player != null && level != null) {
                 ResearchTeamMap map = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
                 if (map != null) {
-                    ResearchProgress researchProgress = map.getTeam(player.getUUID()).getResearchProgress();
+                    ResearchProgress researchProgress = map.getTeamByPlayer(player).getResearchProgress();
                     if (researchProgress != null) {
                         ResearchQueue queue = researchProgress.researchQueue();
                         if (!queue.isEmpty()) {

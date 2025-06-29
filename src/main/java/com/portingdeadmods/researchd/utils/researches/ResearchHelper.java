@@ -95,7 +95,7 @@ public final class ResearchHelper {
 
         ResearchTeamMap researchData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
 
-        ResearchTeam team = researchData.getTeam(player.getUUID());
+        ResearchTeam team = researchData.getTeamByMember(player.getUUID());
         for (Map.Entry<ResourceKey<AttachmentType<?>>, AttachmentType<?>> entry : NeoForgeRegistries.ATTACHMENT_TYPES.entrySet()) {
             Object data = player.getData(entry.getValue());
             if (data instanceof ResearchEffectData<?> effectData) {

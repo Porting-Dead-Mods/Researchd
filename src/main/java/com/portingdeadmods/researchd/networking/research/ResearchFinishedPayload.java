@@ -37,7 +37,7 @@ public record ResearchFinishedPayload(int timeStamp) implements CustomPacketPayl
     public void researchFinishedAction(IPayloadContext context) {
         context.enqueueWork(() -> {
             Player player = context.player();
-            ResearchTeam team = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeam(player.getUUID());
+            ResearchTeam team = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeamByMember(player.getUUID());
             ResearchQueue queue = team.getResearchProgress().researchQueue();
 
             if (!queue.isEmpty()) {
