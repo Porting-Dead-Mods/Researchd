@@ -48,9 +48,9 @@ public class ClientResearchTeamHelper {
 
     /**
      * Returns the permission level of the player. <br>
-     * <span color="red">0 - Member</span> <br>
-     * <span color="yellow">1 - Moderator</span> <br>
-     * <span color="green">2 - Owner</span> <br>
+     * <font color="red">0 - Member</font> <br>
+     * <font color="yellow">1 - Moderator</font> <br>
+     * <font color="green">2 - Owner</font> <br>
      */
     public static int getPlayerPermissionLevel(UUID uuid) {
         return getPlayerRole(uuid).getPermissionLevel();
@@ -58,9 +58,9 @@ public class ClientResearchTeamHelper {
 
     /**
      * Returns the permission level of the player. <br>
-     * <span color="red">0 - Member</span> <br>
-     * <span color="yellow">1 - Moderator</span> <br>
-     * <span color="green">2 - Owner</span> <br>
+     * <font color="red">0 - Member</font> <br>
+     * <font color="yellow">1 - Moderator</font> <br>
+     * <font color="green">2 - Owner</font> <br>
      */
     public static int getPlayerPermissionLevel(Player player) {
         return getPlayerRole(player.getUUID()).getPermissionLevel();

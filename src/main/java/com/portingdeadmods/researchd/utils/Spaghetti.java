@@ -10,7 +10,7 @@ import java.util.Set;
 
 public class Spaghetti {
 	/**
-	 * <span style="color:red;">CLIENT SIDE ONLY</span>
+	 * <font color="red">CLIENT SIDE ONLY</font>
 	 *
 	 * <br>
 	 * Returns the set of {@link ResearchNode} currently displayed on the screen.
@@ -20,7 +20,7 @@ public class Spaghetti {
 	}
 
 	/**
-	 * <span style="color:red;">CLIENT SIDE ONLY</span>
+	 * <font color="red">CLIENT SIDE ONLY</font>
 	 *
 	 * <br>
 	 * Returns the current {@link ResearchScreen} if it is open, otherwise returns null.
