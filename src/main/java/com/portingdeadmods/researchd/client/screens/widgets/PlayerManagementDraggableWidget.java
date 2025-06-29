@@ -35,7 +35,8 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
             this.buttonWidgets.add(new DraggableWidgetImageButton(getX() + 6 + i * (12 + 2), getY() + 6, 12, 12, entry.getValue(), btn -> {}));
             i++;
         }
-        this.managementList = new PlayerManagementList(84, 116, 0, 16);
+        this.managementList = new PlayerManagementList(84, 116, 0, 16, this);
+        this.managementList.active = this.visible; // Probably redundant... but idrk some freaky stuff is happening with visibility
         this.managementList.setPosition(x + 6, y + 6);
         for (GameProfile member : members) {
             this.managementList.addEntry(new PlayerManagementList.Entry(member, buttonSettings, this));
@@ -44,6 +45,7 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
 
     public void setVisible(boolean visible) {
         this.visible = visible;
+        this.managementList.active = visible;
         this.managementList.setVisible(visible);
     }
 

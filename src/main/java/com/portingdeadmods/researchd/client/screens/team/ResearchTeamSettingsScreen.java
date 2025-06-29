@@ -11,6 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
@@ -24,10 +25,18 @@ public class ResearchTeamSettingsScreen extends BaseScreen {
     public static final ResourceLocation SCREEN_TEXTURE = Researchd.rl("textures/gui/team_settings_screen.png");
     private LinearLayout layout;
     private final Screen prevScreen;
+    private String tempTeamName;
+
+    // Widgets
+    private StringWidget titleWidget;
+    private EditBox teamNameEdit;
+
+    private Button manageMembersButton;
+    private Button transferOwnershipButton;
+    private Button leaveButton;
+
     private PlayerManagementDraggableWidget playerManagementWindow;
     private PlayerManagementDraggableWidget transferOwnershipWindow;
-    private EditBox teamNameEdit;
-    private String tempTeamName;
 
     public ResearchTeamSettingsScreen() {
         super(Component.literal("Team Settings"), 480, 264, 128, 195);
@@ -38,13 +47,20 @@ public class ResearchTeamSettingsScreen extends BaseScreen {
     protected void init() {
         super.init();
 
+        // Variables
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         ResearchTeam researchTeam = ResearchTeamHelper.getResearchTeam(Objects.requireNonNull(player));
 
+        // Layout Setup
         this.layout = LinearLayout.vertical().spacing(8);
         this.layout.setPosition(this.leftPos + 8, this.topPos + 6);
-        this.layout.addChild(new StringWidget(this.title, this.font));
+
+        // Layout Widgets - Title
+        this.titleWidget = new StringWidget(this.title, this.font);
+        this.layout.addChild(this.titleWidget);
+
+        // Layout Widgets - Team Name
         this.teamNameEdit = this.layout.addChild(new EditBox(this.font, 112, 16, Component.empty()));
         if (this.tempTeamName == null) {
             this.teamNameEdit.setValue(researchTeam.getName());
@@ -52,19 +68,28 @@ public class ResearchTeamSettingsScreen extends BaseScreen {
             this.teamNameEdit.setValue(this.tempTeamName);
             this.tempTeamName = null;
         }
+
+        // Layout Widgets - Buttons
+        this.manageMembersButton = Button.builder(Component.literal("Manage Members"), btn -> {
+            this.playerManagementWindow.visible = !this.playerManagementWindow.visible;
+        }).size(112, 16).build();
+        this.transferOwnershipButton = Button.builder(Component.literal("Transfer Ownership"), btn -> {
+            this.transferOwnershipWindow.visible = !this.transferOwnershipWindow.visible;
+        }).size(112, 16).build();
+        this.leaveButton = Button.builder(Component.literal("Leave"), btn -> {
+        }).size(112, 16).build();
+
         if (ClientResearchTeamHelper.getPlayerRole(Minecraft.getInstance().player.getUUID()) == ResearchTeamRole.OWNER) {
-            this.layout.addChild(Button.builder(Component.literal("Manage Members"), btn -> {
-                this.playerManagementWindow.visible = !this.playerManagementWindow.visible;
-            }).size(112, 16).build());
-            this.layout.addChild(Button.builder(Component.literal("Transfer Ownership"), btn -> {
-                this.transferOwnershipWindow.visible = !this.transferOwnershipWindow.visible;
-            }).size(112, 16).build());
+            this.layout.addChild(manageMembersButton);
+            this.layout.addChild(transferOwnershipButton);
         }
-        this.layout.addChild(Button.builder(Component.literal("Leave"), btn -> {
-        }).size(112, 16).build());
+        this.layout.addChild(leaveButton);
+
+        // Layout Final
         this.layout.arrangeElements();
         this.layout.visitWidgets(this::addRenderableWidget);
 
+        // Windows - Player Management
         this.playerManagementWindow = new PlayerManagementDraggableWidget(
                 this.leftPos,
                 this.topPos,
@@ -75,6 +100,7 @@ public class ResearchTeamSettingsScreen extends BaseScreen {
         this.playerManagementWindow.visible = false;
         this.playerManagementWindow.visitWidgets(this::addRenderableWidget);
 
+        // Windows - Transfer Ownership
         this.transferOwnershipWindow = new PlayerManagementDraggableWidget(
                 this.leftPos + this.width / 2,
                 this.topPos + this.height / 2,
