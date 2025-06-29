@@ -17,9 +17,9 @@ public enum ResearchTeamRole {
 
     /**
      * Returns the permission level of the role. <br>
-     * <font color="red">0 - Member</font> <br>
-     * <font color="yellow">1 - Moderator</font> <br>
-     * <font color="green">2 - Owner</font> <br>
+     * <span style="color:red">0 - Member</span> <br>
+     * <span style="color:yellow">1 - Moderator</span> <br>
+     * <span style="color:green">2 - Owner</span> <br>
      */
     public int getPermissionLevel() {
         return switch (this) {
