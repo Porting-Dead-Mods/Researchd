@@ -34,21 +34,20 @@ public abstract class CraftingMenuMixin {
         CraftingInput craftinginput = craftSlots.asCraftInput();
         Optional<RecipeHolder<CraftingRecipe>> recipeHolder = level.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftinginput, level, recipe);
 
-        Researchd.debug("(Crafting Menu)");
-        Researchd.debug("RecipePredicateData: " + data.blockedRecipes());
+        Researchd.debug("Crafting Mixin", "RecipePredicateData: " + data.blockedRecipes());
 
         if (recipeHolder.isPresent()) {
-            Researchd.debug("RecipeHolder id: " + recipeHolder.get().id());
-            Researchd.debug("RecipeHolder result: " + recipeHolder.get().value().getResultItem(level.registryAccess()));
+            Researchd.debug("Crafting Mixin","RecipeHolder id: " + recipeHolder.get().id());
+            Researchd.debug("Crafting Mixin","RecipeHolder result: " + recipeHolder.get().value().getResultItem(level.registryAccess()));
 
             if (!data.blockedRecipes().isEmpty()) {
                 if (data.blockedRecipes().contains(recipeHolder.get())) {
-                    Researchd.debug("Recipe for " + recipeHolder.get().value().getResultItem(level.registryAccess()) + " blocked!");
+                    Researchd.debug("Crafting Mixin","Recipe for " + recipeHolder.get().value().getResultItem(level.registryAccess()) + " blocked!");
                     return ItemStack.EMPTY;
                 }
             }
         } else {
-            Researchd.debug("Invalid recipe.");
+            Researchd.debug("Crafting Mixin","Invalid recipe.");
         }
 
         return itemstack;

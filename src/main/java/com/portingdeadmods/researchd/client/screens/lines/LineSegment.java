@@ -16,7 +16,11 @@ public class LineSegment implements Renderable {
 
 	public LineSegment(Point start, Point end) {
 		if ((start.x != end.x) && (start.y != end.y)) {
-			Researchd.LOGGER.error("LineSegment must be either vertical or horizontal. Provided: (%d, %d) - (%d, %d)".formatted(start.x, start.y, end.x, end.y), new IllegalArgumentException("LineSegment must be either vertical or horizontal. Provided: (%d, %d) - (%d, %d)".formatted(start.x, start.y, end.x, end.y)));
+			Researchd.LOGGER.error(
+					"LineSegment must be either vertical or horizontal. Provided: (%d, %d) - (%d, %d)".formatted(start.x, start.y, end.x, end.y),
+					new IllegalArgumentException("LineSegment must be either vertical or horizontal. Provided: (%d, %d) - (%d, %d)".formatted(start.x, start.y, end.x, end.y))
+			);
+
 			this.start = start;
 			this.end = new Point(start.x, end.y);
 		} else {
