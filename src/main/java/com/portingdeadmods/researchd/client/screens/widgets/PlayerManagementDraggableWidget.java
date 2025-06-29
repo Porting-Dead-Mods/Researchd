@@ -38,8 +38,9 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
         this.managementList = new PlayerManagementList(84, 116, 0, 16, this);
         this.managementList.active = this.visible; // Probably redundant... but idrk some freaky stuff is happening with visibility
         this.managementList.setPosition(x + 6, y + 6);
+        Consumer<PlayerManagementList.Entry> refreshFunction = this.managementList::removeEntry;
         for (GameProfile member : members) {
-            this.managementList.addEntry(new PlayerManagementList.Entry(member, buttonSettings, this));
+            this.managementList.addEntry(new PlayerManagementList.Entry(member, buttonSettings, this, refreshFunction));
         }
     }
 

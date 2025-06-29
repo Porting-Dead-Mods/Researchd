@@ -64,6 +64,11 @@ public class PlayerManagementList extends ContainerObjectSelectionList<PlayerMan
     }
 
     @Override
+    public boolean removeEntry(Entry entry) {
+        return super.removeEntry(entry);
+    }
+
+    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         Entry entry = this.getEntryAtPosition(mouseX, mouseY);
         if (entry != null) {
@@ -93,12 +98,14 @@ public class PlayerManagementList extends ContainerObjectSelectionList<PlayerMan
 
     public static class Entry extends ContainerObjectSelectionList.Entry<Entry> {
         private final GameProfile memberProfile;
+        private final Consumer<Entry> refreshFunction;
         private final List<DraggableWidgetImageButton> buttonWidgets;
 
         private final AbstractWidget parent;
 
-        public Entry(GameProfile memberProfile, PlayerManagementDraggableWidget.PlayerManagementButtons buttonSettings, AbstractWidget parent) {
+        public Entry(GameProfile memberProfile, PlayerManagementDraggableWidget.PlayerManagementButtons buttonSettings, AbstractWidget parent, Consumer<Entry> refreshFunction) {
             this.memberProfile = memberProfile;
+            this.refreshFunction = refreshFunction;
             this.buttonWidgets = new ArrayList<>();
             this.parent = parent;
 
@@ -110,6 +117,7 @@ public class PlayerManagementList extends ContainerObjectSelectionList<PlayerMan
                             case DEMOTE -> ClientResearchTeamHelper.demoteTeamMemberSynced(this.memberProfile);
                             case REMOVE -> ClientResearchTeamHelper.removeTeamMemberSynced(this.memberProfile);
                         }
+                        Entry.this.refreshFunction.accept(Entry.this);
                     }));
                 }
             }
