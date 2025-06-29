@@ -13,6 +13,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.PacketDistributor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -73,29 +74,31 @@ public class ClientResearchTeamHelper {
         if (!mc.isSingleplayer()){
             players = mc.getCurrentServer().players.sample();
         } else {
-            players = List.of(mc.player.getGameProfile());
+            players = new ArrayList<>();
+            players.add(mc.player.getGameProfile());
+            players.add(ResearchTeam.DEBUG_MEMBER);
         }
-        List<GameProfile> profiles = researchTeam.getMembers().stream().map(uuid -> {
+        return researchTeam.getMembers().stream().map(uuid -> {
             for (GameProfile profile : players) {
                 if (profile.getId().equals(uuid)) {
                     return profile;
                 }
             }
             return null;
-        }).filter(Objects::nonNull).collect(Collectors.toList());
-        profiles.add(ResearchTeam.DEBUG_MEMBER);
-        return profiles;
+        }).filter(Objects::nonNull).toList();
     }
 
     public static void removeTeamMemberSynced(GameProfile memberProfile) {
         UUID id = memberProfile.getId();
         ResearchTeam team = getTeam(id);
-        team.removeMember(id);
-        if (getPlayerRole(id) == ResearchTeamRole.MODERATOR) {
-            team.removeModerator(id);
+        if (team != null) {
+            team.removeMember(id);
+            if (getPlayerRole(id) == ResearchTeamRole.MODERATOR) {
+                team.removeModerator(id);
+            }
+            PacketDistributor.sendToServer(new ManageMemberPayload(id, true));
+            Researchd.LOGGER.debug("Remove member {}", memberProfile.getName());
         }
-        PacketDistributor.sendToServer(new ManageMemberPayload(id, true));
-        Researchd.LOGGER.debug("Remove member {}", memberProfile.getName());
     }
 
     public static void promoteTeamMemberSynced(GameProfile memberProfile) {

@@ -208,7 +208,7 @@ public class GraphLayoutManager {
 		int _centerX = (_maxNodes * (NODE_WIDTH + HORIZONTAL_SPACING)) / 2;
 
 		// Process each layer
-		for (Integer layerNum : layerMap.keySet()) {
+		for (int layerNum : layerMap.keySet()) {
 			List<ResearchNode> nodesInLayer = layerMap.get(layerNum);
 
 			// Calculate total width of this layer

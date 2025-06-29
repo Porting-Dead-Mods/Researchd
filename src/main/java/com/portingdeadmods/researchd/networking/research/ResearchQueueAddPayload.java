@@ -37,7 +37,7 @@ public record ResearchQueueAddPayload(ResearchInstance researchInstance) impleme
             if (context.player() instanceof ServerPlayer serverPlayer) {
                 Level level = serverPlayer.level();
                 ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
-                ResearchTeam team = data.getTeam(serverPlayer);
+                ResearchTeam team = data.getTeamByPlayer(serverPlayer);
 
                 boolean added = team.getResearchProgress().researchQueue().add(researchInstance);
                 if (!added) return;
