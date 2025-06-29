@@ -8,7 +8,7 @@ import java.util.UUID;
 
 //TODO: Put this in PDL
 public class PlayerUtils {
-    public static final UUID EmptyUUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    public static final UUID EMPTY_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
     public static Player getPlayerFromName(Level level, String name) {
         return level.getServer().getPlayerList().getPlayerByName(name);
     }
@@ -18,6 +18,6 @@ public class PlayerUtils {
     }
 
     public static String getPlayerNameFromUUID(Level level, UUID uuid) {
-        return uuid == ResearchTeam.DEBUG_MEMBER.getId() ? ResearchTeam.DEBUG_MEMBER.getName() : level.getPlayerByUUID(uuid).getName().getString();
+        return uuid.equals(ResearchTeam.DEBUG_MEMBER.getId()) ? ResearchTeam.DEBUG_MEMBER.getName() : level.getPlayerByUUID(uuid).getName().getString();
     }
 }
