@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.data.helper;
 import com.mojang.authlib.GameProfile;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.utils.LazyFinal;
 import com.portingdeadmods.researchd.utils.TimeUtils;
 import net.minecraft.ChatFormatting;
@@ -87,7 +88,8 @@ public class ResearchTeam {
 	 * @param player The Owner
 	 */
 	public static ResearchTeam createDefaultTeam(ServerPlayer player) {
-		// FIXME: Remove debugging here
+		Researchd.debug("Research Team", "Creating default team for player: " + player.getDisplayName().getString());
+
 		ResearchTeam team = new ResearchTeam(player.getDisplayName().getString() + "'s Team", List.of(player.getUUID(), DEBUG_MEMBER.getId()), List.of(), List.of(), List.of(), player.getUUID(), ResearchProgress.EMPTY);
 		team.setCreationTime(player.getServer().getTickCount() * 50);
 		return team;
