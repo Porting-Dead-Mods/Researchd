@@ -3,7 +3,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'net.neoforged.moddev' version '1.0.23'
-    id 'com.matthewprenger.cursegradle' version '1.4.0'
+    id 'net.darkhax.curseforgegradle' version '1.1.15'
 }
 
 tasks.named('wrapper', Wrapper).configure {
@@ -15,6 +15,9 @@ group = mod_group_id
 
 repositories {
     mavenLocal()
+    mavenCentral()
+
+    maven { url 'https://jitpack.io' }
     exclusiveContent {
         forRepository {
             maven {
@@ -86,7 +89,7 @@ configurations {
 }
 
 dependencies {
-    implementation "curse.maven:porting-dead-libs-1173919:${pdl_version}";
+    implementation "com.github.Porting-Dead-Mods:Porting-Dead-Libs:${pdl_version}"
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
@@ -143,33 +146,25 @@ idea {
 }
 
 if (System.getenv('CURSEFORGE_TOKEN')) {
-    curseforge {
-        apiKey = System.getenv('CURSEFORGE_TOKEN')
+    task curseforge(type: net.darkhax.curseforgegradle.TaskPublishCurseForge) {
 
-        project {
-            id = 1283539
-            changelog = System.getenv('CHANGELOG') ?: 'See GitHub for changes'
-            changelogType = 'markdown'
-            releaseType = System.getenv('RELEASE_TYPE') ?: 'release'
+        apiToken = System.getenv('CURSEFORGE_TOKEN')
+        disableVersionDetection()
 
-            addGameVersion '1.21.1'
-            addGameVersion 'NeoForge'
+        // Upload main jar
+        def mainFile = upload(curseforge_project_id, jar)
+        mainFile.changelog = System.getenv('CHANGELOG') ?: 'See GitHub for changes'
+        mainFile.changelogType = 'markdown'
+        mainFile.releaseType = System.getenv('RELEASE_TYPE') ?: 'release'
+        mainFile.displayName = "${mod_id}-${mod_version}-${minecraft_version}"
+        mainFile.addGameVersion minecraft_version
+        mainFile.addModLoader 'NeoForge'
 
-            mainArtifact(jar) {
-                displayName = "Researchd ${System.getenv('MOD_VERSION')}-${System.getenv('MC_VERSION')}"
-            }
-            addArtifact sourcesJar
-            addArtifact javadocJar
+        // Add sources and javadoc as additional files
+        def sourcesFile = mainFile.withAdditionalFile(sourcesJar)
+        sourcesFile.displayName = "${mod_id}-${mod_version}-${minecraft_version}-sources"
 
-            relations {
-                requiredDependency 'porting-dead-libs'
-            }
-        }
-
-        options {
-            javaVersionAutoDetect = false
-            javaIntegration = false
-            forgeGradleIntegration = false
-        }
+        def javadocFile = mainFile.withAdditionalFile(javadocJar)
+        javadocFile.displayName = "${mod_id}-${mod_version}-${minecraft_version}-javadoc"
     }
 }

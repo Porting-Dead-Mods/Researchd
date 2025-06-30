@@ -1,7 +1,8 @@
 package com.portingdeadmods.researchd.utils.researches.data;
 
+import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
-import com.portingdeadmods.researchd.utils.UniqueArray;
+
 
 import java.util.List;
 

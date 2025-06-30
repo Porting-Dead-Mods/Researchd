@@ -4,7 +4,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.client.screens.lines.ResearchLine;
 import com.portingdeadmods.researchd.utils.Spaghetti;
-import com.portingdeadmods.researchd.utils.UniqueArray;
+import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchGraph;
 import net.minecraft.resources.ResourceKey;
 

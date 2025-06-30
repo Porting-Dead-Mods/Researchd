@@ -7,7 +7,7 @@ import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSeri
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectSerializer;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchSerializer;
 import com.portingdeadmods.researchd.impl.research.ResearchPack;
-import com.portingdeadmods.researchd.utils.UniqueArray;
+import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;

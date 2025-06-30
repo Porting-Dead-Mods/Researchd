@@ -20,7 +20,7 @@ import com.portingdeadmods.researchd.data.helper.ResearchTeam;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamMap;
 import com.portingdeadmods.researchd.networking.SyncSavedDataPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchFinishedPayload;
-import com.portingdeadmods.researchd.utils.UniqueArray;
+import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchQueue;
 import net.minecraft.ChatFormatting;

@@ -28,8 +28,8 @@ jobs:
           # Check if commit message contains a semver pattern
           if [[ $COMMIT_MSG =~ v?([0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?) ]]; then
             VERSION="${BASH_REMATCH[1]}"
-            TAG="v$VERSION"
-  
+            TAG="$VERSION"
+          
             echo "Found version: $VERSION"
             echo "SHOULD_RELEASE=true" >> $GITHUB_OUTPUT
             echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
@@ -71,6 +71,9 @@ jobs:
           MOD_VERSION=$(sed -n 's/^mod_version=//p' gradle.properties | tr -d ' \r\n')
           MC_VERSION=$(sed -n 's/^minecraft_version=//p' gradle.properties | tr -d ' \r\n')
           NEO_VERSION=$(sed -n 's/^neo_version=//p' gradle.properties | tr -d ' \r\n')
+          MOD_ID=$(sed -n 's/^mod_id=//p' gradle.properties | tr -d ' \r\n')
+          MOD_NAME=$(sed -n 's/^mod_name=//p' gradle.properties | tr -d ' \r\n')
+          CURSEFORGE_PROJECT_ID=$(sed -n 's/^curseforge_project_id=//p' gradle.properties | tr -d ' \r\n')
           
           echo "Mod version: $MOD_VERSION"
           echo "Minecraft version: $MC_VERSION"
@@ -80,6 +83,9 @@ jobs:
           MOD_VERSION=${MOD_VERSION}
           MC_VERSION=${MC_VERSION}
           NEO_VERSION=${NEO_VERSION}
+          MOD_ID=${MOD_ID}
+          MOD_NAME=${MOD_NAME}
+          CURSEFORGE_PROJECT_ID=${CURSEFORGE_PROJECT_ID}
           EOF
 
       - name: Find built JAR files
@@ -123,46 +129,29 @@ jobs:
           git tag -a ${{ steps.check_version.outputs.TAG }} -m "Release ${{ steps.check_version.outputs.TAG }}"
           git push origin ${{ steps.check_version.outputs.TAG }}
 
-      - name: Create Release
+      - name: Create Release and Upload JARs
         if: steps.check_version.outputs.SHOULD_RELEASE == 'true'
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.check_version.outputs.TAG }}
-          release_name: Researchd ${{ steps.check_version.outputs.TAG }}
+          name: "${{ steps.mod_info.outputs.MOD_NAME }} v${{ steps.check_version.outputs.TAG }}"
           body: |
-            ## Researchd ${{ steps.check_version.outputs.TAG }}
-            
+            ## ${{ steps.mod_info.outputs.MOD_NAME }} v${{ steps.check_version.outputs.TAG }}
+
             ### Changes
             ${{ steps.commit_log.outputs.log }}
-            
+
             ### Build Information
             - **Minecraft Version:** ${{ steps.mod_info.outputs.MC_VERSION }}
             - **NeoForge Version:** ${{ steps.mod_info.outputs.NEO_VERSION }}
             - **Mod Version:** ${{ steps.mod_info.outputs.MOD_VERSION }}
-            
+
             ### Download
-            Available on [CurseForge](https://www.curseforge.com/minecraft/mc-mods/researchd) and below.
+            Available on [CurseForge](https://www.curseforge.com/minecraft/mc-mods/${{ steps.mod_info.outputs.MOD_ID }}) and below.
           draft: false
           prerelease: ${{ contains(steps.check_version.outputs.VERSION, '-') }}
-
-      - name: Upload all JARs to Release
-        if: steps.check_version.outputs.SHOULD_RELEASE == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          UPLOAD_URL: ${{ steps.create_release.outputs.upload_url }}
-        run: |
-          for file in build/libs/*.jar; do
-            echo "Uploading $file"
-            curl -sSL \
-              -X POST \
-              -H "Authorization: token $GITHUB_TOKEN" \
-              -H "Content-Type: application/java-archive" \
-              --data-binary @"$file" \
-              "$UPLOAD_URL?name=$(basename $file)"
-          done
+          files: build/libs/*.jar
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload to CurseForge
         if: steps.check_version.outputs.SHOULD_RELEASE == 'true' && env.CURSEFORGE_TOKEN != ''
@@ -170,6 +159,12 @@ jobs:
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
           RELEASE_TYPE: ${{ steps.check_version.outputs.RELEASE_TYPE }}
           CHANGELOG: ${{ github.event.head_commit.message }}
+          MOD_VERSION: ${{ steps.mod_info.outputs.MOD_VERSION }}
+          MC_VERSION: ${{ steps.mod_info.outputs.MC_VERSION }}
+          MOD_ID: ${{ steps.mod_info.outputs.MOD_ID }}
+          MOD_NAME: ${{ steps.mod_info.outputs.MOD_NAME }}
+          CURSEFORGE_PROJECT_ID: ${{ steps.mod_info.outputs.CURSEFORGE_PROJECT_ID }}
+
         run: ./gradlew curseforge
 
       # Always upload artifacts for every build (even without release)

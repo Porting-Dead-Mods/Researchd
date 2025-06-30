@@ -3,7 +3,7 @@ package com.portingdeadmods.researchd.content.predicates;
 import com.mojang.serialization.Codec;
 import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
 import com.portingdeadmods.researchd.api.research.ResearchEffectData;
-import com.portingdeadmods.researchd.utils.UniqueArray;
+import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
