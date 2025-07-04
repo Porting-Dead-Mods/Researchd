@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.content.items;
 import com.portingdeadmods.portingdeadlibs.utils.AABBUtils;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.content.blockentities.ResearchLabPartBE;
 import com.portingdeadmods.researchd.registries.ResearchdBlocks;
 import com.portingdeadmods.researchd.utils.Spaghetti;
 import net.minecraft.core.BlockPos;
@@ -49,6 +50,8 @@ public class ResearchLabItem extends BlockItem {
 			} else {
 				//Researchd.debug("Research Lab", "Placing Research Lab Part at " + pos);
 				level.setBlockAndUpdate(pos, ResearchdBlocks.RESEARCH_LAB_PART.get().defaultBlockState());
+				ResearchLabPartBE rlp = (ResearchLabPartBE) level.getBlockEntity(pos);
+				rlp.setControllerPos(controllerPos);
 			}
 		});
 
