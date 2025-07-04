@@ -10,6 +10,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 
+import static com.portingdeadmods.researchd.registries.ResearchdBlocks.*;
+
 public final class LangProvider extends LanguageProvider {
     public LangProvider(PackOutput output) {
         super(output, Researchd.MODID, "en_us");
@@ -30,6 +32,9 @@ public final class LangProvider extends LanguageProvider {
         add("screen.researchd.research_team.buttons.leave_team", "Leave Team");
         add("screen.researchd.research_team.titles.members", "Members");
         add("screen.researchd.research_team.titles.recently_researched", "Recently Researched");
+
+        addBlock(RESEARCH_LAB_PART, "Research Lab Part");
+        addBlock(RESEARCH_LAB_CONTROLLER, "Research Lab Controller");
 
         addResearch(Researches.WOOD, "Wood");
         addResearch(Researches.STONE, "Stone");
