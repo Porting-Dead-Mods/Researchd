@@ -1,10 +1,9 @@
-package com.portingdeadmods.researchd.client.screens.widgets;
+package com.portingdeadmods.researchd.client.screens.team.widgets;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
-import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamRole;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -14,25 +13,23 @@ import net.minecraft.client.gui.components.PlayerFaceRenderer;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class PlayerManagementList extends ContainerObjectSelectionList<PlayerManagementList.Entry> {
     public static final ResourceLocation PLAYER_ENTRY_TEXTURE = Researchd.rl("player");
     private int scrollBarPos;
-    private final ClientResearchTeamHelper researchTeamHelper;
     private AbstractWidget parent;
 
     public PlayerManagementList(int width, int height, int y, int itemHeight, AbstractWidget parent) {
         super(Minecraft.getInstance(), width, height, y, itemHeight);
         this.parent = parent;
-        this.researchTeamHelper = new ClientResearchTeamHelper();
     }
 
     @Override
@@ -71,10 +68,10 @@ public class PlayerManagementList extends ContainerObjectSelectionList<PlayerMan
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         Entry entry = this.getEntryAtPosition(mouseX, mouseY);
-        if (entry != null) {
+        if (entry != null && entry.parent.visible) {
             entry.mouseClicked(mouseX, mouseY, button);
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return false;//super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
@@ -98,12 +95,12 @@ public class PlayerManagementList extends ContainerObjectSelectionList<PlayerMan
 
     public static class Entry extends ContainerObjectSelectionList.Entry<Entry> {
         private final GameProfile memberProfile;
-        private final Consumer<Entry> refreshFunction;
+        private final BiConsumer<Entry, PlayerManagementDraggableWidget.PlayerManagementButtonType> refreshFunction;
         private final List<DraggableWidgetImageButton> buttonWidgets;
 
         private final AbstractWidget parent;
 
-        public Entry(GameProfile memberProfile, PlayerManagementDraggableWidget.PlayerManagementButtons buttonSettings, AbstractWidget parent, Consumer<Entry> refreshFunction) {
+        public Entry(GameProfile memberProfile, PlayerManagementDraggableWidget.PlayerManagementButtons buttonSettings, AbstractWidget parent, BiConsumer<Entry, PlayerManagementDraggableWidget.PlayerManagementButtonType> refreshFunction) {
             this.memberProfile = memberProfile;
             this.refreshFunction = refreshFunction;
             this.buttonWidgets = new ArrayList<>();
@@ -115,9 +112,16 @@ public class PlayerManagementList extends ContainerObjectSelectionList<PlayerMan
                         switch (entry.getKey()) {
                             case PROMOTE -> ClientResearchTeamHelper.promoteTeamMemberSynced(this.memberProfile);
                             case DEMOTE -> ClientResearchTeamHelper.demoteTeamMemberSynced(this.memberProfile);
+                            // FIXME: Gets called twice
                             case REMOVE -> ClientResearchTeamHelper.removeTeamMemberSynced(this.memberProfile);
+                            case INVITE_PLAYER -> ClientResearchTeamHelper.sendTeamInviteSynced(this.memberProfile);
+                            case TRANSFER_OWNERSHIP -> {
+                                if (this.parent instanceof PlayerManagementDraggableWidget widget) {
+                                    widget.openPopupWidget(memberProfile);
+                                }
+                            }
                         }
-                        Entry.this.refreshFunction.accept(Entry.this);
+                        Entry.this.refreshFunction.accept(Entry.this, entry.getKey());
                     }));
                 }
             }
@@ -170,8 +174,9 @@ public class PlayerManagementList extends ContainerObjectSelectionList<PlayerMan
         }
 
         @Override
-        public List<? extends GuiEventListener> children() {
+        public @NotNull List<? extends GuiEventListener> children() {
             return List.of();
         }
+
     }
 }
