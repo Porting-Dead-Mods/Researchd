@@ -1,9 +1,11 @@
 package com.portingdeadmods.researchd.client.screens.team;
 
 import com.mojang.authlib.GameProfile;
+import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.BaseScreen;
+import com.portingdeadmods.researchd.client.screens.team.widgets.PlayerManagementDraggableWidget;
 import com.portingdeadmods.researchd.client.screens.team.widgets.RecentResearchWidget;
 import com.portingdeadmods.researchd.client.screens.team.widgets.TeamMemberWidget;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
@@ -28,6 +30,7 @@ public class ResearchTeamScreen extends BaseScreen {
     public static final WidgetSprites SETTINGS_BUTTON_SPRITES = new WidgetSprites(Researchd.rl("settings_button"), Researchd.rl("settings_button_disabled"), Researchd.rl("settings_button_focused"));
     public static final WidgetSprites INVITE_BUTTON_SPRITES = new WidgetSprites(Researchd.rl("invite_button"), Researchd.rl("invite_button_disabled"), Researchd.rl("invite_button_focused"));
     public static final WidgetSprites RECENT_RESEARCH_SPRITES = new WidgetSprites(Researchd.rl("recent_research"), Researchd.rl("recent_research_focused"));
+
     private LocalPlayer player;
 
     // Widgets n Layouts
@@ -35,6 +38,7 @@ public class ResearchTeamScreen extends BaseScreen {
     private EditBox teamNameEdit;
     private ImageButton inviteButton;
     private ImageButton settingsButton;
+    private PlayerManagementDraggableWidget inviteWidget;
 
     public ResearchTeamScreen() {
         super(Component.translatable("screen.researchd.research_team.title"), 480, 264, 480 - 64 * 2, 264 - 32 * 2);
@@ -80,6 +84,7 @@ public class ResearchTeamScreen extends BaseScreen {
         headerLayout.addChild(new SpacerElement(77, 0));
 
         this.inviteButton = new ImageButton(14, 14, INVITE_BUTTON_SPRITES, (btn) -> {
+            this.inviteWidget.setVisible(!this.inviteWidget.visible);
         }, Component.translatable("screen.researchd.research_team.buttons.invite"));
         headerLayout.addChild(this.inviteButton);
 
@@ -94,6 +99,7 @@ public class ResearchTeamScreen extends BaseScreen {
         LinearLayout linearLayout = layout.addChild(LinearLayout.horizontal().spacing(12));
 
         // Layout - Elements - Team Information
+        // TODO: Make this into a container list like the ones in draggable widget
         LinearLayout teamMembersLayout = linearLayout.addChild(LinearLayout.vertical());
         teamMembersLayout.addChild(new StringWidget(Component.translatable("screen.researchd.research_team.titles.members"), this.font));
         teamMembersLayout.addChild(new SpacerElement(0, 2));
@@ -103,6 +109,7 @@ public class ResearchTeamScreen extends BaseScreen {
         }
 
         // Layout - Elements - Recent Researches
+        // TODO: Make this into a container list like the ones in draggable widget
         LinearLayout recentResearchesLayout = linearLayout.addChild(LinearLayout.vertical());
         recentResearchesLayout.addChild(new StringWidget(Component.translatable("screen.researchd.research_team.titles.recently_researched"), this.font));
         recentResearchesLayout.addChild(new SpacerElement(0, 2));
@@ -113,9 +120,19 @@ public class ResearchTeamScreen extends BaseScreen {
 
         // Layout - Final
         this.layout.arrangeElements();
-        layout.setX(this.leftPos + 10);
-        layout.setY(this.topPos + 11);
+        this.layout.setX(this.leftPos + 10);
+        this.layout.setY(this.topPos + 11);
         this.layout.visitWidgets(this::addRenderableWidget);
+
+        this.inviteWidget = new PlayerManagementDraggableWidget(
+                this.leftPos,
+                this.topPos,
+                ClientResearchTeamHelper.getPlayersNotInTeam(),
+                new PlayerManagementDraggableWidget.PlayerManagementButtons(false, false, false, false, true),
+                Component.empty()
+        );
+        inviteWidget.setVisible(false);
+        inviteWidget.visitWidgets(this::addRenderableOnly);
     }
 
     @Override
@@ -127,10 +144,29 @@ public class ResearchTeamScreen extends BaseScreen {
     }
 
     @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (this.inviteWidget.isLazyHovered()) {
+            return this.inviteWidget.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+        }
+
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (this.inviteWidget.isHovered()) {
+            return this.inviteWidget.mouseClicked(mouseX, mouseY, button);
+        }
+
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
 
         guiGraphics.blit(SCREEN_TEXTURE, leftPos, topPos, textureWidth, textureHeight, 0, 0, textureWidth, textureHeight, textureWidth, textureHeight);
+
     }
 
     @Override

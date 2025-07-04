@@ -2,15 +2,18 @@ package com.portingdeadmods.researchd.client.utils;
 
 import com.mojang.authlib.GameProfile;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.data.helper.ResearchTeam;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamRole;
-import com.portingdeadmods.researchd.networking.team.ManageMemberPayload;
-import com.portingdeadmods.researchd.networking.team.ManageModeratorPayload;
-import com.portingdeadmods.researchd.networking.team.TeamSetNamePayload;
+import com.portingdeadmods.researchd.networking.team.*;
+import com.portingdeadmods.researchd.utils.PlayerUtils;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
@@ -24,6 +27,7 @@ public class ClientResearchTeamHelper {
         LocalPlayer player = Minecraft.getInstance().player;
         return ResearchTeamHelper.getResearchTeam(player);
     }
+
     public static ResearchTeam getTeam(UUID uuid) {
         return ResearchTeamHelper.getResearchTeamByUUID(Minecraft.getInstance().level, uuid);
     }
@@ -71,7 +75,7 @@ public class ClientResearchTeamHelper {
         ResearchTeam researchTeam = getTeam();
 
         List<GameProfile> players;
-        if (!mc.isSingleplayer()){
+        if (!mc.isSingleplayer()) {
             players = mc.getCurrentServer().players.sample();
         } else {
             players = new ArrayList<>();
@@ -88,6 +92,12 @@ public class ClientResearchTeamHelper {
         }).filter(Objects::nonNull).toList();
     }
 
+    public static List<GameProfile> getPlayersNotInTeam() {
+        ResearchTeam team = getTeam();
+        List<GameProfile> players = ClientPlayerUtils.getPlayers();
+        return players.stream().filter(gameProfile -> !team.getMembers().contains(gameProfile.getId())).toList();
+    }
+
     public static void removeTeamMemberSynced(GameProfile memberProfile) {
         UUID id = memberProfile.getId();
         ResearchTeam team = getTeam(id);
@@ -101,10 +111,31 @@ public class ClientResearchTeamHelper {
         }
     }
 
+    public static void sendTeamInviteSynced(GameProfile profileToInvite) {
+        UUID invited = profileToInvite.getId();
+        boolean remove = getTeam().getSentInvites().contains(invited);
+        LocalPlayer player = Minecraft.getInstance().player;
+
+        ResearchTeam team = getTeam();
+        if (team != null) {
+            if (remove) {
+                team.removeSentInvite(invited);
+            } else {
+                team.addSentInvite(invited);
+            }
+            Level level = player.level();
+            ResearchdSavedData.TEAM_RESEARCH.get().setData(level, ResearchdSavedData.TEAM_RESEARCH.get().getData(level));
+        }
+
+        PacketDistributor.sendToServer(new InvitePlayerPayload(invited, remove));
+    }
+
     public static void promoteTeamMemberSynced(GameProfile memberProfile) {
         switch (getPlayerRole(memberProfile.getId())) {
-            case OWNER -> {}
-            case MODERATOR -> {}
+            case OWNER -> {
+            }
+            case MODERATOR -> {
+            }
             case MEMBER -> {
                 ResearchTeam team = getTeam(memberProfile.getId());
                 team.addModerator(memberProfile.getId());
@@ -116,7 +147,8 @@ public class ClientResearchTeamHelper {
 
     public static void demoteTeamMemberSynced(GameProfile memberProfile) {
         switch (getPlayerRole(memberProfile.getId())) {
-            case OWNER -> {}
+            case OWNER -> {
+            }
             case MODERATOR -> {
                 ResearchTeam team = getTeam(memberProfile.getId());
                 team.removeModerator(memberProfile.getId());
@@ -128,4 +160,9 @@ public class ClientResearchTeamHelper {
         Researchd.LOGGER.debug("Demoted member {}", memberProfile.getName());
     }
 
+    public static void transferOwnershipSynced(GameProfile nextOwner) {
+        ResearchTeam team = getTeam();
+        team.setOwner(nextOwner.getId());
+        PacketDistributor.sendToServer(new TransferOwnershipPayload(nextOwner.getId()));
+    }
 }
