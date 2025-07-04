@@ -87,6 +87,7 @@ public final class ResearchTeamHelper {
      * Removes the player from his research team.
      * <br>
      * Sets savedData dirty
+     *
      * @param player
      */
     public static void removeModFromTeam(ServerPlayer player) {
@@ -125,6 +126,7 @@ public final class ResearchTeamHelper {
 
     /**
      * 2 player param wrapper
+     *
      * @param requester
      * @param memberOfTeam
      */
@@ -171,6 +173,7 @@ public final class ResearchTeamHelper {
 
     /**
      * 2 player param wrapper
+     *
      * @param requester
      * @param nextToLead
      */
@@ -205,6 +208,7 @@ public final class ResearchTeamHelper {
 
     /**
      * 2 player param wrapper
+     *
      * @param requester
      * @param member
      * @param remove
@@ -245,6 +249,7 @@ public final class ResearchTeamHelper {
 
     /**
      * 2 player param wrapper
+     *
      * @param requester
      * @param moderator
      * @param remove
@@ -297,6 +302,7 @@ public final class ResearchTeamHelper {
 
     /**
      * 2 player param wrapper
+     *
      * @param requester
      * @param nextToLead
      */
@@ -316,13 +322,12 @@ public final class ResearchTeamHelper {
         if (team != null) {
             if (remove) {
                 team.removeSentInvite(invited);
-                requester.sendSystemMessage(Component.literal("Invite to " + PlayerUtils.getPlayerNameFromUUID(requester.level(), invited) + " removed").withStyle(ChatFormatting.GREEN));
+                requester.sendSystemMessage(Component.literal("Invite to " + PlayerUtils.getPlayerNameFromUUID(requester.level(), invited) + " removed").withStyle(ChatFormatting.GOLD));
             } else {
                 team.addSentInvite(invited);
                 requester.sendSystemMessage(Component.literal("Invite sent to " + PlayerUtils.getPlayerNameFromUUID(requester.level(), invited)).withStyle(ChatFormatting.GREEN));
             }
-            MinecraftServer server = requester.getServer();
-            ServerLevel level = server.overworld();
+            Level level = requester.level();
             ResearchdSavedData.TEAM_RESEARCH.get().setData(level, ResearchdSavedData.TEAM_RESEARCH.get().getData(level));
         } else {
             requester.sendSystemMessage(Component.literal("You got to be in a team to do that! Create one with /researchd team create <name>"));
@@ -331,6 +336,7 @@ public final class ResearchTeamHelper {
 
     /**
      * 2 player param wrapper
+     *
      * @param requester
      * @param invited
      * @param remove
@@ -362,6 +368,7 @@ public final class ResearchTeamHelper {
 
     /**
      * 2 player param wrapper
+     *
      * @param requester
      * @param teamMember
      * @param remove
@@ -451,6 +458,7 @@ public final class ResearchTeamHelper {
     public static MutableComponent illegalMessage(String message) {
         return Component.literal(message).withStyle(ChatFormatting.RED);
     }
+
     public static MutableComponent getIllegalMessage() {
         List<MutableComponent> msgs = new ArrayList<>();
 

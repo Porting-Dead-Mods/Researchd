@@ -1,6 +1,5 @@
-package com.portingdeadmods.researchd.client.screens.widgets;
+package com.portingdeadmods.researchd.client.screens.team.widgets;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -48,6 +47,10 @@ public abstract class AbstractDraggableWidget extends AbstractWidget {
 
         this.updateIsHovered = true;
         this.isHovered = false;
+    }
+
+    public boolean isLazyHovered() {
+        return this.isHovered;
     }
 
     protected boolean isRectHovered(GuiGraphics guiGraphics, int mouseX, int mouseY, int width, int height) {
