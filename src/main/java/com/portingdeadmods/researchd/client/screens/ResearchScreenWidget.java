@@ -29,19 +29,19 @@ public abstract class ResearchScreenWidget extends AbstractWidget {
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
     }
 
-    public static void renderResearchPanel(GuiGraphics guiGraphics, ResearchInstance instance, int x, int y, int mouseX, int mouseY, int scale) {
+    public static void renderResearchPanel(GuiGraphics guiGraphics, ResearchInstance instance, int x, int y, int mouseX, int mouseY, float scale) {
         renderResearchPanel(guiGraphics, instance, x, y, mouseX, mouseY, scale, true);
     }
 
-    public static void renderResearchPanel(GuiGraphics guiGraphics, ResearchInstance instance, int x, int y, int mouseX, int mouseY, int scale, boolean hoverable) {
+    public static void renderResearchPanel(GuiGraphics guiGraphics, ResearchInstance instance, int x, int y, int mouseX, int mouseY, float scale, boolean hoverable) {
         renderResearchPanel(guiGraphics, instance, x, y, mouseX, mouseY, scale, hoverable, false);
     }
 
-    public static void renderResearchPanel(GuiGraphics guiGraphics, ResearchInstance instance, int x, int y, int mouseX, int mouseY, int scale, boolean hoverable, boolean tall) {
+    public static void renderResearchPanel(GuiGraphics guiGraphics, ResearchInstance instance, int x, int y, int mouseX, int mouseY, float scale, boolean hoverable, boolean tall) {
         int width = PANEL_WIDTH;
         int height = PANEL_HEIGHT;
         ResearchStatus status = instance.getResearchStatus();
-        guiGraphics.blit(status.getSpriteTexture(), x, y, width * scale, height * scale, 0, 0, width, height, width, height);
+        guiGraphics.blit(status.getSpriteTexture(), x, y, (int) (width * scale), (int) (height * scale), 0, 0, width, height, width, height);
 
         RegistryAccess lookup = Minecraft.getInstance().level.registryAccess();
 
@@ -49,14 +49,23 @@ public abstract class ResearchScreenWidget extends AbstractWidget {
 
         poseStack.pushPose();
         {
-            poseStack.scale(scale, scale, scale);
-            guiGraphics.renderItem(ResearchHelper.getResearch(instance.getResearch(), lookup).icon().getDefaultInstance(), x - scale / 2 - 3, y - (height * scale) / (2 * scale) - 16);
+            poseStack.translate(x, y, 0);             // move origin to top-left of panel
+            poseStack.scale(scale, scale, scale);     // scale local coordinates
+
+            int itemX = (PANEL_WIDTH - 16) / 2;       // center item horizontally
+            int itemY = (PANEL_HEIGHT - 18) / 2;      // center item vertically
+
+            guiGraphics.renderItem(
+                    ResearchHelper.getResearch(instance.getResearch(), lookup).icon().getDefaultInstance(),
+                    itemX,
+                    itemY
+            );
         }
         poseStack.popPose();
 
-        if (isHovering(guiGraphics, x, y, mouseX, mouseY, scale) && hoverable) {
+        if (isHovering(guiGraphics, x, y, mouseX, mouseY, (int) scale) && hoverable) {
             int color = -2130706433;
-            guiGraphics.fillGradient(RenderType.guiOverlay(), x, y, x + 20 * scale, y + 20 * scale, color, color, 0);
+            guiGraphics.fillGradient(RenderType.guiOverlay(), x, y, (int) (x + 20 * scale), (int) (y + 20 * scale), color, color, 0);
         }
     }
 
@@ -76,6 +85,7 @@ public abstract class ResearchScreenWidget extends AbstractWidget {
         ResearchStatus status = instance.getResearchStatus();
         GuiUtils.drawImg(guiGraphics, status.getSpriteTexture(spriteType), x, y, PANEL_WIDTH, spriteType.getHeight());
 
+        // TODO: Cache this
         RegistryAccess lookup = Minecraft.getInstance().level.registryAccess();
         guiGraphics.renderItem(ResearchHelper.getResearch(instance.getResearch(), lookup).icon().getDefaultInstance(), x + 2, y + 2);
 

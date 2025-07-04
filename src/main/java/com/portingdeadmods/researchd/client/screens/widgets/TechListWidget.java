@@ -28,8 +28,9 @@ public class TechListWidget extends ResearchScreenWidget {
     private static final ResourceLocation BACKGROUND_TEXTURE = Researchd.rl("textures/gui/tech_list_screen.png");
     private static final ResourceLocation BOTTOM_TEXTURE = Researchd.rl("textures/gui/tech_list_bottom.png");
     private static final ResourceLocation BACKGROUND_TEXTURE_SEARCH_BAR = Researchd.rl("textures/gui/tech_list_screen_search_bar.png");
+    private static final ResourceLocation TECH_LIST_EXPANDABLE = Researchd.rl("textures/gui/research_screen/tech_list_expandable.png");
     private static final int BACKGROUND_WIDTH = 174;
-    private static final int BACKGROUND_HEIGHT = 136;
+    private static final int BACKGROUND_HEIGHT = 18;
     private static final int BOTTOM_WIDTH = 174;
     private static final int BOTTOM_HEIGHT = 8;
     private static final int DISPLAY_ROWS = 5;
@@ -87,8 +88,9 @@ public class TechListWidget extends ResearchScreenWidget {
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
-        GuiUtils.drawImg(guiGraphics, hasSearchBar ? BACKGROUND_TEXTURE_SEARCH_BAR : BACKGROUND_TEXTURE, getX(), getY() + 3, BACKGROUND_WIDTH, BACKGROUND_HEIGHT - 3);
-        GuiUtils.drawImg(guiGraphics, BOTTOM_TEXTURE, getX(), getY() + BACKGROUND_HEIGHT, BOTTOM_WIDTH, BOTTOM_HEIGHT);
+        GuiUtils.drawImg(guiGraphics, hasSearchBar ? BACKGROUND_TEXTURE_SEARCH_BAR : BACKGROUND_TEXTURE, getX(), getY() + 3, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
+        guiGraphics.blit(TECH_LIST_EXPANDABLE, getX(), getY() + BACKGROUND_HEIGHT + 3, 0, 0, 174, guiGraphics.guiHeight() - getY() - BACKGROUND_HEIGHT - BOTTOM_HEIGHT, 174, 16);
+        GuiUtils.drawImg(guiGraphics, BOTTOM_TEXTURE, getX(), getY() + BACKGROUND_HEIGHT + guiGraphics.guiHeight() - getY() - BACKGROUND_HEIGHT - BOTTOM_HEIGHT, BOTTOM_WIDTH, BOTTOM_HEIGHT);
 
         int paddingX = 12;
         int paddingY = 21;

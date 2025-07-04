@@ -4,6 +4,7 @@ import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.client.cache.ClientResearchCache;
+import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.screens.graph.GraphLayoutManager;
 import com.portingdeadmods.researchd.client.screens.graph.GraphStateManager;
 import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
@@ -81,7 +82,7 @@ public class ResearchGraphWidget extends AbstractWidget {
 
     private void calculateLines() {
         this.researchLines.clear();
-        Researchd.debug("Research lines" ,  "Calculating connection lines for graph with ", this.graph.nodes().size(), " nodes.");
+        Researchd.debug("Research lines", "Calculating connection lines for graph with ", this.graph.nodes().size(), " nodes.");
 
         // Proceed only if we have nodes to connect
         if (this.graph == null) {
@@ -90,7 +91,7 @@ public class ResearchGraphWidget extends AbstractWidget {
         }
 
         if (this.graph.nodes().isEmpty()) {
-            Researchd.debug("Research lines" , "No nodes in graph, skipping line calculation.");
+            Researchd.debug("Research lines", "No nodes in graph, skipping line calculation.");
             return;
         }
 
@@ -142,9 +143,9 @@ public class ResearchGraphWidget extends AbstractWidget {
 
                 // Choose consistent path style for this parent-layer combination
                 boolean preferVerticalFirst =
-                        (parent.getX() + PANEL_WIDTH/2) <
+                        (parent.getX() + PANEL_WIDTH / 2) <
                                 (layerChildren.stream()
-                                        .mapToInt(n -> n.getX() + PANEL_WIDTH/2)
+                                        .mapToInt(n -> n.getX() + PANEL_WIDTH / 2)
                                         .average()
                                         .orElse(0));
 
@@ -533,9 +534,7 @@ public class ResearchGraphWidget extends AbstractWidget {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int i, int i1, float v) {
-        guiGraphics.enableScissor(getX(), getY(), getX() + getWidth() - 1, getY() + getHeight());
-
+    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
         if (this.researchLines != null) {
             for (List<ResearchLine> lines : this.researchLines.values()) {
                 for (ResearchLine line : lines) {
@@ -545,11 +544,38 @@ public class ResearchGraphWidget extends AbstractWidget {
         }
 
         for (ResearchNode node : this.graph.nodes()) {
-            node.render(guiGraphics, i, i1, v);
+            if (node == this.graph.rootNode()) {
+                float scale = 1.75f;
+                int width = ResearchScreenWidget.PANEL_WIDTH;
+                int height = ResearchScreenWidget.PANEL_HEIGHT;
+
+                // getX() and getY() = top-left of normal panel (scale = 1)
+                float baseX = node.getX();
+                float baseY = node.getY();
+
+                // compute center of unscaled panel
+                float centerX = baseX + width / 2f;
+                float centerY = baseY + height / 2f;
+
+                // compute top-left of scaled panel to keep same center
+                int scaledX = (int) (centerX - (width * scale) / 2f);
+                int scaledY = (int) (centerY - (height * scale) / 2f);
+
+                ResearchScreenWidget.renderResearchPanel(
+                        guiGraphics,
+                        node.getInstance(),
+                        scaledX + 1,
+                        scaledY,
+                        mouseX,
+                        mouseY,
+                        scale
+                );
+            } else {
+                node.render(guiGraphics, mouseX, mouseY, v);
+            }
         }
 
-        guiGraphics.disableScissor();
-        renderNodeTooltips(guiGraphics, i, i1, v);
+
     }
 
     private void renderNode(ResearchNode node, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
@@ -561,7 +587,7 @@ public class ResearchGraphWidget extends AbstractWidget {
         }
     }
 
-    private void renderNodeTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void renderNodeTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         for (ResearchNode node : this.graph.nodes()) {
             if (node.isHovered()) {
                 Minecraft minecraft = Minecraft.getInstance();
@@ -578,14 +604,19 @@ public class ResearchGraphWidget extends AbstractWidget {
     }
 
     @Override
-    public void onClick(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
         for (ResearchNode node : this.graph.nodes()) {
             if (node.isHovered()) {
                 this.selectedResearchWidget.setSelectedResearch(node.getInstance());
                 this.setGraph(ResearchGraphCache.computeIfAbsent(Minecraft.getInstance().player, node.getInstance().getResearch()));
-                break;
+                return true;
             }
         }
+        return false;
+    }
+
+    @Override
+    public void onClick(double mouseX, double mouseY, int button) {
     }
 
     @Override
