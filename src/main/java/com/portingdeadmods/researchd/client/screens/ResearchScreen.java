@@ -26,6 +26,7 @@ public class ResearchScreen extends Screen {
     public static final ResourceLocation BOTTOM_RIGHT_EDGE = Researchd.rl("textures/gui/research_screen/edges/bottom_right.png");
     public static final ResourceLocation TOP_BAR = Researchd.rl("textures/gui/research_screen/bars/top.png");
     public static final ResourceLocation BOTTOM_BAR = Researchd.rl("textures/gui/research_screen/bars/bottom.png");
+    public static final ResourceLocation RIGHT_BAR = Researchd.rl("textures/gui/research_screen/bars/right.png");
 
     private final TechListWidget techListWidget;
     private final ResearchQueueWidget researchQueueWidget;
@@ -64,7 +65,7 @@ public class ResearchScreen extends Screen {
         addRenderableWidget(this.researchQueueWidget);
         addRenderableWidget(this.techListWidget.searchButton);
         addRenderableWidget(this.techListWidget.startResearchButton);
-        addRenderableWidget(this.researchGraphWidget);
+        addWidget(this.researchGraphWidget);
         addRenderableWidget(this.selectedResearchWidget);
     }
 
@@ -83,8 +84,19 @@ public class ResearchScreen extends Screen {
         GuiUtils.drawImg(guiGraphics, BOTTOM_RIGHT_EDGE, width - 8, height - 8, 8, 8);
         GuiUtils.drawImg(guiGraphics, TOP_RIGHT_EDGE, width - 8, 0, 8, 8);
         int w = 174;
-        GuiUtils.drawImg(guiGraphics, TOP_BAR, w, 0, guiGraphics.guiWidth() - w - 8, 8);
-        GuiUtils.drawImg(guiGraphics, BOTTOM_BAR, w, guiGraphics.guiHeight() - 8, guiGraphics.guiWidth() - w - 8, 8);
+        guiGraphics.blit(TOP_BAR, w, 0, 0, 0, guiGraphics.guiWidth() - w - 8, 8, 256, 8);
+        guiGraphics.blit(BOTTOM_BAR, w, guiGraphics.guiHeight() - 8, 0, 0, guiGraphics.guiWidth() - w - 8, 8, 256, 8);
+        guiGraphics.blit(RIGHT_BAR, width - 8, 8, 0, 0, 8, guiGraphics.guiHeight() - 8 - 8, 8, 256);
+
+        this.researchGraphWidget.setSize(guiGraphics.guiWidth() - 8 - w, guiGraphics.guiHeight() - 8 * 2);
+
+        guiGraphics.enableScissor(w, 8, guiGraphics.guiWidth() - 8, guiGraphics.guiHeight() - 8);
+        {
+            this.researchGraphWidget.render(guiGraphics, mouseX, mouseY, partialTick);
+        }
+        guiGraphics.disableScissor();
+
+        this.researchGraphWidget.renderNodeTooltips(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     public ResearchGraphWidget getResearchGraphWidget() {
