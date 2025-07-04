@@ -55,6 +55,7 @@ public class Researchd {
         ResearchdSavedData.SAVED_DATA.register(modEventBus);
         ResearchdBlocks.BLOCKS.register(modEventBus);
         ResearchdBlockEntityTypes.BLOCK_ENTITY_TYPES.register(modEventBus);
+        ResearchdMenuTypes.MENU_TYPES.register(modEventBus);
 
         modEventBus.addListener(this::registerCapabilities);
         modEventBus.addListener(this::registerRegistries);
