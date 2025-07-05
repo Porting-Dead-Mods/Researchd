@@ -588,6 +588,8 @@ public class ResearchGraphWidget extends AbstractWidget {
     }
 
     public void renderNodeTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        if (!this.isHovered()) return;
+
         for (ResearchNode node : this.graph.nodes()) {
             if (node.isHovered()) {
                 Minecraft minecraft = Minecraft.getInstance();
@@ -595,6 +597,7 @@ public class ResearchGraphWidget extends AbstractWidget {
                         Utils.registryTranslation(node.getInstance().getResearch()),
                         Component.translatable("research_desc." + Researchd.MODID + "." + node.getInstance().getResearch().location().getPath())
                 ), mouseX, mouseY);
+                break;
             }
         }
     }
@@ -609,14 +612,10 @@ public class ResearchGraphWidget extends AbstractWidget {
             if (node.isHovered()) {
                 this.selectedResearchWidget.setSelectedResearch(node.getInstance());
                 this.setGraph(ResearchGraphCache.computeIfAbsent(Minecraft.getInstance().player, node.getInstance().getResearch()));
-                return true;
+                return super.mouseClicked(mouseX, mouseY, button);
             }
         }
-        return false;
-    }
-
-    @Override
-    public void onClick(double mouseX, double mouseY, int button) {
+        return true;
     }
 
     @Override
