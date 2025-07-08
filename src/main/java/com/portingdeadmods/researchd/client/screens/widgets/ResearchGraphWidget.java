@@ -25,6 +25,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.FastColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -75,9 +76,53 @@ public class ResearchGraphWidget extends AbstractWidget {
             node.refreshHeads();
         }
 
-        // Always calculate connection lines after positions are finalized
-        //TODO: REWORK AND REENABLE LINE GENERATION AFTER FINISHING NODE POSITIONING
         calculateLines();
+    }
+
+    /**
+     * Un-nested utility method for overlapping calculation
+     *
+     * @param overlappingLines All the overlapping line groups
+     * @param line1 The line to search the group for
+     * @param line2 The line that line1 overlaps with
+     */
+    private void _createOrAppendOverlapSet(UniqueArray<UniqueArray<ResearchLine>> overlappingLines, ResearchLine line1, ResearchLine line2) {
+        for (UniqueArray<ResearchLine> group : overlappingLines) {
+            if (group.contains(line1)) {
+                group.add(line2);
+                return;
+            }
+        }
+
+        overlappingLines.add(new UniqueArray<>(List.of(line1, line2)));
+    }
+
+    /**
+     * Sets colors for overlapping lines in a group
+     * This is called after all overlaps are calculated
+     */
+    private void _setOverlapColors(UniqueArray<ResearchLine> group) {
+        int MAX_DARK = 100;
+        int MAX_LIGHT = 255;
+
+        for (int i = 0; i < group.size(); i++) {
+            ResearchLine line = group.get(i);
+            int val = MAX_LIGHT - (i * (MAX_LIGHT - MAX_DARK) / group.size());
+            int color = FastColor.ARGB32.color(255, val, val, val); // Gray scale from light to dark
+            line.setColor(color);
+
+            if (line.getStartHead() != null)
+                line.getStartHead().setColor(color);
+            else
+                Researchd.debug("Research lines", "Start head is null...");
+
+            if (line.getEndHead() != null)
+                line.getEndHead().setColor(color);
+            else
+                Researchd.debug("Research lines", "End head is null...");
+
+            Researchd.debug("Research lines", "Setting color for line and heads ", i + 1, "/", group.size(), ": ", val, " out of 255");
+        }
     }
 
     private void calculateLines() {
@@ -195,8 +240,8 @@ public class ResearchGraphWidget extends AbstractWidget {
 
                         // Generate the best path
                         ResearchLine bestLine = generateOptimalPath(
-                                bestHeads.left().getConnectionPoint(),
-                                bestHeads.right().getConnectionPoint(),
+                                bestHeads.left(),
+                                bestHeads.right(),
                                 allLines,
                                 verticalPathXCoords,
                                 preferVerticalFirst
@@ -235,6 +280,24 @@ public class ResearchGraphWidget extends AbstractWidget {
             }
         }
         Researchd.debug("Research lines", "Line calculation complete. Generated ", researchLines.size(), " line groups with total lines: ", allLines.size());
+
+        Researchd.debug("Research lines", "Calculating overlaps and colors...");
+        UniqueArray<UniqueArray<ResearchLine>> overlappingLines = new UniqueArray<>();
+
+        for (ResearchLine line : allLines) {
+            for (ResearchLine line2 : allLines) {
+                if (line.equals(line2)) continue;
+
+                Set<PotentialOverlap> overlaps = line.getOverlaps(line2);
+                Researchd.debug("Research lines", "Checking overlap between lines - Found ", overlaps.size(), " potential overlaps");
+                if (overlaps.stream().anyMatch(PotentialOverlap::isOverlap)) {
+                    Researchd.debug("Research lines", "Found overlap, adding lines to group");
+                    this._createOrAppendOverlapSet(overlappingLines, line, line2);
+                }
+            }
+        }
+
+        overlappingLines.forEach(this::_setOverlapColors);
     }
 
     /**
@@ -296,18 +359,20 @@ public class ResearchGraphWidget extends AbstractWidget {
      * Generates the optimal path between two points
      */
     private ResearchLine generateOptimalPath(
-            Point start,
-            Point end,
+            ResearchHead start,
+            ResearchHead end,
             List<ResearchLine> existingLines,
             Set<Integer> verticalPathXCoords,
             boolean preferVerticalFirst
     ) {
         // Generate candidate paths
         List<ResearchLine> candidates = new ArrayList<>();
+        Point startPoint = start.getConnectionPoint();
+        Point endPoint = end.getConnectionPoint();
 
         // Add direct connection if points are aligned
-        if (start.x == end.x) {
-            candidates.add(ResearchLine.start(start).then(end));
+        if (start.getConnectionPoint().x == end.getConnectionPoint().x) {
+            candidates.add(ResearchLine.direct(start, end));
         }
 
         // Add L-shaped connections (both vertical-first and horizontal-first)
@@ -315,7 +380,7 @@ public class ResearchGraphWidget extends AbstractWidget {
         candidates.add(ResearchLine.createLConnection(start, end, false));
 
         // Try S-shaped connections if there's enough vertical distance
-        int verticalDistance = Math.abs(end.y - start.y);
+        int verticalDistance = Math.abs(endPoint.y - startPoint.y);
         if (verticalDistance > PANEL_HEIGHT) {
             try {
                 candidates.add(ResearchLine.createSConnection(start, end, verticalDistance / 3));
@@ -333,14 +398,16 @@ public class ResearchGraphWidget extends AbstractWidget {
         // Try paths that reuse existing vertical paths
         for (int x : verticalPathXCoords) {
             // Only consider vertical paths between start and end x positions
-            if ((x > Math.min(start.x, end.x) && x < Math.max(start.x, end.x))) {
+            if ((x > Math.min(startPoint.x, endPoint.x) && x < Math.max(startPoint.x, endPoint.x))) {
                 try {
                     ResearchLine path = ResearchLine.start(start)
-                            .then(start.x, start.y) // Extra point for better handling
-                            .then(x, start.y)
-                            .then(x, end.y)
-                            .then(end.x, end.y)
-                            .then(end);
+                            .then(startPoint.x, startPoint.y) // Extra point for better handling
+                            .then(x, startPoint.y)
+                            .then(x, endPoint.y)
+                            .then(endPoint.x, endPoint.y)
+                            .then(endPoint)
+                            .setStartHead(start)
+                            .setEndHead(end);
                     candidates.add(path);
                 } catch (Exception e) {
                     // Skip invalid path
@@ -463,11 +530,14 @@ public class ResearchGraphWidget extends AbstractWidget {
      * Generates a custom path for difficult cases
      */
     private ResearchLine findCustomPath(
-            Point start,
-            Point end,
+            ResearchHead startHead,
+            ResearchHead endHead,
             List<ResearchLine> existingLines,
             Set<Integer> verticalPathXCoords
     ) {
+        Point start = startHead.getConnectionPoint();
+        Point end = endHead.getConnectionPoint();
+
         // First try to find a path using midpoints between start and end
         int minX = Math.min(start.x, end.x);
         int maxX = Math.max(start.x, end.x);
@@ -486,7 +556,9 @@ public class ResearchGraphWidget extends AbstractWidget {
             ResearchLine path = ResearchLine.start(start)
                     .then(midX, start.y)
                     .then(midX, end.y)
-                    .then(end);
+                    .then(end)
+                    .setEndHead(endHead)
+                    .setStartHead(startHead);
 
             double score = evaluatePath(path, existingLines, true);
             if (score < 2.0) {
@@ -508,7 +580,9 @@ public class ResearchGraphWidget extends AbstractWidget {
                     .then(start.x, midY) // Vertical segment from start
                     .then(midX, midY)    // Horizontal segment to middle
                     .then(midX, end.y)   // Vertical segment to end's Y
-                    .then(end);          // Horizontal segment to end
+                    .then(end)  // Horizontal segment to end
+                    .setStartHead(startHead)
+                    .setEndHead(endHead);
 
             double score = evaluatePath(path, existingLines, true);
             if (score < 3.0) {
@@ -526,7 +600,9 @@ public class ResearchGraphWidget extends AbstractWidget {
                 .then(thirdX, midY)       // Then vertically again
                 .then(end.x, midY)        // Then horizontally
                 .then(end.x, end.y)       // Finally vertically
-                .then(end);
+                .then(end)
+                .setEndHead(endHead)
+                .setStartHead(startHead);
     }
 
     public ResearchGraph getCurrentGraph() {

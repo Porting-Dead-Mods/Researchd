@@ -2,7 +2,9 @@ package com.portingdeadmods.researchd.client.screens.lines;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.util.FastColor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.Point;
 import java.util.ArrayList;
@@ -13,6 +15,9 @@ import java.util.Set;
 
 public class ResearchLine implements Renderable {
 	private final LinkedList<Point> points;
+	private @Nullable ResearchHead startHead;
+	private @Nullable ResearchHead endHead;
+	private int color = FastColor.ARGB32.color(255, 255, 255, 255);
 
 	private ResearchLine() {
 		this.points = new LinkedList<>();
@@ -28,10 +33,38 @@ public class ResearchLine implements Renderable {
 	}
 
 	/**
+	 * Creates a new line builder starting at the given research head
+	 */
+	public static ResearchLine start(ResearchHead start) {
+		ResearchLine line = new ResearchLine();
+		line.points.add(start.getConnectionPoint());
+		line.startHead = start;
+		return line;
+	}
+
+	/**
 	 * Creates a new line builder starting at the given coordinates
 	 */
 	public static ResearchLine start(int x, int y) {
 		return start(new Point(x, y));
+	}
+
+	public ResearchLine setEndHead(@NotNull ResearchHead endHead) {
+		this.endHead = endHead;
+		return this;
+	}
+
+	public ResearchLine setStartHead(@NotNull ResearchHead startHead) {
+		this.startHead = startHead;
+		return this;
+	}
+
+	public @Nullable ResearchHead getStartHead() {
+		return startHead;
+	}
+
+	public @Nullable ResearchHead getEndHead() {
+		return endHead;
 	}
 
 	/**
@@ -81,6 +114,12 @@ public class ResearchLine implements Renderable {
 		}
 	}
 
+	public static ResearchLine createLConnection(ResearchHead start, ResearchHead end, boolean verticalFirst) {
+		return createLConnection(start.getConnectionPoint(), end.getConnectionPoint(), verticalFirst)
+				.setStartHead(start)
+				.setEndHead(end);
+	}
+
 	/**
 	 * The same as the L connection but with a vertical offset.
 	 * Goes vertical first (verticalOffset), then horizontal, then the remaining vertical distance.
@@ -103,6 +142,25 @@ public class ResearchLine implements Renderable {
 		}
 	}
 
+
+	public static ResearchLine createSConnection(ResearchHead start, ResearchHead end, int verticalOffset) {
+		return createSConnection(start.getConnectionPoint(), end.getConnectionPoint(), verticalOffset)
+				.setStartHead(start)
+				.setEndHead(end);
+	}
+
+	/**
+	 * Creates a direct connection between two research heads.
+	 * This will not create any bends or curves, just a straight line.
+	 * At the condition that either the X or the Y coordinate of the start and end points are the same.
+	 */
+	public static ResearchLine direct(ResearchHead start, ResearchHead end) {
+		return ResearchLine.start(start.getConnectionPoint())
+				.then(end.getConnectionPoint())
+				.setStartHead(start)
+				.setEndHead(end);
+	}
+
 	/**
 	 * Builds a connection between input and output points of research nodes
 	 * with an L-shaped path.
@@ -117,7 +175,7 @@ public class ResearchLine implements Renderable {
 
 		Point prev = points.getFirst();
 		for (Point curr : points.stream().skip(1).toList()) {
-			new LineSegment(prev, curr).render(guiGraphics);
+			new LineSegment(prev, curr).render(guiGraphics, this.getColor());
 			prev = curr;
 		}
 	}
@@ -164,7 +222,7 @@ public class ResearchLine implements Renderable {
 	public Set<PotentialOverlap> getOverlaps(ResearchLine other) {
 		return getOverlaps(this, other);
 	}
-	
+
 	/**
 	 * Extracts all the line segments from a research line
 	 */
@@ -178,7 +236,7 @@ public class ResearchLine implements Renderable {
 
 		return segments;
 	}
-	
+
 	/**
 	 * Finds all intersections/overlaps between two research lines
 	 * @param line1 First ResearchLine
@@ -202,4 +260,13 @@ public class ResearchLine implements Renderable {
 
 		return overlaps;
 	}
+
+	public int getColor() {
+		return color;
+	}
+
+	public void setColor(int color) {
+		this.color = color;
+	}
 }
+
