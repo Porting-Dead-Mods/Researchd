@@ -12,7 +12,8 @@ import com.portingdeadmods.researchd.data.helper.ResearchTeam;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamMap;
 import com.portingdeadmods.researchd.impl.research.ResearchPack;
 import com.portingdeadmods.researchd.networking.SyncSavedDataPayload;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperServer;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchQueue;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
@@ -52,7 +53,7 @@ public final class ResearchdServerEvents {
 
 				if (!queue.isEmpty()) {
 					ResearchInstance instance = queue.getEntries().getFirst();
-					Research research = ResearchHelper.getResearch(instance.getResearch(), server.registryAccess());
+					Research research = ResearchHelperCommon.getResearch(instance.getResearch(), server.registryAccess());
 
 					// TODO: Continue when the ground basis is set n done
 				}
@@ -73,6 +74,7 @@ public final class ResearchdServerEvents {
 
 	@SubscribeEvent
 	private static void onJoinWorld(PlayerEvent.PlayerLoggedInEvent event) {
+		if (event.getEntity().level().isClientSide()) return;
 		if (!(event.getEntity() instanceof ServerPlayer serverPlayer)) return;
 
 		MinecraftServer server = serverPlayer.server;
@@ -90,7 +92,7 @@ public final class ResearchdServerEvents {
 		}
 
 		// v Research Predicate Attachment v
-		ResearchHelper.refreshResearches(serverPlayer);
+		ResearchHelperServer.refreshResearches(serverPlayer);
 	}
 
 	@SubscribeEvent

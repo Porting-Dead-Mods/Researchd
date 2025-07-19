@@ -2,12 +2,11 @@ package com.portingdeadmods.researchd.data.helper;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.impl.research.ResearchCompletionProgress;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchQueue;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.core.HolderLookup;
@@ -56,7 +55,7 @@ public record ResearchProgress(
     }
 
     public @Nullable ResearchCompletionProgress tryGetProgress(ResourceKey<Research> research) {
-        return progress().get(ResearchHelper.getInstanceByResearch(progress.keySet(), research));
+        return progress().get(ResearchHelperCommon.getInstanceByResearch(progress.keySet(), research));
     }
 
     public @Nullable ResearchCompletionProgress tryGetProgress(ResearchInstance researchInstance) {
@@ -64,7 +63,7 @@ public record ResearchProgress(
     }
 
     public ResearchCompletionProgress getProgress(ResearchInstance research, HolderLookup.Provider provider) {
-        return progress().computeIfAbsent(research, r -> ResearchHelper.getResearch(research.getResearch(), provider).researchMethod().getDefaultProgress());
+        return progress().computeIfAbsent(research, r -> ResearchHelperCommon.getResearch(research.getResearch(), provider).researchMethod().getDefaultProgress());
     }
 
     public void completeResearch(ResearchInstance research) {

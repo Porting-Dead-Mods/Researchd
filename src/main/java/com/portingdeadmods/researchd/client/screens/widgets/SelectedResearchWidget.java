@@ -6,7 +6,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchMethod;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -76,7 +76,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
 
         this.methods.clear();
         this.scrollOffset = 0;
-        ResearchMethod method = ResearchHelper.getResearch(this.selectedInstance.getResearch(), Minecraft.getInstance().level.registryAccess()).researchMethod();
+        ResearchMethod method = ResearchHelperCommon.getResearch(this.selectedInstance.getResearch(), Minecraft.getInstance().level.registryAccess()).researchMethod();
         this.methods.put(method.id(), method);
     }
 

@@ -3,9 +3,10 @@ package com.portingdeadmods.researchd.data.helper;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.client.cache.ClientResearchCache;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperServer;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -68,9 +69,11 @@ public class ResearchTeamMap {
     }
 
     public static void onSync(Player player) {
-        if (player instanceof LocalPlayer) {
-            ResearchHelper.refreshResearches(player);
+        if (player.level().isClientSide) {
+            ResearchHelperClient.refreshResearches((LocalPlayer) player);
             ClientResearchCache.initialize(player);
+        } else {
+            ResearchHelperServer.refreshResearches((ServerPlayer) player);
         }
     }
 

@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
 import com.portingdeadmods.researchd.api.research.ResearchEffectData;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
@@ -33,7 +33,7 @@ public record DimensionPredicateData(Set<ResourceKey<DimensionType>> blockedDime
     }
 
     public DimensionPredicateData getDefault(Level level) {
-        Collection<DimensionPredicate> dps = ResearchHelper.getResearchEffects(DimensionPredicate.class, level);
+        Collection<DimensionPredicate> dps = ResearchHelperCommon.getResearchEffects(DimensionPredicate.class, level);
 
         Set<ResourceKey<DimensionType>> blockedDimensions = new UniqueArray<>();
         for (DimensionPredicate predicate : dps) {
