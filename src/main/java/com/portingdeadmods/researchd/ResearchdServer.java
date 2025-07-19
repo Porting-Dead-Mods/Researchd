@@ -17,16 +17,6 @@ public class ResearchdServer {
 	public static final String MODNAME = "Researchd";
 
 	public ResearchdServer(IEventBus eventBus, ModContainer modContainer) {
-		eventBus.addListener(this::onServerAboutToStart);
-	}
 
-	// Research Pack Syncing - Server Side
-	public void onServerAboutToStart(ServerAboutToStartEvent event) {
-		MinecraftServer server = event.getServer();
-		RegistryAccess registryAccess = server.registryAccess();
-		HolderLookup.RegistryLookup<ResearchPack> packs = registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY);
-		Researchd.RESEARCH_PACKS.addAll(packs.listElements().map(Holder.Reference::value).toList());
-		Researchd.RESEARCH_PACK_COUNT.initialize((int) packs.listElements().count());
-		Researchd.RESEARCH_PACK_REGISTRY.initialize(registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY));
 	}
 }
