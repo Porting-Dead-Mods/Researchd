@@ -34,18 +34,18 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
 			Researchd.debug("Research Lab Item Handler", "Checking stack at idx: ", idx, " stack: ", stack);
 
 			if (!(stack.getItem() instanceof ResearchPackItem pack)) {
-				Researchd.debug("Research Lab Item Handler", "Not a ResearchPackItem at idx:", idx);
+				Researchd.debug("Research Lab Item Handler", "Not a ResearchPackItem at idx: ", idx);
 				return false;
 			}
 			if (!stack.has(ResearchdDataComponents.RESEARCH_PACK)) {
-				Researchd.debug("Research Lab Item Handler", "Stack doesn't have a Research Pack Data Component at idx:", idx);
+				Researchd.debug("Research Lab Item Handler", "Stack doesn't have a Research Pack Data Component at idx: ", idx);
 				return false;
 			}
 
 			ResearchPackComponent component = stack.get(ResearchdDataComponents.RESEARCH_PACK);
 			Optional<ResourceKey<ResearchPack>> optKey = component.researchPackKey();
 			if (optKey.isEmpty()) {
-				Researchd.debug("Research Lab Item Handler", "Component present, but no researchPackKey was found at idx:", idx);
+				Researchd.debug("Research Lab Item Handler", "Component present, but no researchPackKey was found at idx: ", idx);
 				return false;
 			}
 			ResourceKey<ResearchPack> key = optKey.get();
@@ -53,7 +53,7 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
 			ResearchPack expectedPack = Researchd.RESEARCH_PACKS.get(idx);
 			ResearchPack actualPack = Researchd.RESEARCH_PACK_REGISTRY.get().getOrThrow(key).value();
 			boolean matches = expectedPack.equals(actualPack);
-			Researchd.debug("Research Lab Item Handler", "Expected:", expectedPack, " Actual:", actualPack, " Match:", matches, " at idx:", idx);
+			Researchd.debug("Research Lab Item Handler", "Expected: ", expectedPack, " Actual: ", actualPack, " Match: ", matches, " at idx: ", idx);
 			return matches;
 		});
 	}
