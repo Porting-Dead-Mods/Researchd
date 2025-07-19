@@ -79,4 +79,26 @@ public final class ResearchHelperCommon {
 
         return effData.stream().sorted(Comparator.comparing(a -> a.getClass().getName())).toList();
     }
+
+    public static void refreshResearches(ServerPlayer player) {
+        ServerLevel level;
+        MinecraftServer server = player.server;
+        level = server.overworld();
+
+        ResearchTeamMap researchData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
+
+        ResearchTeam team = researchData.getTeamByMember(player.getUUID());
+        for (Map.Entry<ResourceKey<AttachmentType<?>>, AttachmentType<?>> entry : NeoForgeRegistries.ATTACHMENT_TYPES.entrySet()) {
+            Object data = player.getData(entry.getValue());
+            if (data instanceof ResearchEffectData<?> effectData) {
+                player.setData((AttachmentType<ResearchEffectData<?>>) entry.getValue(), effectData.getDefault(level));
+            }
+        }
+
+        for (ResearchInstance res : team.getResearchProgress().completedResearches()) {
+            ResearchHelperCommon.getResearch(res.getResearch(), level.registryAccess()).researchEffects().forEach(
+                    eff -> eff.onUnlock(level, player, res.getResearch())
+            );
+        }
+    }
 }

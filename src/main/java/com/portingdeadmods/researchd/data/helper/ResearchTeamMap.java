@@ -73,7 +73,7 @@ public class ResearchTeamMap {
             ResearchHelperClient.refreshResearches((LocalPlayer) player);
             ClientResearchCache.initialize(player);
         } else {
-            ResearchHelperServer.refreshResearches((ServerPlayer) player);
+            ResearchHelperCommon.refreshResearches((ServerPlayer) player);
         }
     }
 
