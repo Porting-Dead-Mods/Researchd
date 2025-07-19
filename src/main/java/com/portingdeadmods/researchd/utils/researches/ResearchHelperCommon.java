@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public final class ResearchHelper {
+public final class ResearchHelperCommon {
     public static Set<Holder<Research>> getLevelResearches(Level level) {
         RegistryAccess registryAccess = level.registryAccess();
         HolderLookup.RegistryLookup<Research> registry = registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_KEY);
@@ -78,31 +78,5 @@ public final class ResearchHelper {
         });
 
         return effData.stream().sorted(Comparator.comparing(a -> a.getClass().getName())).toList();
-    }
-
-    public static void refreshResearches(Player player) {
-        Level level;
-        if (player instanceof ServerPlayer serverPlayer) {
-            MinecraftServer server = serverPlayer.server;
-            level = server.overworld();
-        } else {
-            level = Minecraft.getInstance().level;
-        }
-
-        ResearchTeamMap researchData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
-
-        ResearchTeam team = researchData.getTeamByMember(player.getUUID());
-        for (Map.Entry<ResourceKey<AttachmentType<?>>, AttachmentType<?>> entry : NeoForgeRegistries.ATTACHMENT_TYPES.entrySet()) {
-            Object data = player.getData(entry.getValue());
-            if (data instanceof ResearchEffectData<?> effectData) {
-                player.setData((AttachmentType<ResearchEffectData<?>>) entry.getValue(), effectData.getDefault(level));
-            }
-        }
-
-        for (ResearchInstance res : team.getResearchProgress().completedResearches()) {
-            ResearchHelper.getResearch(res.getResearch(), level.registryAccess()).researchEffects().forEach(
-                    eff -> eff.onUnlock(level, player, res.getResearch())
-            );
-        }
     }
 }

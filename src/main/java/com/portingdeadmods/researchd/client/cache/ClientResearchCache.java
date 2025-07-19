@@ -5,7 +5,7 @@ import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
@@ -26,7 +26,7 @@ public final class ClientResearchCache {
         Set<ResearchInstance> completedResearches = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeamByPlayer(player).getResearchProgress().completedResearches();
 
         RegistryAccess registryAccess = player.registryAccess();
-        Set<Holder<Research>> levelResearches = ResearchHelper.getLevelResearches(player.level());
+        Set<Holder<Research>> levelResearches = ResearchHelperCommon.getLevelResearches(player.level());
         levelResearches.forEach(holder -> {
             ResearchInstance instance = getResearchByKey(completedResearches, holder.getKey());
             ResearchStatus status;
@@ -59,7 +59,7 @@ public final class ClientResearchCache {
 
         // Add next nodes
         for (ResearchNode node : NODES) {
-            List<ResourceKey<Research>> parents = ResearchHelper.getResearch(node.getInstance().getResearch(), registryAccess).parents();
+            List<ResourceKey<Research>> parents = ResearchHelperCommon.getResearch(node.getInstance().getResearch(), registryAccess).parents();
 
             for (ResourceKey<Research> parentResearch : parents) {
                 ResearchNode parentNode = getNodeByResearch(parentResearch);
@@ -72,7 +72,7 @@ public final class ClientResearchCache {
         }
 
         for (ResearchNode node : NODES) {
-            List<ResourceKey<Research>> parents = ResearchHelper.getResearch(node.getInstance().getResearch(), registryAccess).parents();
+            List<ResourceKey<Research>> parents = ResearchHelperCommon.getResearch(node.getInstance().getResearch(), registryAccess).parents();
 
             for (ResourceKey<Research> parent : parents) {
                 node.addParent(getNodeByResearch(parent));

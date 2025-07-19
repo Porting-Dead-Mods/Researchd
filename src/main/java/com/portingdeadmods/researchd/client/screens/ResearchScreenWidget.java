@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -56,7 +56,7 @@ public abstract class ResearchScreenWidget extends AbstractWidget {
             int itemY = (PANEL_HEIGHT - 18) / 2;      // center item vertically
 
             guiGraphics.renderItem(
-                    ResearchHelper.getResearch(instance.getResearch(), lookup).icon().getDefaultInstance(),
+                    ResearchHelperCommon.getResearch(instance.getResearch(), lookup).icon().getDefaultInstance(),
                     itemX,
                     itemY
             );
@@ -87,7 +87,7 @@ public abstract class ResearchScreenWidget extends AbstractWidget {
 
         // TODO: Cache this
         RegistryAccess lookup = Minecraft.getInstance().level.registryAccess();
-        guiGraphics.renderItem(ResearchHelper.getResearch(instance.getResearch(), lookup).icon().getDefaultInstance(), x + 2, y + 2);
+        guiGraphics.renderItem(ResearchHelperCommon.getResearch(instance.getResearch(), lookup).icon().getDefaultInstance(), x + 2, y + 2);
 
         if (isHovering(guiGraphics, x, y, mouseX, mouseY) && hoverable) {
             int color = -2130706433;

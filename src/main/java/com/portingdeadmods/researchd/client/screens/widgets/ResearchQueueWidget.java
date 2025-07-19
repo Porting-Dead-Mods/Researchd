@@ -9,7 +9,7 @@ import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.networking.research.ResearchQueueRemovePayload;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchQueue;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -148,7 +148,7 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
         guiGraphics.blit(ResearchStatus.RESEARCHED.getSpriteTexture(spriteType), x, y, 0, 0, (int) (progress * PANEL_WIDTH), spriteType.getHeight(), PANEL_WIDTH, spriteType.getHeight());
 
         RegistryAccess lookup = Minecraft.getInstance().level.registryAccess();
-        guiGraphics.renderItem(ResearchHelper.getResearch(instance.getResearch(), lookup).icon().getDefaultInstance(), x + 2, y + 2);
+        guiGraphics.renderItem(ResearchHelperCommon.getResearch(instance.getResearch(), lookup).icon().getDefaultInstance(), x + 2, y + 2);
 
         if (isHovering(guiGraphics, x, y, mouseX, mouseY) && hoverable) {
             int color = -2130706433;
