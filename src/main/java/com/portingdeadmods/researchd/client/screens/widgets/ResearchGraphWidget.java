@@ -297,6 +297,7 @@ public class ResearchGraphWidget extends AbstractWidget {
             }
         }
 
+
         overlappingLines.forEach(this::_setOverlapColors);
     }
 
