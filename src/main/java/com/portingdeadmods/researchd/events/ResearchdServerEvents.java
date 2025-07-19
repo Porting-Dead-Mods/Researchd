@@ -92,7 +92,7 @@ public final class ResearchdServerEvents {
 		}
 
 		// v Research Predicate Attachment v
-		ResearchHelperServer.refreshResearches(serverPlayer);
+		ResearchHelperCommon.refreshResearches(serverPlayer);
 	}
 
 	@SubscribeEvent
