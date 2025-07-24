@@ -78,6 +78,12 @@ public class TechListWidget extends ResearchScreenWidget {
     public void onStartResearchButtonClicked(Button button) {
         ResearchQueueWidget queue = this.screen.getResearchQueueWidget();
         ResearchInstance instance = this.screen.getSelectedResearchWidget().getSelectedInstance();
+        
+        if (instance == null) {
+            // No research selected, cannot start research
+            return;
+        }
+        
         instance.setResearchedPlayer(Minecraft.getInstance().player.getUUID());
         instance.setResearchedTime(Minecraft.getInstance().level.getGameTime());
         queue.getQueue().add(instance);
