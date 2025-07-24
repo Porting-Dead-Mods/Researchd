@@ -2,6 +2,8 @@ package com.portingdeadmods.researchd.content.blockentities;
 
 import com.portingdeadmods.portingdeadlibs.api.blockentities.ContainerBlockEntity;
 import com.portingdeadmods.portingdeadlibs.api.utils.IOAction;
+import com.portingdeadmods.portingdeadlibs.utils.LazyFinal;
+import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.content.items.ResearchPackItem;
@@ -13,6 +15,8 @@ import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.MenuProvider;
@@ -24,10 +28,13 @@ import net.neoforged.neoforge.capabilities.BlockCapability;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 public class ResearchLabControllerBE extends ContainerBlockEntity implements MenuProvider {
+	public LazyFinal<List<BlockPos>> partPos = LazyFinal.create();
+
 	public ResearchLabControllerBE(BlockPos pos, BlockState blockState) {
 		super(ResearchdBlockEntityTypes.RESEARCH_LAB_CONTROLLER.get(), pos, blockState);
 		addItemHandler(Researchd.RESEARCH_PACK_COUNT.getOrThrow(), (idx, stack) -> {
@@ -59,8 +66,36 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
 	}
 
 	@Override
+	protected void saveData(CompoundTag tag, HolderLookup.Provider registries) {
+		partPos.ifInitialized(pos -> {
+			tag.putLongArray("PartPositions", pos.stream().mapToLong(BlockPos::asLong).toArray());
+		});
+	}
+
+	@Override
+	protected void loadData(CompoundTag tag, HolderLookup.Provider registries) {
+		if (tag.contains("PartPositions")) {
+			long[] partPositions = tag.getLongArray("PartPositions");
+			List<BlockPos> positions = new UniqueArray<>();
+			for (long posLong : partPositions) {
+				BlockPos pos = BlockPos.of(posLong);
+				positions.add(pos);
+			}
+
+			this.setPartPositions(positions);
+		}
+	}
+
+	@Override
 	public <T> Map<Direction, Pair<IOAction, int[]>> getSidedInteractions(BlockCapability<T, @Nullable Direction> capability) {
 		return Map.of();
+	}
+
+	public void setPartPositions(List<BlockPos> partPositions) {
+		if (!this.partPos.isInitialized())
+			this.partPos.initialize(partPositions);
+		else
+			Researchd.debug("Research Lab Controller BE", "Part positions are already initialized, ignoring new values: ", partPositions);
 	}
 
 	@Override

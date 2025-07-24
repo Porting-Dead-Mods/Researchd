@@ -129,14 +129,21 @@ public final class ResearchdCommonEvents {
         MinecraftServer server = event.getServer();
         RegistryAccess registryAccess = server.registryAccess();
         HolderLookup.RegistryLookup<ResearchPack> packs = registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY);
-        Researchd.RESEARCH_PACKS.addAll(packs.listElements().map(Holder.Reference::value).toList());
-        Researchd.debug("Researchd Constants Server", "Initialized research packs.", Researchd.RESEARCH_PACKS, "");
 
-        Researchd.RESEARCH_PACK_COUNT.initialize((int) packs.listElements().count());
-        Researchd.debug("Researchd Constants Server", "Initialized research pack count: ", Researchd.RESEARCH_PACK_COUNT.get());
+        if (!Researchd.RESEARCH_PACKS.isEmpty()) {
+            Researchd.RESEARCH_PACKS.addAll(packs.listElements().map(Holder.Reference::value).toList());
+            Researchd.debug("Researchd Constants Server", "Initialized research packs.", Researchd.RESEARCH_PACKS, "");
+        }
 
-        Researchd.RESEARCH_PACK_REGISTRY.initialize(registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY));
-        Researchd.debug("Researchd Constants Server", "Initialized research pack registry LazyFinal. ");
+        if (!Researchd.RESEARCH_PACK_COUNT.isInitialized()) {
+            Researchd.RESEARCH_PACK_COUNT.initialize((int) packs.listElements().count());
+            Researchd.debug("Researchd Constants Server", "Initialized research pack count: ", Researchd.RESEARCH_PACK_COUNT.get());
+        }
+
+        if (!Researchd.RESEARCH_PACK_REGISTRY.isInitialized()) {
+            Researchd.RESEARCH_PACK_REGISTRY.initialize(registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY));
+            Researchd.debug("Researchd Constants Server", "Initialized research pack registry LazyFinal. ");
+        }
     }
 
     public static void onJoinLevel(EntityJoinLevelEvent entity) {

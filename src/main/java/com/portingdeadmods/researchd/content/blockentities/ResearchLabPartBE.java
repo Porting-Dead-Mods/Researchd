@@ -1,6 +1,7 @@
 package com.portingdeadmods.researchd.content.blockentities;
 
 import com.portingdeadmods.portingdeadlibs.utils.LazyFinal;
+import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.registries.ResearchdBlockEntityTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -20,7 +21,7 @@ public class ResearchLabPartBE extends BlockEntity {
 		super.loadAdditional(tag, registries);
 
 		if (tag.contains("ControllerPos")) {
-			this.controllerPos.initialize(BlockPos.of(tag.getLong("ControllerPos")));
+			this.setControllerPos(BlockPos.of(tag.getLong("ControllerPos")));
 		}
 	}
 
@@ -28,13 +29,14 @@ public class ResearchLabPartBE extends BlockEntity {
 	protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
 		super.saveAdditional(tag, registries);
 
-		if (this.controllerPos.isInitialized()) {
-			tag.putLong("ControllerPos", this.controllerPos.getOrThrow().asLong());
-		}
+		this.controllerPos.ifInitialized(pos -> tag.putLong("ControllerPos", this.controllerPos.getOrThrow().asLong()));
 	}
 
 	public void setControllerPos(BlockPos controllerPos) {
-		this.controllerPos.initialize(controllerPos);
+		if (!this.controllerPos.isInitialized())
+			this.controllerPos.initialize(controllerPos);
+		else
+			Researchd.debug("Research Lab Part BE", "Controller position is already set to: " + this.controllerPos.getOrThrow() + ", ignoring new value: " + controllerPos);
 	}
 
 	public BlockPos getControllerPos() {
