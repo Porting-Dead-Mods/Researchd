@@ -1,7 +1,9 @@
 package com.portingdeadmods.researchd.networking.team;
 
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
@@ -21,7 +23,7 @@ public record RefreshResearchesPayload() implements CustomPacketPayload {
 
     public static void refreshResearchesAction(RefreshResearchesPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
-            ResearchHelper.refreshResearches(context.player());
+            ResearchHelperClient.refreshResearches((LocalPlayer) context.player());
         }).exceptionally(e -> {
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
             return null;

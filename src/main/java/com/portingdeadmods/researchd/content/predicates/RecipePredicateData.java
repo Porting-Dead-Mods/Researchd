@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
 import com.portingdeadmods.researchd.api.research.ResearchEffectData;
 import com.portingdeadmods.researchd.utils.Codecs;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 
@@ -40,7 +40,7 @@ public record RecipePredicateData(Set<RecipeHolder<?>> blockedRecipes) implement
      * @param level
      */
     public RecipePredicateData getDefault(Level level) {
-        Collection<RecipePredicate> rps =  ResearchHelper.getResearchEffects(RecipePredicate.class, level);
+        Collection<RecipePredicate> rps =  ResearchHelperCommon.getResearchEffects(RecipePredicate.class, level);
         Set<RecipeHolder<?>> blockedRecipes = new HashSet<>();
 
         for (RecipePredicate rp : rps) {

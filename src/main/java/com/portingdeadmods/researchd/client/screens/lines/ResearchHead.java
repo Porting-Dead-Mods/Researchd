@@ -6,6 +6,7 @@ import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.FastColor;
 
 import java.awt.*;
 import java.util.HashSet;
@@ -16,6 +17,7 @@ public class ResearchHead {
 	private int x;
 	private int y;
 	private final boolean isInput;
+	private int color = FastColor.ARGB32.color(255, 255, 255, 255); // Default color is white
 
 	/**
 	 *
@@ -51,9 +53,9 @@ public class ResearchHead {
 
 	public void render(GuiGraphics graphics) {
 		if (this.isInput)
-			graphics.vLine(this.x, this.y - 4, this.y, -1);
+			graphics.vLine(this.x, this.y - 4, this.y, this.getColor());
 		else
-			graphics.vLine(this.x, this.y, this.y + 4, -1);
+			graphics.vLine(this.x, this.y, this.y + 4, this.getColor());
 	}
 
 	/**
@@ -275,5 +277,13 @@ public class ResearchHead {
 		}
 
 		return heads;
+	}
+
+	public int getColor() {
+		return color;
+	}
+
+	public void setColor(int color) {
+		this.color = color;
 	}
 }
