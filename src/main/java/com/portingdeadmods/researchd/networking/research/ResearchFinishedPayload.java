@@ -44,7 +44,7 @@ public record ResearchFinishedPayload(int timeStamp) implements CustomPacketPayl
                 ResearchInstance first = queue.getEntries().getFirst();
                 first.setResearchStatus(ResearchStatus.RESEARCHED);
                 queue.remove(0);
-                UniqueArray<ResearchNode> children = ClientResearchCache.getNodeByResearch(first.getResearch()).getChildren();
+                UniqueArray<ResearchNode> children = ClientResearchCache.getNodeByResearch(ClientResearchCache.NODES, first.getResearch()).getChildren();
                 for (ResearchNode child : children) {
                     child.getInstance().setResearchStatus(ResearchStatus.RESEARCHABLE);
                 }

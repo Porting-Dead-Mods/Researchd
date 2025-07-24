@@ -30,7 +30,7 @@ public final class ResearchGraphCache {
     }
 
     private static @NotNull ResearchGraph computeGraph(Player player, ResourceKey<Research> key) {
-        return ResearchGraph.fromRootNode(player, ClientResearchCache.getNodeByResearch(key));
+        return ResearchGraph.fromRootNode(player, ClientResearchCache.getNodeByResearch(ClientResearchCache.NODES, key));
     }
 
 }

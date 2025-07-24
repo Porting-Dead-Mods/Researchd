@@ -12,6 +12,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.CommonComponents;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 /**
@@ -22,6 +23,7 @@ import java.util.Set;
 public class ResearchNode extends AbstractWidget {
     private final UniqueArray<ResearchNode> parents;
     private final UniqueArray<ResearchNode> children;
+    private final UniqueArray<ResearchNode> hiddenChildren;
 
     private final UniqueArray<ResearchNode> positionLocks;
     private boolean doMovementLogic;
@@ -38,6 +40,7 @@ public class ResearchNode extends AbstractWidget {
         this.instance = instance;
 
         this.children = new UniqueArray<>();
+        this.hiddenChildren = new UniqueArray<>();
         this.parents = new UniqueArray<>();
         this.positionLocks = new UniqueArray<>();
 
@@ -75,6 +78,10 @@ public class ResearchNode extends AbstractWidget {
         this.doMovementLogic = false;
     }
 
+    public ResearchNode copy() {
+        return new ResearchNode(this.instance.copy());
+    }
+
     public Integer getLayer() {
         if (GraphLayoutManager.nodeLayerMap.get(this) == null) {
             return -1;
@@ -106,14 +113,21 @@ public class ResearchNode extends AbstractWidget {
         return outputs;
     }
 
+    public UniqueArray<ResearchNode> getHiddenChildren() {
+        return hiddenChildren;
+    }
+
     public void refreshHeads() {
         Set<ResearchNode> visibleNodes = ClientResearchCache.NODES;
+
+        Set<ResearchNode> visibleNodesCopy = new UniqueArray<>(visibleNodes);
+        //this.getHiddenChildren().forEach(visibleNodesCopy::remove);
 
         this.inputs.clear();
         this.inputs.addAll(ResearchHead.inputsOf(this, visibleNodes));
 
         this.outputs.clear();
-        this.outputs.addAll(ResearchHead.outputsOf(this, visibleNodes));
+        this.outputs.addAll(ResearchHead.outputsOf(this, visibleNodesCopy));
     }
 
     public boolean isRootNode() {

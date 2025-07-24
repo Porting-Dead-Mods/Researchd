@@ -36,10 +36,10 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
 
         int offsetY = (int) -(this.scrollOffset * 1.5f);
 
-        Font font = Minecraft.getInstance().font;
-        guiGraphics.drawString(font, Utils.registryTranslation(this.selectedInstance.getResearch()), 11, 49, -1);
-        if (selectedInstance != null) {
-            renderResearchPanel(guiGraphics, selectedInstance, 12, 60, mouseX, mouseY, 2, false);
+        if (this.selectedInstance != null) {
+            Font font = Minecraft.getInstance().font;
+            guiGraphics.drawString(font, Utils.registryTranslation(this.selectedInstance.getResearch()), 11, 49, -1);
+            renderResearchPanel(guiGraphics, this.selectedInstance, 12, 60, mouseX, mouseY, 2, false);
 
             guiGraphics.enableScissor(53, 60, 53 + 115, 55 + 48);
 
