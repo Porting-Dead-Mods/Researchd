@@ -51,16 +51,16 @@ public class LineSegment implements Renderable {
 		return start.y == end.y;
 	}
 
-	public void render(GuiGraphics guiGraphics) {
+	public void render(GuiGraphics guiGraphics, int color) {
 		if (isVertical()) {
-			guiGraphics.vLine(start.x, Math.min(start.y, end.y), Math.max(start.y, end.y), -1);
+			guiGraphics.vLine(start.x, Math.min(start.y, end.y), Math.max(start.y, end.y), color);
 		} else if (isHorizontal()) {
-			guiGraphics.hLine(Math.min(start.x, end.x), Math.max(start.x, end.x), start.y, -1);
+			guiGraphics.hLine(Math.min(start.x, end.x), Math.max(start.x, end.x), start.y, color);
 		}
 	}
 
 	@Override
 	public void render(GuiGraphics guiGraphics, int i, int i1, float v) {
-		render(guiGraphics);
+		render(guiGraphics, -1);
 	}
 }

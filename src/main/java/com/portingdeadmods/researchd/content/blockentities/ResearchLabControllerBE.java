@@ -2,12 +2,19 @@ package com.portingdeadmods.researchd.content.blockentities;
 
 import com.portingdeadmods.portingdeadlibs.api.blockentities.ContainerBlockEntity;
 import com.portingdeadmods.portingdeadlibs.api.utils.IOAction;
+import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.ResearchdRegistries;
+import com.portingdeadmods.researchd.content.items.ResearchPackItem;
 import com.portingdeadmods.researchd.content.menus.ResearchLabMenu;
+import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
+import com.portingdeadmods.researchd.impl.research.ResearchPack;
 import com.portingdeadmods.researchd.registries.ResearchdBlockEntityTypes;
+import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -18,10 +25,37 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.Optional;
 
 public class ResearchLabControllerBE extends ContainerBlockEntity implements MenuProvider {
 	public ResearchLabControllerBE(BlockPos pos, BlockState blockState) {
 		super(ResearchdBlockEntityTypes.RESEARCH_LAB_CONTROLLER.get(), pos, blockState);
+		addItemHandler(Researchd.RESEARCH_PACK_COUNT.getOrThrow(), (idx, stack) -> {
+			Researchd.debug("Research Lab Item Handler", "Checking stack at idx: ", idx, " stack: ", stack);
+
+			if (!(stack.getItem() instanceof ResearchPackItem pack)) {
+				Researchd.debug("Research Lab Item Handler", "Not a ResearchPackItem at idx: ", idx);
+				return false;
+			}
+			if (!stack.has(ResearchdDataComponents.RESEARCH_PACK)) {
+				Researchd.debug("Research Lab Item Handler", "Stack doesn't have a Research Pack Data Component at idx: ", idx);
+				return false;
+			}
+
+			ResearchPackComponent component = stack.get(ResearchdDataComponents.RESEARCH_PACK);
+			Optional<ResourceKey<ResearchPack>> optKey = component.researchPackKey();
+			if (optKey.isEmpty()) {
+				Researchd.debug("Research Lab Item Handler", "Component present, but no researchPackKey was found at idx: ", idx);
+				return false;
+			}
+			ResourceKey<ResearchPack> key = optKey.get();
+
+			ResearchPack expectedPack = Researchd.RESEARCH_PACKS.get(idx);
+			ResearchPack actualPack = Researchd.RESEARCH_PACK_REGISTRY.get().getOrThrow(key).value();
+			boolean matches = expectedPack.equals(actualPack);
+			Researchd.debug("Research Lab Item Handler", "Expected: ", expectedPack, " Actual: ", actualPack, " Match: ", matches, " at idx: ", idx);
+			return matches;
+		});
 	}
 
 	@Override

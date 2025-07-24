@@ -2,20 +2,13 @@ package com.portingdeadmods.researchd.commands;
 
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.portingdeadmods.researchd.api.research.ResearchEffectData;
-import com.portingdeadmods.researchd.content.predicates.DimensionPredicateData;
-import com.portingdeadmods.researchd.content.predicates.RecipePredicateData;
-import com.portingdeadmods.researchd.data.ResearchdAttachments;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.level.dimension.DimensionType;
 
 public class DataCommand {
 	public static LiteralCommandNode<CommandSourceStack> build() {
@@ -44,7 +37,7 @@ public class DataCommand {
 						.withStyle(ChatFormatting.YELLOW));
 		player.sendSystemMessage(playerInfo);
 
-		for (ResearchEffectData<?> data : ResearchHelper.getResearchEffectData(player)) {
+		for (ResearchEffectData<?> data : ResearchHelperCommon.getResearchEffectData(player)) {
 			MutableComponent effect = Component.literal(data.getClass().getSimpleName())
 					.withStyle(ChatFormatting.GREEN);
 

@@ -1,7 +1,6 @@
 package com.portingdeadmods.researchd.client.screens.team;
 
 import com.mojang.authlib.GameProfile;
-import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.BaseScreen;
@@ -11,7 +10,7 @@ import com.portingdeadmods.researchd.client.screens.team.widgets.TeamMemberWidge
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.data.helper.ResearchTeam;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
@@ -55,7 +54,7 @@ public class ResearchTeamScreen extends BaseScreen {
         ResearchTeam researchTeam = ResearchTeamHelper.getResearchTeam(Objects.requireNonNull(player));
         String name = researchTeam.getName();
         List<GameProfile> members = ClientResearchTeamHelper.getTeamMembers();
-        List<ResearchInstance> recentResearches = ResearchHelper.getRecentResearches(researchTeam);
+        List<ResearchInstance> recentResearches = ResearchHelperCommon.getRecentResearches(researchTeam);
 
         // Layout setup
         this.layout = LinearLayout.vertical().spacing(5);

@@ -3,7 +3,7 @@ package com.portingdeadmods.researchd.client.screens.team.widgets;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
@@ -22,7 +22,7 @@ public class RecentResearchWidget extends ImageButton {
         super(x, y, width, height, sprites, onPress);
         this.research = research;
 
-        Research research1 = ResearchHelper.getResearch(this.research.getResearch(), Minecraft.getInstance().level.registryAccess());
+        Research research1 = ResearchHelperCommon.getResearch(this.research.getResearch(), Minecraft.getInstance().level.registryAccess());
         this.researchIcon = new ItemStack(research1.icon());
     }
 
