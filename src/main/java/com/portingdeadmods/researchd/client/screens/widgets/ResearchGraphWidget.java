@@ -542,6 +542,10 @@ public class ResearchGraphWidget extends AbstractWidget {
             }
         }
 
+        if (this.graph == null || this.graph.nodes() == null) {
+            return;
+        }
+
         for (ResearchNode node : this.graph.nodes()) {
             if (node == this.graph.rootNode()) {
                 float scale = 1.75f;
@@ -587,7 +591,7 @@ public class ResearchGraphWidget extends AbstractWidget {
     }
 
     public void renderNodeTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        if (!this.isHovered()) return;
+        if (!this.isHovered() || this.graph == null || this.graph.nodes() == null) return;
 
         for (ResearchNode node : this.graph.nodes()) {
             if (node.isHovered()) {
@@ -607,6 +611,10 @@ public class ResearchGraphWidget extends AbstractWidget {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (this.graph == null || this.graph.nodes() == null) {
+            return false;
+        }
+        
         for (ResearchNode node : this.graph.nodes()) {
             if (node.isHovered()) {
                 this.selectedResearchWidget.setSelectedResearch(node.getInstance());
@@ -619,8 +627,10 @@ public class ResearchGraphWidget extends AbstractWidget {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        for (ResearchNode node : this.graph.nodes()) {
-            node.translate((int) dragX, (int) dragY);
+        if (this.graph != null && this.graph.nodes() != null) {
+            for (ResearchNode node : this.graph.nodes()) {
+                node.translate((int) dragX, (int) dragY);
+            }
         }
 
         for (List<ResearchLine> lines : this.researchLines.values()) {
