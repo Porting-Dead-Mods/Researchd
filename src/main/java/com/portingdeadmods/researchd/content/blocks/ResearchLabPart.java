@@ -1,6 +1,7 @@
 package com.portingdeadmods.researchd.content.blocks;
 
 import com.mojang.serialization.MapCodec;
+import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.content.blockentities.ResearchLabControllerBE;
 import com.portingdeadmods.researchd.content.blockentities.ResearchLabPartBE;
 import net.minecraft.core.BlockPos;
@@ -37,6 +38,20 @@ public class ResearchLabPart extends BaseEntityBlock {
 		}
 
 		return InteractionResult.PASS;
+	}
+
+	@Override
+	public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+		if (level.getBlockEntity(pos) instanceof ResearchLabPartBE partBE) {
+			BlockPos controllerPos = partBE.getControllerPos();
+			if (level.getBlockState(controllerPos).getBlock() instanceof ResearchLabController controller) {
+				Researchd.debug("Research Lab Part", "Removing part at " + pos + " and its controller at " + controllerPos);
+				level.removeBlock(controllerPos, false);
+				level.removeBlockEntity(controllerPos);
+			}
+		} else {
+			Researchd.debug("Research Lab Part", "Block entity at " + pos + " is not an instance of ResearchLabPartBE, skipping removal of parts.");
+		}
 	}
 
 	@Override

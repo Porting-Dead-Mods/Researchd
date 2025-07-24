@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.content.items;
 import com.portingdeadmods.portingdeadlibs.utils.AABBUtils;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.content.blockentities.ResearchLabControllerBE;
 import com.portingdeadmods.researchd.content.blockentities.ResearchLabPartBE;
 import com.portingdeadmods.researchd.registries.ResearchdBlocks;
 import com.portingdeadmods.researchd.utils.Spaghetti;
@@ -33,13 +34,16 @@ public class ResearchLabItem extends BlockItem {
 
 	@Override
 	public boolean placeBlock(BlockPlaceContext context, BlockState state) {
-		Researchd.debug("Research Lab", "Placing Research Lab at " + context.getClickedPos());
+		Level level = context.getLevel();
+		if (level.isClientSide()) {
+			return true;
+		}
 
+		Researchd.debug("Research Lab", "Placing Research Lab at " + context.getClickedPos());
 		BlockPos controllerPos = context.getClickedPos().offset(context.getHorizontalDirection().getNormal());
 		BlockPos center = controllerPos.offset(Direction.UP.getNormal());
 		AABB aabb = AABBUtils.create(1, 1, 1, 1, 1, 1, center);
 		Spaghetti.printAABB(aabb);
-		Level level = context.getLevel();
 		UniqueArray<BlockPos> allPos = AABBUtils.getAllPositionsInAABB(aabb);
 		Researchd.debug("Research Lab", "Found " + allPos.size() + " positions in AABB: " + aabb);
 
@@ -55,6 +59,11 @@ public class ResearchLabItem extends BlockItem {
 			}
 		});
 
+		allPos.remove(controllerPos);
+		if (level.getBlockEntity(controllerPos) instanceof ResearchLabControllerBE controller) {
+			controller.setPartPositions(allPos);
+			Researchd.debug("Research Lab", "Set part positions for controller at " + controllerPos + ": " + allPos);
+		}
 		return true;
 	}
 
