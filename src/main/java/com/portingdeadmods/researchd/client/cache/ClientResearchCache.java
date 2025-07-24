@@ -6,7 +6,7 @@ import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.utils.ImmutableLinkedHashSet;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
@@ -27,7 +27,7 @@ public final class ClientResearchCache {
         Set<ResearchInstance> completedResearches = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeamByPlayer(player).getResearchProgress().completedResearches();
 
         RegistryAccess registryAccess = player.registryAccess();
-        Set<Holder<Research>> levelResearches = ResearchHelper.getLevelResearches(player.level());
+        Set<Holder<Research>> levelResearches = ResearchHelperCommon.getLevelResearches(player.level());
         levelResearches.forEach(holder -> {
             ResearchInstance instance = getResearchByKey(completedResearches, holder.getKey());
             ResearchStatus status;
@@ -60,7 +60,7 @@ public final class ClientResearchCache {
 
         // Add next nodes
         for (ResearchInstance instance : GLOBAL_READ_ONLY_RESEARCHES) {
-            List<ResourceKey<Research>> parents = ResearchHelper.getResearch(instance.getResearch(), registryAccess).parents();
+            List<ResourceKey<Research>> parents = ResearchHelperCommon.getResearch(instance.getResearch(), registryAccess).parents();
 
             for (ResourceKey<Research> parentResearch : parents) {
                 ResearchInstance parentInstance = getResearchByKey(GLOBAL_READ_ONLY_RESEARCHES, parentResearch);
@@ -71,7 +71,7 @@ public final class ClientResearchCache {
         }
 
         for (ResearchInstance instance : GLOBAL_READ_ONLY_RESEARCHES) {
-            List<ResourceKey<Research>> parents = ResearchHelper.getResearch(instance.getResearch(), registryAccess).parents();
+            List<ResourceKey<Research>> parents = ResearchHelperCommon.getResearch(instance.getResearch(), registryAccess).parents();
 
             for (ResourceKey<Research> parent : parents) {
                 instance.getParents().add(getResearchByKey(GLOBAL_READ_ONLY_RESEARCHES, parent));

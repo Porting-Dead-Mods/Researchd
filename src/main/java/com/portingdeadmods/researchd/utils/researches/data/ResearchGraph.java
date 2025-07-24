@@ -3,7 +3,6 @@ package com.portingdeadmods.researchd.utils.researches.data;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.entity.player.Player;
 
