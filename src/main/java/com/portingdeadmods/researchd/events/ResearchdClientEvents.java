@@ -95,12 +95,12 @@ public final class ResearchdClientEvents {
 			Researchd.debug("Researchd Constants Client", "Initialized research packs: ", Researchd.RESEARCH_PACKS, "");
 		}
 
-		if (Researchd.RESEARCH_PACK_COUNT.isInitialized()) {
+		if (!Researchd.RESEARCH_PACK_COUNT.isInitialized()) {
 			Researchd.RESEARCH_PACK_COUNT.initialize((int) packs.listElements().count());
 			Researchd.debug("Researchd Constants Client", "Initialized research pack count: ", Researchd.RESEARCH_PACK_COUNT.get());
 		}
 
-		if (Researchd.RESEARCH_PACK_REGISTRY.isInitialized()) {
+		if (!Researchd.RESEARCH_PACK_REGISTRY.isInitialized()) {
 			Researchd.RESEARCH_PACK_REGISTRY.initialize(registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY));
 			Researchd.debug("Researchd Constants Client", "Initialized research pack registry.");
 		}
