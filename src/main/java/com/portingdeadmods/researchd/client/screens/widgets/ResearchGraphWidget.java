@@ -12,8 +12,8 @@ import com.portingdeadmods.researchd.client.screens.lines.PotentialOverlap;
 import com.portingdeadmods.researchd.client.screens.lines.ResearchHead;
 import com.portingdeadmods.researchd.client.screens.lines.ResearchLine;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
-import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchGraph;
 import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
@@ -926,7 +926,7 @@ public class ResearchGraphWidget extends AbstractWidget {
     }
 
     private static @NotNull Research getResearch(ResearchNode node) {
-        return ResearchHelper.getResearch(node.getInstance().getResearch(), Minecraft.getInstance().level.registryAccess());
+        return ResearchHelperCommon.getResearch(node.getInstance().getResearch(), Minecraft.getInstance().level.registryAccess());
     }
 
     public void onClose() {
