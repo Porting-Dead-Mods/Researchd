@@ -38,7 +38,7 @@ public class ResearchScreen extends Screen {
 
         // TECH LIST
         this.techListWidget = new TechListWidget(this, 0, 109, 7);
-        this.techListWidget.setTechList(new TechList(ClientResearchCache.RESEARCHES.stream().toList()));
+        this.techListWidget.setTechList(new TechList(ClientResearchCache.GLOBAL_READ_ONLY_RESEARCHES.stream().toList()));
 
         // THIS NEEDS TO BE BEFORE THE GRAPH
         this.selectedResearchWidget = new SelectedResearchWidget(0, 40, SelectedResearchWidget.BACKGROUND_WIDTH, SelectedResearchWidget.BACKGROUND_HEIGHT);

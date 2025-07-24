@@ -11,9 +11,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.ExtraCodecs;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public final class ResearchInstance {
     public static final Codec<ResearchInstance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -35,6 +33,8 @@ public final class ResearchInstance {
     );
 
     private final ResourceKey<Research> research;
+    private final Set<ResearchInstance> parents;
+    private final Set<ResearchInstance> children;
     private ResearchStatus researchStatus;
     private @Nullable UUID researchedPlayer;
     private long researchedTime;
@@ -44,6 +44,8 @@ public final class ResearchInstance {
         this.researchStatus = researchStatus;
         this.researchedPlayer = researchedPlayer;
         this.researchedTime = researchedTime;
+        this.parents = new HashSet<>();
+        this.children = new HashSet<>();
     }
 
     public ResearchInstance(ResourceKey<Research> research, ResearchStatus researchStatus) {
@@ -56,6 +58,14 @@ public final class ResearchInstance {
 
     public ResearchStatus getResearchStatus() {
         return researchStatus;
+    }
+
+    public Set<ResearchInstance> getParents() {
+        return parents;
+    }
+
+    public Set<ResearchInstance> getChildren() {
+        return children;
     }
 
     public void setResearchStatus(ResearchStatus researchStatus) {

@@ -5,6 +5,7 @@ import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
+import com.portingdeadmods.researchd.utils.ImmutableLinkedHashSet;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelper;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
@@ -15,12 +16,12 @@ import java.util.*;
 
 public final class ClientResearchCache {
     public static final Set<ResearchNode> NODES = new LinkedHashSet<>();
-    public static final Set<ResearchInstance> RESEARCHES = new LinkedHashSet<>();
+    public static Set<ResearchInstance> GLOBAL_READ_ONLY_RESEARCHES;
     public static ResearchNode ROOT_NODE;
 
     public static void initialize(Player player) {
-        RESEARCHES.clear();
         NODES.clear();
+        GLOBAL_READ_ONLY_RESEARCHES = new LinkedHashSet<>();
         ResearchGraphCache.clearCache();
 
         Set<ResearchInstance> completedResearches = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeamByPlayer(player).getResearchProgress().completedResearches();
@@ -35,16 +36,16 @@ public final class ClientResearchCache {
             } else {
                 status = ResearchStatus.LOCKED;
             }
-            RESEARCHES.add(new ResearchInstance(holder.getKey(), status));
+            GLOBAL_READ_ONLY_RESEARCHES.add(new ResearchInstance(holder.getKey(), status));
         });
 
         // Collect completedResearches
-        RESEARCHES.forEach(research -> {
+        GLOBAL_READ_ONLY_RESEARCHES.forEach(research -> {
             if (research.getResearchStatus() == ResearchStatus.LOCKED) {
                 List<ResourceKey<Research>> parents = registryAccess.holderOrThrow(research.getResearch()).value().parents();
                 boolean allParentsUnlocked = true;
                 for (ResourceKey<Research> parent : parents) {
-                    ResearchInstance researchByKey = getResearchByKey(RESEARCHES, parent);
+                    ResearchInstance researchByKey = getResearchByKey(GLOBAL_READ_ONLY_RESEARCHES, parent);
                     if (researchByKey.getResearchStatus() == ResearchStatus.LOCKED || researchByKey.getResearchStatus() == ResearchStatus.RESEARCHABLE) {
                         allParentsUnlocked = false;
                         break;
@@ -58,27 +59,37 @@ public final class ClientResearchCache {
         });
 
         // Add next nodes
-        for (ResearchNode node : NODES) {
-            List<ResourceKey<Research>> parents = ResearchHelper.getResearch(node.getInstance().getResearch(), registryAccess).parents();
+        for (ResearchInstance instance : GLOBAL_READ_ONLY_RESEARCHES) {
+            List<ResourceKey<Research>> parents = ResearchHelper.getResearch(instance.getResearch(), registryAccess).parents();
 
             for (ResourceKey<Research> parentResearch : parents) {
-                ResearchNode parentNode = getNodeByResearch(parentResearch);
-                if (parentNode != null) {
-                    parentNode.addChild(node);
+                ResearchInstance parentInstance = getResearchByKey(GLOBAL_READ_ONLY_RESEARCHES, parentResearch);
+                if (parentInstance != null) {
+                    parentInstance.getChildren().add(instance);
                 }
             }
+        }
 
-            node.refreshHeads();
+        for (ResearchInstance instance : GLOBAL_READ_ONLY_RESEARCHES) {
+            List<ResourceKey<Research>> parents = ResearchHelper.getResearch(instance.getResearch(), registryAccess).parents();
+
+            for (ResourceKey<Research> parent : parents) {
+                instance.getParents().add(getResearchByKey(GLOBAL_READ_ONLY_RESEARCHES, parent));
+            }
+        }
+
+        for (ResearchInstance research : GLOBAL_READ_ONLY_RESEARCHES) {
+            NODES.add(new ResearchNode(research));
         }
 
         for (ResearchNode node : NODES) {
-            List<ResourceKey<Research>> parents = ResearchHelper.getResearch(node.getInstance().getResearch(), registryAccess).parents();
-
-            for (ResourceKey<Research> parent : parents) {
-                node.addParent(getNodeByResearch(parent));
+            for (ResearchInstance parent : node.getInstance().getParents()) {
+                node.addParent(getNodeByResearch(NODES, parent.getResearch()));
             }
 
-            node.refreshHeads();
+            for (ResearchInstance child : node.getInstance().getChildren()) {
+                node.addChild(getNodeByResearch(NODES, child.getResearch()));
+            }
         }
 
         Set<ResearchNode> referencedNodes = new LinkedHashSet<>();
@@ -93,6 +104,8 @@ public final class ClientResearchCache {
         if (ROOT_NODE != null) {
             ROOT_NODE.setRootNode(true);
         }
+
+        GLOBAL_READ_ONLY_RESEARCHES = new ImmutableLinkedHashSet<>(GLOBAL_READ_ONLY_RESEARCHES);
     }
 
     private static ResearchInstance getResearchByKey(Collection<ResearchInstance> researches, ResourceKey<Research> researchKey) {
@@ -104,8 +117,8 @@ public final class ClientResearchCache {
         return null;
     }
 
-    public static ResearchNode getNodeByResearch(ResourceKey<Research> research) {
-        for (ResearchNode node : NODES) {
+    public static ResearchNode getNodeByResearch(Collection<ResearchNode> nodes, ResourceKey<Research> research) {
+        for (ResearchNode node : nodes) {
             if (node.getInstance().getResearch().compareTo(research) == 0) {
                 return node;
             }
