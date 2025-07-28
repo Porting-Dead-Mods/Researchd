@@ -6,12 +6,23 @@ import com.portingdeadmods.portingdeadlibs.utils.LazyFinal;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
+import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.api.research.ResearchMethod;
 import com.portingdeadmods.researchd.content.items.ResearchPackItem;
 import com.portingdeadmods.researchd.content.menus.ResearchLabMenu;
+import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
+import com.portingdeadmods.researchd.data.helper.ResearchProgress;
+import com.portingdeadmods.researchd.data.helper.ResearchTeam;
+import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
+import com.portingdeadmods.researchd.impl.research.ResearchCompletionProgress;
 import com.portingdeadmods.researchd.impl.research.ResearchPack;
+import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
 import com.portingdeadmods.researchd.registries.ResearchdBlockEntityTypes;
 import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
+import com.portingdeadmods.researchd.utils.researches.data.ResearchQueue;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -23,17 +34,24 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ResearchLabControllerBE extends ContainerBlockEntity implements MenuProvider {
 	public LazyFinal<List<BlockPos>> partPos = LazyFinal.create();
+	public Map<ResourceKey<ResearchPack>, Float> researchPackUsage = Researchd.RESEARCH_PACK_REGISTRY.getOrThrow().listElementIds()
+			.collect(Collectors.toConcurrentMap(key -> key, k -> 0f)); // Usage is between 0 and 1. It decreases with 1/DURATION per tick.
+	public int currentResearchDuration = -1; // Just initialized to -1
 
 	public ResearchLabControllerBE(BlockPos pos, BlockState blockState) {
 		super(ResearchdBlockEntityTypes.RESEARCH_LAB_CONTROLLER.get(), pos, blockState);
@@ -65,11 +83,83 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
 		});
 	}
 
+	// Param passed is not mutated.
+	private boolean containsNecessaryPacks(List<ResourceKey<ResearchPack>> _packs) {
+		List<ResourceKey<ResearchPack>> packs = new ArrayList<>(_packs);
+
+		IItemHandler handler = getItemHandler();
+		for (int i = 0; i < handler.getSlots(); i++) {
+			ItemStack stack = handler.getStackInSlot(i);
+			if (stack.isEmpty() || !(stack.getItem() instanceof ResearchPackItem)) continue;
+
+			ResearchPackComponent component = stack.get(ResearchdDataComponents.RESEARCH_PACK);
+			ResourceKey<ResearchPack> key = component.researchPackKey().get(); // Placing item into a lab slot condition alr makes it such that key is present
+
+			if (packs.contains(key) || researchPackUsage.getOrDefault(key, 0f) > 0) {
+				packs.remove(key);
+			}
+		}
+
+		return packs.isEmpty();
+	}
+
+	private void decreaseNecessaryPackCount(List<ResourceKey<ResearchPack>> packs) {
+		IItemHandler handler = getItemHandler();
+		for (int i = 0; i < handler.getSlots(); i++) {
+			ItemStack stack = handler.getStackInSlot(i);
+			if (stack.isEmpty() || !(stack.getItem() instanceof ResearchPackItem)) continue;
+
+			ResearchPackComponent component = stack.get(ResearchdDataComponents.RESEARCH_PACK);
+			ResourceKey<ResearchPack> key = component.researchPackKey().get(); // Placing item into a lab slot condition alr makes it such that key is present
+
+			if (packs.contains(key) && (researchPackUsage.getOrDefault(key, 0f) == 0)) { // Only decrease if the pack is necessary and not already used
+				stack.shrink(1);
+				researchPackUsage.put(key, researchPackUsage.getOrDefault(key, 0f) + 1f);
+			}
+		}
+	}
+
+	private void progressResearch(List<ResourceKey<ResearchPack>> packs, ResearchCompletionProgress researchProgress) {
+		for (ResourceKey<ResearchPack> pack : packs) {
+			researchPackUsage.put(pack, Math.max(researchPackUsage.get(pack) - (1f / this.currentResearchDuration), 0f));
+		}
+
+		researchProgress.progress(1f / this.currentResearchDuration); // 1:1 to research packs used in total :p
+	}
+
+	@Override
+	public void commonTick() {
+		super.commonTick();
+		ResearchTeam team = ResearchTeamHelper.getResearchTeamByUUID(this.getLevel(), this.getData(ResearchdAttachments.PLACED_BY_UUID));
+		if (team == null) return;
+
+		ResearchProgress teamProgress = team.getMetadata().getResearchProgress();
+		ResearchQueue queue = teamProgress.researchQueue();
+		if (queue.getEntries().isEmpty()) return;
+		ResearchInstance currentResearchInstance = queue.getEntries().getFirst();
+		Research currentResearch = ResearchHelperCommon.getResearch(currentResearchInstance.getResearch(), this.getLevel().registryAccess());
+		ResearchMethod method = currentResearch.researchMethod();
+
+		if (!(method instanceof ConsumePackResearchMethod packMethod)) return;
+		List<ResourceKey<ResearchPack>> packs = packMethod.packs();
+		this.currentResearchDuration = packMethod.duration();
+
+		if (!this.containsNecessaryPacks(packs)) return;
+		this.decreaseNecessaryPackCount(packs);
+		this.progressResearch(packs, teamProgress.getProgress(currentResearchInstance, this.getLevel().registryAccess()));
+	}
+
 	@Override
 	protected void saveData(CompoundTag tag, HolderLookup.Provider registries) {
 		partPos.ifInitialized(pos -> {
 			tag.putLongArray("PartPositions", pos.stream().mapToLong(BlockPos::asLong).toArray());
 		});
+
+		for (Map.Entry<ResourceKey<ResearchPack>, Float> entry : researchPackUsage.entrySet()) {
+			ResourceKey<ResearchPack> key = entry.getKey();
+			float usage = entry.getValue();
+			tag.putFloat(key.location().toString(), usage);
+		}
 	}
 
 	@Override
@@ -83,6 +173,15 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
 			}
 
 			this.setPartPositions(positions);
+		}
+
+		for (ResourceKey<ResearchPack> key : Researchd.RESEARCH_PACK_REGISTRY.getOrThrow().listElementIds().toList()) {
+			if (tag.contains(key.location().toString())) {
+				float usage = tag.getFloat(key.location().toString());
+				researchPackUsage.put(key, usage);
+			} else {
+				researchPackUsage.put(key, 0f); // Default to 0 if not present
+			}
 		}
 	}
 

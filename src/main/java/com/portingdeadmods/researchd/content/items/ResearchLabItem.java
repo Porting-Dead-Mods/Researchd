@@ -5,6 +5,7 @@ import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.content.blockentities.ResearchLabControllerBE;
 import com.portingdeadmods.researchd.content.blockentities.ResearchLabPartBE;
+import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.registries.ResearchdBlocks;
 import com.portingdeadmods.researchd.utils.Spaghetti;
 import net.minecraft.core.BlockPos;
@@ -35,8 +36,12 @@ public class ResearchLabItem extends BlockItem {
 	@Override
 	public boolean placeBlock(BlockPlaceContext context, BlockState state) {
 		Level level = context.getLevel();
+		Player player = context.getPlayer();
 		if (level.isClientSide()) {
 			return true;
+		}
+		if (player == null) { // Cannot place without a player due to researching being player dependent
+			return false;
 		}
 
 		Researchd.debug("Research Lab", "Placing Research Lab at " + context.getClickedPos());
@@ -57,6 +62,8 @@ public class ResearchLabItem extends BlockItem {
 				ResearchLabPartBE rlp = (ResearchLabPartBE) level.getBlockEntity(pos);
 				rlp.setControllerPos(controllerPos);
 			}
+
+			level.getBlockEntity(pos).setData(ResearchdAttachments.PLACED_BY_UUID, player != null ? player.getUUID() : null);
 		});
 
 		allPos.remove(controllerPos);
