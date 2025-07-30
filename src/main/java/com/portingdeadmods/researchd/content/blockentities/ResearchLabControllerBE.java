@@ -146,7 +146,7 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
 
 		if (!this.containsNecessaryPacks(packs)) return;
 		this.decreaseNecessaryPackCount(packs);
-		this.progressResearch(packs, teamProgress.getProgress(currentResearchInstance, this.getLevel().registryAccess()));
+		this.progressResearch(packs, team.getResearchingProgressInQueue(this.getLevel().registryAccess()));
 	}
 
 	@Override
