@@ -6,6 +6,7 @@ import com.portingdeadmods.researchd.api.data.PDLClientSavedData;
 import com.portingdeadmods.researchd.api.data.PDLSavedData;
 import com.portingdeadmods.researchd.api.data.SavedDataHolder;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.commands.ResearchdCommands;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
@@ -13,6 +14,7 @@ import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.data.helper.ResearchProgress;
 import com.portingdeadmods.researchd.data.helper.ResearchTeam;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamMap;
+import com.portingdeadmods.researchd.impl.research.ResearchCompletionProgress;
 import com.portingdeadmods.researchd.impl.research.ResearchPack;
 import com.portingdeadmods.researchd.networking.SyncSavedDataPayload;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
@@ -73,18 +75,26 @@ public final class ResearchdCommonEvents {
         ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
 
         if (data != null) {
-            for (Map.Entry<UUID, ResearchTeam> entry : data.getResearchTeams().entrySet()) {
-                ResearchTeam team = entry.getValue();
-                ResearchProgress researchProgress = team.getResearchProgress();
+            for (ResearchTeam team : data.getResearchTeams().values()) {
+                ResearchProgress progress = team.getResearchProgress();
+                ResearchQueue queue = progress.researchQueue();
 
-                // v Research Queue Logic v
-                ResearchQueue queue = researchProgress.researchQueue();
+                Research currentResearch = team.getResearchInQueue(level.registryAccess());
+                ResearchCompletionProgress currentResearchProgress = team.getResearchingProgressInQueue(level.registryAccess());
 
-                if (!queue.isEmpty()) {
-                    ResearchInstance instance = queue.getEntries().getFirst();
-                    Research research = ResearchHelperCommon.getResearch(instance.getResearch(), server.registryAccess());
+                // Apply research effects
+                if (currentResearchProgress != null) {
+                    if (currentResearchProgress.isComplete()) {
+                        for (UUID playerUUIDs : team.getMembers()) {
+                            ServerPlayer player = server.getPlayerList().getPlayer(playerUUIDs);
+                            for (ResearchEffect effect : currentResearch.researchEffects()) {
+                                Researchd.debug("Researching", "Applying research effects for Research: " + team.getResearchKeyInQueue() + " to player: " + player.getName().getString());
+                                effect.onUnlock(level, player, team.getResearchKeyInQueue());
+                            }
+                        }
 
-                    // TODO: Continue when the ground basis is set n done
+                        queue.getEntries().removeFirst();
+                    }
                 }
 
 

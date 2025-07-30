@@ -18,11 +18,12 @@ import net.minecraft.resources.ResourceKey;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 public record ResearchProgress(
         ResearchQueue researchQueue,
         UniqueArray<ResearchInstance> completedResearches,
-        Map<ResearchInstance, ResearchCompletionProgress> progress
+        HashMap<ResearchInstance, ResearchCompletionProgress> progress
 ) {
     public static final ResearchProgress EMPTY = new ResearchProgress(
             new ResearchQueue(),
@@ -34,7 +35,7 @@ public record ResearchProgress(
             ResearchQueue.CODEC.fieldOf("researchQueue").forGetter(ResearchProgress::researchQueue),
             UniqueArray.CODEC(ResearchInstance.CODEC).fieldOf("completedResearches")
                     .forGetter(ResearchProgress::completedResearches),
-            Codec.unboundedMap(ResearchInstance.CODEC, ResearchCompletionProgress.CODEC).fieldOf("completionProgress")
+            Codec.unboundedMap(ResearchInstance.CODEC, ResearchCompletionProgress.CODEC).xmap(HashMap::new, Function.identity()).fieldOf("completionProgress")
                     .forGetter(ResearchProgress::progress)
     ).apply(instance, ResearchProgress::new));
 
@@ -43,7 +44,7 @@ public record ResearchProgress(
             ResearchProgress::researchQueue,
             UniqueArray.STREAM_CODEC(ResearchInstance.STREAM_CODEC),
             ResearchProgress::completedResearches,
-            ByteBufCodecs.map(Object2ObjectOpenHashMap::new, ResearchInstance.STREAM_CODEC, ResearchCompletionProgress.STREAM_CODEC),
+            ByteBufCodecs.map(HashMap::new, ResearchInstance.STREAM_CODEC, ResearchCompletionProgress.STREAM_CODEC),
             ResearchProgress::progress,
             ResearchProgress::new
     );

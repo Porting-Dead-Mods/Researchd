@@ -5,19 +5,27 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.portingdeadlibs.utils.LazyFinal;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.ResearchEffect;
+import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.impl.research.ResearchCompletionProgress;
 import com.portingdeadmods.researchd.utils.TimeUtils;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
+import com.portingdeadmods.researchd.utils.researches.data.ResearchQueue;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -132,8 +140,50 @@ public class ResearchTeam {
 		return this.metadata;
 	}
 
+	/**
+	 * Fetches the team's total research progress
+	 *
+	 * @return {@link ResearchProgress} of the team, which contains the research queue and progress.
+	 */
 	public ResearchProgress getResearchProgress() {
 		return this.metadata.researchProgress;
+	}
+
+	/**
+	 * Fetches the progress of the research that is currently researching.
+	 *
+	 * @param provider Registry access
+	 * @return {@link ResearchProgress} of the research or null if no research is currently in progress.
+	 */
+	@Nullable
+	public ResearchCompletionProgress getResearchingProgressInQueue(HolderLookup.Provider provider) {
+		ResearchQueue queue = this.metadata.researchProgress.researchQueue();
+		if (queue.getEntries() == null) return null;
+		if (queue.getEntries().isEmpty()) return null;
+
+		return this.metadata.researchProgress.getProgress(queue.getEntries().getFirst(), provider);
+	}
+
+	/**
+	 * Fetches the research that is currently being researched in the queue.
+	 *
+	 * @param provider Registry access
+	 * @return {@link Research} of the research or null if no research is currently in progress.
+	 */
+	@Nullable
+	public Research getResearchInQueue(HolderLookup.Provider provider) {
+		ResearchQueue queue = this.metadata.researchProgress.researchQueue();
+		if (queue.getEntries() == null) return null;
+		if (queue.getEntries().isEmpty()) return null;
+
+		return ResearchHelperCommon.getResearch(queue.getEntries().getFirst().getResearch(), provider);
+	}
+
+	public ResourceKey<Research> getResearchKeyInQueue() {
+		ResearchQueue queue = this.metadata.researchProgress.researchQueue();
+		if (queue.getEntries() == null || queue.getEntries().isEmpty()) return null;
+
+		return queue.getEntries().getFirst().getResearch();
 	}
 
 	public void addMember(UUID uuid) {
