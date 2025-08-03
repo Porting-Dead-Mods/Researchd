@@ -11,7 +11,7 @@ import net.minecraft.network.codec.StreamCodec;
  */
 public class ResearchCompletionProgress {
 	private float progress;
-	private float maxProgress;
+	private final float maxProgress;
 
 	public float getProgress() {
 		return this.progress;
@@ -53,7 +53,7 @@ public class ResearchCompletionProgress {
 
 	/**
 	 * Progresses the research by the given amount.
-	 *
+	 * <br> <br>
 	 * If the progress exceeds the max progress, it will be clamped to the max progress
 	 * and return true, indicating that the research is complete, returns false otherwise.
 	 * @param amount
@@ -64,6 +64,23 @@ public class ResearchCompletionProgress {
 			return true;
 		} else {
 			this.progress += amount;
+			return false;
+		}
+	}
+
+	/**
+	 * Sets the research progress to the given amount.
+	 * <br> <br>
+	 * If the progress exceeds the max progress, it will be clamped to the max progress
+	 * and return true, indicating that the research is complete, returns false otherwise.
+	 * @param amount
+	 */
+	public boolean setProgress(float amount) {
+		if (amount > this.maxProgress) {
+			this.progress = this.maxProgress;
+			return true;
+		} else {
+			this.progress = amount;
 			return false;
 		}
 	}

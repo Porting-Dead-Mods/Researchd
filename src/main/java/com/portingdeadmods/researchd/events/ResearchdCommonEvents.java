@@ -17,6 +17,7 @@ import com.portingdeadmods.researchd.data.helper.ResearchTeamMap;
 import com.portingdeadmods.researchd.impl.research.ResearchCompletionProgress;
 import com.portingdeadmods.researchd.impl.research.ResearchPack;
 import com.portingdeadmods.researchd.networking.SyncSavedDataPayload;
+import com.portingdeadmods.researchd.networking.research.ResearchCompleteProgressSyncPayload;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import com.portingdeadmods.researchd.utils.researches.data.ResearchQueue;
 import net.minecraft.core.Holder;
@@ -81,9 +82,16 @@ public final class ResearchdCommonEvents {
 
                 Research currentResearch = team.getResearchInQueue(level.registryAccess());
                 ResearchCompletionProgress currentResearchProgress = team.getResearchingProgressInQueue(level.registryAccess());
-
-                // Apply research effects
                 if (currentResearchProgress != null) {
+                    // Sync to client the progress on every tick
+                    for (UUID memberUUID : team.getMembers()) {
+                        ServerPlayer player = server.getPlayerList().getPlayer(memberUUID);
+                        if (player == null) continue;
+
+                        PacketDistributor.sendToPlayer(player, new ResearchCompleteProgressSyncPayload(currentResearchProgress.getProgress()));
+                    }
+
+                    // Apply research effects
                     if (currentResearchProgress.isComplete()) {
                         for (UUID playerUUIDs : team.getMembers()) {
                             ServerPlayer player = server.getPlayerList().getPlayer(playerUUIDs);
@@ -97,7 +105,7 @@ public final class ResearchdCommonEvents {
                     }
                 }
 
-
+                // Save and sync the whole team research data every 10 ticks
                 if (level.getGameTime() % 10 == 0) {
                     ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
                 }
