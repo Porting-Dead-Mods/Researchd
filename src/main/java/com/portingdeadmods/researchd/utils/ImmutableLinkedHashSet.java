@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 
+// TODO: Move to PDL
 public class ImmutableLinkedHashSet<E> extends LinkedHashSet<E> {
     private boolean locked = false;
 
