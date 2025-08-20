@@ -1,6 +1,7 @@
 package com.portingdeadmods.researchd.client.screens.lab;
 
 import com.portingdeadmods.portingdeadlibs.api.client.screens.PDLAbstractContainerScreen;
+import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.content.menus.ResearchLabMenu;
 import com.portingdeadmods.researchd.impl.research.ResearchPack;
@@ -20,13 +21,17 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
 	public static final Integer TOP_PADDING = 25;
 	public static final Integer SLOTS_PER_ROW = 9;
 	public static final Integer SLOT_WIDTH = 18;
-	public static final Integer SLOT_HEIGHT = 21; // width + 2px for usage bar + 1px for spacing
+	public static final Integer LAB_SLOT_HEIGHT = 21; // width + 2px for usage bar + 1px for spacing
+	public static final Integer DEFAULT_SLOT_SIZE = 18;
 	public static final Integer BAR_HEIGHT = 2;
 	public static final Integer BAR_WIDTH = SLOT_WIDTH - 2; // Slot width but 1px off each side
+	public static final Integer INVENTORY_HOTBAR_GAP = 5;
 
-	public static final Integer BACKGROUND_COLOR = FastColor.ARGB32.color(8, 1, 38);
-	public static final Integer BORDER_COLOR = FastColor.ARGB32.color(5, 1, 23);
+	public static final Integer BACKGROUND_COLOR = FastColor.ARGB32.color(135, 249, 255);
+	public static final Integer BORDER_COLOR = FastColor.ARGB32.color(182, 184, 184);
 	public static final Integer BORDER_SIZE = 2;
+
+	public static final ResourceLocation RESEARCH_PACK_TEXTURE = Researchd.rl("textures/item/research_pack_empty.png");
 
 	public Integer botPos;
 	public Integer rightPos;
@@ -35,10 +40,19 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
 
 	public ResearchLabScreen(ResearchLabMenu menu, Inventory playerInventory, Component title) {
 		super(menu, playerInventory, title);
-		this.imageWidth = SIDE_PADDING * 2 + SLOTS_PER_ROW * SLOT_WIDTH;
+		this.imageWidth =
+				SIDE_PADDING * 2 +
+				SLOTS_PER_ROW * SLOT_WIDTH;
 		Researchd.debug("Research Lab Screen", "Width: " + this.imageWidth);
 
-		this.imageHeight = TOP_PADDING + SIDE_PADDING + (Researchd.RESEARCH_PACK_COUNT.getOrThrow() / SLOTS_PER_ROW + 1) * SLOT_HEIGHT;
+		this.imageHeight =
+				TOP_PADDING +
+				(Researchd.RESEARCH_PACK_COUNT.getOrThrow() / SLOTS_PER_ROW + 1) * LAB_SLOT_HEIGHT +
+				TOP_PADDING +
+				3 * DEFAULT_SLOT_SIZE +
+				INVENTORY_HOTBAR_GAP +
+				DEFAULT_SLOT_SIZE +
+				SIDE_PADDING;
 		Researchd.debug("Research Lab Screen", "Height: " + this.imageHeight);
 }
 
@@ -81,6 +95,10 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
 
 		 // Right border
 		guiGraphics.fill(this.rightPos, this.topPos - BORDER_SIZE, this.rightPos + BORDER_SIZE, this.botPos + BORDER_SIZE, BORDER_COLOR);
+
+		for (Point point : this.menu.getSlotPositions()) {
+			drawPackSlot(guiGraphics, point.x + 1, point.y + 1);
+		}
 	}
 
 	/**
@@ -105,5 +123,15 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
 					pack.color()
 			);
 		}
+	}
+
+	private void drawSlot(GuiGraphics guiGraphics, int x, int y) {
+
+	}
+
+	private void drawPackSlot(GuiGraphics guiGraphics, int x, int y) {
+		GuiUtils.ShaderChain.create()
+				.grayscale()
+				.drawTo(guiGraphics, RESEARCH_PACK_TEXTURE,  this.getGuiLeft() + x, this.getGuiTop() + y, 16, 16, GuiUtils.BlendMode.DARKEN);
 	}
 }

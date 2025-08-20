@@ -3,7 +3,6 @@ package com.portingdeadmods.researchd.content.menus;
 import com.portingdeadmods.portingdeadlibs.api.gui.menus.PDLAbstractContainerMenu;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.client.screens.lab.ResearchLabScreen;
 import com.portingdeadmods.researchd.content.blockentities.ResearchLabControllerBE;
 import com.portingdeadmods.researchd.registries.ResearchdMenuTypes;
 import net.minecraft.network.FriendlyByteBuf;
@@ -15,11 +14,18 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.portingdeadmods.researchd.client.screens.lab.ResearchLabScreen.*;
+
+;
+
 public class ResearchLabMenu extends PDLAbstractContainerMenu<ResearchLabControllerBE> {
 	private final List<Point> slotPositions = new UniqueArray<>();
 	public List<Point> getSlotPositions() {
 		return slotPositions;
 	}
+
+	public final Integer playerInventoryStartY;
+	public final Integer playerHotbarStartY;
 
 	public ResearchLabMenu(int containerId, Inventory inv, FriendlyByteBuf extraData) {
 		this(containerId, inv, (ResearchLabControllerBE) inv.player.level().getBlockEntity(extraData.readBlockPos()));
@@ -31,23 +37,33 @@ public class ResearchLabMenu extends PDLAbstractContainerMenu<ResearchLabControl
 		Researchd.debug("Research Lab Menu", "Creating Research Lab Menu with ", Researchd.RESEARCH_PACK_COUNT, " slots.");
 
 		ArrayList<Integer> slotXPositions = new ArrayList<>();
-		for (int i = Researchd.RESEARCH_PACK_COUNT.getOrThrow(); i > 0; i -= ResearchLabScreen.SLOTS_PER_ROW) {
-			int rowCount = Math.min(i, ResearchLabScreen.SLOTS_PER_ROW);
-			int[] positions = calculateCenteredPositions(ResearchLabScreen.SIDE_PADDING, ResearchLabScreen.SIDE_PADDING + ResearchLabScreen.SLOTS_PER_ROW * ResearchLabScreen.SLOT_WIDTH, ResearchLabScreen.SLOT_WIDTH, rowCount);
+		for (int i = Researchd.RESEARCH_PACK_COUNT.getOrThrow(); i > 0; i -= SLOTS_PER_ROW) {
+			int rowCount = Math.min(i, SLOTS_PER_ROW);
+			int[] positions = calculateCenteredPositions(SIDE_PADDING, SIDE_PADDING + SLOTS_PER_ROW * SLOT_WIDTH, SLOT_WIDTH, rowCount);
 			for (int pos : positions) {
 				slotXPositions.add(pos);
 			}
 		}
 
 		for (int i = 0; i < Researchd.RESEARCH_PACK_COUNT.getOrThrow(); i++) {
-			int row = i / ResearchLabScreen.SLOTS_PER_ROW;
-			addSlot(new SlotItemHandler(blockEntity.getItemHandler(), i, slotXPositions.get(i), ResearchLabScreen.TOP_PADDING + row * ResearchLabScreen.SLOT_HEIGHT));
-			Researchd.debug("Research Lab Menu", "Adding slot ", i, " at position ", slotXPositions.get(i), ":", ResearchLabScreen.TOP_PADDING + row * ResearchLabScreen.SLOT_HEIGHT);
-			this.slotPositions.add(new Point(slotXPositions.get(i), ResearchLabScreen.TOP_PADDING + row * ResearchLabScreen.SLOT_HEIGHT));
+			int row = i / SLOTS_PER_ROW;
+			addSlot(new SlotItemHandler(blockEntity.getItemHandler(), i, slotXPositions.get(i), TOP_PADDING + row * LAB_SLOT_HEIGHT));
+			Researchd.debug("Research Lab Menu", "Adding slot ", i, " at position ", slotXPositions.get(i), ":", TOP_PADDING + row * LAB_SLOT_HEIGHT);
+			this.slotPositions.add(new Point(slotXPositions.get(i), TOP_PADDING + row * LAB_SLOT_HEIGHT));
 		}
 
-		addPlayerInventory(inv);
-		addPlayerHotbar(inv);
+		this.playerInventoryStartY =
+				TOP_PADDING +
+				(Researchd.RESEARCH_PACK_COUNT.getOrThrow() / SLOTS_PER_ROW + 1) * LAB_SLOT_HEIGHT +
+				TOP_PADDING;
+
+		this.playerHotbarStartY =
+				this.playerInventoryStartY +
+				3 * DEFAULT_SLOT_SIZE +
+				INVENTORY_HOTBAR_GAP;
+
+		addPlayerInventory(inv, playerInventoryStartY);
+		addPlayerHotbar(inv, playerHotbarStartY);
 	}
 
 	@Override
