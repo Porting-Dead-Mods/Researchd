@@ -2,7 +2,6 @@ package com.portingdeadmods.researchd.api.research.methods;
 
 import com.mojang.serialization.Codec;
 import com.portingdeadmods.researchd.ResearchdRegistries;
-import com.portingdeadmods.researchd.api.client.research.ClientResearchMethod;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
 import com.portingdeadmods.researchd.data.helper.ResearchCompletionProgress;
@@ -26,9 +25,8 @@ public interface ResearchMethod {
         return Component.translatable("research_method." + id.getNamespace() + "." + id.getPath());
     }
 
-    ClientResearchMethod<?> getClientMethod();
-
     ResearchMethodSerializer<?> getSerializer();
 
     ResearchCompletionProgress getDefaultProgress();
+
 }

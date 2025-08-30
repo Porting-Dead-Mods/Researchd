@@ -6,6 +6,7 @@ import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
+import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -44,14 +45,14 @@ public record ResearchQueueAddPayload(ResearchInstance researchInstance) impleme
 
                 // Announce
                 List<UUID> members = team.getMembers();
-                Component researchName =  Utils.registryTranslation(researchInstance().getResearch());
+                Component researchName = Utils.registryTranslation(researchInstance().getResearch());
 
                 for (UUID memberId : members) {
                     ServerPlayer member = level.getServer().getPlayerList().getPlayer(memberId);
                     if (member != null) {
-                        member.sendSystemMessage(Component.translatable(
-                                "researchd.research.queue.added",
-                                        ChatFormatting.GREEN + serverPlayer.getDisplayName().getString() + ChatFormatting.RESET,
+                        member.sendSystemMessage(ResearchdTranslations.Research.QUEUE_ADDED.component(
+                                Researchd.MODID,
+                                ChatFormatting.GREEN + serverPlayer.getDisplayName().getString() + ChatFormatting.RESET,
                                 ChatFormatting.GREEN + researchName.getString() + ChatFormatting.RESET
                         ));
                     }

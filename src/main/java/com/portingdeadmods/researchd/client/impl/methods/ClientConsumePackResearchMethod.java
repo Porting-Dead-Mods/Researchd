@@ -1,7 +1,6 @@
-package com.portingdeadmods.researchd.client.impl.methods;
+/*package com.portingdeadmods.researchd.client.impl.methods;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.portingdeadmods.researchd.api.client.research.ClientResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -73,3 +72,4 @@ public class ClientConsumePackResearchMethod implements ClientResearchMethod<Con
     }
 
 }
+*/

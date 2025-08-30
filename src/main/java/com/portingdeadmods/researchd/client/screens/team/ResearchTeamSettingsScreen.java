@@ -7,6 +7,7 @@ import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamRole;
+import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -38,7 +39,7 @@ public class ResearchTeamSettingsScreen extends BaseScreen {
     private PlayerManagementDraggableWidget transferOwnershipWindow;
 
     public ResearchTeamSettingsScreen() {
-        super(Component.literal("Team Settings"), 480, 264, 128, 195);
+        super(ResearchdTranslations.component(ResearchdTranslations.Team.SETTINGS_SCREEN_TITLE), 480, 264, 128, 195);
         this.prevScreen = Minecraft.getInstance().screen;
     }
 
@@ -69,13 +70,14 @@ public class ResearchTeamSettingsScreen extends BaseScreen {
         }
 
         // Layout Widgets - Buttons
-        this.manageMembersButton = Button.builder(Component.literal("Manage Members"), btn -> {
+        this.manageMembersButton = Button.builder(ResearchdTranslations.component(ResearchdTranslations.Team.BUTTON_MANAGE_MEMBERS), btn -> {
             this.playerManagementWindow.setVisible(!this.playerManagementWindow.visible);
         }).size(112, 16).build();
-        this.transferOwnershipButton = Button.builder(Component.literal("Transfer Ownership"), btn -> {
+        this.transferOwnershipButton = Button.builder(ResearchdTranslations.component(ResearchdTranslations.Team.BUTTON_TRANSFER_OWNERSHIP), btn -> {
             this.transferOwnershipWindow.setVisible(!this.transferOwnershipWindow.visible);
         }).size(112, 16).build();
-        this.leaveButton = Button.builder(Component.literal("Leave"), btn -> {
+        this.leaveButton = Button.builder(ResearchdTranslations.component(ResearchdTranslations.Team.BUTTON_LEAVE_TEAM), btn -> {
+            // TODO: Implement this
         }).size(112, 16).build();
 
         if (ClientResearchTeamHelper.getPlayerRole(Minecraft.getInstance().player.getUUID()) == ResearchTeamRole.OWNER) {

@@ -4,7 +4,9 @@ import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
 import org.jetbrains.annotations.NotNull;
 
 public class ClientAndResearchMethod extends AbstractResearchMethodList<AndResearchMethod> {
-    public static final ClientAndResearchMethod INSTANCE = new ClientAndResearchMethod();
+    public ClientAndResearchMethod(int x, int y, AndResearchMethod method) {
+        super(x, y, method);
+    }
 
     @Override
     public @NotNull String getSeparatorText() {

@@ -3,7 +3,6 @@ package com.portingdeadmods.researchd.impl.research.method;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.client.research.ClientResearchMethod;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethodList;
@@ -21,6 +20,7 @@ public record AndResearchMethod(List<ResearchMethod> methods) implements Researc
             ResearchMethod.CODEC.listOf().fieldOf("methods").forGetter(AndResearchMethod::methods)
     ).apply(inst, AndResearchMethod::new));
     public static final ResearchMethodSerializer<AndResearchMethod> SERIALIZER = ResearchMethodSerializer.simple(CODEC, null);
+    public static final ResourceLocation ID = Researchd.rl("and");
 
     @Override
     public boolean canResearch(Player player, ResourceKey<Research> research) {
@@ -41,12 +41,7 @@ public record AndResearchMethod(List<ResearchMethod> methods) implements Researc
 
     @Override
     public ResourceLocation id() {
-        return Researchd.rl("and");
-    }
-
-    @Override
-    public ClientResearchMethod<?> getClientMethod() {
-        return ClientAndResearchMethod.INSTANCE;
+        return ID;
     }
 
     @Override

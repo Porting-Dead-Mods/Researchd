@@ -1,6 +1,7 @@
 package com.portingdeadmods.researchd.client.screens.team;
 
 import com.mojang.authlib.GameProfile;
+import com.portingdeadmods.portingdeadlibs.api.translations.TranslatableConstant;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.BaseScreen;
@@ -10,6 +11,7 @@ import com.portingdeadmods.researchd.client.screens.team.widgets.TeamMemberWidge
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
+import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -40,7 +42,7 @@ public class ResearchTeamScreen extends BaseScreen {
     private PlayerManagementDraggableWidget inviteWidget;
 
     public ResearchTeamScreen() {
-        super(Component.translatable("screen.researchd.research_team.title"), 480, 264, 480 - 64 * 2, 264 - 32 * 2);
+        super(ResearchdTranslations.component(ResearchdTranslations.Team.SCREEN_TITLE), 480, 264, 480 - 64 * 2, 264 - 32 * 2);
     }
 
     @Override
@@ -84,14 +86,14 @@ public class ResearchTeamScreen extends BaseScreen {
 
         this.inviteButton = new ImageButton(14, 14, INVITE_BUTTON_SPRITES, (btn) -> {
             this.inviteWidget.setVisible(!this.inviteWidget.visible);
-        }, Component.translatable("screen.researchd.research_team.buttons.invite"));
+        }, ResearchdTranslations.component(ResearchdTranslations.Team.BUTTON_INVITE));
         headerLayout.addChild(this.inviteButton);
 
         this.settingsButton = new ImageButton(14, 14, SETTINGS_BUTTON_SPRITES, (btn) -> {
             ResearchTeamSettingsScreen screen = new ResearchTeamSettingsScreen();
             screen.setTempTeamName(this.teamNameEdit.getValue());
             Minecraft.getInstance().setScreen(screen);
-        }, Component.translatable("screen.researchd.research_team.buttons.team_settings"));
+        }, ResearchdTranslations.component(ResearchdTranslations.Team.BUTTON_TEAM_SETTINGS));
         headerLayout.addChild(this.settingsButton);
 
         // Layout - Elements
@@ -100,7 +102,7 @@ public class ResearchTeamScreen extends BaseScreen {
         // Layout - Elements - Team Information
         // TODO: Make this into a container list like the ones in draggable widget
         LinearLayout teamMembersLayout = linearLayout.addChild(LinearLayout.vertical());
-        teamMembersLayout.addChild(new StringWidget(Component.translatable("screen.researchd.research_team.titles.members"), this.font));
+        teamMembersLayout.addChild(new StringWidget(ResearchdTranslations.component(ResearchdTranslations.Team.TITLE_MEMBERS), this.font));
         teamMembersLayout.addChild(new SpacerElement(0, 2));
         for (GameProfile member : members) {
             teamMembersLayout.addChild(new TeamMemberWidget(94, 22, member, TEAM_MEMBER_BUTTON_SPRITES, btn -> {
@@ -110,7 +112,7 @@ public class ResearchTeamScreen extends BaseScreen {
         // Layout - Elements - Recent Researches
         // TODO: Make this into a container list like the ones in draggable widget
         LinearLayout recentResearchesLayout = linearLayout.addChild(LinearLayout.vertical());
-        recentResearchesLayout.addChild(new StringWidget(Component.translatable("screen.researchd.research_team.titles.recently_researched"), this.font));
+        recentResearchesLayout.addChild(new StringWidget(ResearchdTranslations.component(ResearchdTranslations.Team.TITLE_RECENTLY_RESEARCHED), this.font));
         recentResearchesLayout.addChild(new SpacerElement(0, 2));
         for (ResearchInstance instance : recentResearches) {
             recentResearchesLayout.addChild(new RecentResearchWidget(223, 32, instance, RECENT_RESEARCH_SPRITES, (btn1) -> {

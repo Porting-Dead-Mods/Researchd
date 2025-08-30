@@ -11,6 +11,7 @@ import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.data.ResearchQueue;
+import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -51,10 +52,11 @@ public record ResearchFinishedPayload(int timeStamp) implements CustomPacketPayl
                 team.getResearchProgress().completeResearch(first);
 
                 player.sendSystemMessage(
-                        Component.translatable("researchd.research.queue.finished",
+                        ResearchdTranslations.Research.QUEUE_FINISHED.component(
+                                Researchd.MODID,
                                 ChatFormatting.GREEN + Utils.registryTranslation(first.getResearch()).getString() + ChatFormatting.RESET,
                                 ChatFormatting.GREEN + team.getResearchCompletionTime(timeStamp()) + ChatFormatting.RESET
-                ));
+                        ));
             } else {
                 context.disconnect(Component.translatable("researchd.error.research_queue_desync"));
             }

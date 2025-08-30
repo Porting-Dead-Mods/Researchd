@@ -8,7 +8,6 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
-import com.portingdeadmods.researchd.client.impl.methods.ClientConsumePackResearchMethod;
 import com.portingdeadmods.researchd.data.helper.ResearchCompletionProgress;
 import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
@@ -58,11 +57,6 @@ public record ConsumePackResearchMethod(List<ResourceKey<SimpleResearchPack>> pa
             stacks.add(stack);
         }
         return stacks;
-    }
-
-    @Override
-    public ClientConsumePackResearchMethod getClientMethod() {
-        return ClientConsumePackResearchMethod.INSTANCE;
     }
 
     @Override

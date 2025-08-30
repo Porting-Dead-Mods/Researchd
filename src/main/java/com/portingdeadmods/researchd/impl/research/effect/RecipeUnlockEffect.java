@@ -3,7 +3,6 @@ package com.portingdeadmods.researchd.impl.research.effect;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.client.research.ClientResearchEffect;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectSerializer;
@@ -31,11 +30,6 @@ public record RecipeUnlockEffect(ResourceLocation recipe) implements ResearchEff
 
     public RecipeHolder<?> getRecipe(Level level) {
         return level.getRecipeManager().byKey(this.recipe).orElse(null);
-    }
-
-    @Override
-    public ClientResearchEffect<RecipeUnlockEffect> getClientResearchEffect() {
-        return null;
     }
 
     @Override

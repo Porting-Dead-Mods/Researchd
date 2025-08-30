@@ -2,7 +2,6 @@ package com.portingdeadmods.researchd.api.research.effects;
 
 import com.mojang.serialization.Codec;
 import com.portingdeadmods.researchd.ResearchdRegistries;
-import com.portingdeadmods.researchd.api.client.research.ClientResearchEffect;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectSerializer;
 import net.minecraft.network.chat.Component;
@@ -26,8 +25,6 @@ public interface ResearchEffect {
         ResourceLocation id = id();
         return Component.translatable("research_method." + id.getNamespace() + "." + id.getPath());
     }
-
-    ClientResearchEffect<?> getClientResearchEffect();
 
     ResearchEffectSerializer<?> getSerializer();
 }

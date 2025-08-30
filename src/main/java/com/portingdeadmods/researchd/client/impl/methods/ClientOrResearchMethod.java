@@ -4,10 +4,12 @@ import com.portingdeadmods.researchd.impl.research.method.OrResearchMethod;
 import org.jetbrains.annotations.NotNull;
 
 public class ClientOrResearchMethod extends AbstractResearchMethodList<OrResearchMethod> {
-    public static final ClientOrResearchMethod INSTANCE = new ClientOrResearchMethod();
+    public ClientOrResearchMethod(int x, int y, OrResearchMethod method) {
+        super(x, y, method);
+    }
 
     @Override
     public @NotNull String getSeparatorText() {
-        return "and";
+        return "or";
     }
 }

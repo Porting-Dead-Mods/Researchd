@@ -3,7 +3,6 @@ package com.portingdeadmods.researchd.impl.research.method;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.client.research.ClientResearchMethod;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethodList;
@@ -21,6 +20,7 @@ public record OrResearchMethod(List<ResearchMethod> methods) implements Research
             ResearchMethod.CODEC.listOf().fieldOf("methods").forGetter(OrResearchMethod::methods)
     ).apply(inst, OrResearchMethod::new));
     public static final ResearchMethodSerializer<OrResearchMethod> SERIALIZER = ResearchMethodSerializer.simple(CODEC, null);
+    public static final ResourceLocation ID = Researchd.rl("or");
 
     // TODO: In the far future we might want to implement a way to select the preferred research
     @Override
@@ -44,12 +44,7 @@ public record OrResearchMethod(List<ResearchMethod> methods) implements Research
 
     @Override
     public ResourceLocation id() {
-        return Researchd.rl("or");
-    }
-
-    @Override
-    public ClientResearchMethod<?> getClientMethod() {
-        return ClientOrResearchMethod.INSTANCE;
+        return ID;
     }
 
     @Override

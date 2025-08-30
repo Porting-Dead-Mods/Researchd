@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.client.screens;
 
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidget;
 import com.portingdeadmods.researchd.client.cache.ClientResearchCache;
 import com.portingdeadmods.researchd.client.screens.widgets.ResearchGraphWidget;
 import com.portingdeadmods.researchd.client.screens.widgets.SelectedResearchWidget;
@@ -11,6 +12,7 @@ import com.portingdeadmods.researchd.api.data.ResearchGraph;
 import com.portingdeadmods.researchd.api.data.TechList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -66,7 +68,7 @@ public class ResearchScreen extends Screen {
         addRenderableWidget(this.techListWidget.searchButton);
         addRenderableWidget(this.techListWidget.startResearchButton);
         addWidget(this.researchGraphWidget);
-        addRenderableWidget(this.selectedResearchWidget);
+        this.selectedResearchWidget.visitWidgets(this::addRenderableWidget);
     }
 
     @Override
@@ -97,6 +99,20 @@ public class ResearchScreen extends Screen {
         guiGraphics.disableScissor();
 
         this.researchGraphWidget.renderNodeTooltips(guiGraphics, mouseX, mouseY, partialTick);
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        this.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+
+        for(Renderable renderable : this.renderables) {
+            renderable.render(guiGraphics, mouseX, mouseY, partialTick);
+
+            if (renderable instanceof AbstractResearchInfoWidget<?> infoWidget) {
+                infoWidget.renderTooltip(guiGraphics, mouseX, mouseY, partialTick);
+            }
+        }
+
     }
 
     public ResearchGraphWidget getResearchGraphWidget() {

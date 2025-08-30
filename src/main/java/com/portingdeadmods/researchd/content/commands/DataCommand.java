@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.commands;
+package com.portingdeadmods.researchd.content.commands;
 
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;

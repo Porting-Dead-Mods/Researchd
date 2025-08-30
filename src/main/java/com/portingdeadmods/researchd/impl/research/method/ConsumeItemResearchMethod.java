@@ -55,11 +55,6 @@ public record ConsumeItemResearchMethod(Ingredient toConsume, int count) impleme
     }
 
     @Override
-    public ClientConsumeItemResearchMethod getClientMethod() {
-        return ClientConsumeItemResearchMethod.INSTANCE;
-    }
-
-    @Override
     public Serializer getSerializer() {
         return Serializer.INSTANCE;
     }
