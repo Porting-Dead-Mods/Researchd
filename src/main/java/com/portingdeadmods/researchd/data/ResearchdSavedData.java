@@ -2,8 +2,8 @@ package com.portingdeadmods.researchd.data;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
-import com.portingdeadmods.researchd.api.data.PDLSavedData;
-import com.portingdeadmods.researchd.data.helper.ResearchTeamMap;
+import com.portingdeadmods.researchd.api.pdl.data.PDLSavedData;
+import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;

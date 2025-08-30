@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.api.research;
+package com.portingdeadmods.researchd.api.research.effects;
 
 import net.minecraft.world.level.Level;
 

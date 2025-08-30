@@ -2,15 +2,10 @@ package com.portingdeadmods.researchd.client.screens.graph;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.client.screens.lines.ResearchLine;
-import com.portingdeadmods.researchd.utils.Spaghetti;
-import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
-import com.portingdeadmods.researchd.utils.researches.data.ResearchGraph;
+import com.portingdeadmods.researchd.api.data.ResearchGraph;
 import net.minecraft.resources.ResourceKey;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**

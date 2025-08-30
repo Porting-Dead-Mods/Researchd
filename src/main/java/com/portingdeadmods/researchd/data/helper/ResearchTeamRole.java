@@ -1,18 +1,25 @@
 package com.portingdeadmods.researchd.data.helper;
 
+import com.portingdeadmods.portingdeadlibs.api.translations.TranslatableConstant;
+import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.network.chat.Component;
 
 public enum ResearchTeamRole {
-    MEMBER,
-    MODERATOR,
-    OWNER;
+    MEMBER(ResearchdTranslations.Team.MEMBER, 0),
+    MODERATOR(ResearchdTranslations.Team.MODERATOR, 1),
+    OWNER(ResearchdTranslations.Team.OWNER, 2);
+
+    private final TranslatableConstant displayName;
+    private final int permissionLevel;
+
+    ResearchTeamRole(TranslatableConstant displayName, int permissionLevel) {
+        this.displayName = displayName;
+        this.permissionLevel = permissionLevel;
+    }
 
     public Component getDisplayName() {
-        return Component.literal(switch (this) {
-            case MEMBER -> "Member";
-            case MODERATOR -> "Moderator";
-            case OWNER -> "Owner";
-        });
+        return displayName.component(Researchd.MODID);
     }
 
     /**
@@ -22,10 +29,6 @@ public enum ResearchTeamRole {
      * <span style="color:green">2 - Owner</span> <br>
      */
     public int getPermissionLevel() {
-        return switch (this) {
-            case MEMBER -> 0;
-            case MODERATOR -> 1;
-            case OWNER -> 2;
-        };
+        return this.permissionLevel;
     }
 }

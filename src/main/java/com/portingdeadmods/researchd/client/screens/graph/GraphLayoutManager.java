@@ -6,7 +6,7 @@ import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.screens.widgets.ResearchGraphWidget;
 import com.portingdeadmods.researchd.utils.Spaghetti;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
-import com.portingdeadmods.researchd.utils.researches.data.ResearchGraph;
+import com.portingdeadmods.researchd.api.data.ResearchGraph;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 

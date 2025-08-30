@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.impl.client.research;
+package com.portingdeadmods.researchd.client.impl.methods;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.api.client.research.ClientResearchMethod;
@@ -8,6 +8,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.common.util.Size2i;
 
 import java.util.List;
 
@@ -15,14 +16,11 @@ import java.util.List;
 public class ClientConsumePackResearchMethod implements ClientResearchMethod<ConsumePackResearchMethod> {
     public static final ClientConsumePackResearchMethod INSTANCE = new ClientConsumePackResearchMethod();
 
-    // TODO: Make dynamic
-    private int height = 8;
-
     private ClientConsumePackResearchMethod() {
     }
 
     @Override
-    public void renderMethodInfo(GuiGraphics guiGraphics, ConsumePackResearchMethod method, int x, int y, int mouseX, int mouseY) {
+    public void renderInfo(GuiGraphics guiGraphics, ConsumePackResearchMethod method, int x, int y, int mouseX, int mouseY) {
         Font font = Minecraft.getInstance().font;
         Component methodType = method.getTranslation();
 
@@ -44,14 +42,14 @@ public class ClientConsumePackResearchMethod implements ClientResearchMethod<Con
         poseStack.popPose();
 
         int xPos = x - 3;
-        int yPos = y + height();
+        int yPos = y + getSize(method, mouseX, mouseY).height;
 
         guiGraphics.fill(xPos, yPos, xPos + 80, yPos + 1, -1);
     }
 
     @Override
-    public int height() {
-        return height;
+    public Size2i getSize(ConsumePackResearchMethod methods, int mouseX, int mouseY) {
+        return new Size2i(32, 32);
     }
 
     private void renderPacks(Font font, GuiGraphics guiGraphics, ConsumePackResearchMethod method, int i, int x, int y) {

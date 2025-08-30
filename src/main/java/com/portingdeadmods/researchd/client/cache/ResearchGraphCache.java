@@ -1,7 +1,7 @@
 package com.portingdeadmods.researchd.client.cache;
 
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.utils.researches.data.ResearchGraph;
+import com.portingdeadmods.researchd.api.data.ResearchGraph;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;

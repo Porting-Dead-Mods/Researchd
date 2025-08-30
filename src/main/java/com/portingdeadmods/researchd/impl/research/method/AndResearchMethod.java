@@ -1,13 +1,14 @@
 package com.portingdeadmods.researchd.impl.research.method;
 
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.client.research.ClientResearchMethod;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.ResearchMethod;
+import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
+import com.portingdeadmods.researchd.api.research.methods.ResearchMethodList;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
+import com.portingdeadmods.researchd.client.impl.methods.ClientAndResearchMethod;
 import com.portingdeadmods.researchd.impl.research.ResearchCompletionProgress;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -15,7 +16,7 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.List;
 
-public record AndResearchMethod(List<ResearchMethod> methods) implements ResearchMethod {
+public record AndResearchMethod(List<ResearchMethod> methods) implements ResearchMethodList {
     private static final MapCodec<AndResearchMethod> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
             ResearchMethod.CODEC.listOf().fieldOf("methods").forGetter(AndResearchMethod::methods)
     ).apply(inst, AndResearchMethod::new));
@@ -45,7 +46,7 @@ public record AndResearchMethod(List<ResearchMethod> methods) implements Researc
 
     @Override
     public ClientResearchMethod<?> getClientMethod() {
-        return null;
+        return ClientAndResearchMethod.INSTANCE;
     }
 
     @Override

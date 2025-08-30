@@ -4,7 +4,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
-import com.portingdeadmods.researchd.registries.Researches;
+import com.portingdeadmods.researchd.registries.ResearchdResearches;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -36,23 +36,23 @@ public final class LangProvider extends LanguageProvider {
         addBlock(RESEARCH_LAB_PART, "Research Lab Part");
         addBlock(RESEARCH_LAB_CONTROLLER, "Research Lab Controller");
 
-        addResearch(Researches.WOOD, "Wood");
-        addResearch(Researches.STONE, "Stone");
-        addResearch(Researches.COPPER, "Copper");
-        addResearch(Researches.IRON, "Iron");
-        addResearch(Researches.IRON_TOOLS, "Iron Tools");
-        addResearch(Researches.IRON_ARMOR, "Iron Armor");
-        addResearch(Researches.LIGHTNING_ROD, "Lightning Rod");
-        addResearch(Researches.COPPER_BLOCK, "Copper Block");
+        addResearch(ResearchdResearches.WOOD, "Wood");
+        addResearch(ResearchdResearches.STONE, "Stone");
+        addResearch(ResearchdResearches.COPPER, "Copper");
+        addResearch(ResearchdResearches.IRON, "Iron");
+        addResearch(ResearchdResearches.IRON_TOOLS, "Iron Tools");
+        addResearch(ResearchdResearches.IRON_ARMOR, "Iron Armor");
+        addResearch(ResearchdResearches.LIGHTNING_ROD, "Lightning Rod");
+        addResearch(ResearchdResearches.COPPER_BLOCK, "Copper Block");
 
-        addResearchDesc(Researches.WOOD, "Punch those nasty trees");
-        addResearchDesc(Researches.STONE, "Ooga booga cave man");
-        addResearchDesc(Researches.COPPER, "A decent conductor");
-        addResearchDesc(Researches.IRON, "Speedrunning human history");
-        addResearchDesc(Researches.IRON_TOOLS, "Gearing up");
-        addResearchDesc(Researches.IRON_ARMOR, "Isn't this an achievement already?");
-        addResearchDesc(Researches.LIGHTNING_ROD, "I told ya it's a great conductor!");
-        addResearchDesc(Researches.COPPER_BLOCK, "Efficient Storage");
+        addResearchDesc(ResearchdResearches.WOOD, "Punch those nasty trees");
+        addResearchDesc(ResearchdResearches.STONE, "Ooga booga cave man");
+        addResearchDesc(ResearchdResearches.COPPER, "A decent conductor");
+        addResearchDesc(ResearchdResearches.IRON, "Speedrunning human history");
+        addResearchDesc(ResearchdResearches.IRON_TOOLS, "Gearing up");
+        addResearchDesc(ResearchdResearches.IRON_ARMOR, "Isn't this an achievement already?");
+        addResearchDesc(ResearchdResearches.LIGHTNING_ROD, "I told ya it's a great conductor!");
+        addResearchDesc(ResearchdResearches.COPPER_BLOCK, "Efficient Storage");
 
         addResearchMethod(ConsumePackResearchMethod.ID, "Submit");
         addResearchMethod(ConsumeItemResearchMethod.ID, "Submit");

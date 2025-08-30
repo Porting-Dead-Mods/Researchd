@@ -1,14 +1,9 @@
 package com.portingdeadmods.researchd.networking;
 
-import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.ResearchdRegistries;
-import com.portingdeadmods.researchd.api.data.PDLClientSavedData;
-import com.portingdeadmods.researchd.api.data.PDLSavedData;
-import com.portingdeadmods.researchd.api.data.SavedDataHolder;
-import io.netty.buffer.ByteBuf;
+import com.portingdeadmods.researchd.api.pdl.data.PDLClientSavedData;
+import com.portingdeadmods.researchd.api.pdl.data.SavedDataHolder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.network.handling.IPayloadContext;

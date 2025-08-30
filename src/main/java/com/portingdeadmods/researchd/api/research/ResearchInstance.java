@@ -2,13 +2,12 @@ package com.portingdeadmods.researchd.api.research;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.portingdeadmods.researchd.utils.Codecs;
+import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.ExtraCodecs;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -16,14 +15,14 @@ import java.util.*;
 public final class ResearchInstance {
     public static final Codec<ResearchInstance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Research.RESOURCE_KEY_CODEC.fieldOf("research").forGetter(ResearchInstance::getResearch),
-            Codecs.enumCodec(ResearchStatus.class).fieldOf("research_status").forGetter(ResearchInstance::getResearchStatus),
+            CodecUtils.enumCodec(ResearchStatus.class).fieldOf("research_status").forGetter(ResearchInstance::getResearchStatus),
             UUIDUtil.CODEC.optionalFieldOf("researched_player").forGetter(r -> Optional.ofNullable(r.getResearchedPlayer())),
             Codec.LONG.fieldOf("researched_time").forGetter(ResearchInstance::getResearchedTime)
     ).apply(instance, (r, s, p, t) -> new ResearchInstance(r, s, p.orElse(null), t)));
     public static final StreamCodec<RegistryFriendlyByteBuf, ResearchInstance> STREAM_CODEC = StreamCodec.composite(
             Research.RESOURCE_KEY_STREAM_CODEC,
             ResearchInstance::getResearch,
-            Codecs.enumStreamCodec(ResearchStatus.class),
+            CodecUtils.enumStreamCodec(ResearchStatus.class),
             ResearchInstance::getResearchStatus,
             ByteBufCodecs.optional(UUIDUtil.STREAM_CODEC),
             instance -> Optional.ofNullable(instance.getResearchedPlayer()),

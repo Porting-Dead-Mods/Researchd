@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.api.data;
+package com.portingdeadmods.researchd.api.pdl.data;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;

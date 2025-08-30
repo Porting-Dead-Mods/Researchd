@@ -1,7 +1,7 @@
 package com.portingdeadmods.researchd.commands;
 
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import com.portingdeadmods.researchd.api.research.ResearchEffectData;
+import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;

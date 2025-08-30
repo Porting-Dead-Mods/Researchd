@@ -3,7 +3,7 @@ package com.portingdeadmods.researchd.registries;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.ResearchMethod;
+import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.content.predicates.RecipePredicate;
 import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
@@ -21,13 +21,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-public final class Researches {
+public final class ResearchdResearches {
     private static final Map<ResourceKey<Research>, Research.Builder<?>> RESEARCHES = new HashMap<>();
 
     public static final ResourceKey<Research> WOOD = register("wood", builder -> builder
             .icon(Items.OAK_LOG)
             .researchMethods(
-                    or(new ConsumeItemResearchMethod(Ingredient.of(Items.DIRT), 8), new ConsumeItemResearchMethod(Ingredient.of(Items.WHEAT_SEEDS), 2))
+                    or(new ConsumeItemResearchMethod(Ingredient.of(Items.DIRT), 8), new ConsumeItemResearchMethod(Ingredient.of(Items.WHEAT_SEEDS), 2), new ConsumeItemResearchMethod(Ingredient.of(Items.BROWN_MUSHROOM), 2))
             )
             .researchEffects(
                     new RecipePredicate(ResourceLocation.withDefaultNamespace("anvil"))

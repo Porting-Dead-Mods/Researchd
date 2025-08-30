@@ -1,14 +1,13 @@
 package com.portingdeadmods.researchd.impl.research;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor;
 
 import java.util.Optional;
 
@@ -25,6 +24,10 @@ public record ResearchPack(int color, Optional<ResourceLocation> customTexture) 
         this(-1, Optional.of(customTexture));
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static final class Builder {
         private int color = -1;
         private ResourceLocation customTexture;
@@ -32,12 +35,8 @@ public record ResearchPack(int color, Optional<ResourceLocation> customTexture) 
         private Builder() {
         }
 
-        public static Builder of() {
-            return new Builder();
-        }
-
-        public Builder color(int color) {
-            this.color = color;
+        public Builder color(int r, int g, int b) {
+            this.color = FastColor.ARGB32.color(r, g, b);
             return this;
         }
 

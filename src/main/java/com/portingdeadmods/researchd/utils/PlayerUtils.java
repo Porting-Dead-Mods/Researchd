@@ -1,10 +1,9 @@
 package com.portingdeadmods.researchd.utils;
 
-import com.portingdeadmods.researchd.data.helper.ResearchTeam;
+import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
-import java.util.List;
 import java.util.UUID;
 
 public class PlayerUtils {

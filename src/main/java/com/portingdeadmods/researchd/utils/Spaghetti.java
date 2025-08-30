@@ -18,7 +18,7 @@ public class Spaghetti {
 	 * Returns the set of {@link ResearchNode} currently displayed on the screen.
 	 */
 	public static Set<ResearchNode> getNodesFromScreen() {
-		return Minecraft.getInstance().screen instanceof ResearchScreen ? ((ResearchScreen) Minecraft.getInstance().screen).getResearchGraphWidget().getCurrentGraph().nodes() : new HashSet<>();
+		return Minecraft.getInstance().screen instanceof ResearchScreen researchScreen ? researchScreen.getResearchGraphWidget().getCurrentGraph().nodes() : new HashSet<>();
 	}
 
 	/**

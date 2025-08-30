@@ -3,7 +3,7 @@ package com.portingdeadmods.researchd.datagen;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.registries.ResearchPacks;
-import com.portingdeadmods.researchd.registries.Researches;
+import com.portingdeadmods.researchd.registries.ResearchdResearches;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.data.PackOutput;
@@ -20,5 +20,5 @@ public final class DatapackRegistryProvider extends DatapackBuiltinEntriesProvid
     public static final RegistrySetBuilder BUILDER = new RegistrySetBuilder()
             // -- RESEARCH PACK --
             .add(ResearchdRegistries.RESEARCH_PACK_KEY, ResearchPacks::bootstrap)
-            .add(ResearchdRegistries.RESEARCH_KEY, Researches::bootstrap);
+            .add(ResearchdRegistries.RESEARCH_KEY, ResearchdResearches::bootstrap);
 }

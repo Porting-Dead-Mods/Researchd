@@ -34,7 +34,6 @@ public class ResearchCompletionProgress {
 			ResearchCompletionProgress::new
 	);
 
-
 	/**
 	 * Creates a new ResearchCompletionProgress with 0 progress and max progress of 1.0f.
 	 */
@@ -49,7 +48,6 @@ public class ResearchCompletionProgress {
 		this.progress = progress;
 		this.maxProgress = maxProgress;
 	}
-
 
 	/**
 	 * Progresses the research by the given amount.
@@ -92,4 +90,5 @@ public class ResearchCompletionProgress {
 	public boolean isComplete() {
 		return this.progress >= this.maxProgress;
 	}
+
 }

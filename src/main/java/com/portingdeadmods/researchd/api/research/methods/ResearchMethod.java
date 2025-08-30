@@ -1,9 +1,9 @@
-package com.portingdeadmods.researchd.api.research;
+package com.portingdeadmods.researchd.api.research.methods;
 
 import com.mojang.serialization.Codec;
-import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.client.research.ClientResearchMethod;
+import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
 import com.portingdeadmods.researchd.impl.research.ResearchCompletionProgress;
 import net.minecraft.network.chat.Component;

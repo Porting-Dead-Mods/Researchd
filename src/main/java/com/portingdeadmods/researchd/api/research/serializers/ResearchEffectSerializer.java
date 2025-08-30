@@ -1,8 +1,7 @@
 package com.portingdeadmods.researchd.api.research.serializers;
 
 import com.mojang.serialization.MapCodec;
-import com.portingdeadmods.researchd.api.research.ResearchEffect;
-import com.portingdeadmods.researchd.api.research.ResearchMethod;
+import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 

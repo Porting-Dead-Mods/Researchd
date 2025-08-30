@@ -3,17 +3,15 @@ package com.portingdeadmods.researchd.client.screens.widgets;
 import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.client.research.ClientResearchMethod;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
-import com.portingdeadmods.researchd.api.research.ResearchMethod;
+import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
-import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
-
-import java.util.Map;
 
 public class SelectedResearchWidget extends ResearchScreenWidget {
     private static final ResourceLocation BACKGROUND_TEXTURE = Researchd.rl("textures/gui/selected_research.png");
@@ -21,12 +19,11 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
     public static final int BACKGROUND_WIDTH = 174;
     public static final int BACKGROUND_HEIGHT = 72;
     private ResearchInstance selectedInstance;
-    private final Map<ResourceLocation, ResearchMethod> methods;
+    private ResearchMethod method;
     private int scrollOffset;
 
     public SelectedResearchWidget(int x, int y, int width, int height) {
         super(x, y, width, height);
-        this.methods = new Object2ObjectArrayMap<>();
     }
 
     @Override
@@ -37,24 +34,24 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
         int offsetY = (int) -(this.scrollOffset * 1.5f);
 
         if (this.selectedInstance != null) {
+            int padding = 3;
+
             Font font = Minecraft.getInstance().font;
             guiGraphics.drawString(font, Utils.registryTranslation(this.selectedInstance.getResearch()), 11, 49, -1);
             renderResearchPanel(guiGraphics, this.selectedInstance, 12, 60, mouseX, mouseY, 2, false);
 
-            guiGraphics.enableScissor(53, 60, 53 + 115, 55 + 48);
+            guiGraphics.enableScissor(53, 60, 53 + 115, 55 + 52);
 
             int lineHeight = font.lineHeight + 2;
-            guiGraphics.drawString(font, "Researched by", 56, offsetY + 62, -1, false);
+            guiGraphics.drawString(font, "Researched by", 53 + padding, offsetY + 62, -1);
 
-            int height = 0;
-            for (Map.Entry<ResourceLocation, ResearchMethod> entry : this.methods.entrySet()) {
-//                guiGraphics.drawString(font, Component.literal("Researched by"), 56, 57, -1, false);
-//                ClientResearchMethod clientMethod = method.getClientMethod();
-//                clientMethod.renderMethodTooltip(guiGraphics, entry.getValue(), 56, 57 + lineHeight, mouseX, mouseY);
-//                height += entry.getValue().isEmpty() ? 0 : entry.getValue().getFirst().getClientMethod().height();
-            }
+            int height = ClientResearchMethod.getSize(mouseX, mouseY, this.method).height;
+            ClientResearchMethod.renderMethodInfo(guiGraphics, 53 + padding, 62 + lineHeight + offsetY, mouseX, mouseY, this.method);
 
-            guiGraphics.drawString(font, "Effects", 56, offsetY + 57 + height + 32, -1, false);
+            int yPos = 76 + 4 + ClientResearchMethod.getSize(mouseX, mouseY, this.method).height + offsetY;
+            guiGraphics.fill(53, yPos, 53 + 78, yPos + 1, -1);
+
+            guiGraphics.drawString(font, "Effects", 56, offsetY + 57 + height + 28, -1);
 
             guiGraphics.disableScissor();
         }
@@ -74,10 +71,8 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
     public void setSelectedResearch(ResearchInstance instance) {
         this.selectedInstance = instance;
 
-        this.methods.clear();
         this.scrollOffset = 0;
-        ResearchMethod method = ResearchHelperCommon.getResearch(this.selectedInstance.getResearch(), Minecraft.getInstance().level.registryAccess()).researchMethod();
-        this.methods.put(method.id(), method);
+        this.method = ResearchHelperCommon.getResearch(this.selectedInstance.getResearch(), Minecraft.getInstance().level.registryAccess()).researchMethod();
     }
 
     public ResearchInstance getSelectedInstance() {

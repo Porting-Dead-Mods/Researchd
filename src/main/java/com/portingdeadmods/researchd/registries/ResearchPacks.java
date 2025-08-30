@@ -13,12 +13,15 @@ public final class ResearchPacks {
 	public static final ResourceKey<ResearchPack> END = key("end");
 
 	public static void bootstrap(BootstrapContext<ResearchPack> context) {
-		register(context, OVERWORLD, ResearchPack.Builder.of()
-				.color(FastColor.ARGB32.color(255, 0, 0)));
-		register(context, NETHER, ResearchPack.Builder.of()
-				.color(FastColor.ARGB32.color(0, 0, 255)));
-		register(context, END, ResearchPack.Builder.of()
-				.color(FastColor.ARGB32.color(0, 255, 0)));
+		register(context, OVERWORLD, ResearchPack.builder()
+				.color(255, 0, 0)
+		);
+		register(context, NETHER, ResearchPack.builder()
+				.color(0, 0, 255)
+		);
+		register(context, END, ResearchPack.builder()
+				.color(0, 255, 0)
+		);
 	}
 
 	private static void register(BootstrapContext<ResearchPack> context, ResourceKey<ResearchPack> key, ResearchPack.Builder builder) {

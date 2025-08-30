@@ -2,8 +2,7 @@ package com.portingdeadmods.researchd.content.predicates;
 
 import com.mojang.serialization.Codec;
 import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
-import com.portingdeadmods.researchd.api.research.ResearchEffectData;
-import com.portingdeadmods.researchd.utils.Codecs;
+import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
@@ -16,7 +15,7 @@ import java.util.Set;
 public record RecipePredicateData(Set<RecipeHolder<?>> blockedRecipes) implements ResearchEffectData<RecipePredicate> {
     public static final RecipePredicateData EMPTY = new RecipePredicateData(Collections.emptySet());
 
-    public static final Codec<RecipePredicateData> CODEC = CodecUtils.set(Codecs.RECIPE_HOLDER_CODEC).xmap(RecipePredicateData::new, RecipePredicateData::blockedRecipes);
+    public static final Codec<RecipePredicateData> CODEC = CodecUtils.set(CodecUtils.RECIPE_HOLDER_CODEC).xmap(RecipePredicateData::new, RecipePredicateData::blockedRecipes);
 
     public RecipePredicateData add(RecipePredicate recipe, Level level) {
         Set<RecipeHolder<?>> recipes = new HashSet<>(this.blockedRecipes());

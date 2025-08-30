@@ -1,9 +1,7 @@
-package com.portingdeadmods.researchd.utils.researches.data;
+package com.portingdeadmods.researchd.api.data;
 
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
-import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.LinkedHashSet;

@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.utils.researches.data;
+package com.portingdeadmods.researchd.api.data;
 
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;

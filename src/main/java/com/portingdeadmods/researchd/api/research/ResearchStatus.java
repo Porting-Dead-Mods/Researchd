@@ -12,6 +12,7 @@ public enum ResearchStatus {
     private final ResourceLocation spriteSmallTexture;
     private final ResourceLocation spriteTexture;
     private final ResourceLocation spriteTallTexture;
+    private final int sortingValue;
 
     /**
      * @param spriteTexture The texture name without the file extension.
@@ -21,6 +22,7 @@ public enum ResearchStatus {
         this.spriteSmallTexture = Researchd.rl("textures/gui/sprites/" + spriteTexture + "_small.png");
         this.spriteTexture = Researchd.rl("textures/gui/sprites/" + spriteTexture + ".png");
         this.spriteTallTexture = Researchd.rl("textures/gui/sprites/" + spriteTexture + "_tall.png");
+        this.sortingValue = sortingValue;
     }
 
     public ResourceLocation getSpriteTexture() {
@@ -36,10 +38,6 @@ public enum ResearchStatus {
     }
 
     public int getSortingValue() {
-        return switch (this) {
-            case RESEARCHED -> 3;
-            case RESEARCHABLE -> 1;
-            case LOCKED -> 2;
-        };
+        return this.sortingValue;
     }
 }

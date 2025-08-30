@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.utils.researches.data;
+package com.portingdeadmods.researchd.api.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -26,7 +26,6 @@ public final class ResearchQueue implements Iterable<ResearchInstance> {
             ResearchQueue::getResearchProgress,
             ResearchQueue::new
     );
-    // TODO: Make this configurable
     public static final IntSupplier QUEUE_LENGTH = () -> ResearchdCommonConfig.researchQueueLength;
 
     private final List<ResearchInstance> entries;

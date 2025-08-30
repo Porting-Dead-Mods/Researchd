@@ -1,9 +1,8 @@
 package com.portingdeadmods.researchd.client.utils;
 
 import com.mojang.authlib.GameProfile;
-import com.portingdeadmods.researchd.data.helper.ResearchTeam;
+import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;

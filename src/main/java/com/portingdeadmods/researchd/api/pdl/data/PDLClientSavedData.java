@@ -1,8 +1,7 @@
-package com.portingdeadmods.researchd.api.data;
+package com.portingdeadmods.researchd.api.pdl.data;
 
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
