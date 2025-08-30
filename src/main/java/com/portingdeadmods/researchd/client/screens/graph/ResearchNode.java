@@ -48,6 +48,10 @@ public class ResearchNode extends AbstractWidget {
         this.doMovementLogic = true;
     }
 
+    public void setHovered(GuiGraphics guiGraphics, int x, int y, int width, int height, int mouseX, int mouseY) {
+        this.isHovered = guiGraphics.containsPointInScissor(mouseX, mouseY) && mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
+    }
+
     public void addChild(ResearchNode child) {
         this.children.addLast(child);
     }

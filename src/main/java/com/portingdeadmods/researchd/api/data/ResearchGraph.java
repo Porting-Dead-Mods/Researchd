@@ -41,6 +41,7 @@ public record ResearchGraph(ResearchNode rootNode, Set<ResearchNode> parents, Se
         return new ResearchGraph(rootNode, parents, new LinkedHashSet<>());
     }
 
+    // FIXME: Maybe we need to copy parent... idk
     private static void cleanupParentsChildNodes(ResearchNode rootNode, Set<ResearchNode> parents) {
         for (ResearchNode parent : rootNode.getParents()) {
             ResearchNode parentNode = parent.copy();

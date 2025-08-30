@@ -1,9 +1,12 @@
 package com.portingdeadmods.researchd.client.screens.widgets;
 
+import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.cache.ClientResearchCache;
+import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.screens.graph.GraphLayoutManager;
 import com.portingdeadmods.researchd.client.screens.graph.GraphStateManager;
@@ -18,6 +21,7 @@ import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -38,45 +42,48 @@ import static com.portingdeadmods.researchd.client.screens.ResearchScreenWidget.
 public class ResearchGraphWidget extends AbstractWidget {
     private @Nullable ResearchGraph graph;
     private List<Layer> layers;
-    private Map<ResearchNode, ArrayList<ResearchLine>> researchLines = new HashMap<>();
+    private final Map<ResearchNode, ArrayList<ResearchLine>> researchLines;
 
-    private final SelectedResearchWidget selectedResearchWidget;
+    private final ResearchScreen researchScreen;
 
-    public ResearchGraphWidget(SelectedResearchWidget selectedResearchWidget, int x, int y, int width, int height) {
+    public ResearchGraphWidget(ResearchScreen researchScreen, int x, int y, int width, int height) {
         super(x, y, width, height, Component.empty());
         this.layers = new ArrayList<>();
-        this.selectedResearchWidget = selectedResearchWidget;
+        this.researchScreen = researchScreen;
+        this.researchLines = new HashMap<>();
     }
 
     /**
      * Set the graph to be displayed, applying layout if needed and calculating connection lines
      */
     public void setGraph(ResearchGraph graph) {
-        this.graph = graph;
-        this.researchLines.clear();
+        if (this.graph != graph) {
+            this.graph = graph;
+            this.researchLines.clear();
 
-        if (graph == null || graph.nodes().isEmpty()) {
-            return;
+            if (graph == null || graph.nodes().isEmpty()) {
+                return;
+            }
+
+            // Try to restore the complete layout for this exact graph view
+            boolean layoutRestored = GraphStateManager.getInstance().tryRestoreLastSessionState(graph);
+
+            if (!layoutRestored) {
+                // If we don't have a cached layout for this exact view,
+                // apply our layout manager to position all nodes
+                GraphLayoutManager.applyLayout(graph, getX() + 10, getY() + 10);
+            } else {
+                // Don't do anything if we restored the layout
+            }
+
+            for (ResearchNode node : graph.nodes()) {
+                node.refreshHeads();
+            }
+
+            // Always calculate connection lines after positions are finalized
+            //TODO: REWORK AND REENABLE LINE GENERATION AFTER FINISHING NODE POSITIONING
+            calculateLines();
         }
-
-        // Try to restore the complete layout for this exact graph view
-        boolean layoutRestored = GraphStateManager.getInstance().tryRestoreLastSessionState(graph);
-
-        if (!layoutRestored) {
-            // If we don't have a cached layout for this exact view,
-            // apply our layout manager to position all nodes
-            GraphLayoutManager.applyLayout(graph, getX() + 10, getY() + 10);
-        } else {
-            // Don't do anything if we restored the layout
-        }
-
-        for (ResearchNode node : graph.nodes()) {
-            node.refreshHeads();
-        }
-
-        // Always calculate connection lines after positions are finalized
-        //TODO: REWORK AND REENABLE LINE GENERATION AFTER FINISHING NODE POSITIONING
-        calculateLines();
     }
 
     private void calculateLines() {
@@ -564,6 +571,7 @@ public class ResearchGraphWidget extends AbstractWidget {
                 int scaledX = (int) (centerX - (width * scale) / 2f);
                 int scaledY = (int) (centerY - (height * scale) / 2f);
 
+                node.setHovered(guiGraphics, scaledX, scaledY, (int) (20 * scale), (int) (24 * scale), mouseX, mouseY);
                 ResearchScreenWidget.renderResearchPanel(
                         guiGraphics,
                         node.getInstance(),
@@ -596,10 +604,23 @@ public class ResearchGraphWidget extends AbstractWidget {
         for (ResearchNode node : this.graph.nodes()) {
             if (node.isHovered()) {
                 Minecraft minecraft = Minecraft.getInstance();
-                guiGraphics.renderComponentTooltip(minecraft.font, List.of(
-                        Utils.registryTranslation(node.getInstance().getResearch()),
-                        Component.translatable("research_desc." + Researchd.MODID + "." + node.getInstance().getResearch().location().getPath())
-                ), mouseX, mouseY);
+                // Debug tooltip
+                if (SharedConstants.IS_RUNNING_IN_IDE && !ResearchScreen.hasControlDown()) {
+                    guiGraphics.renderComponentTooltip(minecraft.font, List.of(
+                            Utils.registryTranslation(node.getInstance().getResearch()),
+                            Component.translatable("research_desc." + Researchd.MODID + "." + node.getInstance().getResearch().location().getPath()),
+                            SharedConstants.IS_RUNNING_IN_IDE ? Component.literal("Press Ctrl for debug info") : Component.empty()
+                    ), mouseX, mouseY);
+                } else {
+                    guiGraphics.renderComponentTooltip(minecraft.font, List.of(
+                            Utils.registryTranslation(node.getInstance().getResearch()),
+                            Component.literal("x: %d, y: %d".formatted(node.getX(), node.getY())),
+                            Component.literal("w: %d, h: %d".formatted(node.getWidth(), node.getHeight())),
+                            Component.literal("hovered: %s".formatted(node.isHovered())),
+                            Component.literal("%d parents".formatted(node.getParents().size())),
+                            Component.literal("%d children".formatted(node.getChildren().size()))
+                    ), mouseX, mouseY);
+                }
                 break;
             }
         }
@@ -617,8 +638,10 @@ public class ResearchGraphWidget extends AbstractWidget {
         
         for (ResearchNode node : this.graph.nodes()) {
             if (node.isHovered()) {
-                this.selectedResearchWidget.setSelectedResearch(node.getInstance());
                 this.setGraph(ResearchGraphCache.computeIfAbsent(Minecraft.getInstance().player, node.getInstance().getResearch()));
+                UniqueArray<ResearchInstance> entries = this.researchScreen.getTechList().entries();
+                this.researchScreen.getSelectedResearchWidget().setSelectedResearch(entries.get(entries.indexOf(node.getInstance())));
+                this.researchScreen.prevSelectedResearchMethodWidget = this.researchScreen.getSelectedResearchWidget().methodWidget;
                 return super.mouseClicked(mouseX, mouseY, button);
             }
         }

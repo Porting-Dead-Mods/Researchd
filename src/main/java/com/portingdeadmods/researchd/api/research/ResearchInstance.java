@@ -91,6 +91,7 @@ public final class ResearchInstance {
         return new ResearchInstance(getResearch(), ResearchStatus.values()[getResearchStatus().ordinal()]);
     }
 
+    // TODO: might want to compare the research time idk
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof ResearchInstance instance)) return false;

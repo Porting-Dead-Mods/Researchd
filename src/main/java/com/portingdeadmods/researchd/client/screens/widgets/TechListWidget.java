@@ -146,6 +146,7 @@ public class TechListWidget extends ResearchScreenWidget {
 
             int index = indexY * this.cols + indexX;
             if (index < this.techList.entries().size()) {
+                this.screen.prevSelectedResearchMethodWidget = this.screen.getSelectedResearchWidget().methodWidget;
                 ResearchInstance instance = this.techList.entries().get(index);
                 this.screen.getResearchGraphWidget().setGraph(ResearchGraphCache.computeIfAbsent(Minecraft.getInstance().player, instance.getResearch()));
                 this.screen.getSelectedResearchWidget().setSelectedResearch(instance);

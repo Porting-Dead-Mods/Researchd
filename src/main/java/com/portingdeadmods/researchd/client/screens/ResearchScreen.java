@@ -12,6 +12,7 @@ import com.portingdeadmods.researchd.api.data.ResearchGraph;
 import com.portingdeadmods.researchd.api.data.TechList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -35,6 +36,9 @@ public class ResearchScreen extends Screen {
     private final ResearchGraphWidget researchGraphWidget;
     private final SelectedResearchWidget selectedResearchWidget;
 
+    // Used to delete the previous selected method widget
+    public AbstractWidget prevSelectedResearchMethodWidget;
+
     public ResearchScreen() {
         super(Component.translatable("screen.researchd.research"));
 
@@ -52,7 +56,7 @@ public class ResearchScreen extends Screen {
 
         // GRAPH
         int x = 174;
-        this.researchGraphWidget = new ResearchGraphWidget(selectedResearchWidget, x, 8, 300, 253 - 16);
+        this.researchGraphWidget = new ResearchGraphWidget(this, x, 8, 300, 253 - 16);
         Minecraft mc = Minecraft.getInstance();
         if (ClientResearchCache.ROOT_NODE != null) {
             this.researchGraphWidget.setGraph(ResearchGraph.fromRootNode(mc.player, ClientResearchCache.ROOT_NODE));
@@ -105,12 +109,17 @@ public class ResearchScreen extends Screen {
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         this.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
 
-        for(Renderable renderable : this.renderables) {
+        for (Renderable renderable : this.renderables) {
             renderable.render(guiGraphics, mouseX, mouseY, partialTick);
 
             if (renderable instanceof AbstractResearchInfoWidget<?> infoWidget) {
                 infoWidget.renderTooltip(guiGraphics, mouseX, mouseY, partialTick);
             }
+        }
+
+        if (prevSelectedResearchMethodWidget != null) {
+            this.invalidateSelectedResearch();
+            this.prevSelectedResearchMethodWidget = null;
         }
 
     }
@@ -137,6 +146,11 @@ public class ResearchScreen extends Screen {
         return this.techListWidget.getTechList();
     }
 
+    public void invalidateSelectedResearch() {
+        this.prevSelectedResearchMethodWidget.visitWidgets(this::removeWidget);
+        this.getSelectedResearchWidget().methodWidget.visitWidgets(this::addRenderableWidget);
+    }
+
     @Override
     public void onClose() {
         super.onClose();
@@ -146,4 +160,11 @@ public class ResearchScreen extends Screen {
             this.researchGraphWidget.onClose();
         }
     }
+
+    public enum InvalidateType {
+        ADD,
+        REMOVE,
+        NONE,
+    }
+
 }

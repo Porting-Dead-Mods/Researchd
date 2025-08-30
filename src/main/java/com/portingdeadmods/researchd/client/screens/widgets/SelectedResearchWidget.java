@@ -9,11 +9,16 @@ import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
+import com.portingdeadmods.researchd.utils.WidgetConstructor;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.function.Consumer;
@@ -24,8 +29,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
     public static final int BACKGROUND_WIDTH = 174;
     public static final int BACKGROUND_HEIGHT = 72;
     private ResearchInstance selectedInstance;
-    private ResearchMethod method;
-    private AbstractResearchInfoWidget<? extends ResearchMethod> methodWidget;
+    public AbstractWidget methodWidget;
     private int scrollOffset;
 
     public SelectedResearchWidget(int x, int y, int width, int height) {
@@ -71,14 +75,25 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
     }
 
     public void setSelectedResearch(ResearchInstance instance) {
-        this.selectedInstance = instance;
+        if (this.selectedInstance != instance) {
+            this.selectedInstance = instance;
 
-        Font font = Minecraft.getInstance().font;
-        int padding = 3;
+            // only call after first setting selected research
 
-        this.scrollOffset = 0;
-        this.method = ResearchHelperCommon.getResearch(this.selectedInstance.getResearch(), Minecraft.getInstance().level.registryAccess()).researchMethod();
-        this.methodWidget = ResearchdClient.RESEARCH_METHOD_WIDGETS.get(this.method.id()).create(this.method, 53 + padding, 62 + font.lineHeight);
+            Font font = Minecraft.getInstance().font;
+            int padding = 3;
+
+            this.scrollOffset = 0;
+            ResearchMethod method = ResearchHelperCommon.getResearch(this.selectedInstance.getResearch(), Minecraft.getInstance().level.registryAccess()).researchMethod();
+            WidgetConstructor<? extends ResearchMethod> widgetConstructor = ResearchdClient.RESEARCH_METHOD_WIDGETS.get(method.id());
+            if (widgetConstructor != null) {
+                this.methodWidget = widgetConstructor.create(method, 53 + padding, 62 + font.lineHeight + 4);
+            } else {
+                // in case the dev didn't implement a widget for the research method, we scream at them
+                MutableComponent message = Component.literal("!!%s does not have info widget!!".formatted(method.id().toString())).withStyle(ChatFormatting.RED);
+                this.methodWidget = new StringWidget(53 + padding + 1, 62 + font.lineHeight + 4, font.width(message), font.lineHeight + 2, message, font);
+            }
+        }
     }
 
     public ResearchInstance getSelectedInstance() {

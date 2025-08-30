@@ -63,7 +63,7 @@ public abstract class ResearchScreenWidget extends AbstractWidget {
         }
         poseStack.popPose();
 
-        if (isHovering(guiGraphics, x, y, mouseX, mouseY, (int) scale) && hoverable) {
+        if (isHovering(guiGraphics, x, y, mouseX, mouseY, scale) && hoverable) {
             int color = -2130706433;
             guiGraphics.fillGradient(RenderType.guiOverlay(), x, y, (int) (x + 20 * scale), (int) (y + 20 * scale), color, color, 0);
         }
@@ -99,7 +99,7 @@ public abstract class ResearchScreenWidget extends AbstractWidget {
         return isHovering(guiGraphics, x, y, mouseX, mouseY, 1);
     }
 
-    public static boolean isHovering(@Nullable GuiGraphics guiGraphics, int x, int y, int mouseX, int mouseY, int scale) {
+    public static boolean isHovering(@Nullable GuiGraphics guiGraphics, int x, int y, int mouseX, int mouseY, float scale) {
         return (guiGraphics == null || guiGraphics.containsPointInScissor(mouseX, mouseY))
                 && mouseX >= x
                 && mouseY >= y
