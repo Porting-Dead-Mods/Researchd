@@ -6,12 +6,12 @@ import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.team.ResearchTeamScreen;
-import com.portingdeadmods.researchd.content.predicates.RecipePredicateData;
+import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.api.data.ResearchProgress;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
-import com.portingdeadmods.researchd.impl.research.ResearchPack;
+import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.api.data.ResearchQueue;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -71,7 +71,7 @@ public final class ResearchdClientEvents {
 		LocalPlayer player = (LocalPlayer) event.getEntity();
 		Item item = event.getItemStack().getItem();
 
-		RecipePredicateData recipeData = player.getData(ResearchdAttachments.RECIPE_PREDICATE.get());
+		RecipeUnlockEffectData recipeData = player.getData(ResearchdAttachments.RECIPE_PREDICATE.get());
 		UniqueArray<Item> blockedItems = new UniqueArray<>();
 
 		recipeData.blockedRecipes().forEach(recipe -> {
@@ -88,7 +88,7 @@ public final class ResearchdClientEvents {
 	public static void onClientPlayerLoggingIn(ClientPlayerNetworkEvent.LoggingIn event) {
 		LocalPlayer player = event.getPlayer();
 		RegistryAccess registryAccess = player.registryAccess();
-		HolderLookup.RegistryLookup<ResearchPack> packs = registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY);
+		HolderLookup.RegistryLookup<SimpleResearchPack> packs = registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY);
 
 		if (Researchd.RESEARCH_PACKS.isEmpty()) {
 			Researchd.RESEARCH_PACKS.addAll(packs.listElements().map(Holder.Reference::value).toList());

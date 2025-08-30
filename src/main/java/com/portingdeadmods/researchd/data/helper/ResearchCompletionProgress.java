@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.impl.research;
+package com.portingdeadmods.researchd.data.helper;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -7,7 +7,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
 /**
- * An utility class to track the progress of a single research. Has utility methods for client rendering
+ * A utility class to track the progress of a single research. Has utility methods for client rendering
  */
 public class ResearchCompletionProgress {
 	private float progress;
@@ -37,7 +37,7 @@ public class ResearchCompletionProgress {
 	/**
 	 * Creates a new ResearchCompletionProgress with 0 progress and max progress of 1.0f.
 	 */
-	public static ResearchCompletionProgress ONE() { return new ResearchCompletionProgress(0f, 1.0f); }
+	public static ResearchCompletionProgress one() { return new ResearchCompletionProgress(0f, 1.0f); }
 
 	public ResearchCompletionProgress(float maxProgress) {
 		this.progress = 0f;

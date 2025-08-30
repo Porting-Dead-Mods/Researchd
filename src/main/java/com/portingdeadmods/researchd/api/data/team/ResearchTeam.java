@@ -8,7 +8,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.data.ResearchProgress;
 import com.portingdeadmods.researchd.api.data.ResearchQueue;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.impl.research.ResearchCompletionProgress;
+import com.portingdeadmods.researchd.data.helper.ResearchCompletionProgress;
 import com.portingdeadmods.researchd.utils.TimeUtils;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.ChatFormatting;
@@ -191,8 +191,7 @@ public class ResearchTeam {
 	}
 
 	public void removeMember(UUID uuid) {
-		if (members.contains(uuid))
-			members.remove(uuid);
+        members.remove(uuid);
 	}
 
 	public void addModerator(UUID uuid) {

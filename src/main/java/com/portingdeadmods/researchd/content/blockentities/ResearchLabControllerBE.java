@@ -15,8 +15,8 @@ import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
 import com.portingdeadmods.researchd.api.data.ResearchProgress;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
-import com.portingdeadmods.researchd.impl.research.ResearchCompletionProgress;
-import com.portingdeadmods.researchd.impl.research.ResearchPack;
+import com.portingdeadmods.researchd.data.helper.ResearchCompletionProgress;
+import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
 import com.portingdeadmods.researchd.registries.ResearchdBlockEntityTypes;
 import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
 
 public class ResearchLabControllerBE extends ContainerBlockEntity implements MenuProvider {
 	public LazyFinal<List<BlockPos>> partPos = LazyFinal.create();
-	public Map<ResourceKey<ResearchPack>, Float> researchPackUsage = Researchd.RESEARCH_PACK_REGISTRY.getOrThrow().listElementIds()
+	public Map<ResourceKey<SimpleResearchPack>, Float> researchPackUsage = Researchd.RESEARCH_PACK_REGISTRY.getOrThrow().listElementIds()
 			.collect(Collectors.toConcurrentMap(key -> key, k -> 0f)); // Usage is between 0 and 1. It decreases with 1/DURATION per tick.
 	public int currentResearchDuration = -1; // Just initialized to -1
 
@@ -67,15 +67,15 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
 			}
 
 			ResearchPackComponent component = stack.get(ResearchdDataComponents.RESEARCH_PACK);
-			Optional<ResourceKey<ResearchPack>> optKey = component.researchPackKey();
+			Optional<ResourceKey<SimpleResearchPack>> optKey = component.researchPackKey();
 			if (optKey.isEmpty()) {
 				Researchd.debug("Research Lab Item Handler", "Component present, but no researchPackKey was found at idx: ", idx);
 				return false;
 			}
-			ResourceKey<ResearchPack> key = optKey.get();
+			ResourceKey<SimpleResearchPack> key = optKey.get();
 
-			ResearchPack expectedPack = Researchd.RESEARCH_PACKS.get(idx);
-			ResearchPack actualPack = Researchd.RESEARCH_PACK_REGISTRY.get().getOrThrow(key).value();
+			SimpleResearchPack expectedPack = Researchd.RESEARCH_PACKS.get(idx);
+			SimpleResearchPack actualPack = Researchd.RESEARCH_PACK_REGISTRY.get().getOrThrow(key).value();
 			boolean matches = expectedPack.equals(actualPack);
 			Researchd.debug("Research Lab Item Handler", "Expected: ", expectedPack, " Actual: ", actualPack, " Match: ", matches, " at idx: ", idx);
 			return matches;
@@ -83,8 +83,8 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
 	}
 
 	// Param passed is not mutated.
-	private boolean containsNecessaryPacks(List<ResourceKey<ResearchPack>> _packs) {
-		List<ResourceKey<ResearchPack>> packs = new ArrayList<>(_packs);
+	private boolean containsNecessaryPacks(List<ResourceKey<SimpleResearchPack>> _packs) {
+		List<ResourceKey<SimpleResearchPack>> packs = new ArrayList<>(_packs);
 
 		IItemHandler handler = getItemHandler();
 		for (int i = 0; i < handler.getSlots(); i++) {
@@ -92,7 +92,7 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
 			if (stack.isEmpty() || !(stack.getItem() instanceof ResearchPackItem)) continue;
 
 			ResearchPackComponent component = stack.get(ResearchdDataComponents.RESEARCH_PACK);
-			ResourceKey<ResearchPack> key = component.researchPackKey().get(); // Placing item into a lab slot condition alr makes it such that key is present
+			ResourceKey<SimpleResearchPack> key = component.researchPackKey().get(); // Placing item into a lab slot condition alr makes it such that key is present
 
 			if (packs.contains(key) || researchPackUsage.getOrDefault(key, 0f) > 0) {
 				packs.remove(key);
@@ -102,14 +102,14 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
 		return packs.isEmpty();
 	}
 
-	private void decreaseNecessaryPackCount(List<ResourceKey<ResearchPack>> packs) {
+	private void decreaseNecessaryPackCount(List<ResourceKey<SimpleResearchPack>> packs) {
 		IItemHandler handler = getItemHandler();
 		for (int i = 0; i < handler.getSlots(); i++) {
 			ItemStack stack = handler.getStackInSlot(i);
 			if (stack.isEmpty() || !(stack.getItem() instanceof ResearchPackItem)) continue;
 
 			ResearchPackComponent component = stack.get(ResearchdDataComponents.RESEARCH_PACK);
-			ResourceKey<ResearchPack> key = component.researchPackKey().get(); // Placing item into a lab slot condition alr makes it such that key is present
+			ResourceKey<SimpleResearchPack> key = component.researchPackKey().get(); // Placing item into a lab slot condition alr makes it such that key is present
 
 			if (packs.contains(key) && (researchPackUsage.getOrDefault(key, 0f) == 0)) { // Only decrease if the pack is necessary and not already used
 				stack.shrink(1);
@@ -118,8 +118,8 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
 		}
 	}
 
-	private void progressResearch(List<ResourceKey<ResearchPack>> packs, ResearchCompletionProgress researchProgress) {
-		for (ResourceKey<ResearchPack> pack : packs) {
+	private void progressResearch(List<ResourceKey<SimpleResearchPack>> packs, ResearchCompletionProgress researchProgress) {
+		for (ResourceKey<SimpleResearchPack> pack : packs) {
 			researchPackUsage.put(pack, Math.max(researchPackUsage.get(pack) - (1f / this.currentResearchDuration), 0f));
 		}
 
@@ -140,7 +140,7 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
 		ResearchMethod method = currentResearch.researchMethod();
 
 		if (!(method instanceof ConsumePackResearchMethod packMethod)) return;
-		List<ResourceKey<ResearchPack>> packs = packMethod.packs();
+		List<ResourceKey<SimpleResearchPack>> packs = packMethod.packs();
 		this.currentResearchDuration = packMethod.duration();
 
 		if (!this.containsNecessaryPacks(packs)) return;
@@ -154,8 +154,8 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
 			tag.putLongArray("PartPositions", pos.stream().mapToLong(BlockPos::asLong).toArray());
 		});
 
-		for (Map.Entry<ResourceKey<ResearchPack>, Float> entry : researchPackUsage.entrySet()) {
-			ResourceKey<ResearchPack> key = entry.getKey();
+		for (Map.Entry<ResourceKey<SimpleResearchPack>, Float> entry : researchPackUsage.entrySet()) {
+			ResourceKey<SimpleResearchPack> key = entry.getKey();
 			float usage = entry.getValue();
 			tag.putFloat(key.location().toString(), usage);
 		}
@@ -174,7 +174,7 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
 			this.setPartPositions(positions);
 		}
 
-		for (ResourceKey<ResearchPack> key : Researchd.RESEARCH_PACK_REGISTRY.getOrThrow().listElementIds().toList()) {
+		for (ResourceKey<SimpleResearchPack> key : Researchd.RESEARCH_PACK_REGISTRY.getOrThrow().listElementIds().toList()) {
 			if (tag.contains(key.location().toString())) {
 				float usage = tag.getFloat(key.location().toString());
 				researchPackUsage.put(key, usage);

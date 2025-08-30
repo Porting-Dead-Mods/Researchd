@@ -4,7 +4,7 @@ import com.portingdeadmods.portingdeadlibs.api.client.screens.PDLAbstractContain
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.content.menus.ResearchLabMenu;
-import com.portingdeadmods.researchd.impl.research.ResearchPack;
+import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -107,8 +107,8 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
 	 * @param guiGraphics GuiGraphics instance for drawing
 	 */
 	private void drawBars(GuiGraphics guiGraphics) {
-		for (Map.Entry<ResourceKey<ResearchPack>, Float> entry : this.menu.blockEntity.researchPackUsage.entrySet()) {
-			ResearchPack pack = Researchd.RESEARCH_PACK_REGISTRY.getOrThrow().get(entry.getKey()).get().value(); // Safe usage of Optional
+		for (Map.Entry<ResourceKey<SimpleResearchPack>, Float> entry : this.menu.blockEntity.researchPackUsage.entrySet()) {
+			SimpleResearchPack pack = Researchd.RESEARCH_PACK_REGISTRY.getOrThrow().get(entry.getKey()).get().value(); // Safe usage of Optional
 			int idx = Researchd.RESEARCH_PACKS.indexOf(pack);
 			Point slotPos = this.menu.getSlotPositions().get(idx);
 			float usage = entry.getValue();

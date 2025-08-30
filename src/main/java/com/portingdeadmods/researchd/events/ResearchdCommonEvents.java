@@ -13,8 +13,8 @@ import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.api.data.ResearchProgress;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
-import com.portingdeadmods.researchd.impl.research.ResearchCompletionProgress;
-import com.portingdeadmods.researchd.impl.research.ResearchPack;
+import com.portingdeadmods.researchd.data.helper.ResearchCompletionProgress;
+import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.networking.SyncSavedDataPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchCompleteProgressSyncPayload;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
@@ -145,7 +145,7 @@ public final class ResearchdCommonEvents {
     public static void onServerAboutToStart(ServerAboutToStartEvent event) {
         MinecraftServer server = event.getServer();
         RegistryAccess registryAccess = server.registryAccess();
-        HolderLookup.RegistryLookup<ResearchPack> packs = registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY);
+        HolderLookup.RegistryLookup<SimpleResearchPack> packs = registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY);
 
         if (!Researchd.RESEARCH_PACKS.isEmpty()) {
             Researchd.RESEARCH_PACKS.addAll(packs.listElements().map(Holder.Reference::value).toList());

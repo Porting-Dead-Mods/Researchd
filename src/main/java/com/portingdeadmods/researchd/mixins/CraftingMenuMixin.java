@@ -1,8 +1,7 @@
 package com.portingdeadmods.researchd.mixins;
 
-import com.llamalad7.mixinextras.sugar.Local;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.content.predicates.RecipePredicateData;
+import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
@@ -29,7 +28,7 @@ public abstract class CraftingMenuMixin {
             ordinal = 0
     )
     private static ItemStack checkCraftingPredicate(ItemStack itemstack, AbstractContainerMenu menu, Level level, Player player, CraftingContainer craftSlots, ResultContainer resultSlots, RecipeHolder<CraftingRecipe> recipe) {
-        RecipePredicateData data = player.getData(ResearchdAttachments.RECIPE_PREDICATE);
+        RecipeUnlockEffectData data = player.getData(ResearchdAttachments.RECIPE_PREDICATE);
 
         CraftingInput craftinginput = craftSlots.asCraftInput();
         Optional<RecipeHolder<CraftingRecipe>> recipeHolder = level.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftinginput, level, recipe);

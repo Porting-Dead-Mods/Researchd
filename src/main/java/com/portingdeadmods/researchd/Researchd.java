@@ -4,32 +4,20 @@ import com.mojang.logging.LogUtils;
 import com.portingdeadmods.portingdeadlibs.utils.LazyFinal;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.client.cache.ClientResearchCache;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
-import com.portingdeadmods.researchd.impl.research.ResearchPack;
+import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.registries.*;
 import com.portingdeadmods.researchd.registries.serializers.ResearchEffectSerializers;
 import com.portingdeadmods.researchd.registries.serializers.ResearchMethodSerializers;
 import com.portingdeadmods.researchd.registries.serializers.ResearchSerializers;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
 import org.slf4j.Logger;
@@ -41,8 +29,8 @@ public class Researchd {
 
     // Static Variables
     public static final LazyFinal<Integer> RESEARCH_PACK_COUNT = LazyFinal.create();
-    public static final UniqueArray<ResearchPack> RESEARCH_PACKS = new UniqueArray<>();
-    public static final LazyFinal<HolderLookup.RegistryLookup<ResearchPack>> RESEARCH_PACK_REGISTRY = LazyFinal.create();
+    public static final UniqueArray<SimpleResearchPack> RESEARCH_PACKS = new UniqueArray<>();
+    public static final LazyFinal<HolderLookup.RegistryLookup<SimpleResearchPack>> RESEARCH_PACK_REGISTRY = LazyFinal.create();
 
     public static final Logger LOGGER = LogUtils.getLogger();
 
@@ -98,7 +86,7 @@ public class Researchd {
 
     private void registerDatapackRegistries(DataPackRegistryEvent.NewRegistry event) {
         event.dataPackRegistry(ResearchdRegistries.RESEARCH_KEY, Research.CODEC, Research.CODEC);
-        event.dataPackRegistry(ResearchdRegistries.RESEARCH_PACK_KEY, ResearchPack.CODEC, ResearchPack.CODEC);
+        event.dataPackRegistry(ResearchdRegistries.RESEARCH_PACK_KEY, SimpleResearchPack.CODEC, SimpleResearchPack.CODEC);
     }
 
     public static ResourceLocation rl(String path) {

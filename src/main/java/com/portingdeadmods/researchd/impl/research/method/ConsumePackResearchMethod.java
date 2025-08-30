@@ -9,8 +9,8 @@ import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
 import com.portingdeadmods.researchd.client.impl.methods.ClientConsumePackResearchMethod;
-import com.portingdeadmods.researchd.impl.research.ResearchCompletionProgress;
-import com.portingdeadmods.researchd.impl.research.ResearchPack;
+import com.portingdeadmods.researchd.data.helper.ResearchCompletionProgress;
+import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
 import com.portingdeadmods.researchd.registries.ResearchdItems;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -32,7 +32,7 @@ import java.util.Optional;
  * @param count The amount of packs that will be used
  * @param duration The duration in ticks for a *base speed* machine to use 1 packs o' packs.
  */
-public record ConsumePackResearchMethod(List<ResourceKey<ResearchPack>> packs, int count, int duration) implements ResearchMethod {
+public record ConsumePackResearchMethod(List<ResourceKey<SimpleResearchPack>> packs, int count, int duration) implements ResearchMethod {
     public static final ResourceLocation ID = Researchd.rl("consume_pack");
 
     @Override
@@ -52,7 +52,7 @@ public record ConsumePackResearchMethod(List<ResourceKey<ResearchPack>> packs, i
 
     public List<ItemStack> asStacks() {
         List<ItemStack> stacks = new ArrayList<>();
-        for (ResourceKey<ResearchPack> pack : this.packs) {
+        for (ResourceKey<SimpleResearchPack> pack : this.packs) {
             ItemStack stack = ResearchdItems.RESEARCH_PACK.toStack();
             stack.set(ResearchdDataComponents.RESEARCH_PACK, new ResearchPackComponent(Optional.of(pack)));
             stacks.add(stack);
@@ -78,7 +78,7 @@ public record ConsumePackResearchMethod(List<ResourceKey<ResearchPack>> packs, i
     public static final class Serializer implements ResearchMethodSerializer<ConsumePackResearchMethod> {
         public static final Serializer INSTANCE = new ConsumePackResearchMethod.Serializer();
         public static final MapCodec<ConsumePackResearchMethod> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                Codec.list(ResearchPack.RESOURCE_KEY_CODEC).fieldOf("packs").forGetter(ConsumePackResearchMethod::packs),
+                Codec.list(SimpleResearchPack.RESOURCE_KEY_CODEC).fieldOf("packs").forGetter(ConsumePackResearchMethod::packs),
                 Codec.INT.fieldOf("count").forGetter(ConsumePackResearchMethod::count),
                 Codec.INT.fieldOf("duration").forGetter(ConsumePackResearchMethod::duration)
         ).apply(instance, ConsumePackResearchMethod::new));

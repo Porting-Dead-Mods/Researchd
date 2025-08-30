@@ -4,7 +4,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
-import com.portingdeadmods.researchd.content.predicates.RecipePredicate;
+import com.portingdeadmods.researchd.impl.research.effect.RecipeUnlockEffect;
 import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
@@ -30,7 +30,7 @@ public final class ResearchdResearches {
                     or(new ConsumeItemResearchMethod(Ingredient.of(Items.DIRT), 8), new ConsumeItemResearchMethod(Ingredient.of(Items.WHEAT_SEEDS), 2), new ConsumeItemResearchMethod(Ingredient.of(Items.BROWN_MUSHROOM), 2))
             )
             .researchEffects(
-                    new RecipePredicate(ResourceLocation.withDefaultNamespace("anvil"))
+                    new RecipeUnlockEffect(ResourceLocation.withDefaultNamespace("anvil"))
             ));
     public static final ResourceKey<Research> STICK = register("stick", builder -> builder
             .icon(Items.STICK)
@@ -47,8 +47,8 @@ public final class ResearchdResearches {
                      * minecraft:rarity -> COMMON
                      */
                     List.of(
-                            new RecipePredicate(ResourceLocation.parse("minecraft:stick_from_bamboo_item")),
-                            new RecipePredicate(ResourceLocation.parse("minecraft:stick"))
+                            new RecipeUnlockEffect(ResourceLocation.parse("minecraft:stick_from_bamboo_item")),
+                            new RecipeUnlockEffect(ResourceLocation.parse("minecraft:stick"))
                     ))
             .parents(WOOD));
     public static final ResourceKey<Research> STONE = register("stone", builder -> builder
@@ -70,14 +70,14 @@ public final class ResearchdResearches {
                      * minecraft:rarity -> COMMON
                      */
                     List.of(
-                            new RecipePredicate(ResourceLocation.parse("minecraft:iron_ingot_from_iron_block")),
-                            new RecipePredicate(ResourceLocation.parse("minecraft:iron_ingot_from_nuggets")),
-                            new RecipePredicate(ResourceLocation.parse("minecraft:iron_ingot_from_blasting_deepslate_iron_ore")),
-                            new RecipePredicate(ResourceLocation.parse("minecraft:iron_ingot_from_smelting_deepslate_iron_ore")),
-                            new RecipePredicate(ResourceLocation.parse("minecraft:iron_ingot_from_blasting_iron_ore")),
-                            new RecipePredicate(ResourceLocation.parse("minecraft:iron_ingot_from_smelting_iron_ore")),
-                            new RecipePredicate(ResourceLocation.parse("minecraft:iron_ingot_from_blasting_raw_iron")),
-                            new RecipePredicate(ResourceLocation.parse("minecraft:iron_ingot_from_smelting_raw_iron"))
+                            new RecipeUnlockEffect(ResourceLocation.parse("minecraft:iron_ingot_from_iron_block")),
+                            new RecipeUnlockEffect(ResourceLocation.parse("minecraft:iron_ingot_from_nuggets")),
+                            new RecipeUnlockEffect(ResourceLocation.parse("minecraft:iron_ingot_from_blasting_deepslate_iron_ore")),
+                            new RecipeUnlockEffect(ResourceLocation.parse("minecraft:iron_ingot_from_smelting_deepslate_iron_ore")),
+                            new RecipeUnlockEffect(ResourceLocation.parse("minecraft:iron_ingot_from_blasting_iron_ore")),
+                            new RecipeUnlockEffect(ResourceLocation.parse("minecraft:iron_ingot_from_smelting_iron_ore")),
+                            new RecipeUnlockEffect(ResourceLocation.parse("minecraft:iron_ingot_from_blasting_raw_iron")),
+                            new RecipeUnlockEffect(ResourceLocation.parse("minecraft:iron_ingot_from_smelting_raw_iron"))
                     ))
             .researchMethods(
                     new ConsumePackResearchMethod(List.of(ResearchPacks.OVERWORLD), 6, 10)
@@ -163,7 +163,7 @@ public final class ResearchdResearches {
     public static final ResourceKey<Research> DIAMOND_PICKAXE = register("diamond_pickaxe", builder -> builder
             .icon(Items.DIAMOND_PICKAXE)
             .parents(DIAMOND_ARMOR, TRIDENT)
-            .researchEffects(new RecipePredicate(ResourceLocation.withDefaultNamespace("diamond_pickaxe")))
+            .researchEffects(new RecipeUnlockEffect(ResourceLocation.withDefaultNamespace("diamond_pickaxe")))
             .researchMethods(
                     new ConsumePackResearchMethod(List.of(ResearchPacks.OVERWORLD), 12, 10)
             ));

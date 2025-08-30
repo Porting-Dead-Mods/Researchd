@@ -2,33 +2,32 @@ package com.portingdeadmods.researchd.registries;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
-import com.portingdeadmods.researchd.impl.research.ResearchPack;
+import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.FastColor;
 
 public final class ResearchPacks {
-	public static final ResourceKey<ResearchPack> OVERWORLD = key("overworld");
-	public static final ResourceKey<ResearchPack> NETHER = key("nether");
-	public static final ResourceKey<ResearchPack> END = key("end");
+	public static final ResourceKey<SimpleResearchPack> OVERWORLD = key("overworld");
+	public static final ResourceKey<SimpleResearchPack> NETHER = key("nether");
+	public static final ResourceKey<SimpleResearchPack> END = key("end");
 
-	public static void bootstrap(BootstrapContext<ResearchPack> context) {
-		register(context, OVERWORLD, ResearchPack.builder()
+	public static void bootstrap(BootstrapContext<SimpleResearchPack> context) {
+		register(context, OVERWORLD, SimpleResearchPack.builder()
 				.color(255, 0, 0)
 		);
-		register(context, NETHER, ResearchPack.builder()
+		register(context, NETHER, SimpleResearchPack.builder()
 				.color(0, 0, 255)
 		);
-		register(context, END, ResearchPack.builder()
+		register(context, END, SimpleResearchPack.builder()
 				.color(0, 255, 0)
 		);
 	}
 
-	private static void register(BootstrapContext<ResearchPack> context, ResourceKey<ResearchPack> key, ResearchPack.Builder builder) {
+	private static void register(BootstrapContext<SimpleResearchPack> context, ResourceKey<SimpleResearchPack> key, SimpleResearchPack.Builder builder) {
 		context.register(key, builder.build());
 	}
 
-	private static ResourceKey<ResearchPack> key(String name) {
+	private static ResourceKey<SimpleResearchPack> key(String name) {
 		return ResourceKey.create(ResearchdRegistries.RESEARCH_PACK_KEY, Researchd.rl(name));
 	}
 }

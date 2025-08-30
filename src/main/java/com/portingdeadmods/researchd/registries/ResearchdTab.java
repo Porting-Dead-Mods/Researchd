@@ -3,7 +3,7 @@ package com.portingdeadmods.researchd.registries;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
-import com.portingdeadmods.researchd.impl.research.ResearchPack;
+import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
@@ -25,9 +25,9 @@ public final class ResearchdTab {
                 .icon(Items.DIAMOND::getDefaultInstance)
                 .title(Component.literal(Researchd.MODID))
                 .displayItems((params, output) -> {
-                    Optional<HolderLookup.RegistryLookup<ResearchPack>> lookup = params.holders().lookup(ResearchdRegistries.RESEARCH_PACK_KEY);
+                    Optional<HolderLookup.RegistryLookup<SimpleResearchPack>> lookup = params.holders().lookup(ResearchdRegistries.RESEARCH_PACK_KEY);
                     if (lookup.isPresent()) {
-                        Stream<ResourceKey<ResearchPack>> resourceKeyStream = lookup.get().listElementIds();
+                        Stream<ResourceKey<SimpleResearchPack>> resourceKeyStream = lookup.get().listElementIds();
                         resourceKeyStream.forEach(researchPack -> {
                             addResearchPack(output, params.holders(), researchPack);
                         });
@@ -36,10 +36,10 @@ public final class ResearchdTab {
                 .build());
     }
 
-    private static void addResearchPack(CreativeModeTab.Output output, HolderLookup.Provider lookup, ResourceKey<ResearchPack> elem) {
+    private static void addResearchPack(CreativeModeTab.Output output, HolderLookup.Provider lookup, ResourceKey<SimpleResearchPack> elem) {
         ItemStack stack = ResearchdItems.RESEARCH_PACK.toStack();
 
-        Optional<Holder.Reference<ResearchPack>> holder = lookup.holder(elem);
+        Optional<Holder.Reference<SimpleResearchPack>> holder = lookup.holder(elem);
         stack.set(ResearchdDataComponents.RESEARCH_PACK.get(), new ResearchPackComponent(holder.map(Holder::getKey)));
         output.accept(stack);
     }

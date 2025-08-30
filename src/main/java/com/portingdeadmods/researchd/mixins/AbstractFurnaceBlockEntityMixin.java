@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.mixins;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.content.predicates.RecipePredicateData;
+import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -32,7 +32,7 @@ public class AbstractFurnaceBlockEntityMixin {
             Player player = level.getPlayerByUUID(playerUUID);
 
             if (player != null) {
-                RecipePredicateData data = player.getData(ResearchdAttachments.RECIPE_PREDICATE);
+                RecipeUnlockEffectData data = player.getData(ResearchdAttachments.RECIPE_PREDICATE);
                 if (!data.getAll().isEmpty()) {
                     Researchd.debug("Furnace Mixin", "RecipePredicateData: " + data.blockedRecipes());
                     Researchd.debug("Furnace Mixin","RecipeHolder id: " + recipeholder.id());

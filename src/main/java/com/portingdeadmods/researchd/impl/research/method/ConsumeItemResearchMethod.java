@@ -8,7 +8,7 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
 import com.portingdeadmods.researchd.client.impl.methods.ClientConsumeItemResearchMethod;
-import com.portingdeadmods.researchd.impl.research.ResearchCompletionProgress;
+import com.portingdeadmods.researchd.data.helper.ResearchCompletionProgress;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
