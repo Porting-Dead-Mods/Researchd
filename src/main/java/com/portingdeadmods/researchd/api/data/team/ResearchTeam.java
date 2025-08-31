@@ -40,7 +40,7 @@ public class ResearchTeam {
 	private final List<UUID> receivedInvites; // Invites received by this team from other players
 	private UUID owner;
 
-	private TeamMetadata metadata;
+	private final TeamMetadata metadata;
 
 	public static final Codec<ResearchTeam> CODEC = RecordCodecBuilder.create(builder -> builder.group(
 			Codec.STRING.fieldOf("name").forGetter(ResearchTeam::getName),
@@ -191,7 +191,8 @@ public class ResearchTeam {
 	}
 
 	public void removeMember(UUID uuid) {
-        members.remove(uuid);
+		if (members.contains(uuid))
+			members.remove(uuid);
 	}
 
 	public void addModerator(UUID uuid) {

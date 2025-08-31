@@ -1,10 +1,11 @@
 package com.portingdeadmods.researchd.utils.researches;
 
-import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
-import com.portingdeadmods.researchd.api.research.ResearchInstance;
-import com.portingdeadmods.researchd.data.ResearchdSavedData;
+import com.portingdeadmods.researchd.api.data.ResearchProgress;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
+import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
+import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceKey;
@@ -22,6 +23,8 @@ public class ResearchHelperClient {
 		ResearchTeamMap researchData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
 
 		ResearchTeam team = researchData.getTeamByMember(player.getUUID());
+		ResearchProgress progress = team.getResearchProgress();
+
 		for (Map.Entry<ResourceKey<AttachmentType<?>>, AttachmentType<?>> entry : NeoForgeRegistries.ATTACHMENT_TYPES.entrySet()) {
 			Object data = player.getData(entry.getValue());
 			if (data instanceof ResearchEffectData<?> effectData) {
@@ -29,6 +32,7 @@ public class ResearchHelperClient {
 			}
 		}
 
+		if (progress == null) return;
 		for (ResearchInstance res : team.getResearchProgress().completedResearches()) {
 			ResearchHelperCommon.getResearch(res.getResearch(), level.registryAccess()).researchEffects().forEach(
 					eff -> eff.onUnlock(level, player, res.getResearch())

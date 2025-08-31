@@ -19,7 +19,7 @@ public final class ClientResearchCache {
     public static Set<ResearchInstance> GLOBAL_READ_ONLY_RESEARCHES;
     public static ResearchNode ROOT_NODE;
 
-    public static void initialize(Player player) {
+    public static void sync(Player player) {
         NODES.clear();
         GLOBAL_READ_ONLY_RESEARCHES = new LinkedHashSet<>();
         ResearchGraphCache.clearCache();

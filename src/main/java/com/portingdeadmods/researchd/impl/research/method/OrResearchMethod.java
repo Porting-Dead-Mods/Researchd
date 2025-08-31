@@ -23,6 +23,7 @@ public record OrResearchMethod(List<ResearchMethod> methods) implements Research
     public static final ResourceLocation ID = Researchd.rl("or");
 
     // TODO: In the far future we might want to implement a way to select the preferred research
+    // ^ imo should just be able to research any of them and it finishes whenever one is done
     @Override
     public boolean canResearch(Player player, ResourceKey<Research> research) {
         for (ResearchMethod method : this.methods) {
