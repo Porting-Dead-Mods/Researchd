@@ -4,10 +4,11 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
+import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
+import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -69,9 +70,14 @@ public class ResearchTeamMap {
 
     public static void onSync(Player player) {
         if (player.level().isClientSide) {
-            ResearchHelperClient.refreshResearches((LocalPlayer) player);
-            // TODO: Maybe sync them from the server as soon as the player joins
+            // Usa
+            ResearchHelperClient.refreshResearches(player);
+            // TODO: Sync them from the server as soon as the player joins
             CommonResearchCache.initialize(player.level());
+            ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level());
+            for (ResearchTeam team : data.getResearchTeams().values()) {
+                ClientResearchTeamHelper.resolveInstances(team);
+            }
         } else {
             ResearchHelperCommon.refreshResearches((ServerPlayer) player);
         }

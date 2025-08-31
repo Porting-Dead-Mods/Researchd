@@ -1,20 +1,16 @@
 package com.portingdeadmods.researchd.client.screens.graph;
 
+import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.data.ResearchGraph;
-import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.screens.lines.ResearchHead;
-import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.resources.ResourceKey;
 
 import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Drawable widget for completedResearches <br>
@@ -24,7 +20,6 @@ import java.util.Set;
 public class ResearchNode extends AbstractWidget {
     private final UniqueArray<ResearchNode> parents;
     private final UniqueArray<ResearchNode> children;
-    private final UniqueArray<ResearchNode> hiddenChildren;
 
     private final UniqueArray<ResearchNode> positionLocks;
     private boolean doMovementLogic;
@@ -42,7 +37,6 @@ public class ResearchNode extends AbstractWidget {
         this.instance = instance;
 
         this.children = new UniqueArray<>();
-        this.hiddenChildren = new UniqueArray<>();
         this.parents = new UniqueArray<>();
         this.positionLocks = new UniqueArray<>();
 
@@ -113,10 +107,6 @@ public class ResearchNode extends AbstractWidget {
 
     public UniqueArray<ResearchHead> getOutputs() {
         return outputs;
-    }
-
-    public UniqueArray<ResearchNode> getHiddenChildren() {
-        return hiddenChildren;
     }
 
     public void refreshHeads() {

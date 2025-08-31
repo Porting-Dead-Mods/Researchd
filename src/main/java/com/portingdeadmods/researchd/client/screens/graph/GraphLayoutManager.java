@@ -1,12 +1,12 @@
 package com.portingdeadmods.researchd.client.screens.graph;
 
+import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.data.ResearchGraph;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.screens.widgets.ResearchGraphWidget;
 import com.portingdeadmods.researchd.utils.Spaghetti;
-import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
-import com.portingdeadmods.researchd.api.data.ResearchGraph;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
@@ -105,15 +105,18 @@ public class GraphLayoutManager {
 	}
 
 	private static int _calculateDepth(ResearchNode node, int depth) {
-		if (node.getParents().isEmpty()) {
-			return depth;
-		} else {
-			int maxDepth = depth;
-			for (ResearchNode parent : node.getParents()) {
-				maxDepth = Math.max(maxDepth, _calculateDepth(parent, depth + 1));
+		if (node != null) {
+			if (node.getParents().isEmpty()) {
+				return depth;
+			} else {
+				int maxDepth = depth;
+				for (ResearchNode parent : node.getParents()) {
+					maxDepth = Math.max(maxDepth, _calculateDepth(parent, depth + 1));
+				}
+				return maxDepth;
 			}
-			return maxDepth;
 		}
+		return depth;
 	}
 
 	// Thinking that [0] would be leftMost and [.length - 1] would be rightMost
@@ -175,7 +178,9 @@ public class GraphLayoutManager {
 		// TODO: Remake this method to use the above logic, but with the : graph.nodes() instead of recursively going through the children.
 		// PS: It works, but the positioning gets *a bit messed up* and all the nodes are shifted to a direction and it looks weird imo
 		for (ResearchNode gNode : graph.nodes().values()) {
-			_addRightToLayer(calculateDepth(gNode), gNode);
+			if (gNode != null) {
+				_addRightToLayer(calculateDepth(gNode), gNode);
+			}
 		}
 	}
 
@@ -261,10 +266,12 @@ public class GraphLayoutManager {
 				UniqueArray<ResearchNode> children = node.getChildren();
 
 				// One layer below, sorted by X position
-				UniqueArray<ResearchNode> subsequentChildren = children.stream().filter((child) -> child.getLayer() == node.getLayer() + 1).collect(Collectors.toCollection(UniqueArray::new));
-				subsequentChildren.sort(Comparator.comparingInt(ResearchNode::getX));
+				UniqueArray<ResearchNode> subsequentChildren = children.stream()
+                        .filter((child) -> child != null && child.getLayer() == node.getLayer() + 1)
+						.sorted(Comparator.comparingInt(ResearchNode::getX))
+						.collect(Collectors.toCollection(UniqueArray::new));
 
-				allSubsequentChildren.addAll(subsequentChildren);
+                allSubsequentChildren.addAll(subsequentChildren);
 				subsequentChildrenMap.put(node, subsequentChildren);
 			}
 
@@ -319,20 +326,28 @@ public class GraphLayoutManager {
 				UniqueArray<ResearchNode> children = node.getChildren();
 
 				// One layer below, sorted by X position
-				UniqueArray<ResearchNode> subsequentChildren = children.stream().filter((child) -> child.getLayer() == node.getLayer() + 1).collect(Collectors.toCollection(UniqueArray::new));
-				subsequentChildren.sort(Comparator.comparingInt(ResearchNode::getX));
+				UniqueArray<ResearchNode> subsequentChildren = children.stream()
+						.filter((child) -> child != null && child.getLayer() == node.getLayer() + 1)
+						.sorted(Comparator.comparingInt(ResearchNode::getX))
+						.collect(Collectors.toCollection(UniqueArray::new));
 
-				// One layer above, sorted by X position
-				UniqueArray<ResearchNode> parentsOnLayerAbove = parents.stream().filter(parent -> parent.getLayer() == node.getLayer() + 1).collect(Collectors.toCollection(UniqueArray::new));
-				parentsOnLayerAbove.sort(Comparator.comparingInt(ResearchNode::getX));
+                // One layer above, sorted by X position
+				UniqueArray<ResearchNode> parentsOnLayerAbove = parents.stream()
+						.filter(parent -> parent != null && parent.getLayer() == node.getLayer() + 1)
+						.sorted(Comparator.comparingInt(ResearchNode::getX))
+						.collect(Collectors.toCollection(UniqueArray::new));
 
-				// Apply
+                // Apply
 
 				// If the node's subsequent children only have this one node as parent, we shift the node to their center
-				if (!subsequentChildren.isEmpty() && subsequentChildren.stream().filter(child -> child.getParents().size() != 1).toList().isEmpty()) {
+				if (!subsequentChildren.isEmpty() && subsequentChildren.stream().filter(child -> child != null && child.getParents().size() != 1).toList().isEmpty()) {
 					node.setXExt(centerOf2Nodes(subsequentChildren).x - NODE_WIDTH / 2);
 
-					subsequentChildren.forEach(child -> child.lockNodeTo(node));
+					subsequentChildren.forEach(child -> {
+						if (child != null) {
+							child.lockNodeTo(node);
+						}
+					});
 
 					Researchd.debug("Layout", "Shifted node: " + node.getInstance().getResearch() + " to center of its children: " + subsequentChildren.stream().map(ResearchNode::getInstance).map(instance -> instance.getResearch().toString()).collect(Collectors.joining(", ")));
 					continue;
@@ -370,15 +385,17 @@ public class GraphLayoutManager {
 				UniqueArray<ResearchNode> children = node.getChildren();
 
 				HashMap<Integer, UniqueArray<ResearchNode>> parentToSubsequentChildren = new HashMap<>();
-				UniqueArray<ResearchNode> parentsOnLayerAbove = parents.stream().filter(parent -> parent.getLayer() == node.getLayer() - 1).collect(Collectors.toCollection(UniqueArray::new));
+				UniqueArray<ResearchNode> parentsOnLayerAbove = parents.stream().filter(parent -> parent != null && parent.getLayer() == node.getLayer() - 1).collect(Collectors.toCollection(UniqueArray::new));
 
 				int _parentIndex = 0;
 				for (ResearchNode parent : parents) {
-					UniqueArray<ResearchNode> _children = new UniqueArray<>(parent.getChildren());
-					UniqueArray<ResearchNode> _subsequentChildren = new UniqueArray<>(_children.stream().filter(child -> child.getLayer() == parent.getLayer() - 1).toList());
+					if (parent != null) {
+						UniqueArray<ResearchNode> _children = new UniqueArray<>(parent.getChildren());
+						UniqueArray<ResearchNode> _subsequentChildren = new UniqueArray<>(_children.stream().filter(child -> child != null && child.getLayer() == parent.getLayer() - 1).toList());
 
-					parentToSubsequentChildren.put(_parentIndex, _subsequentChildren);
-					_parentIndex++;
+						parentToSubsequentChildren.put(_parentIndex, _subsequentChildren);
+						_parentIndex++;
+					}
 				}
 
 				if (children.isEmpty()) {

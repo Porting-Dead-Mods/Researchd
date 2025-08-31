@@ -2,21 +2,23 @@ package com.portingdeadmods.researchd.client.utils;
 
 import com.mojang.authlib.GameProfile;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
+import com.portingdeadmods.researchd.api.research.GlobalResearch;
+import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.cache.CommonResearchCache;
+import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamRole;
 import com.portingdeadmods.researchd.networking.team.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class ClientResearchTeamHelper {
     public static ResearchTeam getTeam() {
@@ -160,5 +162,19 @@ public class ClientResearchTeamHelper {
         ResearchTeam team = getTeam();
         team.setOwner(nextOwner.getId());
         PacketDistributor.sendToServer(new TransferOwnershipPayload(nextOwner.getId()));
+    }
+
+    public static void resolveInstances(ResearchTeam team) {
+        HashMap<ResourceKey<Research>, ResearchInstance> researches = team.getResearchProgress().researches();
+
+        for (Map.Entry<ResourceKey<Research>, ResearchInstance> research : researches.entrySet()) {
+            GlobalResearch research1 = CommonResearchCache.GLOBAL_RESEARCHES.get(research.getKey());
+            if (research1 != null) {
+                research.setValue(research.getValue().withResearch(research1));
+            } else {
+                Researchd.LOGGER.debug("RESEARCH");
+            }
+        }
+
     }
 }

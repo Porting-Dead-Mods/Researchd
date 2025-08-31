@@ -66,8 +66,6 @@ public class GlobalResearch {
     public String toString() {
         return "GlobalResearch{" +
                 "research=" + research +
-                ", children=" + children +
-                ", parents=" + parents +
                 '}';
     }
 }

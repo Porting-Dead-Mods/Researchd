@@ -12,7 +12,10 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 public final class ResearchInstance {
     public static final Codec<ResearchInstance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -47,6 +50,10 @@ public final class ResearchInstance {
 
     public ResearchInstance(GlobalResearch research, ResearchStatus researchStatus) {
         this(research, researchStatus, null, -1);
+    }
+
+    public ResearchInstance withResearch(GlobalResearch research) {
+        return new ResearchInstance(research, researchStatus, researchedPlayer, researchedTime);
     }
 
     public GlobalResearch getResearch() {

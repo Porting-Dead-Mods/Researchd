@@ -31,9 +31,6 @@ public final class CommonResearchCache {
             globalResearchMap.put(research.getKey(), new GlobalResearch(research.getKey()));
         }
 
-        Researchd.LOGGER.debug("Researches: {}", researches);
-        Researchd.LOGGER.debug("Research map: {}", globalResearchMap);
-
         // CHILDREN
         for (GlobalResearch research : globalResearchMap.values()) {
             Holder<Research> researchHolder = registryAccess.holderOrThrow(research.getResearch());
@@ -64,6 +61,9 @@ public final class CommonResearchCache {
             }
         }
 
+        Researchd.LOGGER.debug("Researches: {}", researches);
+        Researchd.LOGGER.debug("Research map: {}", globalResearchMap);
+
         // Lock global researches
         for (GlobalResearch research : globalResearchMap.values()) {
             research.lock();
@@ -80,8 +80,8 @@ public final class CommonResearchCache {
     public static void reset() {
         if (GLOBAL_RESEARCHES != null) {
             ROOT_RESEARCH = null;
-            GLOBAL_RESEARCHES.clear();
             GLOBAL_RESEARCHES = null;
+            LOCKED = false;
         }
     }
 }

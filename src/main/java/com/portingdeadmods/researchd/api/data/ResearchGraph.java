@@ -7,7 +7,9 @@ import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
 import net.minecraft.resources.ResourceKey;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Data of the research graph
@@ -22,6 +24,8 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
         this(new ResearchNode(researches.get(researchRoot.getResearch())), new HashMap<>());
 
         createNodes(rootNode.getInstance(), 0, CommonResearchCache.ROOT_RESEARCH.is(rootNode.getInstance().getKey()) ? -1 : RESEARCH_GRAPH_LAYERS, researches);
+        this.rootNode.setRootNode(true);
+        this.nodes.put(this.rootNode.getInstance().getKey(), this.rootNode);
         collectRelatedNodes();
 
         for (ResearchNode node : this.nodes.values()) {
@@ -55,9 +59,11 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
     }
 
     private void createNodesUpward(ResearchInstance instance, int nesting, int layers, Map<ResourceKey<Research>, ResearchInstance> researches) {
-        this.nodes.put(instance.getKey(), new ResearchNode(instance));
+        if (nesting > 0) {
+            this.nodes.put(instance.getKey(), new ResearchNode(instance));
+        }
         for (GlobalResearch research : instance.getParents()) {
-            if (nesting <= layers || layers == -1) {
+            if (nesting < layers || layers == -1) {
                 createNodesUpward(researches.get(research.getResearch()), nesting + 1, layers, researches);
             } else {
                 return;
@@ -66,9 +72,11 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
     }
 
     private void createNodesDownward(ResearchInstance instance, int nesting, int layers, Map<ResourceKey<Research>, ResearchInstance> researches) {
-        this.nodes.put(instance.getKey(), new ResearchNode(instance));
+        if (nesting > 0) {
+            this.nodes.put(instance.getKey(), new ResearchNode(instance));
+        }
         for (GlobalResearch research : instance.getChildren()) {
-            if (nesting <= layers || layers == -1) {
+            if (nesting < layers || layers == -1) {
                 createNodesDownward(researches.get(research.getResearch()), nesting + 1, layers, researches);
             } else {
                 return;

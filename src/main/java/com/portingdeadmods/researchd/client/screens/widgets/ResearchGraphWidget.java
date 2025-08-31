@@ -3,8 +3,10 @@ package com.portingdeadmods.researchd.client.screens.widgets;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.data.ResearchGraph;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.screens.graph.GraphLayoutManager;
@@ -13,8 +15,6 @@ import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
 import com.portingdeadmods.researchd.client.screens.lines.PotentialOverlap;
 import com.portingdeadmods.researchd.client.screens.lines.ResearchHead;
 import com.portingdeadmods.researchd.client.screens.lines.ResearchLine;
-import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
-import com.portingdeadmods.researchd.api.data.ResearchGraph;
 import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -553,7 +553,7 @@ public class ResearchGraphWidget extends AbstractWidget {
         }
 
         for (ResearchNode node : this.graph.nodes().values()) {
-            if (node == this.graph.rootNode()) {
+            if (node.isRootNode()) {
                 float scale = 1.75f;
                 int width = ResearchScreenWidget.PANEL_WIDTH;
                 int height = ResearchScreenWidget.PANEL_HEIGHT;
