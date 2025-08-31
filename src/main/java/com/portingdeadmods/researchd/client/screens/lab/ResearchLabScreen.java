@@ -126,7 +126,6 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
 	}
 
 	private void drawSlot(GuiGraphics guiGraphics, int x, int y) {
-
 	}
 
 	private void drawPackSlot(GuiGraphics guiGraphics, int x, int y) {

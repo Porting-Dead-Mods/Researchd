@@ -70,7 +70,7 @@ public class ResearchTeamMap {
     public static void onSync(Player player) {
         if (player.level().isClientSide) {
             ResearchHelperClient.refreshResearches((LocalPlayer) player);
-            ClientResearchCache.initialize(player);
+            ClientResearchCache.sync(player);
         } else {
             ResearchHelperCommon.refreshResearches((ServerPlayer) player);
         }

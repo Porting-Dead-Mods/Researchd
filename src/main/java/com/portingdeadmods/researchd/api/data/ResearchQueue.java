@@ -10,20 +10,26 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.IntSupplier;
 
 public final class ResearchQueue implements Iterable<ResearchInstance> {
-    public static final ResearchQueue EMPTY = new ResearchQueue(new ArrayList<>(), 0);
+    public static final ResearchQueue EMPTY = new ResearchQueue(new ArrayList<>(), 0, 0);
     public static final Codec<ResearchQueue> CODEC = RecordCodecBuilder.create(inst -> inst.group(
             ResearchInstance.CODEC.listOf().fieldOf("entries").forGetter(ResearchQueue::getEntries),
-            Codec.INT.fieldOf("researchProgress").forGetter(ResearchQueue::getResearchProgress)
+            Codec.INT.fieldOf("researchProgress").forGetter(ResearchQueue::getResearchProgress),
+            Codec.INT.fieldOf("maxResearchProgress").forGetter(ResearchQueue::getMaxResearchProgress)
     ).apply(inst, ResearchQueue::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, ResearchQueue> STREAM_CODEC = StreamCodec.composite(
             ResearchInstance.STREAM_CODEC.apply(ByteBufCodecs.list()),
             ResearchQueue::getEntries,
             ByteBufCodecs.INT,
             ResearchQueue::getResearchProgress,
+            ByteBufCodecs.INT,
+            ResearchQueue::getMaxResearchProgress,
             ResearchQueue::new
     );
     public static final IntSupplier QUEUE_LENGTH = () -> ResearchdCommonConfig.researchQueueLength;
@@ -32,14 +38,14 @@ public final class ResearchQueue implements Iterable<ResearchInstance> {
     private int researchProgress;
     private int maxResearchProgress;
 
-    public ResearchQueue(List<ResearchInstance> entries, int researchProgress) {
+    public ResearchQueue(List<ResearchInstance> entries, int researchProgress, int maxResearchProgress) {
         this.entries = new ArrayList<>(entries);
         this.researchProgress = researchProgress;
-        this.maxResearchProgress = 1000;
+        this.maxResearchProgress = maxResearchProgress;
     }
 
     public ResearchQueue() {
-        this(new ArrayList<>(QUEUE_LENGTH.getAsInt()), 0);
+        this(new ArrayList<>(QUEUE_LENGTH.getAsInt()), 0, 0);
     }
 
     /**
