@@ -7,7 +7,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -55,7 +55,7 @@ public final class PDLSavedData<T> {
         return streamCodec != null;
     }
 
-    public void setData(Level level, T data) {
+    public void setData(LevelAccessor level, T data) {
         if (level instanceof ServerLevel serverLevel0) {
             ServerLevel serverLevel;
             if (isGlobal()) {
@@ -75,7 +75,7 @@ public final class PDLSavedData<T> {
         }
     }
 
-    public T getData(Level level) {
+    public T getData(LevelAccessor level) {
         if (level instanceof ServerLevel serverLevel0) {
             ServerLevel serverLevel;
             if (isGlobal()) {

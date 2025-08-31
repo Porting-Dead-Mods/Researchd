@@ -2,11 +2,11 @@ package com.portingdeadmods.researchd.events;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
-import com.portingdeadmods.researchd.api.data.team.TeamResearchProgress;
 import com.portingdeadmods.researchd.api.data.ResearchQueue;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.api.data.team.TeamMember;
+import com.portingdeadmods.researchd.api.data.team.TeamResearchProgress;
 import com.portingdeadmods.researchd.api.pdl.data.PDLClientSavedData;
 import com.portingdeadmods.researchd.api.pdl.data.PDLSavedData;
 import com.portingdeadmods.researchd.api.pdl.data.SavedDataHolder;
@@ -18,6 +18,7 @@ import com.portingdeadmods.researchd.content.commands.ResearchdCommands;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.data.helper.ResearchCompletionProgress;
+import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
 import com.portingdeadmods.researchd.networking.SyncSavedDataPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchCompleteProgressSyncPayload;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
@@ -167,9 +168,22 @@ public final class ResearchdCommonEvents {
     }
 
     @SubscribeEvent
-    public static void onWorldLoad(LevelEvent.Load event) {
-        // TODO: Syncing
-        CommonResearchCache.initialize(event.getLevel());
+    public static void onWorldUnload(LevelEvent.Load event) {
+        if (!event.getLevel().isClientSide()) {
+            // Initialize the research cache
+            CommonResearchCache.initialize(event.getLevel());
+
+            // Add new researches to teams in case new ones were added
+            ResearchTeamHelper.initializeTeamResearches(event.getLevel());
+        }
+
+    }
+
+    @SubscribeEvent
+    public static void onWorldUnload(LevelEvent.Unload event) {
+        // Reset the research cache
+        CommonResearchCache.reset();
+
     }
 
     public static void onJoinLevel(EntityJoinLevelEvent entity) {

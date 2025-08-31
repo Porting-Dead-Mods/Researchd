@@ -10,7 +10,10 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.LevelAccessor;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public final class CommonResearchCache {
     public static Map<ResourceKey<Research>, GlobalResearch> GLOBAL_RESEARCHES;
@@ -72,5 +75,13 @@ public final class CommonResearchCache {
 
         GLOBAL_RESEARCHES = ImmutableMap.copyOf(globalResearchMap);
         LOCKED = true;
+    }
+
+    public static void reset() {
+        if (GLOBAL_RESEARCHES != null) {
+            ROOT_RESEARCH = null;
+            GLOBAL_RESEARCHES.clear();
+            GLOBAL_RESEARCHES = null;
+        }
     }
 }

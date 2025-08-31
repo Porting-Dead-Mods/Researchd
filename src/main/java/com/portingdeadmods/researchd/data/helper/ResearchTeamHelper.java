@@ -2,6 +2,11 @@ package com.portingdeadmods.researchd.data.helper;
 
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
+import com.portingdeadmods.researchd.api.research.GlobalResearch;
+import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.api.research.ResearchStatus;
+import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.networking.team.RefreshResearchesPayload;
 import com.portingdeadmods.researchd.networking.team.TransferOwnershipPayload;
@@ -9,18 +14,17 @@ import com.portingdeadmods.researchd.utils.PlayerUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public final class ResearchTeamHelper {
     public static boolean isResearchTeamLeader(Player player) {
@@ -476,4 +480,18 @@ public final class ResearchTeamHelper {
 
         return msgs.get((int) Math.floor(Math.random() * msgs.size()));
     }
+
+    public static void initializeTeamResearches(LevelAccessor level) {
+        ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
+        for (ResearchTeam team : data.getResearchTeams().values()) {
+            Map<ResourceKey<Research>, ResearchInstance> researches = team.getResearchProgress().researches();
+            Set<GlobalResearch> globalResearches = new HashSet<>(CommonResearchCache.GLOBAL_RESEARCHES.values());
+            researches.values().stream().map(ResearchInstance::getResearch).toList().forEach(globalResearches::remove);
+            for (GlobalResearch globalResearch : globalResearches) {
+                researches.put(globalResearch.getResearch(), new ResearchInstance(globalResearch, ResearchStatus.LOCKED));
+            }
+        }
+        ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
+    }
+
 }

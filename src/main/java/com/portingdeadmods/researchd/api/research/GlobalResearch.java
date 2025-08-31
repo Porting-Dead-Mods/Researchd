@@ -2,18 +2,13 @@ package com.portingdeadmods.researchd.api.research;
 
 import com.google.common.collect.ImmutableSet;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
-import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 public class GlobalResearch {
@@ -65,5 +60,14 @@ public class GlobalResearch {
     @Override
     public int hashCode() {
         return Objects.hashCode(research);
+    }
+
+    @Override
+    public String toString() {
+        return "GlobalResearch{" +
+                "research=" + research +
+                ", children=" + children +
+                ", parents=" + parents +
+                '}';
     }
 }

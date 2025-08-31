@@ -7,6 +7,9 @@ import com.portingdeadmods.portingdeadlibs.utils.LazyFinal;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.data.ResearchQueue;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.api.research.ResearchStatus;
+import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.data.helper.ResearchCompletionProgress;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamRole;
 import com.portingdeadmods.researchd.utils.TimeUtils;
@@ -24,9 +27,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 // TODO: Move to api
 public class ResearchTeam {
@@ -65,7 +67,7 @@ public class ResearchTeam {
             ResearchTeam::new
     );
 
-    public ResearchTeam(String name, List<TeamMember> members, List<UUID> sentInvites, List<UUID> receivedInvites, UUID owner, TeamResearchProgress researchProgress) {
+    private ResearchTeam(String name, List<TeamMember> members, List<UUID> sentInvites, List<UUID> receivedInvites, UUID owner, TeamResearchProgress researchProgress) {
         this.name = name;
         this.members = new ArrayList<>(members);
         this.sentInvites = new ArrayList<>(sentInvites);
@@ -74,7 +76,7 @@ public class ResearchTeam {
         this.metadata = new TeamMetadata(researchProgress);
     }
 
-    public ResearchTeam(String name, List<TeamMember> members, List<UUID> sentInvites, List<UUID> receivedInvites, UUID owner, TeamMetadata metadata) {
+    private ResearchTeam(String name, List<TeamMember> members, List<UUID> sentInvites, List<UUID> receivedInvites, UUID owner, TeamMetadata metadata) {
         this.name = name;
         this.members = new ArrayList<>(members);
         this.sentInvites = new ArrayList<>(sentInvites);
@@ -93,6 +95,7 @@ public class ResearchTeam {
 
         ResearchTeam team = new ResearchTeam(player.getDisplayName().getString() + "'s Team", List.of(new TeamMember(player.getUUID(), ResearchTeamRole.OWNER), new TeamMember(DEBUG_MEMBER.getId(), ResearchTeamRole.MEMBER)), List.of(), List.of(), player.getUUID(), TeamResearchProgress.EMPTY);
         team.setCreationTime(player.getServer().getTickCount() * 50);
+        team.init();
         return team;
     }
 
@@ -102,7 +105,7 @@ public class ResearchTeam {
      * @param uuid The Owner
      * @param name The Name of the Team
      */
-    public ResearchTeam(UUID uuid, String name) {
+    private ResearchTeam(UUID uuid, String name) {
         this(name, List.of(new TeamMember(uuid, ResearchTeamRole.OWNER)), List.of(), List.of(), uuid, TeamResearchProgress.EMPTY);
     }
 
@@ -277,6 +280,15 @@ public class ResearchTeam {
 
     public String getResearchCompletionTime(int time) {
         return new TimeUtils.TimeDifference(this.metadata.creationTime.get(), time).getFormatted();
+    }
+
+    public void init() {
+        Map<ResourceKey<Research>, ResearchInstance> globalResearches = CommonResearchCache.GLOBAL_RESEARCHES.entrySet().stream()
+                .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), new ResearchInstance(e.getValue(), CommonResearchCache.ROOT_RESEARCH.is(e.getKey())
+                        ? ResearchStatus.RESEARCHABLE
+                        : ResearchStatus.LOCKED)))
+                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
+        this.getResearchProgress().researches().putAll(globalResearches);
     }
 
     // Codecs are too small.
