@@ -103,7 +103,7 @@ public class ClientResearchTeamHelper {
                 team.removeModerator(id);
             }
             PacketDistributor.sendToServer(new ManageMemberPayload(id, true));
-            Researchd.LOGGER.debug("Remove member {}", memberProfile.getName());
+            Researchd.LOGGER.debug("Remove player {}", memberProfile.getName());
         }
     }
 
@@ -138,7 +138,7 @@ public class ClientResearchTeamHelper {
                 PacketDistributor.sendToServer(new ManageModeratorPayload(memberProfile.getId(), false));
             }
         }
-        Researchd.LOGGER.debug("Promoted member {}", memberProfile.getName());
+        Researchd.LOGGER.debug("Promoted player {}", memberProfile.getName());
     }
 
     public static void demoteTeamMemberSynced(GameProfile memberProfile) {
@@ -153,7 +153,7 @@ public class ClientResearchTeamHelper {
             case MEMBER -> {
             }
         }
-        Researchd.LOGGER.debug("Demoted member {}", memberProfile.getName());
+        Researchd.LOGGER.debug("Demoted player {}", memberProfile.getName());
     }
 
     public static void transferOwnershipSynced(GameProfile nextOwner) {

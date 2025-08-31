@@ -966,7 +966,8 @@ public class ResearchGraphWidget extends AbstractWidget {
             // Make sure we save the final state
             GraphStateManager.getInstance().saveLastSessionState(graph);
 
-            ClientResearchCache.ROOT_NODE = graph.rootNode();
+            // TODO: Reimpl this
+            //ClientResearchCache.ROOT_NODE = graph.rootNode();
         }
     }
 }

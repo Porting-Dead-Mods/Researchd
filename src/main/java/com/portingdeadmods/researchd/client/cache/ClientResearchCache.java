@@ -15,12 +15,10 @@ import net.minecraft.world.entity.player.Player;
 import java.util.*;
 
 public final class ClientResearchCache {
-    public static final Set<ResearchNode> NODES = new LinkedHashSet<>();
     public static Set<ResearchInstance> GLOBAL_READ_ONLY_RESEARCHES;
-    public static ResearchNode ROOT_NODE;
+    public static ResearchInstance ROOT_INSTANCE;
 
     public static void initialize(Player player) {
-        NODES.clear();
         GLOBAL_READ_ONLY_RESEARCHES = new LinkedHashSet<>();
         ResearchGraphCache.clearCache();
 
@@ -55,10 +53,10 @@ public final class ClientResearchCache {
                     research.setResearchStatus(ResearchStatus.RESEARCHABLE);
                 }
             }
-            NODES.add(new ResearchNode(research));
         });
 
         // Add next nodes
+        // CHILDREN
         for (ResearchInstance instance : GLOBAL_READ_ONLY_RESEARCHES) {
             List<ResourceKey<Research>> parents = ResearchHelperCommon.getResearch(instance.getResearch(), registryAccess).parents();
 
@@ -70,6 +68,7 @@ public final class ClientResearchCache {
             }
         }
 
+        // PARENTS
         for (ResearchInstance instance : GLOBAL_READ_ONLY_RESEARCHES) {
             List<ResourceKey<Research>> parents = ResearchHelperCommon.getResearch(instance.getResearch(), registryAccess).parents();
 
@@ -78,32 +77,15 @@ public final class ClientResearchCache {
             }
         }
 
-        for (ResearchInstance research : GLOBAL_READ_ONLY_RESEARCHES) {
-            NODES.add(new ResearchNode(research));
+        Set<ResearchInstance> referencedNodes = new LinkedHashSet<>();
+        for (ResearchInstance instance : GLOBAL_READ_ONLY_RESEARCHES) {
+            referencedNodes.addAll(instance.getChildren());
         }
 
-        for (ResearchNode node : NODES) {
-            for (ResearchInstance parent : node.getInstance().getParents()) {
-                node.addParent(getNodeByResearch(NODES, parent.getResearch()));
-            }
+        Set<ResearchInstance> researchesCopy = new LinkedHashSet<>(GLOBAL_READ_ONLY_RESEARCHES);
+        researchesCopy.removeAll(referencedNodes);
 
-            for (ResearchInstance child : node.getInstance().getChildren()) {
-                node.addChild(getNodeByResearch(NODES, child.getResearch()));
-            }
-        }
-
-        Set<ResearchNode> referencedNodes = new LinkedHashSet<>();
-        for (ResearchNode node : NODES) {
-            referencedNodes.addAll(node.getChildren());
-        }
-
-        Set<ResearchNode> researchNodesCopy = new LinkedHashSet<>(NODES);
-        researchNodesCopy.removeAll(referencedNodes);
-
-        ROOT_NODE = researchNodesCopy.stream().findFirst().orElse(null);
-        if (ROOT_NODE != null) {
-            ROOT_NODE.setRootNode(true);
-        }
+        ROOT_INSTANCE = researchesCopy.stream().findFirst().orElse(null);
 
         GLOBAL_READ_ONLY_RESEARCHES = new ImmutableLinkedHashSet<>(GLOBAL_READ_ONLY_RESEARCHES);
     }

@@ -14,13 +14,13 @@ import java.util.*;
 
 public final class ResearchInstance {
     public static final Codec<ResearchInstance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Research.RESOURCE_KEY_CODEC.fieldOf("research").forGetter(ResearchInstance::getResearch),
+            GlobalResearch.CODEC.fieldOf("research").forGetter(ResearchInstance::getResearch),
             CodecUtils.enumCodec(ResearchStatus.class).fieldOf("research_status").forGetter(ResearchInstance::getResearchStatus),
             UUIDUtil.CODEC.optionalFieldOf("researched_player").forGetter(r -> Optional.ofNullable(r.getResearchedPlayer())),
             Codec.LONG.fieldOf("researched_time").forGetter(ResearchInstance::getResearchedTime)
     ).apply(instance, (r, s, p, t) -> new ResearchInstance(r, s, p.orElse(null), t)));
     public static final StreamCodec<RegistryFriendlyByteBuf, ResearchInstance> STREAM_CODEC = StreamCodec.composite(
-            Research.RESOURCE_KEY_STREAM_CODEC,
+            GlobalResearch.STREAM_CODEC,
             ResearchInstance::getResearch,
             CodecUtils.enumStreamCodec(ResearchStatus.class),
             ResearchInstance::getResearchStatus,
@@ -31,40 +31,28 @@ public final class ResearchInstance {
             (r, s, p, t) -> new ResearchInstance(r, s, p.orElse(null), t)
     );
 
-    private final ResourceKey<Research> research;
-    private final Set<ResearchInstance> parents;
-    private final Set<ResearchInstance> children;
+    private final GlobalResearch research;
     private ResearchStatus researchStatus;
     private @Nullable UUID researchedPlayer;
     private long researchedTime;
 
-    private ResearchInstance(ResourceKey<Research> research, ResearchStatus researchStatus, UUID researchedPlayer, long researchedTime) {
+    private ResearchInstance(GlobalResearch research, ResearchStatus researchStatus, UUID researchedPlayer, long researchedTime) {
         this.research = research;
         this.researchStatus = researchStatus;
         this.researchedPlayer = researchedPlayer;
         this.researchedTime = researchedTime;
-        this.parents = new HashSet<>();
-        this.children = new HashSet<>();
     }
 
-    public ResearchInstance(ResourceKey<Research> research, ResearchStatus researchStatus) {
+    public ResearchInstance(GlobalResearch research, ResearchStatus researchStatus) {
         this(research, researchStatus, null, -1);
     }
 
-    public ResourceKey<Research> getResearch() {
+    public GlobalResearch getResearch() {
         return research;
     }
 
     public ResearchStatus getResearchStatus() {
         return researchStatus;
-    }
-
-    public Set<ResearchInstance> getParents() {
-        return parents;
-    }
-
-    public Set<ResearchInstance> getChildren() {
-        return children;
     }
 
     public void setResearchStatus(ResearchStatus researchStatus) {
@@ -87,20 +75,39 @@ public final class ResearchInstance {
         this.researchedTime = researchedTime;
     }
 
-    public ResearchInstance copy() {
-        return new ResearchInstance(getResearch(), ResearchStatus.values()[getResearchStatus().ordinal()]);
+    public Set<GlobalResearch> getChildren() {
+        return this.research.getChildren();
     }
 
-    // TODO: might want to compare the research time idk
+    public Set<GlobalResearch> getParents() {
+        return this.research.getParents();
+    }
+
+    public boolean is(ResearchInstance instance) {
+        return this.is(instance.getResearch());
+    }
+
+    public boolean is(GlobalResearch research) {
+        return this.is(research.getResearch());
+    }
+
+    public boolean is(ResourceKey<Research> key) {
+        return this.research.is(key);
+    }
+
+    public ResearchInstance copy() {
+        return new ResearchInstance(this.getResearch(), this.getResearchStatus(), this.getResearchedPlayer(), this.getResearchedTime());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof ResearchInstance instance)) return false;
-        return Objects.equals(research, instance.research) && researchStatus == instance.researchStatus;
+        return researchedTime == instance.researchedTime && Objects.equals(research, instance.research) && researchStatus == instance.researchStatus && Objects.equals(researchedPlayer, instance.researchedPlayer);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(research, researchStatus);
+        return Objects.hash(research, researchStatus, researchedPlayer, researchedTime);
     }
 
     @Override

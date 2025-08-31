@@ -22,6 +22,8 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
+import java.util.Set;
+
 public record ResearchFinishedPayload(int timeStamp) implements CustomPacketPayload {
     public static final Type<ResearchFinishedPayload> TYPE = new Type<>(Researchd.rl("research_finished"));
     public static final StreamCodec<? super RegistryFriendlyByteBuf, ResearchFinishedPayload> STREAM_CODEC = StreamCodec.composite(
@@ -45,9 +47,9 @@ public record ResearchFinishedPayload(int timeStamp) implements CustomPacketPayl
                 ResearchInstance first = queue.getEntries().getFirst();
                 first.setResearchStatus(ResearchStatus.RESEARCHED);
                 queue.remove(0);
-                UniqueArray<ResearchNode> children = ClientResearchCache.getNodeByResearch(ClientResearchCache.NODES, first.getResearch()).getChildren();
-                for (ResearchNode child : children) {
-                    child.getInstance().setResearchStatus(ResearchStatus.RESEARCHABLE);
+                Set<ResearchInstance> children = first.getChildren();
+                for (ResearchInstance child : children) {
+                    child.setResearchStatus(ResearchStatus.RESEARCHABLE);
                 }
                 team.getResearchProgress().completeResearch(first);
 

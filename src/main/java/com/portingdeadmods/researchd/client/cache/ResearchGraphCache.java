@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.client.cache;
 
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.data.ResearchGraph;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +31,7 @@ public final class ResearchGraphCache {
     }
 
     private static @NotNull ResearchGraph computeGraph(Player player, ResourceKey<Research> key) {
-        return ResearchGraph.fromRootNode(player, ClientResearchCache.getNodeByResearch(ClientResearchCache.NODES, key));
+        return ResearchGraph.formRootResearch(player, ResearchHelperCommon.getInstanceByResearch(ClientResearchCache.GLOBAL_READ_ONLY_RESEARCHES, key));
     }
 
 }

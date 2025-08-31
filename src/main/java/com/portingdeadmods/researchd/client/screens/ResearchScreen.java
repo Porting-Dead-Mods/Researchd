@@ -58,8 +58,8 @@ public class ResearchScreen extends Screen {
         int x = 174;
         this.researchGraphWidget = new ResearchGraphWidget(this, x, 8, 300, 253 - 16);
         Minecraft mc = Minecraft.getInstance();
-        if (ClientResearchCache.ROOT_NODE != null) {
-            this.researchGraphWidget.setGraph(ResearchGraph.fromRootNode(mc.player, ClientResearchCache.ROOT_NODE));
+        if (ClientResearchCache.ROOT_INSTANCE != null) {
+            this.researchGraphWidget.setGraph(ResearchGraph.formRootResearch(mc.player, ClientResearchCache.ROOT_INSTANCE));
         }
     }
 

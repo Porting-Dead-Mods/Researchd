@@ -49,7 +49,7 @@ public record ResearchProgress(
     // Helper methods
     public boolean hasCompleted(ResourceKey<Research> research) {
         return completedResearches.stream()
-                .anyMatch(r -> r.equals(research));
+                .anyMatch(r -> r.is(research));
     }
 
     public @Nullable ResearchCompletionProgress tryGetProgress(ResourceKey<Research> research) {
@@ -61,7 +61,7 @@ public record ResearchProgress(
     }
 
     public ResearchCompletionProgress getProgress(ResearchInstance research, HolderLookup.Provider provider) {
-        return progress().computeIfAbsent(research, r -> ResearchHelperCommon.getResearch(research.getResearch(), provider).researchMethod().getDefaultProgress());
+        return progress().computeIfAbsent(research, r -> ResearchHelperCommon.getResearch(r.getResearch(), provider).researchMethod().getDefaultProgress());
     }
 
     public void completeResearch(ResearchInstance research) {

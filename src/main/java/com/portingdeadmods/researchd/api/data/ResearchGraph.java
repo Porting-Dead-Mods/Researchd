@@ -1,6 +1,8 @@
 package com.portingdeadmods.researchd.api.data;
 
-import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
+import com.portingdeadmods.researchd.api.research.GlobalResearch;
+import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.client.cache.ClientResearchCache;
 import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
 import net.minecraft.world.entity.player.Player;
 
@@ -8,46 +10,54 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public record ResearchGraph(ResearchNode rootNode, Set<ResearchNode> parents, Set<ResearchNode> children, Set<ResearchNode> nodes) {
+    private static final int RESEARCH_GRAPH_LAYERS = 2;
+
     private ResearchGraph(ResearchNode rootNode, Set<ResearchNode> parents, Set<ResearchNode> children) {
         this(rootNode, parents, children, new LinkedHashSet<>());
         this.nodes.addAll(this.parents);
         this.nodes.addAll(this.children);
 
-        collectUpwards(rootNode, null);
-        collectDownwards(rootNode);
+        createNodes(rootNode.getInstance(), 0, ClientResearchCache.ROOT_INSTANCE.is(rootNode.getInstance()) ? -1 : RESEARCH_GRAPH_LAYERS);
+
+        for (ResearchNode node : this.nodes) {
+            node.graph = this;
+        }
+
     }
 
-    private void collectUpwards(ResearchNode node, ResearchNode prevNode) {
-        this.nodes.add(node);
-        for (ResearchNode node2 : node.getParents()) {
-            UniqueArray<ResearchNode> hiddenChildren = node2.getHiddenChildren();
-            hiddenChildren.addAll(node2.getChildren());
-            hiddenChildren.remove(prevNode);
-            collectUpwards(node2, node);
+    private void createNodes(ResearchInstance instance, int nesting, int layers) {
+        createNodesDownward(instance, nesting, layers);
+        createNodesUpward(instance, nesting, layers);
+    }
+
+    private void createNodesUpward(ResearchInstance instance, int nesting, int layers) {
+        this.nodes.add(new ResearchNode(instance));
+        for (GlobalResearch instance1 : instance.getParents()) {
+            if (nesting <= layers && layers != -1) {
+                createNodesUpward(instance1, nesting + 1, layers);
+            } else {
+                return;
+            }
         }
     }
 
-    private void collectDownwards(ResearchNode node) {
-        this.nodes.add(node);
-        for (ResearchNode node2 : node.getChildren()) {
-            collectDownwards(node2);
+    private void createNodesDownward(ResearchInstance instance, int nesting, int layers) {
+        this.nodes.add(new ResearchNode(instance));
+        for (GlobalResearch instance1 : instance.getChildren()) {
+            if (nesting <= layers && layers != -1) {
+                createNodesDownward(instance1, nesting + 1, layers);
+            } else {
+                return;
+            }
         }
     }
 
-    public static ResearchGraph fromRootNode(Player player, ResearchNode rootNode) {
+    public static ResearchGraph formRootResearch(Player player, ResearchInstance root) {
         Set<ResearchNode> parents = new LinkedHashSet<>();
-        cleanupParentsChildNodes(rootNode, parents);
+
+        ResearchNode rootNode = new ResearchNode(root);
 
         return new ResearchGraph(rootNode, parents, new LinkedHashSet<>());
     }
 
-    // FIXME: Maybe we need to copy parent... idk
-    private static void cleanupParentsChildNodes(ResearchNode rootNode, Set<ResearchNode> parents) {
-        for (ResearchNode parent : rootNode.getParents()) {
-            ResearchNode parentNode = parent.copy();
-            parentNode.getChildren().removeIf(parentChildNode -> parentChildNode.getInstance().getResearch().compareTo(rootNode.getInstance().getResearch()) != 0);
-            parents.add(parentNode);
-            cleanupParentsChildNodes(parentNode, parents);
-        }
-    }
 }

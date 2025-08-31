@@ -1,5 +1,6 @@
 package com.portingdeadmods.researchd.client.screens.graph;
 
+import com.portingdeadmods.researchd.api.data.ResearchGraph;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.cache.ClientResearchCache;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
@@ -31,6 +32,7 @@ public class ResearchNode extends AbstractWidget {
     private final UniqueArray<ResearchHead> outputs;
 
     private boolean rootNode;
+    public ResearchGraph graph;
 
     public ResearchNode(ResearchInstance instance) {
         super(0, 0, ResearchScreenWidget.PANEL_WIDTH, ResearchScreenWidget.PANEL_HEIGHT, CommonComponents.EMPTY);
@@ -79,10 +81,6 @@ public class ResearchNode extends AbstractWidget {
         this.doMovementLogic = false;
     }
 
-    public ResearchNode copy() {
-        return new ResearchNode(this.instance.copy());
-    }
-
     public Integer getLayer() {
         if (GraphLayoutManager.nodeLayerMap.get(this) == null) {
             return -1;
@@ -119,16 +117,18 @@ public class ResearchNode extends AbstractWidget {
     }
 
     public void refreshHeads() {
-        Set<ResearchNode> visibleNodes = ClientResearchCache.NODES;
+        if (this.graph != null) {
+            Set<ResearchNode> visibleNodes = this.graph.nodes();
 
-        Set<ResearchNode> visibleNodesCopy = new UniqueArray<>(visibleNodes);
-        //this.getHiddenChildren().forEach(visibleNodesCopy::remove);
+            Set<ResearchNode> visibleNodesCopy = new UniqueArray<>(visibleNodes);
+            //this.getHiddenChildren().forEach(visibleNodesCopy::remove);
 
-        this.inputs.clear();
-        this.inputs.addAll(ResearchHead.inputsOf(this, visibleNodes));
+            this.inputs.clear();
+            this.inputs.addAll(ResearchHead.inputsOf(this, visibleNodes));
 
-        this.outputs.clear();
-        this.outputs.addAll(ResearchHead.outputsOf(this, visibleNodesCopy));
+            this.outputs.clear();
+            this.outputs.addAll(ResearchHead.outputsOf(this, visibleNodesCopy));
+        }
     }
 
     public boolean isRootNode() {

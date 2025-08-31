@@ -256,7 +256,7 @@ public class ResearchTeam {
 		components[0] = teamName;
 
 		components[1] = members.size() == 1 ?
-				Component.literal(" has " + this.members.size() + " member: ").withStyle(ChatFormatting.WHITE)
+				Component.literal(" has " + this.members.size() + " player: ").withStyle(ChatFormatting.WHITE)
 				:
 				Component.literal(" has " + this.members.size() + " members: ").withStyle(ChatFormatting.WHITE);
 
