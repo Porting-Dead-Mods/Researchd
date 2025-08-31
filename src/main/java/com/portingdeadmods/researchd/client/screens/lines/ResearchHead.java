@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.FastColor;
 
 import java.awt.*;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -129,10 +130,10 @@ public class ResearchHead {
 
 	/**
 	 * @param node {@link ResearchNode} to get input heads for
-	 * @param visibleNodes {@link Set} of visible nodes in the current graph
+	 * @param visibleNodes {@link Collection} of visible nodes in the current graph
 	 * @return {@link UniqueArray} of input heads, order left -> right
 	 */
-	public static UniqueArray<ResearchHead> inputsOf(ResearchNode node, Set<ResearchNode> visibleNodes) {
+	public static UniqueArray<ResearchHead> inputsOf(ResearchNode node, Collection<ResearchNode> visibleNodes) {
 		UniqueArray<ResearchHead> positions = new UniqueArray<>();
 		UniqueArray<ResearchNode> parents = new UniqueArray<>();
 
@@ -172,10 +173,10 @@ public class ResearchHead {
 
 	/**
 	 * @param node {@link ResearchNode} to get output heads for
-	 * @param visibleNodes {@link Set} of visible nodes in the current graph
+	 * @param visibleNodes {@link Collection} of visible nodes in the current graph
 	 * @return {@link UniqueArray} of output heads, order left -> right
 	 */
-	public static UniqueArray<ResearchHead> outputsOf(ResearchNode node, Set<ResearchNode> visibleNodes) {
+	public static UniqueArray<ResearchHead> outputsOf(ResearchNode node, Collection<ResearchNode> visibleNodes) {
 		UniqueArray<ResearchHead> positions = new UniqueArray<>();
 		UniqueArray<ResearchNode> children = new UniqueArray<>();
 

@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.utils.researches;
 
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
@@ -17,6 +18,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jetbrains.annotations.Nullable;
@@ -25,7 +27,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public final class ResearchHelperCommon {
-    public static Set<Holder<Research>> getLevelResearches(Level level) {
+    public static Set<Holder<Research>> getLevelResearches(LevelAccessor level) {
         RegistryAccess registryAccess = level.registryAccess();
         HolderLookup.RegistryLookup<Research> registry = registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_KEY);
         return registry.listElements().collect(Collectors.toSet());
@@ -46,8 +48,11 @@ public final class ResearchHelperCommon {
     }
 
     public static List<ResearchInstance> getRecentResearches(ResearchTeam team) {
-        UniqueArray<ResearchInstance> researchInstances = team.getResearchProgress().completedResearches();
-        return researchInstances.stream().sorted(Comparator.comparingLong(ResearchInstance::getResearchedTime)).toList();
+        Collection<ResearchInstance> researchInstances = team.getResearchProgress().researches().values();
+        return researchInstances.stream()
+                .filter(r -> r.getResearchStatus() == ResearchStatus.RESEARCHED)
+                .sorted(Comparator.comparingLong(ResearchInstance::getResearchedTime))
+                .toList();
     }
 
     public static Research getResearch(ResourceKey<Research> resourceKey, HolderLookup.Provider lookup) {
@@ -56,7 +61,7 @@ public final class ResearchHelperCommon {
 
     public static @Nullable ResearchInstance getInstanceByResearch(Set<ResearchInstance> researches, ResourceKey<Research> key) {
         for (ResearchInstance instance : researches) {
-            if (instance.getResearch().compareTo(key) == 0) {
+            if (instance.is(key)) {
                 return instance;
             }
         }
@@ -93,10 +98,12 @@ public final class ResearchHelperCommon {
             }
         }
 
-        for (ResearchInstance res : team.getResearchProgress().completedResearches()) {
-            ResearchHelperCommon.getResearch(res.getResearch(), level.registryAccess()).researchEffects().forEach(
-                    eff -> eff.onUnlock(level, player, res.getResearch())
-            );
+        for (ResearchInstance res : team.getResearchProgress().researches().values()) {
+            if (res.getResearchStatus() == ResearchStatus.RESEARCHED) {
+                res.lookup(level.registryAccess()).researchEffects().forEach(
+                        eff -> eff.onUnlock(level, player, res.getKey())
+                );
+            }
         }
     }
 }

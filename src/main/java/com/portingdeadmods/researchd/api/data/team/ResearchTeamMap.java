@@ -3,7 +3,7 @@ package com.portingdeadmods.researchd.api.data.team;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.client.cache.ClientResearchCache;
+import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -52,8 +52,8 @@ public class ResearchTeamMap {
 
     public @Nullable ResearchTeam getTeamByMember(UUID memberUuid) {
         for (ResearchTeam team : this.researchTeams.values()) {
-            for (UUID member : team.getMembers()) {
-                if (memberUuid.equals(member)) return team;
+            for (TeamMember member : team.getMembers()) {
+                if (member.player().equals(memberUuid)) return team;
             }
         }
         return null;
@@ -70,7 +70,8 @@ public class ResearchTeamMap {
     public static void onSync(Player player) {
         if (player.level().isClientSide) {
             ResearchHelperClient.refreshResearches((LocalPlayer) player);
-            ClientResearchCache.sync(player);
+            // TODO: Maybe sync them from the server as soon as the player joins
+            CommonResearchCache.initialize(player.level());
         } else {
             ResearchHelperCommon.refreshResearches((ServerPlayer) player);
         }

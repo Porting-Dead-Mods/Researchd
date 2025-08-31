@@ -5,7 +5,6 @@ import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
-import com.portingdeadmods.researchd.client.cache.ClientResearchCache;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.screens.graph.GraphLayoutManager;
@@ -15,7 +14,6 @@ import com.portingdeadmods.researchd.client.screens.lines.PotentialOverlap;
 import com.portingdeadmods.researchd.client.screens.lines.ResearchHead;
 import com.portingdeadmods.researchd.client.screens.lines.ResearchLine;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import com.portingdeadmods.researchd.api.data.ResearchGraph;
 import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
@@ -26,6 +24,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import org.jetbrains.annotations.NotNull;
@@ -76,7 +75,7 @@ public class ResearchGraphWidget extends AbstractWidget {
                 // Don't do anything if we restored the layout
             }
 
-            for (ResearchNode node : graph.nodes()) {
+            for (ResearchNode node : graph.nodes().values()) {
                 node.refreshHeads();
             }
 
@@ -102,7 +101,7 @@ public class ResearchGraphWidget extends AbstractWidget {
         }
 
         // Process nodes layer by layer, bottom to top, then left to right
-        List<ResearchNode> sortedNodes = new ArrayList<>(graph.nodes());
+        List<ResearchNode> sortedNodes = new ArrayList<>(graph.nodes().values());
         sortedNodes.sort(Comparator
                 .comparingInt(ResearchNode::getY)  // First by Y (layer)
                 .reversed()                        // Reverse to start from bottom
@@ -122,14 +121,14 @@ public class ResearchGraphWidget extends AbstractWidget {
 
         // Process each node
         for (ResearchNode parent : sortedNodes) {
-            Researchd.debug("Research lines", "Processing parent node: ", parent.getInstance().getResearch().location());
+            Researchd.debug("Research lines", "Processing parent node: ", parent.getInstance().getKey().location());
 
             ArrayList<ResearchLine> nodeLines = new ArrayList<>();
 
             // Group children by layer for consistent path styles
             Map<Integer, List<ResearchNode>> childrenByLayer = new HashMap<>();
             for (ResearchNode child : parent.getChildren()) {
-                if (!this.graph.nodes().contains(child)) continue;
+                if (!this.graph.nodes().containsValue(child)) continue;
 
                 childrenByLayer
                         .computeIfAbsent(GraphLayoutManager.calculateDepth(child), k -> new ArrayList<>())
@@ -169,7 +168,7 @@ public class ResearchGraphWidget extends AbstractWidget {
                 for (int i = 0; i < layerChildren.size(); i++) {
                     ResearchNode child = layerChildren.get(i);
 
-                    Researchd.debug("Research lines", "Processing child ", (i + 1), "/", layerChildren.size(), ": ", child.getInstance().getResearch().location());
+                    Researchd.debug("Research lines", "Processing child ", (i + 1), "/", layerChildren.size(), ": ", child.getInstance().getKey().location());
                     Researchd.debug("Research lines", "Total input heads: ", child.getInputs().size());
 
                     // Get available input heads for this child
@@ -553,7 +552,7 @@ public class ResearchGraphWidget extends AbstractWidget {
             return;
         }
 
-        for (ResearchNode node : this.graph.nodes()) {
+        for (ResearchNode node : this.graph.nodes().values()) {
             if (node == this.graph.rootNode()) {
                 float scale = 1.75f;
                 int width = ResearchScreenWidget.PANEL_WIDTH;
@@ -598,22 +597,23 @@ public class ResearchGraphWidget extends AbstractWidget {
         }
     }
 
+    // TODO: Cache hovered node like the isHovered field
     public void renderNodeTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         if (!this.isHovered() || this.graph == null || this.graph.nodes() == null) return;
 
-        for (ResearchNode node : this.graph.nodes()) {
+        for (ResearchNode node : this.graph.nodes().values()) {
             if (node.isHovered()) {
                 Minecraft minecraft = Minecraft.getInstance();
                 // Debug tooltip
                 if (SharedConstants.IS_RUNNING_IN_IDE && !ResearchScreen.hasControlDown()) {
                     guiGraphics.renderComponentTooltip(minecraft.font, List.of(
-                            Utils.registryTranslation(node.getInstance().getResearch()),
-                            Component.translatable("research_desc." + Researchd.MODID + "." + node.getInstance().getResearch().location().getPath()),
+                            Utils.registryTranslation(node.getInstance().getKey()),
+                            Component.translatable("research_desc." + Researchd.MODID + "." + node.getInstance().getKey().location().getPath()),
                             SharedConstants.IS_RUNNING_IN_IDE ? Component.literal("Press Ctrl for debug info") : Component.empty()
                     ), mouseX, mouseY);
                 } else {
                     guiGraphics.renderComponentTooltip(minecraft.font, List.of(
-                            Utils.registryTranslation(node.getInstance().getResearch()),
+                            Utils.registryTranslation(node.getInstance().getKey()),
                             Component.literal("x: %d, y: %d".formatted(node.getX(), node.getY())),
                             Component.literal("w: %d, h: %d".formatted(node.getWidth(), node.getHeight())),
                             Component.literal("hovered: %s".formatted(node.isHovered())),
@@ -636,9 +636,9 @@ public class ResearchGraphWidget extends AbstractWidget {
             return false;
         }
         
-        for (ResearchNode node : this.graph.nodes()) {
+        for (ResearchNode node : this.graph.nodes().values()) {
             if (node.isHovered()) {
-                this.setGraph(ResearchGraphCache.computeIfAbsent(Minecraft.getInstance().player, node.getInstance().getResearch()));
+                this.setGraph(ResearchGraphCache.computeIfAbsent(node.getInstance().getKey()));
                 UniqueArray<ResearchInstance> entries = this.researchScreen.getTechList().entries();
                 this.researchScreen.getSelectedResearchWidget().setSelectedResearch(entries.get(entries.indexOf(node.getInstance())));
                 this.researchScreen.prevSelectedResearchMethodWidget = this.researchScreen.getSelectedResearchWidget().methodWidget;
@@ -651,7 +651,7 @@ public class ResearchGraphWidget extends AbstractWidget {
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
         if (this.graph != null && this.graph.nodes() != null) {
-            for (ResearchNode node : this.graph.nodes()) {
+            for (ResearchNode node : this.graph.nodes().values()) {
                 node.translate((int) dragX, (int) dragY);
             }
         }
@@ -664,6 +664,8 @@ public class ResearchGraphWidget extends AbstractWidget {
 
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
+
+    // TODO: Remove this
 
     private void calculateLayers() {
         this.layers = Layer.calculate(graph).int2ObjectEntrySet()
@@ -861,7 +863,7 @@ public class ResearchGraphWidget extends AbstractWidget {
         }
 
         public static Int2ObjectMap<Layer> calculate(ResearchGraph graph) {
-            return calculate(graph.rootNode(), graph.nodes());
+            return calculate(graph.rootNode(), new HashSet<>(graph.nodes().values()));
         }
 
         private static void traverseTree(ResearchNode node, Int2ObjectMap<Layer> nodes, Set<ResearchNode> remaining, int nesting) {
@@ -958,7 +960,8 @@ public class ResearchGraphWidget extends AbstractWidget {
     }
 
     private static @NotNull Research getResearch(ResearchNode node) {
-        return ResearchHelperCommon.getResearch(node.getInstance().getResearch(), Minecraft.getInstance().level.registryAccess());
+        RegistryAccess registryAccess = Minecraft.getInstance().level.registryAccess();
+        return node.getInstance().lookup(registryAccess);
     }
 
     public void onClose() {

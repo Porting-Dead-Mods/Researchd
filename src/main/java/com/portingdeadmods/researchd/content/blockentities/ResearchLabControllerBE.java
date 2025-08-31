@@ -12,7 +12,7 @@ import com.portingdeadmods.researchd.content.items.ResearchPackItem;
 import com.portingdeadmods.researchd.content.menus.ResearchLabMenu;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
-import com.portingdeadmods.researchd.api.data.ResearchProgress;
+import com.portingdeadmods.researchd.api.data.team.TeamResearchProgress;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
 import com.portingdeadmods.researchd.data.helper.ResearchCompletionProgress;
@@ -20,7 +20,6 @@ import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
 import com.portingdeadmods.researchd.registries.ResearchdBlockEntityTypes;
 import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import com.portingdeadmods.researchd.api.data.ResearchQueue;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.core.BlockPos;
@@ -132,11 +131,12 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
 		ResearchTeam team = ResearchTeamHelper.getResearchTeamByUUID(this.getLevel(), this.getData(ResearchdAttachments.PLACED_BY_UUID));
 		if (team == null) return;
 
-		ResearchProgress teamProgress = team.getMetadata().getResearchProgress();
+		TeamResearchProgress teamProgress = team.getMetadata().getResearchProgress();
 		ResearchQueue queue = teamProgress.researchQueue();
 		if (queue.getEntries().isEmpty()) return;
 		ResearchInstance currentResearchInstance = queue.getEntries().getFirst();
-		Research currentResearch = ResearchHelperCommon.getResearch(currentResearchInstance.getResearch(), this.getLevel().registryAccess());
+		// TODO: Might want to cache this so we dont have to do a lookup every tick
+		Research currentResearch = currentResearchInstance.lookup(this.getLevel().registryAccess());
 		ResearchMethod method = currentResearch.researchMethod();
 
 		if (!(method instanceof ConsumePackResearchMethod packMethod)) return;

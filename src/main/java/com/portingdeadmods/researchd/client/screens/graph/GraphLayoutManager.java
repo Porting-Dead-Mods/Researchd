@@ -174,7 +174,7 @@ public class GraphLayoutManager {
 
 		// TODO: Remake this method to use the above logic, but with the : graph.nodes() instead of recursively going through the children.
 		// PS: It works, but the positioning gets *a bit messed up* and all the nodes are shifted to a direction and it looks weird imo
-		for (ResearchNode gNode : graph.nodes()) {
+		for (ResearchNode gNode : graph.nodes().values()) {
 			_addRightToLayer(calculateDepth(gNode), gNode);
 		}
 	}
@@ -425,7 +425,7 @@ public class GraphLayoutManager {
 		int dx = ((width - NODE_WIDTH) / 2) - root.getX() + screen.getSelectedResearchWidget().getWidth();
 		int dy = ((height - NODE_HEIGHT) / 2) - root.getY();
 
-		for (ResearchNode node : graph.nodes()) {
+		for (ResearchNode node : graph.nodes().values()) {
 			node.translate(dx, dy);
 			Researchd.debug("Layout", "Node@%d: ".formatted(step) + node.getInstance().getResearch() + " Layer: " + node.getLayer() + " X: " + node.getX() + " Y: " + node.getY() + " Pos locks: " + node.getPositionLocks().size());
 		}

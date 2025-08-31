@@ -1,8 +1,8 @@
 package com.portingdeadmods.researchd.client.screens.graph;
 
 import com.portingdeadmods.researchd.api.data.ResearchGraph;
+import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
-import com.portingdeadmods.researchd.client.cache.ClientResearchCache;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.screens.lines.ResearchHead;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
@@ -10,7 +10,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.resources.ResourceKey;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -118,16 +121,13 @@ public class ResearchNode extends AbstractWidget {
 
     public void refreshHeads() {
         if (this.graph != null) {
-            Set<ResearchNode> visibleNodes = this.graph.nodes();
-
-            Set<ResearchNode> visibleNodesCopy = new UniqueArray<>(visibleNodes);
-            //this.getHiddenChildren().forEach(visibleNodesCopy::remove);
+            Collection<ResearchNode> nodes = this.graph.nodes().values();
 
             this.inputs.clear();
-            this.inputs.addAll(ResearchHead.inputsOf(this, visibleNodes));
+            this.inputs.addAll(ResearchHead.inputsOf(this, nodes));
 
             this.outputs.clear();
-            this.outputs.addAll(ResearchHead.outputsOf(this, visibleNodesCopy));
+            this.outputs.addAll(ResearchHead.outputsOf(this, nodes));
         }
     }
 
@@ -142,6 +142,7 @@ public class ResearchNode extends AbstractWidget {
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
         ResearchScreenWidget.renderResearchPanel(guiGraphics, instance,  getX(), getY(), mouseX, mouseY);
+        // FIXME: Can probably be removed
         refreshHeads();
 
         for (ResearchHead input : inputs) {

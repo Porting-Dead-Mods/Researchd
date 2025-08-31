@@ -41,11 +41,11 @@ public class GraphStateManager {
         clearState();
 
         // Save the root node for identification
-        lastGraphRoot = graph.rootNode().getInstance().getResearch();
+        lastGraphRoot = graph.rootNode().getInstance().getKey();
 
         // Save position and scale for each node
-        for (ResearchNode node : graph.nodes()) {
-            ResourceKey<Research> key = node.getInstance().getResearch();
+        for (ResearchNode node : graph.nodes().values()) {
+            ResourceKey<Research> key = node.getInstance().getKey();
             lastSessionState.put(key, new NodeState(
                     node.getX(),
                     node.getY()
@@ -66,15 +66,15 @@ public class GraphStateManager {
         }
 
         // Check if this is the same graph as last time (by root node)
-        if (!graph.rootNode().getInstance().getResearch().equals(lastGraphRoot)) {
+        if (!graph.rootNode().getInstance().is(lastGraphRoot)) {
             Researchd.debug("Graph State Cache","Graph root has changed, not restoring last session state");
             return false;
         }
 
         // Restore positions for nodes that exist in both graphs
         Researchd.debug("Graph State Cache","Restoring last session");
-        for (ResearchNode node : graph.nodes()) {
-            ResourceKey<Research> key = node.getInstance().getResearch();
+        for (ResearchNode node : graph.nodes().values()) {
+            ResourceKey<Research> key = node.getInstance().getKey();
             NodeState state = lastSessionState.get(key);
 
             if (state != null) {

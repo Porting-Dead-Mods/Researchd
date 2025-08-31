@@ -3,7 +3,7 @@ package com.portingdeadmods.researchd.networking.research;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
-import com.portingdeadmods.researchd.api.data.ResearchProgress;
+import com.portingdeadmods.researchd.api.data.team.TeamResearchProgress;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -31,7 +31,7 @@ public record ResearchQueueRemovePayload(ResearchInstance researchInstance) impl
             if (context.player() instanceof ServerPlayer serverPlayer) {
                 Level level = serverPlayer.level();
                 ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
-                ResearchProgress researchProgress = data.getTeamByPlayer(serverPlayer).getResearchProgress();
+                TeamResearchProgress researchProgress = data.getTeamByPlayer(serverPlayer).getResearchProgress();
                 int index = researchProgress.researchQueue().getEntries().indexOf(researchInstance);
                 researchProgress.researchQueue().remove(researchInstance);
                 if (index == 0) {

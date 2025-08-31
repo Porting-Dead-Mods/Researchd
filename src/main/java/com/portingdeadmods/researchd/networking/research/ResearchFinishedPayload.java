@@ -2,14 +2,12 @@ package com.portingdeadmods.researchd.networking.research;
 
 import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.research.GlobalResearch;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
-import com.portingdeadmods.researchd.client.cache.ClientResearchCache;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
-import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
-import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.data.ResearchQueue;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.ChatFormatting;
@@ -24,6 +22,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.Set;
 
+// TODO: Send resourcekey of the completed research
 public record ResearchFinishedPayload(int timeStamp) implements CustomPacketPayload {
     public static final Type<ResearchFinishedPayload> TYPE = new Type<>(Researchd.rl("research_finished"));
     public static final StreamCodec<? super RegistryFriendlyByteBuf, ResearchFinishedPayload> STREAM_CODEC = StreamCodec.composite(
@@ -47,16 +46,16 @@ public record ResearchFinishedPayload(int timeStamp) implements CustomPacketPayl
                 ResearchInstance first = queue.getEntries().getFirst();
                 first.setResearchStatus(ResearchStatus.RESEARCHED);
                 queue.remove(0);
-                Set<ResearchInstance> children = first.getChildren();
-                for (ResearchInstance child : children) {
-                    child.setResearchStatus(ResearchStatus.RESEARCHABLE);
+                Set<GlobalResearch> children = first.getChildren();
+                for (GlobalResearch child : children) {
+                    team.getResearchProgress().researches().get(child.getResearch()).setResearchStatus(ResearchStatus.RESEARCHABLE);
                 }
                 team.getResearchProgress().completeResearch(first);
 
                 player.sendSystemMessage(
                         ResearchdTranslations.Research.QUEUE_FINISHED.component(
                                 Researchd.MODID,
-                                ChatFormatting.GREEN + Utils.registryTranslation(first.getResearch()).getString() + ChatFormatting.RESET,
+                                ChatFormatting.GREEN + Utils.registryTranslation(first.getKey()).getString() + ChatFormatting.RESET,
                                 ChatFormatting.GREEN + team.getResearchCompletionTime(timeStamp()) + ChatFormatting.RESET
                         ));
             } else {

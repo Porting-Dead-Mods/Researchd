@@ -9,7 +9,7 @@ import com.portingdeadmods.researchd.client.screens.team.ResearchTeamScreen;
 import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
-import com.portingdeadmods.researchd.api.data.ResearchProgress;
+import com.portingdeadmods.researchd.api.data.team.TeamResearchProgress;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.api.data.ResearchQueue;
@@ -50,7 +50,7 @@ public final class ResearchdClientEvents {
 		if (player != null && level != null) {
 			ResearchTeamMap map = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
 			if (map != null) {
-				ResearchProgress researchProgress = map.getTeamByPlayer(player).getResearchProgress();
+				TeamResearchProgress researchProgress = map.getTeamByPlayer(player).getResearchProgress();
 				if (researchProgress != null) {
 					ResearchQueue queue = researchProgress.researchQueue();
 					if (!queue.isEmpty()) {

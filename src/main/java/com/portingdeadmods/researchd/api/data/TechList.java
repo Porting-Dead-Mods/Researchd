@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.api.data;
 
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 
 
 import java.util.List;
@@ -14,10 +15,14 @@ public class TechList {
         updateTechList();
     }
 
+    public static TechList client() {
+        return new TechList(ClientResearchTeamHelper.getTeam().getMetadata().getResearchProgress().researches().values().stream().toList());
+    }
+
     public void updateTechList() {
         List<ResearchInstance> sorted = this.entries.stream().sorted((a, b) -> {
             if (a.getResearchStatus() == b.getResearchStatus()) {
-                return a.getResearch().location().toString().compareTo(b.getResearch().location().toString());
+                return a.getKey().location().toString().compareTo(b.getKey().location().toString());
             }
             return a.getResearchStatus().getSortingValue() - b.getResearchStatus().getSortingValue();
         }).toList();

@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.networking.research;
 
 import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.data.team.TeamMember;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
@@ -44,11 +45,11 @@ public record ResearchQueueAddPayload(ResearchInstance researchInstance) impleme
                 if (!added) return;
 
                 // Announce
-                List<UUID> members = team.getMembers();
-                Component researchName = Utils.registryTranslation(researchInstance().getResearch());
+                List<TeamMember> members = team.getMembers();
+                Component researchName = Utils.registryTranslation(researchInstance().getKey());
 
-                for (UUID memberId : members) {
-                    ServerPlayer member = level.getServer().getPlayerList().getPlayer(memberId);
+                for (TeamMember memberId : members) {
+                    ServerPlayer member = level.getServer().getPlayerList().getPlayer(memberId.player());
                     if (member != null) {
                         member.sendSystemMessage(ResearchdTranslations.Research.QUEUE_ADDED.component(
                                 Researchd.MODID,

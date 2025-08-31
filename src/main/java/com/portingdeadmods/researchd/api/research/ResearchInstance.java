@@ -3,6 +3,8 @@ package com.portingdeadmods.researchd.api.research;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -51,6 +53,10 @@ public final class ResearchInstance {
         return research;
     }
 
+    public ResourceKey<Research> getKey() {
+        return this.research.getResearch();
+    }
+
     public ResearchStatus getResearchStatus() {
         return researchStatus;
     }
@@ -73,6 +79,10 @@ public final class ResearchInstance {
 
     public void setResearchedTime(long researchedTime) {
         this.researchedTime = researchedTime;
+    }
+
+    public Research lookup(HolderLookup.Provider lookupProvider) {
+        return lookupProvider.holder(this.research.getResearch()).map(Holder.Reference::value).orElse(null);
     }
 
     public Set<GlobalResearch> getChildren() {

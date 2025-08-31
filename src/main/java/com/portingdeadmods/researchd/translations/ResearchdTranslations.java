@@ -41,8 +41,8 @@ public final class ResearchdTranslations {
         public static final TranslatableConstant QUEUE_ADDED = create("queue.added", "%s added %s to the research queue!");
         public static final TranslatableConstant QUEUE_FINISHED = create("queue.finished", "%s finished researching (%s)!");
 
-        public static final TranslatableConstant SCREEN_LABEL_RESEARCHED_BY = create("screen.label.researched_by", "Researched By");
-        public static final TranslatableConstant SCREEN_LABEL_EFFECTS = create("screen.label.effects", "Effects");
+        public static final TranslatableConstant SCREEN_LABEL_RESEARCH_COST = create("screen.label.researched_by", "Cost");
+        public static final TranslatableConstant SCREEN_LABEL_RESEARCH_EFFECTS = create("screen.label.effects", "Effects");
 
         private static TranslatableConstant create(String key, String defaultValue) {
             TranslatableConstant constant = new TranslatableConstant(key, "research");

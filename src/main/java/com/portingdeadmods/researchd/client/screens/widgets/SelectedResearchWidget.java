@@ -4,19 +4,18 @@ import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdClient;
-import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidget;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import com.portingdeadmods.researchd.utils.WidgetConstructor;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -47,17 +46,17 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
             Font font = Minecraft.getInstance().font;
             int padding = 3;
 
-            guiGraphics.drawString(font, Utils.registryTranslation(this.selectedInstance.getResearch()), 11, 49, -1);
+            guiGraphics.drawString(font, Utils.registryTranslation(this.selectedInstance.getKey()), 11, 49, -1);
             renderResearchPanel(guiGraphics, this.selectedInstance, 12, 60, mouseX, mouseY, 2, false);
 
             guiGraphics.enableScissor(53, 60, 53 + 115, 55 + 52);
 
-            guiGraphics.drawString(font, ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_LABEL_RESEARCHED_BY), 53 + padding, offsetY + 62, -1);
+            guiGraphics.drawString(font, ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_LABEL_RESEARCH_COST), 53 + padding, offsetY + 62, -1);
 
             int yPos = 76 + 4 + this.methodWidget.getHeight() + offsetY;
             guiGraphics.fill(53, yPos, 53 + 78, yPos + 1, -1);
 
-            guiGraphics.drawString(font, ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_LABEL_EFFECTS), 56, offsetY + 57 + height + 28, -1);
+            guiGraphics.drawString(font, ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_LABEL_RESEARCH_EFFECTS), 56, offsetY + 57 + height + 28, -1);
 
             guiGraphics.disableScissor();
         }
@@ -84,7 +83,8 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
             int padding = 3;
 
             this.scrollOffset = 0;
-            ResearchMethod method = ResearchHelperCommon.getResearch(this.selectedInstance.getResearch(), Minecraft.getInstance().level.registryAccess()).researchMethod();
+            RegistryAccess registryAccess = Minecraft.getInstance().level.registryAccess();
+            ResearchMethod method = this.selectedInstance.lookup(registryAccess).researchMethod();
             WidgetConstructor<? extends ResearchMethod> widgetConstructor = ResearchdClient.RESEARCH_METHOD_WIDGETS.get(method.id());
             if (widgetConstructor != null) {
                 this.methodWidget = widgetConstructor.create(method, 53 + padding, 62 + font.lineHeight + 4);

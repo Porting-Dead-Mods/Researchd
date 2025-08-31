@@ -380,8 +380,8 @@ public final class ResearchTeamHelper {
     }
 
     public static ArrayList<String> getTeamMemberNames(Level level, Player player) {
-        return new ArrayList<String>(getResearchTeam(player).getMembers().stream().map(
-                member -> level.getPlayerByUUID(member).getName().getString()
+        return new ArrayList<>(getResearchTeam(player).getMembers().stream().map(
+                member -> level.getPlayerByUUID(member.player()).getName().getString()
         ).toList());
     }
 

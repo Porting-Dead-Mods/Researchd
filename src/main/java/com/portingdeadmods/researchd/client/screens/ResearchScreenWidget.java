@@ -56,7 +56,7 @@ public abstract class ResearchScreenWidget extends AbstractWidget {
             int itemY = (PANEL_HEIGHT - 18) / 2;      // center item vertically
 
             guiGraphics.renderItem(
-                    ResearchHelperCommon.getResearch(instance.getResearch(), lookup).icon().getDefaultInstance(),
+                    instance.lookup(lookup).icon().getDefaultInstance(),
                     itemX,
                     itemY
             );
@@ -87,7 +87,7 @@ public abstract class ResearchScreenWidget extends AbstractWidget {
 
         // TODO: Cache this
         RegistryAccess lookup = Minecraft.getInstance().level.registryAccess();
-        guiGraphics.renderItem(ResearchHelperCommon.getResearch(instance.getResearch(), lookup).icon().getDefaultInstance(), x + 2, y + 2);
+        guiGraphics.renderItem(instance.lookup(lookup).icon().getDefaultInstance(), x + 2, y + 2);
 
         if (isHovering(guiGraphics, x, y, mouseX, mouseY) && hoverable) {
             int color = -2130706433;

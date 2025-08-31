@@ -2,16 +2,18 @@ package com.portingdeadmods.researchd.events;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
-import com.portingdeadmods.researchd.api.data.ResearchProgress;
+import com.portingdeadmods.researchd.api.data.team.TeamResearchProgress;
 import com.portingdeadmods.researchd.api.data.ResearchQueue;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
+import com.portingdeadmods.researchd.api.data.team.TeamMember;
 import com.portingdeadmods.researchd.api.pdl.data.PDLClientSavedData;
 import com.portingdeadmods.researchd.api.pdl.data.PDLSavedData;
 import com.portingdeadmods.researchd.api.pdl.data.SavedDataHolder;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
+import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.content.commands.ResearchdCommands;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
@@ -36,6 +38,7 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -76,15 +79,15 @@ public final class ResearchdCommonEvents {
 
         if (data != null) {
             for (ResearchTeam team : data.getResearchTeams().values()) {
-                ResearchProgress progress = team.getResearchProgress();
+                TeamResearchProgress progress = team.getResearchProgress();
                 ResearchQueue queue = progress.researchQueue();
 
                 Research currentResearch = team.getResearchInQueue(level.registryAccess());
                 ResearchCompletionProgress currentResearchProgress = team.getResearchingProgressInQueue(level.registryAccess());
                 if (currentResearchProgress != null) {
                     // Sync to client the progress on every tick
-                    for (UUID memberUUID : team.getMembers()) {
-                        ServerPlayer player = server.getPlayerList().getPlayer(memberUUID);
+                    for (TeamMember memberUUID : team.getMembers()) {
+                        ServerPlayer player = server.getPlayerList().getPlayer(memberUUID.player());
                         if (player == null) continue;
 
                         PacketDistributor.sendToPlayer(player, new ResearchCompleteProgressSyncPayload(currentResearchProgress.getProgress()));
@@ -92,8 +95,8 @@ public final class ResearchdCommonEvents {
 
                     // Apply research effects
                     if (currentResearchProgress.isComplete()) {
-                        for (UUID playerUUIDs : team.getMembers()) {
-                            ServerPlayer player = server.getPlayerList().getPlayer(playerUUIDs);
+                        for (TeamMember playerUUIDs : team.getMembers()) {
+                            ServerPlayer player = server.getPlayerList().getPlayer(playerUUIDs.player());
                             for (ResearchEffect effect : currentResearch.researchEffects()) {
                                 Researchd.debug("Researching", "Applying research effects for Research: " + team.getResearchKeyInQueue() + " to player: " + player.getName().getString());
                                 effect.onUnlock(level, player, team.getResearchKeyInQueue());
@@ -161,6 +164,12 @@ public final class ResearchdCommonEvents {
             Researchd.RESEARCH_PACK_REGISTRY.initialize(registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY));
             Researchd.debug("Researchd Constants Server", "Initialized research pack registry LazyFinal. ");
         }
+    }
+
+    @SubscribeEvent
+    public static void onWorldLoad(LevelEvent.Load event) {
+        // TODO: Syncing
+        CommonResearchCache.initialize(event.getLevel());
     }
 
     public static void onJoinLevel(EntityJoinLevelEvent entity) {

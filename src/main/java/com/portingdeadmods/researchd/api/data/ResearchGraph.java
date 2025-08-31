@@ -1,63 +1,83 @@
 package com.portingdeadmods.researchd.api.data;
 
 import com.portingdeadmods.researchd.api.research.GlobalResearch;
+import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
-import com.portingdeadmods.researchd.client.cache.ClientResearchCache;
+import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.resources.ResourceKey;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
-public record ResearchGraph(ResearchNode rootNode, Set<ResearchNode> parents, Set<ResearchNode> children, Set<ResearchNode> nodes) {
+/**
+ * Data of the research graph
+ * @param rootNode Root node that is displayed bigger than the rest of the nodes
+ * @param nodes All the nodes in the current graph
+ */
+public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, ResearchNode> nodes) {
     private static final int RESEARCH_GRAPH_LAYERS = 2;
 
-    private ResearchGraph(ResearchNode rootNode, Set<ResearchNode> parents, Set<ResearchNode> children) {
-        this(rootNode, parents, children, new LinkedHashSet<>());
-        this.nodes.addAll(this.parents);
-        this.nodes.addAll(this.children);
+    // TODO: Add researches to the team's research progress
+    private ResearchGraph(GlobalResearch researchRoot, Map<ResourceKey<Research>, ResearchInstance> researches) {
+        this(new ResearchNode(researches.get(researchRoot.getResearch())), new HashMap<>());
 
-        createNodes(rootNode.getInstance(), 0, ClientResearchCache.ROOT_INSTANCE.is(rootNode.getInstance()) ? -1 : RESEARCH_GRAPH_LAYERS);
+        createNodes(rootNode.getInstance(), 0, CommonResearchCache.ROOT_RESEARCH.is(rootNode.getInstance().getKey()) ? -1 : RESEARCH_GRAPH_LAYERS, researches);
+        collectRelatedNodes();
 
-        for (ResearchNode node : this.nodes) {
+        for (ResearchNode node : this.nodes.values()) {
             node.graph = this;
         }
 
     }
 
-    private void createNodes(ResearchInstance instance, int nesting, int layers) {
-        createNodesDownward(instance, nesting, layers);
-        createNodesUpward(instance, nesting, layers);
+    private void collectRelatedNodes() {
+        for (ResearchNode node : this.nodes.values()) {
+            GlobalResearch research = node.getInstance().getResearch();
+            Set<GlobalResearch> parents = research.getParents();
+
+            for (GlobalResearch parent : parents) {
+                ResearchNode parentNode = this.nodes.get(parent.getResearch());
+                node.addParent(parentNode);
+            }
+
+            Set<GlobalResearch> children = research.getChildren();
+
+            for (GlobalResearch child : children) {
+                ResearchNode childNode = this.nodes.get(child.getResearch());
+                node.addChild(childNode);
+            }
+        }
     }
 
-    private void createNodesUpward(ResearchInstance instance, int nesting, int layers) {
-        this.nodes.add(new ResearchNode(instance));
-        for (GlobalResearch instance1 : instance.getParents()) {
-            if (nesting <= layers && layers != -1) {
-                createNodesUpward(instance1, nesting + 1, layers);
+    private void createNodes(ResearchInstance instance, int nesting, int layers, Map<ResourceKey<Research>, ResearchInstance> researches) {
+        createNodesDownward(instance, nesting, layers, researches);
+        createNodesUpward(instance, nesting, layers, researches);
+    }
+
+    private void createNodesUpward(ResearchInstance instance, int nesting, int layers, Map<ResourceKey<Research>, ResearchInstance> researches) {
+        this.nodes.put(instance.getKey(), new ResearchNode(instance));
+        for (GlobalResearch research : instance.getParents()) {
+            if (nesting <= layers || layers == -1) {
+                createNodesUpward(researches.get(research.getResearch()), nesting + 1, layers, researches);
             } else {
                 return;
             }
         }
     }
 
-    private void createNodesDownward(ResearchInstance instance, int nesting, int layers) {
-        this.nodes.add(new ResearchNode(instance));
-        for (GlobalResearch instance1 : instance.getChildren()) {
-            if (nesting <= layers && layers != -1) {
-                createNodesDownward(instance1, nesting + 1, layers);
+    private void createNodesDownward(ResearchInstance instance, int nesting, int layers, Map<ResourceKey<Research>, ResearchInstance> researches) {
+        this.nodes.put(instance.getKey(), new ResearchNode(instance));
+        for (GlobalResearch research : instance.getChildren()) {
+            if (nesting <= layers || layers == -1) {
+                createNodesDownward(researches.get(research.getResearch()), nesting + 1, layers, researches);
             } else {
                 return;
             }
         }
     }
 
-    public static ResearchGraph formRootResearch(Player player, ResearchInstance root) {
-        Set<ResearchNode> parents = new LinkedHashSet<>();
-
-        ResearchNode rootNode = new ResearchNode(root);
-
-        return new ResearchGraph(rootNode, parents, new LinkedHashSet<>());
+    public static ResearchGraph formRootResearch(ResourceKey<Research> root, Map<ResourceKey<Research>, ResearchInstance> researches) {
+        return new ResearchGraph(CommonResearchCache.GLOBAL_RESEARCHES.get(root), researches);
     }
 
 }

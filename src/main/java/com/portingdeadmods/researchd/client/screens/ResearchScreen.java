@@ -3,13 +3,15 @@ package com.portingdeadmods.researchd.client.screens;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidget;
-import com.portingdeadmods.researchd.client.cache.ClientResearchCache;
+import com.portingdeadmods.researchd.cache.CommonResearchCache;
+import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.widgets.ResearchGraphWidget;
 import com.portingdeadmods.researchd.client.screens.widgets.SelectedResearchWidget;
 import com.portingdeadmods.researchd.client.screens.widgets.TechListWidget;
 import com.portingdeadmods.researchd.client.screens.widgets.ResearchQueueWidget;
 import com.portingdeadmods.researchd.api.data.ResearchGraph;
 import com.portingdeadmods.researchd.api.data.TechList;
+import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -44,7 +46,7 @@ public class ResearchScreen extends Screen {
 
         // TECH LIST
         this.techListWidget = new TechListWidget(this, 0, 109, 7);
-        this.techListWidget.setTechList(new TechList(ClientResearchCache.GLOBAL_READ_ONLY_RESEARCHES.stream().toList()));
+        this.techListWidget.setTechList(new TechList(ClientResearchTeamHelper.getTeam().getMetadata().getResearchProgress().researches().values().stream().toList()));
 
         // THIS NEEDS TO BE BEFORE THE GRAPH
         this.selectedResearchWidget = new SelectedResearchWidget(0, 40, SelectedResearchWidget.BACKGROUND_WIDTH, SelectedResearchWidget.BACKGROUND_HEIGHT);
@@ -58,8 +60,8 @@ public class ResearchScreen extends Screen {
         int x = 174;
         this.researchGraphWidget = new ResearchGraphWidget(this, x, 8, 300, 253 - 16);
         Minecraft mc = Minecraft.getInstance();
-        if (ClientResearchCache.ROOT_INSTANCE != null) {
-            this.researchGraphWidget.setGraph(ResearchGraph.formRootResearch(mc.player, ClientResearchCache.ROOT_INSTANCE));
+        if (CommonResearchCache.ROOT_RESEARCH != null) {
+            this.researchGraphWidget.setGraph(ResearchGraphCache.computeIfAbsent(CommonResearchCache.ROOT_RESEARCH.getResearch()));
         }
     }
 
