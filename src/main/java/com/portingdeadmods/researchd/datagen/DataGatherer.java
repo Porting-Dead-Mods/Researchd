@@ -20,5 +20,6 @@ public class DataGatherer {
 
         generator.addProvider(event.includeServer(), new DatapackRegistryProvider(output, lookupProvider));
         generator.addProvider(event.includeClient(), new EnUsLangProvider(output));
+        generator.addProvider(event.includeClient(), new BlockModelProvider(output, event.getExistingFileHelper()));
     }
 }
