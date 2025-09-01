@@ -56,6 +56,20 @@ public final class ResearchdTranslations {
         }
     }
 
+    public static final class Errors {
+        public static final TranslatableConstant RESEARCH_QUEUE_DESYNC = create("research_queue_desync", "Small desync happened, please relog. A research complete packet was emitted but your queue was empty");
+        public static final TranslatableConstant NO_RESEARCH_TEAM = create("no_research_team", "Research related packet handled to player lacking a team");
+
+        private static TranslatableConstant create(String key, String defaultValue) {
+            TranslatableConstant constant = new TranslatableConstant(key, "error");
+            TRANSLATIONS.put(constant.key(Researchd.MODID), defaultValue);
+            return constant;
+        }
+
+        private static void init() {
+        }
+    }
+
     public static MutableComponent component(TranslatableConstant constant, Object... args) {
         return constant.component(Researchd.MODID, args);
     }
@@ -63,5 +77,6 @@ public final class ResearchdTranslations {
     public static void init() {
         Team.init();
         Research.init();
+        Errors.init();
     }
 }

@@ -60,7 +60,7 @@ public record ConsumeItemResearchMethod(Ingredient toConsume, int count) impleme
 
     @Override
     public ResearchCompletionProgress getDefaultProgress() {
-        return new ResearchCompletionProgress(this.count);
+        return new ResearchCompletionProgress(ID, this.count);
     }
 
     public static final class Serializer implements ResearchMethodSerializer<ConsumeItemResearchMethod> {
