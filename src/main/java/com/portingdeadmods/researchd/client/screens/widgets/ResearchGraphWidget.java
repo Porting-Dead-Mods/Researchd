@@ -650,15 +650,17 @@ public class ResearchGraphWidget extends AbstractWidget {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        if (this.graph != null && this.graph.nodes() != null) {
-            for (ResearchNode node : this.graph.nodes().values()) {
-                node.translate((int) dragX, (int) dragY);
+        if (this.isHovered()) {
+            if (this.graph != null && this.graph.nodes() != null) {
+                for (ResearchNode node : this.graph.nodes().values()) {
+                    node.translate((int) dragX, (int) dragY);
+                }
             }
-        }
 
-        for (List<ResearchLine> lines : this.researchLines.values()) {
-            for (ResearchLine line : lines) {
-                line.translate((int) dragX, (int) dragY);
+            for (List<ResearchLine> lines : this.researchLines.values()) {
+                for (ResearchLine line : lines) {
+                    line.translate((int) dragX, (int) dragY);
+                }
             }
         }
 

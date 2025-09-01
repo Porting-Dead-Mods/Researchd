@@ -3,16 +3,15 @@ package com.portingdeadmods.researchd.client.screens;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidget;
+import com.portingdeadmods.researchd.api.data.ResearchGraph;
+import com.portingdeadmods.researchd.api.data.TechList;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.widgets.ResearchGraphWidget;
+import com.portingdeadmods.researchd.client.screens.widgets.ResearchQueueWidget;
 import com.portingdeadmods.researchd.client.screens.widgets.SelectedResearchWidget;
 import com.portingdeadmods.researchd.client.screens.widgets.TechListWidget;
-import com.portingdeadmods.researchd.client.screens.widgets.ResearchQueueWidget;
-import com.portingdeadmods.researchd.api.data.ResearchGraph;
-import com.portingdeadmods.researchd.api.data.TechList;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
@@ -59,7 +58,6 @@ public class ResearchScreen extends Screen {
         // GRAPH
         int x = 174;
         this.researchGraphWidget = new ResearchGraphWidget(this, x, 8, 300, 253 - 16);
-        Minecraft mc = Minecraft.getInstance();
         if (CommonResearchCache.ROOT_RESEARCH != null) {
             this.researchGraphWidget.setGraph(ResearchGraphCache.computeIfAbsent(CommonResearchCache.ROOT_RESEARCH.getResearch()));
         }
