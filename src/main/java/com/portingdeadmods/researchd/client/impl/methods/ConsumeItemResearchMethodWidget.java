@@ -1,5 +1,6 @@
 package com.portingdeadmods.researchd.client.impl.methods;
 
+import com.portingdeadmods.researchd.api.client.renderers.CycledItemRenderer;
 import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidget;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
 import net.minecraft.client.Minecraft;
@@ -12,8 +13,11 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.util.Size2i;
 
 public class ConsumeItemResearchMethodWidget extends AbstractResearchInfoWidget<ConsumeItemResearchMethod> {
+    private final CycledItemRenderer itemRenderer;
+
     public ConsumeItemResearchMethodWidget(int x, int y, ConsumeItemResearchMethod method) {
         super(x, y, method);
+        this.itemRenderer = new CycledItemRenderer(method.toConsume());
     }
 
     @Override
@@ -21,10 +25,8 @@ public class ConsumeItemResearchMethodWidget extends AbstractResearchInfoWidget<
         int x = getX();
         int y = getY();
         guiGraphics.fill(x, y, x + this.width, y + this.height, FastColor.ARGB32.color(69, 69, 69));
-        Ingredient consume = value.toConsume();
-        ItemStack stack = new ItemStack(consume.getItems()[0].getItem(), value.count());
-        guiGraphics.renderItem(stack, x, y);
-        guiGraphics.renderItemDecorations(Minecraft.getInstance().font, stack, x, y);
+        this.itemRenderer.render(guiGraphics, x, y);
+        this.itemRenderer.tick();
     }
 
     @Override

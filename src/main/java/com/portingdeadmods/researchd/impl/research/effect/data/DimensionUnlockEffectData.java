@@ -1,9 +1,9 @@
 package com.portingdeadmods.researchd.impl.research.effect.data;
 
 import com.mojang.serialization.Codec;
+import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
-import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.impl.research.effect.DimensionUnlockEffect;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.core.registries.Registries;
@@ -11,7 +11,10 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 public record DimensionUnlockEffectData(Set<ResourceKey<DimensionType>> blockedDimensions) implements ResearchEffectData<DimensionUnlockEffect> {
     public static final DimensionUnlockEffectData EMPTY = new DimensionUnlockEffectData(Collections.emptySet());
@@ -19,13 +22,13 @@ public record DimensionUnlockEffectData(Set<ResourceKey<DimensionType>> blockedD
 
     public DimensionUnlockEffectData add(DimensionUnlockEffect predicate, Level level) {
         Set<ResourceKey<DimensionType>> dimensions = new HashSet<>(this.blockedDimensions());
-        dimensions.add(predicate.getDimension());
+        dimensions.add(predicate.getDimensionType());
         return new DimensionUnlockEffectData(dimensions);
     }
 
     public DimensionUnlockEffectData remove(DimensionUnlockEffect predicate, Level level) {
         Set<ResourceKey<DimensionType>> dimensions = new HashSet<>(this.blockedDimensions());
-        dimensions.remove(predicate.getDimension());
+        dimensions.remove(predicate.getDimensionType());
         return new DimensionUnlockEffectData(dimensions);
     }
 
@@ -38,7 +41,7 @@ public record DimensionUnlockEffectData(Set<ResourceKey<DimensionType>> blockedD
 
         Set<ResourceKey<DimensionType>> blockedDimensions = new UniqueArray<>();
         for (DimensionUnlockEffect predicate : dps) {
-            blockedDimensions.add(predicate.getDimension());
+            blockedDimensions.add(predicate.getDimensionType());
         }
         return new DimensionUnlockEffectData(blockedDimensions);
     }

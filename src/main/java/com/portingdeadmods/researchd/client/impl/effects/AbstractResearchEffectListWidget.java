@@ -61,27 +61,33 @@ public abstract class AbstractResearchEffectListWidget<T extends ResearchEffectL
             if (i > 0 && i - 1 != effects.size()) {
                 int xSize1 = (int) (getSizeFor(i, false).width + (i - 1) * padding);
                 int ySize = (this.height - Minecraft.getInstance().font.lineHeight) / 2;
-                guiGraphics.drawCenteredString(Minecraft.getInstance().font, getSeparatorText(), (int) (x + xSize1 + getPadding() / 2), y + ySize, -1);
+                guiGraphics.drawCenteredString(Minecraft.getInstance().font, getSeparatorText(), (int) (x + xSize1 + getPadding() / 2), y + ySize + 1, -1);
             }
         }
     }
 
-//    @Override
-//    public void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-//        List<? extends ResearchMethod> methods = method.methods();
-//        for (int i = 0; i < methods.size(); i++) {
-//            ResearchMethod researchMethod = methods.get(i);
-//            float padding = getPadding();
-//            int xSize = (int) (getSizeFor(method, mouseX, mouseY, i, false).width + i * padding);
-//            ClientResearchMethod.renderTooltip(guiGraphics, x + xSize, y, mouseX, mouseY, researchMethod);
-//        }
-//    }
+    @Override
+    public void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        for (AbstractResearchInfoWidget<? extends ResearchEffect> researchEffect : this.effects) {
+            researchEffect.renderTooltip(guiGraphics, mouseX, mouseY, partialTicks);
+        }
+    }
 
     public abstract @NotNull String getSeparatorText();
 
     @Override
     public Size2i getSize() {
         return getSizeFor(this.value.effects().size(), false);
+    }
+
+    @Override
+    public void setY(int y) {
+        super.setY(y);
+
+        for (AbstractResearchInfoWidget<? extends ResearchEffect> effect : this.effects) {
+            effect.setY(y);
+        }
+
     }
 
     public float getPadding() {

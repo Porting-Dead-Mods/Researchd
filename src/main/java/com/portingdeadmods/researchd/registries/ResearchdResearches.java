@@ -3,9 +3,11 @@ package com.portingdeadmods.researchd.registries;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
 import com.portingdeadmods.researchd.impl.research.effect.AndResearchEffect;
+import com.portingdeadmods.researchd.impl.research.effect.DimensionUnlockEffect;
 import com.portingdeadmods.researchd.impl.research.effect.RecipeUnlockEffect;
 import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
@@ -16,6 +18,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.Level;
 
 import java.util.HashMap;
 import java.util.List;
@@ -76,17 +79,15 @@ public final class ResearchdResearches {
                      * minecraft:attribute_modifiers -> ItemAttributeModifiers[modifiers=[], showInTooltip=true]
                      * minecraft:rarity -> COMMON
                      */
-                    new AndResearchEffect(
-                            List.of(
-                                    new RecipeUnlockEffect(ResourceLocation.parse("minecraft:iron_ingot_from_iron_block")),
-                                    new RecipeUnlockEffect(ResourceLocation.parse("minecraft:iron_ingot_from_nuggets")),
-                                    new RecipeUnlockEffect(ResourceLocation.parse("minecraft:iron_ingot_from_blasting_deepslate_iron_ore")),
-                                    new RecipeUnlockEffect(ResourceLocation.parse("minecraft:iron_ingot_from_smelting_deepslate_iron_ore")),
-                                    new RecipeUnlockEffect(ResourceLocation.parse("minecraft:iron_ingot_from_blasting_iron_ore")),
-                                    new RecipeUnlockEffect(ResourceLocation.parse("minecraft:iron_ingot_from_smelting_iron_ore")),
-                                    new RecipeUnlockEffect(ResourceLocation.parse("minecraft:iron_ingot_from_blasting_raw_iron")),
-                                    new RecipeUnlockEffect(ResourceLocation.parse("minecraft:iron_ingot_from_smelting_raw_iron"))
-                            )
+                    and(
+                            new RecipeUnlockEffect(ResourceLocation.parse("minecraft:iron_ingot_from_iron_block")),
+                            new RecipeUnlockEffect(ResourceLocation.parse("minecraft:iron_ingot_from_nuggets")),
+                            new RecipeUnlockEffect(ResourceLocation.parse("minecraft:iron_ingot_from_blasting_deepslate_iron_ore")),
+                            new RecipeUnlockEffect(ResourceLocation.parse("minecraft:iron_ingot_from_smelting_deepslate_iron_ore")),
+                            new RecipeUnlockEffect(ResourceLocation.parse("minecraft:iron_ingot_from_blasting_iron_ore")),
+                            new RecipeUnlockEffect(ResourceLocation.parse("minecraft:iron_ingot_from_smelting_iron_ore")),
+                            new RecipeUnlockEffect(ResourceLocation.parse("minecraft:iron_ingot_from_blasting_raw_iron")),
+                            new RecipeUnlockEffect(ResourceLocation.parse("minecraft:iron_ingot_from_smelting_raw_iron"))
                     )
             ));
     public static final ResourceKey<Research> COPPER = register("copper", builder -> builder
@@ -136,6 +137,13 @@ public final class ResearchdResearches {
             .parents(COPPER_BLOCK)
             .researchMethod(
                     new ConsumePackResearchMethod(List.of(ResearchPacks.OVERWORLD), 12, 10)
+            )
+            .researchEffect(
+                    and(
+                            new DimensionUnlockEffect(Level.OVERWORLD.location(), DimensionUnlockEffect.OVERWORLD_SPRITE),
+                            new DimensionUnlockEffect(Level.NETHER.location(), DimensionUnlockEffect.NETHER_SPRITE),
+                            new DimensionUnlockEffect(Level.END.location(), DimensionUnlockEffect.END_SPRITE)
+                    )
             ));
     public static final ResourceKey<Research> OXIDIZED_COPPER = register("oxidized_copper", builder -> builder
             .icon(Items.OXIDIZED_COPPER)
@@ -202,4 +210,9 @@ public final class ResearchdResearches {
     private static ResearchMethod or(ResearchMethod... methods) {
         return new OrResearchMethod(List.of(methods));
     }
+
+    private static ResearchEffect and(ResearchEffect... methods) {
+        return new AndResearchEffect(List.of(methods));
+    }
+
 }

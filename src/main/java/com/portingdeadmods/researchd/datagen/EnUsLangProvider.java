@@ -2,8 +2,6 @@ package com.portingdeadmods.researchd.datagen;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
-import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
 import com.portingdeadmods.researchd.registries.ResearchdResearches;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.data.PackOutput;
@@ -13,7 +11,8 @@ import net.neoforged.neoforge.common.data.LanguageProvider;
 
 import java.util.Map;
 
-import static com.portingdeadmods.researchd.registries.ResearchdBlocks.*;
+import static com.portingdeadmods.researchd.registries.ResearchdBlocks.RESEARCH_LAB_CONTROLLER;
+import static com.portingdeadmods.researchd.registries.ResearchdBlocks.RESEARCH_LAB_PART;
 
 public final class EnUsLangProvider extends LanguageProvider {
     public EnUsLangProvider(PackOutput output) {

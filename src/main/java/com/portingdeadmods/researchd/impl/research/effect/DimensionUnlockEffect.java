@@ -19,9 +19,12 @@ public record DimensionUnlockEffect(ResourceLocation dimension,
                                     ResourceLocation dimensionIconSprite) implements ResearchEffect {
     public static final ResourceLocation ID = Researchd.rl("dimension_unlock");
     public static final ResourceLocation DEFAULT_SPRITE = Researchd.rl("dimension_icons/default");
+    public static final ResourceLocation OVERWORLD_SPRITE = Researchd.rl("dimension_icons/overworld");
+    public static final ResourceLocation NETHER_SPRITE = Researchd.rl("dimension_icons/nether");
+    public static final ResourceLocation END_SPRITE = Researchd.rl("dimension_icons/end");
     public static final MapCodec<DimensionUnlockEffect> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             ResourceLocation.CODEC.fieldOf("dimension").forGetter(DimensionUnlockEffect::dimension),
-            ResourceLocation.CODEC.optionalFieldOf("dimension_icon_sprite", DEFAULT_SPRITE).forGetter(DimensionUnlockEffect::dimensionIconSprite)
+            ResourceLocation.CODEC.optionalFieldOf("icon_sprite", DEFAULT_SPRITE).forGetter(DimensionUnlockEffect::dimensionIconSprite)
     ).apply(instance, DimensionUnlockEffect::new));
     public static final ResearchEffectSerializer<DimensionUnlockEffect> SERIALIZER = ResearchEffectSerializer.simple(CODEC, null);
 
@@ -33,11 +36,15 @@ public record DimensionUnlockEffect(ResourceLocation dimension,
 
     @Override
     public ResourceLocation id() {
-        return null;
+        return ID;
     }
 
-    public ResourceKey<DimensionType> getDimension() {
+    public ResourceKey<DimensionType> getDimensionType() {
         return ResourceKey.create(Registries.DIMENSION_TYPE, this.dimension());
+    }
+
+    public ResourceKey<Level> getDimension() {
+        return ResourceKey.create(Registries.DIMENSION, this.dimension());
     }
 
     @Override

@@ -19,6 +19,7 @@ public record RecipeUnlockEffect(ResourceLocation recipe) implements ResearchEff
             ResourceLocation.CODEC.fieldOf("recipe").forGetter(RecipeUnlockEffect::recipe)
     ).apply(instance, RecipeUnlockEffect::new));
     public static final ResearchEffectSerializer<RecipeUnlockEffect> SERIALIZER = ResearchEffectSerializer.simple(CODEC, null);
+    public static final ResourceLocation ID = Researchd.rl("unlock_recipe");
 
     @Override
     public void onUnlock(Level level, Player player, ResourceKey<Research> research) {
@@ -28,7 +29,7 @@ public record RecipeUnlockEffect(ResourceLocation recipe) implements ResearchEff
 
     @Override
     public ResourceLocation id() {
-        return Researchd.rl("unlock_recipe");
+        return ID;
     }
 
     public RecipeHolder<?> getRecipe(Level level) {
