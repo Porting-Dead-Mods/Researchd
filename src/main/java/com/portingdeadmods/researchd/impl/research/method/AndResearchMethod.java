@@ -44,7 +44,7 @@ public record AndResearchMethod(List<ResearchMethod> methods) implements Researc
     }
 
     @Override
-    public ResearchMethodSerializer<?> getSerializer() {
+    public ResearchMethodSerializer<AndResearchMethod> getSerializer() {
         return SERIALIZER;
     }
 

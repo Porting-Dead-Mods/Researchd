@@ -2,7 +2,6 @@ package com.portingdeadmods.researchd.client.screens;
 
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidget;
 import com.portingdeadmods.researchd.api.data.ResearchGraph;
 import com.portingdeadmods.researchd.api.data.TechList;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
@@ -13,8 +12,6 @@ import com.portingdeadmods.researchd.client.screens.widgets.SelectedResearchWidg
 import com.portingdeadmods.researchd.client.screens.widgets.TechListWidget;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 
@@ -35,9 +32,6 @@ public class ResearchScreen extends Screen {
     private final ResearchQueueWidget researchQueueWidget;
     private final ResearchGraphWidget researchGraphWidget;
     private final SelectedResearchWidget selectedResearchWidget;
-
-    // Used to delete the previous selected method widget
-    public AbstractWidget prevSelectedResearchMethodWidget;
 
     public ResearchScreen() {
         super(ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_TITLE));
@@ -69,7 +63,8 @@ public class ResearchScreen extends Screen {
         this.techListWidget.visitWidgets(this::addRenderableWidget);
         addRenderableWidget(this.researchQueueWidget);
         addWidget(this.researchGraphWidget);
-        this.selectedResearchWidget.visitWidgets(this::addRenderableWidget);
+        addRenderableOnly(this.selectedResearchWidget);
+        this.selectedResearchWidget.visitWidgets(this::addWidget);
     }
 
     @Override
@@ -104,20 +99,7 @@ public class ResearchScreen extends Screen {
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
-
-        for (Renderable renderable : this.renderables) {
-            renderable.render(guiGraphics, mouseX, mouseY, partialTick);
-
-            if (renderable instanceof AbstractResearchInfoWidget<?> infoWidget) {
-                infoWidget.renderTooltip(guiGraphics, mouseX, mouseY, partialTick);
-            }
-        }
-
-        if (prevSelectedResearchMethodWidget != null) {
-            this.invalidateSelectedResearch();
-            this.prevSelectedResearchMethodWidget = null;
-        }
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
 
     }
 
@@ -141,11 +123,6 @@ public class ResearchScreen extends Screen {
 
     public TechList getTechList() {
         return this.techListWidget.getTechList();
-    }
-
-    public void invalidateSelectedResearch() {
-        this.prevSelectedResearchMethodWidget.visitWidgets(this::removeWidget);
-        this.getSelectedResearchWidget().methodWidget.visitWidgets(this::addRenderableWidget);
     }
 
     @Override

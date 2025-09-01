@@ -3,12 +3,16 @@ package com.portingdeadmods.researchd;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
-import com.portingdeadmods.researchd.client.impl.methods.ClientAndResearchMethod;
-import com.portingdeadmods.researchd.client.impl.methods.ClientConsumeItemResearchMethod;
-import com.portingdeadmods.researchd.client.impl.methods.ClientConsumePackResearchMethod;
-import com.portingdeadmods.researchd.client.impl.methods.ClientOrResearchMethod;
+import com.portingdeadmods.researchd.client.impl.effects.AndResearchEffectWidget;
+import com.portingdeadmods.researchd.client.impl.effects.DimensionUnlockEffectWidget;
+import com.portingdeadmods.researchd.client.impl.methods.AndResearchMethodWidget;
+import com.portingdeadmods.researchd.client.impl.methods.ConsumeItemResearchMethodWidget;
+import com.portingdeadmods.researchd.client.impl.methods.ConsumePackResearchMethodWidget;
+import com.portingdeadmods.researchd.client.impl.methods.OrResearchMethodWidget;
 import com.portingdeadmods.researchd.client.screens.lab.ResearchLabScreen;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
+import com.portingdeadmods.researchd.impl.research.effect.AndResearchEffect;
+import com.portingdeadmods.researchd.impl.research.effect.DimensionUnlockEffect;
 import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
@@ -52,10 +56,13 @@ public class ResearchdClient {
 
     private void clientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
-            addMethodWidget(ConsumePackResearchMethod.ID, ClientConsumePackResearchMethod::new);
-            addMethodWidget(ConsumeItemResearchMethod.ID, ClientConsumeItemResearchMethod::new);
-            addMethodWidget(OrResearchMethod.ID, ClientOrResearchMethod::new);
-            addMethodWidget(AndResearchMethod.ID, ClientAndResearchMethod::new);
+            addMethodWidget(ConsumePackResearchMethod.ID, ConsumePackResearchMethodWidget::new);
+            addMethodWidget(ConsumeItemResearchMethod.ID, ConsumeItemResearchMethodWidget::new);
+            addMethodWidget(OrResearchMethod.ID, OrResearchMethodWidget::new);
+            addMethodWidget(AndResearchMethod.ID, AndResearchMethodWidget::new);
+
+            addEffectWidget(AndResearchEffect.ID, AndResearchEffectWidget::new);
+            addEffectWidget(DimensionUnlockEffect.ID, DimensionUnlockEffectWidget::new);
 
             ItemBlockRenderTypes.setRenderLayer(ResearchdBlocks.RESEARCH_LAB_CONTROLLER.get(), RenderType.solid()); // Should fiddle with render types till it works ngl
         });

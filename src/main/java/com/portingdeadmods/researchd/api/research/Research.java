@@ -31,7 +31,7 @@ public interface Research {
     /**
      * @return The research effects that happen after researching this
      */
-    List<ResearchEffect> researchEffects();
+    ResearchEffect researchEffect();
 
     /**
      * @return An {@link Optional} {@link ResourceKey} which represents the parent of this research.

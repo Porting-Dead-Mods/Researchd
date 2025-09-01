@@ -11,7 +11,6 @@ import com.portingdeadmods.researchd.api.pdl.data.PDLClientSavedData;
 import com.portingdeadmods.researchd.api.pdl.data.PDLSavedData;
 import com.portingdeadmods.researchd.api.pdl.data.SavedDataHolder;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.content.commands.ResearchdCommands;
@@ -98,10 +97,8 @@ public final class ResearchdCommonEvents {
                     if (currentResearchProgress.isComplete()) {
                         for (TeamMember playerUUIDs : team.getMembers()) {
                             ServerPlayer player = server.getPlayerList().getPlayer(playerUUIDs.player());
-                            for (ResearchEffect effect : currentResearch.researchEffects()) {
-                                Researchd.debug("Researching", "Applying research effects for Research: " + team.getResearchKeyInQueue() + " to player: " + player.getName().getString());
-                                effect.onUnlock(level, player, team.getResearchKeyInQueue());
-                            }
+                            Researchd.debug("Researching", "Applying research effects for Research: " + team.getResearchKeyInQueue() + " to player: " + player.getName().getString());
+                            currentResearch.researchEffect().onUnlock(level, player, team.getResearchKeyInQueue());
                         }
 
                         queue.getEntries().removeFirst();

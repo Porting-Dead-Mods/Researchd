@@ -30,6 +30,16 @@ public class TechList {
         this.entries.addAll(sorted);
     }
 
+    public TechList getListForSearch(String searchVal) {
+        List<ResearchInstance> entries = new UniqueArray<>();
+        for (ResearchInstance entry : this.entries()) {
+            if (entry.getDisplayName().getString().toLowerCase().contains(searchVal.strip().toLowerCase())) {
+                entries.add(entry);
+            }
+        }
+        return new TechList(entries);
+    }
+
     public UniqueArray<ResearchInstance> entries() {
         return this.entries;
     }

@@ -4,7 +4,10 @@ import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdClient;
+import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidget;
+import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
@@ -14,7 +17,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.components.MultiLineTextWidget;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -29,6 +32,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
     public static final int BACKGROUND_HEIGHT = 72;
     private ResearchInstance selectedInstance;
     public AbstractWidget methodWidget;
+    public AbstractWidget effectWidget;
     private int scrollOffset;
 
     public SelectedResearchWidget(int x, int y, int width, int height) {
@@ -49,22 +53,37 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
             guiGraphics.drawString(font, Utils.registryTranslation(this.selectedInstance.getKey()), 11, 49, -1);
             renderResearchPanel(guiGraphics, this.selectedInstance, 12, 60, mouseX, mouseY, 2, false);
 
-            guiGraphics.enableScissor(53, 60, 53 + 115, 55 + 52);
+            guiGraphics.enableScissor(53, 60, 53 + 108, 60 + 47);
+            {
+                guiGraphics.drawString(font, ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_LABEL_RESEARCH_COST), 53 + padding, offsetY + 62, -1);
 
-            guiGraphics.drawString(font, ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_LABEL_RESEARCH_COST), 53 + padding, offsetY + 62, -1);
+                this.methodWidget.render(guiGraphics, mouseX, mouseY, v);
 
-            int yPos = 76 + 4 + this.methodWidget.getHeight() + offsetY;
-            guiGraphics.fill(53, yPos, 53 + 78, yPos + 1, -1);
+                int yPos = 76 + 4 + this.methodWidget.getHeight() + offsetY;
+                guiGraphics.fill(53, yPos, 53 + 78, yPos + 1, -1);
 
-            guiGraphics.drawString(font, ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_LABEL_RESEARCH_EFFECTS), 56, offsetY + 57 + height + 28, -1);
+                guiGraphics.drawString(font, ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_LABEL_RESEARCH_EFFECTS), 56, offsetY + 64 + 36, -1);
 
+                this.effectWidget.render(guiGraphics, mouseX, mouseY, v);
+            }
             guiGraphics.disableScissor();
+
+            if (this.methodWidget instanceof AbstractResearchInfoWidget<?> infoWidget) {
+                infoWidget.renderTooltip(guiGraphics, mouseX, mouseY, v);
+            }
+
+            if (this.effectWidget instanceof AbstractResearchInfoWidget<?> infoWidget) {
+                infoWidget.renderTooltip(guiGraphics, mouseX, mouseY, v);
+            }
+
         }
     }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
         this.scrollOffset = (int) Math.max(Math.max(this.scrollOffset - scrollY * 2, 0), 0);
+        this.methodWidget.setY((int) (62 + Minecraft.getInstance().font.lineHeight + 4 - (this.scrollOffset * 1.5f)));
+        this.effectWidget.setY((int) (64 + 36 + Minecraft.getInstance().font.lineHeight + 4 - (this.scrollOffset * 1.5f)));
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
 
@@ -84,15 +103,29 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
 
             this.scrollOffset = 0;
             RegistryAccess registryAccess = Minecraft.getInstance().level.registryAccess();
-            ResearchMethod method = this.selectedInstance.lookup(registryAccess).researchMethod();
-            WidgetConstructor<? extends ResearchMethod> widgetConstructor = ResearchdClient.RESEARCH_METHOD_WIDGETS.get(method.id());
-            if (widgetConstructor != null) {
-                this.methodWidget = widgetConstructor.create(method, 53 + padding, 62 + font.lineHeight + 4);
+            Research research = this.selectedInstance.lookup(registryAccess);
+            ResearchMethod method = research.researchMethod();
+            WidgetConstructor<? extends ResearchMethod> methodWidgetConstructor = ResearchdClient.RESEARCH_METHOD_WIDGETS.get(method.id());
+            if (methodWidgetConstructor != null) {
+                this.methodWidget = methodWidgetConstructor.createMethod(53 + padding, 62 + font.lineHeight + 4, method);
             } else {
                 // in case the dev didn't implement a widget for the research method, we scream at them
                 MutableComponent message = Component.literal("!!%s does not have info widget!!".formatted(method.id().toString())).withStyle(ChatFormatting.RED);
-                this.methodWidget = new StringWidget(53 + padding + 1, 62 + font.lineHeight + 4, font.width(message), font.lineHeight + 2, message, font);
+                this.methodWidget = new MultiLineTextWidget(53 + padding + 1, 62 + font.lineHeight + 4, message, font);
+                ((MultiLineTextWidget) this.methodWidget).setMaxWidth(108);
             }
+
+            ResearchEffect effect = research.researchEffect();
+            WidgetConstructor<? extends ResearchEffect> effectWidgetConstructor = ResearchdClient.RESEARCH_EFFECT_WIDGETS.get(effect.id());
+            if (effectWidgetConstructor != null) {
+                this.effectWidget = effectWidgetConstructor.createEffect(53 + padding, 64 + 36 + font.lineHeight + 4, effect);
+            } else {
+                // in case the dev didn't implement a widget for the research method, we scream at them
+                MutableComponent message = Component.literal("!!%s does not have info widget!!".formatted(effect.id().toString())).withStyle(ChatFormatting.RED);
+                this.effectWidget = new MultiLineTextWidget(53 + padding + 1, 64 + 36 + font.lineHeight + 4, message, font);
+                ((MultiLineTextWidget) this.effectWidget).setMaxWidth(108);
+            }
+
         }
     }
 
@@ -104,6 +137,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
     public void visitWidgets(Consumer<AbstractWidget> consumer) {
         super.visitWidgets(consumer);
 
-        this.methodWidget.visitWidgets(consumer);
+        //this.methodWidget.visitWidgets(consumer);
+        //this.effectWidget.visitWidgets(consumer);
     }
 }

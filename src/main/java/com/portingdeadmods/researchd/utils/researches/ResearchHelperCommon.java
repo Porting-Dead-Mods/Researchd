@@ -1,15 +1,15 @@
 package com.portingdeadmods.researchd.utils.researches;
 
+import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.ResearchdRegistries;
+import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
+import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
-import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
-import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
-import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
-import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
@@ -36,13 +36,12 @@ public final class ResearchHelperCommon {
     public static <T extends ResearchEffect> Collection<T> getResearchEffects(Class<T> clazz, Level level) {
         Collection<T> effects = new UniqueArray<>();
 
-        getLevelResearches(level).forEach(research -> {
-            research.value().researchEffects().forEach(effect -> {
-                if (effect.getClass().equals(clazz)) {
-                    effects.add(clazz.cast(effect));
-                };
-            });
-        });
+        for (Holder<Research> research : getLevelResearches(level)) {
+            ResearchEffect effect = research.value().researchEffect();
+            if (effect.getClass().equals(clazz)) {
+                effects.add(clazz.cast(effect));
+            }
+        }
 
         return effects;
     }
@@ -100,9 +99,8 @@ public final class ResearchHelperCommon {
 
         for (ResearchInstance res : team.getResearchProgress().researches().values()) {
             if (res.getResearchStatus() == ResearchStatus.RESEARCHED) {
-                res.lookup(level.registryAccess()).researchEffects().forEach(
-                        eff -> eff.onUnlock(level, player, res.getKey())
-                );
+                ResearchEffect effect = res.lookup(level.registryAccess()).researchEffect();
+                effect.onUnlock(level, player, res.getKey());
             }
         }
     }
