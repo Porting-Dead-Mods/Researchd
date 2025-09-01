@@ -13,11 +13,14 @@ import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.OrResearchMethod;
+import com.portingdeadmods.researchd.registries.ResearchdBlocks;
 import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
 import com.portingdeadmods.researchd.registries.ResearchdItems;
 import com.portingdeadmods.researchd.registries.ResearchdMenuTypes;
 import com.portingdeadmods.researchd.utils.WidgetConstructor;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
@@ -53,6 +56,8 @@ public class ResearchdClient {
             addMethodWidget(ConsumeItemResearchMethod.ID, ClientConsumeItemResearchMethod::new);
             addMethodWidget(OrResearchMethod.ID, ClientOrResearchMethod::new);
             addMethodWidget(AndResearchMethod.ID, ClientAndResearchMethod::new);
+
+            ItemBlockRenderTypes.setRenderLayer(ResearchdBlocks.RESEARCH_LAB_CONTROLLER.get(), RenderType.solid()); // Should fiddle with render types till it works ngl
         });
     }
 
