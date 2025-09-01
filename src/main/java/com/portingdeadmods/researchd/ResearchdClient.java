@@ -5,6 +5,7 @@ import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.client.impl.methods.ClientAndResearchMethod;
 import com.portingdeadmods.researchd.client.impl.methods.ClientConsumeItemResearchMethod;
+import com.portingdeadmods.researchd.client.impl.methods.ClientConsumePackResearchMethod;
 import com.portingdeadmods.researchd.client.impl.methods.ClientOrResearchMethod;
 import com.portingdeadmods.researchd.client.screens.lab.ResearchLabScreen;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
@@ -28,7 +29,6 @@ import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -49,6 +49,7 @@ public class ResearchdClient {
 
     private void clientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
+            addMethodWidget(ConsumePackResearchMethod.ID, ClientConsumePackResearchMethod::new);
             addMethodWidget(ConsumeItemResearchMethod.ID, ClientConsumeItemResearchMethod::new);
             addMethodWidget(OrResearchMethod.ID, ClientOrResearchMethod::new);
             addMethodWidget(AndResearchMethod.ID, ClientAndResearchMethod::new);
