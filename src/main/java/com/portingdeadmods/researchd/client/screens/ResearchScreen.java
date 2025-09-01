@@ -12,7 +12,6 @@ import com.portingdeadmods.researchd.client.screens.widgets.SelectedResearchWidg
 import com.portingdeadmods.researchd.client.screens.widgets.TechListWidget;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 
@@ -33,9 +32,6 @@ public class ResearchScreen extends Screen {
     private final ResearchQueueWidget researchQueueWidget;
     private final ResearchGraphWidget researchGraphWidget;
     private final SelectedResearchWidget selectedResearchWidget;
-
-    // Used to delete the previous selected method widget
-    public AbstractWidget prevSelectedResearchMethodWidget;
 
     public ResearchScreen() {
         super(ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_TITLE));
@@ -105,11 +101,6 @@ public class ResearchScreen extends Screen {
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
 
-        if (prevSelectedResearchMethodWidget != null) {
-            this.invalidateSelectedResearch();
-            this.prevSelectedResearchMethodWidget = null;
-        }
-
     }
 
     public ResearchGraphWidget getResearchGraphWidget() {
@@ -132,11 +123,6 @@ public class ResearchScreen extends Screen {
 
     public TechList getTechList() {
         return this.techListWidget.getTechList();
-    }
-
-    public void invalidateSelectedResearch() {
-        this.prevSelectedResearchMethodWidget.visitWidgets(this::removeWidget);
-        this.getSelectedResearchWidget().methodWidget.visitWidgets(this::addRenderableWidget);
     }
 
     @Override

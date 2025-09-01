@@ -193,7 +193,6 @@ public class TechListWidget extends ResearchScreenWidget {
 
             int index = indexY * this.cols + indexX;
             if (index < this.displayTechList.entries().size()) {
-                this.screen.prevSelectedResearchMethodWidget = this.screen.getSelectedResearchWidget().methodWidget;
                 ResearchInstance instance = this.displayTechList.entries().get(index);
                 this.screen.getResearchGraphWidget().setGraph(ResearchGraphCache.computeIfAbsent(instance.getKey()));
                 this.screen.getSelectedResearchWidget().setSelectedResearch(instance);

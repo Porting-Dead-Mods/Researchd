@@ -31,8 +31,6 @@ public class GraphLayoutManager {
 	// Map to track which layer each node is assigned to
 	public static Map<ResearchNode, Integer> nodeLayerMap = new HashMap<>();
 
-	private static ResearchGraph currentGraph;
-
 	/**
 	 * Apply layout to a research graph
 	 *

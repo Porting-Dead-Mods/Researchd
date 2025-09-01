@@ -73,7 +73,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
             }
 
             if (this.effectWidget instanceof AbstractResearchInfoWidget<?> infoWidget) {
-                infoWidget.render(guiGraphics, mouseX, mouseY, v);
+                infoWidget.renderTooltip(guiGraphics, mouseX, mouseY, v);
             }
 
         }
