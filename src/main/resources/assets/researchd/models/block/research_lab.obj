@@ -1,5 +1,5 @@
 # Made in Blockbench 4.12.1
-mtllib lab.mtl
+mtllib research_lab.mtl
 
 o cube
 v 0.5 1 -0.5
