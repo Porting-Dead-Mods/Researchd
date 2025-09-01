@@ -7,7 +7,6 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethodList;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
-import com.portingdeadmods.researchd.client.impl.methods.ClientOrResearchMethod;
 import com.portingdeadmods.researchd.data.helper.ResearchCompletionProgress;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;

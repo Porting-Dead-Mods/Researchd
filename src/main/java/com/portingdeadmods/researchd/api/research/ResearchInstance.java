@@ -2,11 +2,13 @@ package com.portingdeadmods.researchd.api.research;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
@@ -54,6 +56,10 @@ public final class ResearchInstance {
 
     public ResearchInstance withResearch(GlobalResearch research) {
         return new ResearchInstance(research, researchStatus, researchedPlayer, researchedTime);
+    }
+
+    public Component getDisplayName() {
+        return Utils.registryTranslation(this.getKey());
     }
 
     public GlobalResearch getResearch() {

@@ -11,10 +11,11 @@ import net.minecraft.util.FastColor;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.util.Size2i;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
-public class ClientConsumePackResearchMethod extends AbstractResearchInfoWidget<ConsumePackResearchMethod> {
+public class ConsumePackResearchMethodWidget extends AbstractResearchInfoWidget<ConsumePackResearchMethod> {
     public static final int GAP_BETWEEN_PACKS = 4;
 
     public final int count;
@@ -23,7 +24,9 @@ public class ClientConsumePackResearchMethod extends AbstractResearchInfoWidget<
 
     public final int textWidth;
 
-    public ClientConsumePackResearchMethod(int x, int y, ConsumePackResearchMethod method) {
+    private final List<ItemStack> stacks;
+
+    public ConsumePackResearchMethodWidget(int x, int y, ConsumePackResearchMethod method) {
         super(x, y, method);
 
         this.count = method.count();
@@ -31,6 +34,12 @@ public class ClientConsumePackResearchMethod extends AbstractResearchInfoWidget<
         this.types = method.packs().size();
 
         this.textWidth = Minecraft.getInstance().font.width(" x %dt".formatted(duration));
+
+        this.stacks = new ArrayList<>();
+        List<ItemStack> asStacks = this.value.asStacks();
+        for (ItemStack stack : asStacks) {
+            this.stacks.add(stack.copyWithCount(this.value.count()));
+        }
 
         this.setWidth(16 + GAP_BETWEEN_PACKS * method.packs().size() + this.textWidth);
     }
@@ -41,27 +50,25 @@ public class ClientConsumePackResearchMethod extends AbstractResearchInfoWidget<
         int y = getY();
         guiGraphics.fill(x, y, x + this.width, y + this.height, FastColor.ARGB32.color(69, 69, 69));
 
-        List<ItemStack> stacks = method.asStacks().stream().map(ItemStack::copy).toList();
-        stacks.forEach(s -> s.setCount(1));
-
         for (int idx = 0; idx < stacks.size(); idx++) {
             ItemStack stack = stacks.get(idx);
             int xPos = x + idx * GAP_BETWEEN_PACKS;
             guiGraphics.renderItem(stack, xPos, y);
+            guiGraphics.renderItemDecorations(this.font, stack, xPos, y);
 
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().translate(0.0F, 0.0F, 200.0F);
-            {
-                if (idx == stacks.size() - 1) {
-                    guiGraphics.drawString(Minecraft.getInstance().font,
-                            String.valueOf(count),
-                            xPos + 17 - Minecraft.getInstance().font.width(String.valueOf(count)),
-                            y + 9,
-                            16777215,
-                            true);
-                }
-            }
-            guiGraphics.pose().popPose();
+//            guiGraphics.pose().pushPose();
+//            guiGraphics.pose().translate(0.0F, 0.0F, 200.0F);
+//            {
+//                if (idx == stacks.size() - 1) {
+//                    guiGraphics.drawString(Minecraft.getInstance().font,
+//                            String.valueOf(count),
+//                            xPos + 17 - Minecraft.getInstance().font.width(String.valueOf(count)),
+//                            y + 9,
+//                            16777215,
+//                            true);
+//                }
+//            }
+//            guiGraphics.pose().popPose();
         }
 
         guiGraphics.drawString(

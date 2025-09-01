@@ -3,12 +3,13 @@ package com.portingdeadmods.researchd.impl.research;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchSerializer;
-import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
+import com.portingdeadmods.researchd.impl.research.effect.EmptyResearchEffect;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -16,10 +17,11 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
 
 // TODO: Change icon to Ingredient
-public record SimpleResearch(Item icon, ResearchMethod researchMethod, List<ResearchEffect> researchEffects,
+public record SimpleResearch(Item icon, ResearchMethod researchMethod, ResearchEffect researchEffect,
                              List<ResourceKey<Research>> parents, boolean requiresParent) implements Research {
     @Override
     public ResearchSerializer<?> getSerializer() {
@@ -28,21 +30,24 @@ public record SimpleResearch(Item icon, ResearchMethod researchMethod, List<Rese
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof SimpleResearch that)) return false;
-        return requiresParent == that.requiresParent && Objects.equals(icon, that.icon) && Objects.equals(parents, that.parents) && Objects.equals(researchMethod, that.researchMethod);
+        if (!(o instanceof SimpleResearch(
+                Item icon1, ResearchMethod method, ResearchEffect effect, List<ResourceKey<Research>> parents1,
+                boolean parent
+        ))) return false;
+        return requiresParent == parent && Objects.equals(icon, icon1) && Objects.equals(researchMethod, method) && Objects.equals(researchEffect, effect) && Objects.equals(parents, parents1);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(icon, researchMethod, parents, requiresParent);
+        return Objects.hash(icon, researchMethod, researchEffect, parents, requiresParent);
     }
 
     public static class Serializer implements ResearchSerializer<SimpleResearch> {
         public static final Serializer INSTANCE = new Serializer();
         public static final MapCodec<SimpleResearch> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
                 CodecUtils.registryCodec(BuiltInRegistries.ITEM).fieldOf("icon").forGetter(SimpleResearch::icon),
-                ResearchMethod.CODEC.fieldOf("research_methods").forGetter(SimpleResearch::researchMethod),
-                ResearchEffect.CODEC.listOf().fieldOf("research_effects").forGetter(SimpleResearch::researchEffects),
+                ResearchMethod.CODEC.fieldOf("method").forGetter(SimpleResearch::researchMethod),
+                ResearchEffect.CODEC.optionalFieldOf("effect", EmptyResearchEffect.INSTANCE).forGetter(SimpleResearch::researchEffect),
                 Research.RESOURCE_KEY_CODEC.listOf().fieldOf("parents").forGetter(SimpleResearch::parents),
                 Codec.BOOL.fieldOf("requires_parent").forGetter(SimpleResearch::requiresParent)
         ).apply(instance, SimpleResearch::new));
@@ -63,8 +68,8 @@ public record SimpleResearch(Item icon, ResearchMethod researchMethod, List<Rese
 
     public static class Builder implements Research.Builder<SimpleResearch> {
         private Item icon = Items.AIR;
-        private ResearchMethod researchMethods;
-        private UniqueArray<ResearchEffect> researchEffects = new UniqueArray<>();
+        private ResearchMethod researchMethod;
+        private ResearchEffect researchEffect = EmptyResearchEffect.INSTANCE;
         private UniqueArray<ResourceKey<Research>> parents = new UniqueArray<>();
         private boolean requiresParent = false;
 
@@ -80,18 +85,13 @@ public record SimpleResearch(Item icon, ResearchMethod researchMethod, List<Rese
             return this;
         }
 
-        public Builder researchMethods(ResearchMethod researchMethods) {
-            this.researchMethods = researchMethods;
+        public Builder researchMethod(ResearchMethod researchMethod) {
+            this.researchMethod = researchMethod;
             return this;
         }
 
-        public Builder researchEffects(ResearchEffect... researchEffects) {
-            this.researchEffects.addAll(List.of(researchEffects));
-            return this;
-        }
-
-        public Builder researchEffects(List<? extends ResearchEffect> researchEffects) {
-            this.researchEffects.addAll(researchEffects);
+        public Builder researchEffect(ResearchEffect researchEffect) {
+            this.researchEffect = researchEffect;
             return this;
         }
 
@@ -108,7 +108,7 @@ public record SimpleResearch(Item icon, ResearchMethod researchMethod, List<Rese
 
         @Override
         public SimpleResearch build() {
-            return new SimpleResearch(this.icon, this.researchMethods, this.researchEffects, this.parents, this.requiresParent);
+            return new SimpleResearch(this.icon, this.researchMethod, this.researchEffect, this.parents, this.requiresParent);
         }
     }
 }

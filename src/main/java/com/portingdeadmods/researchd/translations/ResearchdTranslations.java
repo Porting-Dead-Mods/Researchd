@@ -46,6 +46,8 @@ public final class ResearchdTranslations {
         public static final TranslatableConstant SCREEN_LABEL_RESEARCH_COST = create("screen.label.researched_by", "Cost");
         public static final TranslatableConstant SCREEN_LABEL_RESEARCH_EFFECTS = create("screen.label.effects", "Effects");
 
+        public static final TranslatableConstant DIMENSION_UNLOCK_EFFECT_TOOLTIP = create("effects.tooltip.dimension_unlock", "Unlocks Dimension: %s");
+
         private static TranslatableConstant create(String key, String defaultValue) {
             TranslatableConstant constant = new TranslatableConstant(key, "research");
             TRANSLATIONS.put(constant.key(Researchd.MODID), defaultValue);

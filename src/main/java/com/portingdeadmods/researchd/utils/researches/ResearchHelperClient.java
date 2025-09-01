@@ -36,9 +36,7 @@ public class ResearchHelperClient {
 		if (progress == null) return;
 		for (ResearchInstance res : team.getResearchProgress().researches().values()) {
 			if (res.getResearchStatus() == ResearchStatus.RESEARCHED) {
-				res.lookup(level.registryAccess()).researchEffects().forEach(
-						eff -> eff.onUnlock(level, player, res.getKey())
-				);
+				res.lookup(level.registryAccess()).researchEffect().onUnlock(level, player, res.getKey());
 			}
 		}
 	}

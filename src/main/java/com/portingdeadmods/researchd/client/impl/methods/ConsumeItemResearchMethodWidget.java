@@ -11,8 +11,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.util.Size2i;
 
-public class ClientConsumeItemResearchMethod extends AbstractResearchInfoWidget<ConsumeItemResearchMethod> {
-    public ClientConsumeItemResearchMethod(int x, int y, ConsumeItemResearchMethod method) {
+public class ConsumeItemResearchMethodWidget extends AbstractResearchInfoWidget<ConsumeItemResearchMethod> {
+    public ConsumeItemResearchMethodWidget(int x, int y, ConsumeItemResearchMethod method) {
         super(x, y, method);
     }
 
@@ -21,8 +21,8 @@ public class ClientConsumeItemResearchMethod extends AbstractResearchInfoWidget<
         int x = getX();
         int y = getY();
         guiGraphics.fill(x, y, x + this.width, y + this.height, FastColor.ARGB32.color(69, 69, 69));
-        Ingredient consume = method.toConsume();
-        ItemStack stack = new ItemStack(consume.getItems()[0].getItem(), method.count());
+        Ingredient consume = value.toConsume();
+        ItemStack stack = new ItemStack(consume.getItems()[0].getItem(), value.count());
         guiGraphics.renderItem(stack, x, y);
         guiGraphics.renderItemDecorations(Minecraft.getInstance().font, stack, x, y);
     }
@@ -31,8 +31,8 @@ public class ClientConsumeItemResearchMethod extends AbstractResearchInfoWidget<
     public void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         Font font = Minecraft.getInstance().font;
         if (this.isHovered()) {
-            Ingredient consume = method.toConsume();
-            ItemStack stack = new ItemStack(consume.getItems()[0].getItem(), method.count());
+            Ingredient consume = value.toConsume();
+            ItemStack stack = new ItemStack(consume.getItems()[0].getItem(), value.count());
             guiGraphics.renderTooltip(font, Screen.getTooltipFromItem(Minecraft.getInstance(), stack), stack.getTooltipImage(), stack, mouseX, mouseY);
         }
     }
