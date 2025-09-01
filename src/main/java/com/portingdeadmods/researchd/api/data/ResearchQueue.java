@@ -9,6 +9,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -129,6 +130,10 @@ public final class ResearchQueue implements Iterable<ResearchInstance> {
 
     public void setMaxResearchProgress(int maxResearchProgress) {
         this.maxResearchProgress = maxResearchProgress;
+    }
+
+    public @Nullable ResearchInstance current() {
+        return (getEntries().isEmpty() ? null : getEntries().getFirst());
     }
 
     public List<ResearchInstance> getEntries() {

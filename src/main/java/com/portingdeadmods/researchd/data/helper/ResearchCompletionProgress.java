@@ -2,16 +2,32 @@ package com.portingdeadmods.researchd.data.helper;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
+import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
+import com.portingdeadmods.researchd.impl.research.method.OrResearchMethod;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 /**
  * A utility class to track the progress of a single research. Has utility methods for client rendering
  */
 public class ResearchCompletionProgress {
-	private float progress;
+	private final ResourceLocation methodId;
+
 	private final float maxProgress;
+	private float progress;
+
+	public ResourceLocation getMethodId() {
+		return this.methodId;
+	}
+
+	public final boolean hasChildren;
+	public final @Nullable List<ResearchCompletionProgress> children;
 
 	public float getProgress() {
 		return this.progress;
@@ -22,11 +38,14 @@ public class ResearchCompletionProgress {
 	}
 
 	public static final Codec<ResearchCompletionProgress> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			ResourceLocation.CODEC.fieldOf("method").forGetter(ResearchCompletionProgress::getMethodId),
 			Codec.FLOAT.fieldOf("progress").forGetter(ResearchCompletionProgress::getProgress),
 			Codec.FLOAT.fieldOf("max_progress").forGetter(ResearchCompletionProgress::getMaxProgress)
 	).apply(instance, ResearchCompletionProgress::new));
 
 	public static final StreamCodec<RegistryFriendlyByteBuf, ResearchCompletionProgress> STREAM_CODEC = StreamCodec.composite(
+			ResourceLocation.STREAM_CODEC,
+			ResearchCompletionProgress::getMethodId,
 			ByteBufCodecs.FLOAT,
 			ResearchCompletionProgress::getProgress,
 			ByteBufCodecs.FLOAT,
@@ -37,14 +56,32 @@ public class ResearchCompletionProgress {
 	/**
 	 * Creates a new ResearchCompletionProgress with 0 progress and max progress of 1.0f.
 	 */
-	public static ResearchCompletionProgress one() { return new ResearchCompletionProgress(0f, 1.0f); }
+	public static ResearchCompletionProgress one(ResourceLocation methodId) { return new ResearchCompletionProgress(methodId, 1.0f); }
 
-	public ResearchCompletionProgress(float maxProgress) {
+	public ResearchCompletionProgress(ResourceLocation methodId, float maxProgress) {
+		if (methodId != OrResearchMethod.ID && methodId != AndResearchMethod.ID) {
+			this.children = null;
+			this.hasChildren = false;
+		} else {
+			this.children = new UniqueArray<>();
+			this.hasChildren = true;
+		}
+
+		this.methodId = methodId;
 		this.progress = 0f;
 		this.maxProgress = maxProgress;
 	}
 
-	public ResearchCompletionProgress(float progress, float maxProgress) {
+	public ResearchCompletionProgress(ResourceLocation methodId, float progress, float maxProgress) {
+		if (methodId != OrResearchMethod.ID && methodId != AndResearchMethod.ID) {
+			this.children = null;
+			this.hasChildren = false;
+		} else {
+			this.children = new UniqueArray<>();
+			this.hasChildren = true;
+		}
+
+		this.methodId = methodId;
 		this.progress = progress;
 		this.maxProgress = maxProgress;
 	}

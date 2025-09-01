@@ -27,9 +27,6 @@ public final class EnUsLangProvider extends LanguageProvider {
             add(entry.getKey(), entry.getValue());
         }
 
-        // Errors
-        add("researchd.error.research_queue_desync", "Small desync happened, please relog. A research complete packed was emitted but your queue was empty");
-
         addBlock(RESEARCH_LAB_PART, "Research Lab Part");
         addBlock(RESEARCH_LAB_CONTROLLER, "Research Lab Controller");
 

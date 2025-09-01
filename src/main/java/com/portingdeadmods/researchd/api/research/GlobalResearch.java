@@ -11,6 +11,9 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * Research Wrapper holding the parent-child relationship between itself and other researches
+ */
 public class GlobalResearch {
     public static final Codec<GlobalResearch> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Research.RESOURCE_KEY_CODEC.fieldOf("research").forGetter(GlobalResearch::getResearch)

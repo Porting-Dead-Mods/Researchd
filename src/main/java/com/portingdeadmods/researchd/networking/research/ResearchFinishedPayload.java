@@ -2,18 +2,17 @@ package com.portingdeadmods.researchd.networking.research;
 
 import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.data.ResearchQueue;
+import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.research.GlobalResearch;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
-import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
-import com.portingdeadmods.researchd.api.data.ResearchQueue;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -40,6 +39,11 @@ public record ResearchFinishedPayload(int timeStamp) implements CustomPacketPayl
         context.enqueueWork(() -> {
             Player player = context.player();
             ResearchTeam team = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeamByMember(player.getUUID());
+            if (team == null) {
+                context.disconnect(ResearchdTranslations.component(ResearchdTranslations.Errors.NO_RESEARCH_TEAM));
+                return;
+            }
+
             ResearchQueue queue = team.getResearchProgress().researchQueue();
 
             if (!queue.isEmpty()) {
@@ -59,7 +63,7 @@ public record ResearchFinishedPayload(int timeStamp) implements CustomPacketPayl
                                 ChatFormatting.GREEN + team.getResearchCompletionTime(timeStamp()) + ChatFormatting.RESET
                         ));
             } else {
-                context.disconnect(Component.translatable("researchd.error.research_queue_desync"));
+                context.disconnect(ResearchdTranslations.component(ResearchdTranslations.Errors.RESEARCH_QUEUE_DESYNC));
             }
             if (Minecraft.getInstance().screen instanceof ResearchScreen screen)
                 screen.getTechList().updateTechList();
