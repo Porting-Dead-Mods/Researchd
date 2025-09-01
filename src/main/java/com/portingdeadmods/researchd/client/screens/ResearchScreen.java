@@ -11,12 +11,11 @@ import com.portingdeadmods.researchd.client.screens.widgets.ResearchGraphWidget;
 import com.portingdeadmods.researchd.client.screens.widgets.ResearchQueueWidget;
 import com.portingdeadmods.researchd.client.screens.widgets.SelectedResearchWidget;
 import com.portingdeadmods.researchd.client.screens.widgets.TechListWidget;
-import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
+import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 public class ResearchScreen extends Screen {
@@ -41,11 +40,11 @@ public class ResearchScreen extends Screen {
     public AbstractWidget prevSelectedResearchMethodWidget;
 
     public ResearchScreen() {
-        super(Component.translatable("screen.researchd.research"));
+        super(ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_TITLE));
 
         // TECH LIST
         this.techListWidget = new TechListWidget(this, 0, 109, 7);
-        this.techListWidget.setTechList(new TechList(ClientResearchTeamHelper.getTeam().getMetadata().getResearchProgress().researches().values().stream().toList()));
+        this.techListWidget.setTechList(TechList.getClientTechList());
 
         // THIS NEEDS TO BE BEFORE THE GRAPH
         this.selectedResearchWidget = new SelectedResearchWidget(0, 40, SelectedResearchWidget.BACKGROUND_WIDTH, SelectedResearchWidget.BACKGROUND_HEIGHT);
@@ -67,10 +66,8 @@ public class ResearchScreen extends Screen {
     protected void init() {
         super.init();
 
-        addRenderableWidget(this.techListWidget);
+        this.techListWidget.visitWidgets(this::addRenderableWidget);
         addRenderableWidget(this.researchQueueWidget);
-        addRenderableWidget(this.techListWidget.searchButton);
-        addRenderableWidget(this.techListWidget.startResearchButton);
         addWidget(this.researchGraphWidget);
         this.selectedResearchWidget.visitWidgets(this::addRenderableWidget);
     }

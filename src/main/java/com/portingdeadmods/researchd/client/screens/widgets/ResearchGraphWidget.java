@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import static com.portingdeadmods.researchd.client.screens.ResearchScreenWidget.PANEL_HEIGHT;
 import static com.portingdeadmods.researchd.client.screens.ResearchScreenWidget.PANEL_WIDTH;
 
+// TODO: Fix null node children and parents
 public class ResearchGraphWidget extends AbstractWidget {
     private @Nullable ResearchGraph graph;
     private final Map<ResearchNode, ArrayList<ResearchLine>> researchLines;

@@ -17,22 +17,22 @@ import java.util.List;
 public class ClientConsumePackResearchMethod extends AbstractResearchInfoWidget<ConsumePackResearchMethod> {
     public static final int GAP_BETWEEN_PACKS = 4;
 
-    public final int COUNT;
-    public final int DURATION;
-    public final int TYPES;
+    public final int count;
+    public final int duration;
+    public final int types;
 
-    public final int TEXT_WIDTH;
+    public final int textWidth;
 
     public ClientConsumePackResearchMethod(int x, int y, ConsumePackResearchMethod method) {
         super(x, y, method);
 
-        this.COUNT = method.count();
-        this.DURATION = method.duration();
-        this.TYPES = method.packs().size();
+        this.count = method.count();
+        this.duration = method.duration();
+        this.types = method.packs().size();
 
-        this.TEXT_WIDTH = Minecraft.getInstance().font.width(" x %dt".formatted(DURATION));
+        this.textWidth = Minecraft.getInstance().font.width(" x %dt".formatted(duration));
 
-        this.setWidth(16 + GAP_BETWEEN_PACKS * method.packs().size() + this.TEXT_WIDTH);
+        this.setWidth(16 + GAP_BETWEEN_PACKS * method.packs().size() + this.textWidth);
     }
 
     @Override
@@ -54,8 +54,8 @@ public class ClientConsumePackResearchMethod extends AbstractResearchInfoWidget<
             {
                 if (idx == stacks.size() - 1) {
                     guiGraphics.drawString(Minecraft.getInstance().font,
-                            String.valueOf(COUNT),
-                            xPos + 17 - Minecraft.getInstance().font.width(String.valueOf(COUNT)),
+                            String.valueOf(count),
+                            xPos + 17 - Minecraft.getInstance().font.width(String.valueOf(count)),
                             y + 9,
                             16777215,
                             true);
@@ -66,7 +66,7 @@ public class ClientConsumePackResearchMethod extends AbstractResearchInfoWidget<
 
         guiGraphics.drawString(
                 Minecraft.getInstance().font,
-                " x %dt".formatted(DURATION),
+                " x %dt".formatted(duration),
                 x + 14 + GAP_BETWEEN_PACKS * stacks.size(),
                 y + 4,
                 16777215,
@@ -80,11 +80,11 @@ public class ClientConsumePackResearchMethod extends AbstractResearchInfoWidget<
         if (this.isHovered()) {
             guiGraphics.renderTooltip(font,
                     Component.literal("Consume ").append(
-                    Component.literal("%d".formatted(COUNT)).withStyle(ChatFormatting.GOLD)).append(
-                    Component.literal(COUNT == 1 ? " pack for " : " packs for ")).append(
-                    Component.literal("%d".formatted(DURATION)).withStyle(ChatFormatting.GOLD)).append(
-                    Component.literal(DURATION == 1 ? " tick" : " ticks")).append(
-                    Component.literal(COUNT == 1 ? "." : " each.")),
+                    Component.literal("%d".formatted(count)).withStyle(ChatFormatting.GOLD)).append(
+                    Component.literal(count == 1 ? " pack for " : " packs for ")).append(
+                    Component.literal("%d".formatted(duration)).withStyle(ChatFormatting.GOLD)).append(
+                    Component.literal(duration == 1 ? " tick" : " ticks")).append(
+                    Component.literal(count == 1 ? "." : " each.")),
                     mouseX, mouseY);
         }
     }

@@ -2,18 +2,15 @@ package com.portingdeadmods.researchd.client.screens.widgets;
 
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.data.TechList;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.networking.research.ResearchQueueAddPayload;
-import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
-import com.portingdeadmods.researchd.api.data.TechList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.ImageButton;
-import net.minecraft.client.gui.components.WidgetSprites;
+import net.minecraft.client.gui.components.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -36,12 +33,14 @@ public class TechListWidget extends ResearchScreenWidget {
     private static final int DISPLAY_ROWS = 5;
 
     private TechList techList;
+    private TechList displayTechList;
 
     private final int cols;
     private int curRow;
     private int scrollOffset;
     public final ImageButton searchButton;
     public final Button startResearchButton;
+    private final EditBox searchBox;
     private boolean hasSearchBar;
     private final ResearchScreen screen;
 
@@ -60,11 +59,52 @@ public class TechListWidget extends ResearchScreenWidget {
                 .bounds(11, y + 4, 32, 14)
                 .build();
 
+        this.searchBox = new EditBox(Minecraft.getInstance().font, x + 73 + 2, y + 3 + 4, 78, 14, Component.empty()) {
+            @Override
+            public boolean charTyped(char codePoint, int modifiers) {
+                String searchValue = this.getValue();
+                boolean typed = super.charTyped(codePoint, modifiers);
+                String newValue = this.getValue();
+                if (!searchValue.equals(newValue)) {
+                    refreshSearchResult();
+                }
+                return typed;
+            }
+
+            @Override
+            public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+                String searchValue = this.getValue();
+                boolean pressed = super.keyPressed(keyCode, scanCode, modifiers);
+                String newValue = this.getValue();
+                if (!searchValue.equals(newValue)) {
+                    refreshSearchResult();
+                }
+                return pressed;
+            }
+
+            @Override
+            public void setValue(String text) {
+                String searchValue = this.getValue();
+                super.setValue(text);
+                String newValue = this.getValue();
+                if (!searchValue.equals(newValue)) {
+                    refreshSearchResult();
+                }
+            }
+        };
+        this.searchBox.setBordered(false);
+        this.searchBox.setVisible(false);
+
         this.screen = screen;
+    }
+
+    private void refreshSearchResult() {
+
     }
 
     public void setTechList(TechList techList) {
         this.techList = techList;
+        this.displayTechList = techList;
     }
 
     public TechList getTechList() {
@@ -73,6 +113,7 @@ public class TechListWidget extends ResearchScreenWidget {
 
     public void onSearchButtonClicked(Button button) {
         this.hasSearchBar = !this.hasSearchBar;
+        this.searchBox.setVisible(this.hasSearchBar);
     }
 
     public void onStartResearchButtonClicked(Button button) {
@@ -166,5 +207,6 @@ public class TechListWidget extends ResearchScreenWidget {
         super.visitWidgets(consumer);
         consumer.accept(this.searchButton);
         consumer.accept(this.startResearchButton);
+        consumer.accept(this.searchBox);
     }
 }

@@ -38,6 +38,8 @@ public final class ResearchdTranslations {
     }
 
     public static final class Research {
+        public static final TranslatableConstant SCREEN_TITLE = create("screen.title", "Researches");
+
         public static final TranslatableConstant QUEUE_ADDED = create("queue.added", "%s added %s to the research queue!");
         public static final TranslatableConstant QUEUE_FINISHED = create("queue.finished", "%s finished researching (%s)!");
 

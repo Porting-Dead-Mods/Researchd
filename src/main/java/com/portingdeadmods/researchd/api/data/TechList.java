@@ -4,7 +4,6 @@ import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 
-
 import java.util.List;
 
 public class TechList {
@@ -15,7 +14,7 @@ public class TechList {
         updateTechList();
     }
 
-    public static TechList client() {
+    public static TechList getClientTechList() {
         return new TechList(ClientResearchTeamHelper.getTeam().getMetadata().getResearchProgress().researches().values().stream().toList());
     }
 
