@@ -48,6 +48,9 @@ public final class ResearchdTranslations {
 
         public static final TranslatableConstant DIMENSION_UNLOCK_EFFECT_TOOLTIP = create("effects.tooltip.dimension_unlock", "Unlocks Dimension: %s");
 
+        public static final TranslatableConstant RECIPE_UNLOCK_EFFECT_TOOLTIP_NO_ARG = create("effects.tooltip.recipe_unlock_no_arg", "Unlocks Recipe: ");
+        public static final TranslatableConstant RECIPE_UNLOCK_EFFECT_TOOLTIP = create("effects.tooltip.recipe_unlock", "Unlocks Recipe: %s");
+
         private static TranslatableConstant create(String key, String defaultValue) {
             TranslatableConstant constant = new TranslatableConstant(key, "research");
             TRANSLATIONS.put(constant.key(Researchd.MODID), defaultValue);

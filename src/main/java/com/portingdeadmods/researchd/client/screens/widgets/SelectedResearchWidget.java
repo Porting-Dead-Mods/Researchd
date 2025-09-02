@@ -120,7 +120,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
             if (effectWidgetConstructor != null) {
                 this.effectWidget = effectWidgetConstructor.createEffect(53 + padding, 64 + 36 + font.lineHeight + 4, effect);
             } else {
-                // in case the dev didn't implement a widget for the research method, we scream at them
+                // in case the dev didn't implement a widget for the research method, we *aggressively* scream at them
                 MutableComponent message = Component.literal("!!%s does not have info widget!!".formatted(effect.id().toString())).withStyle(ChatFormatting.RED);
                 this.effectWidget = new MultiLineTextWidget(53 + padding + 1, 64 + 36 + font.lineHeight + 4, message, font);
                 ((MultiLineTextWidget) this.effectWidget).setMaxWidth(108);
