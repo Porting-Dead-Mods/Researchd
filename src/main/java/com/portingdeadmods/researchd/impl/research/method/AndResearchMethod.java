@@ -7,7 +7,10 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethodList;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
-import com.portingdeadmods.researchd.data.helper.ResearchCompletionProgress;
+import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
@@ -18,7 +21,14 @@ public record AndResearchMethod(List<ResearchMethod> methods) implements Researc
     private static final MapCodec<AndResearchMethod> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
             ResearchMethod.CODEC.listOf().fieldOf("methods").forGetter(AndResearchMethod::methods)
     ).apply(inst, AndResearchMethod::new));
-    public static final ResearchMethodSerializer<AndResearchMethod> SERIALIZER = ResearchMethodSerializer.simple(CODEC, null);
+
+    private static final StreamCodec<RegistryFriendlyByteBuf, AndResearchMethod> STREAM_CODEC = StreamCodec.composite(
+            ResearchMethod.STREAM_CODEC.apply(ByteBufCodecs.list()),
+            AndResearchMethod::methods,
+            AndResearchMethod::new
+    );
+
+    public static final ResearchMethodSerializer<AndResearchMethod> SERIALIZER = ResearchMethodSerializer.simple(CODEC, STREAM_CODEC);
     public static final ResourceLocation ID = Researchd.rl("and");
 
     @Override
@@ -49,7 +59,7 @@ public record AndResearchMethod(List<ResearchMethod> methods) implements Researc
     }
 
     @Override
-    public ResearchCompletionProgress getDefaultProgress() {
-        return new ResearchCompletionProgress(ID, methods.size());
+    public ResearchMethodProgress getDefaultProgress() {
+        return new ResearchMethodProgress(this, methods.size());
     }
 }

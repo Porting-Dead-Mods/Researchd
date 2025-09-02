@@ -4,8 +4,10 @@ import com.mojang.serialization.Codec;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
-import com.portingdeadmods.researchd.data.helper.ResearchCompletionProgress;
+import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
@@ -13,6 +15,9 @@ import net.minecraft.world.entity.player.Player;
 public interface ResearchMethod {
     Codec<ResearchMethod> CODEC =
             ResearchdRegistries.RESEARCH_METHOD_SERIALIZER.byNameCodec().dispatch(ResearchMethod::getSerializer, ResearchMethodSerializer::codec);
+
+    StreamCodec<RegistryFriendlyByteBuf, ResearchMethod> STREAM_CODEC =
+            ResearchMethodSerializer.STREAM_CODEC.dispatch(ResearchMethod::getSerializer, ResearchMethodSerializer::streamCodec);
 
     boolean canResearch(Player player, ResourceKey<Research> research);
 
@@ -27,6 +32,5 @@ public interface ResearchMethod {
 
     ResearchMethodSerializer<?> getSerializer();
 
-    ResearchCompletionProgress getDefaultProgress();
-
+    ResearchMethodProgress getDefaultProgress();
 }

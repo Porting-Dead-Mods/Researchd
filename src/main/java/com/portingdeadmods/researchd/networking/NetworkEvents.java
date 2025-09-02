@@ -4,7 +4,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.pdl.data.PDLSavedData;
 import com.portingdeadmods.researchd.api.pdl.data.SavedDataHolder;
-import com.portingdeadmods.researchd.networking.research.ResearchCompleteProgressSyncPayload;
+import com.portingdeadmods.researchd.networking.research.ResearchMethodProgressSyncPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchFinishedPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchQueueAddPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchQueueRemovePayload;
@@ -85,9 +85,9 @@ public class NetworkEvents {
                 RefreshResearchesPayload::refreshResearchesAction
         );
         registrar.playToClient(
-                ResearchCompleteProgressSyncPayload.TYPE,
-                ResearchCompleteProgressSyncPayload.STREAM_CODEC,
-                ResearchCompleteProgressSyncPayload::researchCompleteProgressSyncAction
+                ResearchMethodProgressSyncPayload.TYPE,
+                ResearchMethodProgressSyncPayload.STREAM_CODEC,
+                ResearchMethodProgressSyncPayload::researchMethodProgressSyncAction
         );
 
         for (PDLSavedData<?> savedData : ResearchdRegistries.SAVED_DATA) {

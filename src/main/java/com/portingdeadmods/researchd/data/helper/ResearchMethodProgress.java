@@ -3,12 +3,12 @@ package com.portingdeadmods.researchd.data.helper;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
+import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.OrResearchMethod;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -16,18 +16,18 @@ import java.util.List;
 /**
  * A utility class to track the progress of a single research. Has utility methods for client rendering
  */
-public class ResearchCompletionProgress {
-	private final ResourceLocation methodId;
+public class ResearchMethodProgress {
+	private final ResearchMethod method;
 
 	private final float maxProgress;
 	private float progress;
 
-	public ResourceLocation getMethodId() {
-		return this.methodId;
+	public ResearchMethod getMethod() {
+		return this.method;
 	}
 
 	public final boolean hasChildren;
-	public final @Nullable List<ResearchCompletionProgress> children;
+	public final @Nullable List<ResearchMethodProgress> children;
 
 	public float getProgress() {
 		return this.progress;
@@ -37,29 +37,29 @@ public class ResearchCompletionProgress {
 		return this.maxProgress;
 	}
 
-	public static final Codec<ResearchCompletionProgress> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			ResourceLocation.CODEC.fieldOf("method").forGetter(ResearchCompletionProgress::getMethodId),
-			Codec.FLOAT.fieldOf("progress").forGetter(ResearchCompletionProgress::getProgress),
-			Codec.FLOAT.fieldOf("max_progress").forGetter(ResearchCompletionProgress::getMaxProgress)
-	).apply(instance, ResearchCompletionProgress::new));
+	public static final Codec<ResearchMethodProgress> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			ResearchMethod.CODEC.fieldOf("method").forGetter(ResearchMethodProgress::getMethod),
+			Codec.FLOAT.fieldOf("progress").forGetter(ResearchMethodProgress::getProgress),
+			Codec.FLOAT.fieldOf("max_progress").forGetter(ResearchMethodProgress::getMaxProgress)
+	).apply(instance, ResearchMethodProgress::new));
 
-	public static final StreamCodec<RegistryFriendlyByteBuf, ResearchCompletionProgress> STREAM_CODEC = StreamCodec.composite(
-			ResourceLocation.STREAM_CODEC,
-			ResearchCompletionProgress::getMethodId,
+	public static final StreamCodec<RegistryFriendlyByteBuf, ResearchMethodProgress> STREAM_CODEC = StreamCodec.composite(
+			ResearchMethod.STREAM_CODEC,
+			ResearchMethodProgress::getMethod,
 			ByteBufCodecs.FLOAT,
-			ResearchCompletionProgress::getProgress,
+			ResearchMethodProgress::getProgress,
 			ByteBufCodecs.FLOAT,
-			ResearchCompletionProgress::getMaxProgress,
-			ResearchCompletionProgress::new
+			ResearchMethodProgress::getMaxProgress,
+			ResearchMethodProgress::new
 	);
 
 	/**
-	 * Creates a new ResearchCompletionProgress with 0 progress and max progress of 1.0f.
+	 * Creates a new ResearchMethodProgress with 0 progress and max progress of 1.0f.
 	 */
-	public static ResearchCompletionProgress one(ResourceLocation methodId) { return new ResearchCompletionProgress(methodId, 1.0f); }
+	public static ResearchMethodProgress one(ResearchMethod methodId) { return new ResearchMethodProgress(methodId, 1.0f); }
 
-	public ResearchCompletionProgress(ResourceLocation methodId, float maxProgress) {
-		if (methodId != OrResearchMethod.ID && methodId != AndResearchMethod.ID) {
+	public ResearchMethodProgress(ResearchMethod method, float maxProgress) {
+		if (!(method instanceof OrResearchMethod) && !(method instanceof AndResearchMethod)) {
 			this.children = null;
 			this.hasChildren = false;
 		} else {
@@ -67,13 +67,13 @@ public class ResearchCompletionProgress {
 			this.hasChildren = true;
 		}
 
-		this.methodId = methodId;
+		this.method = method;
 		this.progress = 0f;
 		this.maxProgress = maxProgress;
 	}
 
-	public ResearchCompletionProgress(ResourceLocation methodId, float progress, float maxProgress) {
-		if (methodId != OrResearchMethod.ID && methodId != AndResearchMethod.ID) {
+	public ResearchMethodProgress(ResearchMethod method, float progress, float maxProgress) {
+		if (!(method instanceof OrResearchMethod) && !(method instanceof AndResearchMethod)) {
 			this.children = null;
 			this.hasChildren = false;
 		} else {
@@ -81,7 +81,7 @@ public class ResearchCompletionProgress {
 			this.hasChildren = true;
 		}
 
-		this.methodId = methodId;
+		this.method = method;
 		this.progress = progress;
 		this.maxProgress = maxProgress;
 	}

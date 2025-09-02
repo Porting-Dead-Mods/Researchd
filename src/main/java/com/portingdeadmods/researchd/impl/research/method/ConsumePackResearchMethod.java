@@ -4,20 +4,23 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
+import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
-import com.portingdeadmods.researchd.data.helper.ResearchCompletionProgress;
-import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
+import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
 import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
 import com.portingdeadmods.researchd.registries.ResearchdItems;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,8 +68,8 @@ public record ConsumePackResearchMethod(List<ResourceKey<SimpleResearchPack>> pa
     }
 
     @Override
-    public ResearchCompletionProgress getDefaultProgress() {
-        return new ResearchCompletionProgress(ID, this.count);
+    public ResearchMethodProgress getDefaultProgress() {
+        return new ResearchMethodProgress(this, this.count);
     }
 
     public static final class Serializer implements ResearchMethodSerializer<ConsumePackResearchMethod> {
@@ -77,17 +80,27 @@ public record ConsumePackResearchMethod(List<ResourceKey<SimpleResearchPack>> pa
                 Codec.INT.fieldOf("duration").forGetter(ConsumePackResearchMethod::duration)
         ).apply(instance, ConsumePackResearchMethod::new));
 
+        public static final StreamCodec<RegistryFriendlyByteBuf, ConsumePackResearchMethod> STREAM_CODEC = StreamCodec.composite(
+                ResourceKey.streamCodec(ResearchdRegistries.RESEARCH_PACK_KEY).apply(ByteBufCodecs.list()),
+                ConsumePackResearchMethod::packs,
+                ByteBufCodecs.INT,
+                ConsumePackResearchMethod::count,
+                ByteBufCodecs.INT,
+                ConsumePackResearchMethod::duration,
+                ConsumePackResearchMethod::new
+        );
+
         private Serializer() {
         }
 
         @Override
-        public MapCodec<ConsumePackResearchMethod> codec() {
+        public @NotNull MapCodec<ConsumePackResearchMethod> codec() {
             return CODEC;
         }
 
         @Override
-        public StreamCodec<RegistryFriendlyByteBuf, ConsumePackResearchMethod> streamCodec() {
-            return null;
+        public @NotNull StreamCodec<RegistryFriendlyByteBuf, ConsumePackResearchMethod> streamCodec() {
+            return STREAM_CODEC;
         }
     }
 }

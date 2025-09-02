@@ -7,8 +7,9 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
-import com.portingdeadmods.researchd.data.helper.ResearchCompletionProgress;
+import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -16,6 +17,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import org.jetbrains.annotations.NotNull;
 
 public record ConsumeItemResearchMethod(Ingredient toConsume, int count) implements ResearchMethod {
     public static final ConsumeItemResearchMethod EMPTY = new ConsumeItemResearchMethod(Ingredient.EMPTY, 0);
@@ -59,8 +61,8 @@ public record ConsumeItemResearchMethod(Ingredient toConsume, int count) impleme
     }
 
     @Override
-    public ResearchCompletionProgress getDefaultProgress() {
-        return new ResearchCompletionProgress(ID, this.count);
+    public ResearchMethodProgress getDefaultProgress() {
+        return new ResearchMethodProgress(this, this.count);
     }
 
     public static final class Serializer implements ResearchMethodSerializer<ConsumeItemResearchMethod> {
@@ -70,17 +72,25 @@ public record ConsumeItemResearchMethod(Ingredient toConsume, int count) impleme
                 Codec.INT.fieldOf("count").forGetter(ConsumeItemResearchMethod::count)
         ).apply(instance, ConsumeItemResearchMethod::new));
 
+        public static final StreamCodec<RegistryFriendlyByteBuf, ConsumeItemResearchMethod> STREAM_CODEC = StreamCodec.composite(
+                Ingredient.CONTENTS_STREAM_CODEC,
+                ConsumeItemResearchMethod::toConsume,
+                ByteBufCodecs.INT,
+                ConsumeItemResearchMethod::count,
+                ConsumeItemResearchMethod::new
+        );
+
         private Serializer() {
         }
 
         @Override
-        public MapCodec<ConsumeItemResearchMethod> codec() {
+        public @NotNull MapCodec<ConsumeItemResearchMethod> codec() {
             return CODEC;
         }
 
         @Override
-        public StreamCodec<RegistryFriendlyByteBuf, ConsumeItemResearchMethod> streamCodec() {
-            return null;
+        public @NotNull StreamCodec<RegistryFriendlyByteBuf, ConsumeItemResearchMethod> streamCodec() {
+            return STREAM_CODEC;
         }
     }
 

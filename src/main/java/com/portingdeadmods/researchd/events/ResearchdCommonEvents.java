@@ -16,10 +16,10 @@ import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.content.commands.ResearchdCommands;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
-import com.portingdeadmods.researchd.data.helper.ResearchCompletionProgress;
+import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
 import com.portingdeadmods.researchd.networking.SyncSavedDataPayload;
-import com.portingdeadmods.researchd.networking.research.ResearchCompleteProgressSyncPayload;
+import com.portingdeadmods.researchd.networking.research.ResearchMethodProgressSyncPayload;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
@@ -83,14 +83,14 @@ public final class ResearchdCommonEvents {
                 ResearchQueue queue = progress.researchQueue();
 
                 Research currentResearch = team.getResearchInQueue(level.registryAccess());
-                ResearchCompletionProgress currentResearchProgress = team.getResearchingProgressInQueue(level.registryAccess());
+                ResearchMethodProgress currentResearchProgress = team.getResearchingProgressInQueue(level.registryAccess());
                 if (currentResearchProgress != null) {
                     // Sync to client the progress on every tick
                     for (TeamMember memberUUID : team.getMembers()) {
                         ServerPlayer player = server.getPlayerList().getPlayer(memberUUID.player());
                         if (player == null) continue;
 
-                        PacketDistributor.sendToPlayer(player, new ResearchCompleteProgressSyncPayload(currentResearchProgress.getProgress()));
+                        PacketDistributor.sendToPlayer(player, new ResearchMethodProgressSyncPayload(currentResearchProgress.getProgress()));
                     }
 
                     // Apply research effects

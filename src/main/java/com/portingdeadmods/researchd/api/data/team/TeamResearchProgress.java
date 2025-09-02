@@ -7,7 +7,7 @@ import com.portingdeadmods.researchd.api.data.ResearchQueue;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
-import com.portingdeadmods.researchd.data.helper.ResearchCompletionProgress;
+import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -21,7 +21,7 @@ import java.util.function.Function;
 public record TeamResearchProgress(
         ResearchQueue researchQueue,
         HashMap<ResourceKey<Research>, ResearchInstance> researches,
-        HashMap<ResourceKey<Research>, ResearchCompletionProgress> progress
+        HashMap<ResourceKey<Research>, ResearchMethodProgress> progress
 ) {
     public static final TeamResearchProgress EMPTY = new TeamResearchProgress(
             new ResearchQueue(),
@@ -33,7 +33,7 @@ public record TeamResearchProgress(
             ResearchQueue.CODEC.fieldOf("researchQueue").forGetter(TeamResearchProgress::researchQueue),
             Codec.unboundedMap(Research.RESOURCE_KEY_CODEC, ResearchInstance.CODEC).xmap(HashMap::new, Function.identity()).fieldOf("researches")
                     .forGetter(TeamResearchProgress::researches),
-            Codec.unboundedMap(Research.RESOURCE_KEY_CODEC, ResearchCompletionProgress.CODEC).xmap(HashMap::new, Function.identity()).fieldOf("completionProgress")
+            Codec.unboundedMap(Research.RESOURCE_KEY_CODEC, ResearchMethodProgress.CODEC).xmap(HashMap::new, Function.identity()).fieldOf("completionProgress")
                     .forGetter(TeamResearchProgress::progress)
     ).apply(instance, TeamResearchProgress::new));
 
@@ -42,7 +42,7 @@ public record TeamResearchProgress(
             TeamResearchProgress::researchQueue,
             ByteBufCodecs.map(HashMap::new, Research.RESOURCE_KEY_STREAM_CODEC, ResearchInstance.STREAM_CODEC),
             TeamResearchProgress::researches,
-            ByteBufCodecs.map(HashMap::new, Research.RESOURCE_KEY_STREAM_CODEC, ResearchCompletionProgress.STREAM_CODEC),
+            ByteBufCodecs.map(HashMap::new, Research.RESOURCE_KEY_STREAM_CODEC, ResearchMethodProgress.STREAM_CODEC),
             TeamResearchProgress::progress,
             TeamResearchProgress::new
     );
@@ -52,19 +52,19 @@ public record TeamResearchProgress(
         return this.researches.get(research).getResearchStatus() == ResearchStatus.RESEARCHED;
     }
 
-    public ResearchCompletionProgress getProgress(ResourceKey<Research> key, HolderLookup.Provider provider) {
+    public ResearchMethodProgress getProgress(ResourceKey<Research> key, HolderLookup.Provider provider) {
         return progress().computeIfAbsent(key, r -> provider.holderOrThrow(r).value().researchMethod().getDefaultProgress());
     }
 
-    private boolean _check_or_and_method(ResearchCompletionProgress prog, ResearchProgressPacket pkt) {
+    private boolean _check_or_and_method(ResearchMethodProgress prog, ResearchProgressPacket pkt) {
         if (prog.hasChildren) {
-            for (ResearchCompletionProgress child : prog.children) {
+            for (ResearchMethodProgress child : prog.children) {
                 if (_check_or_and_method(child, pkt)) {
                     return true;
                 }
             }
         }
-        return pkt.methodId().equals(prog.getMethodId()) && !prog.isComplete();
+        return pkt.methodId().equals(prog.getMethod()) && !prog.isComplete();
     }
 
     /**
@@ -77,18 +77,18 @@ public record TeamResearchProgress(
         ResearchInstance current = this.researchQueue.current();
         if (current == null) return false;
 
-        ResearchCompletionProgress prog = this.getProgress(current.getResearch().getResearch(), provider);
+        ResearchMethodProgress prog = this.getProgress(current.getResearch().getResearch(), provider);
         return _check_or_and_method(prog, pkt);
     }
 
-    private ResearchCompletionProgress _findFirstMatchingProgress(ResearchCompletionProgress prog, ResearchProgressPacket pkt) {
+    private ResearchMethodProgress _findFirstMatchingProgress(ResearchMethodProgress prog, ResearchProgressPacket pkt) {
         if (prog.hasChildren) {
-            for (ResearchCompletionProgress child : prog.children) {
-                ResearchCompletionProgress res = _findFirstMatchingProgress(child, pkt);
+            for (ResearchMethodProgress child : prog.children) {
+                ResearchMethodProgress res = _findFirstMatchingProgress(child, pkt);
                 if (res != null) return res;
             }
         }
-        if (pkt.methodId().equals(prog.getMethodId()) && !prog.isComplete()) {
+        if (pkt.methodId().equals(prog.getMethod()) && !prog.isComplete()) {
             return prog;
         }
         return null;
@@ -102,9 +102,9 @@ public record TeamResearchProgress(
     public void pushProgress(ResearchProgressPacket pkt) {
         ResearchInstance current = this.researchQueue.current();
         if (current == null) return;
-        ResearchCompletionProgress prog = this.progress().get(current.getResearch().getResearch());
+        ResearchMethodProgress prog = this.progress().get(current.getResearch().getResearch());
 
-        ResearchCompletionProgress target = _findFirstMatchingProgress(prog, pkt);
+        ResearchMethodProgress target = _findFirstMatchingProgress(prog, pkt);
         target.progress(pkt.progress());
     }
 
