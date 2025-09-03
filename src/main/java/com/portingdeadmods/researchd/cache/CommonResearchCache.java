@@ -33,7 +33,7 @@ public final class CommonResearchCache {
 
         // CHILDREN
         for (GlobalResearch research : globalResearchMap.values()) {
-            Holder<Research> researchHolder = registryAccess.holderOrThrow(research.getResearch());
+            Holder<Research> researchHolder = registryAccess.holderOrThrow(research.getResearchKey());
             List<ResourceKey<Research>> parents = researchHolder.value().parents();
             for (ResourceKey<Research> parent : parents) {
                 GlobalResearch parentGlobalResearch = globalResearchMap.get(parent);
@@ -43,7 +43,7 @@ public final class CommonResearchCache {
 
         // PARENTS
         for (GlobalResearch research : globalResearchMap.values()) {
-            Holder<Research> researchHolder = registryAccess.holderOrThrow(research.getResearch());
+            Holder<Research> researchHolder = registryAccess.holderOrThrow(research.getResearchKey());
             List<ResourceKey<Research>> parents = researchHolder.value().parents();
 
             if (parents.isEmpty()) {
@@ -52,7 +52,7 @@ public final class CommonResearchCache {
                     continue;
                 } else {
                     // Found multiple root instances
-                    throw new IllegalStateException("Multiple research roots (Researches without parents), prev root research: %s, other root research: %s".formatted(ROOT_RESEARCH.getResearch().location(), research.getResearch().location()));
+                    throw new IllegalStateException("Multiple research roots (Researches without parents), prev root research: %s, other root research: %s".formatted(ROOT_RESEARCH.getResearchKey().location(), research.getResearchKey().location()));
                 }
             }
 

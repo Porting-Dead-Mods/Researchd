@@ -21,7 +21,7 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
 
     // TODO: Add researches to the team's research progress
     private ResearchGraph(GlobalResearch researchRoot, Map<ResourceKey<Research>, ResearchInstance> researches) {
-        this(new ResearchNode(researches.get(researchRoot.getResearch())), new HashMap<>());
+        this(new ResearchNode(researches.get(researchRoot.getResearchKey())), new HashMap<>());
 
         createNodes(rootNode.getInstance(), 0, CommonResearchCache.ROOT_RESEARCH.is(rootNode.getInstance().getKey()) ? -1 : RESEARCH_GRAPH_LAYERS, researches);
         this.rootNode.setRootNode(true);
@@ -40,14 +40,14 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
             Set<GlobalResearch> parents = research.getParents();
 
             for (GlobalResearch parent : parents) {
-                ResearchNode parentNode = this.nodes.get(parent.getResearch());
+                ResearchNode parentNode = this.nodes.get(parent.getResearchKey());
                 node.addParent(parentNode);
             }
 
             Set<GlobalResearch> children = research.getChildren();
 
             for (GlobalResearch child : children) {
-                ResearchNode childNode = this.nodes.get(child.getResearch());
+                ResearchNode childNode = this.nodes.get(child.getResearchKey());
                 node.addChild(childNode);
             }
         }
@@ -64,7 +64,7 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
         }
         for (GlobalResearch research : instance.getParents()) {
             if (nesting < layers || layers == -1) {
-                createNodesUpward(researches.get(research.getResearch()), nesting + 1, layers, researches);
+                createNodesUpward(researches.get(research.getResearchKey()), nesting + 1, layers, researches);
             } else {
                 return;
             }
@@ -77,7 +77,7 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
         }
         for (GlobalResearch research : instance.getChildren()) {
             if (nesting < layers || layers == -1) {
-                createNodesDownward(researches.get(research.getResearch()), nesting + 1, layers, researches);
+                createNodesDownward(researches.get(research.getResearchKey()), nesting + 1, layers, researches);
             } else {
                 return;
             }

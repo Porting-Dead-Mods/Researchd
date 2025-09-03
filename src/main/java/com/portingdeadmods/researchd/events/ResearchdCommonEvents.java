@@ -165,7 +165,7 @@ public final class ResearchdCommonEvents {
     }
 
     @SubscribeEvent
-    public static void onWorldUnload(LevelEvent.Load event) {
+    public static void onWorldLoad(LevelEvent.Load event) {
         if (!event.getLevel().isClientSide()) {
             // Initialize the research cache
             CommonResearchCache.initialize(event.getLevel());
@@ -173,7 +173,6 @@ public final class ResearchdCommonEvents {
             // Add new researches to teams in case new ones were added
             ResearchTeamHelper.initializeTeamResearches(event.getLevel());
         }
-
     }
 
     @SubscribeEvent

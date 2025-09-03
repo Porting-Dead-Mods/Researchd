@@ -2,7 +2,6 @@ package com.portingdeadmods.researchd.api.data.team;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.portingdeadmods.researchd.api.data.ResearchProgressPacket;
 import com.portingdeadmods.researchd.api.data.ResearchQueue;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
@@ -15,7 +14,9 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.function.Function;
 
 public record TeamResearchProgress(
@@ -52,60 +53,30 @@ public record TeamResearchProgress(
         return this.researches.get(research).getResearchStatus() == ResearchStatus.RESEARCHED;
     }
 
-    public ResearchMethodProgress getProgress(ResourceKey<Research> key, HolderLookup.Provider provider) {
-        return progress().computeIfAbsent(key, r -> provider.holderOrThrow(r).value().researchMethod().getDefaultProgress());
-    }
+    private void _backtrackCollect(List<ResearchMethodProgress> list, ResearchMethodProgress node) {
+        if (node.isComplete()) return;
 
-    private boolean _check_or_and_method(ResearchMethodProgress prog, ResearchProgressPacket pkt) {
-        if (prog.hasChildren) {
-            for (ResearchMethodProgress child : prog.children) {
-                if (_check_or_and_method(child, pkt)) {
-                    return true;
-                }
-            }
+        if (node.hasChildren) {
+            _backtrackCollect(list, node);
+        } else {
+            list.add(node);
         }
-        return pkt.methodId().equals(prog.getMethod()) && !prog.isComplete();
     }
 
     /**
-     * Check if the given progress packet would be accepted for processing
-     * @param pkt the packet to check
-     * @param provider registry access
-     * @return true if the packet would fit any of the current research methods, false otherwise
-     */
-    public boolean wouldAcceptProgressPacket(ResearchProgressPacket pkt, HolderLookup.Provider provider) {
-        ResearchInstance current = this.researchQueue.current();
-        if (current == null) return false;
-
-        ResearchMethodProgress prog = this.getProgress(current.getResearch().getResearch(), provider);
-        return _check_or_and_method(prog, pkt);
-    }
-
-    private ResearchMethodProgress _findFirstMatchingProgress(ResearchMethodProgress prog, ResearchProgressPacket pkt) {
-        if (prog.hasChildren) {
-            for (ResearchMethodProgress child : prog.children) {
-                ResearchMethodProgress res = _findFirstMatchingProgress(child, pkt);
-                if (res != null) return res;
-            }
-        }
-        if (pkt.methodId().equals(prog.getMethod()) && !prog.isComplete()) {
-            return prog;
-        }
-        return null;
-    }
-
-    /**
-     * Shouldn't be called without checking {@link TeamResearchProgress#wouldAcceptProgressPacket}  first!
+     * Filters out all the complete and And/Or methods.
      *
-     * @param pkt the packet to process
+     * @param provider Registry access
+     * @return A list of all the valid (non Or/And) methods available for the current research. Null if no current research.
      */
-    public void pushProgress(ResearchProgressPacket pkt) {
-        ResearchInstance current = this.researchQueue.current();
-        if (current == null) return;
-        ResearchMethodProgress prog = this.progress().get(current.getResearch().getResearch());
+    public @Nullable List<ResearchMethodProgress> getAllValidMethodProgress(HolderLookup.Provider provider) {
+        List<ResearchMethodProgress> progressList = new ArrayList<>();
+        if (current() == null) return null;
 
-        ResearchMethodProgress target = _findFirstMatchingProgress(prog, pkt);
-        target.progress(pkt.progress());
+        ResearchMethodProgress parent = progress().get(current().getKey());
+        _backtrackCollect(progressList, parent);
+
+        return progressList;
     }
 
     public @Nullable ResearchInstance current() {

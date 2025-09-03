@@ -153,7 +153,7 @@ public class ResearchTeam {
         if (queue.getEntries() == null) return null;
         if (queue.getEntries().isEmpty()) return null;
 
-        return this.metadata.researchProgress.getProgress(queue.getEntries().getFirst().getKey(), provider);
+        return this.metadata.researchProgress.progress().get(queue.getEntries().getFirst().getKey());
     }
 
     /**
@@ -168,7 +168,7 @@ public class ResearchTeam {
         if (queue.getEntries() == null) return null;
         if (queue.getEntries().isEmpty()) return null;
 
-        return ResearchHelperCommon.getResearch(queue.getEntries().getFirst().getResearch().getResearch(), provider);
+        return ResearchHelperCommon.getResearch(queue.getEntries().getFirst().getResearch().getResearchKey(), provider);
     }
 
     public ResourceKey<Research> getResearchKeyInQueue() {

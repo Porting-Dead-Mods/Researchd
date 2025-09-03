@@ -485,10 +485,18 @@ public final class ResearchTeamHelper {
         ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
         for (ResearchTeam team : data.getResearchTeams().values()) {
             Map<ResourceKey<Research>, ResearchInstance> researches = team.getResearchProgress().researches();
+            Map<ResourceKey<Research>, ResearchMethodProgress> progress = team.getResearchProgress().progress();
             Set<GlobalResearch> globalResearches = new HashSet<>(CommonResearchCache.GLOBAL_RESEARCHES.values());
+
+            for (GlobalResearch research : globalResearches) {
+                if (progress.containsKey(research.getResearchKey())) continue;
+
+                progress.put(research.getResearchKey(), research.getResearch(level.registryAccess()).researchMethod().getDefaultProgress());
+            }
+
             researches.values().stream().map(ResearchInstance::getResearch).toList().forEach(globalResearches::remove);
             for (GlobalResearch globalResearch : globalResearches) {
-                researches.put(globalResearch.getResearch(), new ResearchInstance(globalResearch, ResearchStatus.LOCKED));
+                researches.put(globalResearch.getResearchKey(), new ResearchInstance(globalResearch, ResearchStatus.LOCKED));
             }
         }
         ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);

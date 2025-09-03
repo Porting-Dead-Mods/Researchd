@@ -3,6 +3,8 @@ package com.portingdeadmods.researchd.api.research;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
@@ -16,11 +18,11 @@ import java.util.Set;
  */
 public class GlobalResearch {
     public static final Codec<GlobalResearch> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Research.RESOURCE_KEY_CODEC.fieldOf("research").forGetter(GlobalResearch::getResearch)
+            Research.RESOURCE_KEY_CODEC.fieldOf("research").forGetter(GlobalResearch::getResearchKey)
     ).apply(instance, GlobalResearch::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, GlobalResearch> STREAM_CODEC = StreamCodec.composite(
             Research.RESOURCE_KEY_STREAM_CODEC,
-            GlobalResearch::getResearch,
+            GlobalResearch::getResearchKey,
             GlobalResearch::new
     );
     private final ResourceKey<Research> research;
@@ -37,8 +39,12 @@ public class GlobalResearch {
         return this.research.compareTo(research) == 0;
     }
 
-    public ResourceKey<Research> getResearch() {
+    public ResourceKey<Research> getResearchKey() {
         return this.research;
+    }
+
+    public Research getResearch(HolderLookup.Provider access) {
+        return ResearchHelperCommon.getResearch(this.getResearchKey(), access);
     }
 
     public Set<GlobalResearch> getChildren() {

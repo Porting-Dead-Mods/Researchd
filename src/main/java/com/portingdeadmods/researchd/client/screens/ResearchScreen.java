@@ -52,7 +52,7 @@ public class ResearchScreen extends Screen {
         int x = 174;
         this.researchGraphWidget = new ResearchGraphWidget(this, x, 8, 300, 253 - 16);
         if (CommonResearchCache.ROOT_RESEARCH != null) {
-            this.researchGraphWidget.setGraph(ResearchGraphCache.computeIfAbsent(CommonResearchCache.ROOT_RESEARCH.getResearch()));
+            this.researchGraphWidget.setGraph(ResearchGraphCache.computeIfAbsent(CommonResearchCache.ROOT_RESEARCH.getResearchKey()));
         }
     }
 

@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
+import com.portingdeadmods.researchd.api.research.methods.ResearchMethodList;
 import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.OrResearchMethod;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -25,6 +26,9 @@ public class ResearchMethodProgress {
 	public ResearchMethod getMethod() {
 		return this.method;
 	}
+
+	public boolean hasParent; // Only valid if the method is part of an And/Or
+	public ResearchMethodProgress parent;
 
 	public final boolean hasChildren;
 	public final @Nullable List<ResearchMethodProgress> children;
@@ -59,17 +63,7 @@ public class ResearchMethodProgress {
 	public static ResearchMethodProgress one(ResearchMethod methodId) { return new ResearchMethodProgress(methodId, 1.0f); }
 
 	public ResearchMethodProgress(ResearchMethod method, float maxProgress) {
-		if (!(method instanceof OrResearchMethod) && !(method instanceof AndResearchMethod)) {
-			this.children = null;
-			this.hasChildren = false;
-		} else {
-			this.children = new UniqueArray<>();
-			this.hasChildren = true;
-		}
-
-		this.method = method;
-		this.progress = 0f;
-		this.maxProgress = maxProgress;
+		this(method, 0f, maxProgress);
 	}
 
 	public ResearchMethodProgress(ResearchMethod method, float progress, float maxProgress) {
@@ -79,6 +73,13 @@ public class ResearchMethodProgress {
 		} else {
 			this.children = new UniqueArray<>();
 			this.hasChildren = true;
+
+			for (ResearchMethod childMethod : ((ResearchMethodList) method).methods()) {
+				ResearchMethodProgress childProgress = childMethod.getDefaultProgress();
+				childProgress.hasParent = true;
+				childProgress.parent = this;
+				this.children.add(childProgress);
+			}
 		}
 
 		this.method = method;
@@ -96,6 +97,8 @@ public class ResearchMethodProgress {
 	public boolean progress(float amount) {
 		if (this.progress > this.maxProgress) {
 			this.progress = this.maxProgress;
+
+			if (this.hasParent) this.parent.progress(1f);
 			return true;
 		} else {
 			this.progress += amount;
@@ -127,5 +130,4 @@ public class ResearchMethodProgress {
 	public boolean isComplete() {
 		return this.progress >= this.maxProgress;
 	}
-
 }

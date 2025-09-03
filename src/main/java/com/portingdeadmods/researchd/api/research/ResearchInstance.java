@@ -67,7 +67,7 @@ public final class ResearchInstance {
     }
 
     public ResourceKey<Research> getKey() {
-        return this.research.getResearch();
+        return this.research.getResearchKey();
     }
 
     public ResearchStatus getResearchStatus() {
@@ -95,7 +95,7 @@ public final class ResearchInstance {
     }
 
     public Research lookup(HolderLookup.Provider lookupProvider) {
-        return lookupProvider.holder(this.research.getResearch()).map(Holder.Reference::value).orElse(null);
+        return lookupProvider.holder(this.research.getResearchKey()).map(Holder.Reference::value).orElse(null);
     }
 
     public Set<GlobalResearch> getChildren() {
@@ -111,7 +111,7 @@ public final class ResearchInstance {
     }
 
     public boolean is(GlobalResearch research) {
-        return this.is(research.getResearch());
+        return this.is(research.getResearchKey());
     }
 
     public boolean is(ResourceKey<Research> key) {

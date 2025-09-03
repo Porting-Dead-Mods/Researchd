@@ -52,7 +52,7 @@ public record ResearchFinishedPayload(int timeStamp) implements CustomPacketPayl
                 queue.remove(0);
                 Set<GlobalResearch> children = first.getChildren();
                 for (GlobalResearch child : children) {
-                    team.getResearchProgress().researches().get(child.getResearch()).setResearchStatus(ResearchStatus.RESEARCHABLE);
+                    team.getResearchProgress().researches().get(child.getResearchKey()).setResearchStatus(ResearchStatus.RESEARCHABLE);
                 }
                 team.getResearchProgress().completeResearch(first);
 
