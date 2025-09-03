@@ -62,7 +62,7 @@ public final class ResearchdTranslations {
     }
 
     public static final class Errors {
-        public static final TranslatableConstant RESEARCH_QUEUE_DESYNC = create("research_queue_desync", "Small desync happened, please relog. A research complete packet was emitted but your queue was empty");
+        public static final TranslatableConstant RESEARCH_QUEUE_DESYNC = create("research_queue_desync", "A small desynchronization happened regarding the Research Queue happened, please relog.");
         public static final TranslatableConstant NO_RESEARCH_TEAM = create("no_research_team", "Research related packet handled to player lacking a team");
 
         private static TranslatableConstant create(String key, String defaultValue) {

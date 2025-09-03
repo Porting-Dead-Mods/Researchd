@@ -3,14 +3,15 @@ package com.portingdeadmods.researchd.client.screens.widgets;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.data.ResearchQueue;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
+import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
+import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
 import com.portingdeadmods.researchd.networking.research.ResearchQueueRemovePayload;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
-import com.portingdeadmods.researchd.api.data.ResearchQueue;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -106,9 +107,6 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
         if (this.queue.getEntries().size() > index) {
             ResearchInstance instance = this.queue.getEntries().get(index);
             this.queue.remove(index);
-            if (index == 0) {
-                this.queue.setResearchProgress(0);
-            }
             PacketDistributor.sendToServer(new ResearchQueueRemovePayload(instance));
         }
     }
@@ -139,16 +137,18 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
         }
     }
 
-    private void renderResearchingResearchPanel(GuiGraphics guiGraphics, ResearchInstance instance, int x, int y, int mouseX, int mouseY, boolean hoverable) {
+    private void renderResearchingResearchPanel(GuiGraphics guiGraphics, ResearchInstance firstInQueue, int x, int y, int mouseX, int mouseY, boolean hoverable) {
         PanelSpriteType spriteType = PanelSpriteType.NORMAL;
-        ResearchStatus status = instance.getResearchStatus();
+        ResearchStatus status = firstInQueue.getResearchStatus();
         GuiUtils.drawImg(guiGraphics, status.getSpriteTexture(spriteType), x, y, PANEL_WIDTH, spriteType.getHeight());
-        float progress = (float) queue.getResearchProgress() / queue.getMaxResearchProgress();
+
+        ResearchMethodProgress rmp = ClientResearchTeamHelper.getTeam().getResearchProgress().getRootProgress(firstInQueue.getKey());
+        float progress = rmp == null ? 0f : rmp.getProgressPercent();
 
         guiGraphics.blit(ResearchStatus.RESEARCHED.getSpriteTexture(spriteType), x, y, 0, 0, (int) (progress * PANEL_WIDTH), spriteType.getHeight(), PANEL_WIDTH, spriteType.getHeight());
 
         RegistryAccess lookup = Minecraft.getInstance().level.registryAccess();
-        guiGraphics.renderItem(instance.lookup(lookup).icon().getDefaultInstance(), x + 2, y + 2);
+        guiGraphics.renderItem(firstInQueue.lookup(lookup).icon().getDefaultInstance(), x + 2, y + 2);
 
         if (isHovering(guiGraphics, x, y, mouseX, mouseY) && hoverable) {
             int color = -2130706433;

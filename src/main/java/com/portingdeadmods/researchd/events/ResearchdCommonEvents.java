@@ -11,6 +11,7 @@ import com.portingdeadmods.researchd.api.pdl.data.PDLClientSavedData;
 import com.portingdeadmods.researchd.api.pdl.data.PDLSavedData;
 import com.portingdeadmods.researchd.api.pdl.data.SavedDataHolder;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.content.commands.ResearchdCommands;
@@ -20,6 +21,7 @@ import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
 import com.portingdeadmods.researchd.networking.SyncSavedDataPayload;
+import com.portingdeadmods.researchd.networking.research.ResearchFinishedPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchMethodProgressSyncPayload;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.core.Holder;
@@ -45,6 +47,7 @@ import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
@@ -74,25 +77,26 @@ public final class ResearchdCommonEvents {
         PDLClientSavedData.CLIENT_SAVED_DATA_CACHE.clear();
     }
 
-    @SubscribeEvent
-    public static void consumeItemResearchMethodLogic(ServerTickEvent.Post event) {
-        MinecraftServer server = event.getServer();
-        ServerLevel level = server.overworld();
-
-        if (level.getGameTime() % 20 != 0) return; // Run logic 1/1s
-
-        ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
-        if (data == null) return;
+    public static void consumeItemResearchMethodLogic(@NotNull ResearchTeamMap data, MinecraftServer server) {
         for (ResearchTeam team : data.getResearchTeams().values()) {
             TeamResearchProgress teamProgress = team.getResearchProgress();
             List<ResearchMethodProgress> progressList = teamProgress.getAllValidMethodProgress(ConsumeItemResearchMethod.class);
             if (progressList == null) continue;
             if (progressList.isEmpty()) continue;
+            if (team.getResearchProgressInQueue() == null) continue; // Useless line, but just make the IDE shut up
 
+            Researchd.debug("ConsumeItemResearchMethodLogic", "Current progress on root: " + team.getResearchProgressInQueue().getProgress() + "/" + team.getResearchProgressInQueue().getMaxProgress(), " ROOT UUID: ", team.getResearchProgressInQueue().DEBUG_UUID());
             for (ResearchMethodProgress progress : progressList) {
                 ConsumeItemResearchMethod method = (ConsumeItemResearchMethod) progress.getMethod();
                 Ingredient ingredient = method.toConsume();
                 int needed = (int) progress.getRemainingProgress();
+                Researchd.debug("ConsumeItemResearchMethodLogic", "Current progress on possible method: " + progress.getProgress() + "/" + progress.getMaxProgress());
+                if (progress.getParentAsOptional().isPresent())
+                    Researchd.debug("ConsumeItemResearchMethodLogic", "PARENT UUID: ", progress.getParent().DEBUG_UUID());
+                else
+                    Researchd.debug("ConsumeItemResearchMethodLogic", "NO PARENT");
+
+                Researchd.debug("ConsumeItemResearchMethodLogic", "Needed " + needed + " for method: " + method);
 
                 for (TeamMember memberUUID : team.getMembers()) {
                     ServerPlayer player = server.getPlayerList().getPlayer(memberUUID.player());
@@ -112,8 +116,13 @@ public final class ResearchdCommonEvents {
                             needed -= toConsume;
                         }
                     }
+                    Researchd.debug("ConsumeItemResearchMethodLogic", "Found " + found + " for player: " + player.getName().getString());
 
                     progress.progress(found);
+
+                    Researchd.debug("ConsumeItemResearchMethodLogic", "New progress on possible method: " + progress.getProgress() + "/" + progress.getMaxProgress(), " | IS COMPLETE: ", progress.isComplete() ? "YES" : "NO");
+                    Researchd.debug("ConsumeItemResearchMethodLogic", "New progress on root: " + team.getResearchProgressInQueue().getProgress() + "/" + team.getResearchProgressInQueue().getMaxProgress(), " ROOT UUID: ", team.getResearchProgressInQueue().DEBUG_UUID());
+
                     if (needed <= 0) break;
                 }
             }
@@ -124,29 +133,43 @@ public final class ResearchdCommonEvents {
     public static void onServerTick(ServerTickEvent.Post event) {
         MinecraftServer server = event.getServer();
         ServerLevel level = server.overworld();
-
         ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
 
         if (data != null) {
+            if (level.getGameTime() % 20 == 0) {
+                // Logic here please
+                consumeItemResearchMethodLogic(data, server);
+            }
+
             for (ResearchTeam team : data.getResearchTeams().values()) {
-                TeamResearchProgress progress = team.getResearchProgress();
-                ResearchQueue queue = progress.researchQueue();
+                TeamResearchProgress teamProgress = team.getResearchProgress();
+
+                ResearchQueue queue = teamProgress.researchQueue();
+                if (queue.isEmpty()) continue;
+                ResearchInstance instance = queue.current();
 
                 Research currentResearch = team.getResearchInQueue(level.registryAccess());
-                ResearchMethodProgress currentResearchProgress = team.getResearchingProgressInQueue();
+                ResearchMethodProgress currentResearchProgress = team.getResearchProgressInQueue();
+
                 if (currentResearchProgress != null) {
                     if (level.getGameTime() % 2 == 0)
                         for (TeamMember memberUUID : team.getMembers()) {
                             ServerPlayer player = server.getPlayerList().getPlayer(memberUUID.player());
                             if (player == null) continue;
 
-                            PacketDistributor.sendToPlayer(player, new ResearchMethodProgressSyncPayload(team.getResearchKeyInQueue(), team.getResearchingProgressInQueue()));
+                            PacketDistributor.sendToPlayer(player, new ResearchMethodProgressSyncPayload(team.getResearchKeyInQueue(), team.getAllRMPInQueue()));
                         }
 
-                    // Apply research effects
+                    // Research Complete Logic
                     if (currentResearchProgress.isComplete()) {
+                        teamProgress.completeResearchAndUpdate(instance, server.getTickCount() * 50L);
+
                         for (TeamMember playerUUIDs : team.getMembers()) {
                             ServerPlayer player = server.getPlayerList().getPlayer(playerUUIDs.player());
+                            if (player == null) continue;
+
+                            PacketDistributor.sendToPlayer(player, new ResearchFinishedPayload(instance.getKey(), server.getTickCount() * 50));
+
                             Researchd.debug("Researching", "Applying research effects for Research: " + team.getResearchKeyInQueue() + " to player: " + player.getName().getString());
                             currentResearch.researchEffect().onUnlock(level, player, team.getResearchKeyInQueue());
                         }

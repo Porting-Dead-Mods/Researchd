@@ -18,35 +18,25 @@ import java.util.Objects;
 import java.util.function.IntSupplier;
 
 public final class ResearchQueue implements Iterable<ResearchInstance> {
-    public static final ResearchQueue EMPTY = new ResearchQueue(new ArrayList<>(), 0, 0);
+    public static final ResearchQueue EMPTY = new ResearchQueue(new ArrayList<>());
     public static final Codec<ResearchQueue> CODEC = RecordCodecBuilder.create(inst -> inst.group(
-            ResearchInstance.CODEC.listOf().fieldOf("entries").forGetter(ResearchQueue::getEntries),
-            Codec.INT.fieldOf("researchProgress").forGetter(ResearchQueue::getResearchProgress),
-            Codec.INT.fieldOf("maxResearchProgress").forGetter(ResearchQueue::getMaxResearchProgress)
+            ResearchInstance.CODEC.listOf().fieldOf("entries").forGetter(ResearchQueue::getEntries)
     ).apply(inst, ResearchQueue::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, ResearchQueue> STREAM_CODEC = StreamCodec.composite(
             ResearchInstance.STREAM_CODEC.apply(ByteBufCodecs.list()),
             ResearchQueue::getEntries,
-            ByteBufCodecs.INT,
-            ResearchQueue::getResearchProgress,
-            ByteBufCodecs.INT,
-            ResearchQueue::getMaxResearchProgress,
             ResearchQueue::new
     );
     public static final IntSupplier QUEUE_LENGTH = () -> ResearchdCommonConfig.researchQueueLength;
 
     private final List<ResearchInstance> entries;
-    private int researchProgress;
-    private int maxResearchProgress;
 
-    public ResearchQueue(List<ResearchInstance> entries, int researchProgress, int maxResearchProgress) {
+    public ResearchQueue(List<ResearchInstance> entries) {
         this.entries = new ArrayList<>(entries);
-        this.researchProgress = researchProgress;
-        this.maxResearchProgress = maxResearchProgress;
     }
 
     public ResearchQueue() {
-        this(new ArrayList<>(QUEUE_LENGTH.getAsInt()), 0, 0);
+        this(new ArrayList<>(QUEUE_LENGTH.getAsInt()));
     }
 
     /**
@@ -116,22 +106,6 @@ public final class ResearchQueue implements Iterable<ResearchInstance> {
         return entries.iterator();
     }
 
-    public int getResearchProgress() {
-        return researchProgress;
-    }
-
-    public void setResearchProgress(int researchProgress) {
-        this.researchProgress = researchProgress;
-    }
-
-    public int getMaxResearchProgress() {
-        return maxResearchProgress;
-    }
-
-    public void setMaxResearchProgress(int maxResearchProgress) {
-        this.maxResearchProgress = maxResearchProgress;
-    }
-
     public @Nullable ResearchInstance current() {
         return (getEntries().isEmpty() ? null : getEntries().getFirst());
     }
@@ -145,20 +119,18 @@ public final class ResearchQueue implements Iterable<ResearchInstance> {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
         var that = (ResearchQueue) obj;
-        return Objects.equals(this.entries, that.entries) &&
-                this.researchProgress == that.researchProgress;
+        return Objects.equals(this.entries, that.entries);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(entries, researchProgress);
+        return Objects.hash(entries);
     }
 
     @Override
     public String toString() {
         return "ResearchQueue[" +
-                "entries=" + entries + ", " +
-                "researchProgress=" + researchProgress + ']';
+                "entries=" + entries + ']';
     }
 
 }

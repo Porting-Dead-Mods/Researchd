@@ -3,11 +3,14 @@ package com.portingdeadmods.researchd.api.data.team;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.api.data.ResearchQueue;
+import com.portingdeadmods.researchd.api.research.GlobalResearch;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
+import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
+import com.portingdeadmods.researchd.impl.research.method.OrResearchMethod;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -22,7 +25,7 @@ import java.util.function.Function;
 public record TeamResearchProgress(
         ResearchQueue researchQueue,
         HashMap<ResourceKey<Research>, ResearchInstance> researches,
-        HashMap<ResourceKey<Research>, ResearchMethodProgress> progress
+        HashMap<ResourceKey<Research>, List<ResearchMethodProgress>> progress
 ) {
     public static final TeamResearchProgress EMPTY = new TeamResearchProgress(
             new ResearchQueue(),
@@ -34,7 +37,7 @@ public record TeamResearchProgress(
             ResearchQueue.CODEC.fieldOf("researchQueue").forGetter(TeamResearchProgress::researchQueue),
             Codec.unboundedMap(Research.RESOURCE_KEY_CODEC, ResearchInstance.CODEC).xmap(HashMap::new, Function.identity()).fieldOf("researches")
                     .forGetter(TeamResearchProgress::researches),
-            Codec.unboundedMap(Research.RESOURCE_KEY_CODEC, ResearchMethodProgress.CODEC).xmap(HashMap::new, Function.identity()).fieldOf("completionProgress")
+            Codec.unboundedMap(Research.RESOURCE_KEY_CODEC, ResearchMethodProgress.CODEC.listOf()).xmap(HashMap::new, Function.identity()).fieldOf("completionProgress")
                     .forGetter(TeamResearchProgress::progress)
     ).apply(instance, TeamResearchProgress::new));
 
@@ -43,7 +46,7 @@ public record TeamResearchProgress(
             TeamResearchProgress::researchQueue,
             ByteBufCodecs.map(HashMap::new, Research.RESOURCE_KEY_STREAM_CODEC, ResearchInstance.STREAM_CODEC),
             TeamResearchProgress::researches,
-            ByteBufCodecs.map(HashMap::new, Research.RESOURCE_KEY_STREAM_CODEC, ResearchMethodProgress.STREAM_CODEC),
+            ByteBufCodecs.map(HashMap::new, Research.RESOURCE_KEY_STREAM_CODEC, ResearchMethodProgress.STREAM_CODEC.apply(ByteBufCodecs.list())),
             TeamResearchProgress::progress,
             TeamResearchProgress::new
     );
@@ -53,14 +56,19 @@ public record TeamResearchProgress(
         return this.researches.get(research).getResearchStatus() == ResearchStatus.RESEARCHED;
     }
 
-    private void _backtrackCollect(List<ResearchMethodProgress> list, ResearchMethodProgress node) {
-        if (node.isComplete()) return;
+    /**
+     * Gets the root progress of a research a.k.a. the one that dictates if the research is complete or not.
+     */
+    public @Nullable ResearchMethodProgress getRootProgress(ResourceKey<Research> research) {
+        if (!this.progress.containsKey(research)) return null;
+        List<ResearchMethodProgress> progressList = this.progress.get(research);
+        ResearchMethodProgress rmp = progressList.getFirst();
 
-        if (node.getChildren().isEmpty()) {
-            _backtrackCollect(list, node);
-        } else {
-            list.add(node);
+        while (rmp.getParent() != null) {
+            rmp = rmp.getParent();
         }
+
+        return rmp;
     }
 
     /**
@@ -69,11 +77,23 @@ public record TeamResearchProgress(
      * @return A list of all the valid (non Or/And) methods available for the current research. Null if no current research.
      */
     public @Nullable List<ResearchMethodProgress> getAllValidMethodProgress() {
-        List<ResearchMethodProgress> progressList = new ArrayList<>();
         if (current() == null) return null;
+        List<ResearchMethodProgress> progressList = progress().get(current().getKey());
 
-        ResearchMethodProgress parent = progress().get(current().getKey());
-        _backtrackCollect(progressList, parent);
+        progressList = new ArrayList<>(progressList.parallelStream().filter(rmp -> {
+            if (rmp.isComplete()) return false;
+            if (rmp.getMethod() instanceof OrResearchMethod || rmp.getMethod() instanceof AndResearchMethod) return false;
+
+            ResearchMethodProgress parent = rmp.getParent();
+
+            while (parent != null) {
+                if (parent.isComplete()) {
+                    return false;
+                }
+                parent = parent.getParent();
+            }
+            return true;
+        }).toList());
 
         return progressList;
     }
@@ -96,7 +116,13 @@ public record TeamResearchProgress(
         return this.researchQueue.current();
     }
 
-    public void completeResearch(ResearchInstance research) {
-        this.researches.get(research.getKey()).setResearchStatus(ResearchStatus.RESEARCHED);
+    public void completeResearchAndUpdate(ResearchInstance research, long completionTime) {
+        this.researches.get(research.getKey()).setResearchStatus(ResearchStatus.RESEARCHED).setResearchedTime(completionTime);
+
+        for (GlobalResearch child : research.getResearch().getChildren()) {
+            if (child.getParents().stream().allMatch(parent -> this.hasCompleted(parent.getResearchKey()))) {
+                this.researches().get(child.getResearchKey()).setResearchStatus(ResearchStatus.RESEARCHABLE);
+            }
+        }
     }
 }

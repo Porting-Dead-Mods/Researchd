@@ -94,7 +94,7 @@ public class ResearchTeam {
 
         ResearchTeam team = new ResearchTeam(player.getDisplayName().getString() + "'s Team", List.of(new TeamMember(player.getUUID(), ResearchTeamRole.OWNER), new TeamMember(DEBUG_MEMBER.getId(), ResearchTeamRole.MEMBER)), List.of(), List.of(), player.getUUID(), TeamResearchProgress.EMPTY);
         team.setCreationTime(player.getServer().getTickCount() * 50);
-        team.init();
+        team.init(player.registryAccess());
         return team;
     }
 
@@ -175,7 +175,15 @@ public class ResearchTeam {
      * @return {@link ResearchMethodProgress} of the research or null if no research is currently in progress.
      */
     @Nullable
-    public ResearchMethodProgress getResearchingProgressInQueue() {
+    public ResearchMethodProgress getResearchProgressInQueue() {
+        ResearchQueue queue = this.metadata.researchProgress.researchQueue();
+        if (queue.getEntries() == null) return null;
+        if (queue.getEntries().isEmpty()) return null;
+
+        return this.metadata.researchProgress.getRootProgress(queue.getEntries().getFirst().getKey());
+    }
+    
+    public List<ResearchMethodProgress> getAllRMPInQueue() {
         ResearchQueue queue = this.metadata.researchProgress.researchQueue();
         if (queue.getEntries() == null) return null;
         if (queue.getEntries().isEmpty()) return null;
@@ -286,13 +294,18 @@ public class ResearchTeam {
         return new TimeUtils.TimeDifference(this.metadata.creationTime.get(), time).getFormatted();
     }
 
-    public void init() {
-        Map<ResourceKey<Research>, ResearchInstance> globalResearches = CommonResearchCache.GLOBAL_RESEARCHES.entrySet().stream()
+    public void init(HolderLookup.Provider access) {
+        Map<ResourceKey<Research>, ResearchInstance> researchInstances = CommonResearchCache.GLOBAL_RESEARCHES.entrySet().stream()
                 .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), new ResearchInstance(e.getValue(), CommonResearchCache.ROOT_RESEARCH.is(e.getKey())
                         ? ResearchStatus.RESEARCHABLE
                         : ResearchStatus.LOCKED)))
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
-        this.getResearchProgress().researches().putAll(globalResearches);
+        this.getResearchProgress().researches().putAll(researchInstances);
+
+        Map<ResourceKey<Research>, List<ResearchMethodProgress>> rmps = CommonResearchCache.GLOBAL_RESEARCHES.entrySet().stream()
+                .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), ResearchMethodProgress.collectFromRoot(e.getValue().getResearch(access).researchMethod())))
+                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
+        this.getResearchProgress().progress().putAll(rmps);
     }
 
     // Codecs are too small.

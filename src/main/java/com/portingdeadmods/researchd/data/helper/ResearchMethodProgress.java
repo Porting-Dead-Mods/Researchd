@@ -2,9 +2,7 @@ package com.portingdeadmods.researchd.data.helper;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
-import com.portingdeadmods.researchd.api.research.methods.ResearchMethodList;
 import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.OrResearchMethod;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -13,8 +11,10 @@ import net.minecraft.network.codec.StreamCodec;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * A utility class to track the progress of a single research. Has utility methods for client rendering
@@ -24,7 +24,7 @@ public class ResearchMethodProgress {
 	private final float maxProgress;
 	private float progress;
 	private @Nullable ResearchMethodProgress parent;
-	private final List<ResearchMethodProgress> children;
+	private final UUID DEBUG_UUID;
 
 	public ResearchMethod getMethod() {
 		return this.method;
@@ -38,11 +38,16 @@ public class ResearchMethodProgress {
 		return this.maxProgress;
 	}
 
+	public UUID DEBUG_UUID() { return this.DEBUG_UUID; }
+
 	public @Nullable ResearchMethodProgress getParent() { return this.parent; };
 
-	public @NotNull Optional<ResearchMethodProgress> getParentAsOptional() { return Optional.ofNullable(this.parent); };
+	public ResearchMethodProgress setParent(@Nullable ResearchMethodProgress parent) {
+		this.parent = parent;
+		return this;
+	}
 
-	public List<ResearchMethodProgress> getChildren() { return this.children; }
+	public @NotNull Optional<ResearchMethodProgress> getParentAsOptional() { return Optional.ofNullable(this.parent); };
 
 
 	public static final Codec<ResearchMethodProgress> CODEC = Codec.recursive(
@@ -51,8 +56,7 @@ public class ResearchMethodProgress {
 					ResearchMethod.CODEC.fieldOf("method").forGetter(ResearchMethodProgress::getMethod),
 					Codec.FLOAT.fieldOf("progress").forGetter(ResearchMethodProgress::getProgress),
 					Codec.FLOAT.fieldOf("max_progress").forGetter(ResearchMethodProgress::getMaxProgress),
-					self.optionalFieldOf("parent").forGetter(ResearchMethodProgress::getParentAsOptional),
-					self.listOf().fieldOf("children").forGetter(ResearchMethodProgress::getChildren)
+					self.optionalFieldOf("parent").forGetter(ResearchMethodProgress::getParentAsOptional)
 			).apply(instance, ResearchMethodProgress::new))
 	);
 
@@ -66,8 +70,6 @@ public class ResearchMethodProgress {
 					ResearchMethodProgress::getMaxProgress,
 					ByteBufCodecs.optional(self),
 					ResearchMethodProgress::getParentAsOptional,
-					self.apply(ByteBufCodecs.list()),
-					ResearchMethodProgress::getChildren,
 					ResearchMethodProgress::new
 	));
 
@@ -85,27 +87,42 @@ public class ResearchMethodProgress {
 		return new ResearchMethodProgress(method, 0f, maxProgress);
 	}
 
-	public ResearchMethodProgress(ResearchMethod method, float progress, float maxProgress) {
-		this.method = method;
-		this.progress = progress;
-		this.maxProgress = maxProgress;
-		this.children = new UniqueArray<>();
+	private static void _backtrackCollect(List<ResearchMethodProgress> list, ResearchMethodProgress node) {
+		list.add(node);
 
-		if (method instanceof OrResearchMethod || method instanceof AndResearchMethod) {
-			for (ResearchMethod childMethod : ((ResearchMethodList) method).methods()) {
-				ResearchMethodProgress childProgress = childMethod.getDefaultProgress();
-				childProgress.parent = this;
-				this.children.add(childProgress);
+		if (node.getMethod() instanceof OrResearchMethod(List<ResearchMethod> methods)) {
+			for (ResearchMethod childMethod : methods) {
+				_backtrackCollect(list, childMethod.getDefaultProgress().setParent(node));
+			}
+		} else if (node.getMethod() instanceof AndResearchMethod(List<ResearchMethod> methods)) {
+			for (ResearchMethod childMethod : methods) {
+				_backtrackCollect(list, childMethod.getDefaultProgress().setParent(node));
 			}
 		}
 	}
 
-	public ResearchMethodProgress(ResearchMethod method, float progress, float maxProgress, @Nullable Optional<ResearchMethodProgress> parent, List<ResearchMethodProgress> children) {
+	public static List<ResearchMethodProgress> collectFromRoot(ResearchMethod method) {
+		List<ResearchMethodProgress> progressList = new ArrayList<>();
+		_backtrackCollect(progressList, method.getDefaultProgress());
+		return progressList;
+	}
+
+	public static List<ResearchMethodProgress> collectFromRoot(ResearchMethodProgress method) {
+		List<ResearchMethodProgress> progressList = new ArrayList<>();
+		_backtrackCollect(progressList, method);
+		return progressList;
+	}
+
+	public ResearchMethodProgress(ResearchMethod method, float progress, float maxProgress) {
+		 this(method, progress, maxProgress, Optional.empty());
+	}
+
+	public ResearchMethodProgress(ResearchMethod method, float progress, float maxProgress, Optional<ResearchMethodProgress> parent) {
 		this.method = method;
 		this.progress = progress;
 		this.maxProgress = maxProgress;
-		this.parent = parent.get();
-		this.children = children;
+		this.parent = parent.isPresent() ? parent.get() : null;
+		this.DEBUG_UUID = UUID.randomUUID();
 	}
 
 	/**
@@ -116,7 +133,7 @@ public class ResearchMethodProgress {
 	 * @param amount
 	 */
 	public boolean progress(float amount) {
-		if (this.progress > this.maxProgress) {
+		if (this.progress + amount >= this.maxProgress) {
 			this.progress = this.maxProgress;
 
 			if (this.parent != null) this.parent.progress(1f);
@@ -154,5 +171,15 @@ public class ResearchMethodProgress {
 
 	public boolean isComplete() {
 		return this.progress >= this.maxProgress;
+	}
+
+	@Override
+	public String toString() {
+		return "ResearchMethodProgress[" +
+				"method=" + method + ", " +
+				"progress=" + progress + "/" + maxProgress + ", " +
+				"parent=" + (parent != null ? parent.method : "none") + ", " +
+				"DEBUG_UUID=" + DEBUG_UUID +
+				']';
 	}
 }

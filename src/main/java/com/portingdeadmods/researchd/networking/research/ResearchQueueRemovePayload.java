@@ -32,11 +32,8 @@ public record ResearchQueueRemovePayload(ResearchInstance researchInstance) impl
                 Level level = serverPlayer.level();
                 ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
                 TeamResearchProgress researchProgress = data.getTeamByPlayer(serverPlayer).getResearchProgress();
-                int index = researchProgress.researchQueue().getEntries().indexOf(researchInstance);
                 researchProgress.researchQueue().remove(researchInstance);
-                if (index == 0) {
-                    researchProgress.researchQueue().setResearchProgress(0);
-                }
+
                 ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
             }
         }).exceptionally(err -> {

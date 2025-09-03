@@ -51,16 +51,7 @@ public final class ResearchdClientEvents {
 			ResearchTeamMap map = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
 			if (map != null) {
 				TeamResearchProgress researchProgress = map.getTeamByPlayer(player).getResearchProgress();
-				if (researchProgress != null) {
-					ResearchQueue queue = researchProgress.researchQueue();
-					if (!queue.isEmpty()) {
-						if (queue.getMaxResearchProgress() > queue.getResearchProgress()) {
-							queue.setResearchProgress(queue.getResearchProgress() + 1);
-						} else {
-							queue.setResearchProgress(0);
-						}
-					}
-				}
+				ResearchQueue queue = researchProgress.researchQueue();
 			}
 		}
 	}

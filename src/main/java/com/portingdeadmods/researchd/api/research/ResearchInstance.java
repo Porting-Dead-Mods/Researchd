@@ -74,24 +74,27 @@ public final class ResearchInstance {
         return researchStatus;
     }
 
-    public void setResearchStatus(ResearchStatus researchStatus) {
+    public ResearchInstance setResearchStatus(ResearchStatus researchStatus) {
         this.researchStatus = researchStatus;
+        return this;
     }
 
     public @Nullable UUID getResearchedPlayer() {
         return researchedPlayer;
     }
 
-    public void setResearchedPlayer(@Nullable UUID researchedPlayer) {
+    public ResearchInstance setResearchedPlayer(@Nullable UUID researchedPlayer) {
         this.researchedPlayer = researchedPlayer;
+        return this;
     }
 
     public long getResearchedTime() {
         return researchedTime;
     }
 
-    public void setResearchedTime(long researchedTime) {
+    public ResearchInstance setResearchedTime(long researchedTime) {
         this.researchedTime = researchedTime;
+        return this;
     }
 
     public Research lookup(HolderLookup.Provider lookupProvider) {

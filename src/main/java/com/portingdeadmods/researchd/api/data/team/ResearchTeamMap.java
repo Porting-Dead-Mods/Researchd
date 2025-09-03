@@ -88,8 +88,6 @@ public class ResearchTeamMap {
      * Does nothing if the player is already in a team.
      * <p>
      * Returns true if a team was created, false if not.
-     *
-     * @return a map with team UUIDs as strings
      */
     public boolean initPlayer(ServerPlayer player) {
         try {

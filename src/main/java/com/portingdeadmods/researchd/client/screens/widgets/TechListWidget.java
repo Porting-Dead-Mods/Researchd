@@ -141,8 +141,7 @@ public class TechListWidget extends ResearchScreenWidget {
         instance.setResearchedPlayer(Minecraft.getInstance().player.getUUID());
         instance.setResearchedTime(Minecraft.getInstance().level.getGameTime());
         queue.getQueue().add(instance);
-        // TODO: Make this dynamic
-        queue.getQueue().setMaxResearchProgress(1000);
+
         PacketDistributor.sendToServer(new ResearchQueueAddPayload(instance));
     }
 
