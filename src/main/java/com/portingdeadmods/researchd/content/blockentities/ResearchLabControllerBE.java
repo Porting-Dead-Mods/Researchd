@@ -5,17 +5,15 @@ import com.portingdeadmods.portingdeadlibs.api.utils.IOAction;
 import com.portingdeadmods.portingdeadlibs.utils.LazyFinal;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.data.ResearchProgressPacket;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.data.team.TeamResearchProgress;
-import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
-import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.content.items.ResearchPackItem;
 import com.portingdeadmods.researchd.content.menus.ResearchLabMenu;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
+import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
 import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
 import com.portingdeadmods.researchd.registries.ResearchdBlockEntityTypes;
@@ -80,10 +78,6 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
 		});
 	}
 
-	public ResearchProgressPacket getProgressPacket() {
-		return new ResearchProgressPacket(1f / this.currentResearchDuration, ConsumePackResearchMethod.ID);
-	}
-
 	// Param passed is not mutated.
 	private boolean containsNecessaryPacks(List<ResourceKey<SimpleResearchPack>> _packs) {
 		List<ResourceKey<SimpleResearchPack>> packs = new ArrayList<>(_packs);
@@ -130,21 +124,22 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
 		ResearchInstance current = teamProgress.current();
 		if (current == null) return;
 
-		Research currentResearch = current.lookup(this.getLevel().registryAccess());
-		ResearchMethod method = currentResearch.researchMethod();
-		if (!(method instanceof ConsumePackResearchMethod packMethod)) return;
+		List<ResearchMethodProgress> validMethods = teamProgress.getAllValidMethodProgress(ConsumePackResearchMethod.class);
+		if (validMethods.isEmpty()) return;
 
-		List<ResourceKey<SimpleResearchPack>> packs = packMethod.packs();
-		this.currentResearchDuration = packMethod.duration();
+		for (ResearchMethodProgress progress : validMethods) {
+			ConsumePackResearchMethod method = (ConsumePackResearchMethod) progress.getMethod();
+			List<ResourceKey<SimpleResearchPack>> packs = method.packs();
+			this.currentResearchDuration = method.duration();
 
-		if (!this.containsNecessaryPacks(packs)) return;
-		if (!teamProgress.wouldAcceptProgressPacket(this.getProgressPacket(), this.getLevel().registryAccess())) return;
+			if (!this.containsNecessaryPacks(packs)) continue;
+			this.decreaseNecessaryPackCount(packs);
 
-		this.decreaseNecessaryPackCount(packs);
-		for (ResourceKey<SimpleResearchPack> pack : packs) {
-			researchPackUsage.put(pack, Math.max(researchPackUsage.get(pack) - (1f / this.currentResearchDuration), 0f));
+			for (ResourceKey<SimpleResearchPack> pack : packs) {
+				researchPackUsage.put(pack, Math.max(researchPackUsage.get(pack) - (1f / this.currentResearchDuration), 0f));
+			}
+			progress.progress(1f / this.currentResearchDuration);
 		}
-		teamProgress.pushProgress(this.getProgressPacket());
 	}
 
 	@Override

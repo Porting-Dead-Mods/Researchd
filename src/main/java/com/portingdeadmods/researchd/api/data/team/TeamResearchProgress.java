@@ -6,8 +6,8 @@ import com.portingdeadmods.researchd.api.data.ResearchQueue;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
+import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -66,16 +66,29 @@ public record TeamResearchProgress(
     /**
      * Filters out all the complete and And/Or methods.
      *
-     * @param provider Registry access
      * @return A list of all the valid (non Or/And) methods available for the current research. Null if no current research.
      */
-    public @Nullable List<ResearchMethodProgress> getAllValidMethodProgress(HolderLookup.Provider provider) {
+    public @Nullable List<ResearchMethodProgress> getAllValidMethodProgress() {
         List<ResearchMethodProgress> progressList = new ArrayList<>();
         if (current() == null) return null;
 
         ResearchMethodProgress parent = progress().get(current().getKey());
         _backtrackCollect(progressList, parent);
 
+        return progressList;
+    }
+
+    /**
+     * ! Filtering by {@link com.portingdeadmods.researchd.impl.research.method.AndResearchMethod} or {@link com.portingdeadmods.researchd.impl.research.method.OrResearchMethod} return an empty list !
+     *
+     * @param clazz The class of ResearchMethod to filter by
+     * @return {@link #getAllValidMethodProgress()} filtered by the given class. Null if no current research.
+     */
+    public @Nullable <T extends ResearchMethod> List<ResearchMethodProgress> getAllValidMethodProgress(Class<T> clazz) {
+        List<ResearchMethodProgress> progressList = this.getAllValidMethodProgress();
+        if (progressList == null) return null;
+
+        progressList.removeIf(p -> !clazz.isInstance(p.getMethod()));
         return progressList;
     }
 
