@@ -1,6 +1,5 @@
 package com.portingdeadmods.researchd.client.screens.widgets;
 
-import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.data.ResearchGraph;
@@ -631,7 +630,7 @@ public class ResearchGraphWidget extends AbstractWidget {
         for (ResearchNode node : this.graph.nodes().values()) {
             if (node.isHovered()) {
                 this.setGraph(ResearchGraphCache.computeIfAbsent(node.getInstance().getKey()));
-                UniqueArray<ResearchInstance> entries = this.researchScreen.getTechList().entries();
+                List<ResearchInstance> entries = this.researchScreen.getTechList().entries();
                 this.researchScreen.getSelectedResearchWidget().setSelectedResearch(entries.get(entries.indexOf(node.getInstance())));
                 return super.mouseClicked(mouseX, mouseY, button);
             }

@@ -29,7 +29,7 @@ public abstract class AbstractResearchEffectListWidget<T extends ResearchEffectL
             int xSize = i > 0 ? (int) (getSizeFor(i, false).width + i * getPadding()) : 0;
             WidgetConstructor<? extends ResearchEffect> widgetConstructor = ResearchdClient.RESEARCH_EFFECT_WIDGETS.get(researchEffect.id());
             if (widgetConstructor != null) {
-                this.effects.add(widgetConstructor.createEffect(x + xSize, y, researchEffect));
+                this.effects.add(widgetConstructor.createEffect(x + xSize + 1, y + 1, researchEffect));
             }
         }
         Size2i size = getSize(true);
@@ -50,7 +50,8 @@ public abstract class AbstractResearchEffectListWidget<T extends ResearchEffectL
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         int x = getX();
         int y = getY();
-        guiGraphics.fill(x - 1, y - 1, x + this.width + 1, y + this.height + 1, FastColor.ARGB32.color(109, 109, 109));
+        Size2i firstSize = getSizeFor(1, false);
+        guiGraphics.fill(x, y, x + this.width, y + firstSize.height, FastColor.ARGB32.color(109, 109, 109));
 
         List<? extends ResearchEffect> effects = value.effects();
         for (int i = 0; i < effects.size(); i++) {
@@ -85,7 +86,7 @@ public abstract class AbstractResearchEffectListWidget<T extends ResearchEffectL
         super.setY(y);
 
         for (AbstractResearchInfoWidget<? extends ResearchEffect> effect : this.effects) {
-            effect.setY(y);
+            effect.setY(y + 1);
         }
 
     }
@@ -114,10 +115,10 @@ public abstract class AbstractResearchEffectListWidget<T extends ResearchEffectL
         if (!methods.isEmpty()) {
             AbstractResearchInfoWidget<? extends ResearchEffect> first = methods.getFirst();
             Size2i firstMethodSize = first.getSize();
-            Size2i size = new Size2i(0, firstMethodSize.height);
+            Size2i size = new Size2i(0, firstMethodSize.height + 2);
             for (int i = 0; i < amount; i++) {
                 AbstractResearchInfoWidget<? extends ResearchEffect> researchMethod = methods.get(i);
-                size = new Size2i((int) (size.width + researchMethod.getWidth() + (includePadding && i > 0 ? getPadding() : 0)), size.height);
+                size = new Size2i((int) (size.width + researchMethod.getWidth() + (includePadding && i > 0 ? getPadding() : 0)) + 2, size.height);
             }
             return size;
         }

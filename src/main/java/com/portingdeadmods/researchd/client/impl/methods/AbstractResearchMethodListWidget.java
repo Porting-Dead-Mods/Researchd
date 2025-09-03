@@ -46,7 +46,8 @@ public abstract class AbstractResearchMethodListWidget<T extends ResearchMethodL
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         int x = getX();
         int y = getY();
-        guiGraphics.fill(x - 1, y - 1, x + this.width + 1, y + this.height + 1, FastColor.ARGB32.color(109, 109, 109));
+        Size2i firstSize = getSizeFor(1, false);
+        guiGraphics.fill(x, y, x + this.width + 1, y + firstSize.height, FastColor.ARGB32.color(109, 109, 109));
 
         List<? extends ResearchMethod> methods = value.methods();
         for (int i = 0; i < methods.size(); i++) {
@@ -104,7 +105,7 @@ public abstract class AbstractResearchMethodListWidget<T extends ResearchMethodL
         }
         if (!methods.isEmpty()) {
             Size2i firstMethodSize = methods.getFirst().getSize();
-            Size2i size = new Size2i(0, firstMethodSize.height);
+            Size2i size = new Size2i(0, firstMethodSize.height + 1);
             for (int i = 0; i < amount; i++) {
                 AbstractResearchInfoWidget<? extends ResearchMethod> researchMethod = methods.get(i);
                 size = new Size2i((int) (size.width + researchMethod.getWidth() + (includePadding && i > 0 ? getPadding() : 0)), size.height);

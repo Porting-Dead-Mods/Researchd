@@ -62,9 +62,9 @@ public class ResearchScreen extends Screen {
 
         this.techListWidget.visitWidgets(this::addRenderableWidget);
         addRenderableWidget(this.researchQueueWidget);
-        addWidget(this.researchGraphWidget);
         addRenderableOnly(this.selectedResearchWidget);
         this.selectedResearchWidget.visitWidgets(this::addWidget);
+        addWidget(this.researchGraphWidget);
     }
 
     @Override

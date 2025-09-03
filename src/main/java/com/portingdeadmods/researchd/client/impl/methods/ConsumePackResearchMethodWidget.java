@@ -75,7 +75,7 @@ public class ConsumePackResearchMethodWidget extends AbstractResearchInfoWidget<
                 Minecraft.getInstance().font,
                 " x %dt".formatted(duration),
                 x + 14 + GAP_BETWEEN_PACKS * stacks.size(),
-                y + 4,
+                y + (int) ((16f - font.lineHeight) / 2f) + 2,
                 16777215,
                 true
         );

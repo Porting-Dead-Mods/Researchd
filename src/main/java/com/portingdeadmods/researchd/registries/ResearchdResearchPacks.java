@@ -6,20 +6,20 @@ import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 
-public final class ResearchPacks {
+public final class ResearchdResearchPacks {
 	public static final ResourceKey<SimpleResearchPack> OVERWORLD = key("overworld");
 	public static final ResourceKey<SimpleResearchPack> NETHER = key("nether");
 	public static final ResourceKey<SimpleResearchPack> END = key("end");
 
 	public static void bootstrap(BootstrapContext<SimpleResearchPack> context) {
 		register(context, OVERWORLD, SimpleResearchPack.builder()
-				.color(255, 0, 0)
+				.color(222, 0, 0)
 		);
 		register(context, NETHER, SimpleResearchPack.builder()
-				.color(0, 0, 255)
+				.color(0, 0, 222)
 		);
 		register(context, END, SimpleResearchPack.builder()
-				.color(0, 255, 0)
+				.color(0, 222, 0)
 		);
 	}
 
