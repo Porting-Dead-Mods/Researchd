@@ -40,32 +40,36 @@ public class ResearchMethodProgress {
 
 	public @Nullable ResearchMethodProgress getParent() { return this.parent; };
 
-	public @NotNull Optional<ResearchMethodProgress> getParrentAsOptional() { return Optional.ofNullable(this.parent); };
+	public @NotNull Optional<ResearchMethodProgress> getParentAsOptional() { return Optional.ofNullable(this.parent); };
 
 	public List<ResearchMethodProgress> getChildren() { return this.children; }
 
 
-	public static final Codec<ResearchMethodProgress> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			ResearchMethod.CODEC.fieldOf("method").forGetter(ResearchMethodProgress::getMethod),
-			Codec.FLOAT.fieldOf("progress").forGetter(ResearchMethodProgress::getProgress),
-			Codec.FLOAT.fieldOf("max_progress").forGetter(ResearchMethodProgress::getMaxProgress),
-			ResearchMethodProgress.CODEC.optionalFieldOf("parent").forGetter(ResearchMethodProgress::getParrentAsOptional),
-			ResearchMethodProgress.CODEC.listOf().fieldOf("children").forGetter(ResearchMethodProgress::getChildren)
-	).apply(instance, ResearchMethodProgress::new));
-
-	public static final StreamCodec<RegistryFriendlyByteBuf, ResearchMethodProgress> STREAM_CODEC = StreamCodec.composite(
-			ResearchMethod.STREAM_CODEC,
-			ResearchMethodProgress::getMethod,
-			ByteBufCodecs.FLOAT,
-			ResearchMethodProgress::getProgress,
-			ByteBufCodecs.FLOAT,
-			ResearchMethodProgress::getMaxProgress,
-			ByteBufCodecs.optional(ResearchMethodProgress.STREAM_CODEC),
-			ResearchMethodProgress::getParrentAsOptional,
-			ResearchMethodProgress.STREAM_CODEC.apply(ByteBufCodecs.list()),
-			ResearchMethodProgress::getChildren,
-			ResearchMethodProgress::new
+	public static final Codec<ResearchMethodProgress> CODEC = Codec.recursive(
+			"ResearchMethodProgress",
+			self -> RecordCodecBuilder.create(instance -> instance.group(
+					ResearchMethod.CODEC.fieldOf("method").forGetter(ResearchMethodProgress::getMethod),
+					Codec.FLOAT.fieldOf("progress").forGetter(ResearchMethodProgress::getProgress),
+					Codec.FLOAT.fieldOf("max_progress").forGetter(ResearchMethodProgress::getMaxProgress),
+					self.optionalFieldOf("parent").forGetter(ResearchMethodProgress::getParentAsOptional),
+					self.listOf().fieldOf("children").forGetter(ResearchMethodProgress::getChildren)
+			).apply(instance, ResearchMethodProgress::new))
 	);
+
+	public static final StreamCodec<RegistryFriendlyByteBuf, ResearchMethodProgress> STREAM_CODEC =
+			StreamCodec.recursive(self -> StreamCodec.composite(
+					ResearchMethod.STREAM_CODEC,
+					ResearchMethodProgress::getMethod,
+					ByteBufCodecs.FLOAT,
+					ResearchMethodProgress::getProgress,
+					ByteBufCodecs.FLOAT,
+					ResearchMethodProgress::getMaxProgress,
+					ByteBufCodecs.optional(self),
+					ResearchMethodProgress::getParentAsOptional,
+					self.apply(ByteBufCodecs.list()),
+					ResearchMethodProgress::getChildren,
+					ResearchMethodProgress::new
+	));
 
 	/**
 	 * Creates a new ResearchMethodProgress with 0 progress and max progress of 1.0f.

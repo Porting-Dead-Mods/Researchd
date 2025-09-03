@@ -86,6 +86,7 @@ public final class ResearchdCommonEvents {
         for (ResearchTeam team : data.getResearchTeams().values()) {
             TeamResearchProgress teamProgress = team.getResearchProgress();
             List<ResearchMethodProgress> progressList = teamProgress.getAllValidMethodProgress(ConsumeItemResearchMethod.class);
+            if (progressList == null) continue;
             if (progressList.isEmpty()) continue;
 
             for (ResearchMethodProgress progress : progressList) {

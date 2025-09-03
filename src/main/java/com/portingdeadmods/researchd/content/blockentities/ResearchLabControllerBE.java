@@ -125,6 +125,7 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
 		if (current == null) return;
 
 		List<ResearchMethodProgress> validMethods = teamProgress.getAllValidMethodProgress(ConsumePackResearchMethod.class);
+		if (validMethods == null) return;
 		if (validMethods.isEmpty()) return;
 
 		for (ResearchMethodProgress progress : validMethods) {
