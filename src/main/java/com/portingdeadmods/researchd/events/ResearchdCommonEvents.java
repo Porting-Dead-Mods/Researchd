@@ -18,6 +18,7 @@ import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
+import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
 import com.portingdeadmods.researchd.networking.SyncSavedDataPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchMethodProgressSyncPayload;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
@@ -31,6 +32,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -43,6 +46,7 @@ import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -71,6 +75,51 @@ public final class ResearchdCommonEvents {
     }
 
     @SubscribeEvent
+    public static void consumeItemResearchMethodLogic(ServerTickEvent.Post event) {
+        MinecraftServer server = event.getServer();
+        ServerLevel level = server.overworld();
+
+        if (level.getGameTime() % 20 != 0) return; // Run logic 1/1s
+
+        ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
+        if (data == null) return;
+        for (ResearchTeam team : data.getResearchTeams().values()) {
+            TeamResearchProgress teamProgress = team.getResearchProgress();
+            List<ResearchMethodProgress> progressList = teamProgress.getAllValidMethodProgress(ConsumeItemResearchMethod.class);
+            if (progressList.isEmpty()) continue;
+
+            for (ResearchMethodProgress progress : progressList) {
+                ConsumeItemResearchMethod method = (ConsumeItemResearchMethod) progress.getMethod();
+                Ingredient ingredient = method.toConsume();
+                int needed = (int) progress.getRemainingProgress();
+
+                for (TeamMember memberUUID : team.getMembers()) {
+                    ServerPlayer player = server.getPlayerList().getPlayer(memberUUID.player());
+                    if (player == null) continue;
+
+                    int found = 0;
+                    for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+                        if (needed <= 0) break;
+
+                        ItemStack stack = player.getInventory().getItem(i);
+                        if (stack.isEmpty()) continue;
+
+                        if (ingredient.test(stack)) {
+                            int toConsume = Math.min(stack.getCount(), needed);
+                            stack.shrink(toConsume);
+                            found += toConsume;
+                            needed -= toConsume;
+                        }
+                    }
+
+                    progress.progress(found);
+                    if (needed <= 0) break;
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event) {
         MinecraftServer server = event.getServer();
         ServerLevel level = server.overworld();
@@ -83,15 +132,15 @@ public final class ResearchdCommonEvents {
                 ResearchQueue queue = progress.researchQueue();
 
                 Research currentResearch = team.getResearchInQueue(level.registryAccess());
-                ResearchMethodProgress currentResearchProgress = team.getResearchingProgressInQueue(level.registryAccess());
+                ResearchMethodProgress currentResearchProgress = team.getResearchingProgressInQueue();
                 if (currentResearchProgress != null) {
-                    // Sync to client the progress on every tick
-                    for (TeamMember memberUUID : team.getMembers()) {
-                        ServerPlayer player = server.getPlayerList().getPlayer(memberUUID.player());
-                        if (player == null) continue;
+                    if (level.getGameTime() % 2 == 0)
+                        for (TeamMember memberUUID : team.getMembers()) {
+                            ServerPlayer player = server.getPlayerList().getPlayer(memberUUID.player());
+                            if (player == null) continue;
 
-                        PacketDistributor.sendToPlayer(player, new ResearchMethodProgressSyncPayload(currentResearchProgress.getProgress()));
-                    }
+                            PacketDistributor.sendToPlayer(player, new ResearchMethodProgressSyncPayload(team.getResearchKeyInQueue(), team.getResearchingProgressInQueue()));
+                        }
 
                     // Apply research effects
                     if (currentResearchProgress.isComplete()) {
@@ -105,8 +154,8 @@ public final class ResearchdCommonEvents {
                     }
                 }
 
-                // Save and sync the whole team research data every 10 ticks
-                if (level.getGameTime() % 10 == 0) {
+                // Save and sync the whole team research data every 20 ticks
+                if (level.getGameTime() % 20 == 0) {
                     ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
                 }
             }

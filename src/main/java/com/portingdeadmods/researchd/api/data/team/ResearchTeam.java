@@ -142,21 +142,6 @@ public class ResearchTeam {
     }
 
     /**
-     * Fetches the progress of the research that is currently researching.
-     *
-     * @param provider Registry access
-     * @return {@link TeamResearchProgress} of the research or null if no research is currently in progress.
-     */
-    @Nullable
-    public ResearchMethodProgress getResearchingProgressInQueue(HolderLookup.Provider provider) {
-        ResearchQueue queue = this.metadata.researchProgress.researchQueue();
-        if (queue.getEntries() == null) return null;
-        if (queue.getEntries().isEmpty()) return null;
-
-        return this.metadata.researchProgress.progress().get(queue.getEntries().getFirst().getKey());
-    }
-
-    /**
      * Fetches the research that is currently being researched in the queue.
      *
      * @param provider Registry access
@@ -171,11 +156,31 @@ public class ResearchTeam {
         return ResearchHelperCommon.getResearch(queue.getEntries().getFirst().getResearch().getResearchKey(), provider);
     }
 
+
+    /**
+     * Fetches the research key that is currently being researched in the queue.
+     *
+     * @return {@link ResourceKey<Research>} of the research or null if no research is currently in progress.
+     */
     public ResourceKey<Research> getResearchKeyInQueue() {
         ResearchQueue queue = this.metadata.researchProgress.researchQueue();
         if (queue.getEntries() == null || queue.getEntries().isEmpty()) return null;
 
         return queue.getEntries().getFirst().getKey();
+    }
+
+    /**
+     * Fetches the progress of the research that is currently researching.
+     *
+     * @return {@link ResearchMethodProgress} of the research or null if no research is currently in progress.
+     */
+    @Nullable
+    public ResearchMethodProgress getResearchingProgressInQueue() {
+        ResearchQueue queue = this.metadata.researchProgress.researchQueue();
+        if (queue.getEntries() == null) return null;
+        if (queue.getEntries().isEmpty()) return null;
+
+        return this.metadata.researchProgress.progress().get(queue.getEntries().getFirst().getKey());
     }
 
     public void addMember(UUID uuid) {
