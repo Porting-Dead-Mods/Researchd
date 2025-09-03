@@ -60,6 +60,6 @@ public record AndResearchMethod(List<ResearchMethod> methods) implements Researc
 
     @Override
     public ResearchMethodProgress getDefaultProgress() {
-        return new ResearchMethodProgress(this, methods.size());
+        return ResearchMethodProgress.empty(this, methods.size());
     }
 }

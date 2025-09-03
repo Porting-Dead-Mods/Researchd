@@ -56,7 +56,7 @@ public record TeamResearchProgress(
     private void _backtrackCollect(List<ResearchMethodProgress> list, ResearchMethodProgress node) {
         if (node.isComplete()) return;
 
-        if (node.hasChildren) {
+        if (node.getChildren().isEmpty()) {
             _backtrackCollect(list, node);
         } else {
             list.add(node);

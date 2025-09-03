@@ -24,7 +24,7 @@ public class ResearchMethodProgress {
 	private final float maxProgress;
 	private float progress;
 	private @Nullable ResearchMethodProgress parent;
-	public final List<ResearchMethodProgress> children;
+	private final List<ResearchMethodProgress> children;
 
 	public ResearchMethod getMethod() {
 		return this.method;
@@ -72,6 +72,11 @@ public class ResearchMethodProgress {
 	 */
 	public static ResearchMethodProgress one(ResearchMethod method) { return ResearchMethodProgress.empty(method, 1.0f); }
 
+	/**
+	 * @param method {@link ResearchMethod}
+	 * @param maxProgress The max progress for this method
+	 * @return A new ResearchMethodProgress with 0 progress
+	 */
 	public static ResearchMethodProgress empty(ResearchMethod method, float maxProgress) {
 		return new ResearchMethodProgress(method, 0f, maxProgress);
 	}

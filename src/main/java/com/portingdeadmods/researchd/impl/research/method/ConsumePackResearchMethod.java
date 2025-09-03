@@ -69,7 +69,7 @@ public record ConsumePackResearchMethod(List<ResourceKey<SimpleResearchPack>> pa
 
     @Override
     public ResearchMethodProgress getDefaultProgress() {
-        return new ResearchMethodProgress(this, this.count);
+        return ResearchMethodProgress.empty(this, this.count);
     }
 
     public static final class Serializer implements ResearchMethodSerializer<ConsumePackResearchMethod> {
