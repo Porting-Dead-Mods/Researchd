@@ -53,7 +53,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
         GuiUtils.drawImg(guiGraphics, BACKGROUND_TEXTURE, getX(), getY(), width, height);
-        float percentage = (float) (this.scrollOffset) / (this.getInfoHeight() - 47f);
+        float percentage = (float) this.scrollOffset / (this.getInfoHeight() - 47f);
         guiGraphics.blitSprite(SMALL_SCROLLER_SPRITE, getX() + getWidth() - 9, (int) (getY() + 20 + (41 * percentage)), 4, 7);
 
         int offsetY = (int) -(this.scrollOffset);

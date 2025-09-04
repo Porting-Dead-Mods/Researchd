@@ -27,8 +27,7 @@ public class TechListWidget extends ResearchScreenWidget {
     private static final ResourceLocation BACKGROUND_TEXTURE_SEARCH_BAR = Researchd.rl("textures/gui/tech_list_screen_search_bar.png");
     private static final ResourceLocation TECH_LIST_EXPANDABLE = Researchd.rl("textures/gui/research_screen/tech_list_expandable.png");
     private static final int BACKGROUND_WIDTH = 174;
-    // Cuz changing BACKGROUND_HEIGHT is way too scary lol
-    private static final int BACKGROUND_HEIGHT = 65;
+    private static final int BACKGROUND_HEIGHT = 150;
     private static final int BACKGROUND_HEIGHT_SPRITE = 18;
     private static final int BOTTOM_WIDTH = 174;
     private static final int BOTTOM_HEIGHT = 8;
@@ -36,11 +35,10 @@ public class TechListWidget extends ResearchScreenWidget {
     private TechList techList;
     private TechList displayTechList;
 
-    private final int maxRows;
-    private int rows;
     private final int cols;
-    private int curRow;
+    private int rows;
     private int scrollOffset;
+
     public final ImageButton searchButton;
     public final Button startResearchButton;
     private final EditBox searchBox;
@@ -97,22 +95,22 @@ public class TechListWidget extends ResearchScreenWidget {
         };
         this.searchBox.setBordered(false);
         this.searchBox.setVisible(false);
-
-        this.maxRows = (int) (double) (this.getTechListHeight() / ResearchScreenWidget.PANEL_HEIGHT);
-
         this.screen = screen;
     }
 
     private void refreshSearchResult() {
         this.displayTechList = this.techList.getListForSearch(this.searchBox.getValue());
         this.scrollOffset = 0;
-        this.rows = (int) ((double) this.displayTechList.entries.size() / this.cols);
+
+        this.rows = this.displayTechList.entries.size() / this.cols + (this.displayTechList.entries().size() % this.cols != 0 ? 1 : 0);
     }
 
     public void setTechList(TechList techList) {
+        this.scrollOffset = 0;
         this.techList = techList;
         this.displayTechList = techList;
-        this.rows = (int) ((double) this.displayTechList.entries.size() / this.cols);
+
+        this.rows = this.displayTechList.entries.size() / this.cols + (this.displayTechList.entries().size() % this.cols != 0 ? 1 : 0);
     }
 
     public TechList getDisplayTechList() {
@@ -157,24 +155,24 @@ public class TechListWidget extends ResearchScreenWidget {
 
         guiGraphics.enableScissor(12, 106 + 24, 12 + 140, 106 + 24 + techListHeight - 1);
         {
-            for (int y = curRow; y < this.maxRows; y++) {
-                for (int x = 0; x < this.cols; x++) {
-                    int index = y * this.cols + x;
+            for (int row = 0; row < this.rows; row++) {
+                for (int col = 0; col < this.cols; col++) {
+                    int index = row * this.cols + col;
                     if (index < this.displayTechList.entries().size()) {
                         ResearchInstance instance = this.displayTechList.entries().get(index);
-                        int y1 = paddingY + getY() + y * PANEL_HEIGHT - (this.scrollOffset * PANEL_HEIGHT);
+                        int y1 = paddingY + getY() + row * PANEL_HEIGHT - this.scrollOffset;
                         boolean selected = instance == this.screen.getSelectedResearchWidget().getSelectedInstance();
                         if (selected) {
                             y1 += 2;
                         }
                         if (index >= this.displayTechList.entries().size() - this.cols) {
                             if (selected) {
-                                renderSmallResearchPanel(guiGraphics, instance, paddingX + getX() + x * PANEL_WIDTH, y1, mouseX, mouseY);
+                                renderSmallResearchPanel(guiGraphics, instance, paddingX + getX() + col * PANEL_WIDTH, y1, mouseX, mouseY);
                             } else {
-                                renderResearchPanel(guiGraphics, instance, paddingX + getX() + x * PANEL_WIDTH, y1, mouseX, mouseY);
+                                renderResearchPanel(guiGraphics, instance, paddingX + getX() + col * PANEL_WIDTH, y1, mouseX, mouseY);
                             }
                         } else {
-                            renderTallResearchPanel(guiGraphics, instance, paddingX + getX() + x * PANEL_WIDTH, y1, mouseX, mouseY);
+                            renderTallResearchPanel(guiGraphics, instance, paddingX + getX() + col * PANEL_WIDTH, y1, mouseX, mouseY);
                         }
                     }
                 }
@@ -183,7 +181,8 @@ public class TechListWidget extends ResearchScreenWidget {
         guiGraphics.disableScissor();
 
         int scrollerX = getX() + cols * ResearchScreenWidget.PANEL_WIDTH + paddingX + 4;
-        guiGraphics.blitSprite(SCROLLER_SPRITE, scrollerX, getY() + paddingY, SCROLLER_WIDTH, SCROLLER_HEIGHT);
+        float percentage = (float) this.scrollOffset / (this.getContentHeight() - techListHeight);
+        guiGraphics.blitSprite(SCROLLER_SPRITE, scrollerX, (int) (getY() + paddingY + (percentage * (techListHeight - SCROLLER_HEIGHT - 1))), SCROLLER_WIDTH, SCROLLER_HEIGHT);
     }
 
     private int getTechListHeight() {
@@ -191,16 +190,18 @@ public class TechListWidget extends ResearchScreenWidget {
     }
 
     public int getContentHeight() {
-        return ((int) ((double) (this.techList.entries().size() / this.cols)) * ResearchScreenWidget.PANEL_HEIGHT);
+        return this.rows * ResearchScreenWidget.PANEL_HEIGHT;
     }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-//        if (this.isHovered(mouseX, mouseY, 10, 132, 140, this.getTechListHeight())) {
-//        }
-        if (this.techList.entries.size() / this.cols > this.maxRows) {
-            this.scrollOffset = Math.max(Math.min((int) Math.max(this.scrollOffset - scrollY, 0), this.displayTechList.entries().size() - 3), 0);
-            this.curRow = this.scrollOffset;
+        if (this.isHovered(mouseX, mouseY, 12, 130, 156, this.getTechListHeight() - 1)) {
+            double rawScrollOffset = (int) Math.max(this.scrollOffset - scrollY * 7, 0);
+            if (rawScrollOffset > this.getContentHeight() - this.getTechListHeight() + 1) {
+                this.scrollOffset = (this.getContentHeight() - this.getTechListHeight()) + 1;
+            } else {
+                this.scrollOffset = (int) rawScrollOffset;
+            }
             return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
         }
         return false;
@@ -211,9 +212,9 @@ public class TechListWidget extends ResearchScreenWidget {
         int paddingX = getX() + 12;
         int paddingY = 24 + getY();
         if (mouseX > paddingX && mouseX < paddingX + this.cols * ResearchScreenWidget.PANEL_WIDTH
-                && mouseY > paddingY && mouseY < paddingY + this.maxRows * ResearchScreenWidget.PANEL_HEIGHT) {
+                && mouseY > paddingY && mouseY < paddingY + this.rows * ResearchScreenWidget.PANEL_HEIGHT) {
             int indexX = ((int) mouseX - paddingX) / ResearchScreenWidget.PANEL_WIDTH;
-            int indexY = ((int) mouseY - paddingY) / ResearchScreenWidget.PANEL_HEIGHT;
+            int indexY = ((int) mouseY - paddingY - this.scrollOffset) / ResearchScreenWidget.PANEL_HEIGHT;
 
             int index = indexY * this.cols + indexX;
             if (index < this.displayTechList.entries().size()) {

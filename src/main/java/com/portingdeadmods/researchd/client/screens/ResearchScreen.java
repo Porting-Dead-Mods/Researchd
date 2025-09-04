@@ -64,7 +64,7 @@ public class ResearchScreen extends Screen {
         addRenderableWidget(this.researchQueueWidget);
         addRenderableOnly(this.selectedResearchWidget);
         this.selectedResearchWidget.visitWidgets(this::addWidget);
-        addWidget(this.researchGraphWidget);
+        addRenderableWidget(this.researchGraphWidget);
     }
 
     @Override
@@ -87,20 +87,12 @@ public class ResearchScreen extends Screen {
         guiGraphics.blit(RIGHT_BAR, width - 8, 8, 0, 0, 8, guiGraphics.guiHeight() - 8 - 8, 8, 256);
 
         this.researchGraphWidget.setSize(guiGraphics.guiWidth() - 8 - w, guiGraphics.guiHeight() - 8 * 2);
-
-        guiGraphics.enableScissor(w, 8, guiGraphics.guiWidth() - 8, guiGraphics.guiHeight() - 8);
-        {
-            this.researchGraphWidget.render(guiGraphics, mouseX, mouseY, partialTick);
-        }
-        guiGraphics.disableScissor();
-
         this.researchGraphWidget.renderNodeTooltips(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-
     }
 
     public ResearchGraphWidget getResearchGraphWidget() {
