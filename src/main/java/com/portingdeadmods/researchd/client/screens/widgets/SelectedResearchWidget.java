@@ -36,9 +36,13 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
     public static final int LABEL_PADDING_TOP_2 = 2;
     public static final int LABEL_PADDING_BOTTOM_2 = 4;
     public static final int BOTTOM_PADDING = 6;
+    public static final int VISIBLE_CONENT_HEIGHT = 47;
+    public static final int PADDING_Y = 20;
     // ---
     public static final int BACKGROUND_WIDTH = 174;
     public static final int BACKGROUND_HEIGHT = 72;
+    public static final int SCROLLER_WIDTH = 4;
+    public static final int SCROLLER_HEIGHT = 7;
     private ResearchInstance selectedInstance;
     public AbstractWidget methodWidget;
     public AbstractWidget effectWidget;
@@ -54,7 +58,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
         GuiUtils.drawImg(guiGraphics, BACKGROUND_TEXTURE, getX(), getY(), width, height);
         float percentage = (float) this.scrollOffset / (this.getInfoHeight() - 47f);
-        guiGraphics.blitSprite(SMALL_SCROLLER_SPRITE, getX() + getWidth() - 9, (int) (getY() + 20 + (41 * percentage)), 4, 7);
+        guiGraphics.blitSprite(SMALL_SCROLLER_SPRITE, getX() + getWidth() - 9, (int) (getY() + PADDING_Y + (41 * percentage)), SCROLLER_WIDTH, SCROLLER_HEIGHT);
 
         int offsetY = (int) -(this.scrollOffset);
 
@@ -107,20 +111,52 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
         double rawScrollOffset = Math.max(this.scrollOffset - scrollY * 5, 0);
-        if (rawScrollOffset > getInfoHeight() - 47) {
-            this.scrollOffset = (getInfoHeight() - 47);
+        if (rawScrollOffset > getInfoHeight() - VISIBLE_CONENT_HEIGHT) {
+            this.scrollOffset = (getInfoHeight() - VISIBLE_CONENT_HEIGHT);
         } else {
             this.scrollOffset = (int) rawScrollOffset;
         }
+        this.updateChildWidgetPositions();
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    /**
+     * Recalculate Y positions of method/effect widgets based on current scroll offset.
+     */
+    private void updateChildWidgetPositions() {
+        if (this.methodWidget == null || this.effectWidget == null) return;
         float offsetY = this.scrollOffset;
         this.methodWidget.setY((int) (60 + LABEL_PADDING_TOP_1 + font.lineHeight + LABEL_PADDING_BOTTOM_1 - offsetY));
         this.effectWidget.setY((int) (60 + LABEL_PADDING_TOP_1 + font.lineHeight + LABEL_PADDING_BOTTOM_1 + methodWidget.getHeight() + METHOD_WIDGET_PADDING_BOTTOM + LINE_HEIGHT + LABEL_PADDING_TOP_2 + font.lineHeight + LABEL_PADDING_BOTTOM_2 - offsetY));
-        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        int scrollerX = getX() + getWidth() - 9;
+        int trackTop = getY() + PADDING_Y;
+        int trackRange = 41;
+
+        if (
+                mouseX >= scrollerX &&
+                mouseX < scrollerX + SCROLLER_WIDTH &&
+                mouseY >= trackTop &&
+                mouseY <= trackTop + trackRange + SCROLLER_HEIGHT &&
+                getInfoHeight() > VISIBLE_CONENT_HEIGHT
+        ) {
+            double clamped = Math.clamp(mouseY, trackTop, trackTop + trackRange) - trackTop;
+            double percentage = clamped / (double) trackRange;
+            int scrollableHeight = getInfoHeight() - VISIBLE_CONENT_HEIGHT;
+            this.scrollOffset = (int) (scrollableHeight * percentage);
+            this.updateChildWidgetPositions();
+            return super.mouseClicked(mouseX, mouseY, button);
+        }
+
         return false;
+    }
+
+    @Override
+    public void onDrag(double mouseX, double mouseY, double dragX, double dragY) {
+        this.mouseClicked(mouseX, mouseY, 0);
     }
 
     public void setSelectedResearch(ResearchInstance instance) {
