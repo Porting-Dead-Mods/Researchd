@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.events;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
+import com.portingdeadmods.researchd.integration.KubeJSIntegration;
 import com.portingdeadmods.researchd.api.data.ResearchQueue;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
@@ -122,6 +123,11 @@ public final class ResearchdCommonEvents {
 
                     progress.progress(found);
 
+                    if (found > 0) {
+                        double progressPercent = team.getResearchProgressInQueue().getProgress() / (double) team.getResearchProgressInQueue().getMaxProgress();
+                        KubeJSIntegration.fireResearchProgressEvent(player, team.getResearchKeyInQueue(), progressPercent);
+                    }
+
                     Researchd.debug("ConsumeItemResearchMethodLogic", "New progress on possible method: " + progress.getProgress() + "/" + progress.getMaxProgress(), " | IS COMPLETE: ", progress.isComplete() ? "YES" : "NO");
                     Researchd.debug("ConsumeItemResearchMethodLogic", "New progress on root: " + team.getResearchProgressInQueue().getProgress() + "/" + team.getResearchProgressInQueue().getMaxProgress(), " ROOT UUID: ", team.getResearchProgressInQueue().DEBUG_UUID());
 
@@ -171,6 +177,8 @@ public final class ResearchdCommonEvents {
                             if (player == null) continue;
 
                             PacketDistributor.sendToPlayer(player, new ResearchFinishedPayload(instance.getKey(), server.getTickCount() * 50));
+
+                            KubeJSIntegration.fireResearchCompletedEvent(player, instance.getKey());
 
                             Researchd.debug("Researching", "Applying research effects for Research: " + team.getResearchKeyInQueue() + " to player: " + player.getName().getString());
                             currentResearch.researchEffect().onUnlock(level, player, team.getResearchKeyInQueue());

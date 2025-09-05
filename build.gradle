@@ -90,6 +90,10 @@ configurations {
 
 dependencies {
     implementation "com.github.Porting-Dead-Mods:Porting-Dead-Libs:${pdl_version}"
+    compileOnly "curse.maven:kubejs-238086:5810100"
+    compileOnly "curse.maven:rhino-416294:6886923"
+    localRuntime "curse.maven:kubejs-238086:5810100"
+    localRuntime "curse.maven:rhino-416294:6886923"
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {

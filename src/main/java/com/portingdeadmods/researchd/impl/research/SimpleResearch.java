@@ -19,10 +19,12 @@ import net.minecraft.world.item.Items;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 // TODO: Change icon to List<ItemStack> and use a CycledItemRenderer
 public record SimpleResearch(Item icon, ResearchMethod researchMethod, ResearchEffect researchEffect,
-                             List<ResourceKey<Research>> parents, boolean requiresParent) implements Research {
+                             List<ResourceKey<Research>> parents, boolean requiresParent,
+                             Optional<String> literalName, Optional<String> literalDescription) implements Research {
     @Override
     public ResearchSerializer<?> getSerializer() {
         return Serializer.INSTANCE;
@@ -32,14 +34,16 @@ public record SimpleResearch(Item icon, ResearchMethod researchMethod, ResearchE
     public boolean equals(Object o) {
         if (!(o instanceof SimpleResearch(
                 Item icon1, ResearchMethod method, ResearchEffect effect, List<ResourceKey<Research>> parents1,
-                boolean parent
+                boolean parent, Optional<String> name, Optional<String> desc
         ))) return false;
-        return requiresParent == parent && Objects.equals(icon, icon1) && Objects.equals(researchMethod, method) && Objects.equals(researchEffect, effect) && Objects.equals(parents, parents1);
+        return requiresParent == parent && Objects.equals(icon, icon1) && Objects.equals(researchMethod, method) 
+                && Objects.equals(researchEffect, effect) && Objects.equals(parents, parents1)
+                && Objects.equals(literalName, name) && Objects.equals(literalDescription, desc);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(icon, researchMethod, researchEffect, parents, requiresParent);
+        return Objects.hash(icon, researchMethod, researchEffect, parents, requiresParent, literalName, literalDescription);
     }
 
     public static class Serializer implements ResearchSerializer<SimpleResearch> {
@@ -49,7 +53,9 @@ public record SimpleResearch(Item icon, ResearchMethod researchMethod, ResearchE
                 ResearchMethod.CODEC.fieldOf("method").forGetter(SimpleResearch::researchMethod),
                 ResearchEffect.CODEC.optionalFieldOf("effect", EmptyResearchEffect.INSTANCE).forGetter(SimpleResearch::researchEffect),
                 Research.RESOURCE_KEY_CODEC.listOf().fieldOf("parents").forGetter(SimpleResearch::parents),
-                Codec.BOOL.fieldOf("requires_parent").forGetter(SimpleResearch::requiresParent)
+                Codec.BOOL.fieldOf("requires_parent").forGetter(SimpleResearch::requiresParent),
+                Codec.STRING.optionalFieldOf("literal_name").forGetter(SimpleResearch::literalName),
+                Codec.STRING.optionalFieldOf("literal_description").forGetter(SimpleResearch::literalDescription)
         ).apply(instance, SimpleResearch::new));
 
         private Serializer() {
@@ -72,6 +78,8 @@ public record SimpleResearch(Item icon, ResearchMethod researchMethod, ResearchE
         private ResearchEffect researchEffect = EmptyResearchEffect.INSTANCE;
         private UniqueArray<ResourceKey<Research>> parents = new UniqueArray<>();
         private boolean requiresParent = false;
+        private Optional<String> literalName = Optional.empty();
+        private Optional<String> literalDescription = Optional.empty();
 
         public static Builder of() {
             return new Builder();
@@ -106,9 +114,19 @@ public record SimpleResearch(Item icon, ResearchMethod researchMethod, ResearchE
             return this;
         }
 
+        public Builder literalName(String name) {
+            this.literalName = Optional.of(name);
+            return this;
+        }
+
+        public Builder literalDescription(String description) {
+            this.literalDescription = Optional.of(description);
+            return this;
+        }
+
         @Override
         public SimpleResearch build() {
-            return new SimpleResearch(this.icon, this.researchMethod, this.researchEffect, this.parents, this.requiresParent);
+            return new SimpleResearch(this.icon, this.researchMethod, this.researchEffect, this.parents, this.requiresParent, this.literalName, this.literalDescription);
         }
     }
 }

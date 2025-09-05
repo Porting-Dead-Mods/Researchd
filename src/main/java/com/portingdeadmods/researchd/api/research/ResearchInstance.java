@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
+import com.portingdeadmods.researchd.impl.research.SimpleResearch;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.UUIDUtil;
@@ -60,6 +61,27 @@ public final class ResearchInstance {
 
     public Component getDisplayName() {
         return Utils.registryTranslation(this.getKey());
+    }
+    
+    public Component getDisplayName(HolderLookup.Provider access) {
+        Research r = this.research.getResearch(access);
+        if (r instanceof SimpleResearch simple) {
+            if (simple.literalName().isPresent()) {
+                return Component.literal(simple.literalName().get());
+            }
+        }
+        return Utils.registryTranslation(this.getKey());
+    }
+    
+    public Component getDescription(HolderLookup.Provider access) {
+        Research r = this.research.getResearch(access);
+        if (r instanceof SimpleResearch simple) {
+            if (simple.literalDescription().isPresent()) {
+                return Component.literal(simple.literalDescription().get());
+            }
+        }
+        ResourceKey<Research> key = this.getKey();
+        return Component.translatable("research." + key.location().getNamespace() + "." + key.location().getPath() + ".description");
     }
 
     public GlobalResearch getResearch() {

@@ -66,7 +66,8 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
             Font font = Minecraft.getInstance().font;
             int padding = 3;
 
-            guiGraphics.drawString(font, Utils.registryTranslation(this.selectedInstance.getKey()), 11, 49, -1);
+            var registryAccess = Minecraft.getInstance().level.registryAccess();
+            guiGraphics.drawString(font, this.selectedInstance.getDisplayName(registryAccess), 11, 49, -1);
             renderResearchPanel(guiGraphics, this.selectedInstance, 12, 60, mouseX, mouseY, 2, false);
 
             int startY = 60;

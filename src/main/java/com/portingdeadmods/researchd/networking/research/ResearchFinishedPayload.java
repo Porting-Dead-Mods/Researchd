@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.networking.research;
 import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
+import com.portingdeadmods.researchd.integration.KubeJSIntegration;
 import com.portingdeadmods.researchd.api.data.ResearchQueue;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.research.Research;
@@ -17,6 +18,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
@@ -51,6 +53,10 @@ public record ResearchFinishedPayload(ResourceKey<Research> key, int timeStamp) 
 
             team.getResearchProgress().completeResearchAndUpdate(first, timeStamp);
             queue.remove(0);
+
+            if (player instanceof ServerPlayer serverPlayer) {
+                KubeJSIntegration.fireResearchCompletedEvent(serverPlayer, this.key());
+            }
 
             player.sendSystemMessage(
                     ResearchdTranslations.Research.QUEUE_FINISHED.component(
