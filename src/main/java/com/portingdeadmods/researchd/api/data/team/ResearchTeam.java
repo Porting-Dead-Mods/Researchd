@@ -9,6 +9,7 @@ import com.portingdeadmods.researchd.api.data.ResearchQueue;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
+import com.portingdeadmods.researchd.api.research.ValueEffect;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamRole;
@@ -294,6 +295,14 @@ public class ResearchTeam {
         return new TimeUtils.TimeDifference(this.metadata.creationTime.get(), time).getFormatted();
     }
 
+    public Map<String, Float> getTeamEffectList() {
+        return this.metadata.teamEffectList;
+    }
+
+    public Float getTeamEffect(ValueEffect eff) {
+        return this.getTeamEffectList().computeIfAbsent(eff.get(), k -> 1f);
+    }
+
     public void init(HolderLookup.Provider access) {
         Map<ResourceKey<Research>, ResearchInstance> researchInstances = CommonResearchCache.GLOBAL_RESEARCHES.entrySet().stream()
                 .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), new ResearchInstance(e.getValue(), CommonResearchCache.ROOT_RESEARCH.is(e.getKey())
@@ -312,21 +321,25 @@ public class ResearchTeam {
     public static class TeamMetadata {
         private final TeamResearchProgress researchProgress;
         private final LazyFinal<Integer> creationTime;
+        private final Map<String, Float> teamEffectList;
 
         public TeamMetadata(TeamResearchProgress progress) {
             this.researchProgress = progress;
             this.creationTime = LazyFinal.create();
+            this.teamEffectList = new HashMap<>();
         }
 
-        public TeamMetadata(TeamResearchProgress researchProgress, int creationTime) {
+        public TeamMetadata(TeamResearchProgress researchProgress, int creationTime, Map<String, Float> simpleEffectList) {
             this.researchProgress = researchProgress;
             this.creationTime = LazyFinal.create();
             this.creationTime.initialize(creationTime);
+            this.teamEffectList = simpleEffectList;
         }
 
         public static final Codec<TeamMetadata> CODEC = RecordCodecBuilder.create(builder -> builder.group(
                 TeamResearchProgress.CODEC.fieldOf("research_progress").forGetter(TeamMetadata::getResearchProgress),
-                Codec.INT.fieldOf("creation_time").forGetter(TeamMetadata::getCreationTime)
+                Codec.INT.fieldOf("creation_time").forGetter(TeamMetadata::getCreationTime),
+                Codec.unboundedMap(Codec.STRING, Codec.FLOAT).fieldOf("simple_effect_list").forGetter(m -> m.teamEffectList)
         ).apply(builder, TeamMetadata::new));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, TeamMetadata> STREAM_CODEC = StreamCodec.composite(
@@ -334,6 +347,8 @@ public class ResearchTeam {
                 TeamMetadata::getResearchProgress,
                 ByteBufCodecs.INT,
                 TeamMetadata::getCreationTime,
+                ByteBufCodecs.map(HashMap::new, ByteBufCodecs.STRING_UTF8, ByteBufCodecs.FLOAT),
+                TeamMetadata::getTeamEffectList,
                 TeamMetadata::new
         );
 
@@ -347,6 +362,10 @@ public class ResearchTeam {
 
         public int getCreationTime() {
             return creationTime.get();
+        }
+
+        public Map<String, Float> getTeamEffectList() {
+            return teamEffectList;
         }
     }
 }

@@ -18,6 +18,7 @@ import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
 import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
 import com.portingdeadmods.researchd.registries.ResearchdBlockEntityTypes;
 import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
+import com.portingdeadmods.researchd.registries.ResearchdValueEffects;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -137,7 +138,7 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
 			this.decreaseNecessaryPackCount(packs);
 
 			for (ResourceKey<SimpleResearchPack> pack : packs) {
-				researchPackUsage.put(pack, Math.max(researchPackUsage.get(pack) - (1f / this.currentResearchDuration), 0f));
+				researchPackUsage.put(pack, Math.max(researchPackUsage.get(pack) - ((1f / this.currentResearchDuration) / team.getTeamEffect(ResearchdValueEffects.RESEARCH_LAB_PRODUCTIVITY.get())), 0f));
 			}
 			progress.progress(1f / this.currentResearchDuration);
 		}

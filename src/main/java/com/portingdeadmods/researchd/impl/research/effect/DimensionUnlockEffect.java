@@ -9,6 +9,8 @@ import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectSeri
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.impl.research.effect.data.DimensionUnlockEffectData;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
@@ -18,15 +20,26 @@ import net.minecraft.world.level.dimension.DimensionType;
 public record DimensionUnlockEffect(ResourceLocation dimension,
                                     ResourceLocation dimensionIconSprite) implements ResearchEffect {
     public static final ResourceLocation ID = Researchd.rl("dimension_unlock");
+
     public static final ResourceLocation DEFAULT_SPRITE = Researchd.rl("dimension_icons/default");
     public static final ResourceLocation OVERWORLD_SPRITE = Researchd.rl("dimension_icons/overworld");
     public static final ResourceLocation NETHER_SPRITE = Researchd.rl("dimension_icons/nether");
     public static final ResourceLocation END_SPRITE = Researchd.rl("dimension_icons/end");
-    public static final MapCodec<DimensionUnlockEffect> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+
+    private static final MapCodec<DimensionUnlockEffect> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             ResourceLocation.CODEC.fieldOf("dimension").forGetter(DimensionUnlockEffect::dimension),
             ResourceLocation.CODEC.optionalFieldOf("icon_sprite", DEFAULT_SPRITE).forGetter(DimensionUnlockEffect::dimensionIconSprite)
     ).apply(instance, DimensionUnlockEffect::new));
-    public static final ResearchEffectSerializer<DimensionUnlockEffect> SERIALIZER = ResearchEffectSerializer.simple(CODEC, null);
+
+    private static final StreamCodec<RegistryFriendlyByteBuf, DimensionUnlockEffect> STREAM_CODEC = StreamCodec.composite(
+            ResourceLocation.STREAM_CODEC,
+            DimensionUnlockEffect::dimension,
+            ResourceLocation.STREAM_CODEC,
+            DimensionUnlockEffect::dimensionIconSprite,
+            DimensionUnlockEffect::new
+    );
+
+    public static final ResearchEffectSerializer<DimensionUnlockEffect> SERIALIZER = ResearchEffectSerializer.simple(CODEC, STREAM_CODEC);
 
     @Override
     public void onUnlock(Level level, Player player, ResourceKey<Research> research) {

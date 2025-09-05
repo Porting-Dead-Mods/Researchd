@@ -64,6 +64,7 @@ public class Researchd {
         ResearchdBlocks.BLOCKS.register(modEventBus);
         ResearchdBlockEntityTypes.BLOCK_ENTITY_TYPES.register(modEventBus);
         ResearchdMenuTypes.MENU_TYPES.register(modEventBus);
+        ResearchdValueEffects.VALUE_EFFECTS.register(modEventBus);
 
         modEventBus.addListener(this::registerCapabilities);
         modEventBus.addListener(this::registerRegistries);
@@ -82,6 +83,7 @@ public class Researchd {
         event.register(ResearchdRegistries.RESEARCH_EFFECT_SERIALIZER);
         event.register(ResearchdRegistries.RESEARCH_METHOD_SERIALIZER);
         event.register(ResearchdRegistries.SAVED_DATA);
+        event.register(ResearchdRegistries.VALUE_EFFECT);
     }
 
     private void registerDatapackRegistries(DataPackRegistryEvent.NewRegistry event) {
