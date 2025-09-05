@@ -333,7 +333,7 @@ public class ResearchTeam {
             this.researchProgress = researchProgress;
             this.creationTime = LazyFinal.create();
             this.creationTime.initialize(creationTime);
-            this.teamEffectList = simpleEffectList;
+            this.teamEffectList = new HashMap<>(simpleEffectList);
         }
 
         public static final Codec<TeamMetadata> CODEC = RecordCodecBuilder.create(builder -> builder.group(
