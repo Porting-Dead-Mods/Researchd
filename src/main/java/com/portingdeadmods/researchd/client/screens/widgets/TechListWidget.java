@@ -38,6 +38,7 @@ public class TechListWidget extends ResearchScreenWidget {
     private final int cols;
     private int rows;
     private int scrollOffset;
+    private ResearchInstance hoveredResearch;
 
     public final ImageButton searchButton;
     public final Button startResearchButton;
@@ -130,12 +131,12 @@ public class TechListWidget extends ResearchScreenWidget {
     public void onStartResearchButtonClicked(Button button) {
         ResearchQueueWidget queue = this.screen.getResearchQueueWidget();
         ResearchInstance instance = this.screen.getSelectedResearchWidget().getSelectedInstance();
-        
+
         if (instance == null) {
             // No research selected, cannot start research
             return;
         }
-        
+
         instance.setResearchedPlayer(Minecraft.getInstance().player.getUUID());
         instance.setResearchedTime(Minecraft.getInstance().level.getGameTime());
         queue.getQueue().add(instance);
@@ -145,6 +146,7 @@ public class TechListWidget extends ResearchScreenWidget {
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
+        this.hoveredResearch = null;
         GuiUtils.drawImg(guiGraphics, hasSearchBar ? BACKGROUND_TEXTURE_SEARCH_BAR : BACKGROUND_TEXTURE, getX(), getY() + 3, BACKGROUND_WIDTH, BACKGROUND_HEIGHT_SPRITE);
         int techListHeight = this.getTechListHeight();
         guiGraphics.blit(TECH_LIST_EXPANDABLE, getX(), getY() + BACKGROUND_HEIGHT_SPRITE + 3, 0, 0, 174, techListHeight, 174, 16);
@@ -165,14 +167,18 @@ public class TechListWidget extends ResearchScreenWidget {
                         if (selected) {
                             y1 += 2;
                         }
+                        int x = paddingX + getX() + col * PANEL_WIDTH;
+                        if (isHovering(guiGraphics, x, y1, mouseX, mouseY)) {
+                            this.hoveredResearch = instance;
+                        }
                         if (index >= this.displayTechList.entries().size() - this.cols) {
                             if (selected) {
-                                renderSmallResearchPanel(guiGraphics, instance, paddingX + getX() + col * PANEL_WIDTH, y1, mouseX, mouseY);
+                                renderSmallResearchPanel(guiGraphics, instance, x, y1, mouseX, mouseY);
                             } else {
-                                renderResearchPanel(guiGraphics, instance, paddingX + getX() + col * PANEL_WIDTH, y1, mouseX, mouseY);
+                                renderResearchPanel(guiGraphics, instance, x, y1, mouseX, mouseY);
                             }
                         } else {
-                            renderTallResearchPanel(guiGraphics, instance, paddingX + getX() + col * PANEL_WIDTH, y1, mouseX, mouseY);
+                            renderTallResearchPanel(guiGraphics, instance, x, y1, mouseX, mouseY);
                         }
                     }
                 }
@@ -209,20 +215,10 @@ public class TechListWidget extends ResearchScreenWidget {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        int paddingX = getX() + 12;
-        int paddingY = 24 + getY();
-        if (mouseX > paddingX && mouseX < paddingX + this.cols * ResearchScreenWidget.PANEL_WIDTH
-                && mouseY > paddingY && mouseY < paddingY + this.rows * ResearchScreenWidget.PANEL_HEIGHT) {
-            int indexX = ((int) mouseX - paddingX) / ResearchScreenWidget.PANEL_WIDTH;
-            int indexY = ((int) mouseY - paddingY - this.scrollOffset) / ResearchScreenWidget.PANEL_HEIGHT;
-
-            int index = indexY * this.cols + indexX;
-            if (index < this.displayTechList.entries().size()) {
-                ResearchInstance instance = this.displayTechList.entries().get(index);
-                this.screen.getResearchGraphWidget().setGraph(ResearchGraphCache.computeIfAbsent(instance.getKey()));
-                this.screen.getSelectedResearchWidget().setSelectedResearch(instance);
-                return super.mouseClicked(mouseX, mouseY, button);
-            }
+        if (this.hoveredResearch != null) {
+            this.screen.getResearchGraphWidget().setGraph(ResearchGraphCache.computeIfAbsent(this.hoveredResearch.getKey()));
+            this.screen.getSelectedResearchWidget().setSelectedResearch(this.hoveredResearch);
+            return super.mouseClicked(mouseX, mouseY, button);
         }
 
         return false;
