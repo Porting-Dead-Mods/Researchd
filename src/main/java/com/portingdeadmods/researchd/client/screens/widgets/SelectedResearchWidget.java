@@ -1,6 +1,5 @@
 package com.portingdeadmods.researchd.client.screens.widgets;
 
-import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdClient;
@@ -9,6 +8,7 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
+import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import com.portingdeadmods.researchd.utils.WidgetConstructor;
@@ -48,10 +48,12 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
     public AbstractWidget effectWidget;
     private int scrollOffset;
     private final Font font;
+    private final ResearchScreen researchScreen;
 
-    public SelectedResearchWidget(int x, int y, int width, int height) {
+    public SelectedResearchWidget(ResearchScreen screen, int x, int y, int width, int height) {
         super(x, y, width, height);
         this.font = Minecraft.getInstance().font;
+        this.researchScreen = screen;
     }
 
     @Override
@@ -90,14 +92,18 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
             }
             guiGraphics.disableScissor();
 
-            if (this.methodWidget instanceof AbstractResearchInfoWidget<?> infoWidget) {
-                infoWidget.renderTooltip(guiGraphics, mouseX, mouseY, v);
-            }
+            renderTooltip(guiGraphics, mouseX, mouseY, v);
 
-            if (this.effectWidget instanceof AbstractResearchInfoWidget<?> infoWidget) {
-                infoWidget.renderTooltip(guiGraphics, mouseX, mouseY, v);
-            }
+        }
+    }
 
+    public void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
+        if (this.methodWidget instanceof AbstractResearchInfoWidget<?> infoWidget) {
+            infoWidget.renderTooltip(guiGraphics, mouseX, mouseY, v);
+        }
+
+        if (this.effectWidget instanceof AbstractResearchInfoWidget<?> infoWidget) {
+            infoWidget.renderTooltip(guiGraphics, mouseX, mouseY, v);
         }
     }
 

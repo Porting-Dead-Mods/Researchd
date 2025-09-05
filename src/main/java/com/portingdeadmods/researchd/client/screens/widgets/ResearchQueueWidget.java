@@ -6,6 +6,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.data.ResearchQueue;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
+import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
@@ -65,42 +66,28 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
 
     @Override
     protected void onDrag(double mouseX, double mouseY, double dragX, double dragY) {
-        if (selected == null) {
-            int paddingX = 12;
-            int paddingY = 17;
-
-            int index = (int) (mouseX - paddingX) / PANEL_WIDTH;
-            if (mouseX > paddingX && mouseY > paddingY && index < this.queue.getEntries().size()) {
-                this.selected = this.queue.getEntries().get(index);
-                this.selectedX = paddingX + index * PANEL_WIDTH;
-                this.selectedY = paddingY;
-            }
-        }
-        this.selectedX += dragX;
-        this.selectedY += dragY;
-        Researchd.LOGGER.debug("Drag x: {}, Drag y: {}, mouse x: {}, mouse y: {}", dragX, dragY, mouseX, mouseY);
         super.onDrag(mouseX, mouseY, dragX, dragY);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         int paddingX = 12;
-        int paddingY = 17;
+        int paddingY = 14;
 
         int index = (int) (mouseX - paddingX) / PANEL_WIDTH;
         if (mouseX > paddingX && mouseY > paddingY && index < this.queue.getEntries().size()) {
             ResearchInstance instance = this.queue.getEntries().get(index);
             if (this.isHovering(null, (int) mouseX, (int) mouseY, index, paddingY + 17, getWidth(), getHeight() - 17)) {
-                Researchd.LOGGER.debug("removing");
                 this.screen.getResearchQueueWidget().removeResearch(index);
                 return super.mouseClicked(mouseX, mouseY, button);
-            } else if (isHovering(null, index, paddingY, (int) mouseX, (int) mouseY)) {
+            } else if (isHovering(null, (int) mouseX, (int) mouseY, index, paddingY, getWidth(), getHeight())) {
                 this.screen.getSelectedResearchWidget().setSelectedResearch(instance);
+                this.screen.getResearchGraphWidget().setGraph(ResearchGraphCache.computeIfAbsent(instance.getKey()));
                 return super.mouseClicked(mouseX, mouseY, button);
             }
         }
 
-        return this.isHovered();
+        return false;
     }
 
     public void removeResearch(int index) {
@@ -120,10 +107,13 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
             renderResearchPanel(guiGraphics, instance, x, y, mouseX, mouseY, false, PanelSpriteType.NORMAL);
         }
 
-        if (this.isHovering(guiGraphics, mouseX, mouseY, x, y + 17, PANEL_WIDTH, PANEL_HEIGHT - 17)) {
+        if (this.isHovering(guiGraphics, mouseX, mouseY, x, y, PANEL_WIDTH, PANEL_HEIGHT)) {
             Font font = Minecraft.getInstance().font;
 
-            int color = FastColor.ARGB32.color(120, 90, 90, 90);
+            int color = FastColor.ARGB32.color(120, 20, 20, 20);
+            if (this.isHovering(guiGraphics, mouseX, mouseY, x, y + 17, PANEL_WIDTH, PANEL_HEIGHT - 17)) {
+                color = FastColor.ARGB32.color(120, 90, 90, 90);
+            }
             guiGraphics.fillGradient(x, y + 17, x + PANEL_WIDTH, y + PANEL_HEIGHT, color, color);
 
             PoseStack poseStack = guiGraphics.pose();

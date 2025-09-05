@@ -41,7 +41,7 @@ public class ResearchScreen extends Screen {
         this.techListWidget.setTechList(TechList.getClientTechList());
 
         // THIS NEEDS TO BE BEFORE THE GRAPH
-        this.selectedResearchWidget = new SelectedResearchWidget(0, 40, SelectedResearchWidget.BACKGROUND_WIDTH, SelectedResearchWidget.BACKGROUND_HEIGHT);
+        this.selectedResearchWidget = new SelectedResearchWidget(this, 0, 40, SelectedResearchWidget.BACKGROUND_WIDTH, SelectedResearchWidget.BACKGROUND_HEIGHT);
         if (!this.techListWidget.getTechList().entries().isEmpty()) {
             this.selectedResearchWidget.setSelectedResearch(this.techListWidget.getTechList().entries().getFirst());
         }
@@ -94,6 +94,8 @@ public class ResearchScreen extends Screen {
         int w = 174;
         this.researchGraphWidget.setSize(guiGraphics.guiWidth() - 8 - w, guiGraphics.guiHeight() - 8 * 2);
         this.researchGraphWidget.renderNodeTooltips(guiGraphics, mouseX, mouseY, partialTick);
+
+        this.selectedResearchWidget.renderTooltip(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     public ResearchGraphWidget getResearchGraphWidget() {
