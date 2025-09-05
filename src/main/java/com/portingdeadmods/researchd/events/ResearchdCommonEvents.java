@@ -246,6 +246,7 @@ public final class ResearchdCommonEvents {
             CommonResearchCache.initialize(event.getLevel());
 
             // Add new researches to teams in case new ones were added
+            // TODO: Remove old researches from teams in cases ones were removed
             ResearchTeamHelper.initializeTeamResearches(event.getLevel());
         }
     }

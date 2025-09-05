@@ -13,11 +13,9 @@ import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.OrResearchMethod;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
@@ -185,14 +183,14 @@ public final class ResearchdResearches {
                     new ConsumePackResearchMethod(List.of(ResearchdResearchPacks.OVERWORLD), 12, 10)
             ));
 
-    static {
-        for (int i = 0; i < 200; i++) {
-            register("test_research_%d".formatted(i), builder -> builder
-                    .icon(BuiltInRegistries.ITEM.getRandom(RandomSource.create()).get().value())
-                    .parents(DIAMOND_PICKAXE)
-                    .researchMethod(new ConsumeItemResearchMethod(Ingredient.of(Items.BREAD), 10)));
-        }
-    }
+//    static {
+//        for (int i = 0; i < 200; i++) {
+//            register("test_research_%d".formatted(i), builder -> builder
+//                    .icon(BuiltInRegistries.ITEM.getRandom(RandomSource.create()).get().value())
+//                    .parents(DIAMOND_PICKAXE)
+//                    .researchMethod(new ConsumeItemResearchMethod(Ingredient.of(Items.BREAD), 10)));
+//        }
+//    }
 
     public static void bootstrap(BootstrapContext<Research> context) {
         for (Map.Entry<ResourceKey<Research>, Research.Builder<?>> research : RESEARCHES.entrySet()) {

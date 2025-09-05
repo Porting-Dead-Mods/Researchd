@@ -34,8 +34,8 @@ public class TechListWidget extends ResearchScreenWidget {
     private static final int PADDING_Y = 21;
     private static final int PADDING_X = 12;
 
-    private final int SEARCH_BUTTON_X;
-    private final int SCROLLER_X;
+    private final int searchButtonX;
+    private final int scrollX;
 
     private TechList techList;
     private TechList displayTechList;
@@ -56,10 +56,10 @@ public class TechListWidget extends ResearchScreenWidget {
         this.cols = cols;
 
         int padding = 15;
-        this.SEARCH_BUTTON_X = getX() + cols * ResearchScreenWidget.PANEL_WIDTH + padding;
-        this.SCROLLER_X = getX() + cols * ResearchScreenWidget.PANEL_WIDTH + PADDING_X + 4;
+        this.searchButtonX = getX() + cols * ResearchScreenWidget.PANEL_WIDTH + padding;
+        this.scrollX = getX() + cols * ResearchScreenWidget.PANEL_WIDTH + PADDING_X + 4;
 
-        this.searchButton = new ImageButton(SEARCH_BUTTON_X, y + 4, 14, 14, new WidgetSprites(
+        this.searchButton = new ImageButton(searchButtonX, y + 4, 14, 14, new WidgetSprites(
                 Researchd.rl("search_button"),
                 Researchd.rl("search_button_highlighted")
         ), this::onSearchButtonClicked);
@@ -194,7 +194,7 @@ public class TechListWidget extends ResearchScreenWidget {
         guiGraphics.disableScissor();
 
         float percentage = (float) this.scrollOffset / (this.getContentHeight() - techListHeight);
-        guiGraphics.blitSprite(SCROLLER_SPRITE, this.SCROLLER_X, (int) (getY() + PADDING_Y + (percentage * (techListHeight - SCROLLER_HEIGHT - 1))), SCROLLER_WIDTH, SCROLLER_HEIGHT);
+        guiGraphics.blitSprite(SCROLLER_SPRITE, this.scrollX, (int) (getY() + PADDING_Y + (percentage * (techListHeight - SCROLLER_HEIGHT - 1))), SCROLLER_WIDTH, SCROLLER_HEIGHT);
     }
 
     private int getTechListHeight() {
@@ -207,7 +207,7 @@ public class TechListWidget extends ResearchScreenWidget {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        if (this.isHovered(mouseX, mouseY, 12, 130, 156, this.getTechListHeight() - 1)) {
+        if (this.isHovered(mouseX, mouseY, 12, 130, 156, this.getTechListHeight() - 1) && this.getContentHeight() > this.getTechListHeight()) {
             double rawScrollOffset = (int) Math.max(this.scrollOffset - scrollY * 7, 0);
             if (rawScrollOffset > this.getContentHeight() - this.getTechListHeight() + 1) {
                 this.scrollOffset = (this.getContentHeight() - this.getTechListHeight()) + 1;

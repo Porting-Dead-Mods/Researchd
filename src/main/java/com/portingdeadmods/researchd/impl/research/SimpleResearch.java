@@ -20,7 +20,7 @@ import net.minecraft.world.item.Items;
 import java.util.List;
 import java.util.Objects;
 
-// TODO: Change icon to Ingredient
+// TODO: Change icon to List<ItemStack> and use a CycledItemRenderer
 public record SimpleResearch(Item icon, ResearchMethod researchMethod, ResearchEffect researchEffect,
                              List<ResourceKey<Research>> parents, boolean requiresParent) implements Research {
     @Override

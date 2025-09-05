@@ -531,52 +531,55 @@ public class ResearchGraphWidget extends AbstractWidget {
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
-        if (this.researchLines != null) {
-            for (List<ResearchLine> lines : this.researchLines.values()) {
-                for (ResearchLine line : lines) {
-                    line.render(guiGraphics);
+        int w = 174;
+        guiGraphics.enableScissor(w, 8, guiGraphics.guiWidth() - 8, guiGraphics.guiHeight() - 8);
+        {
+            if (this.researchLines != null) {
+                for (List<ResearchLine> lines : this.researchLines.values()) {
+                    for (ResearchLine line : lines) {
+                        line.render(guiGraphics);
+                    }
+                }
+            }
+
+            if (this.graph == null || this.graph.nodes() == null) {
+                return;
+            }
+
+            for (ResearchNode node : this.graph.nodes().values()) {
+                if (node.isRootNode()) {
+                    float scale = 1.75f;
+                    int width = ResearchScreenWidget.PANEL_WIDTH;
+                    int height = ResearchScreenWidget.PANEL_HEIGHT;
+
+                    // getX() and getY() = top-left of normal panel (scale = 1)
+                    float baseX = node.getX();
+                    float baseY = node.getY();
+
+                    // compute center of unscaled panel
+                    float centerX = baseX + width / 2f;
+                    float centerY = baseY + height / 2f;
+
+                    // compute top-left of scaled panel to keep same center
+                    int scaledX = (int) (centerX - (width * scale) / 2f);
+                    int scaledY = (int) (centerY - (height * scale) / 2f);
+
+                    node.setHovered(guiGraphics, scaledX, scaledY, (int) (20 * scale), (int) (24 * scale), mouseX, mouseY);
+                    ResearchScreenWidget.renderResearchPanel(
+                            guiGraphics,
+                            node.getInstance(),
+                            scaledX + 1,
+                            scaledY,
+                            mouseX,
+                            mouseY,
+                            scale
+                    );
+                } else {
+                    node.render(guiGraphics, mouseX, mouseY, v);
                 }
             }
         }
-
-        if (this.graph == null || this.graph.nodes() == null) {
-            return;
-        }
-
-        for (ResearchNode node : this.graph.nodes().values()) {
-            if (node.isRootNode()) {
-                float scale = 1.75f;
-                int width = ResearchScreenWidget.PANEL_WIDTH;
-                int height = ResearchScreenWidget.PANEL_HEIGHT;
-
-                // getX() and getY() = top-left of normal panel (scale = 1)
-                float baseX = node.getX();
-                float baseY = node.getY();
-
-                // compute center of unscaled panel
-                float centerX = baseX + width / 2f;
-                float centerY = baseY + height / 2f;
-
-                // compute top-left of scaled panel to keep same center
-                int scaledX = (int) (centerX - (width * scale) / 2f);
-                int scaledY = (int) (centerY - (height * scale) / 2f);
-
-                node.setHovered(guiGraphics, scaledX, scaledY, (int) (20 * scale), (int) (24 * scale), mouseX, mouseY);
-                ResearchScreenWidget.renderResearchPanel(
-                        guiGraphics,
-                        node.getInstance(),
-                        scaledX + 1,
-                        scaledY,
-                        mouseX,
-                        mouseY,
-                        scale
-                );
-            } else {
-                node.render(guiGraphics, mouseX, mouseY, v);
-            }
-        }
-
-
+        guiGraphics.disableScissor();
     }
 
     private void renderNode(ResearchNode node, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
