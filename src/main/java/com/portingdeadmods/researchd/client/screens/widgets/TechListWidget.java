@@ -225,9 +225,37 @@ public class TechListWidget extends ResearchScreenWidget {
             this.screen.getResearchGraphWidget().setGraph(ResearchGraphCache.computeIfAbsent(this.hoveredResearch.getKey()));
             this.screen.getSelectedResearchWidget().setSelectedResearch(this.hoveredResearch);
             return super.mouseClicked(mouseX, mouseY, button);
+        } else if (
+                    mouseX >= this.scrollX &&
+                    mouseX < this.scrollX + SCROLLER_WIDTH &&
+                    mouseY >= getY() + PADDING_Y &&
+                    mouseY < getY() + PADDING_Y + this.getTechListHeight() - 1 &&
+                    this.getContentHeight() > this.getTechListHeight()
+        ) {
+            int scrollableHeight = this.getContentHeight() - this.getTechListHeight();
+            int minY = getY() + PADDING_Y + 7;
+            int maxY = getY() + PADDING_Y + this.getTechListHeight() - 1 - 8;
+
+            double scrolledPercentage = ((Math.clamp(mouseY, minY, maxY) - (minY))) / (double) (maxY - minY);
+
+            this.scrollOffset = (int) (scrollableHeight * scrolledPercentage);
+            return super.mouseClicked(mouseX, mouseY, button);
         }
 
         return false;
+    }
+
+    @Override
+    public void onDrag(double mouseX, double mouseY, double dragX, double dragY) {
+        if (
+                mouseX >= this.scrollX &&
+                mouseX < this.scrollX + SCROLLER_WIDTH &&
+                mouseY >= getY() + PADDING_Y &&
+                mouseY < getY() + PADDING_Y + this.getTechListHeight() - 1 &&
+                this.getContentHeight() > this.getTechListHeight()
+        ) {
+            this.mouseClicked(mouseX, mouseY, 0);
+        }
     }
 
     private boolean isHovered(double mouseX, double mouseY, int x, int y, int width, int height) {
