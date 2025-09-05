@@ -31,6 +31,11 @@ public class TechListWidget extends ResearchScreenWidget {
     private static final int BACKGROUND_HEIGHT_SPRITE = 18;
     private static final int BOTTOM_WIDTH = 174;
     private static final int BOTTOM_HEIGHT = 8;
+    private static final int PADDING_Y = 21;
+    private static final int PADDING_X = 12;
+
+    private final int SEARCH_BUTTON_X;
+    private final int SCROLLER_X;
 
     private TechList techList;
     private TechList displayTechList;
@@ -49,10 +54,12 @@ public class TechListWidget extends ResearchScreenWidget {
     public TechListWidget(ResearchScreen screen, int x, int y, int cols) {
         super(x, y, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
         this.cols = cols;
-        int padding = 15;
-        int scrollerX = getX() + cols * ResearchScreenWidget.PANEL_WIDTH + padding;
 
-        this.searchButton = new ImageButton(scrollerX, y + 4, 14, 14, new WidgetSprites(
+        int padding = 15;
+        this.SEARCH_BUTTON_X = getX() + cols * ResearchScreenWidget.PANEL_WIDTH + padding;
+        this.SCROLLER_X = getX() + cols * ResearchScreenWidget.PANEL_WIDTH + PADDING_X + 4;
+
+        this.searchButton = new ImageButton(SEARCH_BUTTON_X, y + 4, 14, 14, new WidgetSprites(
                 Researchd.rl("search_button"),
                 Researchd.rl("search_button_highlighted")
         ), this::onSearchButtonClicked);
@@ -131,12 +138,12 @@ public class TechListWidget extends ResearchScreenWidget {
     public void onStartResearchButtonClicked(Button button) {
         ResearchQueueWidget queue = this.screen.getResearchQueueWidget();
         ResearchInstance instance = this.screen.getSelectedResearchWidget().getSelectedInstance();
-
+        
         if (instance == null) {
             // No research selected, cannot start research
             return;
         }
-
+        
         instance.setResearchedPlayer(Minecraft.getInstance().player.getUUID());
         instance.setResearchedTime(Minecraft.getInstance().level.getGameTime());
         queue.getQueue().add(instance);
@@ -162,7 +169,7 @@ public class TechListWidget extends ResearchScreenWidget {
                     int index = row * this.cols + col;
                     if (index < this.displayTechList.entries().size()) {
                         ResearchInstance instance = this.displayTechList.entries().get(index);
-                        int y1 = paddingY + getY() + row * PANEL_HEIGHT - this.scrollOffset;
+                        int y1 = PADDING_Y + getY() + row * PANEL_HEIGHT - this.scrollOffset;
                         boolean selected = instance == this.screen.getSelectedResearchWidget().getSelectedInstance();
                         if (selected) {
                             y1 += 2;
@@ -186,9 +193,8 @@ public class TechListWidget extends ResearchScreenWidget {
         }
         guiGraphics.disableScissor();
 
-        int scrollerX = getX() + cols * ResearchScreenWidget.PANEL_WIDTH + paddingX + 4;
         float percentage = (float) this.scrollOffset / (this.getContentHeight() - techListHeight);
-        guiGraphics.blitSprite(SCROLLER_SPRITE, scrollerX, (int) (getY() + paddingY + (percentage * (techListHeight - SCROLLER_HEIGHT - 1))), SCROLLER_WIDTH, SCROLLER_HEIGHT);
+        guiGraphics.blitSprite(SCROLLER_SPRITE, this.SCROLLER_X, (int) (getY() + PADDING_Y + (percentage * (techListHeight - SCROLLER_HEIGHT - 1))), SCROLLER_WIDTH, SCROLLER_HEIGHT);
     }
 
     private int getTechListHeight() {

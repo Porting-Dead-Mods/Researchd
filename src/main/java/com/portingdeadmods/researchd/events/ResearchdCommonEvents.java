@@ -14,6 +14,7 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
+import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.content.commands.ResearchdCommands;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
@@ -75,6 +76,7 @@ public final class ResearchdCommonEvents {
     @SubscribeEvent
     private static void onLeaveWorld(PlayerEvent.PlayerLoggedOutEvent event) {
         PDLClientSavedData.CLIENT_SAVED_DATA_CACHE.clear();
+        ResearchGraphCache.clearCache();
     }
 
     public static void consumeItemResearchMethodLogic(@NotNull ResearchTeamMap data, MinecraftServer server) {
@@ -252,7 +254,6 @@ public final class ResearchdCommonEvents {
     public static void onWorldUnload(LevelEvent.Unload event) {
         // Reset the research cache
         CommonResearchCache.reset();
-
     }
 
     public static void onJoinLevel(EntityJoinLevelEvent entity) {
