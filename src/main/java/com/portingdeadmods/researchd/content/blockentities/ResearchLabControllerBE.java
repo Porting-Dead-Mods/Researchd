@@ -138,7 +138,7 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
 			this.decreaseNecessaryPackCount(packs);
 
 			for (ResourceKey<SimpleResearchPack> pack : packs) {
-				researchPackUsage.put(pack, Math.max(researchPackUsage.get(pack) - ((1f / this.currentResearchDuration) / team.getTeamEffect(ResearchdValueEffects.RESEARCH_LAB_PRODUCTIVITY.get())), 0f));
+				researchPackUsage.put(pack, Math.max(researchPackUsage.get(pack) - ((1f / this.currentResearchDuration) / team.getTeamEffect(ResearchdValueEffects.RESEARCH_LAB_PRODUCTIVITY)), 0f));
 			}
 			progress.progress(1f / this.currentResearchDuration);
 		}

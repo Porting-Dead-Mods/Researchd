@@ -5,6 +5,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.portingdeadlibs.utils.LazyFinal;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.data.ResearchQueue;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
@@ -24,11 +25,14 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class ResearchTeam {
@@ -183,7 +187,7 @@ public class ResearchTeam {
 
         return this.metadata.researchProgress.getRootProgress(queue.getEntries().getFirst().getKey());
     }
-    
+
     public List<ResearchMethodProgress> getAllRMPInQueue() {
         ResearchQueue queue = this.metadata.researchProgress.researchQueue();
         if (queue.getEntries() == null) return null;
@@ -295,12 +299,16 @@ public class ResearchTeam {
         return new TimeUtils.TimeDifference(this.metadata.creationTime.get(), time).getFormatted();
     }
 
-    public Map<String, Float> getTeamEffectList() {
+    public Map<ResourceLocation, Float> getTeamEffectList() {
         return this.metadata.teamEffectList;
     }
 
-    public Float getTeamEffect(ValueEffect eff) {
-        return this.getTeamEffectList().computeIfAbsent(eff.get(), k -> 1f);
+    public float getTeamEffect(ValueEffect eff) {
+        return this.getTeamEffectList().computeIfAbsent(ResearchdRegistries.VALUE_EFFECT.getKey(eff), k -> 1f);
+    }
+
+    public float getTeamEffect(Supplier<ValueEffect> eff) {
+        return this.getTeamEffectList().computeIfAbsent(ResearchdRegistries.VALUE_EFFECT.getKey(eff.get()), k -> 1f);
     }
 
     public void init(HolderLookup.Provider access) {
@@ -321,7 +329,7 @@ public class ResearchTeam {
     public static class TeamMetadata {
         private final TeamResearchProgress researchProgress;
         private final LazyFinal<Integer> creationTime;
-        private final Map<String, Float> teamEffectList;
+        private final Map<ResourceLocation, Float> teamEffectList;
 
         public TeamMetadata(TeamResearchProgress progress) {
             this.researchProgress = progress;
@@ -329,25 +337,37 @@ public class ResearchTeam {
             this.teamEffectList = new HashMap<>();
         }
 
-        public TeamMetadata(TeamResearchProgress researchProgress, int creationTime, Map<String, Float> simpleEffectList) {
+        public TeamMetadata(TeamResearchProgress researchProgress, int creationTime, Map<ResourceLocation, Float> simpleEffectList) {
             this.researchProgress = researchProgress;
             this.creationTime = LazyFinal.create();
             this.creationTime.initialize(creationTime);
             this.teamEffectList = new HashMap<>(simpleEffectList);
         }
 
+        private static TeamMetadata newFromStringMap(TeamResearchProgress researchProgress, int creationTime, Map<String, Float> simpleEffectList) {
+            return new TeamMetadata(researchProgress, creationTime, simpleEffectList.entrySet().stream()
+                    .map(e -> new AbstractMap.SimpleEntry<>(ResourceLocation.parse(e.getKey()), e.getValue()))
+                    .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue)));
+        }
+
         public static final Codec<TeamMetadata> CODEC = RecordCodecBuilder.create(builder -> builder.group(
                 TeamResearchProgress.CODEC.fieldOf("research_progress").forGetter(TeamMetadata::getResearchProgress),
                 Codec.INT.fieldOf("creation_time").forGetter(TeamMetadata::getCreationTime),
-                Codec.unboundedMap(Codec.STRING, Codec.FLOAT).fieldOf("simple_effect_list").forGetter(m -> m.teamEffectList)
-        ).apply(builder, TeamMetadata::new));
+                Codec.unboundedMap(Codec.STRING, Codec.FLOAT).fieldOf("simple_effect_list").forGetter(ResearchTeam.TeamMetadata::getTeamMetadataEffectMap)
+        ).apply(builder, TeamMetadata::newFromStringMap));
+
+        private static @NotNull Map<String, Float> getTeamMetadataEffectMap(TeamMetadata metadata) {
+            return metadata.teamEffectList.entrySet().stream()
+                    .map(e -> new AbstractMap.SimpleEntry<>(e.getKey().toString(), e.getValue()))
+                    .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
+        }
 
         public static final StreamCodec<RegistryFriendlyByteBuf, TeamMetadata> STREAM_CODEC = StreamCodec.composite(
                 TeamResearchProgress.STREAM_CODEC,
                 TeamMetadata::getResearchProgress,
                 ByteBufCodecs.INT,
                 TeamMetadata::getCreationTime,
-                ByteBufCodecs.map(HashMap::new, ByteBufCodecs.STRING_UTF8, ByteBufCodecs.FLOAT),
+                ByteBufCodecs.map(HashMap::new, ResourceLocation.STREAM_CODEC, ByteBufCodecs.FLOAT),
                 TeamMetadata::getTeamEffectList,
                 TeamMetadata::new
         );
@@ -364,7 +384,7 @@ public class ResearchTeam {
             return creationTime.get();
         }
 
-        public Map<String, Float> getTeamEffectList() {
+        public Map<ResourceLocation, Float> getTeamEffectList() {
             return teamEffectList;
         }
     }

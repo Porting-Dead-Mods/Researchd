@@ -13,7 +13,7 @@ public class ResearchdValueEffects {
     public static final Supplier<ValueEffect> RESEARCH_LAB_PRODUCTIVITY = register("research_lab_productivity");
 
     public static Supplier<ValueEffect> register(String name) {
-        Supplier<ValueEffect> effect = () -> new ValueEffect(name);
+        Supplier<ValueEffect> effect = () -> ValueEffect.DEFAULT;
         VALUE_EFFECTS.register(name, effect);
         return effect;
     }
