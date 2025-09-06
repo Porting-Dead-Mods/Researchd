@@ -37,7 +37,7 @@ public record IncreaseValueEffect(ValueEffect value, Float increment) implements
     @Override
     public void onUnlock(Level level, Player player, ResourceKey<Research> research) {
         ResearchTeamHelper.getResearchTeam(player).getMetadata().getTeamEffectList()
-                .computeIfAbsent(value.get(), k -> 1f + increment());
+                .computeIfAbsent(value.getKey(), k -> 1f + increment());
     }
 
     @Override

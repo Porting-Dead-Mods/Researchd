@@ -37,7 +37,7 @@ public record DecreaseValueEffect(ValueEffect value, Float decrement) implements
     @Override
     public void onUnlock(Level level, Player player, ResourceKey<Research> research) {
         ResearchTeamHelper.getResearchTeam(player).getMetadata().getTeamEffectList()
-                .computeIfAbsent(value.get(), k -> 1f - decrement());
+                .computeIfAbsent(value.getKey(), k -> 1f - decrement());
     }
 
     @Override

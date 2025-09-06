@@ -10,7 +10,7 @@ import net.minecraft.util.FastColor;
 import net.neoforged.neoforge.common.util.Size2i;
 
 public abstract class AbstractResearchInfoWidget<T> extends AbstractWidget {
-    public static final int BACKGROUND_COLOR = FastColor.ARGB32.color(69, 69, 69);
+    public static final int BACKGROUND_COLOR = FastColor.ARGB32.color(89, 89, 89);
     protected final T value;
     protected final Font font;
 

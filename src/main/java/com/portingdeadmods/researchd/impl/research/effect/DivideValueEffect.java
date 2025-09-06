@@ -37,7 +37,7 @@ public record DivideValueEffect(ValueEffect value, Float divisor) implements Res
     @Override
     public void onUnlock(Level level, Player player, ResourceKey<Research> research) {
         ResearchTeamHelper.getResearchTeam(player).getMetadata().getTeamEffectList()
-                .computeIfAbsent(value.get(), k -> 1f / divisor());
+                .computeIfAbsent(value.getKey(), k -> 1f / divisor());
     }
 
     @Override

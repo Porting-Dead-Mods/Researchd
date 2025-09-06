@@ -51,7 +51,7 @@ public abstract class AbstractResearchEffectListWidget<T extends ResearchEffectL
         int x = getX();
         int y = getY();
         Size2i firstSize = getSizeFor(1, false);
-        guiGraphics.fill(x, y, x + this.width, y + firstSize.height, FastColor.ARGB32.color(109, 109, 109));
+        guiGraphics.fill(x, y, x + this.width, y + firstSize.height, FastColor.ARGB32.color(92, 92, 92));
 
         List<? extends ResearchEffect> effects = value.effects();
         for (int i = 0; i < effects.size(); i++) {

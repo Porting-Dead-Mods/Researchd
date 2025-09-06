@@ -5,6 +5,7 @@ import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.client.impl.effects.AndResearchEffectWidget;
 import com.portingdeadmods.researchd.client.impl.effects.DimensionUnlockEffectWidget;
+import com.portingdeadmods.researchd.client.impl.effects.EmptyResearchEffectWidget;
 import com.portingdeadmods.researchd.client.impl.effects.RecipeUnlockEffectWidget;
 import com.portingdeadmods.researchd.client.impl.methods.AndResearchMethodWidget;
 import com.portingdeadmods.researchd.client.impl.methods.ConsumeItemResearchMethodWidget;
@@ -15,6 +16,7 @@ import com.portingdeadmods.researchd.client.screens.lab.ResearchLabScreen;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
 import com.portingdeadmods.researchd.impl.research.effect.AndResearchEffect;
 import com.portingdeadmods.researchd.impl.research.effect.DimensionUnlockEffect;
+import com.portingdeadmods.researchd.impl.research.effect.EmptyResearchEffect;
 import com.portingdeadmods.researchd.impl.research.effect.RecipeUnlockEffect;
 import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
@@ -65,6 +67,7 @@ public class ResearchdClient {
 
             addEffectWidget(AndResearchEffect.ID, AndResearchEffectWidget::new);
             addEffectWidget(DimensionUnlockEffect.ID, DimensionUnlockEffectWidget::new);
+            addEffectWidget(EmptyResearchEffect.ID, EmptyResearchEffectWidget::new);
             addEffectWidget(RecipeUnlockEffect.ID, RecipeUnlockEffectWidget::new);
 
             ItemBlockRenderTypes.setRenderLayer(ResearchdBlocks.RESEARCH_LAB_CONTROLLER.get(), RenderType.solid()); // Should fiddle with render types till it works ngl

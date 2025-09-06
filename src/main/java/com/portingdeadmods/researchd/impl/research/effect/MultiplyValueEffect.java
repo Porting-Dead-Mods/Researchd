@@ -37,7 +37,7 @@ public record MultiplyValueEffect(ValueEffect value, Float multiplier) implement
     @Override
     public void onUnlock(Level level, Player player, ResourceKey<Research> research) {
         ResearchTeamHelper.getResearchTeam(player).getMetadata().getTeamEffectList()
-                .computeIfAbsent(value.get(), k -> 1f * multiplier());
+                .computeIfAbsent(value.getKey(), k -> 1f * multiplier());
     }
 
     @Override

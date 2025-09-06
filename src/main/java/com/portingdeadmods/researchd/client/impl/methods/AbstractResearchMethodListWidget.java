@@ -26,7 +26,7 @@ public abstract class AbstractResearchMethodListWidget<T extends ResearchMethodL
         for (int i = 0; i < methods.size(); i++) {
             ResearchMethod researchMethod = methods.get(i);
             int xSize = i > 0 ? (int) (getSizeFor(i, false).width + i * getPadding()) : 0;
-            this.methods.add(ResearchdClient.RESEARCH_METHOD_WIDGETS.get(researchMethod.id()).createMethod(x + xSize, y, researchMethod));
+            this.methods.add(ResearchdClient.RESEARCH_METHOD_WIDGETS.get(researchMethod.id()).createMethod(x + xSize + 1, y + 1, researchMethod));
         }
         Size2i size = getSize(true);
         this.setWidth(size.width);
@@ -47,7 +47,7 @@ public abstract class AbstractResearchMethodListWidget<T extends ResearchMethodL
         int x = getX();
         int y = getY();
         Size2i firstSize = getSizeFor(1, false);
-        guiGraphics.fill(x, y, x + this.width + 1, y + firstSize.height, FastColor.ARGB32.color(109, 109, 109));
+        guiGraphics.fill(x, y, x + this.width, y + firstSize.height, FastColor.ARGB32.color(109, 109, 109));
 
         List<? extends ResearchMethod> methods = value.methods();
         for (int i = 0; i < methods.size(); i++) {
@@ -80,7 +80,7 @@ public abstract class AbstractResearchMethodListWidget<T extends ResearchMethodL
         super.setY(y);
 
         for (AbstractResearchInfoWidget<? extends ResearchMethod> method : this.methods) {
-            method.setY(y);
+            method.setY(y + 1);
         }
 
     }
@@ -105,10 +105,10 @@ public abstract class AbstractResearchMethodListWidget<T extends ResearchMethodL
         }
         if (!methods.isEmpty()) {
             Size2i firstMethodSize = methods.getFirst().getSize();
-            Size2i size = new Size2i(0, firstMethodSize.height + 1);
+            Size2i size = new Size2i(0, firstMethodSize.height + 2);
             for (int i = 0; i < amount; i++) {
                 AbstractResearchInfoWidget<? extends ResearchMethod> researchMethod = methods.get(i);
-                size = new Size2i((int) (size.width + researchMethod.getWidth() + (includePadding && i > 0 ? getPadding() : 0)), size.height);
+                size = new Size2i((int) (size.width + researchMethod.getWidth() + (includePadding && i > 0 ? getPadding() : 0)) + 2, size.height);
             }
             return size;
         }
