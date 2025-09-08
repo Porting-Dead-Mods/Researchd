@@ -11,6 +11,7 @@ import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.networking.research.ResearchQueueAddPayload;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.network.chat.Component;
@@ -68,11 +69,13 @@ public class TechListWidget extends ResearchScreenWidget {
                 Researchd.rl("search_button_highlighted")
         ), this::onSearchButtonClicked);
 
+        Font font = Minecraft.getInstance().font;
+
         this.startResearchButton = Button.builder(ResearchdTranslations.component(ResearchdTranslations.Research.START_RESEARCH_BUTTON), this::onStartResearchButtonClicked)
-                .bounds(11, y + 4, Minecraft.getInstance().font.width(ResearchdTranslations.component(ResearchdTranslations.Research.ENQUEUE_RESEARCH_BUTTON)), 14)
+                .bounds(11, y + 4, Math.min(font.width(ResearchdTranslations.component(ResearchdTranslations.Research.ENQUEUE_RESEARCH_BUTTON)), 58), 14)
                 .build();
 
-        this.searchBox = new EditBox(Minecraft.getInstance().font, x + 73 + 2, y + 3 + 4, 78, 14, Component.empty()) {
+        this.searchBox = new EditBox(font, x + 73 + 2, y + 3 + 4, 78, 14, Component.empty()) {
             @Override
             public boolean charTyped(char codePoint, int modifiers) {
                 String searchValue = this.getValue();
