@@ -40,13 +40,14 @@ public class ResearchScreen extends Screen {
         this.techListWidget = new TechListWidget(this, 0, 109, 7);
         this.techListWidget.setTechList(TechList.getClientTechList());
 
+        // QUEUE
+        this.researchQueueWidget = new ResearchQueueWidget(this, 0, 0);
+
         // THIS NEEDS TO BE BEFORE THE GRAPH
         this.selectedResearchWidget = new SelectedResearchWidget(this, 0, 40, SelectedResearchWidget.BACKGROUND_WIDTH, SelectedResearchWidget.BACKGROUND_HEIGHT);
         if (!this.techListWidget.getTechList().entries().isEmpty()) {
             this.selectedResearchWidget.setSelectedResearch(this.techListWidget.getTechList().entries().getFirst());
         }
-        // QUEUE
-        this.researchQueueWidget = new ResearchQueueWidget(this, 0, 0);
 
         // GRAPH
         int x = 174;

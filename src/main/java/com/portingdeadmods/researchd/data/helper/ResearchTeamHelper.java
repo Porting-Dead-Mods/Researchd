@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.data.helper;
 
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
+import com.portingdeadmods.researchd.api.data.team.TeamResearchProgress;
 import com.portingdeadmods.researchd.api.research.GlobalResearch;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
@@ -502,5 +503,14 @@ public final class ResearchTeamHelper {
             }
         }
         ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
+    }
+
+    public static void resolveGlobalResearches(ResearchTeamMap researchTeamMap) {
+        for (ResearchTeam team : researchTeamMap.getResearchTeams().values()) {
+            TeamResearchProgress researchProgress = team.getMetadata().getResearchProgress();
+            for (Map.Entry<ResourceKey<Research>, ResearchInstance> entry : researchProgress.researches().entrySet()) {
+                entry.setValue(new ResearchInstance(CommonResearchCache.GLOBAL_RESEARCHES.get(entry.getKey()), entry.getValue().getResearchStatus()));
+            }
+        }
     }
 }

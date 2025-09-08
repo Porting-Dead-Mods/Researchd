@@ -3,17 +3,17 @@ package com.portingdeadmods.researchd.content.commands;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.*;
-import net.minecraft.ChatFormatting;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeManager;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -63,7 +63,7 @@ public class HandCommand {
                                                                 .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, "new RecipePredicate(ResourceLocation.parse(" + recipeId + "))"))
                                                                 .withHoverEvent(new HoverEvent(
                                                                         HoverEvent.Action.SHOW_TEXT,
-                                                                        Component.literal("Click to copy recipe ID")))));
+                                                                        Component.literal("Click to copy recipes ID")))));
 
                                             source.sendSystemMessage(recipeComponent);
                                         }
@@ -85,7 +85,7 @@ public class HandCommand {
                                                             .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, "new RecipePredicate(ResourceLocation.parse(" + recipeId + "))"))
                                                             .withHoverEvent(new HoverEvent(
                                                                     HoverEvent.Action.SHOW_TEXT,
-                                                                    Component.literal("Click to copy recipe ID")))));
+                                                                    Component.literal("Click to copy recipes ID")))));
 
                                             source.sendSystemMessage(recipeComponent);
                                         }
@@ -282,7 +282,7 @@ public class HandCommand {
                         .withHoverEvent(
                                 new HoverEvent(
                                         net.minecraft.network.chat.HoverEvent.Action.SHOW_TEXT,
-                                        Component.literal("Click to copy recipe ID")))
+                                        Component.literal("Click to copy recipes ID")))
                 );
 
         player.sendSystemMessage(recipeIdsComponent);

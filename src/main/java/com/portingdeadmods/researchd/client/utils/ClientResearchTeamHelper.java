@@ -168,9 +168,9 @@ public class ClientResearchTeamHelper {
         HashMap<ResourceKey<Research>, ResearchInstance> researches = team.getResearchProgress().researches();
 
         for (Map.Entry<ResourceKey<Research>, ResearchInstance> research : researches.entrySet()) {
-            GlobalResearch research1 = CommonResearchCache.GLOBAL_RESEARCHES.get(research.getKey());
-            if (research1 != null) {
-                research.setValue(research.getValue().withResearch(research1));
+            GlobalResearch globalResearch = CommonResearchCache.GLOBAL_RESEARCHES.get(research.getKey());
+            if (globalResearch != null) {
+                research.setValue(research.getValue().withResearch(globalResearch));
             } else {
                 Researchd.LOGGER.debug("RESEARCH");
             }

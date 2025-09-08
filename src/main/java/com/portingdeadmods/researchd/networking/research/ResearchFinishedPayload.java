@@ -3,13 +3,12 @@ package com.portingdeadmods.researchd.networking.research;
 import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
-import com.portingdeadmods.researchd.integration.KubeJSIntegration;
 import com.portingdeadmods.researchd.api.data.ResearchQueue;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
+import com.portingdeadmods.researchd.integration.KubeJSIntegration;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -48,10 +47,10 @@ public record ResearchFinishedPayload(ResourceKey<Research> key, int timeStamp) 
 
             ResearchQueue queue = team.getResearchProgress().researchQueue();
             if (queue.isEmpty()) context.disconnect(ResearchdTranslations.component(ResearchdTranslations.Errors.RESEARCH_QUEUE_DESYNC));
-            ResearchInstance first = queue.getEntries().getFirst();
-            if (first.getResearch().getResearchKey() != this.key()) context.disconnect(ResearchdTranslations.component(ResearchdTranslations.Errors.RESEARCH_QUEUE_DESYNC));
+            ResourceKey<Research> first = queue.getEntries().getFirst();
+            if (first != this.key()) context.disconnect(ResearchdTranslations.component(ResearchdTranslations.Errors.RESEARCH_QUEUE_DESYNC));
 
-            team.getResearchProgress().completeResearchAndUpdate(first, timeStamp);
+            team.getResearchProgress().completeResearchAndUpdate(first, timeStamp, player.level());
             queue.remove(0);
 
             if (player instanceof ServerPlayer serverPlayer) {
@@ -61,7 +60,7 @@ public record ResearchFinishedPayload(ResourceKey<Research> key, int timeStamp) 
             player.sendSystemMessage(
                     ResearchdTranslations.Research.QUEUE_FINISHED.component(
                             Researchd.MODID,
-                            ChatFormatting.GREEN + Utils.registryTranslation(first.getKey()).getString() + ChatFormatting.RESET,
+                            ChatFormatting.GREEN + Utils.registryTranslation(first).getString() + ChatFormatting.RESET,
                             ChatFormatting.GREEN + team.getResearchCompletionTime(timeStamp()) + ChatFormatting.RESET
             ));
 

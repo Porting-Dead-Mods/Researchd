@@ -50,6 +50,8 @@ public final class ResearchdTranslations {
 
         public static final TranslatableConstant RECIPE_UNLOCK_EFFECT_TOOLTIP_NO_ARG = create("effects.tooltip.recipe_unlock_no_arg", "Unlocks Recipe: ");
         public static final TranslatableConstant RECIPE_UNLOCK_EFFECT_TOOLTIP = create("effects.tooltip.recipe_unlock", "Unlocks Recipe: %s");
+        public static final TranslatableConstant START_RESEARCH_BUTTON = create("screen.button.start_research", "Start");
+        public static final TranslatableConstant ENQUEUE_RESEARCH_BUTTON = create("screen.button.enqueue_research", "Enqueue");
 
         private static TranslatableConstant create(String key, String defaultValue) {
             TranslatableConstant constant = new TranslatableConstant(key, "research");

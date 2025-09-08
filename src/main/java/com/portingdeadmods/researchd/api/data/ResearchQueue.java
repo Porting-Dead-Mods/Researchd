@@ -3,35 +3,32 @@ package com.portingdeadmods.researchd.api.data;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.ResearchdCommonConfig;
+import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.resources.ResourceKey;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.IntSupplier;
 
-public final class ResearchQueue implements Iterable<ResearchInstance> {
+public record ResearchQueue(List<ResourceKey<Research>> entries) {
     public static final ResearchQueue EMPTY = new ResearchQueue(new ArrayList<>());
     public static final Codec<ResearchQueue> CODEC = RecordCodecBuilder.create(inst -> inst.group(
-            ResearchInstance.CODEC.listOf().fieldOf("entries").forGetter(ResearchQueue::getEntries)
+            Research.RESOURCE_KEY_CODEC.listOf().fieldOf("entries").forGetter(ResearchQueue::getEntries)
     ).apply(inst, ResearchQueue::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, ResearchQueue> STREAM_CODEC = StreamCodec.composite(
-            ResearchInstance.STREAM_CODEC.apply(ByteBufCodecs.list()),
+            Research.RESOURCE_KEY_STREAM_CODEC.apply(ByteBufCodecs.list()),
             ResearchQueue::getEntries,
             ResearchQueue::new
     );
     public static final IntSupplier QUEUE_LENGTH = () -> ResearchdCommonConfig.researchQueueLength;
 
-    private final List<ResearchInstance> entries;
-
-    public ResearchQueue(List<ResearchInstance> entries) {
+    public ResearchQueue(List<ResourceKey<Research>> entries) {
         this.entries = new ArrayList<>(entries);
     }
 
@@ -45,10 +42,10 @@ public final class ResearchQueue implements Iterable<ResearchInstance> {
      */
     public boolean increasePriority(int index) {
         if (index > 0) {
-            ResearchInstance instance = this.entries.get(index);
-            ResearchInstance next = this.entries.get(index - 1);
+            ResourceKey<Research> research = this.entries.get(index);
+            ResourceKey<Research> next = this.entries.get(index - 1);
             this.entries.set(index, next);
-            this.entries.set(index - 1, instance);
+            this.entries.set(index - 1, research);
             return true;
         }
         return false;
@@ -61,23 +58,23 @@ public final class ResearchQueue implements Iterable<ResearchInstance> {
     public boolean add(ResearchInstance researchInstance) {
         if (researchInstance.getResearchStatus() == ResearchStatus.RESEARCHED) return false;
 
-        for (ResearchInstance instance : this.entries) {
-            if (instance.getResearch().equals(researchInstance.getResearch())) return false;
+        for (ResourceKey<Research> instance : this.entries) {
+            if (instance.equals(researchInstance.getKey())) return false;
         }
 
         if (this.entries.size() < QUEUE_LENGTH.getAsInt()) {
-            this.entries.add(researchInstance);
+            this.entries.add(researchInstance.getKey());
             return true;
         }
         return false;
     }
 
     /**
-     * @param instance the element to be removed
+     * @param researchKey the element to be removed
      * @return whether it was possible to remove the element
      */
-    public boolean remove(ResearchInstance instance) {
-        return remove(this.entries.indexOf(instance));
+    public boolean remove(ResourceKey<Research> researchKey) {
+        return this.remove(this.entries.indexOf(researchKey));
     }
 
     /**
@@ -101,36 +98,12 @@ public final class ResearchQueue implements Iterable<ResearchInstance> {
         return this.entries.isEmpty();
     }
 
-    @Override
-    public @NotNull Iterator<ResearchInstance> iterator() {
-        return entries.iterator();
-    }
-
-    public @Nullable ResearchInstance current() {
+    public @Nullable ResourceKey<Research> current() {
         return (getEntries().isEmpty() ? null : getEntries().getFirst());
     }
 
-    public List<ResearchInstance> getEntries() {
+    public List<ResourceKey<Research>> getEntries() {
         return entries;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
-        var that = (ResearchQueue) obj;
-        return Objects.equals(this.entries, that.entries);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(entries);
-    }
-
-    @Override
-    public String toString() {
-        return "ResearchQueue[" +
-                "entries=" + entries + ']';
     }
 
 }

@@ -62,7 +62,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
         float percentage = (float) this.scrollOffset / (this.getInfoHeight() - 47f);
         guiGraphics.blitSprite(SMALL_SCROLLER_SPRITE, getX() + getWidth() - 9, (int) (getY() + PADDING_Y + (41 * percentage)), SCROLLER_WIDTH, SCROLLER_HEIGHT);
 
-        int offsetY = (int) -(this.scrollOffset);
+        int offsetY = -(this.scrollOffset);
 
         if (this.selectedInstance != null) {
             Font font = Minecraft.getInstance().font;
@@ -92,7 +92,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
             }
             guiGraphics.disableScissor();
 
-            renderTooltip(guiGraphics, mouseX, mouseY, v);
+            this.renderTooltip(guiGraphics, mouseX, mouseY, v);
 
         }
     }
@@ -155,7 +155,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
             int scrollableHeight = getInfoHeight() - VISIBLE_CONENT_HEIGHT;
             this.scrollOffset = (int) (scrollableHeight * percentage);
             this.updateChildWidgetPositions();
-            return super.mouseClicked(mouseX, mouseY, button);
+            return true;
         }
 
         return false;
@@ -169,6 +169,9 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
     public void setSelectedResearch(ResearchInstance instance) {
         if (this.selectedInstance != instance) {
             this.selectedInstance = instance;
+
+            this.researchScreen.getTechListWidget().startResearchButton.active = this.selectedInstance.isResearchable() && !this.researchScreen.getResearchQueueWidget().getQueue().entries().contains(this.selectedInstance.getKey());
+            //if (this.researchScreen.)
 
             // only call after first setting selected research
 

@@ -3,7 +3,6 @@ package com.portingdeadmods.researchd.api.research;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.portingdeadlibs.utils.Utils;
-import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
@@ -23,14 +22,14 @@ import java.util.UUID;
 public final class ResearchInstance {
     public static final Codec<ResearchInstance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             GlobalResearch.CODEC.fieldOf("research").forGetter(ResearchInstance::getResearch),
-            CodecUtils.enumCodec(ResearchStatus.class).fieldOf("research_status").forGetter(ResearchInstance::getResearchStatus),
+            ResearchStatus.CODEC.fieldOf("research_status").forGetter(ResearchInstance::getResearchStatus),
             UUIDUtil.CODEC.optionalFieldOf("researched_player").forGetter(r -> Optional.ofNullable(r.getResearchedPlayer())),
             Codec.LONG.fieldOf("researched_time").forGetter(ResearchInstance::getResearchedTime)
     ).apply(instance, (r, s, p, t) -> new ResearchInstance(r, s, p.orElse(null), t)));
     public static final StreamCodec<RegistryFriendlyByteBuf, ResearchInstance> STREAM_CODEC = StreamCodec.composite(
             GlobalResearch.STREAM_CODEC,
             ResearchInstance::getResearch,
-            CodecUtils.enumStreamCodec(ResearchStatus.class),
+            ResearchStatus.STREAM_CODEC,
             ResearchInstance::getResearchStatus,
             ByteBufCodecs.optional(UUIDUtil.STREAM_CODEC),
             instance -> Optional.ofNullable(instance.getResearchedPlayer()),
@@ -55,6 +54,18 @@ public final class ResearchInstance {
         this(research, researchStatus, null, -1);
     }
 
+    public boolean isResearched() {
+        return this.researchStatus == ResearchStatus.RESEARCHED;
+    }
+
+    public boolean isResearchable() {
+        return this.researchStatus == ResearchStatus.RESEARCHABLE;
+    }
+
+    public boolean isLocked() {
+        return this.researchStatus == ResearchStatus.LOCKED;
+    }
+
     public ResearchInstance withResearch(GlobalResearch research) {
         return new ResearchInstance(research, researchStatus, researchedPlayer, researchedTime);
     }
@@ -62,7 +73,7 @@ public final class ResearchInstance {
     public Component getDisplayName() {
         return Utils.registryTranslation(this.getKey());
     }
-    
+
     public Component getDisplayName(HolderLookup.Provider access) {
         Research r = this.research.getResearch(access);
         if (r instanceof SimpleResearch simple) {
@@ -72,7 +83,7 @@ public final class ResearchInstance {
         }
         return Utils.registryTranslation(this.getKey());
     }
-    
+
     public Component getDescription(HolderLookup.Provider access) {
         Research r = this.research.getResearch(access);
         if (r instanceof SimpleResearch simple) {

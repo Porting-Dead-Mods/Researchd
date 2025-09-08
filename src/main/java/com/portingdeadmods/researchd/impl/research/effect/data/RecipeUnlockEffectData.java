@@ -20,13 +20,13 @@ public record RecipeUnlockEffectData(Set<RecipeHolder<?>> blockedRecipes) implem
 
     public RecipeUnlockEffectData add(RecipeUnlockEffect recipe, Level level) {
         Set<RecipeHolder<?>> recipes = new HashSet<>(this.blockedRecipes());
-        recipes.add(recipe.getRecipe(level));
+        recipes.addAll(recipe.getRecipes(level));
         return new RecipeUnlockEffectData(recipes);
     }
 
     public RecipeUnlockEffectData remove(RecipeUnlockEffect recipe, Level level) {
         Set<RecipeHolder<?>> recipes = new HashSet<>(this.blockedRecipes());
-        recipes.remove(recipe.getRecipe(level));
+        recipes.removeAll(recipe.getRecipes(level));
         return new RecipeUnlockEffectData(recipes);
     }
 
@@ -39,12 +39,13 @@ public record RecipeUnlockEffectData(Set<RecipeHolder<?>> blockedRecipes) implem
      *
      * @param level
      */
+    @Override
     public RecipeUnlockEffectData getDefault(Level level) {
         Collection<RecipeUnlockEffect> rps =  ResearchHelperCommon.getResearchEffects(RecipeUnlockEffect.class, level);
         Set<RecipeHolder<?>> blockedRecipes = new HashSet<>();
 
         for (RecipeUnlockEffect rp : rps) {
-            blockedRecipes.add(rp.getRecipe(level));
+            blockedRecipes.addAll(rp.getRecipes(level));
         }
 
         return new RecipeUnlockEffectData(blockedRecipes);

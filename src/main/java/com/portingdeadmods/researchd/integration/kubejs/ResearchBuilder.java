@@ -6,20 +6,25 @@ import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
-import com.portingdeadmods.researchd.impl.research.effect.*;
-import com.portingdeadmods.researchd.impl.research.effect.data.*;
-import com.portingdeadmods.researchd.impl.research.method.*;
-import net.minecraft.world.item.crafting.Ingredient;
+import com.portingdeadmods.researchd.impl.research.effect.AndResearchEffect;
+import com.portingdeadmods.researchd.impl.research.effect.DimensionUnlockEffect;
+import com.portingdeadmods.researchd.impl.research.effect.EmptyResearchEffect;
+import com.portingdeadmods.researchd.impl.research.effect.RecipeUnlockEffect;
+import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
+import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
+import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
+import com.portingdeadmods.researchd.impl.research.method.OrResearchMethod;
 import dev.latvian.mods.kubejs.registry.BuilderBase;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.crafting.Ingredient;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @ReturnsSelf
 public class ResearchBuilder extends BuilderBase<Research> {
@@ -85,17 +90,17 @@ public class ResearchBuilder extends BuilderBase<Research> {
         return this;
     }
 
-    public ResearchBuilder unlockRecipe(String recipeId) {
-        this.researchEffect = new RecipeUnlockEffect(ResourceLocation.parse(recipeId));
+    public ResearchBuilder unlockRecipe(String itemId, String recipeId) {
+        this.researchEffect = new RecipeUnlockEffect(BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(itemId)).map(ItemStack::new), Optional.empty(), Set.of(ResourceLocation.parse(recipeId)));
         return this;
     }
 
-    public ResearchBuilder unlockMultipleRecipes(String... recipeIds) {
-        List<ResearchEffect> effects = new ArrayList<>();
+    public ResearchBuilder unlockMultipleRecipes(String itemId, String... recipeIds) {
+        Set<ResourceLocation> recipes = new HashSet<>();
         for (String recipeId : recipeIds) {
-            effects.add(new RecipeUnlockEffect(ResourceLocation.parse(recipeId)));
+            recipes.add(ResourceLocation.parse(recipeId));
         }
-        this.researchEffect = new AndResearchEffect(effects);
+        this.researchEffect = new RecipeUnlockEffect(BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(itemId)).map(ItemStack::new), Optional.empty(), recipes);
         return this;
     }
 

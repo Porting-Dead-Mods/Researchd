@@ -6,28 +6,37 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class CycledItemRenderer {
     public static final int CYCLE_INTERVAL = 35;
     private List<ItemStack> items;
     private int index;
+    private int count;
 
-    public CycledItemRenderer() {
-        this(new ArrayList<>());
+    public CycledItemRenderer(int count) {
+        this(new ArrayList<>(), count);
     }
 
-    public CycledItemRenderer(Ingredient ingredient) {
-        this(Arrays.asList(ingredient.getItems()));
+    public CycledItemRenderer(Ingredient ingredient, int count) {
+        this(count);
+        this.setItems(ingredient);
     }
 
-    public CycledItemRenderer(List<ItemStack> items) {
+    public CycledItemRenderer(List<ItemStack> items, int count) {
         this.items = items;
+        this.count = count;
     }
 
     public void setItems(Ingredient ingredient) {
-        this.items = Arrays.asList(ingredient.getItems());
+        this.items.clear();
+        for (ItemStack item : ingredient.getItems()) {
+            this.items.add(item.copyWithCount(this.count));
+        }
+    }
+
+    public void setCount(int count) {
+        this.count = count;
     }
 
     public void setItems(List<ItemStack> items) {

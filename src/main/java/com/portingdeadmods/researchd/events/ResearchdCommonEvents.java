@@ -2,7 +2,6 @@ package com.portingdeadmods.researchd.events;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
-import com.portingdeadmods.researchd.integration.KubeJSIntegration;
 import com.portingdeadmods.researchd.api.data.ResearchQueue;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
@@ -12,7 +11,6 @@ import com.portingdeadmods.researchd.api.pdl.data.PDLClientSavedData;
 import com.portingdeadmods.researchd.api.pdl.data.PDLSavedData;
 import com.portingdeadmods.researchd.api.pdl.data.SavedDataHolder;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
@@ -22,6 +20,7 @@ import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
+import com.portingdeadmods.researchd.integration.KubeJSIntegration;
 import com.portingdeadmods.researchd.networking.SyncSavedDataPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchFinishedPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchMethodProgressSyncPayload;
@@ -125,7 +124,7 @@ public final class ResearchdCommonEvents {
 
                     if (found > 0) {
                         double progressPercent = team.getResearchProgressInQueue().getProgress() / (double) team.getResearchProgressInQueue().getMaxProgress();
-                        KubeJSIntegration.fireResearchProgressEvent(player, team.getResearchKeyInQueue(), progressPercent);
+                        KubeJSIntegration.fireResearchProgressEvent(player, team.getFirstQueueResearch(), progressPercent);
                     }
 
                     Researchd.debug("ConsumeItemResearchMethodLogic", "New progress on possible method: " + progress.getProgress() + "/" + progress.getMaxProgress(), " | IS COMPLETE: ", progress.isComplete() ? "YES" : "NO");
@@ -154,9 +153,10 @@ public final class ResearchdCommonEvents {
 
                 ResearchQueue queue = teamProgress.researchQueue();
                 if (queue.isEmpty()) continue;
-                ResearchInstance instance = queue.current();
+                ResourceKey<Research> research = queue.current();
 
-                Research currentResearch = team.getResearchInQueue(level.registryAccess());
+                ResourceKey<Research> currentResearchKey = team.getFirstQueueResearch();
+                Research currentResearch = ResearchHelperCommon.getResearch(currentResearchKey, level.registryAccess());
                 ResearchMethodProgress currentResearchProgress = team.getResearchProgressInQueue();
 
                 if (currentResearchProgress != null) {
@@ -165,23 +165,23 @@ public final class ResearchdCommonEvents {
                             ServerPlayer player = server.getPlayerList().getPlayer(memberUUID.player());
                             if (player == null) continue;
 
-                            PacketDistributor.sendToPlayer(player, new ResearchMethodProgressSyncPayload(team.getResearchKeyInQueue(), team.getAllRMPInQueue()));
+                            PacketDistributor.sendToPlayer(player, new ResearchMethodProgressSyncPayload(team.getFirstQueueResearch(), team.getAllQueueProgresses()));
                         }
 
                     // Research Complete Logic
                     if (currentResearchProgress.isComplete()) {
-                        teamProgress.completeResearchAndUpdate(instance, server.getTickCount() * 50L);
+                        teamProgress.completeResearchAndUpdate(research, server.getTickCount() * 50L, level);
 
                         for (TeamMember playerUUIDs : team.getMembers()) {
                             ServerPlayer player = server.getPlayerList().getPlayer(playerUUIDs.player());
                             if (player == null) continue;
 
-                            PacketDistributor.sendToPlayer(player, new ResearchFinishedPayload(instance.getKey(), server.getTickCount() * 50));
+                            PacketDistributor.sendToPlayer(player, new ResearchFinishedPayload(research, server.getTickCount() * 50));
 
-                            KubeJSIntegration.fireResearchCompletedEvent(player, instance.getKey());
+                            KubeJSIntegration.fireResearchCompletedEvent(player, research);
 
-                            Researchd.debug("Researching", "Applying research effects for Research: " + team.getResearchKeyInQueue() + " to player: " + player.getName().getString());
-                            currentResearch.researchEffect().onUnlock(level, player, team.getResearchKeyInQueue());
+                            Researchd.debug("Researching", "Applying research effects for Research: " + team.getFirstQueueResearch() + " to player: " + player.getName().getString());
+                            currentResearch.researchEffect().onUnlock(level, player, team.getFirstQueueResearch());
                         }
 
                         queue.getEntries().removeFirst();
@@ -252,6 +252,8 @@ public final class ResearchdCommonEvents {
         if (!event.getLevel().isClientSide()) {
             // Initialize the research cache
             CommonResearchCache.initialize(event.getLevel());
+
+            ResearchTeamHelper.resolveGlobalResearches(ResearchdSavedData.TEAM_RESEARCH.get().getData(event.getLevel()));
 
             // Add new researches to teams in case new ones were added
             // TODO: Remove old researches from teams in cases ones were removed

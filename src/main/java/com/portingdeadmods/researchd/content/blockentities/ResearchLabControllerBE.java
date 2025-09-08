@@ -7,7 +7,7 @@ import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.data.team.TeamResearchProgress;
-import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.content.items.ResearchPackItem;
 import com.portingdeadmods.researchd.content.menus.ResearchLabMenu;
@@ -122,7 +122,7 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
 		if (team == null) return;
 
 		TeamResearchProgress teamProgress = team.getMetadata().getResearchProgress();
-		ResearchInstance current = teamProgress.current();
+        ResourceKey<Research> current = teamProgress.currentResearch();
 		if (current == null) return;
 
 		List<ResearchMethodProgress> validMethods = teamProgress.getAllValidMethodProgress(ConsumePackResearchMethod.class);

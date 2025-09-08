@@ -1,14 +1,24 @@
 package com.portingdeadmods.researchd.api.research;
 
+import com.mojang.serialization.Codec;
+import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.StringRepresentable;
+import org.jetbrains.annotations.NotNull;
 
-public enum ResearchStatus {
-    RESEARCHED("entry_green", 3),
-    RESEARCHABLE("entry_yellow", 1),
-    LOCKED("entry_red", 2);
+public enum ResearchStatus implements StringRepresentable {
+    RESEARCHED("researched", "entry_green", 3),
+    RESEARCHABLE("researchable", "entry_yellow", 1),
+    LOCKED("locked", "entry_red", 2);
 
+    public static final Codec<ResearchStatus> CODEC = StringRepresentable.fromEnum(ResearchStatus::values);
+    public static final StreamCodec<? super RegistryFriendlyByteBuf, ResearchStatus> STREAM_CODEC = CodecUtils.enumStreamCodec(ResearchStatus.class);
+
+    private final String name;
     private final ResourceLocation spriteSmallTexture;
     private final ResourceLocation spriteTexture;
     private final ResourceLocation spriteTallTexture;
@@ -16,9 +26,10 @@ public enum ResearchStatus {
 
     /**
      * @param spriteTexture The texture name without the file extension.
-     * @param sortingValue A comparative value for sorting purposes. Higher values are drawn on top of lower values.
+     * @param sortingValue  A comparative value for sorting purposes. Higher values are drawn on top of lower values.
      */
-    ResearchStatus(String spriteTexture, int sortingValue) {
+    ResearchStatus(String name, String spriteTexture, int sortingValue) {
+        this.name = name;
         this.spriteSmallTexture = Researchd.rl("textures/gui/sprites/" + spriteTexture + "_small.png");
         this.spriteTexture = Researchd.rl("textures/gui/sprites/" + spriteTexture + ".png");
         this.spriteTallTexture = Researchd.rl("textures/gui/sprites/" + spriteTexture + "_tall.png");
@@ -39,5 +50,10 @@ public enum ResearchStatus {
 
     public int getSortingValue() {
         return this.sortingValue;
+    }
+
+    @Override
+    public @NotNull String getSerializedName() {
+        return this.name;
     }
 }

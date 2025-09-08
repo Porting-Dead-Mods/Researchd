@@ -8,6 +8,7 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
+import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
 import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.OrResearchMethod;
@@ -15,6 +16,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -77,8 +79,8 @@ public record TeamResearchProgress(
      * @return A list of all the valid (non Or/And) methods available for the current research. Null if no current research.
      */
     public @Nullable List<ResearchMethodProgress> getAllValidMethodProgress() {
-        if (current() == null) return null;
-        List<ResearchMethodProgress> progressList = progress().get(current().getKey());
+        if (currentResearch() == null) return null;
+        List<ResearchMethodProgress> progressList = this.progress().get(this.currentResearch());
 
         progressList = new ArrayList<>(progressList.parallelStream().filter(rmp -> {
             if (rmp.isComplete()) return false;
@@ -112,17 +114,20 @@ public record TeamResearchProgress(
         return progressList;
     }
 
-    public @Nullable ResearchInstance current() {
+    public @Nullable ResourceKey<Research> currentResearch() {
         return this.researchQueue.current();
     }
 
-    public void completeResearchAndUpdate(ResearchInstance research, long completionTime) {
-        this.researches.get(research.getKey()).setResearchStatus(ResearchStatus.RESEARCHED).setResearchedTime(completionTime);
+    public void completeResearchAndUpdate(ResourceKey<Research> research, long completionTime, Level level) {
+        this.researches.get(research).setResearchStatus(ResearchStatus.RESEARCHED).setResearchedTime(completionTime);
 
-        for (GlobalResearch child : research.getResearch().getChildren()) {
+        ResearchInstance instance = this.researches().get(research);
+
+        for (GlobalResearch child : instance.getChildren()) {
             if (child.getParents().stream().allMatch(parent -> this.hasCompleted(parent.getResearchKey()))) {
                 this.researches().get(child.getResearchKey()).setResearchStatus(ResearchStatus.RESEARCHABLE);
             }
         }
+        ResearchdSavedData.TEAM_RESEARCH.get().setData(level, ResearchdSavedData.TEAM_RESEARCH.get().getData(level));
     }
 }

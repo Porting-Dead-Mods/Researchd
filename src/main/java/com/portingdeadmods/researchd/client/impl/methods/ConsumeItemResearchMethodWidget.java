@@ -17,7 +17,7 @@ public class ConsumeItemResearchMethodWidget extends AbstractResearchInfoWidget<
 
     public ConsumeItemResearchMethodWidget(int x, int y, ConsumeItemResearchMethod method) {
         super(x, y, method);
-        this.itemRenderer = new CycledItemRenderer(method.toConsume());
+        this.itemRenderer = new CycledItemRenderer(method.toConsume(), method.count());
     }
 
     @Override

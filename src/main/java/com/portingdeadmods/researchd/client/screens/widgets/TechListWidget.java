@@ -3,18 +3,22 @@ package com.portingdeadmods.researchd.client.screens.widgets;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.data.TechList;
+import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.networking.research.ResearchQueueAddPayload;
+import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.PacketDistributor;
 
+import java.util.UUID;
 import java.util.function.Consumer;
 
 // TODO: Selected list entries are offset a bit so it looks like they are pressed (like keys on a keyboard)
@@ -64,8 +68,8 @@ public class TechListWidget extends ResearchScreenWidget {
                 Researchd.rl("search_button_highlighted")
         ), this::onSearchButtonClicked);
 
-        this.startResearchButton = Button.builder(Component.literal("Start"), this::onStartResearchButtonClicked)
-                .bounds(11, y + 4, 32, 14)
+        this.startResearchButton = Button.builder(ResearchdTranslations.component(ResearchdTranslations.Research.START_RESEARCH_BUTTON), this::onStartResearchButtonClicked)
+                .bounds(11, y + 4, Minecraft.getInstance().font.width(ResearchdTranslations.component(ResearchdTranslations.Research.ENQUEUE_RESEARCH_BUTTON)), 14)
                 .build();
 
         this.searchBox = new EditBox(Minecraft.getInstance().font, x + 73 + 2, y + 3 + 4, 78, 14, Component.empty()) {
@@ -106,6 +110,12 @@ public class TechListWidget extends ResearchScreenWidget {
         this.screen = screen;
     }
 
+    public void setResearchButtonMode(ResearchButtonMode mode) {
+        this.startResearchButton.setMessage(mode == ResearchButtonMode.START
+                ? ResearchdTranslations.component(ResearchdTranslations.Research.START_RESEARCH_BUTTON)
+                : ResearchdTranslations.component(ResearchdTranslations.Research.ENQUEUE_RESEARCH_BUTTON));
+    }
+
     private void refreshSearchResult() {
         this.displayTechList = this.techList.getListForSearch(this.searchBox.getValue());
         this.scrollOffset = 0;
@@ -137,18 +147,21 @@ public class TechListWidget extends ResearchScreenWidget {
 
     public void onStartResearchButtonClicked(Button button) {
         ResearchQueueWidget queue = this.screen.getResearchQueueWidget();
-        ResearchInstance instance = this.screen.getSelectedResearchWidget().getSelectedInstance();
-        
-        if (instance == null) {
-            // No research selected, cannot start research
-            return;
-        }
-        
-        instance.setResearchedPlayer(Minecraft.getInstance().player.getUUID());
-        instance.setResearchedTime(Minecraft.getInstance().level.getGameTime());
-        queue.getQueue().add(instance);
+        ResearchInstance selectedInstance = this.screen.getSelectedResearchWidget().getSelectedInstance();
+        if (selectedInstance != null) {
+            ResourceKey<Research> researchKey = selectedInstance.getKey();
 
-        PacketDistributor.sendToServer(new ResearchQueueAddPayload(instance));
+
+            UUID player = Minecraft.getInstance().player.getUUID();
+            long gameTime = Minecraft.getInstance().level.getGameTime();
+            selectedInstance.setResearchedPlayer(player);
+            selectedInstance.setResearchedTime(gameTime);
+            queue.getQueue().add(selectedInstance);
+
+            PacketDistributor.sendToServer(new ResearchQueueAddPayload(researchKey, player, gameTime));
+
+            this.startResearchButton.active = false;
+        }
     }
 
     @Override
@@ -269,4 +282,10 @@ public class TechListWidget extends ResearchScreenWidget {
         consumer.accept(this.startResearchButton);
         consumer.accept(this.searchBox);
     }
+
+    public enum ResearchButtonMode {
+        START,
+        ENQUEUE
+    }
+
 }

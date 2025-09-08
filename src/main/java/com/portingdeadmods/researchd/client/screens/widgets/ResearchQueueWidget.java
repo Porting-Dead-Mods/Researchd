@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.data.ResearchQueue;
+import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
@@ -18,6 +19,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -51,16 +53,17 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
 
         guiGraphics.drawString(Minecraft.getInstance().font, "Research Queue", paddingX - 1, 4, -1);
 
-        List<ResearchInstance> entries = this.queue.getEntries();
+        List<ResourceKey<Research>> entries = this.queue.getEntries();
         for (int i = 0; i < entries.size(); i++) {
-            ResearchInstance instance = entries.get(i);
-            if (instance != selected) {
+            ResourceKey<Research> key = entries.get(i);
+            if (this.selected == null || key != this.selected.getKey()) {
+                ResearchInstance instance = ClientResearchTeamHelper.getTeam().getResearchProgress().researches().get(key);
                 renderQueuePanel(guiGraphics, instance, paddingX + i * PANEL_WIDTH, paddingY, mouseX, mouseY, i);
             }
         }
 
-        if (selected != null) {
-            renderQueuePanel(guiGraphics, selected, (int) selectedX, (int) selectedY, mouseX, mouseY, this.queue.getEntries().indexOf(selected));
+        if (this.selected != null) {
+            renderQueuePanel(guiGraphics, this.selected, (int) selectedX, (int) selectedY, mouseX, mouseY, this.queue.getEntries().indexOf(this.selected.getKey()));
         }
     }
 
@@ -76,13 +79,15 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
 
         int index = (int) (mouseX - paddingX) / PANEL_WIDTH;
         if (mouseX > paddingX && mouseY > paddingY && index < this.queue.getEntries().size()) {
-            ResearchInstance instance = this.queue.getEntries().get(index);
+            ResourceKey<Research> researchKey = this.queue.getEntries().get(index);
             if (this.isHovering(null, (int) mouseX, (int) mouseY, index, paddingY + 17, getWidth(), getHeight() - 17)) {
-                this.screen.getResearchQueueWidget().removeResearch(index);
+                this.removeResearch(index);
+                this.screen.getTechListWidget().startResearchButton.active = true;
                 return super.mouseClicked(mouseX, mouseY, button);
             } else if (isHovering(null, (int) mouseX, (int) mouseY, index, paddingY, getWidth(), getHeight())) {
+                ResearchInstance instance = ClientResearchTeamHelper.getTeam().getResearchProgress().researches().get(researchKey);
                 this.screen.getSelectedResearchWidget().setSelectedResearch(instance);
-                this.screen.getResearchGraphWidget().setGraph(ResearchGraphCache.computeIfAbsent(instance.getKey()));
+                this.screen.getResearchGraphWidget().setGraph(ResearchGraphCache.computeIfAbsent(researchKey));
                 return super.mouseClicked(mouseX, mouseY, button);
             }
         }
@@ -92,9 +97,9 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
 
     public void removeResearch(int index) {
         if (this.queue.getEntries().size() > index) {
-            ResearchInstance instance = this.queue.getEntries().get(index);
+            ResourceKey<Research> researchKey = this.queue.getEntries().get(index);
             this.queue.remove(index);
-            PacketDistributor.sendToServer(new ResearchQueueRemovePayload(instance));
+            PacketDistributor.sendToServer(new ResearchQueueRemovePayload(researchKey));
         }
     }
 

@@ -4,8 +4,8 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.pdl.data.PDLSavedData;
 import com.portingdeadmods.researchd.api.pdl.data.SavedDataHolder;
-import com.portingdeadmods.researchd.networking.research.ResearchMethodProgressSyncPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchFinishedPayload;
+import com.portingdeadmods.researchd.networking.research.ResearchMethodProgressSyncPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchQueueAddPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchQueueRemovePayload;
 import com.portingdeadmods.researchd.networking.team.*;
@@ -14,7 +14,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
-@EventBusSubscriber(modid = Researchd.MODID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = Researchd.MODID)
 public class NetworkEvents {
     @SubscribeEvent
     public static void registerPayloads(final RegisterPayloadHandlersEvent event) {
@@ -66,7 +66,7 @@ public class NetworkEvents {
         registrar.playToServer(
                 ResearchQueueAddPayload.TYPE,
                 ResearchQueueAddPayload.STREAM_CODEC,
-                ResearchQueueAddPayload::researchQueueAddAction
+                ResearchQueueAddPayload::handle
         );
         registrar.playToServer(
                 ResearchQueueRemovePayload.TYPE,

@@ -51,12 +51,7 @@ public final class ResearchdResearches {
                      * minecraft:attribute_modifiers -> ItemAttributeModifiers[modifiers=[], showInTooltip=true]
                      * minecraft:rarity -> COMMON
                      */
-                    new AndResearchEffect(
-                            List.of(
-                                    new RecipeUnlockEffect(ResourceLocation.parse("minecraft:stick_from_bamboo_item")),
-                                    new RecipeUnlockEffect(ResourceLocation.parse("minecraft:stick"))
-                            )
-                    )
+                    new RecipeUnlockEffect(ResourceLocation.parse("minecraft:stick_from_bamboo_item"), ResourceLocation.parse("minecraft:stick"))
             ));
     public static final ResourceKey<Research> STONE = register("stone", builder -> builder
             .icon(Items.STONE)

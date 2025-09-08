@@ -15,7 +15,6 @@ import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamRole;
 import com.portingdeadmods.researchd.utils.TimeUtils;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.UUIDUtil;
@@ -137,6 +136,10 @@ public class ResearchTeam {
         return this.metadata;
     }
 
+    public Map<ResourceKey<Research>, ResearchInstance> getResearches() {
+        return this.metadata.researchProgress.researches();
+    }
+
     /**
      * Fetches the team's total research progress
      *
@@ -146,32 +149,11 @@ public class ResearchTeam {
         return this.metadata.researchProgress;
     }
 
-    /**
-     * Fetches the research that is currently being researched in the queue.
-     *
-     * @param provider Registry access
-     * @return {@link Research} of the research or null if no research is currently in progress.
-     */
-    @Nullable
-    public Research getResearchInQueue(HolderLookup.Provider provider) {
-        ResearchQueue queue = this.metadata.researchProgress.researchQueue();
-        if (queue.getEntries() == null) return null;
-        if (queue.getEntries().isEmpty()) return null;
-
-        return ResearchHelperCommon.getResearch(queue.getEntries().getFirst().getResearch().getResearchKey(), provider);
-    }
-
-
-    /**
-     * Fetches the research key that is currently being researched in the queue.
-     *
-     * @return {@link ResourceKey<Research>} of the research or null if no research is currently in progress.
-     */
-    public ResourceKey<Research> getResearchKeyInQueue() {
+    public @Nullable ResourceKey<Research> getFirstQueueResearch() {
         ResearchQueue queue = this.metadata.researchProgress.researchQueue();
         if (queue.getEntries() == null || queue.getEntries().isEmpty()) return null;
 
-        return queue.getEntries().getFirst().getKey();
+        return queue.getEntries().getFirst();
     }
 
     /**
@@ -185,15 +167,15 @@ public class ResearchTeam {
         if (queue.getEntries() == null) return null;
         if (queue.getEntries().isEmpty()) return null;
 
-        return this.metadata.researchProgress.getRootProgress(queue.getEntries().getFirst().getKey());
+        return this.metadata.researchProgress.getRootProgress(queue.getEntries().getFirst());
     }
 
-    public List<ResearchMethodProgress> getAllRMPInQueue() {
+    public List<ResearchMethodProgress> getAllQueueProgresses() {
         ResearchQueue queue = this.metadata.researchProgress.researchQueue();
         if (queue.getEntries() == null) return null;
         if (queue.getEntries().isEmpty()) return null;
 
-        return this.metadata.researchProgress.progress().get(queue.getEntries().getFirst().getKey());
+        return this.metadata.researchProgress.progress().get(queue.getEntries().getFirst());
     }
 
     public void addMember(UUID uuid) {

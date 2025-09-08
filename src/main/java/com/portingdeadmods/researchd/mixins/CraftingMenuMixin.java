@@ -1,10 +1,13 @@
 package com.portingdeadmods.researchd.mixins;
 
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
+import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.*;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.inventory.CraftingMenu;
+import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
@@ -46,7 +49,7 @@ public abstract class CraftingMenuMixin {
                 }
             }
         } else {
-            Researchd.debug("Crafting Mixin","Invalid recipe.");
+            Researchd.debug("Crafting Mixin","Invalid recipes.");
         }
 
         return itemstack;
