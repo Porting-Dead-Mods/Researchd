@@ -19,6 +19,7 @@ import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMet
 import com.portingdeadmods.researchd.registries.ResearchdBlockEntityTypes;
 import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
 import com.portingdeadmods.researchd.registries.ResearchdValueEffects;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -31,6 +32,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -44,42 +46,41 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ResearchLabControllerBE extends ContainerBlockEntity implements MenuProvider {
-	public LazyFinal<List<BlockPos>> partPos = LazyFinal.create();
-	public Map<ResourceKey<SimpleResearchPack>, Float> researchPackUsage = Researchd.RESEARCH_PACK_REGISTRY.getOrThrow().listElementIds()
-			.collect(Collectors.toConcurrentMap(key -> key, k -> 0f)); // Usage is between 0 and 1. It decreases with 1/DURATION per tick.
-	public int currentResearchDuration = -1; // Just initialized to -1
+	public LazyFinal<List<BlockPos>> partPos;
+	public Map<ResourceKey<SimpleResearchPack>, Float> researchPackUsage; // Usage is between 0 and 1. It decreases with 1/DURATION per tick.
+	public int currentResearchDuration; // Just initialized to -1
+    public List<ResourceKey<SimpleResearchPack>> researchPacks;
 
 	public ResearchLabControllerBE(BlockPos pos, BlockState blockState) {
 		super(ResearchdBlockEntityTypes.RESEARCH_LAB_CONTROLLER.get(), pos, blockState);
-		addItemHandler(Researchd.RESEARCH_PACK_COUNT.getOrThrow(), (idx, stack) -> {
-			Researchd.debug("Research Lab Item Handler", "Checking stack at idx: ", idx, " stack: ", stack);
-
-			if (!(stack.getItem() instanceof ResearchPackItem pack)) {
-				Researchd.debug("Research Lab Item Handler", "Not a ResearchPackItem at idx: ", idx);
-				return false;
-			}
-			if (!stack.has(ResearchdDataComponents.RESEARCH_PACK)) {
-				Researchd.debug("Research Lab Item Handler", "Stack doesn't have a Research Pack Data Component at idx: ", idx);
-				return false;
-			}
-
-			ResearchPackComponent component = stack.get(ResearchdDataComponents.RESEARCH_PACK);
-			Optional<ResourceKey<SimpleResearchPack>> optKey = component.researchPackKey();
-			if (optKey.isEmpty()) {
-				Researchd.debug("Research Lab Item Handler", "Component present, but no researchPackKey was found at idx: ", idx);
-				return false;
-			}
-			ResourceKey<SimpleResearchPack> key = optKey.get();
-
-			SimpleResearchPack expectedPack = Researchd.RESEARCH_PACKS.get(idx);
-			SimpleResearchPack actualPack = Researchd.RESEARCH_PACK_REGISTRY.get().getOrThrow(key).value();
-			boolean matches = expectedPack.equals(actualPack);
-			Researchd.debug("Research Lab Item Handler", "Expected: ", expectedPack, " Actual: ", actualPack, " Match: ", matches, " at idx: ", idx);
-			return matches;
-		});
+        this.partPos = LazyFinal.create();
+        this.researchPackUsage = Researchd.RESEARCH_PACK_REGISTRY.getOrThrow().listElementIds()
+                .collect(Collectors.toConcurrentMap(key -> key, k -> 0f));
+        this.currentResearchDuration = -1;
+		addItemHandler(Researchd.RESEARCH_PACK_COUNT.getOrThrow(), this::isItemValid);
 	}
 
-	// Param passed is not mutated.
+    @Override
+    public void setLevel(Level level) {
+        super.setLevel(level);
+
+        this.researchPacks = ResearchHelperCommon.getResearchPacks(level.registryAccess());
+    }
+
+    private boolean isItemValid(int slot, ItemStack stack) {
+        if (stack.has(ResearchdDataComponents.RESEARCH_PACK.get())) {
+            if (this.researchPacks.size() > slot) {
+                ResourceKey<SimpleResearchPack> packKey = this.researchPacks.get(slot);
+                Optional<ResourceKey<SimpleResearchPack>> itemPackKey = stack.get(ResearchdDataComponents.RESEARCH_PACK.get()).researchPackKey();
+                if (itemPackKey.isPresent()) {
+                    return packKey.compareTo(itemPackKey.get()) == 0;
+                }
+            }
+        }
+        return false;
+    }
+
+    // Param passed is not mutated.
 	private boolean containsNecessaryPacks(List<ResourceKey<SimpleResearchPack>> _packs) {
 		List<ResourceKey<SimpleResearchPack>> packs = new ArrayList<>(_packs);
 

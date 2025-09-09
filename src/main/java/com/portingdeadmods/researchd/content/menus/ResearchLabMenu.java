@@ -5,8 +5,6 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.content.blockentities.ResearchLabControllerBE;
 import com.portingdeadmods.researchd.registries.ResearchdMenuTypes;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Inventory;
@@ -16,12 +14,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-;
-
 public class ResearchLabMenu extends PDLAbstractContainerMenu<ResearchLabControllerBE> {
     private final List<ItemStack> researchPackItems;
+    private final List<ResourceKey<SimpleResearchPack>> researchPacks;
 
-	public ResearchLabMenu(int containerId, Inventory inv, FriendlyByteBuf extraData) {
+    public ResearchLabMenu(int containerId, Inventory inv, FriendlyByteBuf extraData) {
 		this(containerId, inv, (ResearchLabControllerBE) inv.player.level().getBlockEntity(extraData.readBlockPos()));
 	}
 
@@ -29,7 +26,7 @@ public class ResearchLabMenu extends PDLAbstractContainerMenu<ResearchLabControl
 		super(ResearchdMenuTypes.RESEARCH_LAB_MENU.get(), containerId, inv, blockEntity);
 		Researchd.debug("Research Lab Menu", "Creating Research Lab Menu with ", Researchd.RESEARCH_PACK_COUNT, " slots.");
 
-        List<ResourceKey<SimpleResearchPack>> researchPacks = ResearchHelperCommon.getResearchPacks(Minecraft.getInstance().level.registryAccess());
+        this.researchPacks = this.getBlockEntity().researchPacks;
         this.researchPackItems = researchPacks.stream().map(SimpleResearchPack::asStack).toList();
 
 		int slotsX = 8;
@@ -41,6 +38,10 @@ public class ResearchLabMenu extends PDLAbstractContainerMenu<ResearchLabControl
 		addPlayerInventory(inv, 116);
 		addPlayerHotbar(inv, 174);
 	}
+
+    public List<ResourceKey<SimpleResearchPack>> getResearchPacks() {
+        return researchPacks;
+    }
 
     public List<ItemStack> getResearchPackItems() {
         return this.researchPackItems;

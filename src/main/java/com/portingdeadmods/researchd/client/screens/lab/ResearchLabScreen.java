@@ -9,10 +9,12 @@ import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.content.menus.ResearchLabMenu;
+import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.player.Inventory;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,6 +23,7 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
     public static final ResourceLocation RESEARCH_PACK_TEXTURE = Researchd.rl("textures/item/research_pack_empty.png");
     public static final ResourceLocation SLOT_SPRITE = Researchd.rl("slot_with_progress");
     public static final ResourceLocation SCROLLER_HORIZONTAL = Researchd.rl("scroller_small_horizontal");
+    public static final int PROGRESS_COLOR = FastColor.ARGB32.color(0, 225, 100);
 
     public ResearchLabScreen(ResearchLabMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -81,6 +84,8 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
         {
             for (int i = 0; i < this.menu.getResearchPackItems().size(); i++) {
                 guiGraphics.blitSprite(SLOT_SPRITE, startX + i * 18, startY, 18, 20);
+                int progress = (int) (this.menu.blockEntity.researchPackUsage.get(this.menu.getResearchPacks().get(i)) * 17);
+                guiGraphics.fill(startX + 1 + i * 18, startY + 18, startX + 1 + i * 18 + progress, startY + 18 + 1, PROGRESS_COLOR);
                 RenderSystem.enableBlend();
                 RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 60f / 255f);
                 {
@@ -99,6 +104,13 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
         if (instance != null) {
             ResearchScreenWidget.renderResearchPanel(guiGraphics, instance, this.leftPos + 123, this.topPos + 51, mouseX, mouseY, 2, false, false);
         }
+
+        int x = this.leftPos + 12;
+        int y = this.topPos + 72;
+        ResearchMethodProgress rmp = ClientResearchTeamHelper.getTeam().getResearchProgress().getRootProgress(team.getFirstQueueResearch());
+        float progress = rmp == null ? 0f : rmp.getProgressPercent();
+        int width = (int) (progress * 93);
+        guiGraphics.fill(x, y, x + width, y + 6, PROGRESS_COLOR);
 
         guiGraphics.drawString(Minecraft.getInstance().font, "0%", this.leftPos + 108,  this.topPos + 71, 0xF8F8F8);
 
