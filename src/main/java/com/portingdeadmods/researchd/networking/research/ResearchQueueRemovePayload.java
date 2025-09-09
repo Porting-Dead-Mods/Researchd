@@ -33,7 +33,7 @@ public record ResearchQueueRemovePayload(ResourceKey<Research> researchKey) impl
                 Level level = serverPlayer.level();
                 ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
                 TeamResearchProgress researchProgress = data.getTeamByPlayer(serverPlayer).getResearchProgress();
-                researchProgress.researchQueue().remove(researchKey);
+                researchProgress.researchQueue().remove(researchKey, true);
 
                 ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
                 researchProgress.refreshResearchStatus(level);
