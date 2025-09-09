@@ -78,19 +78,20 @@ public record ResearchQueue(List<ResourceKey<Research>> entries) {
      * @param researchKey the element to be removed
      * @return whether it was possible to remove the element
      */
-    public boolean remove(ResourceKey<Research> researchKey) {
-        return this.remove(this.entries.indexOf(researchKey));
+    public boolean remove(ResourceKey<Research> researchKey, boolean removeChildren) {
+        return this.remove(this.entries.indexOf(researchKey), removeChildren);
     }
 
     /**
      * @param index of the element to be removed
      * @return whether it was possible to remove the element
      */
-    public boolean remove(int index) {
+    public boolean remove(int index, boolean removeChildren) {
         if (this.entries.size() > index && index >= 0) {
-            for (ResourceKey<Research> child : CommonResearchCache.allChildrenOf(this.entries.get(index)).stream().map(GlobalResearch::getResearchKey).toList()) {
-                this.remove(this.entries.indexOf(child));
-            }
+            if (removeChildren)
+                for (ResourceKey<Research> child : CommonResearchCache.allChildrenOf(this.entries.get(index)).stream().map(GlobalResearch::getResearchKey).toList()) {
+                    this.remove(this.entries.indexOf(child), true);
+                }
 
             for (int i = index; i < this.entries.size(); i++) {
                 if (i + 1 < this.entries.size()) {

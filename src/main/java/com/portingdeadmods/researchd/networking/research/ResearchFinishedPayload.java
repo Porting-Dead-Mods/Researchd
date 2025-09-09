@@ -51,7 +51,7 @@ public record ResearchFinishedPayload(ResourceKey<Research> key, int timeStamp) 
             if (first != this.key()) context.disconnect(ResearchdTranslations.component(ResearchdTranslations.Errors.RESEARCH_QUEUE_DESYNC));
 
             team.getResearchProgress().completeResearch(first, timeStamp, player.level());
-            queue.remove(0);
+            queue.remove(0, false);
 
             if (player instanceof ServerPlayer serverPlayer) {
                 KubeJSIntegration.fireResearchCompletedEvent(serverPlayer, this.key());
