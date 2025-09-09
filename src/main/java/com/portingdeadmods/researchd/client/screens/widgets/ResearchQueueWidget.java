@@ -100,6 +100,8 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
             ResourceKey<Research> researchKey = this.queue.getEntries().get(index);
             this.queue.remove(index);
             PacketDistributor.sendToServer(new ResearchQueueRemovePayload(researchKey));
+            ClientResearchTeamHelper.getTeam().getResearchProgress().refreshResearchStatus(Minecraft.getInstance().level);
+            this.screen.getTechList().updateTechList();
         }
     }
 

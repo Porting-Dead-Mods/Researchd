@@ -11,9 +11,10 @@ import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.NotNull;
 
 public enum ResearchStatus implements StringRepresentable {
-    RESEARCHED("researched", "entry_green", 3),
+    RESEARCHED("researched", "entry_green", 4),
     RESEARCHABLE("researchable", "entry_yellow", 1),
-    LOCKED("locked", "entry_red", 2);
+    RESEARCHABLE_AFTER_QUEUE("researchable_after_queue", "entry_orange", 2),
+    LOCKED("locked", "entry_red", 3);
 
     public static final Codec<ResearchStatus> CODEC = StringRepresentable.fromEnum(ResearchStatus::values);
     public static final StreamCodec<? super RegistryFriendlyByteBuf, ResearchStatus> STREAM_CODEC = CodecUtils.enumStreamCodec(ResearchStatus.class);

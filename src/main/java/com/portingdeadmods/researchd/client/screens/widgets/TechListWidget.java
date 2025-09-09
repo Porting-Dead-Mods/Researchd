@@ -8,6 +8,7 @@ import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
+import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.networking.research.ResearchQueueAddPayload;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.client.Minecraft;
@@ -152,16 +153,19 @@ public class TechListWidget extends ResearchScreenWidget {
         ResearchQueueWidget queue = this.screen.getResearchQueueWidget();
         ResearchInstance selectedInstance = this.screen.getSelectedResearchWidget().getSelectedInstance();
         if (selectedInstance != null) {
-            ResourceKey<Research> researchKey = selectedInstance.getKey();
+            if (queue.getQueue().add(selectedInstance)) {
+                UUID player = Minecraft.getInstance().player.getUUID();
+                long gameTime = Minecraft.getInstance().level.getGameTime();
 
 
-            UUID player = Minecraft.getInstance().player.getUUID();
-            long gameTime = Minecraft.getInstance().level.getGameTime();
-            selectedInstance.setResearchedPlayer(player);
-            selectedInstance.setResearchedTime(gameTime);
-            queue.getQueue().add(selectedInstance);
+                selectedInstance.setResearchedPlayer(player);
+                selectedInstance.setResearchedTime(gameTime);
 
-            PacketDistributor.sendToServer(new ResearchQueueAddPayload(researchKey, player, gameTime));
+                ResourceKey<Research> researchKey = selectedInstance.getKey();
+                PacketDistributor.sendToServer(new ResearchQueueAddPayload(researchKey, player, gameTime));
+                ClientResearchTeamHelper.getTeam().getResearchProgress().refreshResearchStatus(Minecraft.getInstance().level);
+                this.screen.getTechList().updateTechList();
+            }
 
             this.startResearchButton.active = false;
         }

@@ -59,7 +59,7 @@ public final class ResearchInstance {
     }
 
     public boolean isResearchable() {
-        return this.researchStatus == ResearchStatus.RESEARCHABLE;
+        return this.researchStatus == ResearchStatus.RESEARCHABLE || this.researchStatus == ResearchStatus.RESEARCHABLE_AFTER_QUEUE;
     }
 
     public boolean isLocked() {

@@ -3,7 +3,6 @@ package com.portingdeadmods.researchd.api.data.team;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.api.data.ResearchQueue;
-import com.portingdeadmods.researchd.api.research.GlobalResearch;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
@@ -118,16 +117,33 @@ public record TeamResearchProgress(
         return this.researchQueue.current();
     }
 
-    public void completeResearchAndUpdate(ResourceKey<Research> research, long completionTime, Level level) {
+    public void refreshResearchStatus(Level level) {
+        for (ResearchInstance instance : this.researches().values()) {
+            if (instance.getResearchStatus() == ResearchStatus.RESEARCHED) continue;
+
+            if (instance.getParents().stream().allMatch(parent -> this.hasCompleted(parent.getResearchKey()))) {
+                instance.setResearchStatus(ResearchStatus.RESEARCHABLE);
+                continue;
+                }
+
+            if (instance.getParents().stream().allMatch(parent -> {
+                if (this.hasCompleted(parent.getResearchKey())) return true;
+                if (this.researchQueue.getEntries().contains(parent.getResearchKey())) return true;
+                return false;
+            })) {
+                instance.setResearchStatus(ResearchStatus.RESEARCHABLE_AFTER_QUEUE);
+                continue;
+            }
+
+            instance.setResearchStatus(ResearchStatus.LOCKED);
+        }
+
+        ResearchdSavedData.TEAM_RESEARCH.get().setData(level, ResearchdSavedData.TEAM_RESEARCH.get().getData(level));
+    }
+
+    public void completeResearch(ResourceKey<Research> research, long completionTime, Level level) {
         this.researches.get(research).setResearchStatus(ResearchStatus.RESEARCHED).setResearchedTime(completionTime);
 
-        ResearchInstance instance = this.researches().get(research);
-
-        for (GlobalResearch child : instance.getChildren()) {
-            if (child.getParents().stream().allMatch(parent -> this.hasCompleted(parent.getResearchKey()))) {
-                this.researches().get(child.getResearchKey()).setResearchStatus(ResearchStatus.RESEARCHABLE);
-            }
-        }
-        ResearchdSavedData.TEAM_RESEARCH.get().setData(level, ResearchdSavedData.TEAM_RESEARCH.get().getData(level));
+        refreshResearchStatus(level);
     }
 }

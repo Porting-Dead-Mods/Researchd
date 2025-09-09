@@ -170,7 +170,7 @@ public final class ResearchdCommonEvents {
 
                     // Research Complete Logic
                     if (currentResearchProgress.isComplete()) {
-                        teamProgress.completeResearchAndUpdate(research, server.getTickCount() * 50L, level);
+                        teamProgress.completeResearch(research, server.getTickCount() * 50L, level);
 
                         for (TeamMember playerUUIDs : team.getMembers()) {
                             ServerPlayer player = server.getPlayerList().getPlayer(playerUUIDs.player());

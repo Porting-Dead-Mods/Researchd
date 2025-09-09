@@ -1,6 +1,7 @@
 package com.portingdeadmods.researchd.cache;
 
 import com.google.common.collect.ImmutableMap;
+import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.GlobalResearch;
 import com.portingdeadmods.researchd.api.research.Research;
@@ -75,6 +76,38 @@ public final class CommonResearchCache {
 
         GLOBAL_RESEARCHES = ImmutableMap.copyOf(globalResearchMap);
         LOCKED = true;
+    }
+
+    private static void _collectChildren(GlobalResearch research, List<GlobalResearch> list) {
+        for (GlobalResearch child : research.getChildren()) {
+            list.add(child);
+            if (!child.getChildren().isEmpty()) {
+                _collectChildren(child, list);
+            }
+        }
+    }
+
+    public static List<GlobalResearch> allChildrenOf(ResourceKey<Research> key) {
+        List<GlobalResearch> list = new UniqueArray<>();
+        _collectChildren(GLOBAL_RESEARCHES.get(key), list);
+
+        return list;
+    }
+
+    private static void _collectParents(GlobalResearch research, List<GlobalResearch> list) {
+        for (GlobalResearch parent : research.getParents()) {
+            list.add(parent);
+            if (!parent.getParents().isEmpty()) {
+                _collectChildren(parent, list);
+            }
+        }
+    }
+
+    public static List<GlobalResearch> allParentsOf(ResourceKey<Research> key) {
+        List<GlobalResearch> list = new UniqueArray<>();
+        _collectParents(GLOBAL_RESEARCHES.get(key), list);
+
+        return list;
     }
 
     public static void reset() {

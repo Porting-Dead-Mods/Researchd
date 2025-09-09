@@ -50,7 +50,7 @@ public record ResearchFinishedPayload(ResourceKey<Research> key, int timeStamp) 
             ResourceKey<Research> first = queue.getEntries().getFirst();
             if (first != this.key()) context.disconnect(ResearchdTranslations.component(ResearchdTranslations.Errors.RESEARCH_QUEUE_DESYNC));
 
-            team.getResearchProgress().completeResearchAndUpdate(first, timeStamp, player.level());
+            team.getResearchProgress().completeResearch(first, timeStamp, player.level());
             queue.remove(0);
 
             if (player instanceof ServerPlayer serverPlayer) {
