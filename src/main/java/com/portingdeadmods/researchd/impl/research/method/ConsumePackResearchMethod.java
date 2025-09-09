@@ -9,10 +9,7 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
-import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
 import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
-import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
-import com.portingdeadmods.researchd.registries.ResearchdItems;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -24,7 +21,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * A 1:1 to the Factorio research. All the listed packs start getting consumed at once.
@@ -55,8 +51,7 @@ public record ConsumePackResearchMethod(List<ResourceKey<SimpleResearchPack>> pa
     public List<ItemStack> asStacks() {
         List<ItemStack> stacks = new ArrayList<>();
         for (ResourceKey<SimpleResearchPack> pack : this.packs) {
-            ItemStack stack = ResearchdItems.RESEARCH_PACK.toStack();
-            stack.set(ResearchdDataComponents.RESEARCH_PACK, new ResearchPackComponent(Optional.of(pack)));
+            ItemStack stack = SimpleResearchPack.asStack(pack);
             stacks.add(stack);
         }
         return stacks;

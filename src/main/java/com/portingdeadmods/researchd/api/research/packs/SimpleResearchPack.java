@@ -3,11 +3,15 @@ package com.portingdeadmods.researchd.api.research.packs;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.ResearchdRegistries;
+import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
+import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
+import com.portingdeadmods.researchd.registries.ResearchdItems;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.Optional;
 
@@ -25,6 +29,12 @@ public record SimpleResearchPack(int color, int sorting_value, Optional<Resource
 
     public SimpleResearchPack(ResourceLocation customTexture) {
         this(-1, -1, Optional.of(customTexture));
+    }
+
+    public static ItemStack asStack(ResourceKey<SimpleResearchPack> key) {
+        ItemStack stack = ResearchdItems.RESEARCH_PACK.toStack();
+        stack.set(ResearchdDataComponents.RESEARCH_PACK, new ResearchPackComponent(Optional.of(key)));
+        return stack;
     }
 
     public static Builder builder() {

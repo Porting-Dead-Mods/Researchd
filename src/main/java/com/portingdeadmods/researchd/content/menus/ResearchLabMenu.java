@@ -1,72 +1,52 @@
 package com.portingdeadmods.researchd.content.menus;
 
 import com.portingdeadmods.portingdeadlibs.api.gui.menus.PDLAbstractContainerMenu;
-import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.content.blockentities.ResearchLabControllerBE;
 import com.portingdeadmods.researchd.registries.ResearchdMenuTypes;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
-
-import static com.portingdeadmods.researchd.client.screens.lab.ResearchLabScreen.*;
 
 ;
 
 public class ResearchLabMenu extends PDLAbstractContainerMenu<ResearchLabControllerBE> {
-	private final List<Point> slotPositions = new UniqueArray<>();
-	public List<Point> getSlotPositions() {
-		return slotPositions;
-	}
-
-	public final Integer playerInventoryStartY;
-	public final Integer playerHotbarStartY;
+    private final List<ItemStack> researchPackItems;
 
 	public ResearchLabMenu(int containerId, Inventory inv, FriendlyByteBuf extraData) {
 		this(containerId, inv, (ResearchLabControllerBE) inv.player.level().getBlockEntity(extraData.readBlockPos()));
 	}
 
-
 	public ResearchLabMenu(int containerId, @NotNull Inventory inv, @NotNull ResearchLabControllerBE blockEntity) {
 		super(ResearchdMenuTypes.RESEARCH_LAB_MENU.get(), containerId, inv, blockEntity);
 		Researchd.debug("Research Lab Menu", "Creating Research Lab Menu with ", Researchd.RESEARCH_PACK_COUNT, " slots.");
 
-		ArrayList<Integer> slotXPositions = new ArrayList<>();
-		for (int i = Researchd.RESEARCH_PACK_COUNT.getOrThrow(); i > 0; i -= SLOTS_PER_ROW) {
-			int rowCount = Math.min(i, SLOTS_PER_ROW);
-			int[] positions = calculateCenteredPositions(SIDE_PADDING, SIDE_PADDING + SLOTS_PER_ROW * SLOT_WIDTH, SLOT_WIDTH, rowCount);
-			for (int pos : positions) {
-				slotXPositions.add(pos);
-			}
-		}
+        List<ResourceKey<SimpleResearchPack>> researchPacks = ResearchHelperCommon.getResearchPacks(Minecraft.getInstance().level.registryAccess());
+        this.researchPackItems = researchPacks.stream().map(SimpleResearchPack::asStack).toList();
 
-		for (int i = 0; i < Researchd.RESEARCH_PACK_COUNT.getOrThrow(); i++) {
-			int row = i / SLOTS_PER_ROW;
-			addSlot(new SlotItemHandler(blockEntity.getItemHandler(), i, slotXPositions.get(i), TOP_PADDING + row * LAB_SLOT_HEIGHT));
-			Researchd.debug("Research Lab Menu", "Adding slot ", i, " at position ", slotXPositions.get(i), ":", TOP_PADDING + row * LAB_SLOT_HEIGHT);
-			this.slotPositions.add(new Point(slotXPositions.get(i), TOP_PADDING + row * LAB_SLOT_HEIGHT));
-		}
+		int slotsX = 8;
+        int slotsY = 18;
+        for (int i = 0; i < this.researchPackItems.size(); i++) {
+            addSlot(new SlotItemHandler(this.getBlockEntity().getItemHandler(), i, slotsX + i * 18, slotsY));
+        }
 
-		this.playerInventoryStartY =
-				TOP_PADDING +
-				(Researchd.RESEARCH_PACK_COUNT.getOrThrow() / SLOTS_PER_ROW + 1) * LAB_SLOT_HEIGHT +
-				TOP_PADDING;
-
-		this.playerHotbarStartY =
-				this.playerInventoryStartY +
-				3 * DEFAULT_SLOT_SIZE +
-				INVENTORY_HOTBAR_GAP;
-
-		addPlayerInventory(inv, playerInventoryStartY);
-		addPlayerHotbar(inv, playerHotbarStartY);
+		addPlayerInventory(inv, 116);
+		addPlayerHotbar(inv, 174);
 	}
 
-	@Override
+    public List<ItemStack> getResearchPackItems() {
+        return this.researchPackItems;
+    }
+
+    @Override
 	protected int getMergeableSlotCount() {
 		return Researchd.RESEARCH_PACK_COUNT.getOrThrow(); // At menu creation time the LazyFinal should be initialized, so safe getOrThrow()
 	}

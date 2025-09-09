@@ -1,136 +1,140 @@
 package com.portingdeadmods.researchd.client.screens.lab;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.portingdeadmods.portingdeadlibs.api.client.screens.PDLAbstractContainerScreen;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
+import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
+import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.content.menus.ResearchLabMenu;
-import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.player.Inventory;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
-import java.util.Map;
-
 public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMenu> {
-	public static final Integer SIDE_PADDING = 11;
-	public static final Integer TOP_PADDING = 25;
-	public static final Integer SLOTS_PER_ROW = 9;
-	public static final Integer SLOT_WIDTH = 18;
-	public static final Integer LAB_SLOT_HEIGHT = 21; // width + 2px for usage bar + 1px for spacing
-	public static final Integer DEFAULT_SLOT_SIZE = 18;
-	public static final Integer BAR_HEIGHT = 2;
-	public static final Integer BAR_WIDTH = SLOT_WIDTH - 2; // Slot width but 1px off each side
-	public static final Integer INVENTORY_HOTBAR_GAP = 5;
+    public static final ResourceLocation BACKGROUND_TEXTURE = Researchd.rl("textures/gui/research_lab.png");
+    public static final ResourceLocation RESEARCH_PACK_TEXTURE = Researchd.rl("textures/item/research_pack_empty.png");
+    public static final ResourceLocation SLOT_SPRITE = Researchd.rl("slot_with_progress");
+    public static final ResourceLocation SCROLLER_HORIZONTAL = Researchd.rl("scroller_small_horizontal");
 
-	public static final Integer BACKGROUND_COLOR = FastColor.ARGB32.color(135, 249, 255);
-	public static final Integer BORDER_COLOR = FastColor.ARGB32.color(182, 184, 184);
-	public static final Integer BORDER_SIZE = 2;
+    public ResearchLabScreen(ResearchLabMenu menu, Inventory playerInventory, Component title) {
+        super(menu, playerInventory, title);
+        this.imageWidth = 176;
+        this.imageHeight = 198;
+        this.titleLabelX = 8;
+        this.titleLabelY = 6;
+        this.inventoryLabelX = 8;
+        this.inventoryLabelY = this.imageHeight - 93;
+    }
 
-	public static final ResourceLocation RESEARCH_PACK_TEXTURE = Researchd.rl("textures/item/research_pack_empty.png");
+    @Override
+    public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+        super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
+        // Foreground
+        this.drawBars(pGuiGraphics);
+    }
 
-	public Integer botPos;
-	public Integer rightPos;
-	public Integer imageWidth;
-	public Integer imageHeight;
+    @Override
+    public void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        super.renderLabels(guiGraphics, mouseX, mouseY);
+    }
 
-	public ResearchLabScreen(ResearchLabMenu menu, Inventory playerInventory, Component title) {
-		super(menu, playerInventory, title);
-		this.imageWidth =
-				SIDE_PADDING * 2 +
-				SLOTS_PER_ROW * SLOT_WIDTH;
-		Researchd.debug("Research Lab Screen", "Width: " + this.imageWidth);
+    @Override
+    public @NotNull ResourceLocation getBackgroundTexture() {
+        return BACKGROUND_TEXTURE;
+    }
 
-		this.imageHeight =
-				TOP_PADDING +
-				(Researchd.RESEARCH_PACK_COUNT.getOrThrow() / SLOTS_PER_ROW + 1) * LAB_SLOT_HEIGHT +
-				TOP_PADDING +
-				3 * DEFAULT_SLOT_SIZE +
-				INVENTORY_HOTBAR_GAP +
-				DEFAULT_SLOT_SIZE +
-				SIDE_PADDING;
-		Researchd.debug("Research Lab Screen", "Height: " + this.imageHeight);
-}
+    @Override
+    protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
+        super.renderBg(guiGraphics, partialTick, mouseX, mouseY);
+//
+//        this.botPos = this.topPos + getYSize();
+//        this.rightPos = this.leftPos + getXSize();
+//
+//        guiGraphics.fill(this.leftPos, this.topPos, this.rightPos, this.botPos, BACKGROUND_COLOR);
+//        //Researchd.debug("Research Lab Screen", "Rendering background at: " + this.leftPos + ":" + this.topPos + " -> " + this.rightPos + ":" + this.botPos);
+//
+//        // Top border
+//        guiGraphics.fill(this.leftPos - BORDER_SIZE, this.topPos - BORDER_SIZE, this.rightPos + BORDER_SIZE, this.topPos, BORDER_COLOR);
+//
+//        // Bottom border
+//        guiGraphics.fill(this.leftPos - BORDER_SIZE, this.botPos, this.rightPos + BORDER_SIZE, this.botPos + BORDER_SIZE, BORDER_COLOR);
+//
+//        // Left border
+//        guiGraphics.fill(this.leftPos - BORDER_SIZE, this.topPos - BORDER_SIZE, this.leftPos, this.botPos + BORDER_SIZE, BORDER_COLOR);
+//
+//        guiGraphics.fill(this.rightPos, this.topPos - BORDER_SIZE, this.rightPos + BORDER_SIZE, this.botPos + BORDER_SIZE, BORDER_COLOR);
+        // Right border
 
-	@Override
-	public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-		// Background
-		this.renderBg(pGuiGraphics, pPartialTick, pMouseX, pMouseY);
+//        for (Point point : this.menu.getSlotPositions()) {
+//            drawPackSlot(guiGraphics, point.x + 1, point.y + 1);
+//        }
 
-		// Foreground
-		super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
-		this.drawBars(pGuiGraphics);
-	}
+        int startX = this.leftPos + 7;
+        int startY = this.topPos + 17;
+        guiGraphics.enableScissor(startX, startY, startX + 162, startY + 20);
+        {
+            for (int i = 0; i < this.menu.getResearchPackItems().size(); i++) {
+                guiGraphics.blitSprite(SLOT_SPRITE, startX + i * 18, startY, 18, 20);
+                RenderSystem.enableBlend();
+                RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 60f / 255f);
+                {
+                    guiGraphics.renderFakeItem(this.menu.getResearchPackItems().get(i),
+                            startX + i * 18 + 1,
+                            startY + 1);
+                }
+                RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+                RenderSystem.disableBlend();
+            }
+        }
+        guiGraphics.disableScissor();
 
-	@Override
-	public void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-		guiGraphics.drawString(this.font, this.title, (this.imageWidth - this.font.width(this.title)) / 2, (TOP_PADDING - this.font.lineHeight) / 2, 0xF8F8F8);
-	}
+        ResearchTeam team = ClientResearchTeamHelper.getTeam();
+        ResearchInstance instance = team.getResearches().get(team.getFirstQueueResearch());
+        if (instance != null) {
+            ResearchScreenWidget.renderResearchPanel(guiGraphics, instance, this.leftPos + 123, this.topPos + 51, mouseX, mouseY, 2, false, false);
+        }
 
-	@Override
-	public @NotNull ResourceLocation getBackgroundTexture() {
-		return Researchd.rl(""); // We don't use it
-	}
+        guiGraphics.drawString(Minecraft.getInstance().font, "0%", this.leftPos + 108,  this.topPos + 71, 0xF8F8F8);
 
-	@Override
-	public void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
-		this.botPos = this.topPos + getYSize();
-		this.rightPos = this.leftPos + getXSize();
+        guiGraphics.blitSprite(SCROLLER_HORIZONTAL, this.leftPos + 8, this.topPos + 41, 7, 4);
+    }
 
-		guiGraphics.fill(this.leftPos, this.topPos, this.rightPos, this.botPos, BACKGROUND_COLOR);
-		//Researchd.debug("Research Lab Screen", "Rendering background at: " + this.leftPos + ":" + this.topPos + " -> " + this.rightPos + ":" + this.botPos);
+    /**
+     * The slot order is based on the {@link Researchd#RESEARCH_PACKS}'s index order
+     *
+     * @param guiGraphics GuiGraphics instance for drawing
+     */
+    private void drawBars(GuiGraphics guiGraphics) {
+//        for (Map.Entry<ResourceKey<SimpleResearchPack>, Float> entry : this.menu.blockEntity.researchPackUsage.entrySet()) {
+//            SimpleResearchPack pack = Researchd.RESEARCH_PACK_REGISTRY.getOrThrow().get(entry.getKey()).get().value(); // Safe usage of Optional
+//            int idx = Researchd.RESEARCH_PACKS.indexOf(pack);
+//            Point slotPos = this.menu.getSlotPositions().get(idx);
+//            float usage = entry.getValue();
+//
+//            int left = this.leftPos + slotPos.x;
+//            int top = this.topPos + slotPos.y + SLOT_WIDTH;
+//            guiGraphics.fill(
+//                    left + 1, // LEFT X
+//                    top + 1, // TOP Y
+//                    left + 1 + (int) (BAR_WIDTH * usage), // RIGHT X
+//                    top + 1, // BOTTOM Y
+//                    pack.color()
+//            );
+//        }
+    }
 
-		// Top border
-		guiGraphics.fill(this.leftPos - BORDER_SIZE, this.topPos - BORDER_SIZE, this.rightPos + BORDER_SIZE, this.topPos, BORDER_COLOR);
+    private void drawSlot(GuiGraphics guiGraphics, int x, int y) {
+    }
 
-		 // Bottom border
-		guiGraphics.fill(this.leftPos - BORDER_SIZE, this.botPos, this.rightPos + BORDER_SIZE, this.botPos + BORDER_SIZE, BORDER_COLOR);
-
-		 // Left border
-		guiGraphics.fill(this.leftPos - BORDER_SIZE, this.topPos - BORDER_SIZE, this.leftPos, this.botPos + BORDER_SIZE, BORDER_COLOR);
-
-		 // Right border
-		guiGraphics.fill(this.rightPos, this.topPos - BORDER_SIZE, this.rightPos + BORDER_SIZE, this.botPos + BORDER_SIZE, BORDER_COLOR);
-
-		for (Point point : this.menu.getSlotPositions()) {
-			drawPackSlot(guiGraphics, point.x + 1, point.y + 1);
-		}
-	}
-
-	/**
-	 * The slot order is based on the {@link Researchd#RESEARCH_PACKS}'s index order
-	 *
-	 * @param guiGraphics GuiGraphics instance for drawing
-	 */
-	private void drawBars(GuiGraphics guiGraphics) {
-		for (Map.Entry<ResourceKey<SimpleResearchPack>, Float> entry : this.menu.blockEntity.researchPackUsage.entrySet()) {
-			SimpleResearchPack pack = Researchd.RESEARCH_PACK_REGISTRY.getOrThrow().get(entry.getKey()).get().value(); // Safe usage of Optional
-			int idx = Researchd.RESEARCH_PACKS.indexOf(pack);
-			Point slotPos = this.menu.getSlotPositions().get(idx);
-			float usage = entry.getValue();
-
-			int left = this.leftPos + slotPos.x;
-			int top = this.topPos + slotPos.y + SLOT_WIDTH;
-			guiGraphics.fill(
-					left + 1, // LEFT X
-					top + 1, // TOP Y
-					left + 1 + (int) (BAR_WIDTH * usage), // RIGHT X
-					top + 1, // BOTTOM Y
-					pack.color()
-			);
-		}
-	}
-
-	private void drawSlot(GuiGraphics guiGraphics, int x, int y) {
-	}
-
-	private void drawPackSlot(GuiGraphics guiGraphics, int x, int y) {
-		GuiUtils.ShaderChain.create()
-				.grayscale()
-				.drawTo(guiGraphics, RESEARCH_PACK_TEXTURE,  this.getGuiLeft() + x, this.getGuiTop() + y, 16, 16, GuiUtils.BlendMode.DARKEN);
-	}
+    private void drawPackSlot(GuiGraphics guiGraphics, int x, int y) {
+        GuiUtils.ShaderChain.create()
+                .grayscale()
+                .drawTo(guiGraphics, RESEARCH_PACK_TEXTURE, this.getGuiLeft() + x, this.getGuiTop() + y, 16, 16, GuiUtils.BlendMode.DARKEN);
+    }
 }

@@ -9,6 +9,7 @@ import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
+import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
@@ -72,14 +73,21 @@ public final class ResearchHelperCommon {
         ServerLevel level = server.overworld();
         List<ResearchEffectData<?>> effData = new UniqueArray<>();
 
-        NeoForgeRegistries.ATTACHMENT_TYPES.entrySet().forEach(entry -> {
+        for (Map.Entry<ResourceKey<AttachmentType<?>>, AttachmentType<?>> entry : NeoForgeRegistries.ATTACHMENT_TYPES.entrySet()) {
             Object data = serverPlayer.getData(entry.getValue());
             if (data instanceof ResearchEffectData<?> effectData) {
                 effData.add(effectData);
             }
-        });
+        }
 
         return effData.stream().sorted(Comparator.comparing(a -> a.getClass().getName())).toList();
+    }
+
+    public static List<ResourceKey<SimpleResearchPack>> getResearchPacks(HolderLookup.Provider lookup) {
+        return lookup.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY).listElements()
+                .sorted(Comparator.comparingInt(h -> h.value().sorting_value()))
+                .map(Holder::getKey)
+                .toList();
     }
 
     public static void refreshResearches(ServerPlayer player) {
@@ -104,4 +112,5 @@ public final class ResearchHelperCommon {
             }
         }
     }
+
 }
