@@ -13,12 +13,15 @@ public final class ResearchdResearchPacks {
 
 	public static void bootstrap(BootstrapContext<SimpleResearchPack> context) {
 		register(context, OVERWORLD, SimpleResearchPack.builder()
+				.sortingValue(1)
 				.color(222, 0, 0)
 		);
 		register(context, NETHER, SimpleResearchPack.builder()
+				.sortingValue(2)
 				.color(0, 0, 222)
 		);
 		register(context, END, SimpleResearchPack.builder()
+				.sortingValue(3)
 				.color(0, 222, 0)
 		);
 	}

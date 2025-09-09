@@ -13,6 +13,7 @@ import java.util.Optional;
 public class ResearchPackBuilder extends BuilderBase<SimpleResearchPack> {
     private int color = -1;
     private ResourceLocation customTexture;
+    private int sorting_value = 0;
 
     public ResearchPackBuilder(ResourceLocation id) {
         super(id);
@@ -39,8 +40,17 @@ public class ResearchPackBuilder extends BuilderBase<SimpleResearchPack> {
         return this;
     }
 
+    /**
+     * A value to dictate where in the progression the research pack should be. <br>
+     * Lower = earlier, higher = later
+     */
+    public ResearchPackBuilder sortingValue(int value) {
+        this.sorting_value = value;
+        return this;
+    }
+
     @Override
     public SimpleResearchPack createObject() {
-        return new SimpleResearchPack(color, Optional.ofNullable(customTexture));
+        return new SimpleResearchPack(color, sorting_value, Optional.ofNullable(customTexture));
     }
 }

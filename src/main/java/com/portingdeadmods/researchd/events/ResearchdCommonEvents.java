@@ -50,6 +50,7 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -232,7 +233,7 @@ public final class ResearchdCommonEvents {
         HolderLookup.RegistryLookup<SimpleResearchPack> packs = registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY);
 
         if (!Researchd.RESEARCH_PACKS.isEmpty()) {
-            Researchd.RESEARCH_PACKS.addAll(packs.listElements().map(Holder.Reference::value).toList());
+            Researchd.RESEARCH_PACKS.addAll(packs.listElements().map(Holder.Reference::value).sorted(Comparator.comparingInt(SimpleResearchPack::sorting_value)).toList());
             Researchd.debug("Researchd Constants Server", "Initialized research packs.", Researchd.RESEARCH_PACKS, "");
         }
 

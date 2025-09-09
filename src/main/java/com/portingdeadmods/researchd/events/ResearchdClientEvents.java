@@ -3,16 +3,16 @@ package com.portingdeadmods.researchd.events;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
+import com.portingdeadmods.researchd.api.data.ResearchQueue;
+import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
+import com.portingdeadmods.researchd.api.data.team.TeamResearchProgress;
+import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.team.ResearchTeamScreen;
-import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
-import com.portingdeadmods.researchd.api.data.team.TeamResearchProgress;
-import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
-import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
-import com.portingdeadmods.researchd.api.data.ResearchQueue;
+import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -28,6 +28,8 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
+
+import java.util.Comparator;
 
 @EventBusSubscriber(modid = Researchd.MODID, value = Dist.CLIENT)
 public final class ResearchdClientEvents {
@@ -82,7 +84,7 @@ public final class ResearchdClientEvents {
 		HolderLookup.RegistryLookup<SimpleResearchPack> packs = registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY);
 
 		if (Researchd.RESEARCH_PACKS.isEmpty()) {
-			Researchd.RESEARCH_PACKS.addAll(packs.listElements().map(Holder.Reference::value).toList());
+			Researchd.RESEARCH_PACKS.addAll(packs.listElements().map(Holder.Reference::value).sorted(Comparator.comparingInt(SimpleResearchPack::sorting_value)).toList());
 			Researchd.debug("Researchd Constants Client", "Initialized research packs: ", Researchd.RESEARCH_PACKS, "");
 		}
 
