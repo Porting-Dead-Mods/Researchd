@@ -1,9 +1,6 @@
 package com.portingdeadmods.researchd.networking;
 
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.ResearchdRegistries;
-import com.portingdeadmods.researchd.api.pdl.data.PDLSavedData;
-import com.portingdeadmods.researchd.api.pdl.data.SavedDataHolder;
 import com.portingdeadmods.researchd.networking.research.ResearchFinishedPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchMethodProgressSyncPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchQueueAddPayload;
@@ -89,11 +86,6 @@ public class NetworkEvents {
                 ResearchMethodProgressSyncPayload.STREAM_CODEC,
                 ResearchMethodProgressSyncPayload::researchMethodProgressSyncAction
         );
-
-        for (PDLSavedData<?> savedData : ResearchdRegistries.SAVED_DATA) {
-            SavedDataHolder<?> holder = SavedDataHolder.fromValue(savedData);
-            registrar.playToClient(SyncSavedDataPayload.type(holder), SyncSavedDataPayload.streamCodec(holder), SyncSavedDataPayload::handle);
-        }
 
     }
 }

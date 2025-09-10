@@ -7,13 +7,9 @@ import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.api.data.team.TeamMember;
 import com.portingdeadmods.researchd.api.data.team.TeamResearchProgress;
-import com.portingdeadmods.researchd.api.pdl.data.PDLClientSavedData;
-import com.portingdeadmods.researchd.api.pdl.data.PDLSavedData;
-import com.portingdeadmods.researchd.api.pdl.data.SavedDataHolder;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
-import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.content.commands.ResearchdCommands;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
@@ -21,7 +17,6 @@ import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
 import com.portingdeadmods.researchd.integration.KubeJSIntegration;
-import com.portingdeadmods.researchd.networking.SyncSavedDataPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchFinishedPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchMethodProgressSyncPayload;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
@@ -29,7 +24,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -42,7 +36,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
@@ -52,7 +45,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @EventBusSubscriber(modid = Researchd.MODID)
@@ -72,12 +64,6 @@ public final class ResearchdCommonEvents {
     @SubscribeEvent
     private static void onCommandRegister(RegisterCommandsEvent event) {
         ResearchdCommands.register(event.getDispatcher());
-    }
-
-    @SubscribeEvent
-    private static void onLeaveWorld(PlayerEvent.PlayerLoggedOutEvent event) {
-        PDLClientSavedData.CLIENT_SAVED_DATA_CACHE.clear();
-        ResearchGraphCache.clearCache();
     }
 
     public static void consumeItemResearchMethodLogic(@NotNull ResearchTeamMap data, MinecraftServer server) {
@@ -197,35 +183,6 @@ public final class ResearchdCommonEvents {
         }
     }
 
-    private static <T> void sendSavedDataSyncPayload(ServerPlayer serverPlayer, ResourceLocation id, PDLSavedData<?> savedData) {
-        PDLSavedData<T> savedData1 = (PDLSavedData<T>) savedData;
-        T data = savedData1.getData(serverPlayer.serverLevel());
-        PacketDistributor.sendToPlayer(serverPlayer, new SyncSavedDataPayload<>(new SavedDataHolder<>(id, savedData1), data));
-    }
-
-    @SubscribeEvent
-    private static void onJoinWorld(PlayerEvent.PlayerLoggedInEvent event) {
-        if (event.getEntity().level().isClientSide()) return;
-        if (!(event.getEntity() instanceof ServerPlayer serverPlayer)) return;
-
-        MinecraftServer server = serverPlayer.server;
-        ServerLevel level = server.overworld();
-        ResearchTeamMap researchTeamMap = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
-        researchTeamMap.initPlayer(serverPlayer);
-        ResearchdSavedData.TEAM_RESEARCH.get().setData(level, researchTeamMap);
-
-        for (Map.Entry<ResourceKey<PDLSavedData<?>>, PDLSavedData<?>> savedData : ResearchdRegistries.SAVED_DATA.entrySet()) {
-            PDLSavedData<?> value = savedData.getValue();
-            if (value.isSynced()) {
-                sendSavedDataSyncPayload(serverPlayer, savedData.getKey().location(), value);
-                value.onSyncFunction().accept(serverPlayer);
-            }
-        }
-
-        // v Research Predicate Attachment v
-        ResearchHelperCommon.refreshResearches(serverPlayer);
-    }
-
     @SubscribeEvent
     public static void onServerAboutToStart(ServerAboutToStartEvent event) {
         MinecraftServer server = event.getServer();
@@ -254,7 +211,7 @@ public final class ResearchdCommonEvents {
             // Initialize the research cache
             CommonResearchCache.initialize(event.getLevel());
 
-            ResearchTeamHelper.resolveGlobalResearches(ResearchdSavedData.TEAM_RESEARCH.get().getData(event.getLevel()));
+            ResearchTeamHelper.resolveGlobalResearches(ResearchdSavedData.TEAM_RESEARCH.get().getData((Level) event.getLevel()));
 
             // Add new researches to teams in case new ones were added
             // TODO: Remove old researches from teams in cases ones were removed

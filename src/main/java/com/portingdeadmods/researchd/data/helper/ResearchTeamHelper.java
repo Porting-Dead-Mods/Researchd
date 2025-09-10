@@ -483,7 +483,7 @@ public final class ResearchTeamHelper {
     }
 
     public static void initializeTeamResearches(LevelAccessor level) {
-        ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
+        ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData((Level) level);
         if (data == null) return;
 
         for (ResearchTeam team : data.getResearchTeams().values()) {
@@ -502,7 +502,7 @@ public final class ResearchTeamHelper {
                 researches.put(globalResearch.getResearchKey(), new ResearchInstance(globalResearch, ResearchStatus.LOCKED));
             }
         }
-        ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
+        ResearchdSavedData.TEAM_RESEARCH.get().setData((Level) level, data);
     }
 
     public static void resolveGlobalResearches(ResearchTeamMap researchTeamMap) {

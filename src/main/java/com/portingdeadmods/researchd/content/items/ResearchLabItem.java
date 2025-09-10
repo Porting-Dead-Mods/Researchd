@@ -21,7 +21,6 @@ import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 public class ResearchLabItem extends BlockItem {
 	public ResearchLabItem(Block block, Properties properties) {
@@ -83,7 +82,7 @@ public class ResearchLabItem extends BlockItem {
 		AABBUtils.move(aabb, Direction.UP, 1);
 
 		UniqueArray<BlockPos> allPos = AABBUtils.getAllPositionsInAABB(aabb);
-		List<BlockPos> badPos = allPos.stream().filter(pos -> !level.getBlockState(pos).isEmpty()).toList();
+		List<BlockPos> badPos = allPos.stream().filter(pos -> !level.getBlockState(pos).canBeReplaced()).toList();
 		if (badPos.isEmpty()) {
 			Researchd.debug("Research Lab", "Can place at " + context.getClickedPos());
 			return true;

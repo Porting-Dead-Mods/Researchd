@@ -79,6 +79,9 @@ public class ResearchTeamMap {
                 ClientResearchTeamHelper.resolveInstances(team);
             }
         } else {
+            ResearchTeamMap researchTeamMap = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level());
+            researchTeamMap.initPlayer((ServerPlayer) player);
+            ResearchdSavedData.TEAM_RESEARCH.get().setData(player.level(), researchTeamMap);
             ResearchHelperCommon.refreshResearches((ServerPlayer) player);
         }
     }

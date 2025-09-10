@@ -4,9 +4,9 @@ import com.mojang.logging.LogUtils;
 import com.portingdeadmods.portingdeadlibs.utils.LazyFinal;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
-import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.registries.*;
 import com.portingdeadmods.researchd.registries.serializers.ResearchEffectSerializers;
 import com.portingdeadmods.researchd.registries.serializers.ResearchMethodSerializers;
@@ -82,7 +82,6 @@ public class Researchd {
         event.register(ResearchdRegistries.RESEARCH_SERIALIZER);
         event.register(ResearchdRegistries.RESEARCH_EFFECT_SERIALIZER);
         event.register(ResearchdRegistries.RESEARCH_METHOD_SERIALIZER);
-        event.register(ResearchdRegistries.SAVED_DATA);
         event.register(ResearchdRegistries.VALUE_EFFECT);
     }
 

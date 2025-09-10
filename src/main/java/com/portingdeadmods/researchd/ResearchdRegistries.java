@@ -1,6 +1,5 @@
 package com.portingdeadmods.researchd;
 
-import com.portingdeadmods.researchd.api.pdl.data.PDLSavedData;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ValueEffect;
 import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
@@ -32,8 +31,4 @@ public class ResearchdRegistries {
 	public static final Registry<ResearchEffectSerializer<?>> RESEARCH_EFFECT_SERIALIZER = new RegistryBuilder<>(RESEARCH_EFFECT_SERIALIZER_KEY).sync(true).create();
 
 	public static final Registry<ValueEffect> VALUE_EFFECT = new RegistryBuilder<>(VALUE_EFFECT_KEY).sync(true).create();
-
-	public static final ResourceKey<Registry<PDLSavedData<?>>> SAVED_DATA_KEY =
-			ResourceKey.createRegistryKey(Researchd.rl("saved_data"));
-	public static final Registry<PDLSavedData<?>> SAVED_DATA = new RegistryBuilder<>(SAVED_DATA_KEY).create();
 }
