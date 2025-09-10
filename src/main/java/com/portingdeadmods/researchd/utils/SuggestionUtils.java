@@ -10,7 +10,6 @@ import net.minecraft.commands.SharedSuggestionProvider;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-//TODO: Put this in PDL
 public class SuggestionUtils {
     public static CompletableFuture<Suggestions> playerNames(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
         return SharedSuggestionProvider.suggest(context.getSource().getLevel().players().stream().map(player -> player.getName().getString()).toList(), builder);

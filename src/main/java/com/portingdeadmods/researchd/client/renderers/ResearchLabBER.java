@@ -7,9 +7,12 @@ import com.portingdeadmods.researchd.registries.ResearchdBlocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.model.data.ModelData;
 
@@ -27,7 +30,24 @@ public class ResearchLabBER implements BlockEntityRenderer<ResearchLabController
         poseStack.pushPose();
         {
             poseStack.translate(0.5, 0, 0.5);
-            Minecraft.getInstance().getBlockRenderer().getModelRenderer().renderModel(poseStack.last(), multiBufferSource.getBuffer(RenderType.SOLID), this.blockState, this.model, 100, 100, 100, packedLight, packedOverlay, ModelData.EMPTY, RenderType.SOLID);
+
+            BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
+            BlockState state = researchLabControllerBE.getBlockState();
+            BlockPos pos = researchLabControllerBE.getBlockPos();
+            blockRenderer.getModelRenderer().tesselateBlock(
+                    researchLabControllerBE.getLevel(),
+                    blockRenderer.getBlockModel(state),
+                    state,
+                    pos,
+                    poseStack,
+                    multiBufferSource.getBuffer(RenderType.TRANSLUCENT),
+                    true,
+                    researchLabControllerBE.getLevel().random,
+                    state.getSeed(pos),
+                    OverlayTexture.NO_OVERLAY,
+                    ModelData.EMPTY,
+                    RenderType.TRANSLUCENT
+            );
         }
         poseStack.popPose();
     }

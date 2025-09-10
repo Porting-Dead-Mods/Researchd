@@ -3,7 +3,6 @@ package com.portingdeadmods.researchd.utils;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
-// TODO: Move to PDL
 public class ImmutableLinkedHashSet<E> extends LinkedHashSet<E> {
     private final boolean locked;
 
