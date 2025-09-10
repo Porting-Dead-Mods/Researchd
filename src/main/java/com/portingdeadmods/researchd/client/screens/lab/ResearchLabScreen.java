@@ -24,6 +24,17 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
     public static final ResourceLocation SLOT_SPRITE = Researchd.rl("slot_with_progress");
     public static final ResourceLocation SCROLLER_HORIZONTAL = Researchd.rl("scroller_small_horizontal");
     public static final int PROGRESS_COLOR = FastColor.ARGB32.color(0, 225, 100);
+    public static final int SLOT_WIDTH = 18;
+    public static final int SLOT_HEIGHT = 20;
+    public static final int SCROLLER_X = 8;
+    public static final int SCROLLER_Y = 41;
+    public static final int SCROLLER_WIDTH = 7;
+    public static final int SCROLLER_HEIGHT = 4;
+    public static final int SCROLLABLE_LENGTH = 160;
+    public static final int VISIBLE_CONENT_WIDTH = 164;
+
+    private double scrollPercentage = 0;
+    private int scrollOffset = 0;
 
     public ResearchLabScreen(ResearchLabMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -80,17 +91,17 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
 
         int startX = this.leftPos + 7;
         int startY = this.topPos + 17;
-        guiGraphics.enableScissor(startX, startY, startX + 162, startY + 20);
+        guiGraphics.enableScissor(startX, startY, startX + 162, startY + SLOT_HEIGHT);
         {
             for (int i = 0; i < this.menu.getResearchPackItems().size(); i++) {
-                guiGraphics.blitSprite(SLOT_SPRITE, startX + i * 18, startY, 18, 20);
+                guiGraphics.blitSprite(SLOT_SPRITE, startX + i * SLOT_WIDTH - this.scrollOffset, startY, SLOT_WIDTH, SLOT_HEIGHT);
                 int progress = (int) (this.menu.blockEntity.researchPackUsage.get(this.menu.getResearchPacks().get(i)) * 17);
-                guiGraphics.fill(startX + 1 + i * 18, startY + 18, startX + 1 + i * 18 + progress, startY + 18 + 1, PROGRESS_COLOR);
+                guiGraphics.fill(startX + 1 + i * SLOT_WIDTH - this.scrollOffset, startY + SLOT_WIDTH, startX + 1 + i * SLOT_WIDTH + progress - this.scrollOffset, startY + SLOT_WIDTH + 1, PROGRESS_COLOR);
                 RenderSystem.enableBlend();
                 RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 60f / 255f);
                 {
                     guiGraphics.renderFakeItem(this.menu.getResearchPackItems().get(i),
-                            startX + i * 18 + 1,
+                            startX + i * SLOT_WIDTH + 1 - this.scrollOffset,
                             startY + 1);
                 }
                 RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -114,7 +125,7 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
 
         guiGraphics.drawString(Minecraft.getInstance().font, String.valueOf((int) progress * 100) + '%', this.leftPos + 108,  this.topPos + 71, 0xF8F8F8);
 
-        guiGraphics.blitSprite(SCROLLER_HORIZONTAL, this.leftPos + 8, this.topPos + 41, 7, 4);
+        guiGraphics.blitSprite(SCROLLER_HORIZONTAL, this.leftPos + SCROLLER_X + (int) (this.scrollPercentage * (SCROLLABLE_LENGTH - SCROLLER_WIDTH) + 1), this.topPos + SCROLLER_Y, SCROLLER_WIDTH, SCROLLER_HEIGHT);
     }
 
     /**
@@ -141,7 +152,44 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
 //        }
     }
 
+    private int getContentWidth() {
+        return SLOT_WIDTH * Researchd.RESEARCH_PACK_COUNT.getOrThrow();
+    }
+
     private void drawSlot(GuiGraphics guiGraphics, int x, int y) {
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (
+                mouseX >= leftPos + SCROLLER_X &&
+                        mouseX < leftPos + SCROLLER_X + SCROLLABLE_LENGTH &&
+                        mouseY >= topPos + SCROLLER_Y - 1 &&
+                        mouseY <= topPos + SCROLLER_Y + SCROLLER_HEIGHT + 1 &&
+                        getContentWidth() > VISIBLE_CONENT_WIDTH
+        ) {
+            int scrollableContent = this.getContentWidth() - VISIBLE_CONENT_WIDTH;
+            int minX = leftPos + SCROLLER_X;
+            int maxX = leftPos + SCROLLER_X + SCROLLABLE_LENGTH;
+            this.scrollPercentage = ((Math.clamp(mouseX, minX, maxX) - (minX))) / (double) (maxX - minX);
+            this.scrollOffset = (int) (scrollableContent * scrollPercentage);
+            this.updateSlotPositions();
+            return true;
+        }
+
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+        return this.mouseClicked(mouseX, mouseY, 0);
+    }
+
+    private void updateSlotPositions() {
+         for (int i = 0; i < this.menu.labSlots.size(); i++) {
+            this.menu.labSlots.get(i).x = this.menu.labSlotsX.get(i) - this.scrollOffset;
+         }
     }
 
     private void drawPackSlot(GuiGraphics guiGraphics, int x, int y) {

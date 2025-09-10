@@ -4,6 +4,7 @@ import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.data.ResearchQueue;
+import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.api.data.team.TeamResearchProgress;
 import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
@@ -48,14 +49,16 @@ public final class ResearchdClientEvents {
 	public static void postClientTick(ClientTickEvent.Post event) {
 		Level level = Minecraft.getInstance().level;
 		LocalPlayer player = Minecraft.getInstance().player;
+		if (player == null || level == null) return;
 
-		if (player != null && level != null) {
-			ResearchTeamMap map = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
-			if (map != null) {
-				TeamResearchProgress researchProgress = map.getTeamByPlayer(player).getResearchProgress();
-				ResearchQueue queue = researchProgress.researchQueue();
-			}
-		}
+		ResearchTeamMap map = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
+		if (map == null) return;
+
+		ResearchTeam team = map.getTeamByPlayer(player);
+		if (team == null) return;
+
+		TeamResearchProgress researchProgress = team.getResearchProgress();
+		ResearchQueue queue = researchProgress.researchQueue();
 	}
 
 	@SubscribeEvent

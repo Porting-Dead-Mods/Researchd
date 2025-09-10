@@ -1,5 +1,6 @@
 package com.portingdeadmods.researchd.content.menus;
 
+import com.google.common.collect.ImmutableList;
 import com.portingdeadmods.portingdeadlibs.api.gui.menus.PDLAbstractContainerMenu;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
@@ -8,6 +9,7 @@ import com.portingdeadmods.researchd.registries.ResearchdMenuTypes;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jetbrains.annotations.NotNull;
@@ -17,6 +19,9 @@ import java.util.List;
 public class ResearchLabMenu extends PDLAbstractContainerMenu<ResearchLabControllerBE> {
     private final List<ItemStack> researchPackItems;
     private final List<ResourceKey<SimpleResearchPack>> researchPacks;
+
+	public final ImmutableList<Integer> labSlotsX;
+	public final ImmutableList<Slot> labSlots;
 
     public ResearchLabMenu(int containerId, Inventory inv, FriendlyByteBuf extraData) {
 		this(containerId, inv, (ResearchLabControllerBE) inv.player.level().getBlockEntity(extraData.readBlockPos()));
@@ -31,9 +36,21 @@ public class ResearchLabMenu extends PDLAbstractContainerMenu<ResearchLabControl
 
 		int slotsX = 8;
         int slotsY = 18;
+
+		var x = new ImmutableList.Builder<Integer>();
+		var s = new ImmutableList.Builder<Slot>();
+
         for (int i = 0; i < this.researchPackItems.size(); i++) {
-            addSlot(new SlotItemHandler(this.getBlockEntity().getItemHandler(), i, slotsX + i * 18, slotsY));
+			int slotX = slotsX + i * 18;
+			Slot slot = new SlotItemHandler(this.getBlockEntity().getItemHandler(), i, slotX, slotsY);
+			x.add(slotX);
+			s.add(slot);
+
+            addSlot(slot);
         }
+
+		this.labSlots = s.build();
+		this.labSlotsX = x.build();
 
 		addPlayerInventory(inv, 116);
 		addPlayerHotbar(inv, 174);
