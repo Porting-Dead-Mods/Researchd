@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.client.screens.lab;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.portingdeadmods.portingdeadlibs.api.client.screens.PDLAbstractContainerScreen;
+import com.portingdeadmods.portingdeadlibs.api.client.screens.widgets.AbstractScroller;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
@@ -22,7 +23,6 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
     public static final ResourceLocation BACKGROUND_TEXTURE = Researchd.rl("textures/gui/research_lab.png");
     public static final ResourceLocation RESEARCH_PACK_TEXTURE = Researchd.rl("textures/item/research_pack_empty.png");
     public static final ResourceLocation SLOT_SPRITE = Researchd.rl("slot_with_progress");
-    public static final ResourceLocation SCROLLER_HORIZONTAL = Researchd.rl("scroller_small_horizontal");
     public static final int PROGRESS_COLOR = FastColor.ARGB32.color(0, 225, 100);
     public static final int SLOT_WIDTH = 18;
     public static final int SLOT_HEIGHT = 20;
@@ -30,11 +30,24 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
     public static final int SCROLLER_Y = 41;
     public static final int SCROLLER_WIDTH = 7;
     public static final int SCROLLER_HEIGHT = 4;
-    public static final int SCROLLABLE_LENGTH = 160;
-    public static final int VISIBLE_CONENT_WIDTH = 164;
+    public static final int SCROLLER_TRACK_LENGTH = 154;
 
-    private double scrollPercentage = 0;
-    private int scrollOffset = 0;
+    private final AbstractScroller scroller = new AbstractScroller(this, SCROLLER_X, SCROLLER_Y, SCROLLER_WIDTH, SCROLLER_HEIGHT, SCROLLER_TRACK_LENGTH, AbstractScroller.Mode.HORIZONTAL, Researchd.rl("scroller_small_horizontal")) {
+        @Override
+        public int getContentLength() {
+            return SLOT_WIDTH * Researchd.RESEARCH_PACK_COUNT.getOrThrow();
+        };
+
+        @Override
+        public int getVisibleContentLength() {
+            return 164;
+        };
+
+        @Override
+        public void onScroll() {
+            updateSlotPositions();
+        }
+    };
 
     public ResearchLabScreen(ResearchLabMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -44,11 +57,14 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
         this.titleLabelY = 6;
         this.inventoryLabelX = 8;
         this.inventoryLabelY = this.imageHeight - 93;
+
+        this.addRenderableWidget(this.scroller);
     }
 
     @Override
     public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
+        this.scroller.renderWidget(pGuiGraphics);
         // Foreground
         this.drawBars(pGuiGraphics);
     }
@@ -94,14 +110,14 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
         guiGraphics.enableScissor(startX, startY, startX + 162, startY + SLOT_HEIGHT);
         {
             for (int i = 0; i < this.menu.getResearchPackItems().size(); i++) {
-                guiGraphics.blitSprite(SLOT_SPRITE, startX + i * SLOT_WIDTH - this.scrollOffset, startY, SLOT_WIDTH, SLOT_HEIGHT);
+                guiGraphics.blitSprite(SLOT_SPRITE, startX + i * SLOT_WIDTH - this.scroller.getScrollOffset(), startY, SLOT_WIDTH, SLOT_HEIGHT);
                 int progress = (int) (this.menu.blockEntity.researchPackUsage.get(this.menu.getResearchPacks().get(i)) * 17);
-                guiGraphics.fill(startX + 1 + i * SLOT_WIDTH - this.scrollOffset, startY + SLOT_WIDTH, startX + 1 + i * SLOT_WIDTH + progress - this.scrollOffset, startY + SLOT_WIDTH + 1, PROGRESS_COLOR);
+                guiGraphics.fill(startX + 1 + i * SLOT_WIDTH - this.scroller.getScrollOffset(), startY + SLOT_WIDTH, startX + 1 + i * SLOT_WIDTH + progress - this.scroller.getScrollOffset(), startY + SLOT_WIDTH + 1, PROGRESS_COLOR);
                 RenderSystem.enableBlend();
                 RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 60f / 255f);
                 {
                     guiGraphics.renderFakeItem(this.menu.getResearchPackItems().get(i),
-                            startX + i * SLOT_WIDTH + 1 - this.scrollOffset,
+                            startX + i * SLOT_WIDTH + 1 - this.scroller.getScrollOffset(),
                             startY + 1);
                 }
                 RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -124,8 +140,6 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
         guiGraphics.fill(x, y, x + width, y + 6, PROGRESS_COLOR);
 
         guiGraphics.drawString(Minecraft.getInstance().font, String.valueOf((int) progress * 100) + '%', this.leftPos + 108,  this.topPos + 71, 0xF8F8F8);
-
-        guiGraphics.blitSprite(SCROLLER_HORIZONTAL, this.leftPos + SCROLLER_X + (int) (this.scrollPercentage * (SCROLLABLE_LENGTH - SCROLLER_WIDTH) + 1), this.topPos + SCROLLER_Y, SCROLLER_WIDTH, SCROLLER_HEIGHT);
     }
 
     /**
@@ -161,22 +175,6 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (
-                mouseX >= leftPos + SCROLLER_X &&
-                        mouseX < leftPos + SCROLLER_X + SCROLLABLE_LENGTH &&
-                        mouseY >= topPos + SCROLLER_Y - 1 &&
-                        mouseY <= topPos + SCROLLER_Y + SCROLLER_HEIGHT + 1 &&
-                        getContentWidth() > VISIBLE_CONENT_WIDTH
-        ) {
-            int scrollableContent = this.getContentWidth() - VISIBLE_CONENT_WIDTH;
-            int minX = leftPos + SCROLLER_X;
-            int maxX = leftPos + SCROLLER_X + SCROLLABLE_LENGTH;
-            this.scrollPercentage = ((Math.clamp(mouseX, minX, maxX) - (minX))) / (double) (maxX - minX);
-            this.scrollOffset = (int) (scrollableContent * scrollPercentage);
-            this.updateSlotPositions();
-            return true;
-        }
-
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
@@ -188,7 +186,7 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
 
     private void updateSlotPositions() {
          for (int i = 0; i < this.menu.labSlots.size(); i++) {
-            this.menu.labSlots.get(i).x = this.menu.labSlotsX.get(i) - this.scrollOffset;
+            this.menu.labSlots.get(i).x = this.menu.labSlotsX.get(i) - this.scroller.getScrollOffset();
          }
     }
 
