@@ -340,6 +340,7 @@ public class ResearchTeam {
 
         private static @NotNull Map<String, Float> getTeamMetadataEffectMap(TeamMetadata metadata) {
             return metadata.teamEffectList.entrySet().stream()
+                    .filter(e -> e.getKey() != null && e.getValue() != null)
                     .map(e -> new AbstractMap.SimpleEntry<>(e.getKey().toString(), e.getValue()))
                     .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
         }
