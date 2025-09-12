@@ -25,7 +25,7 @@ public class BlockModelProvider extends BlockStateProvider {
                                 .modelLocation(modLoc("models/block/research_lab.obj"))
                                 .automaticCulling(true)
                                 .shadeQuads(true)
-                                .flipV(false)
+                                .flipV(true)
                                 .emissiveAmbient(true)
                 ).end()
                 .texture("texture0", modLoc("block/research_lab"))
