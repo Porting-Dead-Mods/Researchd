@@ -64,7 +64,7 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
     @Override
     public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
-        this.scroller.renderWidget(pGuiGraphics);
+        this.scroller.renderWidget(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
         // Foreground
         this.drawBars(pGuiGraphics);
     }
@@ -180,8 +180,8 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
-        return this.mouseClicked(mouseX, mouseY, 0);
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+        //return this.mouseClicked(mouseX, mouseY, 0);
     }
 
     private void updateSlotPositions() {
