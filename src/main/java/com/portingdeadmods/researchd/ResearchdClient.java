@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
+import com.portingdeadmods.researchd.client.ResearchdRenderTypes;
 import com.portingdeadmods.researchd.client.impl.effects.AndResearchEffectWidget;
 import com.portingdeadmods.researchd.client.impl.effects.DimensionUnlockEffectWidget;
 import com.portingdeadmods.researchd.client.impl.effects.EmptyResearchEffectWidget;
@@ -13,6 +14,7 @@ import com.portingdeadmods.researchd.client.impl.methods.ConsumePackResearchMeth
 import com.portingdeadmods.researchd.client.impl.methods.OrResearchMethodWidget;
 import com.portingdeadmods.researchd.client.renderers.ResearchLabBER;
 import com.portingdeadmods.researchd.client.screens.lab.ResearchLabScreen;
+import com.portingdeadmods.researchd.content.blocks.ResearchLabController;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
 import com.portingdeadmods.researchd.impl.research.effect.AndResearchEffect;
 import com.portingdeadmods.researchd.impl.research.effect.DimensionUnlockEffect;
@@ -22,20 +24,28 @@ import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.OrResearchMethod;
+import com.portingdeadmods.researchd.mixins.LevelRendererMixin;
 import com.portingdeadmods.researchd.registries.*;
 import com.portingdeadmods.researchd.utils.WidgetConstructor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.*;
+import net.neoforged.neoforge.common.NeoForge;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,6 +66,8 @@ public class ResearchdClient {
         eventBus.addListener(this::clientSetup);
         eventBus.addListener(this::registerAdditionalModels);
         eventBus.addListener(this::registerBER);
+
+        NeoForge.EVENT_BUS.addListener(this::renderOutline);
     }
 
     private void clientSetup(FMLClientSetupEvent event) {
@@ -107,4 +119,21 @@ public class ResearchdClient {
         event.registerBlockEntityRenderer(ResearchdBlockEntityTypes.RESEARCH_LAB_CONTROLLER.get(), ResearchLabBER::new);
     }
 
+    public void renderOutline(RenderHighlightEvent.Block event) {
+        if (event.getCamera().getEntity() instanceof LivingEntity living) {
+            Level world = living.level();
+            BlockHitResult rtr = event.getTarget();
+            BlockPos pos = rtr.getBlockPos();
+            Vec3 renderView = event.getCamera().getPosition();
+            BlockState targetBlock = world.getBlockState(rtr.getBlockPos());
+            if (targetBlock.getBlock() == ResearchdBlocks.RESEARCH_LAB_CONTROLLER.get() || targetBlock.getBlock() == ResearchdBlocks.RESEARCH_LAB_PART.get()) {
+                ((LevelRendererMixin) event.getLevelRenderer()).callRenderHitOutline(
+                        event.getPoseStack(), event.getMultiBufferSource().getBuffer(ResearchdRenderTypes.LINES_NONTRANSLUCENT),
+                        living, renderView.x, renderView.y, renderView.z,
+                        pos, targetBlock
+                );
+                event.setCanceled(true);
+            }
+        }
+    }
 }
