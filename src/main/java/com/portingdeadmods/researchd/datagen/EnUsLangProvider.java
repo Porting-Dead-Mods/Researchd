@@ -1,7 +1,10 @@
 package com.portingdeadmods.researchd.datagen;
 
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
+import com.portingdeadmods.researchd.registries.ResearchdResearchPacks;
 import com.portingdeadmods.researchd.registries.ResearchdResearches;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.data.PackOutput;
@@ -47,6 +50,10 @@ public final class EnUsLangProvider extends LanguageProvider {
         addResearchDesc(ResearchdResearches.IRON_ARMOR, "Isn't this an achievement already?");
         addResearchDesc(ResearchdResearches.LIGHTNING_ROD, "I told ya it's a great conductor!");
         addResearchDesc(ResearchdResearches.COPPER_BLOCK, "Efficient Storage");
+
+        addResearchPack(ResearchdResearchPacks.END, "End Research Pack");
+        addResearchPack(ResearchdResearchPacks.NETHER, "Nether Research Pack");
+        addResearchPack(ResearchdResearchPacks.OVERWORLD, "Overworld Research Pack");
     }
 
     private void addResearch(ResourceKey<Research> key, String name) {
@@ -59,5 +66,9 @@ public final class EnUsLangProvider extends LanguageProvider {
 
     private void addResearchMethod(ResourceLocation key, String name) {
         add("research_method." + key.getNamespace() + "." + key.getPath(), name);
+    }
+
+    private void addResearchPack(ResourceKey<SimpleResearchPack> key, String name) {
+        add("item.researchd.research_pack_" + key.location().toString().replace(':', '_'), name);
     }
 }

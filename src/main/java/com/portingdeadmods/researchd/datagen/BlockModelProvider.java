@@ -23,7 +23,7 @@ public class BlockModelProvider extends BlockStateProvider {
                 .customLoader((builder, existingFileHelper) ->
                         ObjModelBuilder.begin(builder, existingFileHelper)
                                 .modelLocation(modLoc("models/block/research_lab.obj"))
-                                .automaticCulling(true)
+                                .automaticCulling(false)
                                 .shadeQuads(true)
                                 .flipV(true)
                                 .emissiveAmbient(true)

@@ -14,6 +14,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -22,13 +25,21 @@ public final class ResearchdTab {
 
     static {
         TABS.register("main", () -> CreativeModeTab.builder()
-                .icon(Items.DIAMOND::getDefaultInstance)
+                .icon(() -> {
+                    ItemStack pack = ResearchdItems.RESEARCH_PACK.toStack();
+                    pack.set(ResearchdDataComponents.RESEARCH_PACK, new ResearchPackComponent(Optional.of(ResearchdResearchPacks.OVERWORLD)));
+                    return pack;
+                })
                 .title(Component.literal(Researchd.MODID))
                 .displayItems((params, output) -> {
+                    output.accept(ResearchdItems.RESEARCH_LAB.toStack());
                     Optional<HolderLookup.RegistryLookup<SimpleResearchPack>> lookup = params.holders().lookup(ResearchdRegistries.RESEARCH_PACK_KEY);
                     if (lookup.isPresent()) {
-                        Stream<ResourceKey<SimpleResearchPack>> resourceKeyStream = lookup.get().listElementIds();
-                        resourceKeyStream.forEach(researchPack -> {
+                        List<ResourceKey<SimpleResearchPack>> resourceKeyStream = lookup.get().listElementIds().toList();
+                        List<Holder.Reference<SimpleResearchPack>> holders = new ArrayList<>(resourceKeyStream.stream().map(p -> lookup.get().get(p)).filter(Optional::isPresent).map(Optional::get).toList());
+                        holders.sort(Comparator.comparingInt(a -> a.value().sorting_value()));
+
+                        holders.forEach(researchPack -> {
                             addResearchPack(output, params.holders(), researchPack);
                         });
                     }
@@ -36,11 +47,10 @@ public final class ResearchdTab {
                 .build());
     }
 
-    private static void addResearchPack(CreativeModeTab.Output output, HolderLookup.Provider lookup, ResourceKey<SimpleResearchPack> elem) {
+    private static void addResearchPack(CreativeModeTab.Output output, HolderLookup.Provider lookup, Holder.Reference<SimpleResearchPack> elem) {
         ItemStack stack = ResearchdItems.RESEARCH_PACK.toStack();
 
-        Optional<Holder.Reference<SimpleResearchPack>> holder = lookup.holder(elem);
-        stack.set(ResearchdDataComponents.RESEARCH_PACK.get(), new ResearchPackComponent(holder.map(Holder::getKey)));
+        stack.set(ResearchdDataComponents.RESEARCH_PACK.get(), new ResearchPackComponent(Optional.of(elem.key())));
         output.accept(stack);
     }
 }
