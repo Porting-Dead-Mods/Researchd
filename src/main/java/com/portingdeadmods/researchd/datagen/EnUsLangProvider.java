@@ -1,7 +1,6 @@
 package com.portingdeadmods.researchd.datagen;
 
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.registries.ResearchdResearchPacks;
@@ -31,7 +30,7 @@ public final class EnUsLangProvider extends LanguageProvider {
         }
 
         addBlock(RESEARCH_LAB_PART, "Research Lab Part");
-        addBlock(RESEARCH_LAB_CONTROLLER, "Research Lab Controller");
+        addBlock(RESEARCH_LAB_CONTROLLER, "Research Lab");
 
         addResearch(ResearchdResearches.WOOD, "Wood");
         addResearch(ResearchdResearches.STONE, "Stone");
