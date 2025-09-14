@@ -25,6 +25,7 @@ public class GlobalResearch {
             GlobalResearch::getResearchKey,
             GlobalResearch::new
     );
+
     private final ResourceKey<Research> research;
     private Set<GlobalResearch> children;
     private Set<GlobalResearch> parents;

@@ -225,25 +225,14 @@ public final class ResearchdCommonEvents {
         CommonResearchCache.reset();
     }
 
+    @SubscribeEvent
     public static void onJoinLevel(EntityJoinLevelEvent entity) {
-
+        if (entity.getLevel().isClientSide()) return;
+        if (entity.getEntity() instanceof ServerPlayer player) {
+            ServerLevel level = player.serverLevel();
+            ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
+            data.initPlayer(player);
+            ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
+        }
     }
-//
-//        private static List<ResearchInstance> getChildren(Level level, ResearchInstance instance) {
-//            List<ResearchInstance> children = new ArrayList<>();
-//            for (Holder<Research> levelResearch : ResearchHelper.getLevelResearches(level)) {
-//                if (levelResearch.value().parents().contains(instance.getResearch())) {
-//                    ResearchStatus status;
-//                    if (instance.getResearchStatus() == ResearchStatus.RESEARCHED) {
-//                        status = ResearchStatus.RESEARCHABLE;
-//                    } else if (ResearchdSavedData.PLAYER_RESEARCH.get().getData(level).isCompleted(levelResearch.getKey())) {
-//                        status = ResearchStatus.RESEARCHED;
-//                    }else {
-//                        status = ResearchStatus.LOCKED;
-//                    }
-//                    children.add(new ResearchInstance(levelResearch.getKey(), status));
-//                }
-//            }
-//            return children;
-//        }
 }

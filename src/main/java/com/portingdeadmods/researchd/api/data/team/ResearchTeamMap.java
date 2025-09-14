@@ -70,18 +70,13 @@ public class ResearchTeamMap {
 
     public static void onSync(Player player) {
         if (player.level().isClientSide) {
-            // Usa
             ResearchHelperClient.refreshResearches(player);
-            // TODO: Sync them from the server as soon as the player joins
             CommonResearchCache.initialize(player.level());
             ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level());
             for (ResearchTeam team : data.getResearchTeams().values()) {
                 ClientResearchTeamHelper.resolveInstances(team);
             }
         } else {
-            ResearchTeamMap researchTeamMap = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level());
-            researchTeamMap.initPlayer((ServerPlayer) player);
-            ResearchdSavedData.TEAM_RESEARCH.get().setData(player.level(), researchTeamMap);
             ResearchHelperCommon.refreshResearches((ServerPlayer) player);
         }
     }
