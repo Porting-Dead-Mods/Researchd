@@ -1,0 +1,34 @@
+# Gameplay
+
+This page provides an overview of the core gameplay mechanics of the Researchd mod.
+
+## The Research Screen
+
+The Research Screen is the central hub for all your research activities. It can be opened with a dedicated keybind (check your keybind settings).
+
+The screen is composed of several key components:
+
+### The Research Graph
+
+The largest part of the screen is the Research Graph. This is a visual representation of the entire research tree. You can pan to navigate the tree and see how different researches are connected.
+
+### The Tech List
+
+On the left side of the screen, you'll find the Tech List. This is a searchable and filterable list of all available researches. You can use this to quickly find a specific research you're looking for.
+
+### The Research Queue
+
+At the top of the screen is the Research Queue. This widget shows the researches you are currently working on. The research at the front of the queue is the one that is actively being progressed. You can add, remove, and reorder researches in the queue.
+
+### The Selected Research Widget
+When you select a research from the graph or the tech list, its details will be displayed in the Selected Research Widget. This widget will show all the Research Methods and Effects of the research.
+
+### The Research Lab
+
+The Research Lab is a multiblock structure that is essential for progressing through certain research paths. Specifically, it is used for researches that require `ConsumePackResearchMethod`.
+
+## The Team Research Screen
+
+It can be opened by pressing 'M' (default).
+
+!Currently WIP!

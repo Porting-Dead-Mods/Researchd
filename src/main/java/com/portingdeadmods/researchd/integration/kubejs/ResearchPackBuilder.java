@@ -35,8 +35,8 @@ public class ResearchPackBuilder extends BuilderBase<SimpleResearchPack> {
         return this;
     }
 
-    public ResearchPackBuilder customTexture(ResourceLocation texture) {
-        this.customTexture = texture;
+    public ResearchPackBuilder customTexture(String texture) {
+        this.customTexture = ResourceLocation.parse(texture);
         return this;
     }
 

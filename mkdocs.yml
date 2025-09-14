@@ -1,0 +1,8 @@
+site_name: Researchd Wiki
+nav:
+  - Home: index.md
+  - DataGen:
+    - Java: datagen/java.md
+    - KubeJS: datagen/kubejs.md
+  - Gameplay: gameplay.md
+  - Addons: addons.md
