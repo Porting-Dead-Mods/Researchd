@@ -126,7 +126,7 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
         ResourceKey<Research> current = teamProgress.currentResearch();
 		if (current == null) return;
 
-		List<ResearchMethodProgress> validMethods = teamProgress.getAllValidMethodProgress(ConsumePackResearchMethod.class);
+		List<ResearchMethodProgress<ConsumePackResearchMethod>> validMethods = teamProgress.getAllIncompleteMethodProgress(ConsumePackResearchMethod.class);
 		if (validMethods == null) return;
 		if (validMethods.isEmpty()) return;
 

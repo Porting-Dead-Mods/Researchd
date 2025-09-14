@@ -162,7 +162,7 @@ public class ResearchTeam {
      * @return {@link ResearchMethodProgress} of the research or null if no research is currently in progress.
      */
     @Nullable
-    public ResearchMethodProgress getResearchProgressInQueue() {
+    public ResearchMethodProgress<?> getResearchProgressInQueue() {
         ResearchQueue queue = this.metadata.researchProgress.researchQueue();
         if (queue.getEntries() == null) return null;
         if (queue.getEntries().isEmpty()) return null;
@@ -170,7 +170,7 @@ public class ResearchTeam {
         return this.metadata.researchProgress.getRootProgress(queue.getEntries().getFirst());
     }
 
-    public List<ResearchMethodProgress> getAllQueueProgresses() {
+    public List<ResearchMethodProgress<?>> getAllQueueProgresses() {
         ResearchQueue queue = this.metadata.researchProgress.researchQueue();
         if (queue.getEntries() == null) return null;
         if (queue.getEntries().isEmpty()) return null;
@@ -301,7 +301,7 @@ public class ResearchTeam {
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
         this.getResearchProgress().researches().putAll(researchInstances);
 
-        Map<ResourceKey<Research>, List<ResearchMethodProgress>> rmps = CommonResearchCache.GLOBAL_RESEARCHES.entrySet().stream()
+        Map<ResourceKey<Research>, List<ResearchMethodProgress<?>>> rmps = CommonResearchCache.GLOBAL_RESEARCHES.entrySet().stream()
                 .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), ResearchMethodProgress.collectFromRoot(e.getValue().getResearch(access).researchMethod())))
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
         this.getResearchProgress().progress().putAll(rmps);

@@ -488,7 +488,7 @@ public final class ResearchTeamHelper {
 
         for (ResearchTeam team : data.getResearchTeams().values()) {
             Map<ResourceKey<Research>, ResearchInstance> researches = team.getResearchProgress().researches();
-            Map<ResourceKey<Research>, List<ResearchMethodProgress>> progress = team.getResearchProgress().progress();
+            Map<ResourceKey<Research>, List<ResearchMethodProgress<?>>> progress = team.getResearchProgress().progress();
             Set<GlobalResearch> globalResearches = new HashSet<>(CommonResearchCache.GLOBAL_RESEARCHES.values());
 
             for (GlobalResearch research : globalResearches) {

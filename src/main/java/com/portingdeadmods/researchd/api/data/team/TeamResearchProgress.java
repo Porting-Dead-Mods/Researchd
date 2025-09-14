@@ -26,7 +26,7 @@ import java.util.function.Function;
 public record TeamResearchProgress(
         ResearchQueue researchQueue,
         HashMap<ResourceKey<Research>, ResearchInstance> researches,
-        HashMap<ResourceKey<Research>, List<ResearchMethodProgress>> progress
+        HashMap<ResourceKey<Research>, List<ResearchMethodProgress<?>>> progress
 ) {
     public static final TeamResearchProgress EMPTY = new TeamResearchProgress(
             new ResearchQueue(),
@@ -60,10 +60,10 @@ public record TeamResearchProgress(
     /**
      * Gets the root progress of a research a.k.a. the one that dictates if the research is complete or not.
      */
-    public @Nullable ResearchMethodProgress getRootProgress(ResourceKey<Research> research) {
+    public @Nullable ResearchMethodProgress<?> getRootProgress(ResourceKey<Research> research) {
         if (!this.progress.containsKey(research)) return null;
-        List<ResearchMethodProgress> progressList = this.progress.get(research);
-        ResearchMethodProgress rmp = progressList.getFirst();
+        List<ResearchMethodProgress<?>> progressList = this.progress.get(research);
+        ResearchMethodProgress<?> rmp = progressList.getFirst();
 
         while (rmp.getParent() != null) {
             rmp = rmp.getParent();
@@ -77,15 +77,16 @@ public record TeamResearchProgress(
      *
      * @return A list of all the valid (non Or/And) methods available for the current research. Null if no current research.
      */
-    public @Nullable List<ResearchMethodProgress> getAllValidMethodProgress() {
+    public @Nullable List<ResearchMethodProgress<?>> getAllIncompleteMethodProgress() {
         if (currentResearch() == null) return null;
-        List<ResearchMethodProgress> progressList = this.progress().get(this.currentResearch());
+        List<ResearchMethodProgress<?>> progressList = this.progress().get(this.currentResearch());
 
         progressList = new ArrayList<>(progressList.parallelStream().filter(rmp -> {
             if (rmp.isComplete()) return false;
-            if (rmp.getMethod() instanceof OrResearchMethod || rmp.getMethod() instanceof AndResearchMethod) return false;
+            if (rmp.getMethod() instanceof OrResearchMethod || rmp.getMethod() instanceof AndResearchMethod)
+                return false;
 
-            ResearchMethodProgress parent = rmp.getParent();
+            ResearchMethodProgress<?> parent = rmp.getParent();
 
             while (parent != null) {
                 if (parent.isComplete()) {
@@ -103,14 +104,21 @@ public record TeamResearchProgress(
      * ! Filtering by {@link com.portingdeadmods.researchd.impl.research.method.AndResearchMethod} or {@link com.portingdeadmods.researchd.impl.research.method.OrResearchMethod} return an empty list !
      *
      * @param clazz The class of ResearchMethod to filter by
-     * @return {@link #getAllValidMethodProgress()} filtered by the given class. Null if no current research.
+     * @return {@link #getAllIncompleteMethodProgress()} filtered by the given class. Null if no current research.
      */
-    public @Nullable <T extends ResearchMethod> List<ResearchMethodProgress> getAllValidMethodProgress(Class<T> clazz) {
-        List<ResearchMethodProgress> progressList = this.getAllValidMethodProgress();
+    public @Nullable <T extends ResearchMethod> List<ResearchMethodProgress<T>> getAllIncompleteMethodProgress(Class<T> clazz) {
+        List<ResearchMethodProgress<?>> progressList = this.getAllIncompleteMethodProgress();
         if (progressList == null) return null;
 
-        progressList.removeIf(p -> !clazz.isInstance(p.getMethod()));
-        return progressList;
+        List<ResearchMethodProgress<T>> newProgressList = new ArrayList<>();
+
+        for (ResearchMethodProgress<?> progress : progressList) {
+            if (clazz.isInstance(progress.getMethod())) {
+                newProgressList.add((ResearchMethodProgress<T>) progress);
+            }
+        }
+
+        return newProgressList;
     }
 
     public @Nullable ResourceKey<Research> currentResearch() {
@@ -124,12 +132,11 @@ public record TeamResearchProgress(
             if (instance.getParents().stream().allMatch(parent -> this.hasCompleted(parent.getResearchKey()))) {
                 instance.setResearchStatus(ResearchStatus.RESEARCHABLE);
                 continue;
-                }
+            }
 
             if (instance.getParents().stream().allMatch(parent -> {
                 if (this.hasCompleted(parent.getResearchKey())) return true;
-                if (this.researchQueue.getEntries().contains(parent.getResearchKey())) return true;
-                return false;
+                return this.researchQueue.getEntries().contains(parent.getResearchKey());
             })) {
                 instance.setResearchStatus(ResearchStatus.RESEARCHABLE_AFTER_QUEUE);
                 continue;

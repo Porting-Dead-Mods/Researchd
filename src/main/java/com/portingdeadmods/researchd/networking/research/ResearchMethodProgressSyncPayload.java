@@ -14,7 +14,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.List;
 
-public record ResearchMethodProgressSyncPayload(ResourceKey<Research> res, List<ResearchMethodProgress> prog) implements CustomPacketPayload {
+public record ResearchMethodProgressSyncPayload(ResourceKey<Research> res, List<ResearchMethodProgress<?>> prog) implements CustomPacketPayload {
 	public static final CustomPacketPayload.Type<ResearchMethodProgressSyncPayload> TYPE = new CustomPacketPayload.Type<>(Researchd.rl("research_complete_progress_sync"));
 	public static final StreamCodec<? super RegistryFriendlyByteBuf, ResearchMethodProgressSyncPayload> STREAM_CODEC = StreamCodec.composite(
 			ResourceKey.streamCodec(ResearchdRegistries.RESEARCH_KEY),

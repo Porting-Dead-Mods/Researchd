@@ -69,14 +69,14 @@ public final class ResearchdCommonEvents {
     public static void consumeItemResearchMethodLogic(@NotNull ResearchTeamMap data, MinecraftServer server) {
         for (ResearchTeam team : data.getResearchTeams().values()) {
             TeamResearchProgress teamProgress = team.getResearchProgress();
-            List<ResearchMethodProgress> progressList = teamProgress.getAllValidMethodProgress(ConsumeItemResearchMethod.class);
+            List<ResearchMethodProgress<ConsumeItemResearchMethod>> progressList = teamProgress.getAllIncompleteMethodProgress(ConsumeItemResearchMethod.class);
             if (progressList == null) continue;
             if (progressList.isEmpty()) continue;
             if (team.getResearchProgressInQueue() == null) continue; // Useless line, but just make the IDE shut up
 
             Researchd.debug("ConsumeItemResearchMethodLogic", "Current progress on root: " + team.getResearchProgressInQueue().getProgress() + "/" + team.getResearchProgressInQueue().getMaxProgress(), " ROOT UUID: ", team.getResearchProgressInQueue().DEBUG_UUID());
-            for (ResearchMethodProgress progress : progressList) {
-                ConsumeItemResearchMethod method = (ConsumeItemResearchMethod) progress.getMethod();
+            for (ResearchMethodProgress<ConsumeItemResearchMethod> progress : progressList) {
+                ConsumeItemResearchMethod method = progress.getMethod();
                 Ingredient ingredient = method.toConsume();
                 int needed = (int) progress.getRemainingProgress();
                 Researchd.debug("ConsumeItemResearchMethodLogic", "Current progress on possible method: " + progress.getProgress() + "/" + progress.getMaxProgress());

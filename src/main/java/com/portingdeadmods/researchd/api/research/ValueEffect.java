@@ -18,6 +18,5 @@ public interface ValueEffect {
     }
 
     default void onUnlock(ResearchTeam team, Level level) {
-
     }
 }
