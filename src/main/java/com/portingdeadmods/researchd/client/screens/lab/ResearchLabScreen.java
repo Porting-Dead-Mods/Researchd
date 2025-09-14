@@ -11,12 +11,20 @@ import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.content.menus.ResearchLabMenu;
 import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
+import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.client.event.ContainerScreenEvent;
+import net.neoforged.neoforge.common.NeoForge;
 import org.jetbrains.annotations.NotNull;
 
 public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMenu> {
@@ -63,10 +71,86 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
 
     @Override
     public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-        super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
+        renderBackground(pGuiGraphics, pMouseX, pMouseX, pPartialTick);
+        NeoForge.EVENT_BUS.post(new ContainerScreenEvent.Render.Background(this, pGuiGraphics, pMouseX, pMouseY));
+
+        for(Renderable renderable : this.renderables) {
+            renderable.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
+        }
+
+        renderItemsAndSlots(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
+
         this.scroller.renderWidget(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
         // Foreground
         this.drawBars(pGuiGraphics);
+
+        renderTooltip(pGuiGraphics, pMouseX, pMouseY);
+    }
+
+    public boolean isHovering(GuiGraphics guiGraphics, Slot slot, double mouseX, double mouseY) {
+        return guiGraphics.containsPointInScissor((int) mouseX, (int) mouseY) && this.isHovering(slot, mouseX, mouseY);
+    }
+
+    private void renderItemsAndSlots(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        RenderSystem.disableDepthTest();
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate((float)this.leftPos, (float)this.topPos, 0.0F);
+        this.hoveredSlot = null;
+
+
+        int startX = this.leftPos + 7;
+        int startY = this.topPos + 17;
+        guiGraphics.enableScissor(startX, startY, startX + 162, startY + SLOT_HEIGHT);
+        {
+        for(int k = 0; k < this.menu.slots.size(); ++k) {
+            Slot slot = this.menu.slots.get(k);
+            if (slot.isActive()) {
+                this.renderSlot(guiGraphics, slot);
+            }
+
+            if (this.isHovering(guiGraphics, slot, mouseX, mouseY) && slot.isActive()) {
+                this.hoveredSlot = slot;
+                this.renderSlotHighlight(guiGraphics, slot, mouseX, mouseY, partialTick);
+            }
+        }
+        }
+        guiGraphics.disableScissor();
+
+        this.renderLabels(guiGraphics, mouseX, mouseY);
+        NeoForge.EVENT_BUS.post(new ContainerScreenEvent.Render.Foreground(this, guiGraphics, mouseX, mouseY));
+        ItemStack itemstack = this.draggingItem.isEmpty() ? this.menu.getCarried() : this.draggingItem;
+        if (!itemstack.isEmpty()) {
+            int l1 = 8;
+            int i2 = this.draggingItem.isEmpty() ? 8 : 16;
+            String s = null;
+            if (!this.draggingItem.isEmpty() && this.isSplittingStack) {
+                itemstack = itemstack.copyWithCount(Mth.ceil((float)itemstack.getCount() / 2.0F));
+            } else if (this.isQuickCrafting && this.quickCraftSlots.size() > 1) {
+                itemstack = itemstack.copyWithCount(this.quickCraftingRemainder);
+                if (itemstack.isEmpty()) {
+                    s = ChatFormatting.YELLOW + "0";
+                }
+            }
+
+            this.renderFloatingItem(guiGraphics, itemstack, mouseX - this.leftPos - 8, mouseY - this.topPos - i2, s);
+        }
+
+        if (!this.snapbackItem.isEmpty()) {
+            float f = (float)(Util.getMillis() - this.snapbackTime) / 100.0F;
+            if (f >= 1.0F) {
+                f = 1.0F;
+                this.snapbackItem = ItemStack.EMPTY;
+            }
+
+            int j2 = this.snapbackEnd.x - this.snapbackStartX;
+            int k2 = this.snapbackEnd.y - this.snapbackStartY;
+            int j1 = this.snapbackStartX + (int)((float)j2 * f);
+            int k1 = this.snapbackStartY + (int)((float)k2 * f);
+            this.renderFloatingItem(guiGraphics, this.snapbackItem, j1, k1, (String)null);
+        }
+
+        guiGraphics.pose().popPose();
+        RenderSystem.enableDepthTest();
     }
 
     @Override

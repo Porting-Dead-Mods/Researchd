@@ -11,8 +11,6 @@ import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchSerializer;
 import com.portingdeadmods.researchd.impl.research.effect.EmptyResearchEffect;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -66,10 +64,6 @@ public record SimpleResearch(Item icon, ResearchMethod researchMethod, ResearchE
             return CODEC;
         }
 
-        @Override
-        public StreamCodec<RegistryFriendlyByteBuf, SimpleResearch> streamCodec() {
-            return null;
-        }
     }
 
     public static class Builder implements Research.Builder<SimpleResearch> {
