@@ -1,4 +1,5 @@
 site_name: Researchd Wiki
+repo_url: https://github.com/Porting-Dead-Mods/Researchd
 nav:
   - Home: index.md
   - DataGen:
@@ -6,3 +7,22 @@ nav:
     - KubeJS: datagen/kubejs.md
   - Gameplay: gameplay.md
   - Addons: addons.md
+theme:
+  name: material
+  palette:
+    scheme: slate
+  features:
+    - content.code.annotate
+  icon:
+    repo: fontawesome/brands/github
+  social:
+    - icon: assets/icons/curseforge.svg
+      link: https://www.curseforge.com/minecraft/mc-mods/researchd
+extra_css:
+  - stylesheets/extra.css
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
