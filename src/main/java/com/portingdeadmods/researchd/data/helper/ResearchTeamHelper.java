@@ -410,7 +410,9 @@ public final class ResearchTeamHelper {
                             .append(Component.literal(entry.getValue().getName()).withStyle(ChatFormatting.WHITE))
             );
         }
-        for (ResearchTeam team : ResearchdSavedData.TEAM_RESEARCH.get().getData(level).getResearchTeams().values()) {
+
+        Map<UUID, ResearchTeam> map = ResearchdSavedData.TEAM_RESEARCH.get().getData(level).getResearchTeams();
+        for (ResearchTeam team : map.values()) {
             dump.add(team.parseMembers(level));
         }
 

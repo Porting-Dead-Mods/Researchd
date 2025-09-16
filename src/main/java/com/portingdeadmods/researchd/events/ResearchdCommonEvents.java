@@ -97,13 +97,13 @@ public final class ResearchdCommonEvents {
 
                     // Research Complete Logic
                     if (currentResearchProgress.isComplete()) {
-                        teamProgress.completeResearch(research, server.getTickCount() * 50L, level);
+                        teamProgress.completeResearch(research, server.overworld().getDayTime() * 50L, level);
 
                         for (TeamMember playerUUIDs : team.getMembers()) {
                             ServerPlayer player = server.getPlayerList().getPlayer(playerUUIDs.player());
                             if (player == null) continue;
 
-                            PacketDistributor.sendToPlayer(player, new ResearchFinishedPayload(research, server.getTickCount() * 50));
+                            PacketDistributor.sendToPlayer(player, new ResearchFinishedPayload(research,  (int) server.overworld().getDayTime() * 50));
 
                             KubeJSIntegration.fireResearchCompletedEvent(player, research);
 

@@ -100,7 +100,7 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
 
         int startX = this.leftPos + 7;
         int startY = this.topPos + 17;
-        guiGraphics.enableScissor(startX, startY, startX + 162, startY + SLOT_HEIGHT);
+        guiGraphics.enableScissor(startX, startY, startX + SLOT_WIDTH * 9, startY + this.imageHeight);
         {
         for(int k = 0; k < this.menu.slots.size(); ++k) {
             Slot slot = this.menu.slots.get(k);

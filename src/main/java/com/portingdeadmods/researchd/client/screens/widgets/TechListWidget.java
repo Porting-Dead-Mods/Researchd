@@ -155,7 +155,7 @@ public class TechListWidget extends ResearchScreenWidget {
         if (selectedInstance != null) {
             if (queue.getQueue().add(selectedInstance)) {
                 UUID player = Minecraft.getInstance().player.getUUID();
-                long gameTime = Minecraft.getInstance().level.getGameTime();
+                long gameTime = Minecraft.getInstance().level.getDayTime();
 
 
                 selectedInstance.setResearchedPlayer(player);

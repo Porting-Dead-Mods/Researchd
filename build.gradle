@@ -50,6 +50,7 @@ neoForge {
         client {
             client()
 
+            programArguments.addAll '--username', 'Developer', '--uuid', '123456781234123412341234567890ab'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
 
             programArguments.addAll '--username', 'Developer', '--uuid', '123456781234123412341234567890ab'
@@ -57,7 +58,7 @@ neoForge {
 
         server {
             server()
-            programArgument '--nogui'
+
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
