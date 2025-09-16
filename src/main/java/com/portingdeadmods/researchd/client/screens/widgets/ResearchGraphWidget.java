@@ -1,6 +1,5 @@
 package com.portingdeadmods.researchd.client.screens.widgets;
 
-import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.data.ResearchGraph;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
@@ -36,6 +35,7 @@ public class ResearchGraphWidget extends AbstractWidget {
     private final Map<ResearchNode, ArrayList<ResearchLine>> researchLines;
 
     private final ResearchScreen researchScreen;
+    private final float ROOT_NODE_SCALING = 1.75f;
 
     public ResearchGraphWidget(ResearchScreen researchScreen, int x, int y, int width, int height) {
         super(x, y, width, height, Component.empty());
@@ -70,8 +70,15 @@ public class ResearchGraphWidget extends AbstractWidget {
                 node.refreshHeads();
             }
 
-            // Always calculate connection lines after positions are finalized
-            //TODO: REWORK AND REENABLE LINE GENERATION AFTER FINISHING NODE POSITIONING
+
+            // Center the graph to the center of the widget
+            int baseX = this.graph.rootNode().getX();
+            int baseY = this.graph.rootNode().getY();
+
+            int centerX = baseX + ResearchScreenWidget.PANEL_WIDTH / 2;
+            int centerY = baseY + ResearchScreenWidget.PANEL_HEIGHT / 2;
+            translate(this.getWidth() / 2 - centerX + ResearchScreen.LEFT_MARGIN_WIDTH, this.getHeight() / 2 - centerY);
+
             calculateLines();
         }
     }
@@ -548,11 +555,10 @@ public class ResearchGraphWidget extends AbstractWidget {
 
             for (ResearchNode node : this.graph.nodes().values()) {
                 if (node.isRootNode()) {
-                    float scale = 1.75f;
                     int width = ResearchScreenWidget.PANEL_WIDTH;
                     int height = ResearchScreenWidget.PANEL_HEIGHT;
 
-                    // getX() and getY() = top-left of normal panel (scale = 1)
+                    // getX() and getY() = top-left of normal panel (ROOT_NODE_SCALING = 1)
                     float baseX = node.getX();
                     float baseY = node.getY();
 
@@ -561,10 +567,10 @@ public class ResearchGraphWidget extends AbstractWidget {
                     float centerY = baseY + height / 2f;
 
                     // compute top-left of scaled panel to keep same center
-                    int scaledX = (int) (centerX - (width * scale) / 2f);
-                    int scaledY = (int) (centerY - (height * scale) / 2f);
+                    int scaledX = (int) (centerX - (width * ROOT_NODE_SCALING) / 2f);
+                    int scaledY = (int) (centerY - (height * ROOT_NODE_SCALING) / 2f);
 
-                    node.setHovered(guiGraphics, scaledX, scaledY, (int) (20 * scale), (int) (24 * scale), mouseX, mouseY);
+                    node.setHovered(guiGraphics, scaledX, scaledY, (int) (20 * ROOT_NODE_SCALING), (int) (24 * ROOT_NODE_SCALING), mouseX, mouseY);
                     ResearchScreenWidget.renderResearchPanel(
                             guiGraphics,
                             node.getInstance(),
@@ -572,7 +578,7 @@ public class ResearchGraphWidget extends AbstractWidget {
                             scaledY,
                             mouseX,
                             mouseY,
-                            scale
+                            ROOT_NODE_SCALING
                     );
                 } else {
                     node.render(guiGraphics, mouseX, mouseY, v);
@@ -625,6 +631,20 @@ public class ResearchGraphWidget extends AbstractWidget {
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
     }
 
+    public void translate(int dx, int dy) {
+        if (this.graph != null && this.graph.nodes() != null) {
+            for (ResearchNode node : this.graph.nodes().values()) {
+                node.translate(dx, dy);
+            }
+        }
+
+        for (List<ResearchLine> lines : this.researchLines.values()) {
+            for (ResearchLine line : lines) {
+                line.translate(dx, dy);
+            }
+        }
+    }
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (this.graph == null || this.graph.nodes() == null) {
@@ -645,17 +665,7 @@ public class ResearchGraphWidget extends AbstractWidget {
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
         if (this.isHovered()) {
-            if (this.graph != null && this.graph.nodes() != null) {
-                for (ResearchNode node : this.graph.nodes().values()) {
-                    node.translate((int) dragX, (int) dragY);
-                }
-            }
-
-            for (List<ResearchLine> lines : this.researchLines.values()) {
-                for (ResearchLine line : lines) {
-                    line.translate((int) dragX, (int) dragY);
-                }
-            }
+            translate((int) dragX, (int) dragY);
         }
 
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);

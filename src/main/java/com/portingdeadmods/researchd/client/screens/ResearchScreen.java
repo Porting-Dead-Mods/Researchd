@@ -18,10 +18,11 @@ import net.minecraft.resources.ResourceLocation;
 public class ResearchScreen extends Screen {
     public static final ResourceLocation TOP_BAR_TEXTURE = Researchd.rl("textures/gui/top_bar.png");
     public static final ResourceLocation SIDE_BAR_RIGHT_TEXTURE = Researchd.rl("textures/gui/side_bar_right.png");
-    private static final int TOP_BAR_WIDTH = 377;
-    private static final int TOP_BAR_HEIGHT = 8;
-    private static final int SIDE_BAR_WIDTH = 8;
-    private static final int SIDE_BAR_HEIGHT = 253;
+    public static final int TOP_BAR_WIDTH = 377;
+    public static final int TOP_BAR_HEIGHT = 8;
+    public static final int SIDE_BAR_WIDTH = 8;
+    public static final int SIDE_BAR_HEIGHT = 253;
+    public static final int LEFT_MARGIN_WIDTH = 174;
     public static final ResourceLocation TOP_RIGHT_EDGE = Researchd.rl("textures/gui/research_screen/edges/top_right.png");
     public static final ResourceLocation BOTTOM_RIGHT_EDGE = Researchd.rl("textures/gui/research_screen/edges/bottom_right.png");
     public static final ResourceLocation TOP_BAR = Researchd.rl("textures/gui/research_screen/bars/top.png");
