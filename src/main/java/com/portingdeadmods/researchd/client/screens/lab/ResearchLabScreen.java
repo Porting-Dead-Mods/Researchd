@@ -218,7 +218,7 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
 
         int x = this.leftPos + 12;
         int y = this.topPos + 72;
-        ResearchMethodProgress rmp = ClientResearchTeamHelper.getTeam().getResearchProgress().getRootProgress(team.getFirstQueueResearch());
+        ResearchMethodProgress rmp = ClientResearchTeamHelper.getTeam().getResearchProgress().getProgress(team.getFirstQueueResearch());
         float progress = rmp == null ? 0f : rmp.getProgressPercent();
         int width = (int) (progress * 93);
         guiGraphics.fill(x, y, x + width, y + 6, PROGRESS_COLOR);

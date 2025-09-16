@@ -167,15 +167,7 @@ public class ResearchTeam {
         if (queue.getEntries() == null) return null;
         if (queue.getEntries().isEmpty()) return null;
 
-        return this.metadata.researchProgress.getRootProgress(queue.getEntries().getFirst());
-    }
-
-    public List<ResearchMethodProgress<?>> getAllQueueProgresses() {
-        ResearchQueue queue = this.metadata.researchProgress.researchQueue();
-        if (queue.getEntries() == null) return null;
-        if (queue.getEntries().isEmpty()) return null;
-
-        return this.metadata.researchProgress.progress().get(queue.getEntries().getFirst());
+        return this.metadata.researchProgress.getProgress(queue.getEntries().getFirst());
     }
 
     public void addMember(UUID uuid) {
@@ -293,7 +285,7 @@ public class ResearchTeam {
         return this.getTeamEffectList().computeIfAbsent(ResearchdRegistries.VALUE_EFFECT.getKey(eff.get()), k -> 1f);
     }
 
-    public void init(HolderLookup.Provider access) {
+    public void init(HolderLookup.Provider lookup) {
         Map<ResourceKey<Research>, ResearchInstance> researchInstances = CommonResearchCache.GLOBAL_RESEARCHES.entrySet().stream()
                 .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), new ResearchInstance(e.getValue(), CommonResearchCache.ROOT_RESEARCH.is(e.getKey())
                         ? ResearchStatus.RESEARCHABLE
@@ -301,9 +293,10 @@ public class ResearchTeam {
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
         this.getResearchProgress().researches().putAll(researchInstances);
 
-        Map<ResourceKey<Research>, List<ResearchMethodProgress<?>>> rmps = CommonResearchCache.GLOBAL_RESEARCHES.entrySet().stream()
-                .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), ResearchMethodProgress.collectFromRoot(e.getValue().getResearch(access).researchMethod())))
-                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
+        Map<ResourceKey<Research>, ResearchMethodProgress<?>> rmps = new HashMap<>();
+        for (ResourceKey<Research> key : CommonResearchCache.GLOBAL_RESEARCHES.keySet()) {
+            rmps.put(key, ResearchMethodProgress.fromResearch(lookup, key));
+        }
         this.getResearchProgress().progress().putAll(rmps);
     }
 

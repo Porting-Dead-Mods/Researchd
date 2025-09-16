@@ -139,7 +139,7 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
         ResearchStatus status = firstInQueue.getResearchStatus();
         GuiUtils.drawImg(guiGraphics, status.getSpriteTexture(spriteType), x, y, PANEL_WIDTH, spriteType.getHeight());
 
-        ResearchMethodProgress rmp = ClientResearchTeamHelper.getTeam().getResearchProgress().getRootProgress(firstInQueue.getKey());
+        ResearchMethodProgress rmp = ClientResearchTeamHelper.getTeam().getResearchProgress().getProgress(firstInQueue.getKey());
         float progress = rmp == null ? 0f : rmp.getProgressPercent();
 
         guiGraphics.blit(ResearchStatus.RESEARCHED.getSpriteTexture(spriteType), x, y, 0, 0, (int) (progress * PANEL_WIDTH), spriteType.getHeight(), PANEL_WIDTH, spriteType.getHeight());

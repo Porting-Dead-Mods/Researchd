@@ -5,18 +5,21 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
+import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
+import com.portingdeadmods.researchd.content.blockentities.ResearchLabControllerBE;
 import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
+import com.portingdeadmods.researchd.registries.ResearchdValueEffects;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -34,18 +37,34 @@ public record ConsumePackResearchMethod(List<ResourceKey<SimpleResearchPack>> pa
     public static final ResourceLocation ID = Researchd.rl("consume_pack");
 
     @Override
-    public boolean canResearch(Player player, ResourceKey<Research> research) {
-        return true; // Not player based
-    }
-
-    @Override
-    public void onResearchStart(Player player, ResourceKey<Research> research) {
-        return; // Not player based
-    }
-
-    @Override
     public ResourceLocation id() {
         return ID;
+    }
+
+    @Override
+    public void checkProgress(Level level, ResourceKey<Research> research, ResearchMethodProgress<?> progress, MethodContext context) {
+        if (context instanceof SimpleMethodContext(ResearchTeam team, ResearchLabControllerBE blockEntity) && blockEntity != null) {
+            List<ResourceKey<SimpleResearchPack>> packs = this.packs();
+            blockEntity.currentResearchDuration = this.duration();
+
+            if (!blockEntity.containsNecessaryPacks(packs)) return;
+            blockEntity.decreaseNecessaryPackCount(packs);
+
+            for (ResourceKey<SimpleResearchPack> pack : packs) {
+                blockEntity.researchPackUsage.put(pack, Math.max(blockEntity.researchPackUsage.get(pack) - ((1f / blockEntity.currentResearchDuration) / team.getTeamEffect(ResearchdValueEffects.RESEARCH_LAB_PRODUCTIVITY)), 0f));
+            }
+            progress.addProgress(1f / blockEntity.currentResearchDuration);
+        }
+    }
+
+    @Override
+    public boolean shouldCheckProgress() {
+        return false;
+    }
+
+    @Override
+    public float getMaxProgress() {
+        return this.count;
     }
 
     public List<ItemStack> asStacks() {
@@ -60,11 +79,6 @@ public record ConsumePackResearchMethod(List<ResourceKey<SimpleResearchPack>> pa
     @Override
     public Serializer getSerializer() {
         return Serializer.INSTANCE;
-    }
-
-    @Override
-    public ResearchMethodProgress getDefaultProgress() {
-        return ResearchMethodProgress.empty(this, this.count);
     }
 
     public static final class Serializer implements ResearchMethodSerializer<ConsumePackResearchMethod> {

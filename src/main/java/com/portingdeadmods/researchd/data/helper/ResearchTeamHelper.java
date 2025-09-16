@@ -488,13 +488,13 @@ public final class ResearchTeamHelper {
 
         for (ResearchTeam team : data.getResearchTeams().values()) {
             Map<ResourceKey<Research>, ResearchInstance> researches = team.getResearchProgress().researches();
-            Map<ResourceKey<Research>, List<ResearchMethodProgress<?>>> progress = team.getResearchProgress().progress();
+            Map<ResourceKey<Research>, ResearchMethodProgress<?>> progress = team.getResearchProgress().progress();
             Set<GlobalResearch> globalResearches = new HashSet<>(CommonResearchCache.GLOBAL_RESEARCHES.values());
 
             for (GlobalResearch research : globalResearches) {
                 if (progress.containsKey(research.getResearchKey())) continue;
 
-                progress.put(research.getResearchKey(), ResearchMethodProgress.collectFromRoot(research.getResearch(level.registryAccess()).researchMethod()));
+                progress.put(research.getResearchKey(), ResearchMethodProgress.fromResearch(level.registryAccess(), research.getResearchKey()));
             }
 
             researches.values().stream().map(ResearchInstance::getResearch).toList().forEach(globalResearches::remove);

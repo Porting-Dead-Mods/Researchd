@@ -9,8 +9,6 @@ import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
-import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
-import com.portingdeadmods.researchd.impl.research.method.OrResearchMethod;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -18,39 +16,42 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
-public record TeamResearchProgress(
-        ResearchQueue researchQueue,
-        HashMap<ResourceKey<Research>, ResearchInstance> researches,
-        HashMap<ResourceKey<Research>, List<ResearchMethodProgress<?>>> progress
-) {
+public record TeamResearchProgress(ResearchQueue researchQueue,
+                                   HashMap<ResourceKey<Research>, ResearchInstance> researches,
+                                   HashMap<ResourceKey<Research>, ResearchMethodProgress<?>> progress) {
     public static final TeamResearchProgress EMPTY = new TeamResearchProgress(
             new ResearchQueue(),
             new HashMap<>(),
             new HashMap<>()
     );
-
     public static final Codec<TeamResearchProgress> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             ResearchQueue.CODEC.fieldOf("researchQueue").forGetter(TeamResearchProgress::researchQueue),
             Codec.unboundedMap(Research.RESOURCE_KEY_CODEC, ResearchInstance.CODEC).xmap(HashMap::new, Function.identity()).fieldOf("researches")
                     .forGetter(TeamResearchProgress::researches),
-            Codec.unboundedMap(Research.RESOURCE_KEY_CODEC, ResearchMethodProgress.CODEC.listOf()).xmap(HashMap::new, Function.identity()).fieldOf("completionProgress")
+            Codec.unboundedMap(Research.RESOURCE_KEY_CODEC, ResearchMethodProgress.CODEC).xmap(HashMap::new, Function.identity()).fieldOf("completionProgress")
                     .forGetter(TeamResearchProgress::progress)
     ).apply(instance, TeamResearchProgress::new));
-
     public static final StreamCodec<RegistryFriendlyByteBuf, TeamResearchProgress> STREAM_CODEC = StreamCodec.composite(
             ResearchQueue.STREAM_CODEC,
             TeamResearchProgress::researchQueue,
             ByteBufCodecs.map(HashMap::new, Research.RESOURCE_KEY_STREAM_CODEC, ResearchInstance.STREAM_CODEC),
             TeamResearchProgress::researches,
-            ByteBufCodecs.map(HashMap::new, Research.RESOURCE_KEY_STREAM_CODEC, ResearchMethodProgress.STREAM_CODEC.apply(ByteBufCodecs.list())),
+            ByteBufCodecs.map(HashMap::new, Research.RESOURCE_KEY_STREAM_CODEC, ResearchMethodProgress.STREAM_CODEC),
             TeamResearchProgress::progress,
             TeamResearchProgress::new
     );
+
+    public Map<ResourceKey<Research>, ResearchMethodProgress<?>> queueProgresses() {
+        Map<ResourceKey<Research>, ResearchMethodProgress<?>> rmps = new HashMap<>();
+        for (ResourceKey<Research> key : this.researchQueue().entries()) {
+            rmps.put(key, this.progress.get(key));
+        }
+        return rmps;
+    }
 
     // Helper methods
     public boolean hasCompleted(ResourceKey<Research> research) {
@@ -58,67 +59,10 @@ public record TeamResearchProgress(
     }
 
     /**
-     * Gets the root progress of a research a.k.a. the one that dictates if the research is complete or not.
+     * Gets the root progress of a research
      */
-    public @Nullable ResearchMethodProgress<?> getRootProgress(ResourceKey<Research> research) {
-        if (!this.progress.containsKey(research)) return null;
-        List<ResearchMethodProgress<?>> progressList = this.progress.get(research);
-        ResearchMethodProgress<?> rmp = progressList.getFirst();
-
-        while (rmp.getParent() != null) {
-            rmp = rmp.getParent();
-        }
-
-        return rmp;
-    }
-
-    /**
-     * Filters out all the complete and And/Or methods.
-     *
-     * @return A list of all the valid (non Or/And) methods available for the current research. Null if no current research.
-     */
-    public @Nullable List<ResearchMethodProgress<?>> getAllIncompleteMethodProgress() {
-        if (currentResearch() == null) return null;
-        List<ResearchMethodProgress<?>> progressList = this.progress().get(this.currentResearch());
-
-        progressList = new ArrayList<>(progressList.parallelStream().filter(rmp -> {
-            if (rmp.isComplete()) return false;
-            if (rmp.getMethod() instanceof OrResearchMethod || rmp.getMethod() instanceof AndResearchMethod)
-                return false;
-
-            ResearchMethodProgress<?> parent = rmp.getParent();
-
-            while (parent != null) {
-                if (parent.isComplete()) {
-                    return false;
-                }
-                parent = parent.getParent();
-            }
-            return true;
-        }).toList());
-
-        return progressList;
-    }
-
-    /**
-     * ! Filtering by {@link com.portingdeadmods.researchd.impl.research.method.AndResearchMethod} or {@link com.portingdeadmods.researchd.impl.research.method.OrResearchMethod} return an empty list !
-     *
-     * @param clazz The class of ResearchMethod to filter by
-     * @return {@link #getAllIncompleteMethodProgress()} filtered by the given class. Null if no current research.
-     */
-    public @Nullable <T extends ResearchMethod> List<ResearchMethodProgress<T>> getAllIncompleteMethodProgress(Class<T> clazz) {
-        List<ResearchMethodProgress<?>> progressList = this.getAllIncompleteMethodProgress();
-        if (progressList == null) return null;
-
-        List<ResearchMethodProgress<T>> newProgressList = new ArrayList<>();
-
-        for (ResearchMethodProgress<?> progress : progressList) {
-            if (clazz.isInstance(progress.getMethod())) {
-                newProgressList.add((ResearchMethodProgress<T>) progress);
-            }
-        }
-
-        return newProgressList;
+    public <T extends ResearchMethod> ResearchMethodProgress<T> getProgress(ResourceKey<Research> research) {
+        return (ResearchMethodProgress<T>) this.progress().get(research);
     }
 
     public @Nullable ResourceKey<Research> currentResearch() {
@@ -153,4 +97,13 @@ public record TeamResearchProgress(
 
         refreshResearchStatus(level);
     }
+
+    @Override
+    public String toString() {
+        return "TeamResearchProgress[" +
+                "researchQueue=" + researchQueue + ", " +
+                "researches=" + researches + ", " +
+                "progress=" + progress + ']';
+    }
+
 }

@@ -2,15 +2,18 @@ package com.portingdeadmods.researchd.api.research.methods;
 
 import com.mojang.serialization.Codec;
 import com.portingdeadmods.researchd.ResearchdRegistries;
+import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
+import com.portingdeadmods.researchd.content.blockentities.ResearchLabControllerBE;
 import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
 public interface ResearchMethod {
     Codec<ResearchMethod> CODEC =
@@ -19,11 +22,15 @@ public interface ResearchMethod {
     StreamCodec<RegistryFriendlyByteBuf, ResearchMethod> STREAM_CODEC =
             ResearchMethodSerializer.STREAM_CODEC.dispatch(ResearchMethod::getSerializer, ResearchMethodSerializer::streamCodec);
 
-    boolean canResearch(Player player, ResourceKey<Research> research);
-
-    void onResearchStart(Player player, ResourceKey<Research> research);
-
     ResourceLocation id();
+
+    void checkProgress(Level level, ResourceKey<Research> research, ResearchMethodProgress<?> progress, MethodContext context);
+
+    float getMaxProgress();
+
+    default boolean shouldCheckProgress() {
+        return true;
+    }
 
     default Component getTranslation() {
         ResourceLocation id = id();
@@ -32,5 +39,11 @@ public interface ResearchMethod {
 
     ResearchMethodSerializer<?> getSerializer();
 
-    ResearchMethodProgress getDefaultProgress();
+    interface MethodContext {
+        ResearchTeam team();
+    }
+
+    record SimpleMethodContext(ResearchTeam team, @Nullable ResearchLabControllerBE blockEntity) implements MethodContext {
+    }
+
 }

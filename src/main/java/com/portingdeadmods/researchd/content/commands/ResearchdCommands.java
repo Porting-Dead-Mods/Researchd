@@ -8,7 +8,7 @@ import net.minecraft.commands.Commands;
 import java.util.List;
 
 public class ResearchdCommands {
-	private static List<String> aliases = List.of("researchd", "rd", "research", "res");
+	private static List<String> aliases = List.of("researchd", "rd", "research", "key");
 
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 		List<LiteralCommandNode<CommandSourceStack>> rootCommands = aliases.stream().map(

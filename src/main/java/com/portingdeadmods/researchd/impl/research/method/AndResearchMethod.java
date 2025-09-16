@@ -3,17 +3,13 @@ package com.portingdeadmods.researchd.impl.research.method;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethodList;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
-import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.List;
 
@@ -32,20 +28,12 @@ public record AndResearchMethod(List<ResearchMethod> methods) implements Researc
     public static final ResourceLocation ID = Researchd.rl("and");
 
     @Override
-    public boolean canResearch(Player player, ResourceKey<Research> research) {
+    public float getMaxProgress() {
+        float res = 0;
         for (ResearchMethod method : this.methods) {
-            if (!method.canResearch(player, research)) {
-                return false;
-            }
+            res += method.getMaxProgress();
         }
-        return true;
-    }
-
-    @Override
-    public void onResearchStart(Player player, ResourceKey<Research> research) {
-        for (ResearchMethod method : this.methods) {
-            method.onResearchStart(player, research);
-        }
+        return res;
     }
 
     @Override
@@ -58,8 +46,4 @@ public record AndResearchMethod(List<ResearchMethod> methods) implements Researc
         return SERIALIZER;
     }
 
-    @Override
-    public ResearchMethodProgress getDefaultProgress() {
-        return ResearchMethodProgress.empty(this, methods.size());
-    }
 }
