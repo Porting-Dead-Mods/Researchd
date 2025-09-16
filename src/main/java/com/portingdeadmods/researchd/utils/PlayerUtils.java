@@ -17,6 +17,9 @@ public class PlayerUtils {
     }
 
     public static String getPlayerNameFromUUID(Level level, UUID uuid) {
+        if (level.getPlayerByUUID(uuid) == null)
+            return uuid + " not found";
+
         return uuid.equals(ResearchTeam.DEBUG_MEMBER.getId()) ? ResearchTeam.DEBUG_MEMBER.getName() : level.getPlayerByUUID(uuid).getName().getString();
     }
 

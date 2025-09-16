@@ -81,9 +81,23 @@ public final class ResearchdTranslations {
         return constant.component(Researchd.MODID, args);
     }
 
+    public static final class Gui {
+        public static final TranslatableConstant RESEARCHED_BY_ON = create("researched_by_on", "Researched by %s on %s");
+
+        private static TranslatableConstant create(String key, String defaultValue) {
+            TranslatableConstant constant = new TranslatableConstant(key, "gui");
+            TRANSLATIONS.put(constant.key(Researchd.MODID), defaultValue);
+            return constant;
+        }
+
+        private static void init() {
+        }
+    }
+
     public static void init() {
         Team.init();
         Research.init();
         Errors.init();
+        Gui.init();
     }
 }

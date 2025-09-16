@@ -26,6 +26,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -257,7 +258,9 @@ public class ResearchTeam {
 
         // TODO: What about da member roles :(
         for (TeamMember member : this.members) {
-            components[this.members.indexOf(member) + 2] = Component.literal(level.getPlayerByUUID(member.player()).getName().getString() + " ").withStyle(ChatFormatting.AQUA);
+            Player player = level.getPlayerByUUID(member.player());
+            if (player != null)
+                components[this.members.indexOf(member) + 2] = Component.literal(player.getName().getString() + " ").withStyle(ChatFormatting.AQUA);
         }
 
         MutableComponent ret = Component.empty();
