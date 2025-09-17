@@ -4,10 +4,14 @@ import com.portingdeadmods.portingdeadlibs.utils.LazyFinal;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.registries.ResearchdBlockEntityTypes;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.items.IItemHandler;
+import org.jetbrains.annotations.Nullable;
 
 public class ResearchLabPartBE extends BlockEntity {
 	private final LazyFinal<BlockPos> controllerPos = new LazyFinal<>();
@@ -41,5 +45,26 @@ public class ResearchLabPartBE extends BlockEntity {
 
 	public BlockPos getControllerPos() {
 		return this.controllerPos.getOrThrow();
+	}
+
+	@Nullable
+	public IItemHandler exposeItemHandler(@Nullable Direction context) {
+		if (context == Direction.DOWN) return null;
+
+		if (!this.controllerPos.isInitialized()) {
+			return null;
+		}
+
+		Level level = getLevel();
+		if (level == null) {
+			return null;
+		}
+
+		BlockEntity be = level.getBlockEntity(getControllerPos());
+		if (be instanceof ResearchLabControllerBE controller) {
+			if (!controller.shouldExposeHandler(this)) return null;
+			return controller.getItemHandler();
+		}
+		return null;
 	}
 }

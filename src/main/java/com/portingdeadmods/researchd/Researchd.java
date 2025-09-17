@@ -17,6 +17,8 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import com.portingdeadmods.researchd.content.blockentities.ResearchLabPartBE;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
@@ -75,7 +77,7 @@ public class Researchd {
     }
 
     private void registerCapabilities(RegisterCapabilitiesEvent event) {
-        //event.registerEntity(ResearchdCapabilities.ENTITY, EntityType.PLAYER, (player, ctx) -> new EntityResearchWrapper(player));
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ResearchdBlockEntityTypes.RESEARCH_LAB_PART.get(), ResearchLabPartBE::exposeItemHandler);
     }
 
     private void registerRegistries(NewRegistryEvent event) {

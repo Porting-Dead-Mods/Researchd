@@ -178,6 +178,15 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
             Researchd.debug("Research Lab Controller BE", "Part positions are already initialized, ignoring new values: ", partPositions);
     }
 
+    public boolean shouldExposeHandler(ResearchLabPartBE part) {
+        if (this.getBlockPos().relative(Direction.SOUTH).equals(part.getBlockPos())) return true;
+        if (this.getBlockPos().relative(Direction.EAST).equals(part.getBlockPos())) return true;
+        if (this.getBlockPos().relative(Direction.NORTH).equals(part.getBlockPos())) return true;
+        if (this.getBlockPos().relative(Direction.WEST).equals(part.getBlockPos())) return true;
+
+        return false;
+    }
+
     @Override
     public @NotNull Component getDisplayName() {
         return Component.literal("Research Lab");
