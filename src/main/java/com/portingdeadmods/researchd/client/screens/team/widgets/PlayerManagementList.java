@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public class PlayerManagementList extends ContainerObjectSelectionList<PlayerManagementList.Entry> {
     public static final ResourceLocation PLAYER_ENTRY_TEXTURE = Researchd.rl("player");

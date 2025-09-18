@@ -1,21 +1,23 @@
 package com.portingdeadmods.researchd.client.screens.team;
 
 import com.mojang.authlib.GameProfile;
-import com.portingdeadmods.portingdeadlibs.api.translations.TranslatableConstant;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.BaseScreen;
 import com.portingdeadmods.researchd.client.screens.team.widgets.PlayerManagementDraggableWidget;
-import com.portingdeadmods.researchd.client.screens.team.widgets.RecentResearchWidget;
+import com.portingdeadmods.researchd.client.screens.team.widgets.RecentResearchesList;
 import com.portingdeadmods.researchd.client.screens.team.widgets.TeamMemberWidget;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
-import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.*;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.layouts.SpacerElement;
 import net.minecraft.client.player.LocalPlayer;
@@ -23,7 +25,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
 
 public class ResearchTeamScreen extends BaseScreen {
     public static final ResourceLocation SCREEN_TEXTURE = Researchd.rl("textures/gui/team_screen.png");
@@ -40,6 +43,7 @@ public class ResearchTeamScreen extends BaseScreen {
     private ImageButton inviteButton;
     private ImageButton settingsButton;
     private PlayerManagementDraggableWidget inviteWidget;
+    private RecentResearchesList recentResearchesList;
 
     public ResearchTeamScreen() {
         super(ResearchdTranslations.component(ResearchdTranslations.Team.SCREEN_TITLE), 480, 264, 480 - 64 * 2, 264 - 32 * 2);
@@ -110,14 +114,11 @@ public class ResearchTeamScreen extends BaseScreen {
         }
 
         // Layout - Elements - Recent Researches
-        // TODO: Make this into a container list like the ones in draggable widget
+        linearLayout.spacing(64);
         LinearLayout recentResearchesLayout = linearLayout.addChild(LinearLayout.vertical());
         recentResearchesLayout.addChild(new StringWidget(ResearchdTranslations.component(ResearchdTranslations.Team.TITLE_RECENTLY_RESEARCHED), this.font));
-        recentResearchesLayout.addChild(new SpacerElement(0, 2));
-        for (ResearchInstance instance : recentResearches) {
-            recentResearchesLayout.addChild(new RecentResearchWidget(223, 32, instance, RECENT_RESEARCH_SPRITES, (btn1) -> {
-            }));
-        }
+        this.recentResearchesList = recentResearchesLayout.addChild(new RecentResearchesList(142, -4));
+        this.recentResearchesList.addResearches(recentResearches);
 
         // Layout - Final
         this.layout.arrangeElements();
