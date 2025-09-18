@@ -186,6 +186,8 @@ public final class ResearchdCommonEvents {
             ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
             data.initPlayer(player);
             ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
+            ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
         }
     }
+
 }
