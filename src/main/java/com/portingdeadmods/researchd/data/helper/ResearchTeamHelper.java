@@ -48,13 +48,15 @@ public final class ResearchTeamHelper {
         return team.getPermissionLevel(uuid);
     }
 
-    public static ResearchTeam getResearchTeam(Player player) {
+    public @Nullable static ResearchTeam getResearchTeam(Player player) {
         UUID uuid = player.getUUID();
         return ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeamByMember(uuid);
     }
 
-    public static ResearchTeam getResearchTeamByUUID(Level level, UUID uuid) {
-        return ResearchdSavedData.TEAM_RESEARCH.get().getData(level).getTeamByMember(uuid);
+    public @Nullable static ResearchTeam getResearchTeamByUUID(Level level, UUID uuid) {
+        ResearchTeamMap map = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
+        if (map == null) return null;
+        return map.getTeamByMember(uuid);
     }
 
     public static boolean isInATeam(Player player) {
