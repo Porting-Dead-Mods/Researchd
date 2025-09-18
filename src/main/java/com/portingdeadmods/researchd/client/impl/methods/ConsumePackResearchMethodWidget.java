@@ -54,7 +54,9 @@ public class ConsumePackResearchMethodWidget extends AbstractResearchInfoWidget<
             ItemStack stack = stacks.get(idx);
             int xPos = x + idx * GAP_BETWEEN_PACKS;
             guiGraphics.renderItem(stack, xPos, y);
-            guiGraphics.renderItemDecorations(this.font, stack, xPos, y);
+
+            if (idx == stacks.size() - 1)
+                guiGraphics.renderItemDecorations(this.font, stack, xPos, y);
 
 //            guiGraphics.pose().pushPose();
 //            guiGraphics.pose().translate(0.0F, 0.0F, 200.0F);

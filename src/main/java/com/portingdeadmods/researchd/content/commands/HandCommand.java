@@ -60,7 +60,7 @@ public class HandCommand {
                                             MutableComponent recipeComponent = Component.literal("  - (" + recipeType + ") ")
                                                     .append(Component.literal(recipeId).withStyle(style -> style
                                                                 .withColor(ChatFormatting.GREEN)
-                                                                .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, "new RecipePredicate(ResourceLocation.parse(" + recipeId + "))"))
+                                                                .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, "new UnlockRecipeResearchEffect(ResourceLocation.parse(" + recipeId + "))"))
                                                                 .withHoverEvent(new HoverEvent(
                                                                         HoverEvent.Action.SHOW_TEXT,
                                                                         Component.literal("Click to copy recipes ID")))));
@@ -82,7 +82,7 @@ public class HandCommand {
                                             MutableComponent recipeComponent = Component.literal("  - (" + recipeType + ") ")
                                                     .append(Component.literal(recipeId).withStyle(style -> style
                                                             .withColor(ChatFormatting.GREEN)
-                                                            .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, "new RecipePredicate(ResourceLocation.parse(" + recipeId + "))"))
+                                                            .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, "new RecipeUnlockEffect(ResourceLocation.parse(" + recipeId + "))"))
                                                             .withHoverEvent(new HoverEvent(
                                                                     HoverEvent.Action.SHOW_TEXT,
                                                                     Component.literal("Click to copy recipes ID")))));
@@ -255,16 +255,17 @@ public class HandCommand {
         };
 
 	    builder.append(headerComment).append("*/\n");
+        builder.append("new AndResearchEffect(\n");
         builder.append("List.of(\n");
 
         for (RecipeHolder<?> recipeHolder : matchingRecipes) {
-            builder.append("new RecipePredicate(ResourceLocation.parse(");
+            builder.append("new RecipeUnlockEffect(ResourceLocation.parse(");
             String recipeId = recipeHolder.id().toString();
             builder.append('"').append(recipeId).append('"');
             builder.append(matchingRecipes.indexOf(recipeHolder) == matchingRecipes.size() - 1 ? "))\n" : ")),\n");
         }
 
-        builder.append(")");
+        builder.append("))");
 
         String messageType = switch (mode) {
 	        case "allResults" -> " recipes for: ";
