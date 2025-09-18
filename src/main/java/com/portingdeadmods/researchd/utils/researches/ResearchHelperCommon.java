@@ -1,6 +1,7 @@
 package com.portingdeadmods.researchd.utils.researches;
 
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
+import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
@@ -9,8 +10,11 @@ import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
+import com.portingdeadmods.researchd.api.research.effects.ResearchEffectList;
 import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
+import com.portingdeadmods.researchd.impl.research.effect.data.DimensionUnlockEffectData;
+import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
@@ -18,8 +22,10 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jetbrains.annotations.Nullable;
@@ -34,17 +40,26 @@ public final class ResearchHelperCommon {
         return registry.listElements().collect(Collectors.toSet());
     }
 
+    @SuppressWarnings("unchecked")
+    private static <T extends ResearchEffect> void _collectEffects(ResearchEffect effect, Collection<T> effects) {
+        if (effect instanceof ResearchEffectList list) {
+            for (ResearchEffect subEffect : list.effects()) {
+                _collectEffects(subEffect,  effects);
+            }
+        } else {
+            effects.add((T) effect);
+        }
+    }
+
     public static <T extends ResearchEffect> Collection<T> getResearchEffects(Class<T> clazz, Level level) {
         Collection<T> effects = new UniqueArray<>();
 
         for (Holder<Research> research : getLevelResearches(level)) {
             ResearchEffect effect = research.value().researchEffect();
-            if (effect.getClass().equals(clazz)) {
-                effects.add(clazz.cast(effect));
-            }
+            _collectEffects(effect, effects);
         }
 
-        return effects;
+        return new ArrayList<>(effects.stream().filter(clazz::isInstance).toList());
     }
 
     public static List<ResearchInstance> getRecentResearches(ResearchTeam team) {
@@ -102,6 +117,19 @@ public final class ResearchHelperCommon {
             Object data = player.getData(entry.getValue());
             if (data instanceof ResearchEffectData<?> effectData) {
                 player.setData((AttachmentType<ResearchEffectData<?>>) entry.getValue(), effectData.getDefault(level));
+                Researchd.debug("Effect Data", "Refreshing " + data.getClass().getSimpleName() + ": ");
+                if (effectData.getDefault(level) instanceof DimensionUnlockEffectData(Set<ResourceKey<DimensionType>> blockedDimensions)) {
+                    for (ResourceKey<DimensionType> dim : blockedDimensions) {
+                        Researchd.debug("Effect Data", " - " + dim);
+                    }
+                }
+
+                if (effectData.getDefault(level) instanceof RecipeUnlockEffectData(Set<RecipeHolder<?>> blockedRecipes)) {
+                    for (RecipeHolder<?> rec : blockedRecipes) {
+                        Researchd.debug("Effect Data", " - " + rec.id());
+
+                    }
+                }
             }
         }
 
