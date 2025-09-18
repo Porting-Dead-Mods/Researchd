@@ -32,23 +32,12 @@ public final class EnUsLangProvider extends LanguageProvider {
         addBlock(RESEARCH_LAB_PART, "Research Lab Part");
         addBlock(RESEARCH_LAB_CONTROLLER, "Research Lab");
 
-        addResearch(ResearchdResearches.WOOD, "Wood");
-        addResearch(ResearchdResearches.STONE, "Stone");
-        addResearch(ResearchdResearches.COPPER, "Copper");
-        addResearch(ResearchdResearches.IRON, "Iron");
-        addResearch(ResearchdResearches.IRON_TOOLS, "Iron Tools");
-        addResearch(ResearchdResearches.IRON_ARMOR, "Iron Armor");
-        addResearch(ResearchdResearches.LIGHTNING_ROD, "Lightning Rod");
-        addResearch(ResearchdResearches.COPPER_BLOCK, "Copper Block");
-
-        addResearchDesc(ResearchdResearches.WOOD, "Punch those nasty trees");
-        addResearchDesc(ResearchdResearches.STONE, "Ooga booga cave man");
-        addResearchDesc(ResearchdResearches.COPPER, "A decent conductor");
-        addResearchDesc(ResearchdResearches.IRON, "Speedrunning human history");
-        addResearchDesc(ResearchdResearches.IRON_TOOLS, "Gearing up");
-        addResearchDesc(ResearchdResearches.IRON_ARMOR, "Isn't this an achievement already?");
-        addResearchDesc(ResearchdResearches.LIGHTNING_ROD, "I told ya it's a great conductor!");
-        addResearchDesc(ResearchdResearches.COPPER_BLOCK, "Efficient Storage");
+        addResearch(ResearchdResearches.COBBLESTONE, "Wonder what type of stone it is...");
+        addResearch(ResearchdResearches.OVERWORLD_PACK, "The start of something");
+        addResearch(ResearchdResearches.NETHER, "From below...");
+        addResearch(ResearchdResearches.THE_END, "The start... of something?");
+        addResearch(ResearchdResearches.BEACON, "The beam looks funny");
+        addResearch(ResearchdResearches.END_CRYSTAL, "If you look at it, it spins...");
 
         addResearchPack(ResearchdResearchPacks.END, "End Research Pack");
         addResearchPack(ResearchdResearchPacks.NETHER, "Nether Research Pack");
