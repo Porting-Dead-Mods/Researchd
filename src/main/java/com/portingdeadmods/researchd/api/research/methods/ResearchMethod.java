@@ -45,5 +45,4 @@ public interface ResearchMethod {
 
     record SimpleMethodContext(ResearchTeam team, @Nullable ResearchLabControllerBE blockEntity) implements MethodContext {
     }
-
 }

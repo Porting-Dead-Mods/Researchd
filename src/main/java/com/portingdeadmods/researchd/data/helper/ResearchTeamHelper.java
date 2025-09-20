@@ -168,7 +168,7 @@ public final class ResearchTeamHelper {
                     requester.sendSystemMessage(Component.literal("You need to specify the next leader!").withStyle(ChatFormatting.RED));
                     return;
                 }
-                PacketDistributor.sendToServer(new TransferOwnershipPayload(nextToLead));
+                handleTransferOwnership(requester, nextToLead);
             }
 
             ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
@@ -525,7 +525,7 @@ public final class ResearchTeamHelper {
         for (ResearchTeam team : researchTeamMap.getResearchTeams().values()) {
             TeamResearchProgress researchProgress = team.getMetadata().getResearchProgress();
             for (Map.Entry<ResourceKey<Research>, ResearchInstance> entry : researchProgress.researches().entrySet()) {
-                entry.setValue(new ResearchInstance(CommonResearchCache.GLOBAL_RESEARCHES.get(entry.getKey()), entry.getValue().getResearchStatus()));
+                entry.setValue(new ResearchInstance(CommonResearchCache.GLOBAL_RESEARCHES.get(entry.getKey()), entry.getValue().getResearchStatus(), entry.getValue().getResearchedPlayer(), entry.getValue().getResearchedTime()));
             }
         }
     }

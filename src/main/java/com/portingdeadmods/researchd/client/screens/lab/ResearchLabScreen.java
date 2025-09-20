@@ -223,7 +223,7 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
         int width = (int) (progress * 93);
         guiGraphics.fill(x, y, x + width, y + 6, PROGRESS_COLOR);
 
-        guiGraphics.drawString(Minecraft.getInstance().font, String.valueOf((int) progress * 100) + '%', this.leftPos + 108,  this.topPos + 71, 0xF8F8F8);
+        guiGraphics.drawString(Minecraft.getInstance().font, String.valueOf((int) (progress * 100)) + '%', this.leftPos + 108,  this.topPos + 71, 0xF8F8F8);
     }
 
     /**

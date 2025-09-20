@@ -263,6 +263,10 @@ public class ResearchTeam {
         return ret;
     }
 
+	public int getCreationTime() {
+		return this.metadata.creationTime.getOrDefault(0);
+	}
+
     /**
      * Sets the creation time of the team. This should be correctly relative to further calculations.
      *
