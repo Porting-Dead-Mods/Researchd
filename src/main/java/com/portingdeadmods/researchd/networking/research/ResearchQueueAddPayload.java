@@ -71,8 +71,8 @@ public record ResearchQueueAddPayload(ResourceKey<Research> researchKey, UUID pl
                 }
 
                 ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
-
                 team.getResearchProgress().refreshResearchStatus(level);
+	            ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
             }
         }).exceptionally(err -> {
             Researchd.LOGGER.error("Failed to handle ResearchQueueAdd payload", err);

@@ -15,6 +15,7 @@ public final class ResearchdSavedData {
             () -> PDLSavedData.builder(ResearchTeamMap.CODEC, () -> ResearchTeamMap.EMPTY)
                     .synced(ResearchTeamMap.STREAM_CODEC)
                     .postSync(ResearchTeamMap::onSync)
+		            .global()
                     .build());
 
 }

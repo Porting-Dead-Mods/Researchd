@@ -37,6 +37,7 @@ public record ResearchQueueRemovePayload(ResourceKey<Research> researchKey) impl
 
                 ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
                 researchProgress.refreshResearchStatus(level);
+	            ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
             }
         }).exceptionally(err -> {
             Researchd.LOGGER.error("Failed to handle ResearchQueueRemove payload", err);

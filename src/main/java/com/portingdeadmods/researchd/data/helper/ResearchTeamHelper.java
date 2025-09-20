@@ -128,6 +128,7 @@ public final class ResearchTeamHelper {
             team.addMember(requesterId);
             team.removeSentInvite(requesterId);
             ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
+	        ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
 
             PacketDistributor.sendToPlayer(requester, new RefreshResearchesPayload());
         }
@@ -171,6 +172,7 @@ public final class ResearchTeamHelper {
             }
 
             ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
+	        ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
             PacketDistributor.sendToPlayer(requester, new RefreshResearchesPayload());
             return;
         }
@@ -178,6 +180,7 @@ public final class ResearchTeamHelper {
         if (getPermissionLevel(requester) == 1) {
             removeModFromTeam(requester);
         }
+	    ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
     }
 
     /**
@@ -205,14 +208,16 @@ public final class ResearchTeamHelper {
             if (remove) {
                 getResearchTeam(requester).removeMember(member);
                 requester.sendSystemMessage(Component.literal("Member " + PlayerUtils.getPlayerNameFromUUID(level, member) + " removed!").withStyle(ChatFormatting.GREEN));
-                ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
             } else {
                 getResearchTeam(requester).addSentInvite(member);
-                ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
             }
+
+	        ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
+	        ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
         } else {
             requester.sendSystemMessage(Component.literal("You don't have the permission to do that!").withStyle(ChatFormatting.RED));
         }
+	    ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
     }
 
     /**
@@ -242,12 +247,13 @@ public final class ResearchTeamHelper {
                 if (remove) {
                     getResearchTeam(requester).removeModerator(moderator);
                     requester.sendSystemMessage(Component.literal("Moderator " + PlayerUtils.getPlayerNameFromUUID(level, moderator) + " removed!").withStyle(ChatFormatting.GREEN));
-                    ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
                 } else {
                     getResearchTeam(requester).addModerator(moderator);
                     requester.sendSystemMessage(Component.literal("Moderator " + PlayerUtils.getPlayerNameFromUUID(level, moderator) + " added!").withStyle(ChatFormatting.GREEN));
-                    ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
                 }
+
+	            ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
+	            ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
             } else {
                 requester.sendSystemMessage(Component.literal("Player is not in the same team with you!").withStyle(ChatFormatting.RED));
             }
@@ -278,6 +284,7 @@ public final class ResearchTeamHelper {
             getResearchTeam(requester).setName(name);
             requester.sendSystemMessage(Component.literal("Team name changed from " + oldname + " to " + name).withStyle(ChatFormatting.GREEN));
             ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
+	        ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
         } else {
             requester.sendSystemMessage(Component.literal("You don't have the permission to do that!").withStyle(ChatFormatting.RED));
         }
@@ -302,6 +309,7 @@ public final class ResearchTeamHelper {
                 // Set the old leader as moderator
                 getResearchTeam(requester).addModerator(requesterId);
                 ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
+	            ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
                 requester.sendSystemMessage(Component.literal("Ownership transfered to " + nextToLead).withStyle(ChatFormatting.GREEN));
             } else {
                 requester.sendSystemMessage(Component.literal("You can't transfer ownership to someone who's not in your team!").withStyle(ChatFormatting.RED));
@@ -337,7 +345,9 @@ public final class ResearchTeamHelper {
                 requester.sendSystemMessage(Component.literal("Invite sent to " + PlayerUtils.getPlayerNameFromUUID(requester.level(), invited)).withStyle(ChatFormatting.GREEN));
             }
             Level level = requester.level();
+
             ResearchdSavedData.TEAM_RESEARCH.get().setData(level, ResearchdSavedData.TEAM_RESEARCH.get().getData(level));
+	        ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
         } else {
             requester.sendSystemMessage(Component.literal("You got to be in a team to do that! Create one with /researchd team create <name>"));
         }
@@ -367,6 +377,7 @@ public final class ResearchTeamHelper {
                     team.addSentInvite(requester.getUUID());
                 }
                 ResearchdSavedData.TEAM_RESEARCH.get().setData(level, ResearchdSavedData.TEAM_RESEARCH.get().getData(level));
+	            ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
             } else {
                 requester.sendSystemMessage(Component.literal("The player you're trying to join is not in a team!").withStyle(ChatFormatting.RED));
             }
@@ -506,7 +517,8 @@ public final class ResearchTeamHelper {
                 researches.put(globalResearch.getResearchKey(), new ResearchInstance(globalResearch, ResearchStatus.LOCKED));
             }
         }
-        ResearchdSavedData.TEAM_RESEARCH.get().setData((Level) level, data);
+        ResearchdSavedData.TEAM_RESEARCH.get().setData((ServerLevel) level, data);
+	    ResearchdSavedData.TEAM_RESEARCH.get().sync((ServerLevel) level);
     }
 
     public static void resolveGlobalResearches(ResearchTeamMap researchTeamMap) {
