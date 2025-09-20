@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.client.screens.widgets;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdClient;
+import com.portingdeadmods.researchd.ResearchdCommonConfig;
 import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidget;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
@@ -170,7 +171,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
         if (this.selectedInstance != instance) {
             this.selectedInstance = instance;
 
-            this.researchScreen.getTechListWidget().startResearchButton.active = this.selectedInstance.isResearchable() && !this.researchScreen.getResearchQueueWidget().getQueue().entries().contains(this.selectedInstance.getKey());
+            this.researchScreen.getTechListWidget().startResearchButton.active = this.selectedInstance.isResearchable() && !this.researchScreen.getResearchQueueWidget().getQueue().entries().contains(this.selectedInstance.getKey()) && !(this.researchScreen.getResearchQueueWidget().getQueue().entries().size() >= ResearchdCommonConfig.researchQueueLength);
             if (this.selectedInstance.isResearchable() && !this.researchScreen.getResearchQueueWidget().getQueue().isEmpty()) {
                 this.researchScreen.getTechListWidget().setResearchButtonMode(TechListWidget.ResearchButtonMode.ENQUEUE);
             } else {

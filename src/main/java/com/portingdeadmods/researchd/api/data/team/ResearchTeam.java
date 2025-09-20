@@ -280,6 +280,10 @@ public class ResearchTeam {
         return new TimeUtils.TimeDifference(this.metadata.creationTime.get(), time).getFormatted();
     }
 
+	public ResearchQueue getResearchQueue() {
+		return this.metadata.researchProgress.researchQueue();
+	}
+
     public Map<ResourceLocation, Float> getTeamEffectList() {
         return this.metadata.teamEffectList;
     }

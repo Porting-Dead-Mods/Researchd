@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.networking.research;
 
 import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.ResearchdCommonConfig;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.api.data.team.TeamMember;
@@ -48,6 +49,9 @@ public record ResearchQueueAddPayload(ResourceKey<Research> researchKey, UUID pl
                 Level level = serverPlayer.level();
                 ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
                 ResearchTeam team = data.getTeamByPlayer(serverPlayer);
+
+				if (team.getResearchQueue().getEntries().size() >= ResearchdCommonConfig.researchQueueLength) return;
+
                 ResearchInstance instance = team.getResearches().get(researchKey);
                 instance.setResearchedPlayer(this.player);
                 instance.setResearchedTime(this.time);
