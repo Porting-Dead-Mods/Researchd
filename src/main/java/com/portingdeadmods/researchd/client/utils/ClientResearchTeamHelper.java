@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.client.utils;
 import com.mojang.authlib.GameProfile;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
+import com.portingdeadmods.researchd.api.data.team.TeamMember;
 import com.portingdeadmods.researchd.api.research.GlobalResearch;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
@@ -12,8 +13,10 @@ import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamRole;
 import com.portingdeadmods.researchd.networking.team.*;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -68,18 +71,11 @@ public class ClientResearchTeamHelper {
         return getPlayerRole(player.getUUID()).getPermissionLevel();
     }
 
-    public static List<GameProfile> getTeamMembers() {
+    public static List<GameProfile> getTeamMemberProfiles() {
         Minecraft mc = Minecraft.getInstance();
         ResearchTeam researchTeam = getTeam();
 
-        List<GameProfile> players;
-        if (!mc.isSingleplayer()) {
-            players = mc.getCurrentServer().players.sample();
-        } else {
-            players = new ArrayList<>();
-            players.add(mc.player.getGameProfile());
-            players.add(ResearchTeam.DEBUG_MEMBER);
-        }
+        List<GameProfile> players = ClientPlayerUtils.getPlayers();
         return researchTeam.getMembers().stream().map(uuid -> {
             for (GameProfile profile : players) {
                 if (profile.getId().equals(uuid)) {
@@ -88,6 +84,10 @@ public class ClientResearchTeamHelper {
             }
             return null;
         }).filter(Objects::nonNull).toList();
+    }
+
+    public static List<TeamMember> getTeamMembers() {
+        return getTeam().getMembers();
     }
 
     public static List<GameProfile> getPlayersNotInTeam() {

@@ -118,7 +118,6 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
     @Override
     public void commonTick() {
         super.commonTick();
-        if (this.getLevel().isClientSide()) return;
 
         ResearchTeam team = ResearchTeamHelper.getResearchTeamByUUID(this.getLevel(), this.getData(ResearchdAttachments.PLACED_BY_UUID));
         if (team == null) return;

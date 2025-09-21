@@ -1,13 +1,12 @@
 package com.portingdeadmods.researchd.client.screens.team;
 
-import com.mojang.authlib.GameProfile;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.BaseScreen;
 import com.portingdeadmods.researchd.client.screens.team.widgets.PlayerManagementDraggableWidget;
 import com.portingdeadmods.researchd.client.screens.team.widgets.RecentResearchesList;
-import com.portingdeadmods.researchd.client.screens.team.widgets.TeamMemberWidget;
+import com.portingdeadmods.researchd.client.screens.team.widgets.TeamMembersList;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
@@ -43,7 +42,6 @@ public class ResearchTeamScreen extends BaseScreen {
     private ImageButton inviteButton;
     private ImageButton settingsButton;
     private PlayerManagementDraggableWidget inviteWidget;
-    private RecentResearchesList recentResearchesList;
 
     public ResearchTeamScreen() {
         super(ResearchdTranslations.component(ResearchdTranslations.Team.SCREEN_TITLE), 480, 264, 480 - 64 * 2, 264 - 32 * 2);
@@ -59,7 +57,6 @@ public class ResearchTeamScreen extends BaseScreen {
         // Team information
         ResearchTeam researchTeam = ResearchTeamHelper.getResearchTeam(Objects.requireNonNull(player));
         String name = researchTeam.getName();
-        List<GameProfile> members = ClientResearchTeamHelper.getTeamMembers();
         List<ResearchInstance> recentResearches = ResearchHelperCommon.getRecentResearches(researchTeam);
 
         // Layout setup
@@ -101,30 +98,28 @@ public class ResearchTeamScreen extends BaseScreen {
         headerLayout.addChild(this.settingsButton);
 
         // Layout - Elements
-        LinearLayout linearLayout = layout.addChild(LinearLayout.horizontal().spacing(12));
+        LinearLayout linearLayout = layout.addChild(LinearLayout.horizontal().spacing(-1));
 
         // Layout - Elements - Team Information
-        // TODO: Make this into a container list like the ones in draggable widget
         LinearLayout teamMembersLayout = linearLayout.addChild(LinearLayout.vertical());
         teamMembersLayout.addChild(new StringWidget(ResearchdTranslations.component(ResearchdTranslations.Team.TITLE_MEMBERS), this.font));
-        teamMembersLayout.addChild(new SpacerElement(0, 2));
-        for (GameProfile member : members) {
-            teamMembersLayout.addChild(new TeamMemberWidget(94, 22, member, TEAM_MEMBER_BUTTON_SPRITES, btn -> {
-            }));
-        }
+        teamMembersLayout.addChild(new SpacerElement(-1, 1));
+        linearLayout.spacing(11);
+        TeamMembersList list = teamMembersLayout.addChild(new TeamMembersList(94, 142, 94, 22, ClientResearchTeamHelper.getTeamMembers(), false));
 
         // Layout - Elements - Recent Researches
-        linearLayout.spacing(64);
+        linearLayout.spacing(11);
         LinearLayout recentResearchesLayout = linearLayout.addChild(LinearLayout.vertical());
         recentResearchesLayout.addChild(new StringWidget(ResearchdTranslations.component(ResearchdTranslations.Team.TITLE_RECENTLY_RESEARCHED), this.font));
-        this.recentResearchesList = recentResearchesLayout.addChild(new RecentResearchesList(142, -4));
-        this.recentResearchesList.addResearches(recentResearches);
+        recentResearchesLayout.spacing(1);
+        recentResearchesLayout.addChild(new RecentResearchesList(230, 142, 221, 32, recentResearches, true));
 
         // Layout - Final
         this.layout.arrangeElements();
         this.layout.setX(this.leftPos + 10);
         this.layout.setY(this.topPos + 11);
         this.layout.visitWidgets(this::addRenderableWidget);
+        list.setX(list.getX() - 1);
 
         this.inviteWidget = new PlayerManagementDraggableWidget(
                 this.leftPos,
@@ -175,6 +170,7 @@ public class ResearchTeamScreen extends BaseScreen {
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
 
+        // FIXME: sus?
         this.settingsButton.active = (ClientResearchTeamHelper.getPlayerPermissionLevel(this.player) >= 1);
         this.inviteButton.active = (ClientResearchTeamHelper.getPlayerPermissionLevel(this.player) > 0);
     }

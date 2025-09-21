@@ -5,11 +5,12 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.client.screens.team.ResearchTeamScreen;
-import com.portingdeadmods.researchd.client.screens.team.ResearchTeamSettingsScreen;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.*;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
@@ -38,13 +39,17 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
             this.buttonWidgets.add(new DraggableWidgetImageButton(getX() + 6 + i * (12 + 2), getY() + 6, 12, 12, entry.getValue(), btn -> {}));
             i++;
         }
-        this.managementList = new PlayerManagementList(84, 116, 0, 16, this);
+        List<PlayerManagementList.Entry> entries = new ArrayList<>();
+        for (GameProfile member : members) {
+            entries.add(new PlayerManagementList.Entry(member, buttonSettings));
+        }
+        this.managementList = new PlayerManagementList(84, 116, 0, 16, entries, false, this);
         this.managementList.active = this.visible; // Probably redundant... but idrk some freaky stuff is happening with visibility
         this.managementList.setPosition(x + 6, y + 6);
         BiConsumer<PlayerManagementList.Entry, PlayerManagementButtonType> refreshFunction = (entry, type) -> {
             switch (type) {
                 case REMOVE -> {
-                    this.managementList.removeEntry(entry);
+                    //this.managementList.removeEntry(entry);
                 }
                 case DEMOTE -> {
                 }
@@ -56,9 +61,6 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
                 }
             }
         };
-        for (GameProfile member : members) {
-            this.managementList.addEntry(new PlayerManagementList.Entry(member, buttonSettings, this, refreshFunction));
-        }
         this.popupWidget = new WarningPopupWidget(0, 0, this::onOkPress, this::onCancelPress);
         this.popupWidget.visible = false;
     }
@@ -81,7 +83,7 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
     public void setVisible(boolean visible) {
         this.visible = visible;
         this.managementList.active = visible;
-        this.managementList.setVisible(visible);
+        //this.managementList.setVisible(visible);
     }
 
     @Override
@@ -118,7 +120,7 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
     }
 
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        this.managementList.setScrollAmount(this.managementList.getScrollAmount() - scrollY * (double)16 / (double)2.0F);
+        //this.managementList.setScrollAmount(this.managementList.getScrollAmount() - scrollY * (double)16 / (double)2.0F);
         return true;
     }
 
@@ -136,6 +138,8 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
             GuiUtils.drawImg(guiGraphics, WINDOW_TEXTURE, getX(), getY(), getWidth(), getHeight());
         }
         poseStack.popPose();
+
+        this.managementList.render(guiGraphics, mouseX, mouseY, v);
 
     }
 
