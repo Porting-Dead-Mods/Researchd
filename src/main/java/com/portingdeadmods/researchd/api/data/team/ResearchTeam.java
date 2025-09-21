@@ -263,6 +263,10 @@ public class ResearchTeam {
         return ret;
     }
 
+	public int getCreationTime() {
+		return this.metadata.creationTime.getOrDefault(0);
+	}
+
     /**
      * Sets the creation time of the team. This should be correctly relative to further calculations.
      *
@@ -275,6 +279,10 @@ public class ResearchTeam {
     public String getResearchCompletionTime(int time) {
         return new TimeUtils.TimeDifference(this.metadata.creationTime.get(), time).getFormatted();
     }
+
+	public ResearchQueue getResearchQueue() {
+		return this.metadata.researchProgress.researchQueue();
+	}
 
     public Map<ResourceLocation, Float> getTeamEffectList() {
         return this.metadata.teamEffectList;

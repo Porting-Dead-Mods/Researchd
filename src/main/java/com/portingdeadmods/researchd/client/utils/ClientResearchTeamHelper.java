@@ -13,8 +13,10 @@ import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamRole;
 import com.portingdeadmods.researchd.networking.team.*;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -73,14 +75,7 @@ public class ClientResearchTeamHelper {
         Minecraft mc = Minecraft.getInstance();
         ResearchTeam researchTeam = getTeam();
 
-        List<GameProfile> players;
-        if (!mc.isSingleplayer()) {
-            players = mc.getCurrentServer().players.sample();
-        } else {
-            players = new ArrayList<>();
-            players.add(mc.player.getGameProfile());
-            players.add(ResearchTeam.DEBUG_MEMBER);
-        }
+        List<GameProfile> players = ClientPlayerUtils.getPlayers();
         return researchTeam.getMembers().stream().map(uuid -> {
             for (GameProfile profile : players) {
                 if (profile.getId().equals(uuid)) {

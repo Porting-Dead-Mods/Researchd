@@ -43,7 +43,7 @@ public final class ResearchInstance {
     private @Nullable UUID researchedPlayer;
     private long researchedTime;
 
-    private ResearchInstance(GlobalResearch research, ResearchStatus researchStatus, UUID researchedPlayer, long researchedTime) {
+    public ResearchInstance(GlobalResearch research, ResearchStatus researchStatus, UUID researchedPlayer, long researchedTime) {
         this.research = research;
         this.researchStatus = researchStatus;
         this.researchedPlayer = researchedPlayer;
