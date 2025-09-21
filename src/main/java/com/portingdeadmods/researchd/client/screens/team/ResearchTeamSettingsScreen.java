@@ -1,10 +1,10 @@
 package com.portingdeadmods.researchd.client.screens.team;
 
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.client.screens.BaseScreen;
 import com.portingdeadmods.researchd.client.screens.team.widgets.PlayerManagementDraggableWidget;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
-import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamRole;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
@@ -94,7 +94,7 @@ public class ResearchTeamSettingsScreen extends BaseScreen {
         this.playerManagementWindow = new PlayerManagementDraggableWidget(
                 this.leftPos,
                 this.topPos,
-                ClientResearchTeamHelper.getTeamMembers(),
+                ClientResearchTeamHelper.getTeamMemberProfiles(),
                 new PlayerManagementDraggableWidget.PlayerManagementButtons(true, true, true, false, false),
                 Component.empty()
         );
@@ -105,7 +105,7 @@ public class ResearchTeamSettingsScreen extends BaseScreen {
         this.transferOwnershipWindow = new PlayerManagementDraggableWidget(
                 this.leftPos + this.width / 2,
                 this.topPos + this.height / 2,
-                ClientResearchTeamHelper.getTeamMembers(),
+                ClientResearchTeamHelper.getTeamMemberProfiles(),
                 new PlayerManagementDraggableWidget.PlayerManagementButtons(false, false, false, true, false),
                 Component.empty()
         );

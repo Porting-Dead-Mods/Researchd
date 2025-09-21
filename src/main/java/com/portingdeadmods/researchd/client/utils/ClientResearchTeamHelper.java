@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.client.utils;
 import com.mojang.authlib.GameProfile;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
+import com.portingdeadmods.researchd.api.data.team.TeamMember;
 import com.portingdeadmods.researchd.api.research.GlobalResearch;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
@@ -68,7 +69,7 @@ public class ClientResearchTeamHelper {
         return getPlayerRole(player.getUUID()).getPermissionLevel();
     }
 
-    public static List<GameProfile> getTeamMembers() {
+    public static List<GameProfile> getTeamMemberProfiles() {
         Minecraft mc = Minecraft.getInstance();
         ResearchTeam researchTeam = getTeam();
 
@@ -88,6 +89,10 @@ public class ClientResearchTeamHelper {
             }
             return null;
         }).filter(Objects::nonNull).toList();
+    }
+
+    public static List<TeamMember> getTeamMembers() {
+        return getTeam().getMembers();
     }
 
     public static List<GameProfile> getPlayersNotInTeam() {
