@@ -32,6 +32,7 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
     public static final ResourceLocation RESEARCH_PACK_TEXTURE = Researchd.rl("textures/item/research_pack_empty.png");
     public static final ResourceLocation SLOT_SPRITE = Researchd.rl("slot_with_progress");
     public static final int PROGRESS_COLOR = FastColor.ARGB32.color(0, 225, 100);
+    public static final int PROGRESS_BAR_WIDTH = 105;
     public static final int SLOT_WIDTH = 18;
     public static final int SLOT_HEIGHT = 20;
     public static final int SCROLLER_X = 8;
@@ -220,10 +221,10 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
         int y = this.topPos + 72;
         ResearchMethodProgress rmp = ClientResearchTeamHelper.getTeam().getResearchProgress().getProgress(team.getFirstQueueResearch());
         float progress = rmp == null ? 0f : rmp.getProgressPercent();
-        int width = (int) (progress * 93);
+        int width = (int) (progress * PROGRESS_BAR_WIDTH);
         guiGraphics.fill(x, y, x + width, y + 6, PROGRESS_COLOR);
 
-        guiGraphics.drawString(Minecraft.getInstance().font, String.valueOf((int) (progress * 100)) + '%', this.leftPos + 108,  this.topPos + 71, 0xF8F8F8);
+        guiGraphics.drawCenteredString(Minecraft.getInstance().font, String.valueOf((int) (progress * 100)) + '%', x + 1 + PROGRESS_BAR_WIDTH / 2,  y + 9, 0xF8F8F8);
     }
 
     /**
