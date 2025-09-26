@@ -1,14 +1,19 @@
 package com.portingdeadmods.researchd.client.screens.team.widgets;
 
-import com.mojang.authlib.GameProfile;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.data.team.TeamMember;
 import com.portingdeadmods.researchd.client.screens.ContainerWidget;
+import com.portingdeadmods.researchd.client.utils.ClientPlayerUtils;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamRole;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.PlayerFaceRenderer;
 import net.minecraft.client.gui.components.WidgetSprites;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
@@ -27,18 +32,18 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
         this.parent = parent;
 
         for (Entry item : items) {
-            if (ClientResearchTeamHelper.getPlayerRole(item.gameProfile().getId()) != ResearchTeamRole.OWNER) {
+            if (item.teamMember.role() != ResearchTeamRole.OWNER) {
                 for (Map.Entry<PlayerManagementDraggableWidget.PlayerManagementButtonType, WidgetSprites> entry : item.buttonSettings().getSprites().entrySet()) {
                     this.buttonWidgets.add(new DraggableWidgetImageButton(0, 0, 12, 12, entry.getValue(), btn -> {
                         switch (entry.getKey()) {
-                            case PROMOTE -> ClientResearchTeamHelper.promoteTeamMemberSynced(item.gameProfile());
-                            case DEMOTE -> ClientResearchTeamHelper.demoteTeamMemberSynced(item.gameProfile());
+                            case PROMOTE -> ClientResearchTeamHelper.promoteTeamMemberSynced(item.teamMember());
+                            case DEMOTE -> ClientResearchTeamHelper.demoteTeamMemberSynced(item.teamMember());
                             // FIXME: Gets called twice
-                            case REMOVE -> ClientResearchTeamHelper.removeTeamMemberSynced(item.gameProfile());
-                            case INVITE_PLAYER -> ClientResearchTeamHelper.sendTeamInviteSynced(item.gameProfile());
+                            case REMOVE -> ClientResearchTeamHelper.removeTeamMemberSynced(item.teamMember());
+                            case INVITE_PLAYER -> ClientResearchTeamHelper.sendTeamInviteSynced(item.teamMember());
                             case TRANSFER_OWNERSHIP -> {
                                 if (this.parent instanceof PlayerManagementDraggableWidget widget) {
-                                    widget.openPopupWidget(item.gameProfile());
+                                    widget.openPopupWidget(item.teamMember());
                                 }
                             }
                         }
@@ -55,31 +60,36 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
 
     @Override
     public void renderItem(GuiGraphics guiGraphics, PlayerManagementList.Entry item, int index, int left, int top, int mouseX, int mouseY) {
-//        PoseStack poseStack = guiGraphics.pose();
-//        guiGraphics.blitSprite(PLAYER_ENTRY_TEXTURE, left + 66, top - 4, 84, 16);
-//        poseStack.pushPose();
-//        {
-//            poseStack.translate(0, 0, 100);
-//            PlayerFaceRenderer.draw(guiGraphics, Minecraft.getInstance().player.getSkin(), left + 66 + 3, top - 4 + 3, 10);
-//        }
-//        poseStack.popPose();
-//        guiGraphics.drawString(Minecraft.getInstance().font, item.gameProfile.getName(), left + 66 + 3 + 12, top - 4 + 4, -1);
-//        int i = 0;
-//        poseStack.pushPose();
-//        {
-//            poseStack.translate(0, 0, 1);
-//            for (DraggableWidgetImageButton widget : this.buttonWidgets) {
-//                widget.setPosition(left + 66 + 84 - (i + 1) * (12 + 2), top - 4 + 2);
-//                widget.render(guiGraphics, mouseX, mouseY, -1);
-//                i++;
-//            }
-//        }
-//        poseStack.popPose();
-            guiGraphics.drawString(Minecraft.getInstance().font, "Slay", 0, 0, -1);
+        PoseStack poseStack = guiGraphics.pose();
+        poseStack.pushPose();
+        {
+            poseStack.translate(0, 0, PlayerManagementDraggableWidget.BACKGROUND_Z + 1);
+            guiGraphics.blitSprite(PLAYER_ENTRY_TEXTURE, left + 66, top - 4, 84, 16);
+        }
+        poseStack.popPose();
 
+        poseStack.pushPose();
+        {
+            poseStack.translate(0, 0, PlayerManagementDraggableWidget.BACKGROUND_Z + 2);
+            PlayerFaceRenderer.draw(guiGraphics, Minecraft.getInstance().player.getSkin(), left + 66 + 3, top - 4 + 3, 10);
+            guiGraphics.drawScrollingString(Minecraft.getInstance().font, Component.literal(ClientPlayerUtils.getPlayerName(item.teamMember().player())).withStyle(ChatFormatting.WHITE), left + 66 + 3 + 12, left + 66 + 84 - this.buttonWidgets.size() * (12 + 2) - 2, top - 4 + 4, -1);
+        }
+        poseStack.popPose();
+
+        int i = 0;
+        poseStack.pushPose();
+        {
+            poseStack.translate(0, 0, PlayerManagementDraggableWidget.BACKGROUND_Z + 3);
+            for (DraggableWidgetImageButton widget : this.buttonWidgets) {
+                widget.setPosition(left + 66 + 84 - (i + 1) * (12 + 2), top - 4 + 2);
+                widget.render(guiGraphics, mouseX, mouseY, -1);
+                i++;
+            }
+        }
+        poseStack.popPose();
     }
 
-    public record Entry(GameProfile gameProfile, PlayerManagementDraggableWidget.PlayerManagementButtons buttonSettings) {
+    public record Entry(TeamMember teamMember, PlayerManagementDraggableWidget.PlayerManagementButtons buttonSettings) {
     }
 
 }

@@ -97,7 +97,7 @@ public class ResearchTeam {
     public static ResearchTeam createDefaultTeam(ServerPlayer player) {
         Researchd.debug("Research Team", "Creating default team for player: " + player.getDisplayName().getString());
 
-        ResearchTeam team = new ResearchTeam(player.getDisplayName().getString() + "'s Team", List.of(new TeamMember(player.getUUID(), ResearchTeamRole.OWNER), new TeamMember(DEBUG_MEMBER.getId(), ResearchTeamRole.MEMBER)), List.of(), List.of(), player.getUUID(), TeamResearchProgress.EMPTY);
+        ResearchTeam team = new ResearchTeam(player.getDisplayName().getString() + "'s Team", List.of(new TeamMember(player.getUUID(), ResearchTeamRole.OWNER)), List.of(), List.of(), player.getUUID(), TeamResearchProgress.EMPTY);
         team.setCreationTime(player.getServer().getTickCount() * 50);
         team.init(player.registryAccess());
         return team;
@@ -237,6 +237,10 @@ public class ResearchTeam {
 
     public boolean isModerator(UUID uuid) {
         return this.members.stream().anyMatch(m -> m.player().equals(uuid) && m.role() == ResearchTeamRole.MODERATOR);
+    }
+
+    public boolean isPresentInTeam(UUID uuid) {
+        return this.members.stream().anyMatch(m -> m.player().equals(uuid));
     }
 
     public MutableComponent parseMembers(Level level) {

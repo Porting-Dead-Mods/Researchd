@@ -94,7 +94,7 @@ public class ResearchTeamSettingsScreen extends BaseScreen {
         this.playerManagementWindow = new PlayerManagementDraggableWidget(
                 this.leftPos,
                 this.topPos,
-                ClientResearchTeamHelper.getTeamMemberProfiles(),
+                ClientResearchTeamHelper.getTeamMembers(),
                 new PlayerManagementDraggableWidget.PlayerManagementButtons(true, true, true, false, false),
                 Component.empty()
         );
@@ -105,7 +105,7 @@ public class ResearchTeamSettingsScreen extends BaseScreen {
         this.transferOwnershipWindow = new PlayerManagementDraggableWidget(
                 this.leftPos + this.width / 2,
                 this.topPos + this.height / 2,
-                ClientResearchTeamHelper.getTeamMemberProfiles(),
+                ClientResearchTeamHelper.getTeamMembers(),
                 new PlayerManagementDraggableWidget.PlayerManagementButtons(false, false, false, true, false),
                 Component.empty()
         );

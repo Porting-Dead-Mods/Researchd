@@ -1,9 +1,9 @@
 package com.portingdeadmods.researchd.client.screens.team.widgets;
 
-import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.data.team.TeamMember;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -14,7 +14,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 public class WarningPopupWidget extends AbstractWidget {
     public static final ResourceLocation TEXTURE = Researchd.rl("textures/gui/popup_window.png");
@@ -22,7 +21,7 @@ public class WarningPopupWidget extends AbstractWidget {
     private List<Component> bodyText;
     private final Button acceptButton;
     private final Button cancelButton;
-    public GameProfile nextOwner;
+    public TeamMember nextOwner;
 
     public WarningPopupWidget(int x, int y, Button.OnPress confirmButtonOnPress, Button.OnPress cancelButtonOnPress) {
         super(x, y, 160, 96, Component.empty());

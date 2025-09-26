@@ -6,6 +6,7 @@ import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.network.chat.Component;
 
 public enum ResearchTeamRole {
+    NOT_MEMBER(ResearchdTranslations.Team.NOT_MEMBER, -1),
     MEMBER(ResearchdTranslations.Team.MEMBER, 0),
     MODERATOR(ResearchdTranslations.Team.MODERATOR, 1),
     OWNER(ResearchdTranslations.Team.OWNER, 2);

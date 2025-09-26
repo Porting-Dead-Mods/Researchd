@@ -1,11 +1,12 @@
 package com.portingdeadmods.researchd.client.screens.team.widgets;
 
-import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.data.team.TeamMember;
 import com.portingdeadmods.researchd.client.screens.team.ResearchTeamScreen;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
+import com.portingdeadmods.researchd.utils.PlayerUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -23,15 +24,15 @@ import java.util.function.Consumer;
 
 public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
     public static final ResourceLocation WINDOW_TEXTURE = Researchd.rl("textures/gui/player_management_window.png");
-    private final List<GameProfile> members;
     private final PlayerManagementButtons buttonSettings;
     private final List<DraggableWidgetImageButton> buttonWidgets;
     private final PlayerManagementList managementList;
     public final WarningPopupWidget popupWidget;
 
-    public PlayerManagementDraggableWidget(int x, int y, List<GameProfile> members, PlayerManagementButtons buttonSettings, Component message) {
+    public static final int BACKGROUND_Z = 500;
+
+    public PlayerManagementDraggableWidget(int x, int y, List<TeamMember> members, PlayerManagementButtons buttonSettings, Component message) {
         super(x, y, 128, 128, message);
-        this.members = members;
         this.buttonSettings = buttonSettings;
         this.buttonWidgets = new ArrayList<>();
         int i = 0;
@@ -40,7 +41,7 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
             i++;
         }
         List<PlayerManagementList.Entry> entries = new ArrayList<>();
-        for (GameProfile member : members) {
+        for (TeamMember member : members) {
             entries.add(new PlayerManagementList.Entry(member, buttonSettings));
         }
         this.managementList = new PlayerManagementList(84, 116, 0, 16, entries, false, this);
@@ -65,12 +66,12 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
         this.popupWidget.visible = false;
     }
 
-    public void openPopupWidget(GameProfile profile) {
+    public void openPopupWidget(TeamMember profile) {
         this.popupWidget.setTitle(Component.literal("Transfer Ownership"));
         this.popupWidget.setBodyText(List.of(
                 Component.literal("Are you sure you"),
                 Component.literal("want to transfer ownership"),
-                Component.literal("to %s".formatted(profile.getName()))
+                Component.literal("to %s".formatted(PlayerUtils.getPlayerNameFromUUID(Minecraft.getInstance().level, profile.player())))
         ));
         this.popupWidget.visible = true;
         this.popupWidget.nextOwner = profile;
@@ -83,7 +84,6 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
     public void setVisible(boolean visible) {
         this.visible = visible;
         this.managementList.active = visible;
-        //this.managementList.setVisible(visible);
     }
 
     @Override
@@ -134,13 +134,12 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
 
         poseStack.pushPose();
         {
-            poseStack.translate(0, 0, 500);
+            poseStack.translate(0, 0, BACKGROUND_Z);
             GuiUtils.drawImg(guiGraphics, WINDOW_TEXTURE, getX(), getY(), getWidth(), getHeight());
         }
         poseStack.popPose();
 
         this.managementList.render(guiGraphics, mouseX, mouseY, v);
-
     }
 
     private void onOkPress(Button btn) {
