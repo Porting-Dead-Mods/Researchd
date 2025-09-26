@@ -84,6 +84,7 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
     public void setVisible(boolean visible) {
         this.visible = visible;
         this.managementList.active = visible;
+		this.managementList.visible = visible;
     }
 
     @Override

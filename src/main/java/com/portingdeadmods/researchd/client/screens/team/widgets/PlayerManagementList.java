@@ -16,29 +16,27 @@ import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class PlayerManagementList extends ContainerWidget<PlayerManagementList.Entry> {
     public static final ResourceLocation PLAYER_ENTRY_TEXTURE = Researchd.rl("player");
-    private final List<DraggableWidgetImageButton> buttonWidgets;
+    private final Map<Entry, List<DraggableWidgetImageButton>> buttonWidgets;
     private final AbstractWidget parent;
 
     public PlayerManagementList(int width, int height, int itemWidth, int itemHeight, Collection<PlayerManagementList.Entry> items, boolean renderScroller, AbstractWidget parent) {
         super(width, height, itemWidth, itemHeight, items, renderScroller);
-        this.buttonWidgets = new ArrayList<>();
+        this.buttonWidgets = new HashMap<>();
         this.parent = parent;
 
         for (Entry item : items) {
+			buttonWidgets.put(item, new ArrayList<>());
+
             if (item.teamMember.role() != ResearchTeamRole.OWNER) {
                 for (Map.Entry<PlayerManagementDraggableWidget.PlayerManagementButtonType, WidgetSprites> entry : item.buttonSettings().getSprites().entrySet()) {
-                    this.buttonWidgets.add(new DraggableWidgetImageButton(0, 0, 12, 12, entry.getValue(), btn -> {
+                    this.buttonWidgets.get(item).add(new DraggableWidgetImageButton(0, 0, 12, 12, entry.getValue(), btn -> {
                         switch (entry.getKey()) {
                             case PROMOTE -> ClientResearchTeamHelper.promoteTeamMemberSynced(item.teamMember());
                             case DEMOTE -> ClientResearchTeamHelper.demoteTeamMemberSynced(item.teamMember());
-                            // FIXME: Gets called twice
                             case REMOVE -> ClientResearchTeamHelper.removeTeamMemberSynced(item.teamMember());
                             case INVITE_PLAYER -> ClientResearchTeamHelper.sendTeamInviteSynced(item.teamMember());
                             case TRANSFER_OWNERSHIP -> {
@@ -64,15 +62,15 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
         poseStack.pushPose();
         {
             poseStack.translate(0, 0, PlayerManagementDraggableWidget.BACKGROUND_Z + 1);
-            guiGraphics.blitSprite(PLAYER_ENTRY_TEXTURE, left + 66, top - 4, 84, 16);
+            guiGraphics.blitSprite(PLAYER_ENTRY_TEXTURE, left - 1, top - 1, 84, 16);
         }
         poseStack.popPose();
 
         poseStack.pushPose();
         {
             poseStack.translate(0, 0, PlayerManagementDraggableWidget.BACKGROUND_Z + 2);
-            PlayerFaceRenderer.draw(guiGraphics, Minecraft.getInstance().player.getSkin(), left + 66 + 3, top - 4 + 3, 10);
-            guiGraphics.drawScrollingString(Minecraft.getInstance().font, Component.literal(ClientPlayerUtils.getPlayerName(item.teamMember().player())).withStyle(ChatFormatting.WHITE), left + 66 + 3 + 12, left + 66 + 84 - this.buttonWidgets.size() * (12 + 2) - 2, top - 4 + 4, -1);
+            PlayerFaceRenderer.draw(guiGraphics, Minecraft.getInstance().player.getSkin(), left - 1 + 3, top - 1 + 3, 10);
+            guiGraphics.drawScrollingString(Minecraft.getInstance().font, Component.literal(ClientPlayerUtils.getPlayerName(item.teamMember().player())).withStyle(ChatFormatting.WHITE), left + 3 + 12, left + 84 - this.buttonWidgets.get(item).size() * (12 + 2) - 2, top - 4 + 6, -1);
         }
         poseStack.popPose();
 
@@ -80,8 +78,8 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
         poseStack.pushPose();
         {
             poseStack.translate(0, 0, PlayerManagementDraggableWidget.BACKGROUND_Z + 3);
-            for (DraggableWidgetImageButton widget : this.buttonWidgets) {
-                widget.setPosition(left + 66 + 84 - (i + 1) * (12 + 2), top - 4 + 2);
+            for (DraggableWidgetImageButton widget : this.buttonWidgets.get(item)) {
+                widget.setPosition(left + 84 - (i + 1) * (12 + 2) - 1, top + 2 - 1);
                 widget.render(guiGraphics, mouseX, mouseY, -1);
                 i++;
             }
