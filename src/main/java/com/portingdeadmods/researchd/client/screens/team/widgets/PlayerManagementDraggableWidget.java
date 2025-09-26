@@ -32,7 +32,7 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
     public static final int BACKGROUND_Z = 500;
 
     public PlayerManagementDraggableWidget(int x, int y, List<TeamMember> members, PlayerManagementButtons buttonSettings, Component message) {
-        super(x, y, 128, 128, message);
+        super(x, y, 102, 128, message);
         this.buttonSettings = buttonSettings;
         this.buttonWidgets = new ArrayList<>();
         int i = 0;
@@ -44,9 +44,9 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
         for (TeamMember member : members) {
             entries.add(new PlayerManagementList.Entry(member, buttonSettings));
         }
-        this.managementList = new PlayerManagementList(84, 116, 0, 16, entries, false, this);
+        this.managementList = new PlayerManagementList(84, 118, 84, 16, entries, false, this);
         this.managementList.active = this.visible; // Probably redundant... but idrk some freaky stuff is happening with visibility
-        this.managementList.setPosition(x + 6, y + 6);
+        this.managementList.setPosition(x + 5, y + 5);
         BiConsumer<PlayerManagementList.Entry, PlayerManagementButtonType> refreshFunction = (entry, type) -> {
             switch (type) {
                 case REMOVE -> {
@@ -101,10 +101,10 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
 
         int i = 0;
         for (DraggableWidgetImageButton button : this.buttonWidgets) {
-            button.setPosition(getX() + 6 + i * (12 + 2), getY() + 6);
+            button.setPosition(getX() + 5 + i * (12 + 2), getY() + 5);
             i++;
         }
-        this.managementList.setPosition(getX() + 6, getY() + 6);
+        this.managementList.setPosition(getX() + 5, getY() + 5);
     }
 
     @Override

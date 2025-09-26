@@ -62,14 +62,14 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
         poseStack.pushPose();
         {
             poseStack.translate(0, 0, PlayerManagementDraggableWidget.BACKGROUND_Z + 1);
-            guiGraphics.blitSprite(PLAYER_ENTRY_TEXTURE, left - 1, top - 1, 84, 16);
+            guiGraphics.blitSprite(PLAYER_ENTRY_TEXTURE, left, top, 84, 16);
         }
         poseStack.popPose();
 
         poseStack.pushPose();
         {
             poseStack.translate(0, 0, PlayerManagementDraggableWidget.BACKGROUND_Z + 2);
-            PlayerFaceRenderer.draw(guiGraphics, Minecraft.getInstance().player.getSkin(), left - 1 + 3, top - 1 + 3, 10);
+            PlayerFaceRenderer.draw(guiGraphics, Minecraft.getInstance().player.getSkin(), left + 3, top + 3, 10);
             guiGraphics.drawScrollingString(Minecraft.getInstance().font, Component.literal(ClientPlayerUtils.getPlayerName(item.teamMember().player())).withStyle(ChatFormatting.WHITE), left + 3 + 12, left + 84 - this.buttonWidgets.get(item).size() * (12 + 2) - 2, top - 4 + 6, -1);
         }
         poseStack.popPose();
@@ -79,7 +79,7 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
         {
             poseStack.translate(0, 0, PlayerManagementDraggableWidget.BACKGROUND_Z + 3);
             for (DraggableWidgetImageButton widget : this.buttonWidgets.get(item)) {
-                widget.setPosition(left + 84 - (i + 1) * (12 + 2) - 1, top + 2 - 1);
+                widget.setPosition(left + 84 - (i + 1) * (12 + 2), top + 2);
                 widget.render(guiGraphics, mouseX, mouseY, -1);
                 i++;
             }

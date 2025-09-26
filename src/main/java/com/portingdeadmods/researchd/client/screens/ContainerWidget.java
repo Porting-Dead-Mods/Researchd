@@ -31,11 +31,11 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
-        //guiGraphics.enableScissor(this.getLeft(), this.getTop(), this.getX() + this.getItemWidth() + 1, this.getY() + this.getHeight() + 1);
+        guiGraphics.enableScissor(this.getLeft(), this.getTop(), this.getX() + this.getItemWidth(), this.getY() + this.getHeight());
         {
             this.renderContainer(guiGraphics, mouseX, mouseY);
         }
-        //guiGraphics.disableScissor();
+        guiGraphics.disableScissor();
 
         if (renderScroller) {
             float percentage = (float) this.scrollOffset / (this.getContentHeight() - this.getHeight());
