@@ -50,6 +50,11 @@ public class ClientResearchTeamHelper {
         return ResearchTeamRole.MEMBER;
     }
 
+	public static ResearchTeamRole getRole() {
+		LocalPlayer player = Minecraft.getInstance().player;
+		return getPlayerRole(player.getUUID());
+	}
+
     /**
      * Returns the permission level of the player. <br>
      * <span style="color:red">0 - Member</span> <br>
@@ -94,7 +99,7 @@ public class ClientResearchTeamHelper {
         List<UUID> uuids = ClientPlayerUtils.getPlayerUUIDs();
         List<TeamMember> playersNotInTeam = new ArrayList<>();
         for (UUID uuid : uuids.stream().filter(uuid -> !team.isPresentInTeam(uuid)).toList()) {
-            playersNotInTeam.add(new TeamMember(uuid, ResearchTeamRole.NOT_MEMBER));
+            playersNotInTeam.add(new TeamMember(uuid, ResearchTeamRole.MODERATOR));
         }
 
         return playersNotInTeam;

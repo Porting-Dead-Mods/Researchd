@@ -128,8 +128,20 @@ public class ResearchTeamScreen extends BaseScreen {
                 new PlayerManagementDraggableWidget.PlayerManagementButtons(false, false, false, false, true),
                 Component.empty()
         );
+
         inviteWidget.setVisible(false);
         inviteWidget.visitWidgets(this::addRenderableOnly);
+
+		// Call visible logic on init asw since it flickers for 1 frame on screen creation
+	    if (!Minecraft.getInstance().isSingleplayer()) {
+		    if (Minecraft.getInstance().getSingleplayerServer() != null)
+			    this.inviteButton.active = Minecraft.getInstance().getSingleplayerServer().getPlayerCount() > 1;
+		    else if (Minecraft.getInstance().getConnection() != null)
+			    this.inviteButton.active = Minecraft.getInstance().getConnection().getOnlinePlayers().size() > 1;
+	    }
+	    this.inviteButton.active = this.inviteButton.active && (ClientResearchTeamHelper.getPlayerPermissionLevel(this.player) >= 1);
+
+	    this.settingsButton.active = (ClientResearchTeamHelper.getPlayerPermissionLevel(this.player) > 0);
     }
 
     @Override
@@ -170,10 +182,19 @@ public class ResearchTeamScreen extends BaseScreen {
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
 
-        // FIXME: sus?
         this.settingsButton.active = (ClientResearchTeamHelper.getPlayerPermissionLevel(this.player) >= 1);
-        this.inviteButton.active = (ClientResearchTeamHelper.getPlayerPermissionLevel(this.player) > 0);
-    }
+
+
+	    this.inviteButton.active = false;
+
+	    if (!Minecraft.getInstance().isSingleplayer()) {
+		    if (Minecraft.getInstance().getSingleplayerServer() != null)
+			    this.inviteButton.active = Minecraft.getInstance().getSingleplayerServer().getPlayerCount() > 1;
+		    else if (Minecraft.getInstance().getConnection() != null)
+			    this.inviteButton.active = Minecraft.getInstance().getConnection().getOnlinePlayers().size() > 1;
+	    }
+		this.inviteButton.active = this.inviteButton.active && (ClientResearchTeamHelper.getPlayerPermissionLevel(this.player) >= 1);
+	}
 
     @Override
     protected void renderBlurredBackground(float partialTick) {

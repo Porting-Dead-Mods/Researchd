@@ -28,6 +28,7 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
     private final List<DraggableWidgetImageButton> buttonWidgets;
     private final PlayerManagementList managementList;
     public final WarningPopupWidget popupWidget;
+	public final BiConsumer<PlayerManagementList.Entry, PlayerManagementButtonType> refreshFunction;
 
     public static final int BACKGROUND_Z = 500;
 
@@ -44,26 +45,30 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
         for (TeamMember member : members) {
             entries.add(new PlayerManagementList.Entry(member, buttonSettings));
         }
-        this.managementList = new PlayerManagementList(84, 118, 84, 16, entries, false, this);
+        this.managementList = new PlayerManagementList(85, 118, 85, 16, entries, false, this);
         this.managementList.active = this.visible; // Probably redundant... but idrk some freaky stuff is happening with visibility
         this.managementList.setPosition(x + 5, y + 5);
-        BiConsumer<PlayerManagementList.Entry, PlayerManagementButtonType> refreshFunction = (entry, type) -> {
-            switch (type) {
-                case REMOVE -> {
-                    //this.managementList.removeEntry(entry);
-                }
-                case DEMOTE -> {
-                }
-                case PROMOTE -> {
-                }
-                case TRANSFER_OWNERSHIP -> {
-                }
-                case INVITE_PLAYER -> {
-                }
-            }
-        };
         this.popupWidget = new WarningPopupWidget(0, 0, this::onOkPress, this::onCancelPress);
         this.popupWidget.visible = false;
+
+	    this.refreshFunction = (entry, type) -> {
+		    switch (type) {
+			    case REMOVE -> {
+				    this.managementList.getItems().remove(entry);
+			    }
+			    case DEMOTE -> {
+				    this.managementList.resort();
+			    }
+			    case PROMOTE -> {
+				    this.managementList.resort();
+			    }
+			    case TRANSFER_OWNERSHIP -> {
+				    this.managementList.resort();
+			    }
+			    case INVITE_PLAYER -> {
+			    }
+		    }
+	    };
     }
 
     public void openPopupWidget(TeamMember profile) {

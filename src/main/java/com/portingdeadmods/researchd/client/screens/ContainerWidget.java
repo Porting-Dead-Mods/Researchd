@@ -124,6 +124,12 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
                 && mouseY < this.getTop() + (this.itemHeight * (index + 1)) - this.scrollOffset;
     }
 
+	protected void sortEntriesBy(java.util.Comparator<? super E> comparator) {
+		if (this.items instanceof java.util.List<E> list) {
+			list.sort(comparator);
+		}
+	}
+
     public abstract void clickedItem(E item, int index, int left, int top, int mouseX, int mouseY);
 
     public abstract void renderItem(GuiGraphics guiGraphics, E item, int index, int left, int top, int mouseX, int mouseY);

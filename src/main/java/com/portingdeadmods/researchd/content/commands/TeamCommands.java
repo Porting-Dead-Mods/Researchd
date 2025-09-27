@@ -81,6 +81,20 @@ public class TeamCommands {
 							return 1;
 						})
 					))
+				.then(Commands.literal("ignore")
+						.then(Commands.argument("memberOfTeam", StringArgumentType.string())
+								.suggests(SuggestionUtils::playerNames)
+								.executes(context -> {
+									CommandSourceStack source = context.getSource();
+									ServerPlayer player = source.getPlayer();
+
+									if (player != null) {
+										ResearchTeamHelper.handleIgnoreTeam(player, PlayerUtils.getPlayerUUIDFromName(context.getSource().getLevel(), StringArgumentType.getString(context, "memberOfTeam")));
+									}
+
+									return 1;
+								})
+						))
 				.then(Commands.literal("promote")
 						.then(Commands.argument("player", StringArgumentType.string())
 								.suggests(SuggestionUtils::teamMemberNames)

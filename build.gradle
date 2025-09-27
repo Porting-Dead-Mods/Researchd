@@ -54,6 +54,13 @@ neoForge {
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
+        client2 {
+            client()
+
+            programArguments.addAll '--username', 'DeveloperThe2nd', '--uuid', '123456781234123412341234567890ac'
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+
         server {
             server()
 

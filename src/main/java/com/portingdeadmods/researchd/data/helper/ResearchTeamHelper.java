@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.data.helper;
 
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
+import com.portingdeadmods.researchd.api.data.team.TeamMember;
 import com.portingdeadmods.researchd.api.data.team.TeamResearchProgress;
 import com.portingdeadmods.researchd.api.research.GlobalResearch;
 import com.portingdeadmods.researchd.api.research.Research;
@@ -11,8 +12,10 @@ import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.networking.team.RefreshResearchesPayload;
 import com.portingdeadmods.researchd.networking.team.TransferOwnershipPayload;
+import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import com.portingdeadmods.researchd.utils.PlayerUtils;
 import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
@@ -57,11 +60,6 @@ public final class ResearchTeamHelper {
         ResearchTeamMap map = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
         if (map == null) return null;
         return map.getTeamByMember(uuid);
-    }
-
-    public static boolean isInATeam(Player player) {
-        UUID uuid = player.getUUID();
-        return ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeamByMember(uuid) != null;
     }
 
     public static boolean arePlayersSameTeam(Player player1, Player player2) {
@@ -119,12 +117,23 @@ public final class ResearchTeamHelper {
         ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
         ResearchTeam team = savedData.getTeamByMember(memberOfTeam);
 
-        if (isInATeam(requester)) {
-            requester.sendSystemMessage(Component.literal("You're already in a team!").withStyle(ChatFormatting.RED));
+        if (getResearchTeam(requester).getMembers().size() > 1) {
+            requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.ALREADY_IN_TEAM));
             return;
         }
-        if (team != null && (team.getReceivedInvites().contains(requesterId))) {
-            requester.sendSystemMessage(Component.literal("You successfully joined: " + team.getName() + "!").withStyle(ChatFormatting.GREEN));
+        if (team != null && (team.getSentInvites().contains(requesterId))) {
+			ResearchTeamHelper.handleLeaveTeam(requester, PlayerUtils.EMPTY_UUID);
+
+			savedData.getResearchTeams().put(requesterId, team);
+            requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.YOU_JOINED_TEAM, team.getName()));
+
+			for (TeamMember member : team.getMembers()) {
+				Player memberPlayer = level.getPlayerByUUID(member.player());
+				if (memberPlayer != null) {
+					memberPlayer.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.PLAYER_JOINED_TEAM, PlayerUtils.getPlayerNameFromUUID(level, requesterId)));
+				}
+			}
+
             team.addMember(requesterId);
             team.removeSentInvite(requesterId);
             ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
@@ -144,6 +153,29 @@ public final class ResearchTeamHelper {
         handleEnterTeam(requester, memberOfTeam.getUUID());
     }
 
+	public static void handleIgnoreTeam(ServerPlayer requester, UUID memberOfTeam) {
+		Level level = requester.level();
+		UUID requesterId = requester.getUUID();
+
+		ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
+		ResearchTeam team = savedData.getTeamByMember(memberOfTeam);
+
+		if (team != null) {
+			team.addIgnore(requester.getUUID());
+			requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.IGNORE, team.getName()));
+		}
+	}
+
+	/**
+	 * 2 player param wrapper
+	 *
+	 * @param requester
+	 * @param memberOfTeam
+	 */
+	public static void handleIgnoreTeam(ServerPlayer requester, Player memberOfTeam) {
+		handleIgnoreTeam(requester, memberOfTeam.getUUID());
+	}
+
     public static void handleLeaveTeam(ServerPlayer requester, @Nullable UUID nextToLead) {
         MinecraftServer server = requester.getServer();
         ServerLevel level = server.overworld();
@@ -151,21 +183,16 @@ public final class ResearchTeamHelper {
 
         ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
 
-        if (!isInATeam(requester)) {
-            requester.sendSystemMessage(Component.literal("You're not in a team!").withStyle(ChatFormatting.RED));
-            return;
-        }
-
         // Handle the case of transfering ownership
         if (isResearchTeamLeader(requester)) {
             if (getResearchTeam(requester).getMembers().size() <= 1) {
                 savedData.getResearchTeams().remove(requesterId);
-                requester.sendSystemMessage(Component.literal("You successfully abandoned your team!").withStyle(ChatFormatting.GREEN));
+                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.LEFT_TEAM));
 
                 savedData.getResearchTeams().put(requesterId, ResearchTeam.createDefaultTeam(requester));
             } else {
-                if (nextToLead == null) {
-                    requester.sendSystemMessage(Component.literal("You need to specify the next leader!").withStyle(ChatFormatting.RED));
+                if (nextToLead == PlayerUtils.EMPTY_UUID || nextToLead == null) {
+                    requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NO_NEXT_LEADER));
                     return;
                 }
                 handleTransferOwnership(requester, nextToLead);
@@ -207,7 +234,7 @@ public final class ResearchTeamHelper {
         if (getPermissionLevel(requester) >= 1) {
             if (remove) {
                 getResearchTeam(requester).removeMember(member);
-                requester.sendSystemMessage(Component.literal("Member " + PlayerUtils.getPlayerNameFromUUID(level, member) + " removed!").withStyle(ChatFormatting.GREEN));
+                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.REMOVED, PlayerUtils.getPlayerNameFromUUID(level, member)));
             } else {
                 getResearchTeam(requester).addSentInvite(member);
             }
@@ -215,7 +242,7 @@ public final class ResearchTeamHelper {
 	        ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
 	        ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
         } else {
-            requester.sendSystemMessage(Component.literal("You don't have the permission to do that!").withStyle(ChatFormatting.RED));
+            requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NO_PERMS));
         }
 	    ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
     }
@@ -246,19 +273,19 @@ public final class ResearchTeamHelper {
             if (arePlayersSameTeam(requester, moderator)) {
                 if (remove) {
                     getResearchTeam(requester).removeModerator(moderator);
-                    requester.sendSystemMessage(Component.literal("Moderator " + PlayerUtils.getPlayerNameFromUUID(level, moderator) + " removed!").withStyle(ChatFormatting.GREEN));
+                    requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.DEMOTED, PlayerUtils.getPlayerNameFromUUID(level, moderator)));
                 } else {
                     getResearchTeam(requester).addModerator(moderator);
-                    requester.sendSystemMessage(Component.literal("Moderator " + PlayerUtils.getPlayerNameFromUUID(level, moderator) + " added!").withStyle(ChatFormatting.GREEN));
+                    requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.PROMOTED, PlayerUtils.getPlayerNameFromUUID(level, moderator)));
                 }
 
 	            ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
 	            ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
             } else {
-                requester.sendSystemMessage(Component.literal("Player is not in the same team with you!").withStyle(ChatFormatting.RED));
+                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.BAD_INPUT));
             }
         } else {
-            requester.sendSystemMessage(Component.literal("You don't have the permission to do that!").withStyle(ChatFormatting.RED));
+            requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NO_PERMS));
         }
     }
 
@@ -282,11 +309,11 @@ public final class ResearchTeamHelper {
         if (getPermissionLevel(requester) == 2) {
             String oldname = getResearchTeam(requester).getName();
             getResearchTeam(requester).setName(name);
-            requester.sendSystemMessage(Component.literal("Team name changed from " + oldname + " to " + name).withStyle(ChatFormatting.GREEN));
+            requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NEW_TEAM_NAME, oldname, name));
             ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
 	        ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
         } else {
-            requester.sendSystemMessage(Component.literal("You don't have the permission to do that!").withStyle(ChatFormatting.RED));
+            requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NO_PERMS));
         }
     }
 
@@ -310,9 +337,9 @@ public final class ResearchTeamHelper {
                 getResearchTeam(requester).addModerator(requesterId);
                 ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
 	            ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
-                requester.sendSystemMessage(Component.literal("Ownership transfered to " + nextToLead).withStyle(ChatFormatting.GREEN));
+                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.TRANSFERRED_OWNERSHIP, PlayerUtils.getPlayerNameFromUUID(level, nextToLead)));
             } else {
-                requester.sendSystemMessage(Component.literal("You can't transfer ownership to someone who's not in your team!").withStyle(ChatFormatting.RED));
+                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.BAD_INPUT));
             }
         }
     }
@@ -339,17 +366,30 @@ public final class ResearchTeamHelper {
         if (team != null) {
             if (remove) {
                 team.removeSentInvite(invited);
-                requester.sendSystemMessage(Component.literal("Invite to " + PlayerUtils.getPlayerNameFromUUID(requester.level(), invited) + " removed").withStyle(ChatFormatting.GOLD));
+                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.REMOVED_INVITE, PlayerUtils.getPlayerNameFromUUID(requester.level(), invited)));
             } else {
                 team.addSentInvite(invited);
-                requester.sendSystemMessage(Component.literal("Invite sent to " + PlayerUtils.getPlayerNameFromUUID(requester.level(), invited)).withStyle(ChatFormatting.GREEN));
+				ServerPlayer invitedPlayer = (ServerPlayer) requester.serverLevel().getPlayerByUUID(invited);
+				if (invitedPlayer != null) {
+					invitedPlayer.sendSystemMessage(
+							ResearchdTranslations.component(ResearchdTranslations.Team.RECEIVED_INVITE, team.getName())
+									.append(Component.literal("\n"))
+									.append("     ")
+									.append(ResearchdTranslations.component(ResearchdTranslations.Team.ACCEPT).withStyle(style -> style.withClickEvent(
+											new net.minecraft.network.chat.ClickEvent(ClickEvent.Action.RUN_COMMAND, "/researchd team join " + PlayerUtils.getPlayerNameFromUUID(requester.level(), requester.getUUID()))
+									)))
+									.append("     ")
+									.append(ResearchdTranslations.component(ResearchdTranslations.Team.DECLINE).withStyle(style -> style.withClickEvent(
+											new net.minecraft.network.chat.ClickEvent(ClickEvent.Action.RUN_COMMAND, "/researchd team ignore " + PlayerUtils.getPlayerNameFromUUID(requester.level(), requester.getUUID()))
+									)))
+					);
+				}
+                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.SENT_INVITE, PlayerUtils.getPlayerNameFromUUID(requester.level(), invited), team.getName()));
             }
             Level level = requester.level();
 
             ResearchdSavedData.TEAM_RESEARCH.get().setData(level, ResearchdSavedData.TEAM_RESEARCH.get().getData(level));
 	        ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
-        } else {
-            requester.sendSystemMessage(Component.literal("You got to be in a team to do that! Create one with /researchd team create <name>"));
         }
     }
 

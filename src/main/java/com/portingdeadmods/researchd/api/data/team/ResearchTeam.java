@@ -28,6 +28,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,6 +43,7 @@ public class ResearchTeam {
     private final List<TeamMember> members;
     private final List<UUID> sentInvites; // Invites sent by this team to other players
     private final List<UUID> receivedInvites; // Invites received by this team from other players
+	private final List<UUID> ignores;
     private UUID owner;
 
     private final TeamMetadata metadata;
@@ -51,11 +53,12 @@ public class ResearchTeam {
             Codec.list(TeamMember.CODEC).fieldOf("members").forGetter(ResearchTeam::getMembers),
             Codec.list(UUIDUtil.CODEC).fieldOf("sent_invites").forGetter(ResearchTeam::getSentInvites),
             Codec.list(UUIDUtil.CODEC).fieldOf("received_invites").forGetter(ResearchTeam::getReceivedInvites),
+		    Codec.list(UUIDUtil.CODEC).fieldOf("ignores").forGetter(ResearchTeam::getIgnores),
             UUIDUtil.CODEC.fieldOf("owner").forGetter(ResearchTeam::getOwner),
             TeamMetadata.CODEC.fieldOf("metadata").forGetter(ResearchTeam::getMetadata)
     ).apply(builder, ResearchTeam::new));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, ResearchTeam> STREAM_CODEC = StreamCodec.composite(
+    public static final StreamCodec<RegistryFriendlyByteBuf, ResearchTeam> STREAM_CODEC = NeoForgeStreamCodecs.composite(
             ByteBufCodecs.STRING_UTF8,
             ResearchTeam::getName,
             TeamMember.STREAM_CODEC.apply(ByteBufCodecs.list()),
@@ -64,6 +67,8 @@ public class ResearchTeam {
             ResearchTeam::getSentInvites,
             UUIDUtil.STREAM_CODEC.apply(ByteBufCodecs.list()),
             ResearchTeam::getReceivedInvites,
+		    UUIDUtil.STREAM_CODEC.apply(ByteBufCodecs.list()),
+		    ResearchTeam::getIgnores,
             UUIDUtil.STREAM_CODEC,
             ResearchTeam::getOwner,
             TeamMetadata.STREAM_CODEC,
@@ -71,20 +76,22 @@ public class ResearchTeam {
             ResearchTeam::new
     );
 
-    private ResearchTeam(String name, List<TeamMember> members, List<UUID> sentInvites, List<UUID> receivedInvites, UUID owner, TeamResearchProgress researchProgress) {
+    private ResearchTeam(String name, List<TeamMember> members, List<UUID> sentInvites, List<UUID> receivedInvites, List<UUID> ignores, UUID owner, TeamResearchProgress researchProgress) {
         this.name = name;
         this.members = new ArrayList<>(members);
         this.sentInvites = new ArrayList<>(sentInvites);
         this.receivedInvites = new ArrayList<>(receivedInvites);
+		this.ignores = new ArrayList<>(ignores);
         this.owner = owner;
         this.metadata = new TeamMetadata(researchProgress);
     }
 
-    private ResearchTeam(String name, List<TeamMember> members, List<UUID> sentInvites, List<UUID> receivedInvites, UUID owner, TeamMetadata metadata) {
+    private ResearchTeam(String name, List<TeamMember> members, List<UUID> sentInvites, List<UUID> receivedInvites, List<UUID> ignores, UUID owner, TeamMetadata metadata) {
         this.name = name;
         this.members = new ArrayList<>(members);
         this.sentInvites = new ArrayList<>(sentInvites);
         this.receivedInvites = new ArrayList<>(receivedInvites);
+		this.ignores = new ArrayList<>(ignores);
         this.owner = owner;
         this.metadata = metadata;
     }
@@ -97,7 +104,7 @@ public class ResearchTeam {
     public static ResearchTeam createDefaultTeam(ServerPlayer player) {
         Researchd.debug("Research Team", "Creating default team for player: " + player.getDisplayName().getString());
 
-        ResearchTeam team = new ResearchTeam(player.getDisplayName().getString() + "'s Team", List.of(new TeamMember(player.getUUID(), ResearchTeamRole.OWNER)), List.of(), List.of(), player.getUUID(), TeamResearchProgress.EMPTY);
+        ResearchTeam team = new ResearchTeam(player.getDisplayName().getString() + "'s Team", List.of(new TeamMember(player.getUUID(), ResearchTeamRole.OWNER)), List.of(), List.of(), List.of(), player.getUUID(), TeamResearchProgress.EMPTY);
         team.setCreationTime(player.getServer().getTickCount() * 50);
         team.init(player.registryAccess());
         return team;
@@ -110,7 +117,7 @@ public class ResearchTeam {
      * @param name The Name of the Team
      */
     private ResearchTeam(UUID uuid, String name) {
-        this(name, List.of(new TeamMember(uuid, ResearchTeamRole.OWNER)), List.of(), List.of(), uuid, TeamResearchProgress.EMPTY);
+        this(name, List.of(new TeamMember(uuid, ResearchTeamRole.OWNER)), List.of(), List.of(), List.of(), uuid, TeamResearchProgress.EMPTY);
     }
 
     public String getName() {
@@ -128,6 +135,15 @@ public class ResearchTeam {
     public List<UUID> getReceivedInvites() {
         return this.receivedInvites;
     }
+
+	public List<UUID> getIgnores() {
+		return this.ignores;
+	}
+
+	public void addIgnore(UUID uuid) {
+		if (!ignores.contains(uuid))
+			ignores.add(uuid);
+	}
 
     public UUID getOwner() {
         return this.owner;
