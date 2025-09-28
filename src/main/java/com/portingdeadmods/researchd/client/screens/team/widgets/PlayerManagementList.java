@@ -1,5 +1,6 @@
 package com.portingdeadmods.researchd.client.screens.team.widgets;
 
+import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.data.team.TeamMember;
@@ -16,6 +17,7 @@ import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.*;
 
@@ -27,7 +29,7 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
     private final Map<Entry, List<DraggableWidgetImageButton>> buttonWidgets;
     private final AbstractWidget parent;
 
-	private boolean should_add_button(Entry item, PlayerManagementDraggableWidget.PlayerManagementButtonType type) {
+	private boolean _should_add_button(Entry item, PlayerManagementDraggableWidget.PlayerManagementButtonType type) {
 		ResearchTeamRole clientRole = ClientResearchTeamHelper.getRole();
 		ResearchTeamRole targetRole = item.teamMember.role();
 
@@ -48,13 +50,27 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
 
 	    this.playerSkins = Collections.synchronizedMap(new HashMap<>());
 		this.playerNames = Collections.synchronizedMap(new HashMap<>());
+	    Minecraft mc = Minecraft.getInstance();
+
+	    for (PlayerManagementList.Entry item : items) {
+		    Player player = mc.level.getPlayerByUUID(item.teamMember.player());
+		    if (player != null) {
+			    Component name = player.getName();
+			    this.playerNames.put(item.teamMember.player(), name);
+			    GameProfile profile = new GameProfile(item.teamMember.player(), name.getString());
+			    mc.getSkinManager().getOrLoad(profile).thenAccept(skin -> this.playerSkins.put(item.teamMember.player(), skin));
+		    } else {
+			    this.playerNames.put(item.teamMember.player(), Component.literal("!Unknown Player!"));
+		    }
+	    }
+
 
         for (Entry item : items) {
 			buttonWidgets.put(item, new ArrayList<>());
 
             if (item.teamMember.role() != ResearchTeamRole.OWNER) {
                 for (Map.Entry<PlayerManagementDraggableWidget.PlayerManagementButtonType, WidgetSprites> entry : item.buttonSettings().getSprites().entrySet()) {
-					if (!this.should_add_button(item, entry.getKey())) continue;
+					if (!this._should_add_button(item, entry.getKey())) continue;
                     this.buttonWidgets.get(item).add(new DraggableWidgetImageButton(0, 0, 12, 12, entry.getValue(), btn -> {
                         switch (entry.getKey()) {
                             case PROMOTE -> ClientResearchTeamHelper.promoteTeamMemberSynced(item.teamMember());
@@ -94,8 +110,8 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
         poseStack.pushPose();
         {
             poseStack.translate(0, 0, PlayerManagementDraggableWidget.BACKGROUND_Z + 2);
-            PlayerFaceRenderer.draw(guiGraphics, Minecraft.getInstance().player.getSkin(), left + 3, top + 3, 10);
-            guiGraphics.drawScrollingString(Minecraft.getInstance().font, Component.literal(ClientPlayerUtils.getPlayerName(item.teamMember().player())).withStyle(ChatFormatting.WHITE), left + 3 + 12, left + 84 - this.buttonWidgets.get(item).size() * (12 + 2) - 2, top + 4, -1);
+            PlayerFaceRenderer.draw(guiGraphics, playerSkins.get(item.teamMember.player()), left + 3, top + 3, 10);
+            guiGraphics.drawScrollingString(Minecraft.getInstance().font, Component.literal(playerNames.get(item.teamMember.player()).getString()).withStyle(ChatFormatting.WHITE), left + 3 + 12, left + 84 - this.buttonWidgets.get(item).size() * (12 + 2) - 2, top + 4, -1);
         }
         poseStack.popPose();
 

@@ -165,6 +165,14 @@ public class ResearchTeamSettingsScreen extends BaseScreen {
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
+	@Override
+	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+		super.render(guiGraphics, mouseX, mouseY, partialTick);
+		this.manageMembersButton.active = (ClientResearchTeamHelper.getRole().getPermissionLevel() > 0);
+		this.transferOwnershipButton.active = (ClientResearchTeamHelper.getRole() == ResearchTeamRole.OWNER);
+		this.teamNameEdit.setEditable(ClientResearchTeamHelper.getRole() == ResearchTeamRole.OWNER);
+	}
+
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
