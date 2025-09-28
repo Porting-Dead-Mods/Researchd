@@ -15,7 +15,7 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
     private final int itemHeight;
     private final Collection<E> items;
     private final boolean renderScroller;
-    private int scrollOffset;
+    protected int scrollOffset;
 
     public ContainerWidget(int width, int height, int itemWidth, int itemHeight, Collection<E> items, boolean renderScroller) {
         this(0, 0, width, height, itemWidth, itemHeight, items, renderScroller);

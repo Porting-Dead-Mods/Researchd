@@ -74,6 +74,32 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
     }
 
     @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        int index = 0;
+        for (Entry item : this.getItems()) {
+            int top = this.getY() + 1 + index * this.getItemHeight() - this.scrollOffset;
+            int left = this.getX() + 1;
+
+            if (top >= this.getY() + 1 && top < this.getY() + this.getHeight()) {
+                List<DraggableWidgetImageButton> buttons = this.buttonWidgets.get(item);
+                if (buttons != null) {
+                    int i = 0;
+                    for (DraggableWidgetImageButton widget : buttons) {
+                        widget.setPosition(left + 84 - (i + 1) * (12 + 2), top + 2);
+                        if (widget.mouseClicked(mouseX, mouseY, button)) {
+                            return true;
+                        }
+                        i++;
+                    }
+                }
+            }
+            index++;
+        }
+
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
     public void renderItem(GuiGraphics guiGraphics, PlayerManagementList.Entry item, int index, int left, int top, int mouseX, int mouseY) {
         PoseStack poseStack = guiGraphics.pose();
         poseStack.pushPose();
