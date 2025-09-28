@@ -14,6 +14,7 @@ import com.portingdeadmods.researchd.client.screens.team.ResearchTeamScreen;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
+import com.portingdeadmods.researchd.networking.cache.AskServerPlayers;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -29,6 +30,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.Comparator;
 
@@ -100,5 +102,7 @@ public final class ResearchdClientEvents {
 			Researchd.RESEARCH_PACK_REGISTRY.initialize(registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY));
 			Researchd.debug("Researchd Constants Client", "Initialized research pack registry.");
 		}
+
+		PacketDistributor.sendToServer(AskServerPlayers.UNIT);
 	}
 }

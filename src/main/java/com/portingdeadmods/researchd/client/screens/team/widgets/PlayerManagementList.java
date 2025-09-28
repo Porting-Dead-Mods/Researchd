@@ -1,11 +1,10 @@
 package com.portingdeadmods.researchd.client.screens.team.widgets;
 
-import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.data.team.TeamMember;
+import com.portingdeadmods.researchd.client.cache.AllPlayersCache;
 import com.portingdeadmods.researchd.client.screens.ContainerWidget;
-import com.portingdeadmods.researchd.client.utils.ClientPlayerUtils;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamRole;
 import net.minecraft.ChatFormatting;
@@ -14,17 +13,12 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
 import net.minecraft.client.gui.components.WidgetSprites;
-import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.*;
 
 public class PlayerManagementList extends ContainerWidget<PlayerManagementList.Entry> {
-	private final Map<UUID, PlayerSkin> playerSkins;
-	private final Map<UUID, Component> playerNames;
-
     public static final ResourceLocation PLAYER_ENTRY_TEXTURE = Researchd.rl("player");
     private final Map<Entry, List<DraggableWidgetImageButton>> buttonWidgets;
     private final AbstractWidget parent;
@@ -47,24 +41,6 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
         super(width, height, itemWidth, itemHeight, items, renderScroller);
         this.buttonWidgets = new HashMap<>();
         this.parent = parent;
-
-	    this.playerSkins = Collections.synchronizedMap(new HashMap<>());
-		this.playerNames = Collections.synchronizedMap(new HashMap<>());
-	    Minecraft mc = Minecraft.getInstance();
-
-	    for (PlayerManagementList.Entry item : items) {
-		    Player player = mc.level.getPlayerByUUID(item.teamMember.player());
-		    if (player != null) {
-			    Component name = player.getName();
-			    this.playerNames.put(item.teamMember.player(), name);
-			    GameProfile profile = new GameProfile(item.teamMember.player(), name.getString());
-			    mc.getSkinManager().getOrLoad(profile).thenAccept(skin -> this.playerSkins.put(item.teamMember.player(), skin));
-		    } else {
-			    this.playerNames.put(item.teamMember.player(), Component.literal("!Unknown Player!"));
-		    }
-	    }
-
-
         for (Entry item : items) {
 			buttonWidgets.put(item, new ArrayList<>());
 
@@ -110,8 +86,8 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
         poseStack.pushPose();
         {
             poseStack.translate(0, 0, PlayerManagementDraggableWidget.BACKGROUND_Z + 2);
-            PlayerFaceRenderer.draw(guiGraphics, playerSkins.get(item.teamMember.player()), left + 3, top + 3, 10);
-            guiGraphics.drawScrollingString(Minecraft.getInstance().font, Component.literal(playerNames.get(item.teamMember.player()).getString()).withStyle(ChatFormatting.WHITE), left + 3 + 12, left + 84 - this.buttonWidgets.get(item).size() * (12 + 2) - 2, top + 4, -1);
+            PlayerFaceRenderer.draw(guiGraphics, AllPlayersCache.getSkin(item.teamMember.player()), left + 3, top + 3, 10);
+            guiGraphics.drawScrollingString(Minecraft.getInstance().font, Component.literal(AllPlayersCache.getName(item.teamMember.player())).withStyle(ChatFormatting.WHITE), left + 3 + 12, left + 84 - this.buttonWidgets.get(item).size() * (12 + 2) - 2, top + 4, -1);
         }
         poseStack.popPose();
 

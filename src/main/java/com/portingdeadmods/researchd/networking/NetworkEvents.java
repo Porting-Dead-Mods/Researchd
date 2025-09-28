@@ -1,6 +1,8 @@
 package com.portingdeadmods.researchd.networking;
 
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.networking.cache.AskServerPlayers;
+import com.portingdeadmods.researchd.networking.cache.ReceiveServerPlayers;
 import com.portingdeadmods.researchd.networking.research.ResearchFinishedPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchMethodProgressSyncPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchQueueAddPayload;
@@ -70,6 +72,11 @@ public class NetworkEvents {
                 ResearchQueueRemovePayload.STREAM_CODEC,
                 ResearchQueueRemovePayload::researchQueueRemoveAction
         );
+        registrar.playToServer(
+                AskServerPlayers.TYPE,
+                AskServerPlayers.STREAM_CODEC,
+                AskServerPlayers::ping
+        );
 
         registrar.playToClient(
                 ResearchFinishedPayload.TYPE,
@@ -86,6 +93,10 @@ public class NetworkEvents {
                 ResearchMethodProgressSyncPayload.STREAM_CODEC,
                 ResearchMethodProgressSyncPayload::researchMethodProgressSyncAction
         );
-
+        registrar.playToClient(
+                ReceiveServerPlayers.TYPE,
+                ReceiveServerPlayers.STREAM_CODEC,
+                ReceiveServerPlayers::pong
+        );
     }
 }

@@ -16,6 +16,7 @@ import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
 import com.portingdeadmods.researchd.integration.KubeJSIntegration;
+import com.portingdeadmods.researchd.networking.cache.ReceiveServerPlayers;
 import com.portingdeadmods.researchd.networking.research.ResearchFinishedPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchMethodProgressSyncPayload;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
@@ -33,6 +34,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
@@ -40,6 +42,7 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -190,4 +193,10 @@ public final class ResearchdCommonEvents {
         }
     }
 
+    @SubscribeEvent
+    public static void onLoggingIn(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getEntity() instanceof ServerPlayer sp) {
+            PacketDistributor.sendToAllPlayers(new ReceiveServerPlayers(List.of(sp.getGameProfile())));
+        }
+    }
 }
