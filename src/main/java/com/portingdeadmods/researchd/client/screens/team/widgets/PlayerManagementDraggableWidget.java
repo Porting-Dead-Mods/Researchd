@@ -27,6 +27,10 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
     private final PlayerManagementButtons buttonSettings;
     private final List<DraggableWidgetImageButton> buttonWidgets;
     private final PlayerManagementList managementList;
+    public PlayerManagementList getManagementList() {
+        return managementList;
+    }
+
     public final WarningPopupWidget popupWidget;
 	public final BiConsumer<PlayerManagementList.Entry, PlayerManagementButtonType> refreshFunction;
 
@@ -38,7 +42,8 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
         this.buttonWidgets = new ArrayList<>();
         int i = 0;
         for (Map.Entry<PlayerManagementButtonType, WidgetSprites> entry : this.buttonSettings.getSprites().entrySet()) {
-            this.buttonWidgets.add(new DraggableWidgetImageButton(getX() + 6 + i * (12 + 2), getY() + 6, 12, 12, entry.getValue(), btn -> {}));
+            this.buttonWidgets.add(new DraggableWidgetImageButton(getX() + 6 + i * (12 + 2), getY() + 6, 12, 12, entry.getValue(), btn -> {
+            }));
             i++;
         }
         List<PlayerManagementList.Entry> entries = new ArrayList<>();
@@ -51,7 +56,7 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
         this.popupWidget = new WarningPopupWidget(0, 0, this::onOkPress, this::onCancelPress);
         this.popupWidget.visible = false;
 
-	    this.refreshFunction = (entry, type) -> {
+	    /*this.refreshFunction = (entry, type) -> {
 		    switch (type) {
 			    case REMOVE -> {
 				    this.managementList.getItems().remove(entry);
@@ -68,7 +73,8 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
 			    case INVITE_PLAYER -> {
 			    }
 		    }
-	    };
+	    };*/
+        this.refreshFunction = (a, b) -> {};
     }
 
     public void openPopupWidget(TeamMember profile) {

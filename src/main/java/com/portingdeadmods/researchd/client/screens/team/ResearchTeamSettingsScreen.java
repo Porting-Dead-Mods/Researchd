@@ -39,7 +39,14 @@ public class ResearchTeamSettingsScreen extends BaseScreen {
     private Button leaveButton;
 
     private PlayerManagementDraggableWidget playerManagementWindow;
+    public PlayerManagementDraggableWidget getPlayerManagementWindow() {
+        return playerManagementWindow;
+    }
+
     private PlayerManagementDraggableWidget transferOwnershipWindow;
+    public PlayerManagementDraggableWidget getTransferOwnershipWindow() {
+        return transferOwnershipWindow;
+    }
 
     public ResearchTeamSettingsScreen() {
         super(ResearchdTranslations.component(ResearchdTranslations.Team.SETTINGS_SCREEN_TITLE), 480, 264, 128, 195);

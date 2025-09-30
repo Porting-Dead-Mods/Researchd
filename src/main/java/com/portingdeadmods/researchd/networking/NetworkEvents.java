@@ -89,6 +89,11 @@ public class NetworkEvents {
                 RefreshResearchesPayload::refreshResearchesAction
         );
         registrar.playToClient(
+                RefreshPlayerManagementPayload.TYPE,
+                RefreshPlayerManagementPayload.STREAM_CODEC,
+                RefreshPlayerManagementPayload::refreshPlayerManagementAction
+        );
+        registrar.playToClient(
                 ResearchMethodProgressSyncPayload.TYPE,
                 ResearchMethodProgressSyncPayload.STREAM_CODEC,
                 ResearchMethodProgressSyncPayload::researchMethodProgressSyncAction

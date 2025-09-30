@@ -10,8 +10,8 @@ import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
+import com.portingdeadmods.researchd.networking.team.RefreshPlayerManagementPayload;
 import com.portingdeadmods.researchd.networking.team.RefreshResearchesPayload;
-import com.portingdeadmods.researchd.networking.team.TransferOwnershipPayload;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import com.portingdeadmods.researchd.utils.PlayerUtils;
 import net.minecraft.ChatFormatting;
@@ -97,7 +97,7 @@ public final class ResearchTeamHelper {
      *
      * @param player
      */
-    public static void removeModFromTeam(ServerPlayer player) {
+    public static void removePlayerFromTeam(ServerPlayer player) {
         UUID uuid = player.getUUID();
         ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level());
         ResearchTeam team = savedData.getTeamByMember(uuid);
@@ -139,6 +139,7 @@ public final class ResearchTeamHelper {
             ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
 	        ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
 
+            refreshPlayerManagement(team, level);
             PacketDistributor.sendToPlayer(requester, new RefreshResearchesPayload());
         }
     }
@@ -204,10 +205,11 @@ public final class ResearchTeamHelper {
             return;
         }
 
-        if (getPermissionLevel(requester) == 1) {
-            removeModFromTeam(requester);
-        }
+        removePlayerFromTeam(requester);
+        requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.LEFT_TEAM));
+        savedData.getResearchTeams().put(requesterId, ResearchTeam.createDefaultTeam(requester));
 	    ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
+        refreshPlayerManagement(getResearchTeam(requester), level);
     }
 
     /**
@@ -241,6 +243,7 @@ public final class ResearchTeamHelper {
 
 	        ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
 	        ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
+            refreshPlayerManagement(getResearchTeam(requester), level);
         } else {
             requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NO_PERMS));
         }
@@ -281,6 +284,7 @@ public final class ResearchTeamHelper {
 
 	            ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
 	            ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
+                refreshPlayerManagement(getResearchTeam(requester), level);
             } else {
                 requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.BAD_INPUT));
             }
@@ -312,6 +316,7 @@ public final class ResearchTeamHelper {
             requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NEW_TEAM_NAME, oldname, name));
             ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
 	        ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
+            refreshPlayerManagement(getResearchTeam(requester), level);
         } else {
             requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NO_PERMS));
         }
@@ -338,6 +343,7 @@ public final class ResearchTeamHelper {
                 ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
 	            ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
                 requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.TRANSFERRED_OWNERSHIP, PlayerUtils.getPlayerNameFromUUID(level, nextToLead)));
+                refreshPlayerManagement(getResearchTeam(requester), level);
             } else {
                 requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.BAD_INPUT));
             }
@@ -390,6 +396,7 @@ public final class ResearchTeamHelper {
 
             ResearchdSavedData.TEAM_RESEARCH.get().setData(level, ResearchdSavedData.TEAM_RESEARCH.get().getData(level));
 	        ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
+            refreshPlayerManagement(team, level);
         }
     }
 
@@ -418,6 +425,7 @@ public final class ResearchTeamHelper {
                 }
                 ResearchdSavedData.TEAM_RESEARCH.get().setData(level, ResearchdSavedData.TEAM_RESEARCH.get().getData(level));
 	            ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
+                refreshPlayerManagement(team, level);
             } else {
                 requester.sendSystemMessage(Component.literal("The player you're trying to join is not in a team!").withStyle(ChatFormatting.RED));
             }
@@ -566,6 +574,16 @@ public final class ResearchTeamHelper {
             TeamResearchProgress researchProgress = team.getMetadata().getResearchProgress();
             for (Map.Entry<ResourceKey<Research>, ResearchInstance> entry : researchProgress.researches().entrySet()) {
                 entry.setValue(new ResearchInstance(CommonResearchCache.GLOBAL_RESEARCHES.get(entry.getKey()), entry.getValue().getResearchStatus(), entry.getValue().getResearchedPlayer(), entry.getValue().getResearchedTime()));
+            }
+        }
+    }
+
+    private static void refreshPlayerManagement(ResearchTeam team, Level level) {
+        if (team == null) return;
+        for (TeamMember member : team.getMembers()) {
+            ServerPlayer player = level.getServer().getPlayerList().getPlayer(member.player());
+            if (player != null) {
+                PacketDistributor.sendToPlayer(player, RefreshPlayerManagementPayload.INSTANCE);
             }
         }
     }

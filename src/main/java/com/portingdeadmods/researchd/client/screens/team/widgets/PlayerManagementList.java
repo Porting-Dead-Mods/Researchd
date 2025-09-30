@@ -134,6 +134,38 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
 		sortEntriesBy(Comparator.comparing(entry -> ClientResearchTeamHelper.getPlayerRole(entry.teamMember().player()).getPermissionLevel(), Comparator.reverseOrder()));
 	}
 
+    public void refreshEntries(Collection<PlayerManagementList.Entry> newEntries) {
+        this.getItems().clear();
+        this.getItems().addAll(newEntries);
+
+        for (Entry item : newEntries) {
+            buttonWidgets.put(item, new ArrayList<>());
+
+            if (item.teamMember.role() != ResearchTeamRole.OWNER) {
+                for (Map.Entry<PlayerManagementDraggableWidget.PlayerManagementButtonType, WidgetSprites> entry : item.buttonSettings().getSprites().entrySet()) {
+                    if (!this._should_add_button(item, entry.getKey())) continue;
+                    this.buttonWidgets.get(item).add(new DraggableWidgetImageButton(0, 0, 12, 12, entry.getValue(), btn -> {
+                        switch (entry.getKey()) {
+                            case PROMOTE -> ClientResearchTeamHelper.promoteTeamMemberSynced(item.teamMember());
+                            case DEMOTE -> ClientResearchTeamHelper.demoteTeamMemberSynced(item.teamMember());
+                            case REMOVE -> ClientResearchTeamHelper.removeTeamMemberSynced(item.teamMember());
+                            case INVITE_PLAYER -> ClientResearchTeamHelper.sendTeamInviteSynced(item.teamMember());
+                            case TRANSFER_OWNERSHIP -> {
+                                if (this.parent instanceof PlayerManagementDraggableWidget widget) {
+                                    widget.openPopupWidget(item.teamMember());
+                                }
+                            }
+                        }
+                        if (this.parent instanceof PlayerManagementDraggableWidget widget)
+                            widget.refreshFunction.accept(item, entry.getKey());
+                    }));
+                }
+            }
+        }
+
+        resort();
+    }
+
     public record Entry(TeamMember teamMember, PlayerManagementDraggableWidget.PlayerManagementButtons buttonSettings) {
     }
 }

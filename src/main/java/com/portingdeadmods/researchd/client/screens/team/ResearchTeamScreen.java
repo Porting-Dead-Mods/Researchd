@@ -42,6 +42,9 @@ public class ResearchTeamScreen extends BaseScreen {
     private ImageButton inviteButton;
     private ImageButton settingsButton;
     private PlayerManagementDraggableWidget inviteWidget;
+    public PlayerManagementDraggableWidget getInviteWidget() {
+        return inviteWidget;
+    }
 
     public ResearchTeamScreen() {
         super(ResearchdTranslations.component(ResearchdTranslations.Team.SCREEN_TITLE), 480, 264, 480 - 64 * 2, 264 - 32 * 2);
