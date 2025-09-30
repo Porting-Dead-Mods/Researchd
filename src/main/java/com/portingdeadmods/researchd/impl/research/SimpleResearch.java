@@ -4,23 +4,19 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
-import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchSerializer;
 import com.portingdeadmods.researchd.impl.research.effect.EmptyResearchEffect;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-// TODO: Change icon to List<ItemStack> and use a CycledItemRenderer
-public record SimpleResearch(Item icon, ResearchMethod researchMethod, ResearchEffect researchEffect,
+public record SimpleResearch(ItemResearchIcon researchIcon, ResearchMethod researchMethod, ResearchEffect researchEffect,
                              List<ResourceKey<Research>> parents, boolean requiresParent,
                              Optional<String> literalName, Optional<String> literalDescription) implements Research {
     @Override
@@ -31,23 +27,23 @@ public record SimpleResearch(Item icon, ResearchMethod researchMethod, ResearchE
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof SimpleResearch(
-                Item icon1, ResearchMethod method, ResearchEffect effect, List<ResourceKey<Research>> parents1,
+                ItemResearchIcon icon1, ResearchMethod method, ResearchEffect effect, List<ResourceKey<Research>> parents1,
                 boolean parent, Optional<String> name, Optional<String> desc
         ))) return false;
-        return requiresParent == parent && Objects.equals(icon, icon1) && Objects.equals(researchMethod, method) 
+        return requiresParent == parent && Objects.equals(researchIcon, icon1) && Objects.equals(researchMethod, method)
                 && Objects.equals(researchEffect, effect) && Objects.equals(parents, parents1)
                 && Objects.equals(literalName, name) && Objects.equals(literalDescription, desc);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(icon, researchMethod, researchEffect, parents, requiresParent, literalName, literalDescription);
+        return Objects.hash(researchIcon, researchMethod, researchEffect, parents, requiresParent, literalName, literalDescription);
     }
 
     public static class Serializer implements ResearchSerializer<SimpleResearch> {
         public static final Serializer INSTANCE = new Serializer();
         public static final MapCodec<SimpleResearch> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                CodecUtils.registryCodec(BuiltInRegistries.ITEM).fieldOf("icon").forGetter(SimpleResearch::icon),
+                ItemResearchIcon.CODEC.fieldOf("icon").forGetter(SimpleResearch::researchIcon),
                 ResearchMethod.CODEC.fieldOf("method").forGetter(SimpleResearch::researchMethod),
                 ResearchEffect.CODEC.optionalFieldOf("effect", EmptyResearchEffect.INSTANCE).forGetter(SimpleResearch::researchEffect),
                 Research.RESOURCE_KEY_CODEC.listOf().fieldOf("parents").forGetter(SimpleResearch::parents),
@@ -67,10 +63,10 @@ public record SimpleResearch(Item icon, ResearchMethod researchMethod, ResearchE
     }
 
     public static class Builder implements Research.Builder<SimpleResearch> {
-        private Item icon = Items.AIR;
+        private ItemResearchIcon icon = ItemResearchIcon.EMPTY;
         private ResearchMethod researchMethod;
         private ResearchEffect researchEffect = EmptyResearchEffect.INSTANCE;
-        private UniqueArray<ResourceKey<Research>> parents = new UniqueArray<>();
+        private final UniqueArray<ResourceKey<Research>> parents = new UniqueArray<>();
         private boolean requiresParent = false;
         private Optional<String> literalName = Optional.empty();
         private Optional<String> literalDescription = Optional.empty();
@@ -83,7 +79,7 @@ public record SimpleResearch(Item icon, ResearchMethod researchMethod, ResearchE
         }
 
         public Builder icon(Item icon) {
-            this.icon = icon;
+            this.icon = ItemResearchIcon.single(icon);
             return this;
         }
 

@@ -18,7 +18,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
@@ -134,18 +133,17 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
         }
     }
 
-    private void renderResearchingResearchPanel(GuiGraphics guiGraphics, ResearchInstance firstInQueue, int x, int y, int mouseX, int mouseY, boolean hoverable) {
+    private void renderResearchingResearchPanel(GuiGraphics guiGraphics, ResearchInstance instance, int x, int y, int mouseX, int mouseY, boolean hoverable) {
         PanelSpriteType spriteType = PanelSpriteType.NORMAL;
-        ResearchStatus status = firstInQueue.getResearchStatus();
+        ResearchStatus status = instance.getResearchStatus();
         GuiUtils.drawImg(guiGraphics, status.getSpriteTexture(spriteType), x, y, PANEL_WIDTH, spriteType.getHeight());
 
-        ResearchMethodProgress rmp = ClientResearchTeamHelper.getTeam().getResearchProgress().getProgress(firstInQueue.getKey());
+        ResearchMethodProgress<?> rmp = ClientResearchTeamHelper.getTeam().getResearchProgress().getProgress(instance.getKey());
         float progress = rmp == null ? 0f : rmp.getProgressPercent();
 
         guiGraphics.blit(ResearchStatus.RESEARCHED.getSpriteTexture(spriteType), x, y, 0, 0, (int) (progress * PANEL_WIDTH), spriteType.getHeight(), PANEL_WIDTH, spriteType.getHeight());
 
-        RegistryAccess lookup = Minecraft.getInstance().level.registryAccess();
-        guiGraphics.renderItem(firstInQueue.lookup(lookup).icon().getDefaultInstance(), x + 2, y + 2);
+        ResearchScreen.CLIENT_ICONS.get(instance.getKey().location()).render(guiGraphics, x, y, mouseX, mouseY, 0);
 
         if (isHovering(guiGraphics, x, y, mouseX, mouseY) && hoverable) {
             int color = -2130706433;

@@ -5,6 +5,7 @@ import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.GlobalResearch;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
@@ -76,6 +77,11 @@ public final class CommonResearchCache {
 
         GLOBAL_RESEARCHES = ImmutableMap.copyOf(globalResearchMap);
         LOCKED = true;
+
+        if (level.isClientSide()) {
+            ResearchHelperClient.initIconRenderers(level);
+        }
+
     }
 
     private static void _collectChildren(GlobalResearch research, List<GlobalResearch> list) {

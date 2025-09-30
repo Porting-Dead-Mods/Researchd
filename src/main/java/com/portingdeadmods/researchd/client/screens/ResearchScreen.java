@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.client.screens;
 
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
 import com.portingdeadmods.researchd.api.data.ResearchGraph;
 import com.portingdeadmods.researchd.api.data.TechList;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
@@ -14,6 +15,9 @@ import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ResearchScreen extends Screen {
     public static final ResourceLocation TOP_BAR_TEXTURE = Researchd.rl("textures/gui/top_bar.png");
@@ -28,6 +32,9 @@ public class ResearchScreen extends Screen {
     public static final ResourceLocation TOP_BAR = Researchd.rl("textures/gui/research_screen/bars/top.png");
     public static final ResourceLocation BOTTOM_BAR = Researchd.rl("textures/gui/research_screen/bars/bottom.png");
     public static final ResourceLocation RIGHT_BAR = Researchd.rl("textures/gui/research_screen/bars/right.png");
+
+    // Singleton since whole client is a singleton
+    public static final Map<ResourceLocation, ClientResearchIcon<?>> CLIENT_ICONS = new HashMap<>();
 
     private final TechListWidget techListWidget;
     private final ResearchQueueWidget researchQueueWidget;
@@ -130,12 +137,6 @@ public class ResearchScreen extends Screen {
         if (this.researchGraphWidget != null) {
             this.researchGraphWidget.onClose();
         }
-    }
-
-    public enum InvalidateType {
-        ADD,
-        REMOVE,
-        NONE,
     }
 
 }

@@ -3,32 +3,23 @@ package com.portingdeadmods.researchd.client.screens.team.widgets;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.ContainerWidget;
+import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.team.ResearchTeamScreen;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import com.portingdeadmods.researchd.utils.PlayerUtils;
 import com.portingdeadmods.researchd.utils.TimeUtils;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
 public class RecentResearchesList extends ContainerWidget<ResearchInstance> {
-    private final List<ItemStack> researchIcons;
-
     public RecentResearchesList(int width, int height, int itemWidth, int itemHeight, Collection<ResearchInstance> items, boolean renderScroller) {
         super(width, height, itemWidth, itemHeight, items, renderScroller);
-        this.researchIcons = new ArrayList<>();
-        for (ResearchInstance instance : items) {
-            this.researchIcons.add(ResearchHelperClient.getResearch(instance.getKey()).icon().getDefaultInstance());
-        }
     }
 
     @Override
@@ -53,7 +44,7 @@ public class RecentResearchesList extends ContainerWidget<ResearchInstance> {
         poseStack.pushPose();
         {
             poseStack.scale(scale, scale, scale);
-            guiGraphics.renderFakeItem(this.researchIcons.get(index), (int) (((float) left + padding) / scale), (int) (((float) top + padding) / scale));
+            ResearchScreen.CLIENT_ICONS.get(research.getKey().location()).render(guiGraphics, (int) (((float) left + padding) / scale), (int) (((float) top + padding) / scale), mouseX, mouseY, 0);
         }
         poseStack.popPose();
 

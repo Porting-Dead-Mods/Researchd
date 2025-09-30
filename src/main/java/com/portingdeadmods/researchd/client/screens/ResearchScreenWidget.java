@@ -2,15 +2,13 @@ package com.portingdeadmods.researchd.client.screens;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
+import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.CommonComponents;
 
 import javax.annotation.Nullable;
@@ -43,23 +41,16 @@ public abstract class ResearchScreenWidget extends AbstractWidget {
         ResearchStatus status = instance.getResearchStatus();
         guiGraphics.blit(status.getSpriteTexture(), x, y, (int) (width * scale), (int) (height * scale), 0, 0, width, height, width, height);
 
-        RegistryAccess lookup = Minecraft.getInstance().level.registryAccess();
-
         PoseStack poseStack = guiGraphics.pose();
 
         poseStack.pushPose();
         {
-            poseStack.translate(x, y, 0);             // move origin to top-left of panel
             poseStack.scale(scale, scale, scale);     // scale local coordinates
 
-            int itemX = (PANEL_WIDTH - 16) / 2;       // center item horizontally
-            int itemY = (PANEL_HEIGHT - 18) / 2;      // center item vertically
-
-            guiGraphics.renderItem(
-                    instance.lookup(lookup).icon().getDefaultInstance(),
-                    itemX,
-                    itemY
-            );
+            ClientResearchIcon<?> clientResearchIcon = ResearchScreen.CLIENT_ICONS.get(instance.getKey().location());
+            if (clientResearchIcon != null) {
+                clientResearchIcon.render(guiGraphics, x, y, mouseX, mouseY, 0);
+            }
         }
         poseStack.popPose();
 
@@ -85,9 +76,11 @@ public abstract class ResearchScreenWidget extends AbstractWidget {
         ResearchStatus status = instance.getResearchStatus();
         GuiUtils.drawImg(guiGraphics, status.getSpriteTexture(spriteType), x, y, PANEL_WIDTH, spriteType.getHeight());
 
-        // TODO: Cache this
-        RegistryAccess lookup = Minecraft.getInstance().level.registryAccess();
-        guiGraphics.renderItem(instance.lookup(lookup).icon().getDefaultInstance(), x + 2, y + 2);
+        ClientResearchIcon<?> clientResearchIcon = ResearchScreen.CLIENT_ICONS.get(instance.getKey().location());
+
+        if (clientResearchIcon != null) {
+            clientResearchIcon.render(guiGraphics, x + 2, y + 2, mouseX, mouseY, 0);
+        }
 
         if (isHovering(guiGraphics, x, y, mouseX, mouseY) && hoverable) {
             int color = -2130706433;

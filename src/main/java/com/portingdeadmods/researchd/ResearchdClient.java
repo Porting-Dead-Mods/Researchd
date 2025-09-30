@@ -1,9 +1,12 @@
 package com.portingdeadmods.researchd;
 
+import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
+import com.portingdeadmods.researchd.api.research.ResearchIcon;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.client.ResearchdRenderTypes;
+import com.portingdeadmods.researchd.client.impl.ClientItemResearchIcon;
 import com.portingdeadmods.researchd.client.impl.effects.AndResearchEffectWidget;
 import com.portingdeadmods.researchd.client.impl.effects.DimensionUnlockEffectWidget;
 import com.portingdeadmods.researchd.client.impl.effects.EmptyResearchEffectWidget;
@@ -14,8 +17,8 @@ import com.portingdeadmods.researchd.client.impl.methods.ConsumePackResearchMeth
 import com.portingdeadmods.researchd.client.impl.methods.OrResearchMethodWidget;
 import com.portingdeadmods.researchd.client.renderers.ResearchLabBER;
 import com.portingdeadmods.researchd.client.screens.lab.ResearchLabScreen;
-import com.portingdeadmods.researchd.content.blocks.ResearchLabController;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
+import com.portingdeadmods.researchd.impl.research.ItemResearchIcon;
 import com.portingdeadmods.researchd.impl.research.effect.AndResearchEffect;
 import com.portingdeadmods.researchd.impl.research.effect.DimensionUnlockEffect;
 import com.portingdeadmods.researchd.impl.research.effect.EmptyResearchEffect;
@@ -47,16 +50,18 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.common.NeoForge;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 @Mod(value = ResearchdClient.MODID, dist = Dist.CLIENT)
 public class ResearchdClient {
     public static final String MODID = "researchd";
     public static final String MODNAME = "Researchd";
 
-    public static final Map<ResourceLocation, WidgetConstructor<? extends ResearchMethod>> RESEARCH_METHOD_WIDGETS = new ConcurrentHashMap<>();
-    public static final Map<ResourceLocation, WidgetConstructor<? extends ResearchEffect>> RESEARCH_EFFECT_WIDGETS = new ConcurrentHashMap<>();
+    public static final Map<ResourceLocation, WidgetConstructor<? extends ResearchMethod>> RESEARCH_METHOD_WIDGETS = new HashMap<>();
+    public static final Map<ResourceLocation, WidgetConstructor<? extends ResearchEffect>> RESEARCH_EFFECT_WIDGETS = new HashMap<>();
+    public static final Map<ResourceLocation, Function<ResearchIcon, ClientResearchIcon<?>>> RESEARCH_ICONS = new HashMap<>();
     public static final ModelResourceLocation RESEARCH_LAB_MODEL = ModelResourceLocation.standalone(Researchd.rl("block/research_lab"));
 
     public ResearchdClient(IEventBus eventBus, ModContainer modContainer) {
@@ -82,8 +87,14 @@ public class ResearchdClient {
             addEffectWidget(EmptyResearchEffect.ID, EmptyResearchEffectWidget::new);
             addEffectWidget(RecipeUnlockEffect.ID, RecipeUnlockEffectWidget::new);
 
+            addClientResearchIcon(ItemResearchIcon.ID, ClientItemResearchIcon::new);
+
             ItemBlockRenderTypes.setRenderLayer(ResearchdBlocks.RESEARCH_LAB_CONTROLLER.get(), RenderType.solid()); // Should fiddle with render types till it works ngl
         });
+    }
+
+    private static <I extends ResearchIcon> void addClientResearchIcon(ResourceLocation id, Function<I, ClientResearchIcon<?>> factory) {
+        RESEARCH_ICONS.put(id, (Function<ResearchIcon, ClientResearchIcon<?>>) factory);
     }
 
     private static <T extends ResearchMethod> void addMethodWidget(ResourceLocation id, WidgetConstructor<T> constructor) {
