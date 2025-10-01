@@ -13,10 +13,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 
 import java.util.Collection;
+import java.util.Comparator;
 
 public class TeamMembersList extends ContainerWidget<TeamMember> {
     public TeamMembersList(int width, int height, int itemWidth, int itemHeight, Collection<TeamMember> items, boolean renderScroller) {
         super(width, height, itemWidth, itemHeight, items, renderScroller);
+        resort();
     }
 
     @Override
@@ -35,4 +37,7 @@ public class TeamMembersList extends ContainerWidget<TeamMember> {
         guiGraphics.drawString(Minecraft.getInstance().font, item.role().getDisplayName(), left + 4 + 12 + 2, top + 12, (int) Mth.lerp(0.5, ChatFormatting.YELLOW.getColor(), ChatFormatting.GOLD.getColor()));
     }
 
+    public void resort() {
+        this.sortEntriesBy(Comparator.comparing(member -> member.role().getPermissionLevel(), Comparator.reverseOrder()));
+    }
 }

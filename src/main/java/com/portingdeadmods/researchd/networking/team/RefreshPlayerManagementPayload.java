@@ -5,6 +5,7 @@ import com.portingdeadmods.researchd.client.screens.team.ResearchTeamScreen;
 import com.portingdeadmods.researchd.client.screens.team.ResearchTeamSettingsScreen;
 import com.portingdeadmods.researchd.client.screens.team.widgets.PlayerManagementDraggableWidget;
 import com.portingdeadmods.researchd.client.screens.team.widgets.PlayerManagementList;
+import com.portingdeadmods.researchd.client.screens.team.widgets.TeamMembersList;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -39,6 +40,10 @@ public record RefreshPlayerManagementPayload() implements CustomPacketPayload {
                     ClientResearchTeamHelper.getPlayersNotInTeam().forEach(member -> entries.add(new PlayerManagementList.Entry(member, inviteWidget.getManagementList().getItems().stream().findFirst().get().buttonSettings())));
                     inviteWidget.getManagementList().refreshEntries(entries);
                 }
+                TeamMembersList teamMembersList = screen.getTeamMembersList();
+                teamMembersList.getItems().clear();
+                teamMembersList.getItems().addAll(ClientResearchTeamHelper.getTeamMembers());
+                teamMembersList.resort();
             } else if (currentScreen instanceof ResearchTeamSettingsScreen screen) {
                 PlayerManagementDraggableWidget playerManagementWindow = screen.getPlayerManagementWindow();
                 if (playerManagementWindow != null && !playerManagementWindow.getManagementList().getItems().isEmpty()) {
