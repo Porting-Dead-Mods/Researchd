@@ -1,17 +1,16 @@
 package com.portingdeadmods.researchd.utils.researches;
 
 import com.portingdeadmods.researchd.ResearchdClient;
-import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
-import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
-import com.portingdeadmods.researchd.api.data.team.TeamResearchProgress;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchIcon;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
+import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
+import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
@@ -30,7 +29,6 @@ public class ResearchHelperClient {
         ResearchTeamMap researchData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
 
         ResearchTeam team = researchData.getTeamByMember(player.getUUID());
-        TeamResearchProgress progress = team.getResearchProgress();
 
         for (Map.Entry<ResourceKey<AttachmentType<?>>, AttachmentType<?>> entry : NeoForgeRegistries.ATTACHMENT_TYPES.entrySet()) {
             Object data = player.getData(entry.getValue());
@@ -39,8 +37,7 @@ public class ResearchHelperClient {
             }
         }
 
-        if (progress == null) return;
-        for (ResearchInstance res : team.getResearchProgress().researches().values()) {
+        for (ResearchInstance res : team.getResearches().values()) {
             if (res.getResearchStatus() == ResearchStatus.RESEARCHED) {
                 res.lookup(level.registryAccess()).researchEffect().onUnlock(level, player, res.getKey());
             }

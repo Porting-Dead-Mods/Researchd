@@ -5,8 +5,8 @@ import com.portingdeadmods.portingdeadlibs.api.client.screens.PDLAbstractContain
 import com.portingdeadmods.portingdeadlibs.api.client.screens.widgets.AbstractScroller;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.content.menus.ResearchLabMenu;
@@ -212,14 +212,14 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
         guiGraphics.disableScissor();
 
         ResearchTeam team = ClientResearchTeamHelper.getTeam();
-        ResearchInstance instance = team.getResearches().get(team.getFirstQueueResearch());
+        ResearchInstance instance = team.getResearches().get(team.getCurrentResearch());
         if (instance != null) {
             ResearchScreenWidget.renderResearchPanel(guiGraphics, instance, this.leftPos + 123, this.topPos + 51, mouseX, mouseY, 2, false, false);
         }
 
         int x = this.leftPos + 12;
         int y = this.topPos + 72;
-        ResearchMethodProgress rmp = ClientResearchTeamHelper.getTeam().getResearchProgress().getProgress(team.getFirstQueueResearch());
+        ResearchMethodProgress<?> rmp = ClientResearchTeamHelper.getTeam().getResearchProgresses().get(team.getCurrentResearch());
         float progress = rmp == null ? 0f : rmp.getProgressPercent();
         int width = (int) (progress * PROGRESS_BAR_WIDTH);
         guiGraphics.fill(x, y, x + width, y + 6, PROGRESS_COLOR);

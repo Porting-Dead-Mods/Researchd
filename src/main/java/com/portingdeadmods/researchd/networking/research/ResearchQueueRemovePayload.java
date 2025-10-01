@@ -1,10 +1,10 @@
 package com.portingdeadmods.researchd.networking.research;
 
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
-import com.portingdeadmods.researchd.api.data.team.TeamResearchProgress;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
+import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
+import com.portingdeadmods.researchd.impl.team.TeamResearches;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -32,11 +32,11 @@ public record ResearchQueueRemovePayload(ResourceKey<Research> researchKey) impl
             if (context.player() instanceof ServerPlayer serverPlayer) {
                 Level level = serverPlayer.level();
                 ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
-                TeamResearchProgress researchProgress = data.getTeamByPlayer(serverPlayer).getResearchProgress();
-                researchProgress.researchQueue().remove(researchKey, true);
+                TeamResearches teamResearches = data.getTeamByPlayer(serverPlayer).getTeamResearches();
+                teamResearches.researchQueue().remove(researchKey, true);
 
                 ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
-                researchProgress.refreshResearchStatus(level);
+                teamResearches.refreshResearchStatus(level);
 	            ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
             }
         }).exceptionally(err -> {

@@ -4,10 +4,10 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.data.team.TeamMember;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
+import com.portingdeadmods.researchd.api.team.TeamMember;
 import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -30,7 +30,7 @@ public record ConsumeItemResearchMethod(Ingredient toConsume, int count) impleme
 
     @Override
     public void checkProgress(Level level, ResourceKey<Research> research, ResearchMethodProgress<?> progress, MethodContext context) {
-        for (TeamMember member : context.team().getMembers()) {
+        for (TeamMember member : context.team().getMembers().values()) {
             List<ItemStack> matchingItems = new ArrayList<>(8);
             int found = 0;
 

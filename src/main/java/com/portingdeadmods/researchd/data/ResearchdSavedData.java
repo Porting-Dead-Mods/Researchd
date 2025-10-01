@@ -3,7 +3,7 @@ package com.portingdeadmods.researchd.data;
 import com.portingdeadmods.portingdeadlibs.PDLRegistries;
 import com.portingdeadmods.portingdeadlibs.api.data.saved.PDLSavedData;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
+import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;

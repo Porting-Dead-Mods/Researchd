@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.client.screens.widgets;
 
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.data.TechList;
+import com.portingdeadmods.researchd.api.client.TechList;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
@@ -124,7 +124,7 @@ public class TechListWidget extends ResearchScreenWidget {
         this.displayTechList = this.techList.getListForSearch(this.searchBox.getValue());
         this.scrollOffset = 0;
 
-        this.rows = this.displayTechList.entries.size() / this.cols + (this.displayTechList.entries().size() % this.cols != 0 ? 1 : 0);
+        this.rows = this.displayTechList.entries().size() / this.cols + (this.displayTechList.entries().size() % this.cols != 0 ? 1 : 0);
     }
 
     public void setTechList(TechList techList) {
@@ -132,7 +132,7 @@ public class TechListWidget extends ResearchScreenWidget {
         this.techList = techList;
         this.displayTechList = techList;
 
-        this.rows = this.displayTechList.entries.size() / this.cols + (this.displayTechList.entries().size() % this.cols != 0 ? 1 : 0);
+        this.rows = this.displayTechList.entries().size() / this.cols + (this.displayTechList.entries().size() % this.cols != 0 ? 1 : 0);
     }
 
     public TechList getDisplayTechList() {
@@ -163,8 +163,8 @@ public class TechListWidget extends ResearchScreenWidget {
 
                 ResourceKey<Research> researchKey = selectedInstance.getKey();
                 PacketDistributor.sendToServer(new ResearchQueueAddPayload(researchKey, player, gameTime));
-                ClientResearchTeamHelper.getTeam().getResearchProgress().refreshResearchStatus(Minecraft.getInstance().level);
-                this.screen.getTechList().updateTechList();
+                ClientResearchTeamHelper.getTeam().getTeamResearches().refreshResearchStatus(Minecraft.getInstance().level);
+                this.screen.getTechList().sortTechList();
             }
 
             this.startResearchButton.active = false;

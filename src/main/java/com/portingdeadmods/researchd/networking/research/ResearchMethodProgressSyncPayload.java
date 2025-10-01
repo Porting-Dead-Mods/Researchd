@@ -28,7 +28,7 @@ public record ResearchMethodProgressSyncPayload(ResourceKey<Research> key, Resea
 
 	public void researchMethodProgressSyncAction(IPayloadContext context) {
 		context.enqueueWork(() -> {
-			ClientResearchTeamHelper.getTeam().getResearchProgress().progress().put(this.key, this.progress);
+			ClientResearchTeamHelper.getTeam().getResearchProgresses().put(this.key, this.progress);
 		}).exceptionally(err -> {
 			Researchd.LOGGER.error("Failed to handle ResearchMethodProgressSyncPayload", err);
 			return null;

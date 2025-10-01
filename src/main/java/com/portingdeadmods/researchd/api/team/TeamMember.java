@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.api.data.team;
+package com.portingdeadmods.researchd.api.team;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

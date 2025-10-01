@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.api.data;
+package com.portingdeadmods.researchd.api.client;
 
 import com.portingdeadmods.researchd.api.research.GlobalResearch;
 import com.portingdeadmods.researchd.api.research.Research;

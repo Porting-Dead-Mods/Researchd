@@ -55,8 +55,4 @@ public interface Research {
      */
     ResearchSerializer<?> getSerializer();
 
-    interface Builder<T extends Research> {
-        T build();
-    }
-
 }

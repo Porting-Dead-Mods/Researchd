@@ -3,10 +3,10 @@ package com.portingdeadmods.researchd.client.screens.widgets;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.data.ResearchQueue;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
+import com.portingdeadmods.researchd.api.team.ResearchQueue;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
@@ -23,8 +23,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-import java.util.List;
-
 public class ResearchQueueWidget extends ResearchScreenWidget {
     private static final ResourceLocation BACKGROUND_TEXTURE = Researchd.rl("textures/gui/research_queue.png");
     private static final int BACKGROUND_WIDTH = 174;
@@ -40,7 +38,7 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
     public ResearchQueueWidget(ResearchScreen screen, int x, int y) {
         super(x, y, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
         this.screen = screen;
-        this.queue = ResearchdSavedData.TEAM_RESEARCH.get().getData(Minecraft.getInstance().level).getTeamByPlayer(Minecraft.getInstance().player).getResearchProgress().researchQueue();
+        this.queue = ResearchdSavedData.TEAM_RESEARCH.get().getData(Minecraft.getInstance().level).getTeamByPlayer(Minecraft.getInstance().player).getQueue();
     }
 
     @Override
@@ -52,17 +50,19 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
 
         guiGraphics.drawString(Minecraft.getInstance().font, "Research Queue", paddingX - 1, 4, -1);
 
-        List<ResourceKey<Research>> entries = this.queue.getEntries();
-        for (int i = 0; i < entries.size(); i++) {
-            ResourceKey<Research> key = entries.get(i);
+        int selectedIndex = 0;
+        for (int i = 0; i < this.queue.size(); i++) {
+            ResourceKey<Research> key = this.queue.get(i);
             if (this.selected == null || key != this.selected.getKey()) {
-                ResearchInstance instance = ClientResearchTeamHelper.getTeam().getResearchProgress().researches().get(key);
+                ResearchInstance instance = ClientResearchTeamHelper.getTeam().getResearches().get(key);
                 renderQueuePanel(guiGraphics, instance, paddingX + i * PANEL_WIDTH, paddingY, mouseX, mouseY, i);
+            } else {
+                selectedIndex = i;
             }
         }
 
         if (this.selected != null) {
-            renderQueuePanel(guiGraphics, this.selected, (int) selectedX, (int) selectedY, mouseX, mouseY, this.queue.getEntries().indexOf(this.selected.getKey()));
+            renderQueuePanel(guiGraphics, this.selected, (int) selectedX, (int) selectedY, mouseX, mouseY, selectedIndex);
         }
     }
 
@@ -77,14 +77,14 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
         int paddingY = 14;
 
         int index = (int) (mouseX - paddingX) / PANEL_WIDTH;
-        if (mouseX > paddingX && mouseY > paddingY && index < this.queue.getEntries().size()) {
-            ResourceKey<Research> researchKey = this.queue.getEntries().get(index);
+        if (mouseX > paddingX && mouseY > paddingY && index < this.queue.size()) {
+            ResourceKey<Research> researchKey = this.queue.get(index);
             if (this.isHovering(null, (int) mouseX, (int) mouseY, index, paddingY + 17, getWidth(), getHeight() - 17)) {
                 this.removeResearch(index);
                 this.screen.getTechListWidget().startResearchButton.active = true;
                 return super.mouseClicked(mouseX, mouseY, button);
             } else if (isHovering(null, (int) mouseX, (int) mouseY, index, paddingY, getWidth(), getHeight())) {
-                ResearchInstance instance = ClientResearchTeamHelper.getTeam().getResearchProgress().researches().get(researchKey);
+                ResearchInstance instance = ClientResearchTeamHelper.getTeam().getResearches().get(researchKey);
                 this.screen.getSelectedResearchWidget().setSelectedResearch(instance);
                 this.screen.getResearchGraphWidget().setGraph(ResearchGraphCache.computeIfAbsent(researchKey));
                 return super.mouseClicked(mouseX, mouseY, button);
@@ -95,12 +95,12 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
     }
 
     public void removeResearch(int index) {
-        if (this.queue.getEntries().size() > index) {
-            ResourceKey<Research> researchKey = this.queue.getEntries().get(index);
+        if (this.queue.size() > index) {
+            ResourceKey<Research> researchKey = this.queue.get(index);
             this.queue.remove(index, true);
             PacketDistributor.sendToServer(new ResearchQueueRemovePayload(researchKey));
-            ClientResearchTeamHelper.getTeam().getResearchProgress().refreshResearchStatus(Minecraft.getInstance().level);
-            this.screen.getTechList().updateTechList();
+            ClientResearchTeamHelper.getTeam().getTeamResearches().refreshResearchStatus(Minecraft.getInstance().level);
+            this.screen.getTechList().sortTechList();
         }
     }
 
@@ -138,7 +138,7 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
         ResearchStatus status = instance.getResearchStatus();
         GuiUtils.drawImg(guiGraphics, status.getSpriteTexture(spriteType), x, y, PANEL_WIDTH, spriteType.getHeight());
 
-        ResearchMethodProgress<?> rmp = ClientResearchTeamHelper.getTeam().getResearchProgress().getProgress(instance.getKey());
+        ResearchMethodProgress<?> rmp = ClientResearchTeamHelper.getTeam().getTeamResearches().getProgress(instance.getKey());
         float progress = rmp == null ? 0f : rmp.getProgressPercent();
 
         guiGraphics.blit(ResearchStatus.RESEARCHED.getSpriteTexture(spriteType), x, y, 0, 0, (int) (progress * PANEL_WIDTH), spriteType.getHeight(), PANEL_WIDTH, spriteType.getHeight());

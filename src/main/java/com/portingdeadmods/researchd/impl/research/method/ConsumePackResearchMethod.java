@@ -5,11 +5,11 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
-import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
+import com.portingdeadmods.researchd.api.team.ValueEffectsHolder;
 import com.portingdeadmods.researchd.content.blockentities.ResearchLabControllerBE;
 import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
 import com.portingdeadmods.researchd.registries.ResearchdValueEffects;
@@ -43,7 +43,7 @@ public record ConsumePackResearchMethod(List<ResourceKey<SimpleResearchPack>> pa
 
     @Override
     public void checkProgress(Level level, ResourceKey<Research> research, ResearchMethodProgress<?> progress, MethodContext context) {
-        if (context instanceof SimpleMethodContext(ResearchTeam team, ResearchLabControllerBE blockEntity) && blockEntity != null) {
+        if (context instanceof SimpleMethodContext(ValueEffectsHolder team, ResearchLabControllerBE blockEntity) && blockEntity != null) {
             List<ResourceKey<SimpleResearchPack>> packs = this.packs();
             blockEntity.currentResearchDuration = this.duration();
 
@@ -51,7 +51,7 @@ public record ConsumePackResearchMethod(List<ResourceKey<SimpleResearchPack>> pa
             blockEntity.decreaseNecessaryPackCount(packs);
 
             for (ResourceKey<SimpleResearchPack> pack : packs) {
-                blockEntity.researchPackUsage.put(pack, Math.max(blockEntity.researchPackUsage.get(pack) - ((1f / blockEntity.currentResearchDuration) / team.getTeamEffect(ResearchdValueEffects.RESEARCH_LAB_PRODUCTIVITY)), 0f));
+                blockEntity.researchPackUsage.put(pack, Math.max(blockEntity.researchPackUsage.get(pack) - ((1f / blockEntity.currentResearchDuration) / team.getEffectValue(ResearchdValueEffects.RESEARCH_LAB_PRODUCTIVITY)), 0f));
             }
             progress.addProgress(1f / blockEntity.currentResearchDuration);
         }

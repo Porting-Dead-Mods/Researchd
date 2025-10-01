@@ -171,7 +171,9 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
         if (this.selectedInstance != instance) {
             this.selectedInstance = instance;
 
-            this.researchScreen.getTechListWidget().startResearchButton.active = this.selectedInstance.isResearchable() && !this.researchScreen.getResearchQueueWidget().getQueue().entries().contains(this.selectedInstance.getKey()) && !(this.researchScreen.getResearchQueueWidget().getQueue().entries().size() >= ResearchdCommonConfig.researchQueueLength);
+            this.researchScreen.getTechListWidget().startResearchButton.active = this.selectedInstance.isResearchable()
+                    && !this.researchScreen.getResearchQueueWidget().getQueue().contains(this.selectedInstance.getKey())
+                    && !(this.researchScreen.getResearchQueueWidget().getQueue().size() >= ResearchdCommonConfig.researchQueueLength);
             if (this.selectedInstance.isResearchable() && !this.researchScreen.getResearchQueueWidget().getQueue().isEmpty()) {
                 this.researchScreen.getTechListWidget().setResearchButtonMode(TechListWidget.ResearchButtonMode.ENQUEUE);
             } else {

@@ -3,16 +3,11 @@ package com.portingdeadmods.researchd.events;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
-import com.portingdeadmods.researchd.api.data.ResearchQueue;
-import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
-import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
-import com.portingdeadmods.researchd.api.data.team.TeamResearchProgress;
 import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.team.ResearchTeamScreen;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
-import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
 import com.portingdeadmods.researchd.networking.cache.AskServerPlayers;
 import net.minecraft.ChatFormatting;
@@ -23,7 +18,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -47,21 +41,21 @@ public final class ResearchdClientEvents {
 		}
 	}
 
-	@SubscribeEvent
-	public static void postClientTick(ClientTickEvent.Post event) {
-		Level level = Minecraft.getInstance().level;
-		LocalPlayer player = Minecraft.getInstance().player;
-		if (player == null || level == null) return;
-
-		ResearchTeamMap map = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
-		if (map == null) return;
-
-		ResearchTeam team = map.getTeamByPlayer(player);
-		if (team == null) return;
-
-		TeamResearchProgress researchProgress = team.getResearchProgress();
-		ResearchQueue queue = researchProgress.researchQueue();
-	}
+//	@SubscribeEvent
+//	public static void postClientTick(ClientTickEvent.Post event) {
+//		Level level = Minecraft.getInstance().level;
+//		LocalPlayer player = Minecraft.getInstance().player;
+//		if (player == null || level == null) return;
+//
+//		ResearchTeamMap map = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
+//		if (map == null) return;
+//
+//		ResearchTeam team = map.getTeamByPlayer(player);
+//		if (team == null) return;
+//
+//		TeamResearchProgress researchProgress = team.getResearchProgress();
+//		ResearchQueue queue = researchProgress.researchQueue();
+//	}
 
 	@SubscribeEvent
 	public static void onToolTipEvent(ItemTooltipEvent event) {

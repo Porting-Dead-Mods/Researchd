@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 
 public final class ResearchdResearches {
-    private static final Map<ResourceKey<Research>, Research.Builder<?>> RESEARCHES = new HashMap<>();
+    private static final Map<ResourceKey<Research>, SimpleResearch.Builder> RESEARCHES = new HashMap<>();
 
     public static final ResourceKey<Research> COBBLESTONE = register("cobblestone", builder -> builder
             .icon(Items.COBBLESTONE)
@@ -105,12 +105,12 @@ public final class ResearchdResearches {
             ));
 
     public static void bootstrap(BootstrapContext<Research> context) {
-        for (Map.Entry<ResourceKey<Research>, Research.Builder<?>> research : RESEARCHES.entrySet()) {
+        for (Map.Entry<ResourceKey<Research>, SimpleResearch.Builder> research : RESEARCHES.entrySet()) {
             register(context, research.getKey(), research.getValue());
         }
     }
 
-    private static void register(BootstrapContext<Research> context, ResourceKey<Research> key, Research.Builder<?> builder) {
+    private static void register(BootstrapContext<Research> context, ResourceKey<Research> key, SimpleResearch.Builder builder) {
         context.register(key, builder.build());
     }
 

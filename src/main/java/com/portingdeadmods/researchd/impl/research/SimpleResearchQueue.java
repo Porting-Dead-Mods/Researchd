@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.api.data;
+package com.portingdeadmods.researchd.impl.research;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -7,6 +7,7 @@ import com.portingdeadmods.researchd.api.research.GlobalResearch;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
+import com.portingdeadmods.researchd.api.team.ResearchQueue;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -18,42 +19,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.IntSupplier;
 
-public record ResearchQueue(List<ResourceKey<Research>> entries) {
-    public static final ResearchQueue EMPTY = new ResearchQueue(new ArrayList<>());
-    public static final Codec<ResearchQueue> CODEC = RecordCodecBuilder.create(inst -> inst.group(
-            Research.RESOURCE_KEY_CODEC.listOf().fieldOf("entries").forGetter(ResearchQueue::getEntries)
-    ).apply(inst, ResearchQueue::new));
-    public static final StreamCodec<RegistryFriendlyByteBuf, ResearchQueue> STREAM_CODEC = StreamCodec.composite(
+public record SimpleResearchQueue(List<ResourceKey<Research>> entries) implements ResearchQueue {
+    public static final SimpleResearchQueue EMPTY = new SimpleResearchQueue(new ArrayList<>());
+    public static final Codec<SimpleResearchQueue> CODEC = RecordCodecBuilder.create(inst -> inst.group(
+            Research.RESOURCE_KEY_CODEC.listOf().fieldOf("entries").forGetter(SimpleResearchQueue::entries)
+    ).apply(inst, SimpleResearchQueue::new));
+    public static final StreamCodec<RegistryFriendlyByteBuf, SimpleResearchQueue> STREAM_CODEC = StreamCodec.composite(
             Research.RESOURCE_KEY_STREAM_CODEC.apply(ByteBufCodecs.list()),
-            ResearchQueue::getEntries,
-            ResearchQueue::new
+            SimpleResearchQueue::entries,
+            SimpleResearchQueue::new
     );
     public static final IntSupplier QUEUE_LENGTH = () -> ResearchdCommonConfig.researchQueueLength;
 
-    public ResearchQueue(List<ResourceKey<Research>> entries) {
+    public SimpleResearchQueue(List<ResourceKey<Research>> entries) {
         this.entries = new ArrayList<>(entries);
     }
 
-    public ResearchQueue() {
+    public SimpleResearchQueue() {
         this(new ArrayList<>(QUEUE_LENGTH.getAsInt()));
-    }
-
-    /**
-     * @param index of the element of which the priority should be increased
-     * @return whether the priority was successfully increased
-     */
-    public boolean increasePriority(int index) {
-        if (index > 0) {
-            ResourceKey<Research> research = this.entries.get(index);
-            ResourceKey<Research> next = this.entries.get(index - 1);
-
-            if (CommonResearchCache.allChildrenOf(research).stream().map(GlobalResearch::getResearchKey).toList().contains(next)) return false;
-
-            this.entries.set(index, next);
-            this.entries.set(index - 1, research);
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -104,16 +87,31 @@ public record ResearchQueue(List<ResourceKey<Research>> entries) {
         return false;
     }
 
+    @Override
+    public boolean contains(ResourceKey<Research> research) {
+        return this.entries.contains(research);
+    }
+
+    @Override
+    public ResourceKey<Research> get(int index) {
+        return this.entries.get(index);
+    }
+
     public boolean isEmpty() {
         return this.entries.isEmpty();
     }
 
+    @Override
+    public ResourceKey<Research> getFirst() {
+        return this.entries.isEmpty() ? null : this.entries.getFirst();
+    }
+
     public @Nullable ResourceKey<Research> current() {
-        return (getEntries().isEmpty() ? null : getEntries().getFirst());
+        return (this.entries.isEmpty() ? null : this.entries.getFirst());
     }
 
-    public List<ResourceKey<Research>> getEntries() {
-        return entries;
+    @Override
+    public int size() {
+        return this.entries.size();
     }
-
 }

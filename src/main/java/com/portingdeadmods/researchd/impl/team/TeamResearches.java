@@ -1,14 +1,14 @@
-package com.portingdeadmods.researchd.api.data.team;
+package com.portingdeadmods.researchd.impl.team;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.portingdeadmods.researchd.api.data.ResearchQueue;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
+import com.portingdeadmods.researchd.impl.research.SimpleResearchQueue;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -17,41 +17,32 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Function;
 
-public record TeamResearchProgress(ResearchQueue researchQueue,
-                                   HashMap<ResourceKey<Research>, ResearchInstance> researches,
-                                   HashMap<ResourceKey<Research>, ResearchMethodProgress<?>> progress) {
-    public static final TeamResearchProgress EMPTY = new TeamResearchProgress(
-            new ResearchQueue(),
+public record TeamResearches(SimpleResearchQueue researchQueue,
+                             HashMap<ResourceKey<Research>, ResearchInstance> researches,
+                             HashMap<ResourceKey<Research>, ResearchMethodProgress<?>> progress) {
+    public static final TeamResearches EMPTY = new TeamResearches(
+            new SimpleResearchQueue(),
             new HashMap<>(),
             new HashMap<>()
     );
-    public static final Codec<TeamResearchProgress> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            ResearchQueue.CODEC.fieldOf("researchQueue").forGetter(TeamResearchProgress::researchQueue),
+    public static final Codec<TeamResearches> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            SimpleResearchQueue.CODEC.fieldOf("researchQueue").forGetter(TeamResearches::researchQueue),
             Codec.unboundedMap(Research.RESOURCE_KEY_CODEC, ResearchInstance.CODEC).xmap(HashMap::new, Function.identity()).fieldOf("researches")
-                    .forGetter(TeamResearchProgress::researches),
+                    .forGetter(TeamResearches::researches),
             Codec.unboundedMap(Research.RESOURCE_KEY_CODEC, ResearchMethodProgress.CODEC).xmap(HashMap::new, Function.identity()).fieldOf("completionProgress")
-                    .forGetter(TeamResearchProgress::progress)
-    ).apply(instance, TeamResearchProgress::new));
-    public static final StreamCodec<RegistryFriendlyByteBuf, TeamResearchProgress> STREAM_CODEC = StreamCodec.composite(
-            ResearchQueue.STREAM_CODEC,
-            TeamResearchProgress::researchQueue,
+                    .forGetter(TeamResearches::progress)
+    ).apply(instance, TeamResearches::new));
+    public static final StreamCodec<RegistryFriendlyByteBuf, TeamResearches> STREAM_CODEC = StreamCodec.composite(
+            SimpleResearchQueue.STREAM_CODEC,
+            TeamResearches::researchQueue,
             ByteBufCodecs.map(HashMap::new, Research.RESOURCE_KEY_STREAM_CODEC, ResearchInstance.STREAM_CODEC),
-            TeamResearchProgress::researches,
+            TeamResearches::researches,
             ByteBufCodecs.map(HashMap::new, Research.RESOURCE_KEY_STREAM_CODEC, ResearchMethodProgress.STREAM_CODEC),
-            TeamResearchProgress::progress,
-            TeamResearchProgress::new
+            TeamResearches::progress,
+            TeamResearches::new
     );
-
-    public Map<ResourceKey<Research>, ResearchMethodProgress<?>> queueProgresses() {
-        Map<ResourceKey<Research>, ResearchMethodProgress<?>> rmps = new HashMap<>();
-        for (ResourceKey<Research> key : this.researchQueue().entries()) {
-            rmps.put(key, this.progress.get(key));
-        }
-        return rmps;
-    }
 
     // Helper methods
     public boolean hasCompleted(ResourceKey<Research> research) {
@@ -80,7 +71,7 @@ public record TeamResearchProgress(ResearchQueue researchQueue,
 
             if (instance.getParents().stream().allMatch(parent -> {
                 if (this.hasCompleted(parent.getResearchKey())) return true;
-                return this.researchQueue.getEntries().contains(parent.getResearchKey());
+                return this.researchQueue.entries().contains(parent.getResearchKey());
             })) {
                 instance.setResearchStatus(ResearchStatus.RESEARCHABLE_AFTER_QUEUE);
                 continue;
@@ -95,15 +86,7 @@ public record TeamResearchProgress(ResearchQueue researchQueue,
     public void completeResearch(ResourceKey<Research> research, long completionTime, Level level) {
         this.researches.get(research).setResearchStatus(ResearchStatus.RESEARCHED).setResearchedTime(completionTime);
 
-        refreshResearchStatus(level);
-    }
-
-    @Override
-    public String toString() {
-        return "TeamResearchProgress[" +
-                "researchQueue=" + researchQueue + ", " +
-                "researches=" + researches + ", " +
-                "progress=" + progress + ']';
+        this.refreshResearchStatus(level);
     }
 
 }

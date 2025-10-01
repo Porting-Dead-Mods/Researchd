@@ -3,12 +3,12 @@ package com.portingdeadmods.researchd.networking.research;
 import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdCommonConfig;
-import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
-import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
-import com.portingdeadmods.researchd.api.data.team.TeamMember;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.api.team.TeamMember;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
+import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
+import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.UUIDUtil;
@@ -23,7 +23,6 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.UUID;
 
 public record ResearchQueueAddPayload(ResourceKey<Research> researchKey, UUID player, long time) implements CustomPacketPayload {
@@ -48,22 +47,21 @@ public record ResearchQueueAddPayload(ResourceKey<Research> researchKey, UUID pl
             if (context.player() instanceof ServerPlayer serverPlayer) {
                 Level level = serverPlayer.level();
                 ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
-                ResearchTeam team = data.getTeamByPlayer(serverPlayer);
+                SimpleResearchTeam team = data.getTeamByPlayer(serverPlayer);
 
-				if (team.getResearchQueue().getEntries().size() >= ResearchdCommonConfig.researchQueueLength) return;
+				if (team.getQueue().size() >= ResearchdCommonConfig.researchQueueLength) return;
 
                 ResearchInstance instance = team.getResearches().get(researchKey);
                 instance.setResearchedPlayer(this.player);
                 instance.setResearchedTime(this.time);
 
-                boolean added = team.getResearchProgress().researchQueue().add(instance);
+                boolean added = team.getQueue().add(instance);
                 if (!added) return;
 
                 // Announce
-                List<TeamMember> members = team.getMembers();
                 Component researchName = Utils.registryTranslation(this.researchKey);
 
-                for (TeamMember memberId : members) {
+                for (TeamMember memberId : team.getMembers().values()) {
                     ServerPlayer member = level.getServer().getPlayerList().getPlayer(memberId.player());
                     if (member != null) {
                         member.sendSystemMessage(ResearchdTranslations.Research.QUEUE_ADDED.component(
@@ -75,7 +73,7 @@ public record ResearchQueueAddPayload(ResourceKey<Research> researchKey, UUID pl
                 }
 
                 ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
-                team.getResearchProgress().refreshResearchStatus(level);
+                team.getTeamResearches().refreshResearchStatus(level);
 	            ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
             }
         }).exceptionally(err -> {

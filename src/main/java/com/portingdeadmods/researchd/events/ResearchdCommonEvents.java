@@ -2,19 +2,17 @@ package com.portingdeadmods.researchd.events;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
-import com.portingdeadmods.researchd.api.data.ResearchQueue;
-import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
-import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
-import com.portingdeadmods.researchd.api.data.team.TeamMember;
-import com.portingdeadmods.researchd.api.data.team.TeamResearchProgress;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
+import com.portingdeadmods.researchd.api.team.ResearchTeam;
+import com.portingdeadmods.researchd.api.team.TeamMember;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.content.commands.ResearchdCommands;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
+import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.integration.KubeJSIntegration;
 import com.portingdeadmods.researchd.networking.cache.ReceiveServerPlayers;
 import com.portingdeadmods.researchd.networking.research.ResearchFinishedPayload;
@@ -77,59 +75,56 @@ public final class ResearchdCommonEvents {
                 handleResearchMethods(level, teamMap);
             }
 
-            for (ResearchTeam team : teamMap.getResearchTeams().values()) {
-                TeamResearchProgress teamProgress = team.getResearchProgress();
+            for (ResearchTeam team : teamMap.researchTeams().values()) {
+                ResourceKey<Research> research = team.getCurrentResearch();
 
-                ResearchQueue queue = teamProgress.researchQueue();
-                if (queue.isEmpty()) continue;
-                ResourceKey<Research> research = queue.current();
+                if (research != null) {
+                    ResourceKey<Research> currentResearchKey = team.getCurrentResearch();
+                    Research currentResearch = ResearchHelperCommon.getResearch(currentResearchKey, level.registryAccess());
+                    ResearchMethodProgress<?> currentResearchProgress = team.getCurrentProgress();
 
-                ResourceKey<Research> currentResearchKey = team.getFirstQueueResearch();
-                Research currentResearch = ResearchHelperCommon.getResearch(currentResearchKey, level.registryAccess());
-                ResearchMethodProgress<?> currentResearchProgress = team.getResearchProgressInQueue();
+                    if (currentResearchProgress != null) {
+                        if (level.getGameTime() % 4 == 0) {
+                            for (TeamMember memberUUID : team.getMembers().values()) {
+                                ServerPlayer player = server.getPlayerList().getPlayer(memberUUID.player());
+                                if (player == null) continue;
 
-                if (currentResearchProgress != null) {
-                    if (level.getGameTime() % 4 == 0) {
-                        for (TeamMember memberUUID : team.getMembers()) {
-                            ServerPlayer player = server.getPlayerList().getPlayer(memberUUID.player());
-                            if (player == null) continue;
+                                PacketDistributor.sendToPlayer(player, new ResearchMethodProgressSyncPayload(team.getCurrentResearch(), currentResearchProgress));
+                            }
+                        }
 
-                            PacketDistributor.sendToPlayer(player, new ResearchMethodProgressSyncPayload(team.getFirstQueueResearch(), currentResearchProgress));
+                        // Research Complete Logic
+                        if (currentResearchProgress.isComplete()) {
+                            team.completeResearch(research, server.overworld().getDayTime() * 50L, level);
+
+                            for (TeamMember playerUUIDs : team.getMembers().values()) {
+                                ServerPlayer player = server.getPlayerList().getPlayer(playerUUIDs.player());
+                                if (player == null) continue;
+
+                                PacketDistributor.sendToPlayer(player, new ResearchFinishedPayload(research, (int) server.overworld().getDayTime() * 50));
+
+                                KubeJSIntegration.fireResearchCompletedEvent(player, research);
+
+                                Researchd.debug("Researching", "Applying research effects for Research: " + team.getCurrentResearch() + " to player: " + player.getName().getString());
+                                currentResearch.researchEffect().onUnlock(level, player, team.getCurrentResearch());
+                            }
+
+                            team.getQueue().remove(0, false);
                         }
                     }
 
-                    // Research Complete Logic
-                    if (currentResearchProgress.isComplete()) {
-                        teamProgress.completeResearch(research, server.overworld().getDayTime() * 50L, level);
-
-                        for (TeamMember playerUUIDs : team.getMembers()) {
-                            ServerPlayer player = server.getPlayerList().getPlayer(playerUUIDs.player());
-                            if (player == null) continue;
-
-                            PacketDistributor.sendToPlayer(player, new ResearchFinishedPayload(research,  (int) server.overworld().getDayTime() * 50));
-
-                            KubeJSIntegration.fireResearchCompletedEvent(player, research);
-
-                            Researchd.debug("Researching", "Applying research effects for Research: " + team.getFirstQueueResearch() + " to player: " + player.getName().getString());
-                            currentResearch.researchEffect().onUnlock(level, player, team.getFirstQueueResearch());
-                        }
-
-                        queue.getEntries().removeFirst();
+                    // Save and sync the whole team research teamMap every 20 ticks
+                    if (level.getGameTime() % 20 == 0) {
+                        ResearchdSavedData.TEAM_RESEARCH.get().setData(level, teamMap);
                     }
-                }
-
-                // Save and sync the whole team research teamMap every 20 ticks
-                if (level.getGameTime() % 20 == 0) {
-                    ResearchdSavedData.TEAM_RESEARCH.get().setData(level, teamMap);
                 }
             }
         }
     }
 
     public static void handleResearchMethods(Level level, ResearchTeamMap teamMap) {
-        for (ResearchTeam team : teamMap.getResearchTeams().values()) {
-            TeamResearchProgress teamProgress = team.getResearchProgress();
-            Map<ResourceKey<Research>, ResearchMethodProgress<?>> researchProgresses = teamProgress.queueProgresses();
+        for (ResearchTeam team : teamMap.researchTeams().values()) {
+            Map<ResourceKey<Research>, ResearchMethodProgress<?>> researchProgresses = team.getResearchProgresses();
             if (researchProgresses.isEmpty()) continue;
 
             for (Map.Entry<ResourceKey<Research>, ResearchMethodProgress<?>> entry : researchProgresses.entrySet()) {

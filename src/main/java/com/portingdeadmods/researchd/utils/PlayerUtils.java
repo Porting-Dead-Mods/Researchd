@@ -1,6 +1,6 @@
 package com.portingdeadmods.researchd.utils;
 
-import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
+import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
@@ -20,7 +20,7 @@ public class PlayerUtils {
         if (level.getPlayerByUUID(uuid) == null)
             return uuid + " not found";
 
-        return uuid.equals(ResearchTeam.DEBUG_MEMBER.getId()) ? ResearchTeam.DEBUG_MEMBER.getName() : level.getPlayerByUUID(uuid).getName().getString();
+        return uuid.equals(SimpleResearchTeam.DEBUG_MEMBER.getId()) ? SimpleResearchTeam.DEBUG_MEMBER.getName() : level.getPlayerByUUID(uuid).getName().getString();
     }
 
 }

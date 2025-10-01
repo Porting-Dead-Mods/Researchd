@@ -62,7 +62,7 @@ public record SimpleResearch(ItemResearchIcon researchIcon, ResearchMethod resea
 
     }
 
-    public static class Builder implements Research.Builder<SimpleResearch> {
+    public static class Builder {
         private ItemResearchIcon icon = ItemResearchIcon.EMPTY;
         private ResearchMethod researchMethod;
         private ResearchEffect researchEffect = EmptyResearchEffect.INSTANCE;
@@ -114,7 +114,6 @@ public record SimpleResearch(ItemResearchIcon researchIcon, ResearchMethod resea
             return this;
         }
 
-        @Override
         public SimpleResearch build() {
             return new SimpleResearch(this.icon, this.researchMethod, this.researchEffect, this.parents, this.requiresParent, this.literalName, this.literalDescription);
         }

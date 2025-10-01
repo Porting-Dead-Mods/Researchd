@@ -1,8 +1,8 @@
 package com.portingdeadmods.researchd.client.screens.graph;
 
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.client.ResearchGraph;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.data.ResearchGraph;
 import net.minecraft.resources.ResourceKey;
 
 import java.util.HashMap;

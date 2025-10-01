@@ -3,11 +3,11 @@ package com.portingdeadmods.researchd.networking.research;
 import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
-import com.portingdeadmods.researchd.api.data.ResearchQueue;
-import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.team.ResearchQueue;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
+import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
 import com.portingdeadmods.researchd.integration.KubeJSIntegration;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.ChatFormatting;
@@ -39,18 +39,18 @@ public record ResearchFinishedPayload(ResourceKey<Research> key, int timeStamp) 
     public void researchFinishedAction(IPayloadContext context) {
         context.enqueueWork(() -> {
             Player player = context.player();
-            ResearchTeam team = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeamByMember(player.getUUID());
+            SimpleResearchTeam team = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeamByMember(player.getUUID());
             if (team == null) {
                 context.disconnect(ResearchdTranslations.component(ResearchdTranslations.Errors.NO_RESEARCH_TEAM));
                 return;
             }
 
-            ResearchQueue queue = team.getResearchProgress().researchQueue();
+            ResearchQueue queue = team.getQueue();
             if (queue.isEmpty()) context.disconnect(ResearchdTranslations.component(ResearchdTranslations.Errors.RESEARCH_QUEUE_DESYNC));
-            ResourceKey<Research> first = queue.getEntries().getFirst();
+            ResourceKey<Research> first = queue.getFirst();
             if (first != this.key()) context.disconnect(ResearchdTranslations.component(ResearchdTranslations.Errors.RESEARCH_QUEUE_DESYNC));
 
-            team.getResearchProgress().completeResearch(first, timeStamp, player.level());
+            team.completeResearch(first, timeStamp, player.level());
             queue.remove(0, false);
 
             if (player instanceof ServerPlayer serverPlayer) {
@@ -65,7 +65,7 @@ public record ResearchFinishedPayload(ResourceKey<Research> key, int timeStamp) 
             ));
 
             if (Minecraft.getInstance().screen instanceof ResearchScreen screen)
-                screen.getTechList().updateTechList();
+                screen.getTechList().sortTechList();
         }).exceptionally(err -> {
             Researchd.LOGGER.error("Failed to handle ResearchFinishPayload", err);
             return null;

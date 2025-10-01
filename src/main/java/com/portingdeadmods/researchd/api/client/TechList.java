@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.api.data;
+package com.portingdeadmods.researchd.api.client;
 
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
@@ -8,20 +8,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-// TODO: Change back to UniqueArray<ResearchInstance>
-public class TechList {
-    public final UniqueArray<ResearchInstance> entries;
-
+public record TechList(UniqueArray<ResearchInstance> entries) {
     public TechList(Set<ResearchInstance> entries) {
-        this.entries = new UniqueArray<>(entries);
-        updateTechList();
+        this(new UniqueArray<>(entries));
+        this.sortTechList();
     }
 
     public static TechList getClientTechList() {
-        return new TechList(new HashSet<>(ClientResearchTeamHelper.getTeam().getMetadata().getResearchProgress().researches().values()));
+        return new TechList(new HashSet<>(ClientResearchTeamHelper.getTeam().getResearches().values()));
     }
 
-    public void updateTechList() {
+    public void sortTechList() {
         List<ResearchInstance> sorted = this.entries.stream().sorted((a, b) -> {
             if (a.getResearchStatus() == b.getResearchStatus()) {
                 return a.getKey().location().toString().compareTo(b.getKey().location().toString());
@@ -43,7 +40,4 @@ public class TechList {
         return new TechList(entries);
     }
 
-    public UniqueArray<ResearchInstance> entries() {
-        return this.entries;
-    }
 }

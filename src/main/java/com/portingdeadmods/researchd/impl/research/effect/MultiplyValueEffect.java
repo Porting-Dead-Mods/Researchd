@@ -4,11 +4,12 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.ValueEffect;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.ValueEffect;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectSerializer;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
+import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -36,8 +37,9 @@ public record MultiplyValueEffect(ValueEffect value, Float multiplier) implement
 
     @Override
     public void onUnlock(Level level, Player player, ResourceKey<Research> research) {
-        ResearchTeamHelper.getResearchTeam(player).getMetadata().getTeamEffectList()
-                .computeIfAbsent(value.getKey(), k -> 1f * multiplier());
+        SimpleResearchTeam researchTeam = ResearchTeamHelper.getResearchTeam(player);
+        float oldValue = researchTeam.getEffectValue(value);
+        researchTeam.setEffectValue(value, oldValue * this.multiplier());
     }
 
     @Override

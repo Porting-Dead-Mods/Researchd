@@ -3,7 +3,7 @@ package com.portingdeadmods.researchd.client.screens.team.widgets;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.data.team.TeamMember;
+import com.portingdeadmods.researchd.api.team.TeamMember;
 import com.portingdeadmods.researchd.client.screens.team.ResearchTeamScreen;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.utils.PlayerUtils;
@@ -15,10 +15,7 @@ import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -36,7 +33,7 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
 
     public static final int BACKGROUND_Z = 500;
 
-    public PlayerManagementDraggableWidget(int x, int y, List<TeamMember> members, PlayerManagementButtons buttonSettings, Component message) {
+    public PlayerManagementDraggableWidget(int x, int y, Collection<TeamMember> members, PlayerManagementButtons buttonSettings, Component message) {
         super(x, y, 102, 128, message);
         this.buttonSettings = buttonSettings;
         this.buttonWidgets = new ArrayList<>();

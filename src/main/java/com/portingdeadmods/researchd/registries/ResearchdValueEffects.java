@@ -2,8 +2,8 @@ package com.portingdeadmods.researchd.registries;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
-import com.portingdeadmods.researchd.api.research.ValueEffect;
-import com.portingdeadmods.researchd.impl.research.SimpleValueEffect;
+import com.portingdeadmods.researchd.api.ValueEffect;
+import com.portingdeadmods.researchd.impl.SimpleValueEffect;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;

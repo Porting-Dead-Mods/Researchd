@@ -1,7 +1,7 @@
 package com.portingdeadmods.researchd.client.utils;
 
 import com.mojang.authlib.GameProfile;
-import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
+import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
 
@@ -26,7 +26,7 @@ public class ClientPlayerUtils {
 	    } else {
 		    players = new ArrayList<>();
 		    players.add(mc.player.getGameProfile());
-		    players.add(ResearchTeam.DEBUG_MEMBER);
+		    players.add(SimpleResearchTeam.DEBUG_MEMBER);
 	    }
 
         return players;

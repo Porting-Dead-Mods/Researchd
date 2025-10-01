@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.client.screens.team.widgets;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.data.team.TeamMember;
+import com.portingdeadmods.researchd.api.team.TeamMember;
 import com.portingdeadmods.researchd.client.cache.AllPlayersCache;
 import com.portingdeadmods.researchd.client.screens.ContainerWidget;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;

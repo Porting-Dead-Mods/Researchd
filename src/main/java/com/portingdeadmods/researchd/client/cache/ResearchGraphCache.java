@@ -1,17 +1,11 @@
 package com.portingdeadmods.researchd.client.cache;
 
+import com.portingdeadmods.researchd.api.client.ResearchGraph;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.data.ResearchGraph;
-import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.entity.player.Player;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -31,10 +25,7 @@ public final class ResearchGraphCache {
     }
 
     public static ResearchGraph computeIfAbsent(ResourceKey<Research> key) {
-        return GRAPH_CACHE.computeIfAbsent(key, k -> {
-            Map<ResourceKey<Research>, ResearchInstance> researches = ClientResearchTeamHelper.getTeam().getResearchProgress().researches();
-            return ResearchGraph.formRootResearch(key, researches);
-        });
+        return GRAPH_CACHE.computeIfAbsent(key, k -> ResearchGraph.formRootResearch(key, ClientResearchTeamHelper.getTeam().getResearches()));
     }
 
 }

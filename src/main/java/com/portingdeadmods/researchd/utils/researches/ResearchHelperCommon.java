@@ -3,8 +3,6 @@ package com.portingdeadmods.researchd.utils.researches;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
-import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
-import com.portingdeadmods.researchd.api.data.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
@@ -15,6 +13,8 @@ import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.research.effect.data.DimensionUnlockEffectData;
 import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
+import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
+import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
@@ -62,8 +62,8 @@ public final class ResearchHelperCommon {
         return new ArrayList<>(effects.stream().filter(clazz::isInstance).toList());
     }
 
-    public static List<ResearchInstance> getRecentResearches(ResearchTeam team) {
-        Collection<ResearchInstance> researchInstances = team.getResearchProgress().researches().values();
+    public static List<ResearchInstance> getRecentResearches(SimpleResearchTeam team) {
+        Collection<ResearchInstance> researchInstances = team.getResearches().values();
         return researchInstances.stream()
                 .filter(r -> r.getResearchStatus() == ResearchStatus.RESEARCHED)
                 .sorted(Comparator.comparingLong(ResearchInstance::getResearchedTime))
@@ -112,7 +112,7 @@ public final class ResearchHelperCommon {
 
         ResearchTeamMap researchData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
 
-        ResearchTeam team = researchData.getTeamByMember(player.getUUID());
+        SimpleResearchTeam team = researchData.getTeamByMember(player.getUUID());
         for (Map.Entry<ResourceKey<AttachmentType<?>>, AttachmentType<?>> entry : NeoForgeRegistries.ATTACHMENT_TYPES.entrySet()) {
             Object data = player.getData(entry.getValue());
             if (data instanceof ResearchEffectData<?> effectData) {
@@ -133,7 +133,7 @@ public final class ResearchHelperCommon {
             }
         }
 
-        for (ResearchInstance res : team.getResearchProgress().researches().values()) {
+        for (ResearchInstance res : team.getResearches().values()) {
             if (res.getResearchStatus() == ResearchStatus.RESEARCHED) {
                 ResearchEffect effect = res.lookup(level.registryAccess()).researchEffect();
                 effect.onUnlock(level, player, res.getKey());
