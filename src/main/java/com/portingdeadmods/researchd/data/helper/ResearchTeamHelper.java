@@ -10,6 +10,7 @@ import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
+import com.portingdeadmods.researchd.networking.cache.ClearGraphCachePayload;
 import com.portingdeadmods.researchd.networking.team.RefreshPlayerManagementPayload;
 import com.portingdeadmods.researchd.networking.team.RefreshResearchesPayload;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
@@ -202,7 +203,8 @@ public final class ResearchTeamHelper {
         removePlayerFromTeam(requester);
         requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.LEFT_TEAM));
         savedData.researchTeams().put(requesterId, SimpleResearchTeam.createDefaultTeam(requester));
-	    ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
+        PacketDistributor.sendToPlayer(requester, ClearGraphCachePayload.INSTANCE);
+        ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
         refreshPlayerManagement(getResearchTeam(requester), level);
     }
 
@@ -230,6 +232,10 @@ public final class ResearchTeamHelper {
             if (remove) {
                 getResearchTeam(requester).removeMember(member);
                 requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.REMOVED, PlayerUtils.getPlayerNameFromUUID(level, member)));
+                ServerPlayer kickedPlayer = server.getPlayerList().getPlayer(member);
+                if (kickedPlayer != null) {
+                    PacketDistributor.sendToPlayer(kickedPlayer, ClearGraphCachePayload.INSTANCE);
+                }
             } else {
                 getResearchTeam(requester).addSentInvite(member);
             }

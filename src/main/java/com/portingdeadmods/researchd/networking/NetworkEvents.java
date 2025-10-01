@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.networking;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.networking.cache.AskServerPlayers;
+import com.portingdeadmods.researchd.networking.cache.ClearGraphCachePayload;
 import com.portingdeadmods.researchd.networking.cache.ReceiveServerPlayers;
 import com.portingdeadmods.researchd.networking.research.ResearchFinishedPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchMethodProgressSyncPayload;
@@ -76,6 +77,12 @@ public class NetworkEvents {
                 AskServerPlayers.TYPE,
                 AskServerPlayers.STREAM_CODEC,
                 AskServerPlayers::ping
+        );
+
+        registrar.playToClient(
+                ClearGraphCachePayload.TYPE,
+                ClearGraphCachePayload.STREAM_CODEC,
+                ClearGraphCachePayload::clearCache
         );
 
         registrar.playToClient(

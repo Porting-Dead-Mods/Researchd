@@ -5,6 +5,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
+import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.team.ResearchTeamScreen;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
@@ -98,5 +99,10 @@ public final class ResearchdClientEvents {
 		}
 
 		PacketDistributor.sendToServer(AskServerPlayers.UNIT);
+	}
+
+	@SubscribeEvent
+	public static void onClientPlayerLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
+		ResearchGraphCache.clearCache();
 	}
 }
