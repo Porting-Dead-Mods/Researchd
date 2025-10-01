@@ -42,12 +42,14 @@ public class ClientResearchTeamHelper {
 
     public static ResearchTeamRole getPlayerRole(UUID uuid) {
         ResearchTeam clientTeam = getTeam();
-        if (clientTeam.isOwner(uuid)) {
-            return ResearchTeamRole.OWNER;
-        } else if (clientTeam.isModerator(uuid)) {
-            return ResearchTeamRole.MODERATOR;
+        if (clientTeam != null) {
+            for (TeamMember member : clientTeam.getMembers()) {
+                if (member.player().equals(uuid)) {
+                    return member.role();
+                }
+            }
         }
-        return ResearchTeamRole.MEMBER;
+        return ResearchTeamRole.NOT_MEMBER;
     }
 
 	public static ResearchTeamRole getRole() {
@@ -109,10 +111,7 @@ public class ClientResearchTeamHelper {
         UUID id = memberProfile.player();
         ResearchTeam team = getTeam(id);
         if (team != null) {
-            team.removeMember(id);
-            if (getPlayerRole(id) == ResearchTeamRole.MODERATOR) {
-                team.removeModerator(id);
-            }
+            team.remove(id);
             PacketDistributor.sendToServer(new ManageMemberPayload(id, true));
             Researchd.LOGGER.debug("Remove player {}", PlayerUtils.getPlayerNameFromUUID(Minecraft.getInstance().level, memberProfile.player()));
         }
@@ -145,7 +144,7 @@ public class ClientResearchTeamHelper {
             }
             case MEMBER -> {
                 ResearchTeam team = getTeam(member.player());
-                team.addModerator(member.player());
+                team.setRole(member.player(), ResearchTeamRole.MODERATOR);
                 PacketDistributor.sendToServer(new ManageModeratorPayload(member.player(), false));
             }
         }
@@ -158,7 +157,7 @@ public class ClientResearchTeamHelper {
             }
             case MODERATOR -> {
                 ResearchTeam team = getTeam(memberProfile.player());
-                team.removeModerator(memberProfile.player());
+                team.setRole(memberProfile.player(), ResearchTeamRole.MEMBER);
                 PacketDistributor.sendToServer(new ManageModeratorPayload(memberProfile.player(), true));
             }
             case MEMBER -> {

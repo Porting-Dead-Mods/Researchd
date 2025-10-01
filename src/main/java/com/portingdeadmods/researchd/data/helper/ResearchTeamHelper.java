@@ -78,6 +78,7 @@ public final class ResearchTeamHelper {
         ResearchTeam team1 = savedData.getTeamByMember(uuid1);
         ResearchTeam team2 = savedData.getTeamByMember(uuid2);
 
+        if (team1 == null || team2 == null) return false;
         return team1.equals(team2);
     }
 
@@ -103,8 +104,7 @@ public final class ResearchTeamHelper {
         ResearchTeam team = savedData.getTeamByMember(uuid);
 
         if (team != null) {
-            team.removeModerator(uuid);
-            team.removeMember(uuid);
+            team.remove(uuid);
         }
 
         ResearchdSavedData.TEAM_RESEARCH.get().setData(player.level(), savedData);
@@ -134,7 +134,7 @@ public final class ResearchTeamHelper {
 				}
 			}
 
-            team.addMember(requesterId);
+            team.add(requesterId);
             team.removeSentInvite(requesterId);
             ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
 	        ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
@@ -235,7 +235,7 @@ public final class ResearchTeamHelper {
 
         if (getPermissionLevel(requester) >= 1) {
             if (remove) {
-                getResearchTeam(requester).removeMember(member);
+                getResearchTeam(requester).remove(member);
                 requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.REMOVED, PlayerUtils.getPlayerNameFromUUID(level, member)));
             } else {
                 getResearchTeam(requester).addSentInvite(member);
@@ -274,11 +274,13 @@ public final class ResearchTeamHelper {
 
         if (getPermissionLevel(requester) == 2) {
             if (arePlayersSameTeam(requester, moderator)) {
+                ResearchTeam team = getResearchTeam(requester);
+
                 if (remove) {
-                    getResearchTeam(requester).removeModerator(moderator);
+                    team.setRole(moderator, ResearchTeamRole.MEMBER);
                     requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.DEMOTED, PlayerUtils.getPlayerNameFromUUID(level, moderator)));
                 } else {
-                    getResearchTeam(requester).addModerator(moderator);
+                    team.setRole(moderator, ResearchTeamRole.MODERATOR);
                     requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.PROMOTED, PlayerUtils.getPlayerNameFromUUID(level, moderator)));
                 }
 
@@ -330,20 +332,19 @@ public final class ResearchTeamHelper {
 
         if (getPermissionLevel(requester) == 2) {
             if (arePlayersSameTeam(level, requesterId, nextToLead)) {
-                // Set the new leader
-                getResearchTeam(requester).setOwner(nextToLead);
+                ResearchTeam team = getResearchTeam(requester);
 
-                // If he's moderator remove him from the mod list
-                if (getPermissionLevel(level, nextToLead) == 1) {
-                    getResearchTeam(requester).removeModerator(nextToLead);
-                }
+                // Set the new leader
+                team.setOwner(nextToLead);
 
                 // Set the old leader as moderator
-                getResearchTeam(requester).addModerator(requesterId);
+                team.setRole(requesterId, ResearchTeamRole.MODERATOR);
+                team.setRole(nextToLead, ResearchTeamRole.OWNER);
+
                 ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
 	            ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
                 requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.TRANSFERRED_OWNERSHIP, PlayerUtils.getPlayerNameFromUUID(level, nextToLead)));
-                refreshPlayerManagement(getResearchTeam(requester), level);
+                refreshPlayerManagement(team, level);
             } else {
                 requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.BAD_INPUT));
             }

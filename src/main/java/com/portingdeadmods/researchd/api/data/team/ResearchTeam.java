@@ -44,6 +44,8 @@ public class ResearchTeam {
     private final List<UUID> sentInvites; // Invites sent by this team to other players
     private final List<UUID> receivedInvites; // Invites received by this team from other players
 	private final List<UUID> ignores;
+
+    @Deprecated(forRemoval = true)
     private UUID owner;
 
     private final TeamMetadata metadata;
@@ -187,25 +189,39 @@ public class ResearchTeam {
         return this.metadata.researchProgress.getProgress(queue.getEntries().getFirst());
     }
 
-    public void addMember(UUID uuid) {
-        TeamMember member = new TeamMember(uuid, ResearchTeamRole.MEMBER);
+    /**
+     * Adds a member to the team with the specified role.
+     */
+    public void add(UUID uuid, ResearchTeamRole role) {
+        TeamMember member = new TeamMember(uuid, role);
         if (!members.contains(member))
             members.add(member);
     }
 
-    public void removeMember(UUID uuid) {
+    /**
+     * Adds a member to the team with the default role of MEMBER.
+     */
+    public void add(UUID uuid) {
+        this.add(uuid, ResearchTeamRole.MEMBER);
+    }
+
+    /**
+     * Removes a member from the team by their UUID.
+     */
+    public void remove(UUID uuid) {
         members.removeIf(m -> m.player().equals(uuid));
     }
 
-    public void addModerator(UUID uuid) {
-        TeamMember member = new TeamMember(uuid, ResearchTeamRole.MODERATOR);
-        if (!members.contains(member)) {
-            members.add(member);
-        }
-    }
-
-    public void removeModerator(UUID uuid) {
-        members.removeIf(m -> m.player().equals(uuid));
+    /**
+     * @param uuid Member UUID
+     * @param role New Role
+     * @return If the member is not present in the team, it returns false. True otherwise.
+     */
+    public boolean setRole(UUID uuid, ResearchTeamRole role) {
+        if (!isPresentInTeam(uuid)) return false;
+        remove(uuid);
+        members.add(new TeamMember(uuid, role));
+        return true;
     }
 
     public void addSentInvite(UUID uuid) {
@@ -249,10 +265,6 @@ public class ResearchTeam {
 
     public boolean isOwner(UUID uuid) {
         return uuid.equals(owner);
-    }
-
-    public boolean isModerator(UUID uuid) {
-        return this.members.stream().anyMatch(m -> m.player().equals(uuid) && m.role() == ResearchTeamRole.MODERATOR);
     }
 
     public boolean isPresentInTeam(UUID uuid) {

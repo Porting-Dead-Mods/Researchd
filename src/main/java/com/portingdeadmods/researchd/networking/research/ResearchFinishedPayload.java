@@ -3,10 +3,12 @@ package com.portingdeadmods.researchd.networking.research;
 import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
+import com.portingdeadmods.researchd.api.data.ResearchGraph;
 import com.portingdeadmods.researchd.api.data.ResearchQueue;
 import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
+import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.integration.KubeJSIntegration;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
@@ -64,8 +66,12 @@ public record ResearchFinishedPayload(ResourceKey<Research> key, int timeStamp) 
                             ChatFormatting.GREEN + team.getResearchCompletionTime(timeStamp()) + ChatFormatting.RESET
             ));
 
-            if (Minecraft.getInstance().screen instanceof ResearchScreen screen)
+            if (Minecraft.getInstance().screen instanceof ResearchScreen screen) {
                 screen.getTechList().updateTechList();
+
+                ResearchGraph graph = screen.getResearchGraph();
+                screen.getResearchGraphWidget().setGraph(ResearchGraph.formRootResearch(graph.rootNode().getInstance().getKey(), ClientResearchTeamHelper.getTeam().getResearches()));
+            }
         }).exceptionally(err -> {
             Researchd.LOGGER.error("Failed to handle ResearchFinishPayload", err);
             return null;

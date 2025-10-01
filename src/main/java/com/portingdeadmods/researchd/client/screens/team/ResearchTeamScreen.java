@@ -45,6 +45,10 @@ public class ResearchTeamScreen extends BaseScreen {
     public PlayerManagementDraggableWidget getInviteWidget() {
         return inviteWidget;
     }
+    private TeamMembersList teamMembersList;
+    public TeamMembersList getTeamMembersList() {
+        return teamMembersList;
+    }
 
     public ResearchTeamScreen() {
         super(ResearchdTranslations.component(ResearchdTranslations.Team.SCREEN_TITLE), 480, 264, 480 - 64 * 2, 264 - 32 * 2);
@@ -108,7 +112,7 @@ public class ResearchTeamScreen extends BaseScreen {
         teamMembersLayout.addChild(new StringWidget(ResearchdTranslations.component(ResearchdTranslations.Team.TITLE_MEMBERS), this.font));
         teamMembersLayout.addChild(new SpacerElement(-1, 1));
         linearLayout.spacing(11);
-        TeamMembersList list = teamMembersLayout.addChild(new TeamMembersList(94, 142, 94, 22, ClientResearchTeamHelper.getTeamMembers(), false));
+        teamMembersList = teamMembersLayout.addChild(new TeamMembersList(94, 142, 94, 22, ClientResearchTeamHelper.getTeamMembers(), false));
 
         // Layout - Elements - Recent Researches
         linearLayout.spacing(11);
@@ -122,7 +126,7 @@ public class ResearchTeamScreen extends BaseScreen {
         this.layout.setX(this.leftPos + 10);
         this.layout.setY(this.topPos + 11);
         this.layout.visitWidgets(this::addRenderableWidget);
-        list.setX(list.getX() - 1);
+        teamMembersList.setX(teamMembersList.getX() - 1);
 
         this.inviteWidget = new PlayerManagementDraggableWidget(
                 this.leftPos,
