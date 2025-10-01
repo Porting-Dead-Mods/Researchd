@@ -85,7 +85,7 @@ public final class ResearchdCommonEvents {
 
                     if (currentResearchProgress != null) {
                         if (level.getGameTime() % 4 == 0) {
-                            for (TeamMember memberUUID : team.getMembers().values()) {
+                            for (TeamMember memberUUID : team.getMembers()) {
                                 ServerPlayer player = server.getPlayerList().getPlayer(memberUUID.player());
                                 if (player == null) continue;
 
@@ -97,7 +97,7 @@ public final class ResearchdCommonEvents {
                         if (currentResearchProgress.isComplete()) {
                             team.completeResearch(research, server.overworld().getDayTime() * 50L, level);
 
-                            for (TeamMember playerUUIDs : team.getMembers().values()) {
+                            for (TeamMember playerUUIDs : team.getMembers()) {
                                 ServerPlayer player = server.getPlayerList().getPlayer(playerUUIDs.player());
                                 if (player == null) continue;
 

@@ -1,6 +1,5 @@
 package com.portingdeadmods.researchd.client.utils;
 
-import com.mojang.authlib.GameProfile;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.GlobalResearch;
 import com.portingdeadmods.researchd.api.research.Research;
@@ -75,30 +74,15 @@ public class ClientResearchTeamHelper {
         return getPlayerRole(player.getUUID()).getPermissionLevel();
     }
 
-    public static List<GameProfile> getTeamMemberProfiles() {
-        Minecraft mc = Minecraft.getInstance();
-        SimpleResearchTeam researchTeam = getTeam();
-
-        List<GameProfile> players = ClientPlayerUtils.getPlayers();
-        return researchTeam.getMembers().keySet().stream().map(uuid -> {
-            for (GameProfile profile : players) {
-                if (profile.getId().equals(uuid)) {
-                    return profile;
-                }
-            }
-            return null;
-        }).filter(Objects::nonNull).toList();
-    }
-
     public static Collection<TeamMember> getTeamMembers() {
-        return getTeam().getMembers().values();
+        return getTeam().getMembers();
     }
 
     public static List<TeamMember> getPlayersNotInTeam() {
         SimpleResearchTeam team = getTeam();
         List<UUID> uuids = ClientPlayerUtils.getPlayerUUIDs();
         List<TeamMember> playersNotInTeam = new ArrayList<>();
-        for (UUID uuid : uuids.stream().filter(uuid -> !team.isPresentInTeam(uuid)).toList()) {
+        for (UUID uuid : uuids.stream().filter(uuid -> !team.hasMember(uuid)).toList()) {
             playersNotInTeam.add(new TeamMember(uuid, ResearchTeamRole.MODERATOR));
         }
 
@@ -110,9 +94,6 @@ public class ClientResearchTeamHelper {
         SimpleResearchTeam team = getTeam(id);
         if (team != null) {
             team.removeMember(id);
-            if (getPlayerRole(id) == ResearchTeamRole.MODERATOR) {
-                team.removeModerator(id);
-            }
             PacketDistributor.sendToServer(new ManageMemberPayload(id, true));
             Researchd.LOGGER.debug("Remove player {}", PlayerUtils.getPlayerNameFromUUID(Minecraft.getInstance().level, memberProfile.player()));
         }
@@ -138,38 +119,26 @@ public class ClientResearchTeamHelper {
     }
 
     public static void promoteTeamMemberSynced(TeamMember member) {
-        switch (member.role()) {
-            case OWNER -> {
-            }
-            case MODERATOR -> {
-            }
-            case MEMBER -> {
-                SimpleResearchTeam team = getTeam(member.player());
-                team.addModerator(member.player());
-                PacketDistributor.sendToServer(new ManageModeratorPayload(member.player(), false));
-            }
+        if (Objects.requireNonNull(member.role()) == ResearchTeamRole.MEMBER) {
+            SimpleResearchTeam team = getTeam(member.player());
+            team.setRole(member.player(), ResearchTeamRole.MODERATOR);
+            PacketDistributor.sendToServer(new ManageModeratorPayload(member.player(), false));
         }
         Researchd.LOGGER.debug("Promoted player {}", PlayerUtils.getPlayerNameFromUUID(Minecraft.getInstance().level, member.player()));
     }
 
     public static void demoteTeamMemberSynced(TeamMember memberProfile) {
-        switch (memberProfile.role()) {
-            case OWNER -> {
-            }
-            case MODERATOR -> {
-                SimpleResearchTeam team = getTeam(memberProfile.player());
-                team.removeModerator(memberProfile.player());
-                PacketDistributor.sendToServer(new ManageModeratorPayload(memberProfile.player(), true));
-            }
-            case MEMBER -> {
-            }
+        if (Objects.requireNonNull(memberProfile.role()) == ResearchTeamRole.MODERATOR) {
+            SimpleResearchTeam team = getTeam(memberProfile.player());
+            team.setRole(memberProfile.player(), ResearchTeamRole.MEMBER);
+            PacketDistributor.sendToServer(new ManageModeratorPayload(memberProfile.player(), true));
         }
         Researchd.LOGGER.debug("Demoted player {}", memberProfile.player());
     }
 
     public static void transferOwnershipSynced(TeamMember nextOwner) {
         SimpleResearchTeam team = getTeam();
-        team.setOwner(nextOwner.player());
+        team.setRole(nextOwner.player(), ResearchTeamRole.OWNER);
         PacketDistributor.sendToServer(new TransferOwnershipPayload(nextOwner.player()));
     }
 

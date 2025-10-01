@@ -3,13 +3,14 @@ package com.portingdeadmods.researchd.networking.research;
 import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
-import com.portingdeadmods.researchd.api.data.ResearchGraph;
-import com.portingdeadmods.researchd.api.data.ResearchQueue;
-import com.portingdeadmods.researchd.api.data.team.ResearchTeam;
+import com.portingdeadmods.researchd.api.client.ResearchGraph;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.team.ResearchQueue;
+import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
+import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
 import com.portingdeadmods.researchd.integration.KubeJSIntegration;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.ChatFormatting;
@@ -22,6 +23,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import org.jetbrains.annotations.NotNull;
 
 public record ResearchFinishedPayload(ResourceKey<Research> key, int timeStamp) implements CustomPacketPayload {
     public static final Type<ResearchFinishedPayload> TYPE = new Type<>(Researchd.rl("research_finished"));
@@ -34,7 +36,7 @@ public record ResearchFinishedPayload(ResourceKey<Research> key, int timeStamp) 
     );
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public @NotNull Type<? extends CustomPacketPayload> type() {
         return TYPE;
     }
 
@@ -47,12 +49,12 @@ public record ResearchFinishedPayload(ResourceKey<Research> key, int timeStamp) 
                 return;
             }
 
-            ResearchQueue queue = team.getResearchProgress().researchQueue();
+            ResearchQueue queue = team.getQueue();
             if (queue.isEmpty()) context.disconnect(ResearchdTranslations.component(ResearchdTranslations.Errors.RESEARCH_QUEUE_DESYNC));
-            ResourceKey<Research> first = queue.getEntries().getFirst();
+            ResourceKey<Research> first = queue.getFirst();
             if (first != this.key()) context.disconnect(ResearchdTranslations.component(ResearchdTranslations.Errors.RESEARCH_QUEUE_DESYNC));
 
-            team.getResearchProgress().completeResearch(first, timeStamp, player.level());
+            team.completeResearch(first, timeStamp, player.level());
             queue.remove(0, false);
 
             if (player instanceof ServerPlayer serverPlayer) {
@@ -63,11 +65,11 @@ public record ResearchFinishedPayload(ResourceKey<Research> key, int timeStamp) 
                     ResearchdTranslations.Research.QUEUE_FINISHED.component(
                             Researchd.MODID,
                             ChatFormatting.GREEN + Utils.registryTranslation(first).getString() + ChatFormatting.RESET,
-                            ChatFormatting.GREEN + team.getResearchCompletionTime(timeStamp()) + ChatFormatting.RESET
+                            ChatFormatting.GREEN + SimpleResearchTeam.getResearchCompletionTime(team.getCreationTime(), timeStamp()) + ChatFormatting.RESET
             ));
 
             if (Minecraft.getInstance().screen instanceof ResearchScreen screen) {
-                screen.getTechList().updateTechList();
+                screen.getTechList().sortTechList();
 
                 ResearchGraph graph = screen.getResearchGraph();
                 screen.getResearchGraphWidget().setGraph(ResearchGraph.formRootResearch(graph.rootNode().getInstance().getKey(), ClientResearchTeamHelper.getTeam().getResearches()));

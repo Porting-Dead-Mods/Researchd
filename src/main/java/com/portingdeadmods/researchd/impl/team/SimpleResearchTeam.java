@@ -43,9 +43,8 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
 
     private String name;
     private final UUID id;
-    private UUID owner;
     private final LazyFinal<Long> creationTime;
-    private final Map<UUID, TeamMember> members;
+    private final LinkedHashMap<UUID, TeamMember> members;
     private final List<UUID> sentInvites; // Invites sent by this team to other players
     private final List<UUID> receivedInvites; // Invites received by this team from other players
 	private final List<UUID> ignores;
@@ -60,13 +59,12 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
             Codec.list(UUIDUtil.CODEC).fieldOf("sent_invites").forGetter(SimpleResearchTeam::getSentInvites),
             Codec.list(UUIDUtil.CODEC).fieldOf("received_invites").forGetter(SimpleResearchTeam::getReceivedInvites),
 		    Codec.list(UUIDUtil.CODEC).fieldOf("ignores").forGetter(SimpleResearchTeam::getIgnores),
-            UUIDUtil.CODEC.fieldOf("owner").forGetter(t -> t.owner),
             TeamResearches.CODEC.fieldOf("researches").forGetter(t -> t.researches),
             Codec.unboundedMap(Codec.STRING, Codec.FLOAT).fieldOf("effects").forGetter(t -> ResearchdCodecUtils.encodeMap(t.effects))
     ).apply(builder, SimpleResearchTeam::newTeamStringMaps));
 
-    private static @NotNull SimpleResearchTeam newTeamStringMaps(String n, UUID i, Map<String, TeamMember> m, List<UUID> s, List<UUID> r, List<UUID> ig, UUID o, TeamResearches tr, Map<String, Float> e) {
-        return new SimpleResearchTeam(n, i, ResearchdCodecUtils.decodeMap(m, UUID::fromString), s, r, ig, o, tr, ResearchdCodecUtils.decodeMap(e, ResourceLocation::parse));
+    private static @NotNull SimpleResearchTeam newTeamStringMaps(String n, UUID i, Map<String, TeamMember> m, List<UUID> s, List<UUID> r, List<UUID> ig, TeamResearches tr, Map<String, Float> e) {
+        return new SimpleResearchTeam(n, i, ResearchdCodecUtils.decodeMap(m, UUID::fromString), s, r, ig, tr, ResearchdCodecUtils.decodeMap(e, ResourceLocation::parse));
     }
 
     public static final StreamCodec<RegistryFriendlyByteBuf, SimpleResearchTeam> STREAM_CODEC = CodecUtils.streamCodecComposite(
@@ -75,15 +73,13 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
             UUIDUtil.STREAM_CODEC,
             t -> t.id,
             ByteBufCodecs.map(HashMap::new, UUIDUtil.STREAM_CODEC, TeamMember.STREAM_CODEC),
-            SimpleResearchTeam::getMembers,
+            t -> t.members,
             UUIDUtil.STREAM_CODEC.apply(ByteBufCodecs.list()),
             SimpleResearchTeam::getSentInvites,
             UUIDUtil.STREAM_CODEC.apply(ByteBufCodecs.list()),
             SimpleResearchTeam::getReceivedInvites,
 		    UUIDUtil.STREAM_CODEC.apply(ByteBufCodecs.list()),
 		    SimpleResearchTeam::getIgnores,
-            UUIDUtil.STREAM_CODEC,
-            t -> t.owner,
             TeamResearches.STREAM_CODEC,
             t -> t.researches,
             ByteBufCodecs.map(HashMap::new, ResourceLocation.STREAM_CODEC, ByteBufCodecs.FLOAT),
@@ -91,12 +87,11 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
             SimpleResearchTeam::new
     );
 
-    private SimpleResearchTeam(String name, UUID id, Map<UUID, TeamMember> members, List<UUID> sentInvites, List<UUID> receivedInvites, List<UUID> ignores, UUID owner, TeamResearches teamResearches, Map<ResourceLocation, Float> effects) {
+    private SimpleResearchTeam(String name, UUID id, Map<UUID, TeamMember> members, List<UUID> sentInvites, List<UUID> receivedInvites, List<UUID> ignores, TeamResearches teamResearches, Map<ResourceLocation, Float> effects) {
         this.name = name;
         this.id = id;
-        this.owner = owner;
         this.creationTime = LazyFinal.create();
-        this.members = new HashMap<>(members);
+        this.members = new LinkedHashMap<>(members);
         this.sentInvites = new ArrayList<>(sentInvites);
         this.receivedInvites = new ArrayList<>(receivedInvites);
 		this.ignores = new ArrayList<>(ignores);
@@ -111,7 +106,7 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
      * @param name The Name of the Team
      */
     private SimpleResearchTeam(UUID uuid, String name) {
-        this(name, UUID.randomUUID(), Map.of(uuid, new TeamMember(uuid, ResearchTeamRole.OWNER)), List.of(), List.of(), List.of(), uuid, TeamResearches.EMPTY, new HashMap<>());
+        this(name, UUID.randomUUID(), Map.of(uuid, new TeamMember(uuid, ResearchTeamRole.OWNER)), List.of(), List.of(), List.of(), TeamResearches.EMPTY, new HashMap<>());
     }
 
     /**
@@ -141,12 +136,27 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
 
     @Override
     public TeamMember getOwner() {
-        return this.members.get(this.owner);
+        for (TeamMember member : this.members.values()) {
+            if (member.role() == ResearchTeamRole.OWNER) {
+                return member;
+            }
+        }
+        return null;
     }
 
     @Override
-    public Map<UUID, TeamMember> getMembers() {
-        return this.members;
+    public SequencedCollection<TeamMember> getMembers() {
+        return this.members.sequencedValues();
+    }
+
+    @Override
+    public int getMembersAmount() {
+        return this.members.size();
+    }
+
+    @Override
+    public TeamMember getMember(UUID member) {
+        return this.members.get(member);
     }
 
     @Override
@@ -196,21 +206,45 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
 			ignores.add(uuid);
 	}
 
+    @Override
     public void addMember(UUID uuid) {
         this.members.put(uuid, new TeamMember(uuid, ResearchTeamRole.MEMBER));
     }
 
+    @Override
     public void removeMember(UUID uuid) {
         this.members.remove(uuid);
     }
 
-    public void addModerator(UUID uuid) {
-        TeamMember member = new TeamMember(uuid, ResearchTeamRole.MODERATOR);
-        this.members.put(uuid, member);
+    @Override
+    public void setRole(UUID member, ResearchTeamRole role) {
+        this.members.put(member, new TeamMember(member, role));
     }
 
-    public void removeModerator(UUID uuid) {
-        this.members.remove(uuid);
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public boolean hasMember(UUID uuid) {
+        return this.members.containsKey(uuid);
+    }
+
+    @Override
+    public void addMember(UUID member, ResearchTeamRole role) {
+        this.members.put(member, new TeamMember(member, role));
+    }
+
+    @Override
+    public boolean isOwner(UUID uuid) {
+        return this.members.get(uuid).role() == ResearchTeamRole.OWNER;
+    }
+
+    @Override
+    public boolean isModerator(UUID uuid) {
+        TeamMember member = this.members.get(uuid);
+        return member != null && member.role() == ResearchTeamRole.MODERATOR;
     }
 
     public void addSentInvite(UUID uuid) {
@@ -229,35 +263,6 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
 
     public void removeReceivedInvite(UUID uuid) {
         this.receivedInvites.remove(uuid);
-    }
-
-    public void setOwner(UUID uuid) {
-        this.owner = uuid;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public TeamMember getMemberByUUID(UUID uuid) {
-        return this.members.get(uuid);
-    }
-
-    public int getPermissionLevel(UUID uuid) {
-        return getMemberByUUID(uuid).role().getPermissionLevel();
-    }
-
-    public boolean isOwner(UUID uuid) {
-        return uuid.equals(owner);
-    }
-
-    public boolean isModerator(UUID uuid) {
-        TeamMember member = this.members.get(uuid);
-        return member != null && member.role() == ResearchTeamRole.MODERATOR;
-    }
-
-    public boolean isPresentInTeam(UUID uuid) {
-        return this.members.containsKey(uuid);
     }
 
     public MutableComponent parseMembers(Level level) {
@@ -287,8 +292,8 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
     }
 
 
-    public String getResearchCompletionTime(int time) {
-        return new TimeUtils.TimeDifference(this.creationTime.get(), time).getFormatted();
+    public static String getResearchCompletionTime(long creationTime, long time) {
+        return new TimeUtils.TimeDifference(creationTime, time).getFormatted();
     }
 
     public void init(HolderLookup.Provider lookup) {

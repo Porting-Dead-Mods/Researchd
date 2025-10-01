@@ -30,7 +30,7 @@ public record ConsumeItemResearchMethod(Ingredient toConsume, int count) impleme
 
     @Override
     public void checkProgress(Level level, ResourceKey<Research> research, ResearchMethodProgress<?> progress, MethodContext context) {
-        for (TeamMember member : context.team().getMembers().values()) {
+        for (TeamMember member : context.team().getMembers()) {
             List<ItemStack> matchingItems = new ArrayList<>(8);
             int found = 0;
 

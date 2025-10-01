@@ -42,13 +42,7 @@ public final class ResearchTeamHelper {
         UUID uuid = player.getUUID();
         SimpleResearchTeam team = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeamByMember(uuid);
 
-        return team.getPermissionLevel(uuid);
-    }
-
-    public static int getPermissionLevel(Level level, UUID uuid) {
-        SimpleResearchTeam team = ResearchdSavedData.TEAM_RESEARCH.get().getData(level).getTeamByMember(uuid);
-
-        return team.getPermissionLevel(uuid);
+        return team.getMember(uuid).role().getPermissionLevel();
     }
 
     public @Nullable static SimpleResearchTeam getResearchTeam(Player player) {
@@ -104,7 +98,7 @@ public final class ResearchTeamHelper {
         SimpleResearchTeam team = savedData.getTeamByMember(uuid);
 
         if (team != null) {
-            team.remove(uuid);
+            team.removeMember(uuid);
         }
 
         ResearchdSavedData.TEAM_RESEARCH.get().setData(player.level(), savedData);
@@ -117,7 +111,7 @@ public final class ResearchTeamHelper {
         ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
         SimpleResearchTeam team = savedData.getTeamByMember(memberOfTeam);
 
-        if (getResearchTeam(requester).getMembers().size() > 1) {
+        if (getResearchTeam(requester).getMembersAmount() > 1) {
             requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.ALREADY_IN_TEAM));
             return;
         }
@@ -127,14 +121,14 @@ public final class ResearchTeamHelper {
 			savedData.researchTeams().put(requesterId, team);
             requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.YOU_JOINED_TEAM, team.getName()));
 
-			for (TeamMember member : team.getMembers().values()) {
+			for (TeamMember member : team.getMembers()) {
 				Player memberPlayer = level.getPlayerByUUID(member.player());
 				if (memberPlayer != null) {
 					memberPlayer.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.PLAYER_JOINED_TEAM, PlayerUtils.getPlayerNameFromUUID(level, requesterId)));
 				}
 			}
 
-            team.add(requesterId);
+            team.addMember(requesterId);
             team.removeSentInvite(requesterId);
             ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
 	        ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
@@ -186,7 +180,7 @@ public final class ResearchTeamHelper {
 
         // Handle the case of transfering ownership
         if (isResearchTeamLeader(requester)) {
-            if (getResearchTeam(requester).getMembers().size() <= 1) {
+            if (getResearchTeam(requester).getMembersAmount() <= 1) {
                 savedData.researchTeams().remove(requesterId);
                 requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.LEFT_TEAM));
 
@@ -223,7 +217,6 @@ public final class ResearchTeamHelper {
     }
 
     public static void handleManageMember(ServerPlayer requester, UUID member, boolean remove) {
-        UUID requesterId = requester.getUUID();
         MinecraftServer server = requester.getServer();
         ServerLevel level = server.overworld();
         ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
@@ -235,7 +228,7 @@ public final class ResearchTeamHelper {
 
         if (getPermissionLevel(requester) >= 1) {
             if (remove) {
-                getResearchTeam(requester).remove(member);
+                getResearchTeam(requester).removeMember(member);
                 requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.REMOVED, PlayerUtils.getPlayerNameFromUUID(level, member)));
             } else {
                 getResearchTeam(requester).addSentInvite(member);
@@ -335,11 +328,10 @@ public final class ResearchTeamHelper {
                 ResearchTeam team = getResearchTeam(requester);
 
                 // Set the new leader
-                team.setOwner(nextToLead);
+                team.setRole(nextToLead, ResearchTeamRole.OWNER);
 
                 // Set the old leader as moderator
                 team.setRole(requesterId, ResearchTeamRole.MODERATOR);
-                team.setRole(nextToLead, ResearchTeamRole.OWNER);
 
                 ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
 	            ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
@@ -447,9 +439,9 @@ public final class ResearchTeamHelper {
     }
 
     public static ArrayList<String> getTeamMemberNames(Level level, Player player) {
-        return new ArrayList<>(getResearchTeam(player).getMembers().values().stream().map(
-                member -> level.getPlayerByUUID(member.player()).getName().getString()
-        ).toList());
+        return new ArrayList<>(getResearchTeam(player).getMembers().stream()
+                .map(m -> level.getPlayerByUUID(m.player()).getName().getString())
+                .toList());
     }
 
     public static ArrayList<SimpleResearchTeam> getTeams(Level level) {
@@ -578,9 +570,9 @@ public final class ResearchTeamHelper {
         }
     }
 
-    private static void refreshPlayerManagement(SimpleResearchTeam team, Level level) {
+    private static void refreshPlayerManagement(ResearchTeam team, Level level) {
         if (team == null) return;
-        for (TeamMember member : team.getMembers().values()) {
+        for (TeamMember member : team.getMembers()) {
             ServerPlayer player = level.getServer().getPlayerList().getPlayer(member.player());
             if (player != null) {
                 PacketDistributor.sendToPlayer(player, RefreshPlayerManagementPayload.INSTANCE);

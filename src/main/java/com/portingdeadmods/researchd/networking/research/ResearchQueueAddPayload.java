@@ -61,7 +61,7 @@ public record ResearchQueueAddPayload(ResourceKey<Research> researchKey, UUID pl
                 // Announce
                 Component researchName = Utils.registryTranslation(this.researchKey);
 
-                for (TeamMember memberId : team.getMembers().values()) {
+                for (TeamMember memberId : team.getMembers()) {
                     ServerPlayer member = level.getServer().getPlayerList().getPlayer(memberId.player());
                     if (member != null) {
                         member.sendSystemMessage(ResearchdTranslations.Research.QUEUE_ADDED.component(

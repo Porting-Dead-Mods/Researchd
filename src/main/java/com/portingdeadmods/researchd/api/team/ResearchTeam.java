@@ -3,19 +3,26 @@ package com.portingdeadmods.researchd.api.team;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
+import com.portingdeadmods.researchd.data.helper.ResearchTeamRole;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
 import java.util.Map;
+import java.util.SequencedCollection;
 import java.util.UUID;
 
 public interface ResearchTeam {
-    // Team metadata
-
     /**
      * @return The display name of this team
      */
     String getName();
+
+    /**
+     * Set the display name of this team
+     *
+     * @param name The new display name of the team
+     */
+    void setName(String name);
 
     /**
      * @return The unique uuid of this team
@@ -36,16 +43,29 @@ public interface ResearchTeam {
      */
     void setCreationTime(long creationTime);
 
-    // Members
     TeamMember getOwner();
 
-    Map<UUID, TeamMember> getMembers();
+    SequencedCollection<TeamMember> getMembers();
+
+    int getMembersAmount();
+
+    TeamMember getMember(UUID member);
+
+    boolean hasMember(UUID member);
+
+    void addMember(UUID member, ResearchTeamRole role);
+
+    default void addMember(UUID member) {
+        this.addMember(member, ResearchTeamRole.MEMBER);
+    }
+
+    void removeMember(UUID member);
+
+    void setRole(UUID member, ResearchTeamRole role);
 
     boolean isModerator(UUID member);
 
     boolean isOwner(UUID member);
-
-    // Researches
 
     /**
      * Gets the research that is currently researching

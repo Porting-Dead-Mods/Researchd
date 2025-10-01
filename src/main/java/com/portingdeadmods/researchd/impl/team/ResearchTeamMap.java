@@ -41,7 +41,7 @@ public record ResearchTeamMap(Map<UUID, SimpleResearchTeam> researchTeams) {
 
     public @Nullable SimpleResearchTeam getTeamByMember(UUID memberUuid) {
         for (SimpleResearchTeam team : this.researchTeams.values()) {
-            if (team.getMembers().containsKey(memberUuid)) return team;
+            if (team.hasMember(memberUuid)) return team;
         }
         return null;
     }
