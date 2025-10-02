@@ -87,6 +87,7 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
                 ResearchInstance instance = ClientResearchTeamHelper.getTeam().getResearches().get(researchKey);
                 this.screen.getSelectedResearchWidget().setSelectedResearch(instance);
                 this.screen.getResearchGraphWidget().setGraph(ResearchGraphCache.computeIfAbsent(researchKey));
+                ClientResearchTeamHelper.refreshGraphData();
                 return super.mouseClicked(mouseX, mouseY, button);
             }
         }
@@ -99,8 +100,10 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
             ResourceKey<Research> researchKey = this.queue.get(index);
             this.queue.remove(index, true);
             PacketDistributor.sendToServer(new ResearchQueueRemovePayload(researchKey));
+
+            // Instantaneous Effect
             ClientResearchTeamHelper.getTeam().refreshResearchStatus();
-            this.screen.getTechList().sortTechList();
+            ClientResearchTeamHelper.refreshResearchScreenData();
         }
     }
 

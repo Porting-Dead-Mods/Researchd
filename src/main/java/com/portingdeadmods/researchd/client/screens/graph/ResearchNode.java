@@ -3,8 +3,10 @@ package com.portingdeadmods.researchd.client.screens.graph;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.screens.lines.ResearchHead;
+import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -24,7 +26,16 @@ public class ResearchNode extends AbstractWidget {
     private final UniqueArray<ResearchNode> positionLocks;
     private boolean doMovementLogic;
 
-    private final ResearchInstance instance;
+    private ResearchInstance instance; // TODO: Figure out why th there's a desync between Graph and TechList. (then remake this final)
+    public void fetchInstanceFromTeam() {
+        ResearchTeam team = ClientResearchTeamHelper.getTeam();
+        if (team != null) {
+            ResearchInstance updatedInstance = team.getResearches().get(this.instance.getKey());
+            if (updatedInstance != null) {
+                this.instance = updatedInstance;
+            }
+        }
+    }
 
     private final UniqueArray<ResearchHead> inputs;
     private final UniqueArray<ResearchHead> outputs;

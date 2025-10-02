@@ -3,18 +3,16 @@ package com.portingdeadmods.researchd.networking.research;
 import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
-import com.portingdeadmods.researchd.api.client.ResearchGraph;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.team.ResearchQueue;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
-import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.compat.KubeJSIntegration;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
+import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -43,7 +41,8 @@ public record ResearchFinishedPayload(ResourceKey<Research> key, int timeStamp) 
     public void researchFinishedAction(IPayloadContext context) {
         context.enqueueWork(() -> {
             Player player = context.player();
-            ResearchTeam team = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeamByMember(player.getUUID());
+            ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level());
+            ResearchTeam team = data.getTeamByMember(player.getUUID());
             if (team == null) {
                 context.disconnect(ResearchdTranslations.component(ResearchdTranslations.Errors.NO_RESEARCH_TEAM));
                 return;
@@ -68,14 +67,10 @@ public record ResearchFinishedPayload(ResourceKey<Research> key, int timeStamp) 
                             ChatFormatting.GREEN + ResearchHelperCommon.getResearchCompletionTime(team.getCreationTime(), timeStamp()) + ChatFormatting.RESET
             ));
 
-            if (Minecraft.getInstance().screen instanceof ResearchScreen screen) {
-                screen.getTechList().sortTechList();
-
-                ResearchGraph graph = screen.getResearchGraph();
-                screen.getResearchGraphWidget().setGraph(ResearchGraph.formRootResearch(graph.rootNode().getInstance().getKey(), ClientResearchTeamHelper.getTeam().getResearches()));
-            }
+            ClientResearchTeamHelper.refreshResearchScreenData();
+            ResearchdSavedData.TEAM_RESEARCH.get().setData(player.level(), data);
         }).exceptionally(err -> {
-            Researchd.LOGGER.error("Failed to handle ResearchFinishPayload", err);
+            Researchd.LOGGER.error("Failed to handle ResearchFinishPayload: ", err);
             return null;
         });
     }

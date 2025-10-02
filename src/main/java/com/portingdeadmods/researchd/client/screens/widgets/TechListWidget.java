@@ -163,8 +163,10 @@ public class TechListWidget extends ResearchScreenWidget {
 
                 ResourceKey<Research> researchKey = selectedInstance.getKey();
                 PacketDistributor.sendToServer(new ResearchQueueAddPayload(researchKey, player, gameTime));
+
+                // Instantaneous Effect
                 ClientResearchTeamHelper.getTeam().refreshResearchStatus();
-                this.screen.getTechList().sortTechList();
+                ClientResearchTeamHelper.refreshResearchScreenData();
             }
 
             this.startResearchButton.active = false;

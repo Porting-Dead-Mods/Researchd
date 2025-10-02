@@ -1,6 +1,8 @@
 package com.portingdeadmods.researchd.client.utils;
 
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.client.ResearchGraph;
+import com.portingdeadmods.researchd.api.client.TechList;
 import com.portingdeadmods.researchd.api.research.GlobalResearch;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
@@ -8,6 +10,7 @@ import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.ResearchTeamRole;
 import com.portingdeadmods.researchd.api.team.TeamMember;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
+import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.networking.team.*;
 import com.portingdeadmods.researchd.utils.PlayerUtils;
@@ -149,6 +152,24 @@ public class ClientResearchTeamHelper {
                 Researchd.LOGGER.debug("RESEARCH");
             }
         }
+    }
 
+    public static void refreshGraphData() {
+        if (Minecraft.getInstance().screen instanceof ResearchScreen screen) {
+            ResearchGraph graph = screen.getResearchGraph();
+            graph.nodes().forEach((key, node) -> node.fetchInstanceFromTeam());
+        }
+    }
+
+    public static void refreshTechListData() {
+        if (Minecraft.getInstance().screen instanceof ResearchScreen screen) {
+            screen.getTechListWidget().setTechList(TechList.getClientTechList());
+            screen.getTechList().sortTechList();
+        }
+    }
+
+    public static void refreshResearchScreenData() {
+        refreshGraphData();
+        refreshTechListData();
     }
 }

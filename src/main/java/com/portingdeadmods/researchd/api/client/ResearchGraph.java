@@ -31,7 +31,6 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
         for (ResearchNode node : this.nodes.values()) {
             node.graph = this;
         }
-
     }
 
     private void collectRelatedNodes() {
@@ -87,5 +86,4 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
     public static ResearchGraph formRootResearch(ResourceKey<Research> root, Map<ResourceKey<Research>, ResearchInstance> researches) {
         return new ResearchGraph(CommonResearchCache.GLOBAL_RESEARCHES.get(root), researches);
     }
-
 }

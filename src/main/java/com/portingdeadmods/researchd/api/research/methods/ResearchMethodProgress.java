@@ -51,6 +51,8 @@ public class ResearchMethodProgress<T extends ResearchMethod> {
     }
 
     public void checkProgress(Level level, ResearchTeam team, ResourceKey<Research> research) {
+        if (this.isComplete()) return;
+
         if (this.getMethod().shouldCheckProgress()) {
             this.getMethod().checkProgress(level, research, this, new ResearchMethod.SimpleMethodContext(team, null));
         }

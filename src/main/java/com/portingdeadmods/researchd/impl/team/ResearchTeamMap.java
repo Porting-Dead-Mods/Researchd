@@ -73,6 +73,7 @@ public record ResearchTeamMap(Map<UUID, SimpleResearchTeam> researchTeams) {
             for (SimpleResearchTeam team : data.researchTeams().values()) {
                 ClientResearchTeamHelper.resolveInstances(team);
             }
+            ClientResearchTeamHelper.refreshResearchScreenData();
         } else {
             ResearchHelperCommon.refreshResearches((ServerPlayer) player);
         }
