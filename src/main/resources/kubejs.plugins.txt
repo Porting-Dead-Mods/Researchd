@@ -1,1 +1,1 @@
-com.portingdeadmods.researchd.integration.kubejs.ResearchdKubeJSPlugin
+com.portingdeadmods.researchd.compat.kubejs.ResearchdKubeJSPlugin

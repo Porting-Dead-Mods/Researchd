@@ -1,6 +1,5 @@
 package com.portingdeadmods.researchd.client.screens;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
@@ -18,7 +17,7 @@ public abstract class ResearchScreenWidget extends AbstractWidget {
     public static final int SMALL_PANEL_HEIGHT = 22;
     public static final int PANEL_HEIGHT = 24;
     public static final int TALL_PANEL_HEIGHT = 32;
-    
+
     public ResearchScreenWidget(int x, int y, int width, int height) {
         super(x, y, width, height, CommonComponents.EMPTY);
     }
@@ -41,18 +40,10 @@ public abstract class ResearchScreenWidget extends AbstractWidget {
         ResearchStatus status = instance.getResearchStatus();
         guiGraphics.blit(status.getSpriteTexture(), x, y, (int) (width * scale), (int) (height * scale), 0, 0, width, height, width, height);
 
-        PoseStack poseStack = guiGraphics.pose();
-
-        poseStack.pushPose();
-        {
-            poseStack.scale(scale, scale, scale);     // scale local coordinates
-
-            ClientResearchIcon<?> clientResearchIcon = ResearchScreen.CLIENT_ICONS.get(instance.getKey().location());
-            if (clientResearchIcon != null) {
-                clientResearchIcon.render(guiGraphics, x, y, mouseX, mouseY, 0);
-            }
+        ClientResearchIcon<?> clientResearchIcon = ResearchScreen.CLIENT_ICONS.get(instance.getKey().location());
+        if (clientResearchIcon != null) {
+            clientResearchIcon.render(guiGraphics, x, y, mouseX, mouseY, scale, 0);
         }
-        poseStack.popPose();
 
         if (isHovering(guiGraphics, x, y, mouseX, mouseY, scale) && hoverable) {
             int color = -2130706433;
@@ -79,7 +70,7 @@ public abstract class ResearchScreenWidget extends AbstractWidget {
         ClientResearchIcon<?> clientResearchIcon = ResearchScreen.CLIENT_ICONS.get(instance.getKey().location());
 
         if (clientResearchIcon != null) {
-            clientResearchIcon.render(guiGraphics, x + 2, y + 2, mouseX, mouseY, 0);
+            clientResearchIcon.render(guiGraphics, x + 2, y + 2, mouseX, mouseY, 1, 0);
         }
 
         if (isHovering(guiGraphics, x, y, mouseX, mouseY) && hoverable) {

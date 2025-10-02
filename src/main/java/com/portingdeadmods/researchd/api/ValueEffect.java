@@ -3,7 +3,7 @@ package com.portingdeadmods.researchd.api;
 import com.mojang.serialization.Codec;
 import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
 import com.portingdeadmods.researchd.ResearchdRegistries;
-import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
+import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
@@ -17,6 +17,6 @@ public interface ValueEffect {
         return ResearchdRegistries.VALUE_EFFECT.getKey(this);
     }
 
-    default void onUnlock(SimpleResearchTeam team, Level level) {
+    default void onUnlock(ResearchTeam team, Level level) {
     }
 }

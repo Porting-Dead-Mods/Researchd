@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.integration.kubejs;
+package com.portingdeadmods.researchd.compat.kubejs;
 
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
@@ -7,9 +7,9 @@ import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.OrResearchMethod;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
 

@@ -41,12 +41,7 @@ public class RecentResearchesList extends ContainerWidget<ResearchInstance> {
         float scale = 1.75f;
         int padding = (int) ((34f - 16f * scale) / 2f); // 32 + 2 (smth smth border 2px)
 
-        poseStack.pushPose();
-        {
-            poseStack.scale(scale, scale, scale);
-            ResearchScreen.CLIENT_ICONS.get(research.getKey().location()).render(guiGraphics, (int) (((float) left + padding) / scale), (int) (((float) top + padding) / scale), mouseX, mouseY, 0);
-        }
-        poseStack.popPose();
+        ResearchScreen.CLIENT_ICONS.get(research.getKey().location()).render(guiGraphics, (int) (((float) left + padding) / scale), (int) (((float) top + padding) / scale), mouseX, mouseY, scale, 0);
 
         Minecraft minecraft = Minecraft.getInstance();
         Level level = minecraft.level;
@@ -59,7 +54,7 @@ public class RecentResearchesList extends ContainerWidget<ResearchInstance> {
         String researchedBy;
         if (researchedByUUID != null) {
             researchedBy = PlayerUtils.getPlayerNameFromUUID(level, researchedByUUID);
-        }else {
+        } else {
             researchedBy = "NO UUID";
         }
 

@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.integration.kubejs;
+package com.portingdeadmods.researchd.compat.kubejs;
 
 import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import dev.latvian.mods.kubejs.color.KubeColor;

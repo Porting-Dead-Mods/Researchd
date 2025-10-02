@@ -6,7 +6,6 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.content.blockentities.ResearchLabControllerBE;
-import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;

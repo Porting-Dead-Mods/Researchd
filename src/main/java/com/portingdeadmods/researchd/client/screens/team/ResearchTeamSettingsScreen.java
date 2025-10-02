@@ -1,11 +1,11 @@
 package com.portingdeadmods.researchd.client.screens.team;
 
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.team.ResearchTeamRole;
 import com.portingdeadmods.researchd.client.screens.BaseScreen;
 import com.portingdeadmods.researchd.client.screens.team.widgets.PlayerManagementDraggableWidget;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
-import com.portingdeadmods.researchd.data.helper.ResearchTeamRole;
 import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
 import com.portingdeadmods.researchd.networking.team.LeaveTeamPayload;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;

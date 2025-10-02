@@ -58,6 +58,7 @@ public record ResearchTeamMap(Map<UUID, SimpleResearchTeam> researchTeams) {
         if (player.level().isClientSide) {
             ResearchHelperClient.refreshResearches(player);
             CommonResearchCache.initialize(player.level());
+            ResearchHelperClient.initIconRenderers(player.level());
             ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level());
             for (SimpleResearchTeam team : data.researchTeams().values()) {
                 ClientResearchTeamHelper.resolveInstances(team);

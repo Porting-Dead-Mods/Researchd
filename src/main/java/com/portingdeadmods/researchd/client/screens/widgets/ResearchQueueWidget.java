@@ -6,13 +6,13 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
+import com.portingdeadmods.researchd.api.research.methods.ResearchMethodProgress;
 import com.portingdeadmods.researchd.api.team.ResearchQueue;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
-import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
 import com.portingdeadmods.researchd.networking.research.ResearchQueueRemovePayload;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -143,7 +143,7 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
 
         guiGraphics.blit(ResearchStatus.RESEARCHED.getSpriteTexture(spriteType), x, y, 0, 0, (int) (progress * PANEL_WIDTH), spriteType.getHeight(), PANEL_WIDTH, spriteType.getHeight());
 
-        ResearchScreen.CLIENT_ICONS.get(instance.getKey().location()).render(guiGraphics, x, y, mouseX, mouseY, 0);
+        ResearchScreen.CLIENT_ICONS.get(instance.getKey().location()).render(guiGraphics, x, y, mouseX, mouseY, 1, 0);
 
         if (isHovering(guiGraphics, x, y, mouseX, mouseY) && hoverable) {
             int color = -2130706433;

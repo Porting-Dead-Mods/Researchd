@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.integration.kubejs.event;
+package com.portingdeadmods.researchd.compat.kubejs.event;
 
 import com.portingdeadmods.researchd.api.research.Research;
 import dev.latvian.mods.kubejs.player.KubePlayerEvent;

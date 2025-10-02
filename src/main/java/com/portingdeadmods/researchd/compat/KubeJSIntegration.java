@@ -1,10 +1,10 @@
-package com.portingdeadmods.researchd.integration;
+package com.portingdeadmods.researchd.compat;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.integration.kubejs.event.ResearchCompletedKubeEvent;
-import com.portingdeadmods.researchd.integration.kubejs.event.ResearchProgressKubeEvent;
-import com.portingdeadmods.researchd.integration.kubejs.event.ResearchdEvents;
+import com.portingdeadmods.researchd.compat.kubejs.event.ResearchCompletedKubeEvent;
+import com.portingdeadmods.researchd.compat.kubejs.event.ResearchProgressKubeEvent;
+import com.portingdeadmods.researchd.compat.kubejs.event.ResearchdEvents;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.fml.ModList;

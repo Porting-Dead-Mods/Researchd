@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.integration.kubejs.event;
+package com.portingdeadmods.researchd.compat.kubejs.event;
 
 import dev.latvian.mods.kubejs.event.EventGroup;
 import dev.latvian.mods.kubejs.event.EventHandler;

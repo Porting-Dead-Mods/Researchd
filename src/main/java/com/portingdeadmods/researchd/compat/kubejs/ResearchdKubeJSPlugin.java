@@ -1,7 +1,7 @@
-package com.portingdeadmods.researchd.integration.kubejs;
+package com.portingdeadmods.researchd.compat.kubejs;
 
 import com.portingdeadmods.researchd.ResearchdRegistries;
-import com.portingdeadmods.researchd.integration.kubejs.event.ResearchdEvents;
+import com.portingdeadmods.researchd.compat.kubejs.event.ResearchdEvents;
 import dev.latvian.mods.kubejs.event.EventGroupRegistry;
 import dev.latvian.mods.kubejs.plugin.KubeJSPlugin;
 import dev.latvian.mods.kubejs.registry.BuilderTypeRegistry;

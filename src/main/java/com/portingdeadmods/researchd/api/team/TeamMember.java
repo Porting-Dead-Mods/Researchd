@@ -3,7 +3,6 @@ package com.portingdeadmods.researchd.api.team;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
-import com.portingdeadmods.researchd.data.helper.ResearchTeamRole;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;

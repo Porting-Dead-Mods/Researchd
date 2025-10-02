@@ -2,8 +2,7 @@ package com.portingdeadmods.researchd.api.team;
 
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
-import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
-import com.portingdeadmods.researchd.data.helper.ResearchTeamRole;
+import com.portingdeadmods.researchd.api.research.methods.ResearchMethodProgress;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 

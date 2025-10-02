@@ -6,11 +6,11 @@ import com.portingdeadmods.portingdeadlibs.api.client.screens.widgets.AbstractSc
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.api.research.methods.ResearchMethodProgress;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.content.menus.ResearchLabMenu;
-import com.portingdeadmods.researchd.data.helper.ResearchMethodProgress;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;

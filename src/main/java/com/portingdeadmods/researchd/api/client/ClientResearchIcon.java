@@ -22,5 +22,5 @@ public interface ClientResearchIcon<I extends ResearchIcon> {
      * @param panelLeft Left start position of the current panel the icon is rendered on
      * @param panelTop Top start position of the current panel the icon is rendered on
      */
-    void render(GuiGraphics guiGraphics, int panelLeft, int panelTop, int mouseX, int mouseY, float partialTicks);
+    void render(GuiGraphics guiGraphics, int panelLeft, int panelTop, int mouseX, int mouseY, float scale, float partialTicks);
 }

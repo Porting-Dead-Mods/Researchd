@@ -18,7 +18,6 @@ public final class ResearchdTranslations {
     public static final class Team {
         public static final TranslatableConstant OWNER = create("role.owner", "Owner");
         public static final TranslatableConstant MEMBER = create("role.player", "Member");
-        public static final TranslatableConstant NOT_MEMBER = create("role.not_member", "Not Member");
         public static final TranslatableConstant MODERATOR = create("role.moderator", "Moderator");
 
         public static final TranslatableConstant SCREEN_TITLE = create("screen.title", "Research Team");
