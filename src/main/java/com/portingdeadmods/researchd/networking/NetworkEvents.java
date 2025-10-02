@@ -60,7 +60,7 @@ public class NetworkEvents {
         registrar.playToServer(
                 RequestToJoinPayload.TYPE,
                 RequestToJoinPayload.STREAM_CODEC,
-                RequestToJoinPayload::requestToJoinAction
+                RequestToJoinPayload::handle
         );
 
         registrar.playToServer(

@@ -2,9 +2,11 @@ package com.portingdeadmods.researchd.content.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
+import com.portingdeadmods.portingdeadlibs.utils.SuggestionUtils;
+import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.utils.PlayerUtils;
-import com.portingdeadmods.researchd.utils.SuggestionUtils;
+import com.portingdeadmods.researchd.utils.ResearchdSuggestionUtils;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.level.ServerLevel;
@@ -20,7 +22,8 @@ public class TeamCommands {
 							ServerPlayer player = source.getPlayer();
 
 							if (player != null) {
-								ResearchTeamHelper.handleListMembers(player);
+                                ResearchTeam team = ResearchTeamHelper.getTeamByMember(player);
+								player.sendSystemMessage(ResearchTeamHelper.formatMembers(team, player.level()));
 							}
 
 							return 1;
@@ -51,7 +54,7 @@ public class TeamCommands {
 							return 1;
 						})
 						.then(Commands.argument("nextToLead", StringArgumentType.string())
-							.suggests(SuggestionUtils::teamMemberNames)
+							.suggests(ResearchdSuggestionUtils::teamMemberNames)
 							.executes(context -> {
 								CommandSourceStack source = context.getSource();
 								ServerPlayer player = source.getPlayer();
@@ -97,7 +100,7 @@ public class TeamCommands {
 						))
 				.then(Commands.literal("promote")
 						.then(Commands.argument("player", StringArgumentType.string())
-								.suggests(SuggestionUtils::teamMemberNames)
+								.suggests(ResearchdSuggestionUtils::teamMemberNames)
 								.executes(context -> {
 									CommandSourceStack source = context.getSource();
 									ServerPlayer player = source.getPlayer();
@@ -113,7 +116,7 @@ public class TeamCommands {
 						))
 				.then(Commands.literal("demote")
 						.then(Commands.argument("player", StringArgumentType.string())
-								.suggests(SuggestionUtils::teamMemberNames)
+								.suggests(ResearchdSuggestionUtils::teamMemberNames)
 								.executes(context -> {
 									CommandSourceStack source = context.getSource();
 									ServerPlayer player = source.getPlayer();
@@ -129,7 +132,7 @@ public class TeamCommands {
 						))
 				.then(Commands.literal("kick")
 						.then(Commands.argument("player", StringArgumentType.string())
-								.suggests(SuggestionUtils::teamMemberNames)
+								.suggests(ResearchdSuggestionUtils::teamMemberNames)
 								.executes(context -> {
 									CommandSourceStack source = context.getSource();
 									ServerPlayer player = source.getPlayer();
@@ -146,7 +149,7 @@ public class TeamCommands {
 				)
 				.then(Commands.literal("transfer-ownership")
 						.then(Commands.argument("nextToLead", StringArgumentType.string())
-								.suggests(SuggestionUtils::teamMemberNames)
+								.suggests(ResearchdSuggestionUtils::teamMemberNames)
 								.executes(context -> {
 									CommandSourceStack source = context.getSource();
 									ServerPlayer player = source.getPlayer();

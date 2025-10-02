@@ -8,8 +8,9 @@ import com.portingdeadmods.researchd.api.ValueEffect;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectSerializer;
-import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
-import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
+import com.portingdeadmods.researchd.api.team.ResearchTeam;
+import com.portingdeadmods.researchd.api.team.ValueEffectsHolder;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -31,15 +32,17 @@ public record MultiplyValueEffect(ValueEffect value, Float multiplier) implement
             MultiplyValueEffect::multiplier,
             MultiplyValueEffect::new
     );
-    
+
     public static final ResearchEffectSerializer<MultiplyValueEffect> SERIALIZER = ResearchEffectSerializer.simple(CODEC, STREAM_CODEC);
     public static final ResourceLocation ID = Researchd.rl("multiply_value");
 
     @Override
     public void onUnlock(Level level, Player player, ResourceKey<Research> research) {
-        SimpleResearchTeam researchTeam = ResearchTeamHelper.getResearchTeam(player);
-        float oldValue = researchTeam.getEffectValue(value);
-        researchTeam.setEffectValue(value, oldValue * this.multiplier());
+        ResearchTeam researchTeam = ResearchTeamHelper.getTeamByMember(player);
+        if (researchTeam instanceof ValueEffectsHolder effectsHolder) {
+            float oldValue = effectsHolder.getEffectValue(value);
+            effectsHolder.setEffectValue(value, oldValue * this.multiplier());
+        }
     }
 
     @Override

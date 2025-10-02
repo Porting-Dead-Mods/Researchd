@@ -8,10 +8,10 @@ import net.minecraft.commands.Commands;
 import java.util.List;
 
 public class ResearchdCommands {
-	private static List<String> aliases = List.of("researchd", "rd", "research", "key");
+	private static final List<String> ALIASES = List.of("researchd", "rd", "research", "key");
 
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-		List<LiteralCommandNode<CommandSourceStack>> rootCommands = aliases.stream().map(
+		List<LiteralCommandNode<CommandSourceStack>> rootCommands = ALIASES.stream().map(
 				alias -> Commands.literal(alias).build()
 		).toList();
 
@@ -23,9 +23,9 @@ public class ResearchdCommands {
 				DataCommand.build()
 		);
 
-		rootCommands.forEach( root -> {
-			subCommands.forEach(root::addChild);
-			dispatcher.getRoot().addChild(root);
-		});
-	}
+        for (LiteralCommandNode<CommandSourceStack> root : rootCommands) {
+            subCommands.forEach(root::addChild);
+            dispatcher.getRoot().addChild(root);
+        }
+    }
 }

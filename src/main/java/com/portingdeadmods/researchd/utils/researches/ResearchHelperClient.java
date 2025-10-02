@@ -21,7 +21,7 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 import java.util.Map;
 
-public class ResearchHelperClient {
+public final class ResearchHelperClient {
     public static void refreshResearches(Player player) {
         Level level;
         level = Minecraft.getInstance().level;

@@ -3,20 +3,21 @@ package com.portingdeadmods.researchd.utils;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
+import com.portingdeadmods.researchd.api.team.ResearchTeam;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class SuggestionUtils {
-    public static CompletableFuture<Suggestions> playerNames(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
-        return SharedSuggestionProvider.suggest(context.getSource().getLevel().players().stream().map(player -> player.getName().getString()).toList(), builder);
-    }
-
+public final class ResearchdSuggestionUtils {
     public static CompletableFuture<Suggestions> teamMemberNames(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
-        List<String> members = ResearchTeamHelper.getTeamMemberNames(context.getSource().getLevel(), context.getSource().getPlayer());
+        ResearchTeam researchTeam = ResearchTeamHelper.getTeamByMember(context.getSource().getPlayer());
+        List<String> members = new ArrayList<>(researchTeam.getMembers().stream()
+                .map(m -> m.getName(context.getSource().getLevel()).getString())
+                .toList());
         members.add("none");
         return SharedSuggestionProvider.suggest(members, builder);
     }

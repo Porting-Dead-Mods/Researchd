@@ -72,8 +72,8 @@ public record ResearchQueueAddPayload(ResourceKey<Research> researchKey, UUID pl
                     }
                 }
 
+                team.getTeamResearches().refreshResearchStatus();
                 ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
-                team.getTeamResearches().refreshResearchStatus(level);
 	            ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
             }
         }).exceptionally(err -> {

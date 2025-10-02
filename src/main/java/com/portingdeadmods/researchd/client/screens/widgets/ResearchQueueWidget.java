@@ -99,7 +99,7 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
             ResourceKey<Research> researchKey = this.queue.get(index);
             this.queue.remove(index, true);
             PacketDistributor.sendToServer(new ResearchQueueRemovePayload(researchKey));
-            ClientResearchTeamHelper.getTeam().getTeamResearches().refreshResearchStatus(Minecraft.getInstance().level);
+            ClientResearchTeamHelper.getTeam().refreshResearchStatus();
             this.screen.getTechList().sortTechList();
         }
     }
@@ -138,12 +138,12 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
         ResearchStatus status = instance.getResearchStatus();
         GuiUtils.drawImg(guiGraphics, status.getSpriteTexture(spriteType), x, y, PANEL_WIDTH, spriteType.getHeight());
 
-        ResearchMethodProgress<?> rmp = ClientResearchTeamHelper.getTeam().getTeamResearches().getProgress(instance.getKey());
+        ResearchMethodProgress<?> rmp = ClientResearchTeamHelper.getTeam().getResearchProgresses().get(instance.getKey());
         float progress = rmp == null ? 0f : rmp.getProgressPercent();
 
         guiGraphics.blit(ResearchStatus.RESEARCHED.getSpriteTexture(spriteType), x, y, 0, 0, (int) (progress * PANEL_WIDTH), spriteType.getHeight(), PANEL_WIDTH, spriteType.getHeight());
 
-        ResearchScreen.CLIENT_ICONS.get(instance.getKey().location()).render(guiGraphics, x, y, mouseX, mouseY, 1, 0);
+        ResearchScreen.CLIENT_ICONS.get(instance.getKey().location()).render(guiGraphics, x + 2, y + 2, mouseX, mouseY, 1, 0);
 
         if (isHovering(guiGraphics, x, y, mouseX, mouseY) && hoverable) {
             int color = -2130706433;

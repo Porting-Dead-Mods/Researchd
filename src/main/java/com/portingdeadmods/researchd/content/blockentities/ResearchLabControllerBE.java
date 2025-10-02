@@ -14,10 +14,10 @@ import com.portingdeadmods.researchd.content.items.ResearchPackItem;
 import com.portingdeadmods.researchd.content.menus.ResearchLabMenu;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
-import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
 import com.portingdeadmods.researchd.registries.ResearchdBlockEntityTypes;
 import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -118,7 +118,7 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
     public void commonTick() {
         super.commonTick();
 
-        ResearchTeam team = ResearchTeamHelper.getResearchTeamByUUID(this.getLevel(), this.getData(ResearchdAttachments.PLACED_BY_UUID));
+        ResearchTeam team = ResearchTeamHelper.getTeamByMember(this.getLevel(), this.getData(ResearchdAttachments.PLACED_BY_UUID));
         if (team == null) return;
 
         ResourceKey<Research> current = team.getCurrentResearch();

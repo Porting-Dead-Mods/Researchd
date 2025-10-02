@@ -7,7 +7,6 @@ import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethodProgress;
-import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.research.SimpleResearchQueue;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -60,8 +59,8 @@ public record TeamResearches(SimpleResearchQueue researchQueue,
         return this.researchQueue.current();
     }
 
-    public void refreshResearchStatus(Level level) {
-        for (ResearchInstance instance : this.researches().values()) {
+    public void refreshResearchStatus() {
+        for (ResearchInstance instance : this.researches.values()) {
             if (instance.getResearchStatus() == ResearchStatus.RESEARCHED) continue;
 
             if (instance.getParents().stream().allMatch(parent -> this.hasCompleted(parent.getResearchKey()))) {
@@ -80,13 +79,13 @@ public record TeamResearches(SimpleResearchQueue researchQueue,
             instance.setResearchStatus(ResearchStatus.LOCKED);
         }
 
-        ResearchdSavedData.TEAM_RESEARCH.get().setData(level, ResearchdSavedData.TEAM_RESEARCH.get().getData(level));
+        //ResearchdSavedData.TEAM_RESEARCH.get().setData(level, ResearchdSavedData.TEAM_RESEARCH.get().getData(level));
     }
 
     public void completeResearch(ResourceKey<Research> research, long completionTime, Level level) {
         this.researches.get(research).setResearchStatus(ResearchStatus.RESEARCHED).setResearchedTime(completionTime);
 
-        this.refreshResearchStatus(level);
+        this.refreshResearchStatus();
     }
 
 }

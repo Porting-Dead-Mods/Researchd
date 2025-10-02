@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Spaghetti {
+public final class Spaghetti {
 	/**
 	 * <span style="color:red">CLIENT SIDE ONLY</span>
 	 *

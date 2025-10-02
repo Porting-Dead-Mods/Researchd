@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd;
 
 // Fix configs :p
 //@EventBusSubscriber(modid = Researchd.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-public class ResearchdClientConfig
+public final class ResearchdClientConfig
 {
     /*
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();

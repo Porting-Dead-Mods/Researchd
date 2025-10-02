@@ -10,11 +10,13 @@ import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectList;
 import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
+import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.research.effect.data.DimensionUnlockEffectData;
 import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
+import com.portingdeadmods.researchd.utils.TimeUtils;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
@@ -62,7 +64,7 @@ public final class ResearchHelperCommon {
         return new ArrayList<>(effects.stream().filter(clazz::isInstance).toList());
     }
 
-    public static List<ResearchInstance> getRecentResearches(SimpleResearchTeam team) {
+    public static List<ResearchInstance> getRecentResearches(ResearchTeam team) {
         Collection<ResearchInstance> researchInstances = team.getResearches().values();
         return researchInstances.stream()
                 .filter(r -> r.getResearchStatus() == ResearchStatus.RESEARCHED)
@@ -141,4 +143,7 @@ public final class ResearchHelperCommon {
         }
     }
 
+    public static String getResearchCompletionTime(long teamCreationTime, long time) {
+        return new TimeUtils.TimeDifference(teamCreationTime, time).getFormatted();
+    }
 }

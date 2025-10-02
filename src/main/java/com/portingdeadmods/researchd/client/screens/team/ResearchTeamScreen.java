@@ -2,15 +2,15 @@ package com.portingdeadmods.researchd.client.screens.team;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.client.screens.BaseScreen;
 import com.portingdeadmods.researchd.client.screens.team.widgets.PlayerManagementDraggableWidget;
 import com.portingdeadmods.researchd.client.screens.team.widgets.RecentResearchesList;
 import com.portingdeadmods.researchd.client.screens.team.widgets.TeamMembersList;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
-import com.portingdeadmods.researchd.data.helper.ResearchTeamHelper;
-import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
@@ -62,7 +62,7 @@ public class ResearchTeamScreen extends BaseScreen {
         this.player = mc.player;
 
         // Team information
-        SimpleResearchTeam researchTeam = ResearchTeamHelper.getResearchTeam(Objects.requireNonNull(player));
+        ResearchTeam researchTeam = ResearchTeamHelper.getTeamByMember(Objects.requireNonNull(player));
         String name = researchTeam.getName();
         List<ResearchInstance> recentResearches = ResearchHelperCommon.getRecentResearches(researchTeam);
 

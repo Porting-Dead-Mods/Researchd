@@ -84,6 +84,8 @@ public interface ResearchTeam {
         return this.getResearchProgresses().get(this.getCurrentResearch());
     }
 
+    TeamSocialManager getSocialManager();
+
     ResearchQueue getQueue();
 
     Map<ResourceKey<Research>, ResearchInstance> getResearches();
@@ -91,5 +93,7 @@ public interface ResearchTeam {
     Map<ResourceKey<Research>, ResearchMethodProgress<?>> getResearchProgresses();
 
     void completeResearch(ResourceKey<Research> research, long completionTime, Level level);
+
+    void refreshResearchStatus();
 
 }

@@ -11,8 +11,8 @@ import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.compat.KubeJSIntegration;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
-import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -65,7 +65,7 @@ public record ResearchFinishedPayload(ResourceKey<Research> key, int timeStamp) 
                     ResearchdTranslations.Research.QUEUE_FINISHED.component(
                             Researchd.MODID,
                             ChatFormatting.GREEN + Utils.registryTranslation(first).getString() + ChatFormatting.RESET,
-                            ChatFormatting.GREEN + SimpleResearchTeam.getResearchCompletionTime(team.getCreationTime(), timeStamp()) + ChatFormatting.RESET
+                            ChatFormatting.GREEN + ResearchHelperCommon.getResearchCompletionTime(team.getCreationTime(), timeStamp()) + ChatFormatting.RESET
             ));
 
             if (Minecraft.getInstance().screen instanceof ResearchScreen screen) {

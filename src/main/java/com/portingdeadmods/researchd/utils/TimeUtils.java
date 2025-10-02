@@ -1,11 +1,11 @@
 package com.portingdeadmods.researchd.utils;
 
-public class TimeUtils {
+public final class TimeUtils {
     public static class TimeDifference {
         public final long diff;
 
         public TimeDifference(long startMs, long endMs) {
-            diff = endMs - startMs;
+            this.diff = endMs - startMs;
         }
 
         public String getFormatted() {

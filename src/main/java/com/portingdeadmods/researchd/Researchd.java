@@ -5,6 +5,7 @@ import com.portingdeadmods.portingdeadlibs.utils.LazyFinal;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
+import com.portingdeadmods.researchd.content.blockentities.ResearchLabPartBE;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.registries.*;
@@ -17,7 +18,6 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
-import com.portingdeadmods.researchd.content.blockentities.ResearchLabPartBE;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
@@ -25,7 +25,7 @@ import net.neoforged.neoforge.registries.NewRegistryEvent;
 import org.slf4j.Logger;
 
 @Mod(Researchd.MODID)
-public class Researchd {
+public final class Researchd {
     public static final String MODID = "researchd";
     public static final String MODNAME = "Researchd";
 

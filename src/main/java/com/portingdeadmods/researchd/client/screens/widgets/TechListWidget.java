@@ -163,7 +163,7 @@ public class TechListWidget extends ResearchScreenWidget {
 
                 ResourceKey<Research> researchKey = selectedInstance.getKey();
                 PacketDistributor.sendToServer(new ResearchQueueAddPayload(researchKey, player, gameTime));
-                ClientResearchTeamHelper.getTeam().getTeamResearches().refreshResearchStatus(Minecraft.getInstance().level);
+                ClientResearchTeamHelper.getTeam().refreshResearchStatus();
                 this.screen.getTechList().sortTechList();
             }
 

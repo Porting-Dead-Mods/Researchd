@@ -35,8 +35,8 @@ public record ResearchQueueRemovePayload(ResourceKey<Research> researchKey) impl
                 TeamResearches teamResearches = data.getTeamByPlayer(serverPlayer).getTeamResearches();
                 teamResearches.researchQueue().remove(researchKey, true);
 
+                teamResearches.refreshResearchStatus();
                 ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
-                teamResearches.refreshResearchStatus(level);
 	            ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
             }
         }).exceptionally(err -> {

@@ -10,7 +10,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.neoforged.neoforge.registries.RegistryBuilder;
 
-public class ResearchdRegistries {
+public final class ResearchdRegistries {
 	public static final ResourceKey<Registry<Research>> RESEARCH_KEY =
 			ResourceKey.createRegistryKey(Researchd.rl("research"));
 	public static final ResourceKey<Registry<SimpleResearchPack>> RESEARCH_PACK_KEY =

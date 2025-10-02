@@ -54,11 +54,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-@Mod(value = ResearchdClient.MODID, dist = Dist.CLIENT)
-public class ResearchdClient {
-    public static final String MODID = "researchd";
-    public static final String MODNAME = "Researchd";
-
+@Mod(value = Researchd.MODID, dist = Dist.CLIENT)
+public final class ResearchdClient {
     public static final Map<ResourceLocation, WidgetConstructor<? extends ResearchMethod>> RESEARCH_METHOD_WIDGETS = new HashMap<>();
     public static final Map<ResourceLocation, WidgetConstructor<? extends ResearchEffect>> RESEARCH_EFFECT_WIDGETS = new HashMap<>();
     public static final Map<ResourceLocation, Function<ResearchIcon, ClientResearchIcon<?>>> RESEARCH_ICONS = new HashMap<>();
