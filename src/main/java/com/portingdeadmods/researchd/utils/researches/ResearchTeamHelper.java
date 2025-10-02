@@ -33,6 +33,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.Consumer;
 
 public final class ResearchTeamHelper {
     /**
@@ -361,27 +362,29 @@ public final class ResearchTeamHelper {
 
     public static Component getFormattedDump(Level level) {
         List<Component> dump = new ArrayList<>();
-        dump.add(Component.literal("---- RESEARCH'D DUMP - TEAMS ----").withStyle(ChatFormatting.AQUA));
-        for (Map.Entry<UUID, SimpleResearchTeam> entry : ResearchdSavedData.TEAM_RESEARCH.get().getData(level).researchTeams().entrySet()) {
-            dump.add(
-                    Component.literal(PlayerUtils.getPlayerNameFromUUID(level, entry.getKey())).withStyle(ChatFormatting.WHITE)
-                            .append(Component.literal(" -> ").withStyle(ChatFormatting.AQUA))
-                            .append(Component.literal(entry.getValue().getName()).withStyle(ChatFormatting.WHITE))
-            );
-        }
-
-        Map<UUID, SimpleResearchTeam> map = ResearchdSavedData.TEAM_RESEARCH.get().getData(level).researchTeams();
-        for (SimpleResearchTeam team : map.values()) {
-            dump.add(formatMembers(team, level));
+        dump.add(Component.literal("---- Researchd Teams ----").withStyle(ChatFormatting.GOLD));
+        for (Iterator<SimpleResearchTeam> iterator = ResearchdSavedData.TEAM_RESEARCH.get().getData(level).researchTeams().values().iterator(); iterator.hasNext(); ) {
+            ResearchTeam team = iterator.next();
+            dump.add(Component.literal(ChatFormatting.GREEN + team.getName() + ChatFormatting.RESET).append(" with %s member%s".formatted(ChatFormatting.GREEN.toString() + team.getMembersAmount() + ChatFormatting.RESET, team.getMembersAmount() == 1 ? "" : "s")));
+            for (TeamMember member : team.getMembers()) {
+                dump.add(Component.literal("┣ ").append(member.getName(level)).withStyle(ChatFormatting.GRAY));
+            }
+            if (iterator.hasNext()) {
+                dump.add(Component.literal("┣━━").withStyle(ChatFormatting.GRAY));
+            } else {
+                dump.add(Component.literal("┗━━").withStyle(ChatFormatting.GRAY));
+            }
         }
 
         MutableComponent ret = Component.empty();
-        for (Component component : dump) {
+        for (int i = 0; i < dump.size(); i++) {
+            Component component = dump.get(i);
             ret.append(component);
-            ret.append("\n");
+            if (i < dump.size() - 1) {
+                ret.append("\n");
+            }
         }
 
-        ret.append(Component.literal("--------- END OF DUMP ----------").withStyle(ChatFormatting.AQUA));
         return ret;
     }
 
@@ -406,21 +409,23 @@ public final class ResearchTeamHelper {
         return ret;
     }
 
-    public static void handleHelpMessage(Player player, String page) {
-        if (page.equals("team")) {
-            player.sendSystemMessage(Component.literal("> Researchd Teams").withStyle(ChatFormatting.WHITE, ChatFormatting.BOLD));
-            player.sendSystemMessage(helpMessage("team", "create <name>", description("Create a new team with the specified name.")));
-            player.sendSystemMessage(helpMessage("team", "list", description("List all teams.")));
-            player.sendSystemMessage(helpMessage("team", "members", description("List all members of your team.")));
-            player.sendSystemMessage(helpMessage("team", "invite <player>", description("Invite a player to your team.")));
-            player.sendSystemMessage(helpMessage("team", "join <player>", description("Join a team that you have been invited to.")));
-            player.sendSystemMessage(helpMessage("team", "leave <next_to_lead>", paramDescription("next_to_lead", "Put 'none' if there's no-one to lead or you're not the leader."), description("Leave your current team.")));
-            player.sendSystemMessage(helpMessage("team", "promote <player>", description("Promote a player to moderator. You got to be the leader to do this.")));
-            player.sendSystemMessage(helpMessage("team", "demote <player>", description("Demote a player from moderator. You got to be the leader to do this.")));
-            player.sendSystemMessage(helpMessage("team", "kick <player>", description("Kick a player from your team. You got to be a moderator or the leader to do this.")));
-            player.sendSystemMessage(helpMessage("team", "transfer-ownership <player>", description("Transfer ownership of the team to another player.")));
-            player.sendSystemMessage(helpMessage("team", "set-name <name>", description("Set a new name for your team.")));
-        }
+    public enum HelpPage {
+        TEAM,
+    }
+
+    public static void sendHelpMessage(Consumer<Component> sendMessageFunction) {
+        sendMessageFunction.accept(Component.literal("> Researchd Teams").withStyle(ChatFormatting.WHITE, ChatFormatting.BOLD));
+        sendMessageFunction.accept(helpMessage("team", "create <name>", description("Create a new team with the specified name.")));
+        sendMessageFunction.accept(helpMessage("team", "list", description("List all teams.")));
+        sendMessageFunction.accept(helpMessage("team", "members", description("List all members of your team.")));
+        sendMessageFunction.accept(helpMessage("team", "invite <player>", description("Invite a player to your team.")));
+        sendMessageFunction.accept(helpMessage("team", "join <player>", description("Join a team that you have been invited to.")));
+        sendMessageFunction.accept(helpMessage("team", "leave <next_to_lead>", paramDescription("next_to_lead", "Put 'none' if there's no-one to lead or you're not the leader."), description("Leave your current team.")));
+        sendMessageFunction.accept(helpMessage("team", "promote <player>", description("Promote a player to moderator. You got to be the leader to do this.")));
+        sendMessageFunction.accept(helpMessage("team", "demote <player>", description("Demote a player from moderator. You got to be the leader to do this.")));
+        sendMessageFunction.accept(helpMessage("team", "kick <player>", description("Kick a player from your team. You got to be a moderator or the leader to do this.")));
+        sendMessageFunction.accept(helpMessage("team", "transfer-ownership <player>", description("Transfer ownership of the team to another player.")));
+        sendMessageFunction.accept(helpMessage("team", "set-name <name>", description("Set a new name for your team.")));
     }
 
     public static MutableComponent illegalMessage(String message) {

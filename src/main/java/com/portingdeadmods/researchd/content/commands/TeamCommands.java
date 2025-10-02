@@ -16,6 +16,12 @@ import net.minecraft.world.entity.player.Player;
 public class TeamCommands {
 	public static LiteralCommandNode<CommandSourceStack> build() {
 		return Commands.literal("team")
+                .then(Commands.literal("help")
+                        .executes(ctx -> {
+                            CommandSourceStack source = ctx.getSource();
+                            ResearchTeamHelper.sendHelpMessage(source::sendSystemMessage);
+                            return 1;
+                        }))
 				.then(Commands.literal("members")
 						.executes(context -> {
 							CommandSourceStack source = context.getSource();
