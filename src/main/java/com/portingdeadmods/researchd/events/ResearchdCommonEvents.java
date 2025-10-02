@@ -60,7 +60,7 @@ public final class ResearchdCommonEvents {
 
     @SubscribeEvent
     private static void onCommandRegister(RegisterCommandsEvent event) {
-        ResearchdCommands.register(event.getDispatcher());
+        ResearchdCommands.register(event.getDispatcher(), event.getBuildContext());
     }
 
     @SubscribeEvent
