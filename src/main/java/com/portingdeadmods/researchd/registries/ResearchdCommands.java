@@ -1,14 +1,17 @@
-package com.portingdeadmods.researchd.content.commands;
+package com.portingdeadmods.researchd.registries;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import com.portingdeadmods.researchd.content.commands.DebugCommands;
+import com.portingdeadmods.researchd.content.commands.DevCommands;
+import com.portingdeadmods.researchd.content.commands.TeamCommands;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 
 import java.util.List;
 
-public class ResearchdCommands {
+public final class ResearchdCommands {
 	private static final List<String> ALIASES = List.of("researchd", "rd");
 
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context) {
