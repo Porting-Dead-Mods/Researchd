@@ -8,7 +8,8 @@ import net.minecraft.network.chat.Component;
 public enum ResearchTeamRole {
 	OWNER(ResearchdTranslations.Team.OWNER, 2),
 	MODERATOR(ResearchdTranslations.Team.MODERATOR, 1),
-	MEMBER(ResearchdTranslations.Team.MEMBER, 0);
+	MEMBER(ResearchdTranslations.Team.MEMBER, 0),
+	NOT_MEMBER(ResearchdTranslations.Team.NOT_MEMBER, -1);
 
     private final TranslatableConstant displayName;
     private final int permissionLevel;
