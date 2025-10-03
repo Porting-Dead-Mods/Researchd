@@ -29,7 +29,14 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
     private static final int BACKGROUND_HEIGHT = 40;
 
     private final ResearchScreen screen;
-    private final ResearchQueue queue;
+
+	// TODO: Not final atm so it can be refreshed
+	// For some reason it doesn't update properly when another player adds/removes something from the queue
+	// Also it's weird since it's passed by reference from the ClientTeam so it *should* be updated... It's the same issue as the TechList and Graph...
+	private ResearchQueue queue;
+	public void setQueue(ResearchQueue newQueue) {
+		this.queue = newQueue;
+	}
 
     private ResearchInstance selected;
     private float selectedX;

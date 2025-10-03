@@ -168,8 +168,15 @@ public class ClientResearchTeamHelper {
         }
     }
 
+	public static void refreshResearchQueueData() {
+		if (Minecraft.getInstance().screen instanceof ResearchScreen screen) {
+			screen.getResearchQueueWidget().setQueue(getTeam().getQueue());
+		}
+	}
+
     public static void refreshResearchScreenData() {
         refreshGraphData();
         refreshTechListData();
+		refreshResearchQueueData();
     }
 }
