@@ -1,6 +1,8 @@
 package com.portingdeadmods.researchd;
 
 import com.mojang.logging.LogUtils;
+import com.portingdeadmods.portingdeadlibs.api.resources.DynamicPack;
+import com.portingdeadmods.portingdeadlibs.api.resources.DynamicPackSource;
 import com.portingdeadmods.portingdeadlibs.utils.LazyFinal;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.research.Research;
@@ -12,14 +14,18 @@ import com.portingdeadmods.researchd.registries.*;
 import com.portingdeadmods.researchd.registries.serializers.ResearchEffectSerializers;
 import com.portingdeadmods.researchd.registries.serializers.ResearchMethodSerializers;
 import com.portingdeadmods.researchd.registries.serializers.ResearchSerializers;
+import com.portingdeadmods.researchd.resources.ResearchdDynamicPackContents;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.repository.Pack;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.event.AddPackFindersEvent;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
 import org.slf4j.Logger;
@@ -71,9 +77,18 @@ public final class Researchd {
         modEventBus.addListener(this::registerCapabilities);
         modEventBus.addListener(this::registerRegistries);
         modEventBus.addListener(this::registerDatapackRegistries);
+        modEventBus.addListener(this::addPackFinders);
 
         //modContainer.registerConfig(ModConfig.Type.CLIENT, ResearchdClientConfig.SPEC);
         modContainer.registerConfig(ModConfig.Type.COMMON, ResearchdCommonConfig.SPEC);
+    }
+
+    private void addPackFinders(AddPackFindersEvent event) {
+        if (event.getPackType() == PackType.SERVER_DATA) {
+            DynamicPack pack = new DynamicPack(Researchd.rl("example_researches"), PackType.SERVER_DATA);
+            ResearchdDynamicPackContents.write(pack);
+            event.addRepositorySource(new DynamicPackSource(pack.packId(), PackType.SERVER_DATA, Pack.Position.BOTTOM, pack));
+        }
     }
 
     private void registerCapabilities(RegisterCapabilitiesEvent event) {

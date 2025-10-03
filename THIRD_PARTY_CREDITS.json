@@ -1,0 +1,38 @@
+{
+  "parents": [
+    "researchd:nether"
+  ],
+  "requires_parent": false,
+  "icon": [
+    {
+      "id": "minecraft:end_stone",
+      "count": 1
+    }
+  ],
+  "method": {
+    "packs": [
+      "researchd:overworld",
+      "researchd:nether"
+    ],
+    "count": 100,
+    "duration": 200,
+    "type": "researchd:consume_research_pack"
+  },
+  "effect": {
+    "effects": [
+      {
+        "recipes": [
+          "researchd:end_pack"
+        ],
+        "type": "researchd:unlock_recipe"
+      },
+      {
+        "dimension": "minecraft:the_end",
+        "icon_sprite": "researchd:dimension_icons/end",
+        "type": "researchd:unlock_dimension"
+      }
+    ],
+    "type": "researchd:and"
+  },
+  "type": "researchd:simple"
+}

@@ -71,7 +71,7 @@ public final class CommonResearchCache {
         }
 
         if (ROOT_RESEARCH == null) {
-            throw new IllegalStateException("Failed to find a root research (Research without parents)");
+            //throw new IllegalStateException("Failed to find a root research (Research without parents)");
         }
 
         GLOBAL_RESEARCHES = ImmutableMap.copyOf(globalResearchMap);

@@ -153,10 +153,10 @@ public class ResearchBuilder extends BuilderBase<Research> {
 
     @Override
     public Research createObject() {
-        SimpleResearch.Builder builder = SimpleResearch.Builder.of();
+        SimpleResearch.Builder builder = SimpleResearch.builder();
         builder.icon(icon);
-        builder.researchMethod(researchMethod);
-        builder.researchEffect(researchEffect);
+        builder.method(researchMethod);
+        builder.effect(researchEffect);
         for (ResourceKey<Research> parent : parents) {
             builder.parents(parent);
         }

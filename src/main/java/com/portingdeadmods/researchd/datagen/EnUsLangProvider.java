@@ -4,7 +4,6 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
 import com.portingdeadmods.researchd.registries.ResearchdResearchPacks;
-import com.portingdeadmods.researchd.registries.ResearchdResearches;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceKey;
@@ -32,12 +31,12 @@ public final class EnUsLangProvider extends LanguageProvider {
         addBlock(RESEARCH_LAB_PART, "Research Lab Part");
         addBlock(RESEARCH_LAB_CONTROLLER, "Research Lab");
 
-        addResearch(ResearchdResearches.COBBLESTONE, "Wonder what type of stone it is...");
-        addResearch(ResearchdResearches.OVERWORLD_PACK, "The start of something");
-        addResearch(ResearchdResearches.NETHER, "From below...");
-        addResearch(ResearchdResearches.THE_END, "The start... of something?");
-        addResearch(ResearchdResearches.BEACON, "The beam looks funny");
-        addResearch(ResearchdResearches.END_CRYSTAL, "If you look at it, it spins...");
+//        addResearch(ResearchdResearches.COBBLESTONE, "Wonder what type of stone it is...");
+//        addResearch(ResearchdResearches.OVERWORLD_PACK, "The start of something");
+//        addResearch(ResearchdResearches.NETHER, "From below...");
+//        addResearch(ResearchdResearches.THE_END, "The start... of something?");
+//        addResearch(ResearchdResearches.BEACON, "The beam looks funny");
+//        addResearch(ResearchdResearches.END_CRYSTAL, "If you look at it, it spins...");
 
         addResearchPack(ResearchdResearchPacks.END, "End Research Pack");
         addResearchPack(ResearchdResearchPacks.NETHER, "Nether Research Pack");

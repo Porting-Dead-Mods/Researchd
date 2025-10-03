@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
+import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
@@ -19,6 +20,10 @@ import java.util.Optional;
 public record SimpleResearch(ItemResearchIcon researchIcon, ResearchMethod researchMethod, ResearchEffect researchEffect,
                              List<ResourceKey<Research>> parents, boolean requiresParent,
                              Optional<String> literalName, Optional<String> literalDescription) implements Research {
+    public SimpleResearch {
+        Researchd.LOGGER.debug("Creating simple research");
+    }
+
     @Override
     public ResearchSerializer<?> getSerializer() {
         return Serializer.INSTANCE;
@@ -38,6 +43,10 @@ public record SimpleResearch(ItemResearchIcon researchIcon, ResearchMethod resea
     @Override
     public int hashCode() {
         return Objects.hash(researchIcon, researchMethod, researchEffect, parents, requiresParent, literalName, literalDescription);
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     public static class Serializer implements ResearchSerializer<SimpleResearch> {
@@ -71,10 +80,6 @@ public record SimpleResearch(ItemResearchIcon researchIcon, ResearchMethod resea
         private Optional<String> literalName = Optional.empty();
         private Optional<String> literalDescription = Optional.empty();
 
-        public static Builder of() {
-            return new Builder();
-        }
-
         private Builder() {
         }
 
@@ -83,12 +88,12 @@ public record SimpleResearch(ItemResearchIcon researchIcon, ResearchMethod resea
             return this;
         }
 
-        public Builder researchMethod(ResearchMethod researchMethod) {
+        public Builder method(ResearchMethod researchMethod) {
             this.researchMethod = researchMethod;
             return this;
         }
 
-        public Builder researchEffect(ResearchEffect researchEffect) {
+        public Builder effect(ResearchEffect researchEffect) {
             this.researchEffect = researchEffect;
             return this;
         }
