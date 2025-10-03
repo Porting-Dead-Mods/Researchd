@@ -5,6 +5,7 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchIcon;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
+import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
@@ -39,9 +40,11 @@ public final class ResearchHelperClient {
 
         for (ResearchInstance res : team.getResearches().values()) {
             if (res.getResearchStatus() == ResearchStatus.RESEARCHED) {
-                res.lookup(level.registryAccess()).researchEffect().onUnlock(level, player, res.getKey());
+                ResearchEffect effect = res.lookup(level.registryAccess()).researchEffect();
+                effect.onUnlock(level, player, res.getKey());
             }
         }
+
     }
 
     // Called at the end of the initialization phase of the research cache

@@ -13,6 +13,10 @@ public final class ResearchdCommonConfig {
             .comment("The length of the research queue")
             .defineInRange("research_queue_length", 7, 1, 99);
 
+    private static final ModConfigSpec.BooleanValue LOAD_EXAMPLES_RESOURCES = BUILDER
+            .comment("Whether to load the examples resourcepack that can be enabled in the world creation screen.")
+            .define("load_examples_datapack", true);
+
     // To be moved to client
     private static final ModConfigSpec.BooleanValue CONSOLE_DEBUG = BUILDER
             .comment("Whether to enable console debug messages for Researchd")
@@ -22,11 +26,13 @@ public final class ResearchdCommonConfig {
 
     public static int researchQueueLength;
     public static boolean consoleDebug;
+    public static boolean loadExamplesDatapack;
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event)
     {
         researchQueueLength = RESEARCH_QUEUE_LENGTH.get();
         consoleDebug = CONSOLE_DEBUG.get();
+        loadExamplesDatapack = LOAD_EXAMPLES_RESOURCES.get();
     }
 }

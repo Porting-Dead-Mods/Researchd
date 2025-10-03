@@ -539,6 +539,10 @@ public class ResearchGraphWidget extends AbstractWidget {
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
+        if (this.graph == null || this.graph.nodes() == null) {
+            return;
+        }
+
         int w = 174;
         guiGraphics.enableScissor(w, 8, guiGraphics.guiWidth() - 8, guiGraphics.guiHeight() - 8);
         {
@@ -548,10 +552,6 @@ public class ResearchGraphWidget extends AbstractWidget {
                         line.render(guiGraphics);
                     }
                 }
-            }
-
-            if (this.graph == null || this.graph.nodes() == null) {
-                return;
             }
 
             for (ResearchNode node : this.graph.nodes().values()) {

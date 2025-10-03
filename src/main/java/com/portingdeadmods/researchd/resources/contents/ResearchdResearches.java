@@ -1,10 +1,11 @@
-package com.portingdeadmods.researchd.registries;
+package com.portingdeadmods.researchd.resources.contents;
 
+import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
-import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
+import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
 import com.portingdeadmods.researchd.impl.research.effect.AndResearchEffect;
 import com.portingdeadmods.researchd.impl.research.effect.DimensionUnlockEffect;
@@ -13,6 +14,8 @@ import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.OrResearchMethod;
+import com.portingdeadmods.researchd.registries.ResearchdItems;
+import com.portingdeadmods.researchd.resources.ResearchdDatagenProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
@@ -26,7 +29,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-public class ResearchdResearches {
+public class ResearchdResearches implements ResearchdDatagenProvider<Research> {
+    public static final ResourceLocation COBBLESTONE_LOC = Researchd.rl("cobblestone");
+    public static final ResourceLocation OVERWORLD_PACK_LOC = Researchd.rl("overworld_pack");
+    public static final ResourceLocation NETHER_LOC = Researchd.rl("nether");
+    public static final ResourceLocation END_LOC = Researchd.rl("the_end");
+    public static final ResourceLocation END_CRYSTAL_LOC = Researchd.rl("end_crystal");
+    public static final ResourceLocation BEACON_LOC = Researchd.rl("beacon");
+
     private final String modid;
     private final Map<ResourceKey<Research>, Research> researches;
 
@@ -35,6 +45,7 @@ public class ResearchdResearches {
         this.researches = new HashMap<>();
     }
 
+    @Override
     public void build() {
          ResourceKey<Research> cobblestone = simpleResearch("cobblestone", builder -> builder
                 .icon(Items.COBBLESTONE)
@@ -53,7 +64,7 @@ public class ResearchdResearches {
                 .icon(Items.NETHERRACK)
                 .parents(overworldPack)
                 .method(
-                        consumePack(25, 100, ResearchdResearchPacks.OVERWORLD)
+                        consumePack(25, 100, pack(ResearchdResearchPacks.OVERWORLD_PACK_LOC))
                 )
                 .effect(
                         and(
@@ -64,7 +75,7 @@ public class ResearchdResearches {
         ResourceKey<Research> end = simpleResearch("the_end", builder -> builder
                 .icon(Items.END_STONE)
                 .parents(nether)
-                .method(consumePack(100, 200, ResearchdResearchPacks.OVERWORLD, ResearchdResearchPacks.NETHER))
+                .method(consumePack(100, 200, pack(ResearchdResearchPacks.OVERWORLD_PACK_LOC), pack(ResearchdResearchPacks.NETHER_PACK_LOC)))
                 .effect(
                         and(
                                 unlockRecipe(modLoc("end_pack")),
@@ -74,7 +85,7 @@ public class ResearchdResearches {
         simpleResearch("end_crystal", builder -> builder
                 .icon(Items.END_CRYSTAL)
                 .parents(end)
-                .method(consumePack(250, 200, ResearchdResearchPacks.OVERWORLD, ResearchdResearchPacks.NETHER, ResearchdResearchPacks.END))
+                .method(consumePack(250, 200, pack(ResearchdResearchPacks.OVERWORLD_PACK_LOC), pack(ResearchdResearchPacks.NETHER_PACK_LOC), pack(ResearchdResearchPacks.END_PACK_LOC)))
                 .effect(
                         and(unlockRecipe(mcLoc("end_crystal")))
                 ));
@@ -82,13 +93,18 @@ public class ResearchdResearches {
                 .icon(Items.BEACON)
                 .parents(end)
                 .method(
-                        consumePack(250, 200, ResearchdResearchPacks.OVERWORLD, ResearchdResearchPacks.NETHER, ResearchdResearchPacks.END)
+                        consumePack(250, 200, pack(ResearchdResearchPacks.OVERWORLD_PACK_LOC), pack(ResearchdResearchPacks.NETHER_PACK_LOC), pack(ResearchdResearchPacks.END_PACK_LOC))
                 )
                 .effect(
                         and(
                                 unlockRecipe(mcLoc("beacon"))
                         )
                 ));
+    }
+
+    @Override
+    public Map<ResourceKey<Research>, Research> getContents() {
+        return this.researches;
     }
 
     protected @NotNull ResourceLocation mcLoc(String path) {
@@ -104,7 +120,7 @@ public class ResearchdResearches {
     }
 
     @SafeVarargs
-    protected final @NotNull ConsumePackResearchMethod consumePack(int count, int duration, ResourceKey<SimpleResearchPack>... packs) {
+    protected final @NotNull ConsumePackResearchMethod consumePack(int count, int duration, ResourceKey<ResearchPack>... packs) {
         return new ConsumePackResearchMethod(Arrays.asList(packs), count, duration);
     }
 
@@ -118,6 +134,10 @@ public class ResearchdResearches {
 
     protected ResourceKey<Research> key(String name) {
         return ResourceKey.create(ResearchdRegistries.RESEARCH_KEY, modLoc(name));
+    }
+
+    protected ResourceKey<ResearchPack> pack(ResourceLocation location) {
+        return ResourceKey.create(ResearchdRegistries.RESEARCH_PACK_KEY, location);
     }
 
     protected ResearchMethod and(ResearchMethod... methods) {
@@ -137,10 +157,6 @@ public class ResearchdResearches {
         this.researches.put(key, builder.apply(SimpleResearch.builder())
                 .build());
         return key;
-    }
-
-    public Map<ResourceKey<Research>, Research> getResearches() {
-        return researches;
     }
 
 }

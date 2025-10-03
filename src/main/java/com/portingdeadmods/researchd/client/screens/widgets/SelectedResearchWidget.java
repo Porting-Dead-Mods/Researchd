@@ -23,7 +23,9 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
 public class SelectedResearchWidget extends ResearchScreenWidget {
@@ -44,7 +46,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
     public static final int BACKGROUND_HEIGHT = 72;
     public static final int SCROLLER_WIDTH = 4;
     public static final int SCROLLER_HEIGHT = 7;
-    private ResearchInstance selectedInstance;
+    private @Nullable ResearchInstance selectedInstance;
     public AbstractWidget methodWidget;
     public AbstractWidget effectWidget;
     private int scrollOffset;
@@ -109,8 +111,8 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
     }
 
     public int getInfoHeight() {
-        int methodHeight = this.methodWidget.getHeight();
-        int effectHeight = this.effectWidget.getHeight();
+        int methodHeight = this.methodWidget != null ? this.methodWidget.getHeight() : 0;
+        int effectHeight = this.effectWidget != null ? this.effectWidget.getHeight() : 0;
         int methodSectionHeight = LABEL_PADDING_TOP_1 + font.lineHeight + LABEL_PADDING_BOTTOM_1 + methodHeight + METHOD_WIDGET_PADDING_BOTTOM;
         int effectSectionHeight = LABEL_PADDING_TOP_2 + font.lineHeight + LABEL_PADDING_BOTTOM_2 + effectHeight;
         return methodSectionHeight + LINE_HEIGHT + effectSectionHeight + BOTTOM_PADDING;
@@ -118,14 +120,17 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        double rawScrollOffset = Math.max(this.scrollOffset - scrollY * 5, 0);
-        if (rawScrollOffset > getInfoHeight() - VISIBLE_CONENT_HEIGHT) {
-            this.scrollOffset = (getInfoHeight() - VISIBLE_CONENT_HEIGHT);
-        } else {
-            this.scrollOffset = (int) rawScrollOffset;
+        if (this.selectedInstance != null) {
+            double rawScrollOffset = Math.max(this.scrollOffset - scrollY * 5, 0);
+            if (rawScrollOffset > this.getInfoHeight() - VISIBLE_CONENT_HEIGHT) {
+                this.scrollOffset = (this.getInfoHeight() - VISIBLE_CONENT_HEIGHT);
+            } else {
+                this.scrollOffset = (int) rawScrollOffset;
+            }
+            this.updateChildWidgetPositions();
+            return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
         }
-        this.updateChildWidgetPositions();
-        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+        return false;
     }
 
     /**
@@ -167,7 +172,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
         this.mouseClicked(mouseX, mouseY, 0);
     }
 
-    public void setSelectedResearch(ResearchInstance instance) {
+    public void setSelectedResearch(@NotNull ResearchInstance instance) {
         if (this.selectedInstance != instance) {
             this.selectedInstance = instance;
 
@@ -213,7 +218,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
         }
     }
 
-    public ResearchInstance getSelectedInstance() {
+    public @Nullable ResearchInstance getSelectedInstance() {
         return selectedInstance;
     }
 

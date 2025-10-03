@@ -9,7 +9,7 @@ import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectList;
-import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
+import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.research.effect.data.DimensionUnlockEffectData;
@@ -19,14 +19,12 @@ import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
 import com.portingdeadmods.researchd.utils.TimeUtils;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
@@ -36,9 +34,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public final class ResearchHelperCommon {
-    public static Set<Holder<Research>> getLevelResearches(LevelAccessor level) {
-        RegistryAccess registryAccess = level.registryAccess();
-        HolderLookup.RegistryLookup<Research> registry = registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_KEY);
+    public static Set<Holder<Research>> getLevelResearches(HolderLookup.Provider lookup) {
+        HolderLookup.RegistryLookup<Research> registry = lookup.lookupOrThrow(ResearchdRegistries.RESEARCH_KEY);
         return registry.listElements().collect(Collectors.toSet());
     }
 
@@ -56,7 +53,7 @@ public final class ResearchHelperCommon {
     public static <T extends ResearchEffect> Collection<T> getResearchEffects(Class<T> clazz, Level level) {
         Collection<T> effects = new UniqueArray<>();
 
-        for (Holder<Research> research : getLevelResearches(level)) {
+        for (Holder<Research> research : getLevelResearches(level.registryAccess())) {
             ResearchEffect effect = research.value().researchEffect();
             _collectEffects(effect, effects);
         }
@@ -100,7 +97,7 @@ public final class ResearchHelperCommon {
         return effData.stream().sorted(Comparator.comparing(a -> a.getClass().getName())).toList();
     }
 
-    public static List<ResourceKey<SimpleResearchPack>> getResearchPacks(HolderLookup.Provider lookup) {
+    public static List<ResourceKey<ResearchPack>> getResearchPacks(HolderLookup.Provider lookup) {
         return lookup.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY).listElements()
                 .sorted(Comparator.comparingInt(h -> h.value().sorting_value()))
                 .map(Holder::getKey)

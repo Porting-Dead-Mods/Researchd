@@ -15,23 +15,23 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.Optional;
 
-public record SimpleResearchPack(int color, int sorting_value, Optional<ResourceLocation> customTexture) {
-    public static final Codec<SimpleResearchPack> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.INT.fieldOf("color").forGetter(SimpleResearchPack::color),
-            Codec.INT.fieldOf("sorting_value").forGetter(SimpleResearchPack::sorting_value),
-            ResourceLocation.CODEC.optionalFieldOf("customTexture").forGetter(SimpleResearchPack::customTexture)
-    ).apply(instance, SimpleResearchPack::new));
+public record ResearchPack(int color, int sorting_value, Optional<ResourceLocation> customTexture) {
+    public static final Codec<ResearchPack> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.INT.fieldOf("color").forGetter(ResearchPack::color),
+            Codec.INT.fieldOf("sorting_value").forGetter(ResearchPack::sorting_value),
+            ResourceLocation.CODEC.optionalFieldOf("customTexture").forGetter(ResearchPack::customTexture)
+    ).apply(instance, ResearchPack::new));
 
-    public static final Codec<ResourceKey<SimpleResearchPack>> RESOURCE_KEY_CODEC = ResourceKey.codec(ResearchdRegistries.RESEARCH_PACK_KEY);
-    public static final StreamCodec<ByteBuf, ResourceKey<SimpleResearchPack>> RESOURCE_KEY_STREAM_CODEC = ResourceKey.streamCodec(ResearchdRegistries.RESEARCH_PACK_KEY);
+    public static final Codec<ResourceKey<ResearchPack>> RESOURCE_KEY_CODEC = ResourceKey.codec(ResearchdRegistries.RESEARCH_PACK_KEY);
+    public static final StreamCodec<ByteBuf, ResourceKey<ResearchPack>> RESOURCE_KEY_STREAM_CODEC = ResourceKey.streamCodec(ResearchdRegistries.RESEARCH_PACK_KEY);
 
-    public static final SimpleResearchPack EMPTY = new SimpleResearchPack(-1, -1, java.util.Optional.empty());
+    public static final ResearchPack EMPTY = new ResearchPack(-1, -1, java.util.Optional.empty());
 
-    public SimpleResearchPack(ResourceLocation customTexture) {
+    public ResearchPack(ResourceLocation customTexture) {
         this(-1, -1, Optional.of(customTexture));
     }
 
-    public static ItemStack asStack(ResourceKey<SimpleResearchPack> key) {
+    public static ItemStack asStack(ResourceKey<ResearchPack> key) {
         ItemStack stack = ResearchdItems.RESEARCH_PACK.toStack();
         stack.set(ResearchdDataComponents.RESEARCH_PACK, new ResearchPackComponent(Optional.of(key)));
         return stack;
@@ -68,8 +68,8 @@ public record SimpleResearchPack(int color, int sorting_value, Optional<Resource
             return this;
         }
 
-        public SimpleResearchPack build() {
-            return new SimpleResearchPack(this.color, this.sorting_value, java.util.Optional.ofNullable(this.customTexture));
+        public ResearchPack build() {
+            return new ResearchPack(this.color, this.sorting_value, java.util.Optional.ofNullable(this.customTexture));
         }
     }
 }

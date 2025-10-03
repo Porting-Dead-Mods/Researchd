@@ -2,8 +2,7 @@ package com.portingdeadmods.researchd.datagen;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
-import com.portingdeadmods.researchd.registries.ResearchdResearchPacks;
+import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceKey;
@@ -30,17 +29,6 @@ public final class EnUsLangProvider extends LanguageProvider {
 
         addBlock(RESEARCH_LAB_PART, "Research Lab Part");
         addBlock(RESEARCH_LAB_CONTROLLER, "Research Lab");
-
-//        addResearch(ResearchdResearches.COBBLESTONE, "Wonder what type of stone it is...");
-//        addResearch(ResearchdResearches.OVERWORLD_PACK, "The start of something");
-//        addResearch(ResearchdResearches.NETHER, "From below...");
-//        addResearch(ResearchdResearches.THE_END, "The start... of something?");
-//        addResearch(ResearchdResearches.BEACON, "The beam looks funny");
-//        addResearch(ResearchdResearches.END_CRYSTAL, "If you look at it, it spins...");
-
-        addResearchPack(ResearchdResearchPacks.END, "End Research Pack");
-        addResearchPack(ResearchdResearchPacks.NETHER, "Nether Research Pack");
-        addResearchPack(ResearchdResearchPacks.OVERWORLD, "Overworld Research Pack");
     }
 
     private void addResearch(ResourceKey<Research> key, String name) {
@@ -55,7 +43,12 @@ public final class EnUsLangProvider extends LanguageProvider {
         add("research_method." + key.getNamespace() + "." + key.getPath(), name);
     }
 
-    private void addResearchPack(ResourceKey<SimpleResearchPack> key, String name) {
+    private void addResearchPack(ResourceKey<ResearchPack> key, String name) {
         add("item.researchd.research_pack_" + key.location().toString().replace(':', '_'), name);
     }
+
+    private void addResearchPack(ResourceLocation key, String name) {
+        add("item.researchd.research_pack_" + key.toString().replace(':', '_'), name);
+    }
+
 }

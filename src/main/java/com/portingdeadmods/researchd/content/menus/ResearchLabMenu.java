@@ -3,7 +3,7 @@ package com.portingdeadmods.researchd.content.menus;
 import com.google.common.collect.ImmutableList;
 import com.portingdeadmods.portingdeadlibs.api.gui.menus.PDLAbstractContainerMenu;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
+import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.content.blockentities.ResearchLabControllerBE;
 import com.portingdeadmods.researchd.registries.ResearchdMenuTypes;
 import net.minecraft.network.FriendlyByteBuf;
@@ -18,7 +18,7 @@ import java.util.List;
 
 public class ResearchLabMenu extends PDLAbstractContainerMenu<ResearchLabControllerBE> {
     private final List<ItemStack> researchPackItems;
-    private final List<ResourceKey<SimpleResearchPack>> researchPacks;
+    private final List<ResourceKey<ResearchPack>> researchPacks;
 
 	public final ImmutableList<Integer> labSlotsX;
 	public final ImmutableList<Slot> labSlots;
@@ -32,7 +32,7 @@ public class ResearchLabMenu extends PDLAbstractContainerMenu<ResearchLabControl
 		Researchd.debug("Research Lab Menu", "Creating Research Lab Menu with ", Researchd.RESEARCH_PACK_COUNT, " slots.");
 
         this.researchPacks = this.getBlockEntity().researchPacks;
-        this.researchPackItems = researchPacks.stream().map(SimpleResearchPack::asStack).toList();
+        this.researchPackItems = researchPacks.stream().map(ResearchPack::asStack).toList();
 
 		int slotsX = 8;
         int slotsY = 18;
@@ -56,7 +56,7 @@ public class ResearchLabMenu extends PDLAbstractContainerMenu<ResearchLabControl
 		addPlayerHotbar(inv, 174);
 	}
 
-    public List<ResourceKey<SimpleResearchPack>> getResearchPacks() {
+    public List<ResourceKey<ResearchPack>> getResearchPacks() {
         return researchPacks;
     }
 

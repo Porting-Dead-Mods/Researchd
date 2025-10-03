@@ -4,9 +4,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
-import com.portingdeadmods.researchd.cache.CommonResearchCache;
-import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
-import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.utils.ResearchdCodecUtils;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
@@ -67,13 +64,7 @@ public record ResearchTeamMap(Map<UUID, SimpleResearchTeam> researchTeams) {
     public static void onSync(Player player) {
         if (player.level().isClientSide) {
             ResearchHelperClient.refreshResearches(player);
-            CommonResearchCache.initialize(player.level());
-            ResearchHelperClient.initIconRenderers(player.level());
-            ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level());
-            for (SimpleResearchTeam team : data.researchTeams().values()) {
-                ClientResearchTeamHelper.resolveInstances(team);
-            }
-            ClientResearchTeamHelper.refreshResearchScreenData();
+            //CommonResearchCache.initialize(player.level());
         } else {
             ResearchHelperCommon.refreshResearches((ServerPlayer) player);
         }

@@ -3,7 +3,7 @@ package com.portingdeadmods.researchd.events;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
-import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
+import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
@@ -81,10 +81,10 @@ public final class ResearchdClientEvents {
 	public static void onClientPlayerLoggingIn(ClientPlayerNetworkEvent.LoggingIn event) {
 		LocalPlayer player = event.getPlayer();
 		RegistryAccess registryAccess = player.registryAccess();
-		HolderLookup.RegistryLookup<SimpleResearchPack> packs = registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY);
+		HolderLookup.RegistryLookup<ResearchPack> packs = registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY);
 
 		if (Researchd.RESEARCH_PACKS.isEmpty()) {
-			Researchd.RESEARCH_PACKS.addAll(packs.listElements().map(Holder.Reference::value).sorted(Comparator.comparingInt(SimpleResearchPack::sorting_value)).toList());
+			Researchd.RESEARCH_PACKS.addAll(packs.listElements().map(Holder.Reference::value).sorted(Comparator.comparingInt(ResearchPack::sorting_value)).toList());
 			Researchd.debug("Researchd Constants Client", "Initialized research packs: ", Researchd.RESEARCH_PACKS, "");
 		}
 

@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.compat.kubejs;
 
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
-import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
+import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
@@ -24,12 +24,12 @@ public class ResearchMethodHelper {
     }
     
     public static ResearchMethod consumePack(String packId, int count) {
-        ResourceKey<SimpleResearchPack> key = ResourceKey.create(ResearchdRegistries.RESEARCH_PACK_KEY, ResourceLocation.parse(packId));
+        ResourceKey<ResearchPack> key = ResourceKey.create(ResearchdRegistries.RESEARCH_PACK_KEY, ResourceLocation.parse(packId));
         return new ConsumePackResearchMethod(List.of(key), count, 10);
     }
 
     public static ResearchMethod consumePack(String packId, int count, int duration) {
-        ResourceKey<SimpleResearchPack> key = ResourceKey.create(ResearchdRegistries.RESEARCH_PACK_KEY, ResourceLocation.parse(packId));
+        ResourceKey<ResearchPack> key = ResourceKey.create(ResearchdRegistries.RESEARCH_PACK_KEY, ResourceLocation.parse(packId));
         return new ConsumePackResearchMethod(List.of(key), count, duration);
     }
     

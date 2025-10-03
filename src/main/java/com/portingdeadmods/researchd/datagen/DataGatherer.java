@@ -18,7 +18,6 @@ public class DataGatherer {
         PackOutput output = generator.getPackOutput();
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
 
-        generator.addProvider(event.includeServer(), new DatapackRegistryProvider(output, lookupProvider));
         generator.addProvider(event.includeServer(), new RecipesProvider(output, lookupProvider));
         generator.addProvider(event.includeClient(), new EnUsLangProvider(output));
         generator.addProvider(event.includeClient(), new BlockModelProvider(output, event.getExistingFileHelper()));

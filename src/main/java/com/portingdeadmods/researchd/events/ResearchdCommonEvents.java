@@ -4,7 +4,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethodProgress;
-import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
+import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.TeamMember;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
@@ -17,7 +17,6 @@ import com.portingdeadmods.researchd.networking.research.ResearchFinishedPayload
 import com.portingdeadmods.researchd.networking.research.ResearchMethodProgressSyncPayload;
 import com.portingdeadmods.researchd.registries.ResearchdCommands;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
-import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
@@ -138,10 +137,10 @@ public final class ResearchdCommonEvents {
     public static void onServerAboutToStart(ServerAboutToStartEvent event) {
         MinecraftServer server = event.getServer();
         RegistryAccess registryAccess = server.registryAccess();
-        HolderLookup.RegistryLookup<SimpleResearchPack> packs = registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY);
+        HolderLookup.RegistryLookup<ResearchPack> packs = registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY);
 
         if (!Researchd.RESEARCH_PACKS.isEmpty()) {
-            Researchd.RESEARCH_PACKS.addAll(packs.listElements().map(Holder.Reference::value).sorted(Comparator.comparingInt(SimpleResearchPack::sorting_value)).toList());
+            Researchd.RESEARCH_PACKS.addAll(packs.listElements().map(Holder.Reference::value).sorted(Comparator.comparingInt(ResearchPack::sorting_value)).toList());
             Researchd.debug("Researchd Constants Server", "Initialized research packs.", Researchd.RESEARCH_PACKS, "");
         }
 
@@ -160,13 +159,7 @@ public final class ResearchdCommonEvents {
     public static void onWorldLoad(LevelEvent.Load event) {
         if (!event.getLevel().isClientSide()) {
             // Initialize the research cache
-            CommonResearchCache.initialize(event.getLevel());
-
-            ResearchTeamHelper.resolveGlobalResearches(ResearchdSavedData.TEAM_RESEARCH.get().getData((Level) event.getLevel()));
-
-            // Add new researches to teams in case new ones were added
-            // TODO: Remove old researches from teams in cases ones were removed
-            ResearchTeamHelper.initializeTeamResearches(event.getLevel());
+            // CommonResearchCache.initialize(event.getLevel());
         }
     }
 

@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.datagen;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.registries.ResearchdItems;
-import com.portingdeadmods.researchd.registries.ResearchdResearchPacks;
+import com.portingdeadmods.researchd.resources.contents.ResearchdResearchPacks;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -24,7 +24,7 @@ public class RecipesProvider extends RecipeProvider {
     protected void buildRecipes(@NotNull RecipeOutput pRecipeOutput) {
         ItemStack basePack = ResearchdItems.RESEARCH_PACK.asItem().getDefaultInstance();
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ResearchdResearchPacks.asStack(ResearchdResearchPacks.OVERWORLD))
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ResearchdResearchPacks.asStack(ResearchdResearchPacks.OVERWORLD_PACK_LOC))
                 .pattern(" A ")
                 .pattern("BGC")
                 .pattern(" D ")
@@ -36,7 +36,7 @@ public class RecipesProvider extends RecipeProvider {
                 .unlockedBy("has_item", has(Items.GLASS))
                 .save(pRecipeOutput, Researchd.rl("overworld_pack"));
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ResearchdResearchPacks.asStack(ResearchdResearchPacks.NETHER))
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ResearchdResearchPacks.asStack(ResearchdResearchPacks.NETHER_PACK_LOC))
                 .pattern(" A ")
                 .pattern("BGC")
                 .pattern(" D ")
@@ -48,7 +48,7 @@ public class RecipesProvider extends RecipeProvider {
                 .unlockedBy("has_item", has(Items.NETHERRACK))
                 .save(pRecipeOutput, Researchd.rl("nether_pack"));
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ResearchdResearchPacks.asStack(ResearchdResearchPacks.END))
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ResearchdResearchPacks.asStack(ResearchdResearchPacks.END_PACK_LOC))
                 .pattern(" A ")
                 .pattern("BGC")
                 .pattern(" D ")

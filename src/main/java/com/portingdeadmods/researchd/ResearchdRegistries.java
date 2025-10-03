@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd;
 
 import com.portingdeadmods.researchd.api.ValueEffect;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.packs.SimpleResearchPack;
+import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectSerializer;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchSerializer;
@@ -13,7 +13,7 @@ import net.neoforged.neoforge.registries.RegistryBuilder;
 public final class ResearchdRegistries {
 	public static final ResourceKey<Registry<Research>> RESEARCH_KEY =
 			ResourceKey.createRegistryKey(Researchd.rl("research"));
-	public static final ResourceKey<Registry<SimpleResearchPack>> RESEARCH_PACK_KEY =
+	public static final ResourceKey<Registry<ResearchPack>> RESEARCH_PACK_KEY =
 			ResourceKey.createRegistryKey(Researchd.rl("research_pack"));
 
 	public static final ResourceKey<Registry<ResearchSerializer<?>>> RESEARCH_SERIALIZER_KEY =

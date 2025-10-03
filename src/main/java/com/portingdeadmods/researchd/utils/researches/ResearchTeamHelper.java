@@ -18,6 +18,7 @@ import com.portingdeadmods.researchd.networking.team.RefreshResearchesPayload;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import com.portingdeadmods.researchd.utils.PlayerUtils;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -27,7 +28,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
@@ -409,6 +409,20 @@ public final class ResearchTeamHelper {
         return ret;
     }
 
+    public static void cleanupTeamResearches(ResearchTeamMap teamMap, HolderLookup.Provider lookup) {
+        for (SimpleResearchTeam team : teamMap.researchTeams().values()) {
+            Map<ResourceKey<Research>, ResearchInstance> researches = team.getResearches();
+            Map<ResourceKey<Research>, ResearchInstance> newResearches = new HashMap<>();
+            for (Map.Entry<ResourceKey<Research>, ResearchInstance> entry : researches.entrySet()) {
+                if (lookup.holder(entry.getKey()).isPresent()) {
+                    newResearches.put(entry.getKey(), entry.getValue());
+                }
+            }
+            researches.clear();
+            researches.putAll(newResearches);
+        }
+    }
+
     public enum HelpPage {
         TEAM,
     }
@@ -448,11 +462,8 @@ public final class ResearchTeamHelper {
         return msgs.get((int) Math.floor(Math.random() * msgs.size()));
     }
 
-    public static void initializeTeamResearches(LevelAccessor level) {
-        ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData((Level) level);
-        if (data == null) return;
-
-        for (SimpleResearchTeam team : data.researchTeams().values()) {
+    public static void initializeTeamResearches(ResearchTeamMap teamMap, HolderLookup.Provider lookup) {
+        for (SimpleResearchTeam team : teamMap.researchTeams().values()) {
             Map<ResourceKey<Research>, ResearchInstance> researches = team.getResearches();
             Map<ResourceKey<Research>, ResearchMethodProgress<?>> progress = team.getResearchProgresses();
             Set<GlobalResearch> globalResearches = new HashSet<>(CommonResearchCache.GLOBAL_RESEARCHES.values());
@@ -460,16 +471,14 @@ public final class ResearchTeamHelper {
             for (GlobalResearch research : globalResearches) {
                 if (progress.containsKey(research.getResearchKey())) continue;
 
-                progress.put(research.getResearchKey(), ResearchMethodProgress.fromResearch(level.registryAccess(), research.getResearchKey()));
+                progress.put(research.getResearchKey(), ResearchMethodProgress.fromResearch(lookup, research.getResearchKey()));
             }
 
-            researches.values().stream().map(ResearchInstance::getResearch).toList().forEach(globalResearches::remove);
+            researches.values().stream().map(ResearchInstance::getResearch).forEach(globalResearches::remove);
             for (GlobalResearch globalResearch : globalResearches) {
                 researches.put(globalResearch.getResearchKey(), new ResearchInstance(globalResearch, ResearchStatus.LOCKED));
             }
         }
-        ResearchdSavedData.TEAM_RESEARCH.get().setData((ServerLevel) level, data);
-        ResearchdSavedData.TEAM_RESEARCH.get().sync((ServerLevel) level);
     }
 
     public static void resolveGlobalResearches(ResearchTeamMap researchTeamMap) {
