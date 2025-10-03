@@ -10,6 +10,7 @@ import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.ResearchTeamRole;
 import com.portingdeadmods.researchd.api.team.TeamMember;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
+import com.portingdeadmods.researchd.client.cache.AllPlayersCache;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.networking.team.*;
@@ -83,13 +84,7 @@ public class ClientResearchTeamHelper {
 
     public static List<TeamMember> getPlayersNotInTeam() {
         ResearchTeam team = getTeam();
-        List<UUID> uuids = ClientPlayerUtils.getPlayerUUIDs();
-        List<TeamMember> playersNotInTeam = new ArrayList<>();
-        for (UUID uuid : uuids.stream().filter(uuid -> !team.hasMember(uuid)).toList()) {
-            playersNotInTeam.add(new TeamMember(uuid, ResearchTeamRole.MODERATOR));
-        }
-
-        return playersNotInTeam;
+		return AllPlayersCache.getUUIDs().stream().filter(uuid -> !team.hasMember(uuid)).map(uuid -> new TeamMember(uuid, ResearchTeamRole.NOT_MEMBER)).toList();
     }
 
     public static void removeTeamMemberSynced(TeamMember memberProfile) {
