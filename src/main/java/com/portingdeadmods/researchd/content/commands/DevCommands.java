@@ -49,7 +49,7 @@ public class DevCommands {
                         .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, dimensionId))
                         .withHoverEvent(
                                 new HoverEvent(
-                                        net.minecraft.network.chat.HoverEvent.Action.SHOW_TEXT,
+                                        HoverEvent.Action.SHOW_TEXT,
                                         Component.literal("Click to copy dimension ID")))));
         return 1;
     }

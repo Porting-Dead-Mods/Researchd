@@ -58,4 +58,4 @@ ResearchdEvents.RESEARCH_PROGRESS.listen(event => {
 });
 ```
 
-The event handling is set up in `com.portingdeadmods.researchd.compat.KubeJSIntegration`.
+The event handling is set up in `com.portingdeadmods.researchd.compat.KubeJSCompat`.

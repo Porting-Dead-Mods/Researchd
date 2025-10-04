@@ -5,11 +5,17 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.compat.kubejs.event.ResearchCompletedKubeEvent;
 import com.portingdeadmods.researchd.compat.kubejs.event.ResearchProgressKubeEvent;
 import com.portingdeadmods.researchd.compat.kubejs.event.ResearchdEvents;
+import com.portingdeadmods.researchd.utils.Result;
+import dev.latvian.mods.kubejs.KubeJSPaths;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.fml.ModList;
 
-public class KubeJSIntegration {
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+public class KubeJSCompat {
     private static final String KUBEJS_MOD_ID = "kubejs";
     private static boolean kubeJSLoaded = false;
     private static boolean checked = false;
@@ -20,6 +26,37 @@ public class KubeJSIntegration {
             checked = true;
         }
         return kubeJSLoaded;
+    }
+
+    public static final String EXAMPLE_CODE = """
+            console.log("Researches :3")
+            """;
+
+    /**
+     * @return The path the file was created or Exception if it failed
+     */
+    public static Result<Path, Exception> createExample() {
+        Path directory = KubeJSPaths.SERVER_SCRIPTS;
+        try {
+            if (Files.exists(directory)) {
+                Path exampleFile = directory.resolve("research_examples.js");
+                if (Files.notExists(exampleFile)) {
+                    Files.writeString(exampleFile, EXAMPLE_CODE);
+                    return Result.ok(exampleFile);
+                } else {
+                    return Result.err(new Exception("File already exists"));
+                }
+            } else {
+                return Result.err(new Exception("KubeJS server_scripts directory doesn't exist"));
+            }
+        } catch (IOException e) {
+            Researchd.LOGGER.error("Failed to create KubeJS Examples", e);
+            return Result.err(new Exception("File creation failed"));
+        }
+    }
+
+    public static Path getServerScriptsDir() {
+        return KubeJSPaths.SERVER_SCRIPTS;
     }
 
     public static void fireResearchCompletedEvent(ServerPlayer player, ResourceKey<Research> research) {

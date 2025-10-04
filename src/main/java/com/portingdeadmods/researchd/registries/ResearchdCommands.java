@@ -4,6 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.portingdeadmods.researchd.content.commands.DebugCommands;
 import com.portingdeadmods.researchd.content.commands.DevCommands;
+import com.portingdeadmods.researchd.content.commands.ExampleCommands;
 import com.portingdeadmods.researchd.content.commands.TeamCommands;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -22,7 +23,8 @@ public final class ResearchdCommands {
 		List<LiteralCommandNode<CommandSourceStack>> subCommands = List.of(
 				DebugCommands.build(),
 				DevCommands.build(context),
-                TeamCommands.build()
+                TeamCommands.build(),
+                ExampleCommands.build()
 		);
 
         for (LiteralCommandNode<CommandSourceStack> root : rootCommands) {

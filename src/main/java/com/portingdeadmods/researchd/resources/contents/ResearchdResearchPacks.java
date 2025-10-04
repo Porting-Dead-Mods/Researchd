@@ -42,6 +42,12 @@ public class ResearchdResearchPacks implements ResearchdDatagenProvider<Research
                 .color(63, 36, 83));
     }
 
+    public void buildExampleDatapack() {
+        researchPack("test_pack", builder -> builder
+                .sortingValue(1)
+                .color(120, 150, 90));
+    }
+
 	protected ResourceKey<ResearchPack> researchPack(String name, UnaryOperator<ResearchPack.Builder> builder) {
 		ResourceKey<ResearchPack> key = key(name);
 		researchPacks.put(key, builder.apply(ResearchPack.builder()).build());

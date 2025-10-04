@@ -87,8 +87,8 @@ public record ResearchPack(int color, int sortingValue, Optional<ResourceLocatio
          * A value to dictate where in the progression the research pack should be. <br>
          * Lower = earlier, higher = later
          */
-        public Builder sortingValue(int sorting_value) {
-            this.sorting_value = sorting_value;
+        public Builder sortingValue(int sortingValue) {
+            this.sorting_value = sortingValue;
             return this;
         }
 

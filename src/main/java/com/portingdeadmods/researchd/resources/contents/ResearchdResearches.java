@@ -95,11 +95,24 @@ public class ResearchdResearches implements ResearchdDatagenProvider<Research> {
                 .method(
                         consumePack(250, 200, pack(ResearchdResearchPacks.OVERWORLD_PACK_LOC), pack(ResearchdResearchPacks.NETHER_PACK_LOC), pack(ResearchdResearchPacks.END_PACK_LOC))
                 )
-                .effect(
-                        and(
+                .effect(and(
                                 unlockRecipe(mcLoc("beacon"))
-                        )
-                ));
+                )));
+    }
+
+    public void buildExampleDatapack() {
+        simpleResearch("wood", builder -> builder
+                .icon(Items.OAK_LOG)
+                .method(and(consumeItem(Items.DIRT, 8), consumeItem(Items.WHEAT_SEEDS, 1)))
+                .effect(unlockRecipe(mcLoc("oak_planks"))));
+        simpleResearch("iron", builder -> builder
+                .icon(Items.IRON_INGOT)
+                .method(or(consumeItem(Items.FURNACE, 1), consumeItem(Items.COBBLESTONE, 8)))
+                .effect(unlockRecipe(mcLoc("iron_pickaxe"))));
+        simpleResearch("nether_dim", builder -> builder
+                .icon(Items.NETHERRACK)
+                .method(consumePack(50, 200, pack(modLoc("test_pack"))))
+                .effect(and(unlockRecipe(mcLoc("netherite_ingot")), unlockRecipe(mcLoc("gold_block")))));
     }
 
     @Override
@@ -113,6 +126,10 @@ public class ResearchdResearches implements ResearchdDatagenProvider<Research> {
 
     protected @NotNull ResourceLocation modLoc(String path) {
         return ResourceLocation.fromNamespaceAndPath(this.modid, path);
+    }
+
+    protected @NotNull ResourceLocation loc(String namespace, String path) {
+        return ResourceLocation.fromNamespaceAndPath(namespace, path);
     }
 
     protected @NotNull DimensionUnlockEffect unlockDimension(ResourceLocation location, ResourceLocation sprite) {

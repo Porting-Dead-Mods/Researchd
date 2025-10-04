@@ -7,7 +7,7 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.team.ResearchQueue;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
-import com.portingdeadmods.researchd.compat.KubeJSIntegration;
+import com.portingdeadmods.researchd.compat.KubeJSCompat;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
@@ -57,7 +57,7 @@ public record ResearchFinishedPayload(ResourceKey<Research> key, int timeStamp) 
             queue.remove(0, false);
 
             if (player instanceof ServerPlayer serverPlayer) {
-                KubeJSIntegration.fireResearchCompletedEvent(serverPlayer, this.key());
+                KubeJSCompat.fireResearchCompletedEvent(serverPlayer, this.key());
             }
 
             player.sendSystemMessage(

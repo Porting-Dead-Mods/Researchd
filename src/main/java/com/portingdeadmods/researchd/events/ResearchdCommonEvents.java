@@ -6,7 +6,7 @@ import com.portingdeadmods.researchd.api.research.methods.ResearchMethodProgress
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.TeamMember;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
-import com.portingdeadmods.researchd.compat.KubeJSIntegration;
+import com.portingdeadmods.researchd.compat.KubeJSCompat;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
@@ -95,7 +95,7 @@ public final class ResearchdCommonEvents {
 
                                 PacketDistributor.sendToPlayer(player, new ResearchFinishedPayload(research, (int) server.overworld().getDayTime() * 50));
 
-                                KubeJSIntegration.fireResearchCompletedEvent(player, research);
+                                KubeJSCompat.fireResearchCompletedEvent(player, research);
 
                                 Researchd.debug("Researching", "Applying research effects for Research: " + team.getCurrentResearch() + " to player: " + player.getName().getString());
                                 currentResearch.researchEffect().onUnlock(level, player, team.getCurrentResearch());
