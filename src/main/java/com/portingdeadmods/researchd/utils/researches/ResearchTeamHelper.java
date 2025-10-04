@@ -55,7 +55,7 @@ public final class ResearchTeamHelper {
      */
     public static @NotNull ResearchTeam getTeamByMember(Level level, UUID uuid) {
         ResearchTeamMap map = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
-        return map.getTeamByMemberOrThrow(uuid, level);
+        return map.getTeamByMemberOrThrow(uuid);
     }
 
     /**
@@ -107,8 +107,8 @@ public final class ResearchTeamHelper {
     public static boolean arePlayersSameTeam(Level level, UUID uuid1, UUID uuid2) {
         ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
 
-        ResearchTeam team1 = savedData.getTeamByMemberOrThrow(uuid1, level);
-        ResearchTeam team2 = savedData.getTeamByMemberOrThrow(uuid2, level);
+        ResearchTeam team1 = savedData.getTeamByMemberOrThrow(uuid1);
+        ResearchTeam team2 = savedData.getTeamByMemberOrThrow(uuid2);
 
         return team1.getId().equals(team2.getId());
     }

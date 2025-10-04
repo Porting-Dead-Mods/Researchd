@@ -24,6 +24,13 @@ public class AllPlayersCache {
         SKINS.put(uuid, skin);
     }
 
+	public static void add(UUID uuid, String name) {
+		if (!UUIDS.contains(uuid)) {
+			UUIDS.add(uuid);
+		}
+		NAMES.put(uuid, name);
+	}
+
     public static String getName(UUID uuid) {
         String name = NAMES.get(uuid);
         if (name == null) name = "!Unknown Player!";
@@ -34,7 +41,7 @@ public class AllPlayersCache {
         PlayerSkin skin = SKINS.get(uuid);
         if (skin == null) {
             skin = DefaultPlayerSkin.get(uuid);
-            Researchd.LOGGER.error("Skin not found in cache for UUID: {}, using default skin.", uuid);
+            Researchd.LOGGER.error("Skin not found in cache for UUID: {}, using default skin. Probably fetched on serverside.", uuid);
         };
         return skin;
     }

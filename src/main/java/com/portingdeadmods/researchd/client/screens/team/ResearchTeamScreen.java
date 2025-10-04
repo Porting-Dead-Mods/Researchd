@@ -140,12 +140,7 @@ public class ResearchTeamScreen extends BaseScreen {
         inviteWidget.visitWidgets(this::addRenderableOnly);
 
 		// Call visible logic on init asw since it flickers for 1 frame on screen creation
-	    if (!Minecraft.getInstance().isSingleplayer()) {
-		    if (Minecraft.getInstance().getSingleplayerServer() != null)
-			    this.inviteButton.active = Minecraft.getInstance().getSingleplayerServer().getPlayerCount() > 1;
-		    else if (Minecraft.getInstance().getConnection() != null)
-			    this.inviteButton.active = Minecraft.getInstance().getConnection().getOnlinePlayers().size() > 1;
-	    }
+	    this.inviteButton.active = !ClientResearchTeamHelper.getPlayersNotInTeam().isEmpty();
 	    this.inviteButton.active = this.inviteButton.active && (ClientResearchTeamHelper.getPlayerPermissionLevel(this.player) >= 1);
     }
 
@@ -186,17 +181,7 @@ public class ResearchTeamScreen extends BaseScreen {
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-	    this.inviteButton.active = false;
-		int count;
-	    if (!Minecraft.getInstance().isSingleplayer()) {
-		    if (Minecraft.getInstance().getSingleplayerServer() != null) {
-			    count = Minecraft.getInstance().getSingleplayerServer().getPlayerCount();
-			    this.inviteButton.active = count > 1;
-		    } else if (Minecraft.getInstance().getConnection() != null) {
-			    count = Minecraft.getInstance().getConnection().getOnlinePlayers().size();
-			    this.inviteButton.active = count > 1;
-		    }
-	    }
+	    this.inviteButton.active = !ClientResearchTeamHelper.getPlayersNotInTeam().isEmpty();
 		this.inviteButton.active = this.inviteButton.active && (ClientResearchTeamHelper.getPlayerPermissionLevel(this.player) >= 1);
 	}
 

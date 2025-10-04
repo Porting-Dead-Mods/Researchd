@@ -8,6 +8,7 @@ import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.TeamMember;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
+import com.portingdeadmods.researchd.client.cache.AllPlayersCache;
 import com.portingdeadmods.researchd.compat.KubeJSIntegration;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
@@ -24,6 +25,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.GameProfileCache;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -153,6 +155,15 @@ public final class ResearchdCommonEvents {
             Researchd.RESEARCH_PACK_REGISTRY.initialize(registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY));
             Researchd.debug("Researchd Constants Server", "Initialized research pack registry LazyFinal. ");
         }
+
+		// TODO: Add to PDL
+	    GameProfileCache cache;
+	    cache = server.getProfileCache();
+	    if (cache != null) {
+		    for (GameProfileCache.GameProfileInfo profile : cache.profilesByName.values()) {
+			    AllPlayersCache.add(profile.getProfile().getId(), profile.getProfile().getName());
+		    }
+	    }
     }
 
     @SubscribeEvent
@@ -184,6 +195,7 @@ public final class ResearchdCommonEvents {
     @SubscribeEvent
     public static void onLoggingIn(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer sp) {
+			AllPlayersCache.add(sp.getGameProfile().getId(), sp.getGameProfile().getName());
             PacketDistributor.sendToAllPlayers(new ReceiveServerPlayers(List.of(sp.getGameProfile())));
         }
     }
