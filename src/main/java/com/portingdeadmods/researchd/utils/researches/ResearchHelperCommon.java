@@ -143,4 +143,8 @@ public final class ResearchHelperCommon {
     public static String getResearchCompletionTime(long teamCreationTime, long time) {
         return new TimeUtils.TimeDifference(teamCreationTime, time).getFormatted();
     }
+
+    public static ResearchPack getResearchPack(ResourceKey<ResearchPack> key, Level level) {
+        return ResearchdManagers.getResearchPacksManager(level).getLookup().get(key);
+    }
 }

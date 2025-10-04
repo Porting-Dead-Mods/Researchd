@@ -656,8 +656,11 @@ public class ResearchGraphWidget extends AbstractWidget {
                 this.setGraph(ResearchGraphCache.computeIfAbsent(node.getInstance().getKey()));
                 ClientResearchTeamHelper.refreshGraphData();
                 List<ResearchInstance> entries = this.researchScreen.getTechList().entries();
-                this.researchScreen.getSelectedResearchWidget().setSelectedResearch(entries.get(entries.indexOf(node.getInstance())));
-                return super.mouseClicked(mouseX, mouseY, button);
+                int index = entries.indexOf(node.getInstance());
+                if (index != -1) {
+                    this.researchScreen.getSelectedResearchWidget().setSelectedResearch(entries.get(index));
+                    return super.mouseClicked(mouseX, mouseY, button);
+                }
             }
         }
         return true;

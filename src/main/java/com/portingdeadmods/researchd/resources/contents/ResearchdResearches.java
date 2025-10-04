@@ -101,16 +101,18 @@ public class ResearchdResearches implements ResearchdDatagenProvider<Research> {
     }
 
     public void buildExampleDatapack() {
-        simpleResearch("wood", builder -> builder
+        ResourceKey<Research> wood = simpleResearch("wood", builder -> builder
                 .icon(Items.OAK_LOG)
                 .method(and(consumeItem(Items.DIRT, 8), consumeItem(Items.WHEAT_SEEDS, 1)))
                 .effect(unlockRecipe(mcLoc("oak_planks"))));
-        simpleResearch("iron", builder -> builder
+        ResourceKey<Research> iron = simpleResearch("iron", builder -> builder
                 .icon(Items.IRON_INGOT)
+                .parents(wood)
                 .method(or(consumeItem(Items.FURNACE, 1), consumeItem(Items.COBBLESTONE, 8)))
                 .effect(unlockRecipe(mcLoc("iron_pickaxe"))));
         simpleResearch("nether_dim", builder -> builder
                 .icon(Items.NETHERRACK)
+                .parents(iron)
                 .method(consumePack(50, 200, pack(modLoc("test_pack"))))
                 .effect(and(unlockRecipe(mcLoc("netherite_ingot")), unlockRecipe(mcLoc("gold_block")))));
     }

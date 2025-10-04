@@ -4,6 +4,7 @@ import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
 import com.portingdeadmods.researchd.api.research.ResearchIcon;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
+import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.client.ResearchdRenderTypes;
 import com.portingdeadmods.researchd.client.impl.ClientItemResearchIcon;
@@ -30,12 +31,13 @@ import com.portingdeadmods.researchd.impl.research.method.OrResearchMethod;
 import com.portingdeadmods.researchd.mixins.LevelRendererMixin;
 import com.portingdeadmods.researchd.registries.*;
 import com.portingdeadmods.researchd.utils.WidgetConstructor;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -110,8 +112,14 @@ public final class ResearchdClient {
     private void registerColorHandlers(RegisterColorHandlersEvent.Item event) {
         event.register((stack, layer) -> {
             ResearchPackComponent researchPackComponent = stack.get(ResearchdDataComponents.RESEARCH_PACK);
-            RegistryAccess access = Minecraft.getInstance().level.registryAccess();
-            return layer == 1 && researchPackComponent.researchPackKey().isPresent() ? access.holderOrThrow(researchPackComponent.researchPackKey().get()).value().color() : -1;
+            ClientLevel level = Minecraft.getInstance().level;
+            if (layer == 1 && researchPackComponent.researchPackKey().isPresent()) {
+                ResearchPack researchPack = ResearchHelperCommon.getResearchPack(researchPackComponent.researchPackKey().get(), level);
+                if (researchPack != null) {
+                    return researchPack.color();
+                }
+            }
+            return -1;
         }, ResearchdItems.RESEARCH_PACK);
     }
 

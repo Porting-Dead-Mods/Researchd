@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.networking.research;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
+import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
@@ -35,6 +36,7 @@ public record ResearchCacheReloadPayload() implements CustomPacketPayload {
                     ClientResearchTeamHelper.resolveInstances(team);
                 }
             }
+            ResearchGraphCache.clearCache();
             ClientResearchTeamHelper.refreshResearchScreenData();
         }).exceptionally(err -> {
            Researchd.LOGGER.error("Encountered error while handling ResearchCacheReloadPayload", err);
