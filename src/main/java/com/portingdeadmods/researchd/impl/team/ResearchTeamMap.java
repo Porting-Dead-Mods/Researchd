@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
+import com.portingdeadmods.researchd.client.cache.AllPlayersCache;
 import com.portingdeadmods.researchd.utils.ResearchdCodecUtils;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -11,7 +12,6 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.EntityGetter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,11 +45,11 @@ public record ResearchTeamMap(Map<UUID, SimpleResearchTeam> researchTeams) {
         return null;
     }
 
-    public @NotNull ResearchTeam getTeamByMemberOrThrow(UUID memberUuid, @Nullable EntityGetter levelAccess) {
+    public @NotNull ResearchTeam getTeamByMemberOrThrow(UUID memberUuid) {
         for (ResearchTeam team : this.researchTeams.values()) {
             if (team.hasMember(memberUuid)) return team;
         }
-        throw new IllegalStateException("Player %s not in a team".formatted(levelAccess != null ? levelAccess.getPlayerByUUID(memberUuid).getName() : memberUuid));
+        throw new IllegalStateException("Player %s not in a team".formatted(AllPlayersCache.getName(memberUuid).equals("!Unknown Player!") ? memberUuid : AllPlayersCache.getName(memberUuid)));
     }
 
     public SimpleResearchTeam getTeamByPlayer(Player player) {
