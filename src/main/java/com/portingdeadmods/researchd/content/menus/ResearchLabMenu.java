@@ -6,6 +6,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.content.blockentities.ResearchLabControllerBE;
 import com.portingdeadmods.researchd.registries.ResearchdMenuTypes;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Inventory;
@@ -29,7 +30,7 @@ public class ResearchLabMenu extends PDLAbstractContainerMenu<ResearchLabControl
 
 	public ResearchLabMenu(int containerId, @NotNull Inventory inv, @NotNull ResearchLabControllerBE blockEntity) {
 		super(ResearchdMenuTypes.RESEARCH_LAB_MENU.get(), containerId, inv, blockEntity);
-		Researchd.debug("Research Lab Menu", "Creating Research Lab Menu with ", Researchd.RESEARCH_PACK_COUNT, " slots.");
+		Researchd.debug("Research Lab Menu", "Creating Research Lab Menu with ", ResearchHelperCommon.getResearchPacks(inv.player.level()).size(), " slots.");
 
         this.researchPacks = this.getBlockEntity().researchPacks;
         this.researchPackItems = researchPacks.stream().map(ResearchPack::asStack).toList();
@@ -66,7 +67,7 @@ public class ResearchLabMenu extends PDLAbstractContainerMenu<ResearchLabControl
 
     @Override
 	protected int getMergeableSlotCount() {
-		return Researchd.RESEARCH_PACK_COUNT.getOrThrow(); // At menu creation time the LazyFinal should be initialized, so safe getOrThrow()
+		return ResearchHelperCommon.getResearchPacks(inv.player.level()).size(); // At menu creation time the LazyFinal should be initialized, so safe getOrThrow()
 	}
 
 	// TODO: Move to PDL

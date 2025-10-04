@@ -2,7 +2,6 @@ package com.portingdeadmods.researchd.events;
 
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
@@ -11,13 +10,13 @@ import com.portingdeadmods.researchd.client.screens.team.ResearchTeamScreen;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
 import com.portingdeadmods.researchd.networking.cache.AskServerPlayers;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -27,7 +26,7 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-import java.util.Comparator;
+import java.util.Map;
 
 @EventBusSubscriber(modid = Researchd.MODID, value = Dist.CLIENT)
 public final class ResearchdClientEvents {
@@ -81,22 +80,22 @@ public final class ResearchdClientEvents {
 	public static void onClientPlayerLoggingIn(ClientPlayerNetworkEvent.LoggingIn event) {
 		LocalPlayer player = event.getPlayer();
 		RegistryAccess registryAccess = player.registryAccess();
-		HolderLookup.RegistryLookup<ResearchPack> packs = registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY);
+		Map<ResourceKey<ResearchPack>, ResearchPack> packs = ResearchHelperCommon.getResearchPacks(player.level());
 
-		if (Researchd.RESEARCH_PACKS.isEmpty()) {
-			Researchd.RESEARCH_PACKS.addAll(packs.listElements().map(Holder.Reference::value).sorted(Comparator.comparingInt(ResearchPack::sorting_value)).toList());
-			Researchd.debug("Researchd Constants Client", "Initialized research packs: ", Researchd.RESEARCH_PACKS, "");
-		}
-
-		if (!Researchd.RESEARCH_PACK_COUNT.isInitialized()) {
-			Researchd.RESEARCH_PACK_COUNT.initialize((int) packs.listElements().count());
-			Researchd.debug("Researchd Constants Client", "Initialized research pack count: ", Researchd.RESEARCH_PACK_COUNT.get());
-		}
-
-		if (!Researchd.RESEARCH_PACK_REGISTRY.isInitialized()) {
-			Researchd.RESEARCH_PACK_REGISTRY.initialize(registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY));
-			Researchd.debug("Researchd Constants Client", "Initialized research pack registry.");
-		}
+//		if (Researchd.RESEARCH_PACKS.isEmpty()) {
+//			Researchd.RESEARCH_PACKS.addAll(packs.values().stream().sorted(Comparator.comparingInt(ResearchPack::sortingValue)).toList());
+//			Researchd.debug("Researchd Constants Client", "Initialized research packs: ", Researchd.RESEARCH_PACKS, "");
+//		}
+//
+//		if (!Researchd.RESEARCH_PACK_COUNT.isInitialized()) {
+//			Researchd.RESEARCH_PACK_COUNT.initialize(packs.size());
+//			Researchd.debug("Researchd Constants Client", "Initialized research pack count: ", Researchd.RESEARCH_PACK_COUNT.get());
+//		}
+//
+//		if (!Researchd.RESEARCH_PACK_REGISTRY.isInitialized()) {
+//			Researchd.RESEARCH_PACK_REGISTRY.initialize(registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY));
+//			Researchd.debug("Researchd Constants Client", "Initialized research pack registry.");
+//		}
 
 		PacketDistributor.sendToServer(AskServerPlayers.UNIT);
 	}

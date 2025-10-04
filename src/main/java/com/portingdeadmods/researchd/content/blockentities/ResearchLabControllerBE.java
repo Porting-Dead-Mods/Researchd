@@ -5,6 +5,7 @@ import com.portingdeadmods.portingdeadlibs.api.utils.IOAction;
 import com.portingdeadmods.portingdeadlibs.utils.LazyFinal;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethodProgress;
@@ -25,6 +26,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -41,6 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ResearchLabControllerBE extends ContainerBlockEntity implements MenuProvider {
@@ -52,17 +55,22 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
     public ResearchLabControllerBE(BlockPos pos, BlockState blockState) {
         super(ResearchdBlockEntityTypes.RESEARCH_LAB_CONTROLLER.get(), pos, blockState);
         this.partPos = LazyFinal.create();
-        this.researchPackUsage = Researchd.RESEARCH_PACK_REGISTRY.getOrThrow().listElementIds()
-                .collect(Collectors.toConcurrentMap(key -> key, k -> 0f));
         this.currentResearchDuration = -1;
-        addItemHandler(Researchd.RESEARCH_PACK_COUNT.getOrThrow(), this::isItemValid);
+        addItemHandler(0, this::isItemValid);
     }
 
     @Override
     public void setLevel(Level level) {
         super.setLevel(level);
 
-        this.researchPacks = ResearchHelperCommon.getResearchPacks(level.registryAccess());
+        this.researchPacks = ResearchHelperCommon.getResearchPackKeys(level);
+        this.addItemHandler(this.researchPacks.size(), this::isItemValid);
+        if (this.researchPackUsage.isEmpty()) {
+            this.researchPackUsage = ResearchHelperCommon.getResearchPacks(level).keySet().stream()
+                    .collect(Collectors.toConcurrentMap(Function.identity(), $ -> 0f));
+        } else {
+            // TODO: add new packs to pack usage
+        }
     }
 
     private boolean isItemValid(int slot, ItemStack stack) {
@@ -132,20 +140,20 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
     @Override
     protected void saveData(CompoundTag tag, HolderLookup.Provider registries) {
         partPos.ifInitialized(pos -> {
-            tag.putLongArray("PartPositions", pos.stream().mapToLong(BlockPos::asLong).toArray());
+            tag.putLongArray("part_positions", pos.stream().mapToLong(BlockPos::asLong).toArray());
         });
 
+        CompoundTag researchPackUsageTag = new CompoundTag();
         for (Map.Entry<ResourceKey<ResearchPack>, Float> entry : researchPackUsage.entrySet()) {
-            ResourceKey<ResearchPack> key = entry.getKey();
-            float usage = entry.getValue();
-            tag.putFloat(key.location().toString(), usage);
+            researchPackUsageTag.putFloat(entry.getKey().location().toString(), entry.getValue());
         }
+        tag.put("research_pack_usage", researchPackUsageTag);
     }
 
     @Override
     protected void loadData(CompoundTag tag, HolderLookup.Provider registries) {
-        if (tag.contains("PartPositions")) {
-            long[] partPositions = tag.getLongArray("PartPositions");
+        if (tag.contains("part_positions")) {
+            long[] partPositions = tag.getLongArray("part_positions");
             List<BlockPos> positions = new UniqueArray<>();
             for (long posLong : partPositions) {
                 BlockPos pos = BlockPos.of(posLong);
@@ -155,13 +163,9 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
             this.setPartPositions(positions);
         }
 
-        for (ResourceKey<ResearchPack> key : Researchd.RESEARCH_PACK_REGISTRY.getOrThrow().listElementIds().toList()) {
-            if (tag.contains(key.location().toString())) {
-                float usage = tag.getFloat(key.location().toString());
-                researchPackUsage.put(key, usage);
-            } else {
-                researchPackUsage.put(key, 0f); // Default to 0 if not present
-            }
+        CompoundTag researchPackUsageTag = tag.getCompound("research_pack_usage");
+        for (String key : researchPackUsageTag.getAllKeys()) {
+            this.researchPackUsage.put(ResourceKey.create(ResearchdRegistries.RESEARCH_PACK_KEY, ResourceLocation.parse(key)), researchPackUsageTag.getFloat(key));
         }
     }
 

@@ -47,7 +47,7 @@ public class RecentResearchesList extends ContainerWidget<ResearchInstance> {
         Level level = minecraft.level;
         if (level == null) return;
 
-        Component researchName = research.getDisplayName(level.registryAccess());
+        Component researchName = research.getDisplayName(level);
         guiGraphics.drawString(minecraft.font, researchName, left + 32, top + 4, 0xFFFFFF);
 
         UUID researchedByUUID = research.getResearchedPlayer();

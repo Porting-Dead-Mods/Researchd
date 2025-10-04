@@ -19,7 +19,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.MultiLineTextWidget;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -68,11 +67,11 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
         int offsetY = -(this.scrollOffset);
 
         if (this.selectedInstance != null) {
-            Font font = Minecraft.getInstance().font;
+            Minecraft mc = Minecraft.getInstance();
+            Font font = mc.font;
             int padding = 3;
 
-            var registryAccess = Minecraft.getInstance().level.registryAccess();
-            guiGraphics.drawString(font, this.selectedInstance.getDisplayName(registryAccess), 11, 49, -1);
+            guiGraphics.drawString(font, this.selectedInstance.getDisplayName(mc.level), 11, 49, -1);
             renderResearchPanel(guiGraphics, this.selectedInstance, 12, 60, mouseX, mouseY, 2, false);
 
             int startY = 60;
@@ -187,12 +186,12 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
 
             // only call after first setting selected research
 
-            Font font = Minecraft.getInstance().font;
+            Minecraft mc = Minecraft.getInstance();
+            Font font = mc.font;
             int padding = 3;
 
             this.scrollOffset = 0;
-            RegistryAccess registryAccess = Minecraft.getInstance().level.registryAccess();
-            Research research = this.selectedInstance.lookup(registryAccess);
+            Research research = this.selectedInstance.lookup(mc.level);
             ResearchMethod method = research.researchMethod();
             WidgetConstructor<? extends ResearchMethod> methodWidgetConstructor = ResearchdClient.RESEARCH_METHOD_WIDGETS.get(method.id());
             if (methodWidgetConstructor != null) {

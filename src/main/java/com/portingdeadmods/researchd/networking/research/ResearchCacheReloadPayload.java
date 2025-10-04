@@ -26,7 +26,7 @@ public record ResearchCacheReloadPayload() implements CustomPacketPayload {
     public void handle(IPayloadContext context) {
         context.enqueueWork(() -> {
             Level level = context.player().level();
-            CommonResearchCache.initialize(level.registryAccess());
+            CommonResearchCache.initialize(level);
 
             ResearchHelperClient.initIconRenderers(level);
             ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);

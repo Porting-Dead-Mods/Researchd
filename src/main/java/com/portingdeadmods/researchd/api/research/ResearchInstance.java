@@ -4,14 +4,14 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -74,8 +74,8 @@ public final class ResearchInstance {
         return Utils.registryTranslation(this.getKey());
     }
 
-    public Component getDisplayName(HolderLookup.Provider access) {
-        Research r = this.research.getResearch(access);
+    public Component getDisplayName(Level level) {
+        Research r = this.research.getResearch(level);
         if (r instanceof SimpleResearch simple) {
             if (simple.literalName().isPresent()) {
                 return Component.literal(simple.literalName().get());
@@ -84,8 +84,8 @@ public final class ResearchInstance {
         return Utils.registryTranslation(this.getKey());
     }
 
-    public Component getDescription(HolderLookup.Provider access) {
-        Research r = this.research.getResearch(access);
+    public Component getDescription(Level level) {
+        Research r = this.research.getResearch(level);
         if (r instanceof SimpleResearch simple) {
             if (simple.literalDescription().isPresent()) {
                 return Component.literal(simple.literalDescription().get());
@@ -130,8 +130,8 @@ public final class ResearchInstance {
         return this;
     }
 
-    public Research lookup(HolderLookup.Provider lookupProvider) {
-        return lookupProvider.holder(this.research.getResearchKey()).map(Holder.Reference::value).orElse(null);
+    public Research lookup(Level level) {
+        return ResearchHelperCommon.getResearch(this.research.getResearchKey(), level);
     }
 
     public Set<GlobalResearch> getChildren() {

@@ -10,8 +10,12 @@ import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchSerializer;
 import com.portingdeadmods.researchd.impl.research.effect.EmptyResearchEffect;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
+import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
 
 import java.util.List;
 import java.util.Objects;
@@ -60,6 +64,23 @@ public record SimpleResearch(ItemResearchIcon researchIcon, ResearchMethod resea
                 Codec.STRING.optionalFieldOf("literal_name").forGetter(SimpleResearch::literalName),
                 Codec.STRING.optionalFieldOf("literal_description").forGetter(SimpleResearch::literalDescription)
         ).apply(instance, SimpleResearch::new));
+        public static final StreamCodec<? super RegistryFriendlyByteBuf, SimpleResearch> STREAM_CODEC = NeoForgeStreamCodecs.composite(
+                ItemResearchIcon.STREAM_CODEC,
+                SimpleResearch::researchIcon,
+                ResearchMethod.STREAM_CODEC,
+                SimpleResearch::researchMethod,
+                ResearchEffect.STREAM_CODEC,
+                SimpleResearch::researchEffect,
+                Research.RESOURCE_KEY_STREAM_CODEC.apply(ByteBufCodecs.list()),
+                SimpleResearch::parents,
+                ByteBufCodecs.BOOL,
+                SimpleResearch::requiresParent,
+                ByteBufCodecs.optional(ByteBufCodecs.STRING_UTF8),
+                SimpleResearch::literalName,
+                ByteBufCodecs.optional(ByteBufCodecs.STRING_UTF8),
+                SimpleResearch::literalDescription,
+                SimpleResearch::new
+        );
 
         private Serializer() {
         }
@@ -69,6 +90,10 @@ public record SimpleResearch(ItemResearchIcon researchIcon, ResearchMethod resea
             return CODEC;
         }
 
+        @Override
+        public StreamCodec<? super RegistryFriendlyByteBuf, SimpleResearch> streamCodec() {
+            return STREAM_CODEC;
+        }
     }
 
     public static class Builder {

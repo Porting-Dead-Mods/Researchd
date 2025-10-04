@@ -4,6 +4,8 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.networking.cache.AskServerPlayers;
 import com.portingdeadmods.researchd.networking.cache.ClearGraphCachePayload;
 import com.portingdeadmods.researchd.networking.cache.ReceiveServerPlayers;
+import com.portingdeadmods.researchd.networking.registries.UpdateResearchPacksPayload;
+import com.portingdeadmods.researchd.networking.registries.UpdateResearchesPayload;
 import com.portingdeadmods.researchd.networking.research.*;
 import com.portingdeadmods.researchd.networking.team.*;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -86,6 +88,17 @@ public class NetworkEvents {
                 ResearchCacheReloadPayload.TYPE,
                 ResearchCacheReloadPayload.STREAM_CODEC,
                 ResearchCacheReloadPayload::handle
+        );
+
+        registrar.playToClient(
+                UpdateResearchesPayload.TYPE,
+                UpdateResearchesPayload.STREAM_CODEC,
+                UpdateResearchesPayload::handle
+        );
+        registrar.playToClient(
+                UpdateResearchPacksPayload.TYPE,
+                UpdateResearchPacksPayload.STREAM_CODEC,
+                UpdateResearchPacksPayload::handle
         );
 
         registrar.playToClient(

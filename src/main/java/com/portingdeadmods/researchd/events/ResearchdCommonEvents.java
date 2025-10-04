@@ -1,10 +1,8 @@
 package com.portingdeadmods.researchd.events;
 
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethodProgress;
-import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.TeamMember;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
@@ -17,9 +15,6 @@ import com.portingdeadmods.researchd.networking.research.ResearchFinishedPayload
 import com.portingdeadmods.researchd.networking.research.ResearchMethodProgressSyncPayload;
 import com.portingdeadmods.researchd.registries.ResearchdCommands;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -34,11 +29,9 @@ import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
-import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -79,7 +72,7 @@ public final class ResearchdCommonEvents {
 
                 if (research != null) {
                     ResourceKey<Research> currentResearchKey = team.getCurrentResearch();
-                    Research currentResearch = ResearchHelperCommon.getResearch(currentResearchKey, level.registryAccess());
+                    Research currentResearch = ResearchHelperCommon.getResearch(currentResearchKey, level);
                     ResearchMethodProgress<?> currentResearchProgress = team.getCurrentProgress();
 
                     if (currentResearchProgress != null) {
@@ -130,28 +123,6 @@ public final class ResearchdCommonEvents {
                 entry.getValue().checkProgress(level, team, entry.getKey());
             }
 
-        }
-    }
-
-    @SubscribeEvent
-    public static void onServerAboutToStart(ServerAboutToStartEvent event) {
-        MinecraftServer server = event.getServer();
-        RegistryAccess registryAccess = server.registryAccess();
-        HolderLookup.RegistryLookup<ResearchPack> packs = registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY);
-
-        if (!Researchd.RESEARCH_PACKS.isEmpty()) {
-            Researchd.RESEARCH_PACKS.addAll(packs.listElements().map(Holder.Reference::value).sorted(Comparator.comparingInt(ResearchPack::sorting_value)).toList());
-            Researchd.debug("Researchd Constants Server", "Initialized research packs.", Researchd.RESEARCH_PACKS, "");
-        }
-
-        if (!Researchd.RESEARCH_PACK_COUNT.isInitialized()) {
-            Researchd.RESEARCH_PACK_COUNT.initialize((int) packs.listElements().count());
-            Researchd.debug("Researchd Constants Server", "Initialized research pack count: ", Researchd.RESEARCH_PACK_COUNT.get());
-        }
-
-        if (!Researchd.RESEARCH_PACK_REGISTRY.isInitialized()) {
-            Researchd.RESEARCH_PACK_REGISTRY.initialize(registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY));
-            Researchd.debug("Researchd Constants Server", "Initialized research pack registry LazyFinal. ");
         }
     }
 

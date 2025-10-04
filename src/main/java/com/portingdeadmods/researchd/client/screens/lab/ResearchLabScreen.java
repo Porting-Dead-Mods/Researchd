@@ -11,6 +11,7 @@ import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.content.menus.ResearchLabMenu;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
@@ -44,7 +45,7 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
     private final AbstractScroller scroller = new AbstractScroller(this, SCROLLER_X, SCROLLER_Y, SCROLLER_WIDTH, SCROLLER_HEIGHT, SCROLLER_TRACK_LENGTH, AbstractScroller.Mode.HORIZONTAL, Researchd.rl("scroller_small_horizontal")) {
         @Override
         public int getContentLength() {
-            return SLOT_WIDTH * Researchd.RESEARCH_PACK_COUNT.getOrThrow();
+            return SLOT_WIDTH * ResearchHelperClient.getResearchPacks().size();
         };
 
         @Override
@@ -83,7 +84,7 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
 
         this.scroller.renderWidget(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
         // Foreground
-        this.drawBars(pGuiGraphics);
+//        this.drawBars(pGuiGraphics);
 
         renderTooltip(pGuiGraphics, pMouseX, pMouseY);
     }
@@ -227,32 +228,8 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
         guiGraphics.drawCenteredString(Minecraft.getInstance().font, String.valueOf((int) (progress * 100)) + '%', x + 1 + PROGRESS_BAR_WIDTH / 2,  y + 9, 0xF8F8F8);
     }
 
-    /**
-     * The slot order is based on the {@link Researchd#RESEARCH_PACKS}'s index order
-     *
-     * @param guiGraphics GuiGraphics instance for drawing
-     */
-    private void drawBars(GuiGraphics guiGraphics) {
-//        for (Map.Entry<ResourceKey<SimpleResearchPack>, Float> entry : this.menu.blockEntity.researchPackUsage.entrySet()) {
-//            SimpleResearchPack pack = Researchd.RESEARCH_PACK_REGISTRY.getOrThrow().get(entry.getKey()).get().value(); // Safe usage of Optional
-//            int idx = Researchd.RESEARCH_PACKS.indexOf(pack);
-//            Point slotPos = this.menu.getSlotPositions().get(idx);
-//            float usage = entry.getValue();
-//
-//            int left = this.leftPos + slotPos.x;
-//            int top = this.topPos + slotPos.y + SLOT_WIDTH;
-//            guiGraphics.fill(
-//                    left + 1, // LEFT X
-//                    top + 1, // TOP Y
-//                    left + 1 + (int) (BAR_WIDTH * usage), // RIGHT X
-//                    top + 1, // BOTTOM Y
-//                    pack.color()
-//            );
-//        }
-    }
-
     private int getContentWidth() {
-        return SLOT_WIDTH * Researchd.RESEARCH_PACK_COUNT.getOrThrow();
+        return SLOT_WIDTH * ResearchHelperClient.getResearchPacks().size();
     }
 
     private void drawSlot(GuiGraphics guiGraphics, int x, int y) {

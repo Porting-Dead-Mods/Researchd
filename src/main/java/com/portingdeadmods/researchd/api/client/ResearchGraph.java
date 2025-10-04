@@ -13,17 +13,20 @@ import java.util.Set;
 
 /**
  * Data of the research graph
+ *
  * @param rootNode Root node that is displayed bigger than the rest of the nodes
- * @param nodes All the nodes in the current graph
+ * @param nodes    All the nodes in the current graph
  */
 public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, ResearchNode> nodes) {
     private static final int RESEARCH_GRAPH_LAYERS = 2;
 
-    // TODO: Add researches to the team's research progress
+    // TODO: Add researchPacks to the team's research progress
     private ResearchGraph(GlobalResearch researchRoot, Map<ResourceKey<Research>, ResearchInstance> researches) {
         this(new ResearchNode(researches.get(researchRoot.getResearchKey())), new HashMap<>());
 
-        createNodes(rootNode.getInstance(), 0, CommonResearchCache.ROOT_RESEARCH.is(rootNode.getInstance().getKey()) ? -1 : RESEARCH_GRAPH_LAYERS, researches);
+        createNodes(rootNode.getInstance(), 0, CommonResearchCache.ROOT_RESEARCH != null && CommonResearchCache.ROOT_RESEARCH.is(rootNode.getInstance().getKey())
+                ? -1
+                : RESEARCH_GRAPH_LAYERS, researches);
         this.rootNode.setRootNode(true);
         this.nodes.put(this.rootNode.getInstance().getKey(), this.rootNode);
         collectRelatedNodes();

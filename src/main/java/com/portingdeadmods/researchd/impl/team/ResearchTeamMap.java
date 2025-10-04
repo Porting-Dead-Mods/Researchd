@@ -6,7 +6,6 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.utils.ResearchdCodecUtils;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -66,7 +65,7 @@ public record ResearchTeamMap(Map<UUID, SimpleResearchTeam> researchTeams) {
             ResearchHelperClient.refreshResearches(player);
             //CommonResearchCache.initialize(player.level());
         } else {
-            ResearchHelperCommon.refreshResearches((ServerPlayer) player);
+           // ResearchHelperCommon.refreshResearches((ServerPlayer) player);
         }
     }
 

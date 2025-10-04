@@ -18,7 +18,6 @@ import com.portingdeadmods.researchd.networking.team.RefreshResearchesPayload;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import com.portingdeadmods.researchd.utils.PlayerUtils;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -409,14 +408,15 @@ public final class ResearchTeamHelper {
         return ret;
     }
 
-    public static void cleanupTeamResearches(ResearchTeamMap teamMap, HolderLookup.Provider lookup) {
+    public static void cleanupTeamResearches(ResearchTeamMap teamMap, Level level) {
         for (SimpleResearchTeam team : teamMap.researchTeams().values()) {
             Map<ResourceKey<Research>, ResearchInstance> researches = team.getResearches();
             Map<ResourceKey<Research>, ResearchInstance> newResearches = new HashMap<>();
             for (Map.Entry<ResourceKey<Research>, ResearchInstance> entry : researches.entrySet()) {
-                if (lookup.holder(entry.getKey()).isPresent()) {
+                if (ResearchHelperCommon.getResearch(entry.getKey(), level) != null && entry.getValue().getKey() != null) {
                     newResearches.put(entry.getKey(), entry.getValue());
                 }
+
             }
             researches.clear();
             researches.putAll(newResearches);
@@ -462,7 +462,7 @@ public final class ResearchTeamHelper {
         return msgs.get((int) Math.floor(Math.random() * msgs.size()));
     }
 
-    public static void initializeTeamResearches(ResearchTeamMap teamMap, HolderLookup.Provider lookup) {
+    public static void initializeTeamResearches(ResearchTeamMap teamMap, Level level) {
         for (SimpleResearchTeam team : teamMap.researchTeams().values()) {
             Map<ResourceKey<Research>, ResearchInstance> researches = team.getResearches();
             Map<ResourceKey<Research>, ResearchMethodProgress<?>> progress = team.getResearchProgresses();
@@ -471,12 +471,15 @@ public final class ResearchTeamHelper {
             for (GlobalResearch research : globalResearches) {
                 if (progress.containsKey(research.getResearchKey())) continue;
 
-                progress.put(research.getResearchKey(), ResearchMethodProgress.fromResearch(lookup, research.getResearchKey()));
+                progress.put(research.getResearchKey(), ResearchMethodProgress.fromResearch(level, research.getResearchKey()));
             }
 
             researches.values().stream().map(ResearchInstance::getResearch).forEach(globalResearches::remove);
             for (GlobalResearch globalResearch : globalResearches) {
-                researches.put(globalResearch.getResearchKey(), new ResearchInstance(globalResearch, ResearchStatus.LOCKED));
+                ResearchStatus status = CommonResearchCache.ROOT_RESEARCH != null && CommonResearchCache.ROOT_RESEARCH.is(globalResearch.getResearchKey())
+                        ? ResearchStatus.RESEARCHABLE
+                        : ResearchStatus.LOCKED;
+                researches.put(globalResearch.getResearchKey(), new ResearchInstance(globalResearch, status));
             }
         }
     }

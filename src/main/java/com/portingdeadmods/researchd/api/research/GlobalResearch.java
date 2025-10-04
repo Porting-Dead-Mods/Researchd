@@ -4,17 +4,17 @@ import com.google.common.collect.ImmutableSet;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 /**
- * Research Wrapper holding the parent-child relationship between itself and other researches
+ * Research Wrapper holding the parent-child relationship between itself and other researchPacks
  */
 public final class GlobalResearch {
     public static final Codec<GlobalResearch> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -44,8 +44,8 @@ public final class GlobalResearch {
         return this.research;
     }
 
-    public Research getResearch(HolderLookup.Provider access) {
-        return ResearchHelperCommon.getResearch(this.getResearchKey(), access);
+    public Research getResearch(Level level) {
+        return ResearchHelperCommon.getResearch(this.getResearchKey(), level);
     }
 
     public Set<GlobalResearch> getChildren() {

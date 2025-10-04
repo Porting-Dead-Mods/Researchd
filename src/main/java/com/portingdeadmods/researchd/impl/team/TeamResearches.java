@@ -28,7 +28,7 @@ public record TeamResearches(SimpleResearchQueue researchQueue,
     );
     public static final Codec<TeamResearches> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             SimpleResearchQueue.CODEC.fieldOf("researchQueue").forGetter(TeamResearches::researchQueue),
-            Codec.unboundedMap(Research.RESOURCE_KEY_CODEC, ResearchInstance.CODEC).xmap(HashMap::new, Function.identity()).fieldOf("researches")
+            Codec.unboundedMap(Research.RESOURCE_KEY_CODEC, ResearchInstance.CODEC).xmap(HashMap::new, Function.identity()).fieldOf("researchPacks")
                     .forGetter(TeamResearches::researches),
             Codec.unboundedMap(Research.RESOURCE_KEY_CODEC, ResearchMethodProgress.CODEC).xmap(HashMap::new, Function.identity()).fieldOf("completionProgress")
                     .forGetter(TeamResearches::progress)

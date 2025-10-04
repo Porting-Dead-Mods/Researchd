@@ -6,35 +6,32 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.GlobalResearch;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public final class CommonResearchCache {
     public static Map<ResourceKey<Research>, GlobalResearch> GLOBAL_RESEARCHES;
     public static @Nullable GlobalResearch ROOT_RESEARCH;
-    private static boolean LOCKED;
 
-    public static void initialize(HolderLookup.Provider lookup) {
+    public static void initialize(Level level) {
         reset();
 
-        Set<Holder<Research>> researches = ResearchHelperCommon.getLevelResearches(lookup);
-        Map<ResourceKey<Research>, GlobalResearch> globalResearchMap = new HashMap<>(researches.size());
-        // Add the researches to GLOBAL_RESEARCHES
-        for (Holder<Research> research : researches) {
-            globalResearchMap.put(research.getKey(), new GlobalResearch(research.getKey()));
+        Map<ResourceKey<Research>, Research> researchLookup = ResearchHelperCommon.getLevelResearches(level);
+        Map<ResourceKey<Research>, GlobalResearch> globalResearchMap = new HashMap<>(researchLookup.size());
+        // Add the researchPacks to GLOBAL_RESEARCHES
+        for (ResourceKey<Research> key : researchLookup.keySet()) {
+            globalResearchMap.put(key, new GlobalResearch(key));
         }
 
         // CHILDREN
         for (GlobalResearch research : globalResearchMap.values()) {
-            Holder<Research> researchHolder = lookup.holderOrThrow(research.getResearchKey());
-            List<ResourceKey<Research>> parents = researchHolder.value().parents();
+            Research research1 = researchLookup.get(research.getResearchKey());
+            List<ResourceKey<Research>> parents = research1.parents();
             for (ResourceKey<Research> parent : parents) {
                 GlobalResearch parentGlobalResearch = globalResearchMap.get(parent);
                 parentGlobalResearch.getChildren().add(research);
@@ -43,8 +40,8 @@ public final class CommonResearchCache {
 
         // PARENTS
         for (GlobalResearch research : globalResearchMap.values()) {
-            Holder<Research> researchHolder = lookup.holderOrThrow(research.getResearchKey());
-            List<ResourceKey<Research>> parents = researchHolder.value().parents();
+            Research research1 = researchLookup.get(research.getResearchKey());
+            List<ResourceKey<Research>> parents = research1.parents();
 
             if (parents.isEmpty()) {
                 if (ROOT_RESEARCH == null) {
@@ -61,16 +58,15 @@ public final class CommonResearchCache {
             }
         }
 
-        Researchd.LOGGER.debug("Researches: {}", researches);
+        Researchd.LOGGER.debug("Researches: {}", researchLookup);
         Researchd.LOGGER.debug("Research map: {}", globalResearchMap);
 
-        // Lock global researches
+        // Lock global researchLookup
         for (GlobalResearch research : globalResearchMap.values()) {
             research.lock();
         }
 
         GLOBAL_RESEARCHES = ImmutableMap.copyOf(globalResearchMap);
-        LOCKED = true;
 
     }
 
@@ -110,7 +106,6 @@ public final class CommonResearchCache {
         if (GLOBAL_RESEARCHES != null) {
             ROOT_RESEARCH = null;
             GLOBAL_RESEARCHES = null;
-            LOCKED = false;
         }
     }
 }

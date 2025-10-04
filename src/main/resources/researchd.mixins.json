@@ -5,9 +5,11 @@
   "mixins": [
     "AbstractFurnaceBlockEntityMixin",
     "CraftingMenuMixin",
-    "PlayerMixin"
+    "PlayerMixin",
+    "ReloadableServerResourcesMixin"
   ],
   "client": [
+    "ClientLevelMixin",
     "LevelRendererMixin"
   ],
   "injectors": {

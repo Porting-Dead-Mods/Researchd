@@ -5,7 +5,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -36,8 +35,8 @@ public class ResearchMethodProgress<T extends ResearchMethod> {
     private final float maxProgress;
     private float progress;
 
-    public static ResearchMethodProgress<?> fromResearch(HolderLookup.Provider lookup, ResourceKey<Research> key) {
-        return new ResearchMethodProgress<>(ResearchHelperCommon.getResearch(key, lookup).researchMethod());
+    public static ResearchMethodProgress<?> fromResearch(Level level, ResourceKey<Research> key) {
+        return new ResearchMethodProgress<>(ResearchHelperCommon.getResearch(key, level).researchMethod());
     }
 
     public ResearchMethodProgress(T method) {

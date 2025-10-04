@@ -604,18 +604,17 @@ public class ResearchGraphWidget extends AbstractWidget {
 
         for (ResearchNode node : this.graph.nodes().values()) {
             if (node.isHovered()) {
-                Minecraft minecraft = Minecraft.getInstance();
-                var registryAccess = minecraft.level.registryAccess();
+                Minecraft mc = Minecraft.getInstance();
                 // Debug tooltip
                 if (SharedConstants.IS_RUNNING_IN_IDE && !ResearchScreen.hasControlDown()) {
-                    guiGraphics.renderComponentTooltip(minecraft.font, List.of(
-                            node.getInstance().getDisplayName(registryAccess),
-                            node.getInstance().getDescription(registryAccess),
+                    guiGraphics.renderComponentTooltip(mc.font, List.of(
+                            node.getInstance().getDisplayName(mc.level),
+                            node.getInstance().getDescription(mc.level),
                             SharedConstants.IS_RUNNING_IN_IDE ? Component.literal("Press Ctrl for debug info") : Component.empty()
                     ), mouseX, mouseY);
                 } else {
-                    guiGraphics.renderComponentTooltip(minecraft.font, List.of(
-                            node.getInstance().getDisplayName(registryAccess),
+                    guiGraphics.renderComponentTooltip(mc.font, List.of(
+                            node.getInstance().getDisplayName(mc.level),
                             Component.literal("x: %d, y: %d".formatted(node.getX(), node.getY())),
                             Component.literal("w: %d, h: %d".formatted(node.getWidth(), node.getHeight())),
                             Component.literal("hovered: %s".formatted(node.isHovered())),

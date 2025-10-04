@@ -14,7 +14,6 @@ import com.portingdeadmods.researchd.api.research.methods.ResearchMethodProgress
 import com.portingdeadmods.researchd.api.team.*;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.utils.ResearchdCodecUtils;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -45,7 +44,7 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
             UUIDUtil.CODEC.fieldOf("id").forGetter(SimpleResearchTeam::getId),
             Codec.unboundedMap(Codec.STRING, TeamMember.CODEC).fieldOf("members").forGetter(t -> ResearchdCodecUtils.encodeMap(t.members)),
             SimpleTeamSocialManager.CODEC.fieldOf("sent_invites").forGetter(t -> t.socialManager),
-            TeamResearches.CODEC.fieldOf("researches").forGetter(t -> t.researches),
+            TeamResearches.CODEC.fieldOf("researchPacks").forGetter(t -> t.researches),
             Codec.unboundedMap(Codec.STRING, Codec.FLOAT).fieldOf("effects").forGetter(t -> ResearchdCodecUtils.encodeMap(t.effects))
     ).apply(builder, SimpleResearchTeam::newTeamStringMaps));
 
@@ -99,7 +98,7 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
 
         SimpleResearchTeam team = new SimpleResearchTeam(player.getUUID(), player.getDisplayName().getString() + "'s Team");
         team.setCreationTime(player.getServer().getTickCount() * 50);
-        team.init(player.registryAccess());
+        team.init(player.level());
 
         return team;
     }
@@ -206,7 +205,7 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
 
     @Override
     public boolean isOwner(UUID uuid) {
-        return this.members.get(uuid).role() == ResearchTeamRole.OWNER;
+        return this.members.containsKey(uuid) && this.members.get(uuid).role() == ResearchTeamRole.OWNER;
     }
 
     @Override
@@ -230,7 +229,7 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
         this.effects.put(ResearchdRegistries.VALUE_EFFECT.getKey(effect), value);
     }
 
-    public void init(HolderLookup.Provider lookup) {
+    public void init(Level level) {
         Map<ResourceKey<Research>, ResearchInstance> researchInstances = CommonResearchCache.GLOBAL_RESEARCHES.entrySet().stream()
                 .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), new ResearchInstance(e.getValue(), CommonResearchCache.ROOT_RESEARCH.is(e.getKey())
                         ? ResearchStatus.RESEARCHABLE
@@ -240,7 +239,7 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
 
         Map<ResourceKey<Research>, ResearchMethodProgress<?>> rmps = new HashMap<>();
         for (ResourceKey<Research> key : CommonResearchCache.GLOBAL_RESEARCHES.keySet()) {
-            rmps.put(key, ResearchMethodProgress.fromResearch(lookup, key));
+            rmps.put(key, ResearchMethodProgress.fromResearch(level, key));
         }
         this.getResearchProgresses().putAll(rmps);
     }

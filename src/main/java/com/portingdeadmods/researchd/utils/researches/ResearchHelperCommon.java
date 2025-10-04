@@ -2,7 +2,6 @@ package com.portingdeadmods.researchd.utils.researches;
 
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
@@ -17,8 +16,6 @@ import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffec
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
 import com.portingdeadmods.researchd.utils.TimeUtils;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -31,12 +28,10 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public final class ResearchHelperCommon {
-    public static Set<Holder<Research>> getLevelResearches(HolderLookup.Provider lookup) {
-        HolderLookup.RegistryLookup<Research> registry = lookup.lookupOrThrow(ResearchdRegistries.RESEARCH_KEY);
-        return registry.listElements().collect(Collectors.toSet());
+    public static Map<ResourceKey<Research>, Research> getLevelResearches(Level level) {
+        return ResearchdManagers.getResearchesManager(level).getLookup();
     }
 
     @SuppressWarnings("unchecked")
@@ -53,8 +48,8 @@ public final class ResearchHelperCommon {
     public static <T extends ResearchEffect> Collection<T> getResearchEffects(Class<T> clazz, Level level) {
         Collection<T> effects = new UniqueArray<>();
 
-        for (Holder<Research> research : getLevelResearches(level.registryAccess())) {
-            ResearchEffect effect = research.value().researchEffect();
+        for (Research research : getLevelResearches(level).values()) {
+            ResearchEffect effect = research.researchEffect();
             _collectEffects(effect, effects);
         }
 
@@ -69,8 +64,8 @@ public final class ResearchHelperCommon {
                 .toList();
     }
 
-    public static Research getResearch(ResourceKey<Research> resourceKey, HolderLookup.Provider lookup) {
-        return lookup.holderOrThrow(resourceKey).value();
+    public static Research getResearch(ResourceKey<Research> resourceKey, Level level) {
+        return getLevelResearches(level).get(resourceKey);
     }
 
     public static @Nullable ResearchInstance getInstanceByResearch(Set<ResearchInstance> researches, ResourceKey<Research> key) {
@@ -97,10 +92,15 @@ public final class ResearchHelperCommon {
         return effData.stream().sorted(Comparator.comparing(a -> a.getClass().getName())).toList();
     }
 
-    public static List<ResourceKey<ResearchPack>> getResearchPacks(HolderLookup.Provider lookup) {
-        return lookup.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY).listElements()
-                .sorted(Comparator.comparingInt(h -> h.value().sorting_value()))
-                .map(Holder::getKey)
+    public static Map<ResourceKey<ResearchPack>, ResearchPack> getResearchPacks(Level level) {
+        return ResearchdManagers.getResearchPacksManager(level).getLookup();
+    }
+
+    public static List<ResourceKey<ResearchPack>> getResearchPackKeys(Level level) {
+        Map<ResourceKey<ResearchPack>, ResearchPack> lookup = ResearchdManagers.getResearchPacksManager(level).getLookup();
+        return lookup.entrySet().stream()
+                .sorted(Comparator.comparingInt(entry -> entry.getValue().sortingValue()))
+                .map(Map.Entry::getKey)
                 .toList();
     }
 
@@ -134,7 +134,7 @@ public final class ResearchHelperCommon {
 
         for (ResearchInstance res : team.getResearches().values()) {
             if (res.getResearchStatus() == ResearchStatus.RESEARCHED) {
-                ResearchEffect effect = res.lookup(level.registryAccess()).researchEffect();
+                ResearchEffect effect = res.lookup(level).researchEffect();
                 effect.onUnlock(level, player, res.getKey());
             }
         }

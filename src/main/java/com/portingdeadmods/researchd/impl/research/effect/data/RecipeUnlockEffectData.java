@@ -35,7 +35,7 @@ public record RecipeUnlockEffectData(Set<RecipeHolder<?>> blockedRecipes) implem
     }
 
     /**
-     * Returns a new RecipePredicateData with all the blocked recipes from researches.
+     * Returns a new RecipePredicateData with all the blocked recipes from researchPacks.
      *
      * @param level
      */

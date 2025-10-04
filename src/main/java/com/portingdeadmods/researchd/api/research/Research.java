@@ -6,6 +6,8 @@ import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchSerializer;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 
@@ -19,6 +21,7 @@ import java.util.List;
  */
 public interface Research {
     Codec<Research> CODEC = ResearchdRegistries.RESEARCH_SERIALIZER.byNameCodec().dispatch(Research::getSerializer, ResearchSerializer::codec);
+    StreamCodec<RegistryFriendlyByteBuf, Research> STREAM_CODEC = ByteBufCodecs.registry(ResearchdRegistries.RESEARCH_SERIALIZER_KEY).dispatch(Research::getSerializer, ResearchSerializer::streamCodec);
     Codec<ResourceKey<Research>> RESOURCE_KEY_CODEC = ResourceKey.codec(ResearchdRegistries.RESEARCH_KEY);
     StreamCodec<ByteBuf, ResourceKey<Research>> RESOURCE_KEY_STREAM_CODEC = ResourceKey.streamCodec(ResearchdRegistries.RESEARCH_KEY);
 
@@ -41,12 +44,12 @@ public interface Research {
 
     /**
      * @return A {@link List} of {@link ResourceKey}
-     * pointing to the parent researches of this research
+     * pointing to the parent researchPacks of this research
      */
     List<ResourceKey<Research>> parents();
 
     /**
-     * @return whether the parent researches need to be completed to start this research
+     * @return whether the parent researchPacks need to be completed to start this research
      */
     boolean requiresParent();
 
