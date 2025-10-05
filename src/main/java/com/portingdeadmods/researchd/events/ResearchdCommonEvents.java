@@ -115,13 +115,13 @@ public final class ResearchdCommonEvents {
 
     public static void handleResearchMethods(Level level, ResearchTeamMap teamMap) {
         for (ResearchTeam team : teamMap.researchTeams().values()) {
-            Map<ResourceKey<Research>, ResearchMethodProgress<?>> researchProgresses = team.getResearchProgresses();
-            if (researchProgresses.isEmpty()) continue;
+			ResourceKey<Research> firstInQueue = team.getQueue().getFirst();
+			if (firstInQueue == null) continue;
 
-            for (Map.Entry<ResourceKey<Research>, ResearchMethodProgress<?>> entry : researchProgresses.entrySet()) {
-                entry.getValue().checkProgress(level, team, entry.getKey());
-            }
-
+            ResearchMethodProgress<?> researchProgresses = team.getResearchProgresses().get(team.getQueue().getFirst());
+			if (researchProgresses != null) {
+				researchProgresses.checkProgress(level, team, firstInQueue);
+			}
         }
     }
 
