@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
+import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.utils.ResearchdCodecUtils;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -63,9 +64,10 @@ public record ResearchTeamMap(Map<UUID, SimpleResearchTeam> researchTeams) {
     public static void onSync(Player player) {
         if (player.level().isClientSide) {
             ResearchHelperClient.refreshResearches(player);
-            //CommonResearchCache.initialize(player.level());
+            ClientResearchTeamHelper.resolveInstances(ClientResearchTeamHelper.getTeam());
         } else {
-           // ResearchHelperCommon.refreshResearches((ServerPlayer) player);
+            // TODO: Reenable this
+            //ResearchHelperCommon.refreshResearches((ServerPlayer) player);
         }
     }
 

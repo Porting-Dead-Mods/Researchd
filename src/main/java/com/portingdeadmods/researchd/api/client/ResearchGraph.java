@@ -34,6 +34,7 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
         for (ResearchNode node : this.nodes.values()) {
             node.graph = this;
         }
+
     }
 
     private void collectRelatedNodes() {

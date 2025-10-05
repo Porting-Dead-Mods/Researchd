@@ -13,6 +13,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import org.jetbrains.annotations.NotNull;
 
 public record ResearchCacheReloadPayload() implements CustomPacketPayload {
     public static final ResearchCacheReloadPayload INSTANCE = new ResearchCacheReloadPayload();
@@ -20,7 +21,7 @@ public record ResearchCacheReloadPayload() implements CustomPacketPayload {
     public static final StreamCodec<? super RegistryFriendlyByteBuf, ResearchCacheReloadPayload> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public @NotNull Type<? extends CustomPacketPayload> type() {
         return TYPE;
     }
 

@@ -29,11 +29,9 @@ public class ResearchNode extends AbstractWidget {
     private ResearchInstance instance; // TODO: Figure out why th there's a desync between Graph and TechList. (then remake this final)
     public void fetchInstanceFromTeam() {
         ResearchTeam team = ClientResearchTeamHelper.getTeam();
-        if (team != null) {
-            ResearchInstance updatedInstance = team.getResearches().get(this.instance.getKey());
-            if (updatedInstance != null) {
-                this.instance = updatedInstance;
-            }
+        ResearchInstance updatedInstance = team.getResearches().get(this.instance.getKey());
+        if (updatedInstance != null) {
+            this.instance = updatedInstance;
         }
     }
 
