@@ -193,6 +193,7 @@ public class ClientResearchTeamHelper {
 			teamMembersList.getItems().clear();
 			teamMembersList.getItems().addAll(ClientResearchTeamHelper.getTeamMembers());
 			teamMembersList.resort();
+            System.out.println(teamMembersList.getItems().size());
 		}
 	}
 

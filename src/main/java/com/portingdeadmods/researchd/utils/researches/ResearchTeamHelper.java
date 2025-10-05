@@ -1,5 +1,6 @@
 package com.portingdeadmods.researchd.utils.researches;
 
+import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
 import com.portingdeadmods.researchd.api.research.GlobalResearch;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
@@ -27,7 +28,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
@@ -341,7 +341,7 @@ public final class ResearchTeamHelper {
         ResearchTeam team = getTeamByMember(requester);
         if (remove) {
             team.getSocialManager().removeSentInvite(invited);
-            requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.REMOVED_INVITE, PlayerUtils.getPlayerNameFromUUID(requester.level(), invited)));
+            requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.REMOVED_INVITE, AllPlayersCache.getName(invited)));
         } else {
             team.getSocialManager().addSentInvite(invited);
             ServerPlayer invitedPlayer = (ServerPlayer) requester.serverLevel().getPlayerByUUID(invited);
@@ -351,15 +351,15 @@ public final class ResearchTeamHelper {
                                 .append(Component.literal("\n"))
                                 .append("     ")
                                 .append(ResearchdTranslations.component(ResearchdTranslations.Team.ACCEPT).withStyle(style -> style.withClickEvent(
-                                        new net.minecraft.network.chat.ClickEvent(ClickEvent.Action.RUN_COMMAND, "/researchd team join " + PlayerUtils.getPlayerNameFromUUID(requester.level(), requester.getUUID()))
+                                        new net.minecraft.network.chat.ClickEvent(ClickEvent.Action.RUN_COMMAND, "/researchd team join " + AllPlayersCache.getName(requester.getUUID()))
                                 )))
                                 .append("     ")
                                 .append(ResearchdTranslations.component(ResearchdTranslations.Team.DECLINE).withStyle(style -> style.withClickEvent(
-                                        new net.minecraft.network.chat.ClickEvent(ClickEvent.Action.RUN_COMMAND, "/researchd team ignore " + PlayerUtils.getPlayerNameFromUUID(requester.level(), requester.getUUID()))
+                                        new net.minecraft.network.chat.ClickEvent(ClickEvent.Action.RUN_COMMAND, "/researchd team ignore " + AllPlayersCache.getName(requester.getUUID()))
                                 )))
                 );
             }
-            requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.SENT_INVITE, PlayerUtils.getPlayerNameFromUUID(requester.level(), invited), team.getName()));
+            requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.SENT_INVITE, AllPlayersCache.getName(invited), team.getName()));
         }
         Level level = requester.level();
 

@@ -136,7 +136,7 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
 
     @Override
     public SequencedCollection<TeamMember> getMembers() {
-        return this.members.sequencedValues();
+        return new LinkedList<>(this.members.sequencedValues());
     }
 
     @Override

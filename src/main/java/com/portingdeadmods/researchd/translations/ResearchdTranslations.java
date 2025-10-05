@@ -36,8 +36,8 @@ public final class ResearchdTranslations {
 		public static final TranslatableConstant SENT_INVITE = create("sent_invite", AQUA_AT + GREEN + "You invited " + RESET + STR_PARAM + GREEN + " to join " + RESET + STR_PARAM + GREEN + "!" + RESET);
 		public static final TranslatableConstant REMOVED_INVITE = create("removed_invite", AQUA_AT + GREEN + "Invite to " + RESET + STR_PARAM + GREEN + " has been removed!" + RESET);
 		public static final TranslatableConstant RECEIVED_INVITE = create("received_invite", AQUA_AT + GREEN + "You were invited to join: " + RESET + STR_PARAM);
-	    public static final TranslatableConstant YOU_JOINED_TEAM = create("joined_team",  AQUA_AT + STR_PARAM + GREEN + "You joined: " + RESET + STR_PARAM + GREEN + "!" + RESET);
-		public static final TranslatableConstant PLAYER_JOINED_TEAM = create("joined_team",  AQUA_AT + STR_PARAM + GREEN + " joined your team!" + RESET);
+	    public static final TranslatableConstant YOU_JOINED_TEAM = create("joined_team",  AQUA_AT + GREEN + "You joined: " + RESET + STR_PARAM + GREEN + "!" + RESET);
+		public static final TranslatableConstant PLAYER_JOINED_TEAM = create("player_joined_team",  AQUA_AT + STR_PARAM + GREEN + " joined your team!" + RESET);
 		public static final TranslatableConstant LEFT_TEAM = create("left_team", GREEN.toString() + BOLD + "You successfully abandoned your team!" + RESET);
 		public static final TranslatableConstant ACCEPT = create("accept", GREEN.toString() + BOLD + UNDERLINE + "ACCEPT" + RESET);
 		public static final TranslatableConstant DECLINE = create("decline", RED.toString() + BOLD + UNDERLINE + "DECLINE" + RESET);
