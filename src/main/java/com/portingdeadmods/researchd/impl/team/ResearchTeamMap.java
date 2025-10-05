@@ -13,6 +13,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,25 +41,21 @@ public record ResearchTeamMap(Map<UUID, SimpleResearchTeam> researchTeams) {
     }
 
     public @Nullable SimpleResearchTeam getTeamByMember(UUID memberUuid) {
-        for (SimpleResearchTeam team : this.researchTeams.values()) {
-            if (team.hasMember(memberUuid)) return team;
-        }
-        return null;
+        return this.researchTeams.get(memberUuid);
     }
 
     public @NotNull ResearchTeam getTeamByMemberOrThrow(UUID memberUuid) {
-        for (ResearchTeam team : this.researchTeams.values()) {
-            if (team.hasMember(memberUuid)) return team;
-        }
+        SimpleResearchTeam team = getTeamByMember(memberUuid);
+		if (team != null) return team;
         throw new IllegalStateException("Player %s not in a team".formatted(AllPlayersCache.getName(memberUuid).equals("!Unknown Player!") ? memberUuid : AllPlayersCache.getName(memberUuid)));
     }
 
     public SimpleResearchTeam getTeamByPlayer(Player player) {
-        return getTeamByMember(player.getUUID());
+        return this.researchTeams.get(player.getUUID());
     }
 
     public SimpleResearchTeam getTeamByUUID(UUID teamUuid) {
-        return researchTeams().get(teamUuid);
+        return this.researchTeams.get(teamUuid);
     }
 
     public static void onSync(Player player) {
@@ -70,6 +67,14 @@ public record ResearchTeamMap(Map<UUID, SimpleResearchTeam> researchTeams) {
             //ResearchHelperCommon.refreshResearches((ServerPlayer) player);
         }
     }
+
+	public void setDefaultTeam(UUID uuid, Level level) {
+		this.researchTeams.put(uuid, SimpleResearchTeam.createDefaultTeam(uuid, level));
+	}
+
+	public void setDefaultTeam(ServerPlayer player) {
+		this.setDefaultTeam(player.getUUID(), player.level());
+	}
 
     /**
      * Creates a team for the player if it doesn't exist.

@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.impl.team;
 import com.mojang.authlib.GameProfile;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
 import com.portingdeadmods.portingdeadlibs.utils.LazyFinal;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
@@ -78,6 +79,7 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
         this.effects = effects;
     }
 
+
     /**
      * Creates a Research Team with the given name and owner UUID.
      *
@@ -88,19 +90,28 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
         this(name, UUID.randomUUID(), Map.of(uuid, new TeamMember(uuid, ResearchTeamRole.OWNER)), SimpleTeamSocialManager.EMPTY, TeamResearches.EMPTY, new HashMap<>());
     }
 
+	/**
+	 * Creates a default Research Team with the given owner
+	 *
+	 * @param player The Owner
+	 */
+	public static SimpleResearchTeam createDefaultTeam(UUID player, Level level) {
+		Researchd.debug("Research Team", "Creating default team for player: " + AllPlayersCache.getName(player));
+
+		SimpleResearchTeam team = new SimpleResearchTeam(player, AllPlayersCache.getName(player) + "'s Team");
+		team.setCreationTime(level.getGameTime() * 50);
+		team.init(level);
+
+		return team;
+	}
+
     /**
      * Creates a default Research Team with the given owner
      *
      * @param player The Owner
      */
     public static SimpleResearchTeam createDefaultTeam(ServerPlayer player) {
-        Researchd.debug("Research Team", "Creating default team for player: " + player.getDisplayName().getString());
-
-        SimpleResearchTeam team = new SimpleResearchTeam(player.getUUID(), player.getDisplayName().getString() + "'s Team");
-        team.setCreationTime(player.getServer().getTickCount() * 50);
-        team.init(player.level());
-
-        return team;
+        return createDefaultTeam(player.getUUID(), player.level());
     }
 
     @Override
@@ -134,8 +145,11 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
     }
 
     @Override
-    public TeamMember getMember(UUID member) {
-        return this.members.get(member);
+    public @NotNull TeamMember getMember(UUID uuid) {
+		TeamMember member = this.members.get(uuid);
+		if (member == null) return new TeamMember(uuid, ResearchTeamRole.NOT_MEMBER);
+
+		return member;
     }
 
     @Override

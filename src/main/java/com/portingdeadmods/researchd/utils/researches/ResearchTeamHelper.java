@@ -27,6 +27,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
@@ -84,11 +85,18 @@ public final class ResearchTeamHelper {
      * @return integer value permission level ( {@link ResearchTeamRole#getPermissionLevel()} )
      */
     public static int getPermissionLevel(Player player) {
-        UUID uuid = player.getUUID();
-        SimpleResearchTeam team = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeamByMember(uuid);
+        SimpleResearchTeam team = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeamByMember(player.getUUID());
+		if (team == null) return -1;
 
-        return team.getMember(uuid).role().getPermissionLevel();
+        return team.getMember(player.getUUID()).role().getPermissionLevel();
     }
+
+	public static int getPermissionLevel(UUID player, Level level) {
+		SimpleResearchTeam team = ResearchdSavedData.TEAM_RESEARCH.get().getData(level).getTeamByMember(player);
+		if (team == null) return -1;
+
+		return team.getMember(player).role().getPermissionLevel();
+	}
 
     public static boolean arePlayersSameTeam(Player player1, Player player2) {
         UUID uuid1 = player1.getUUID();
@@ -206,14 +214,20 @@ public final class ResearchTeamHelper {
             return;
         }
 
-        if (getPermissionLevel(requester) >= 1) {
+	    if (!arePlayersSameTeam(requester, member)) return;
+
+        if (getPermissionLevel(requester) >= 1 && (getPermissionLevel(requester) > getPermissionLevel(member, requester.level()))) {
             if (remove) {
                 getTeamByMember(requester).removeMember(member);
                 requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.REMOVED, PlayerUtils.getPlayerNameFromUUID(level, member)));
-                ServerPlayer kickedPlayer = server.getPlayerList().getPlayer(member);
+
+				ServerPlayer kickedPlayer = server.getPlayerList().getPlayer(member);
                 if (kickedPlayer != null) {
                     PacketDistributor.sendToPlayer(kickedPlayer, ClearGraphCachePayload.INSTANCE);
+					kickedPlayer.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.KICKED, getTeamByMember(requester).getName()));
                 }
+
+				savedData.setDefaultTeam(member, requester.level());
             } else {
                 getTeamByMember(requester).getSocialManager().addSentInvite(member);
             }
