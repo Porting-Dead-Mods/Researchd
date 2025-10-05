@@ -1,11 +1,11 @@
 package com.portingdeadmods.researchd.compat;
 
+import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.compat.kubejs.event.ResearchCompletedKubeEvent;
 import com.portingdeadmods.researchd.compat.kubejs.event.ResearchProgressKubeEvent;
 import com.portingdeadmods.researchd.compat.kubejs.event.ResearchdEvents;
-import com.portingdeadmods.researchd.utils.Result;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;

@@ -9,7 +9,6 @@ import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.team.ResearchTeamScreen;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
-import com.portingdeadmods.researchd.networking.cache.AskServerPlayers;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -96,8 +95,6 @@ public final class ResearchdClientEvents {
 //			Researchd.RESEARCH_PACK_REGISTRY.initialize(registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY));
 //			Researchd.debug("Researchd Constants Client", "Initialized research pack registry.");
 //		}
-
-		PacketDistributor.sendToServer(AskServerPlayers.UNIT);
 	}
 
 	@SubscribeEvent

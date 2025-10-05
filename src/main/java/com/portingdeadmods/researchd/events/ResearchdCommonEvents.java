@@ -10,7 +10,6 @@ import com.portingdeadmods.researchd.compat.KubeJSCompat;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
-import com.portingdeadmods.researchd.networking.cache.ReceiveServerPlayers;
 import com.portingdeadmods.researchd.networking.research.ResearchFinishedPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchMethodProgressSyncPayload;
 import com.portingdeadmods.researchd.registries.ResearchdCommands;
@@ -149,13 +148,6 @@ public final class ResearchdCommonEvents {
             data.initPlayer(player);
             ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
             ResearchdSavedData.TEAM_RESEARCH.get().syncToPlayer(player);
-        }
-    }
-
-    @SubscribeEvent
-    public static void onLoggingIn(PlayerEvent.PlayerLoggedInEvent event) {
-        if (event.getEntity() instanceof ServerPlayer sp) {
-            PacketDistributor.sendToAllPlayers(new ReceiveServerPlayers(List.of(sp.getGameProfile())));
         }
     }
 }

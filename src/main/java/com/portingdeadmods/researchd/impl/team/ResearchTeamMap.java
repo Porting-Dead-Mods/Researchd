@@ -2,9 +2,9 @@ package com.portingdeadmods.researchd.impl.team;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
-import com.portingdeadmods.researchd.client.cache.AllPlayersCache;
 import com.portingdeadmods.researchd.utils.ResearchdCodecUtils;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
 import net.minecraft.network.RegistryFriendlyByteBuf;

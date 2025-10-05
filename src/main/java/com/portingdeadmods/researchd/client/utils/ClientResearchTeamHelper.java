@@ -1,5 +1,6 @@
 package com.portingdeadmods.researchd.client.utils;
 
+import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;
 import com.portingdeadmods.researchd.api.client.TechList;
@@ -10,7 +11,6 @@ import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.ResearchTeamRole;
 import com.portingdeadmods.researchd.api.team.TeamMember;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
-import com.portingdeadmods.researchd.client.cache.AllPlayersCache;
 import com.portingdeadmods.researchd.client.screens.ResearchScreen;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.networking.team.*;
