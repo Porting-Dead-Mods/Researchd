@@ -2,21 +2,22 @@ package com.portingdeadmods.researchd.compat.kubejs;
 
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import dev.latvian.mods.kubejs.color.KubeColor;
-import dev.latvian.mods.kubejs.registry.BuilderBase;
-import dev.latvian.mods.rhino.util.ReturnsSelf;
+import dev.latvian.mods.kubejs.script.SourceLine;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 
 import java.util.Optional;
 
-@ReturnsSelf
-public class ResearchPackBuilder extends BuilderBase<ResearchPack> {
+public class ResearchPackBuilder {
+    public final ResourceLocation id;
+    public SourceLine sourceLine;
     private int color = -1;
     private ResourceLocation customTexture;
     private int sorting_value = 0;
 
     public ResearchPackBuilder(ResourceLocation id) {
-        super(id);
+        this.id = id;
+        this.sourceLine = SourceLine.UNKNOWN;
     }
 
     public ResearchPackBuilder color(Object color) {
@@ -49,7 +50,6 @@ public class ResearchPackBuilder extends BuilderBase<ResearchPack> {
         return this;
     }
 
-    @Override
     public ResearchPack createObject() {
         return new ResearchPack(color, sorting_value, Optional.ofNullable(customTexture));
     }

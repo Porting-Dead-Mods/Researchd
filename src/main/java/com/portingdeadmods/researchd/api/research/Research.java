@@ -21,7 +21,7 @@ import java.util.List;
  */
 public interface Research {
     Codec<Research> CODEC = ResearchdRegistries.RESEARCH_SERIALIZER.byNameCodec().dispatch(Research::getSerializer, ResearchSerializer::codec);
-    StreamCodec<RegistryFriendlyByteBuf, Research> STREAM_CODEC = ByteBufCodecs.registry(ResearchdRegistries.RESEARCH_SERIALIZER_KEY).dispatch(Research::getSerializer, ResearchSerializer::streamCodec);
+    StreamCodec<RegistryFriendlyByteBuf, Research> STREAM_CODEC = ByteBufCodecs.fromCodecTrusted(CODEC).cast();
     Codec<ResourceKey<Research>> RESOURCE_KEY_CODEC = ResourceKey.codec(ResearchdRegistries.RESEARCH_KEY);
     StreamCodec<ByteBuf, ResourceKey<Research>> RESOURCE_KEY_STREAM_CODEC = ResourceKey.streamCodec(ResearchdRegistries.RESEARCH_KEY);
 

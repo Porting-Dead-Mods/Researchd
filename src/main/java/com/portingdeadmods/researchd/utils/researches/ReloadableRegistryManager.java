@@ -8,6 +8,10 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.ResearchdRegistries;
+import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
+import com.portingdeadmods.researchd.compat.KubeJSCompat;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -55,6 +59,22 @@ public class ReloadableRegistryManager<T> extends SimpleJsonResourceReloadListen
                     Researchd.LOGGER.error("Parsing error loading shop entry {}", location, e);
                 }
             }
+        }
+
+        if (this.registry.equals(ResearchdRegistries.RESEARCH_KEY)) {
+            Map<ResourceLocation, Research> kubeJSResearches = KubeJSCompat.getKubeJSResearches();
+            for (Map.Entry<ResourceLocation, Research> entry : kubeJSResearches.entrySet()) {
+                ResourceKey<T> key = ResourceKey.create(this.registry, entry.getKey());
+                builder.put(key, (T) entry.getValue());
+            }
+            Researchd.LOGGER.info("Loaded {} KubeJS researches", kubeJSResearches.size());
+        } else if (this.registry.equals(ResearchdRegistries.RESEARCH_PACK_KEY)) {
+            Map<ResourceLocation, ResearchPack> kubeJSPacks = KubeJSCompat.getKubeJSResearchPacks();
+            for (Map.Entry<ResourceLocation, ResearchPack> entry : kubeJSPacks.entrySet()) {
+                ResourceKey<T> key = ResourceKey.create(this.registry, entry.getKey());
+                builder.put(key, (T) entry.getValue());
+            }
+            Researchd.LOGGER.info("Loaded {} KubeJS research packs", kubeJSPacks.size());
         }
 
         this.byName = builder.build();
