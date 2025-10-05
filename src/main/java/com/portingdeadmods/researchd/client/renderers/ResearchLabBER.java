@@ -1,6 +1,7 @@
 package com.portingdeadmods.researchd.client.renderers;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.portingdeadmods.portingdeadlibs.utils.AABBUtils;
 import com.portingdeadmods.researchd.ResearchdClient;
 import com.portingdeadmods.researchd.content.blockentities.ResearchLabControllerBE;
 import com.portingdeadmods.researchd.registries.ResearchdBlocks;
@@ -13,12 +14,14 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.client.NeoForgeRenderTypes;
+import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.client.RenderTypeHelper;
 import net.neoforged.neoforge.client.model.data.ModelData;
+import org.jetbrains.annotations.NotNull;
 
 public class ResearchLabBER implements BlockEntityRenderer<ResearchLabControllerBE> {
     private final BlockEntityRendererProvider.Context context;
@@ -100,5 +103,10 @@ public class ResearchLabBER implements BlockEntityRenderer<ResearchLabController
             }
             poseStack.popPose();
         }
+    }
+
+    @Override
+    public @NotNull AABB getRenderBoundingBox(ResearchLabControllerBE blockEntity) {
+        return AABBUtils.move(new AABB(blockEntity.getBlockPos()), Direction.UP, 1).inflate(1);
     }
 }

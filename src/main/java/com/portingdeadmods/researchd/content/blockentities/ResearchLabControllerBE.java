@@ -39,10 +39,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -56,6 +53,9 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
         super(ResearchdBlockEntityTypes.RESEARCH_LAB_CONTROLLER.get(), pos, blockState);
         this.partPos = LazyFinal.create();
         this.currentResearchDuration = -1;
+        this.researchPackUsage = new HashMap<>();
+        this.researchPacks = new ArrayList<>();
+
         addItemHandler(0, this::isItemValid);
     }
 
