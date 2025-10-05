@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.impl.team;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
 import com.portingdeadmods.researchd.api.team.TeamSocialManager;
 import net.minecraft.core.UUIDUtil;
@@ -13,22 +14,22 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public record SimpleTeamSocialManager(Set<UUID> receivedInvites, Set<UUID> sentInvites, Set<UUID> ignores) implements TeamSocialManager {
+public record SimpleTeamSocialManager(UniqueArray<UUID> receivedInvites, UniqueArray<UUID> sentInvites, UniqueArray<UUID> ignores) implements TeamSocialManager {
     public static final Codec<SimpleTeamSocialManager> CODEC = RecordCodecBuilder.create(inst -> inst.group(
-            CodecUtils.set(UUIDUtil.CODEC).fieldOf("received_invites").forGetter(SimpleTeamSocialManager::receivedInvites),
-            CodecUtils.set(UUIDUtil.CODEC).fieldOf("sent_invites").forGetter(SimpleTeamSocialManager::sentInvites),
-            CodecUtils.set(UUIDUtil.CODEC).fieldOf("ignores").forGetter(SimpleTeamSocialManager::ignores)
+            UniqueArray.CODEC(UUIDUtil.CODEC).fieldOf("received_invites").forGetter(SimpleTeamSocialManager::receivedInvites),
+		    UniqueArray.CODEC(UUIDUtil.CODEC).fieldOf("sent_invites").forGetter(SimpleTeamSocialManager::sentInvites),
+		    UniqueArray.CODEC(UUIDUtil.CODEC).fieldOf("ignores").forGetter(SimpleTeamSocialManager::ignores)
     ).apply(inst, SimpleTeamSocialManager::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, SimpleTeamSocialManager> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.collection(HashSet::new, UUIDUtil.STREAM_CODEC),
+            ByteBufCodecs.collection(UniqueArray::new, UUIDUtil.STREAM_CODEC),
             SimpleTeamSocialManager::sentInvites,
-            ByteBufCodecs.collection(HashSet::new, UUIDUtil.STREAM_CODEC),
+            ByteBufCodecs.collection(UniqueArray::new, UUIDUtil.STREAM_CODEC),
             SimpleTeamSocialManager::receivedInvites,
-            ByteBufCodecs.collection(HashSet::new, UUIDUtil.STREAM_CODEC),
+            ByteBufCodecs.collection(UniqueArray::new, UUIDUtil.STREAM_CODEC),
             SimpleTeamSocialManager::ignores,
             SimpleTeamSocialManager::new
     );
-    public static final SimpleTeamSocialManager EMPTY = new SimpleTeamSocialManager(Set.of(), Set.of(), Set.of());
+    public static final SimpleTeamSocialManager EMPTY = new SimpleTeamSocialManager(new UniqueArray<>(), new UniqueArray<>(), new UniqueArray<>());
 
     @Override
     public void addReceivedInvite(UUID uuid) {
