@@ -14,8 +14,7 @@ import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.OrResearchMethod;
-import dev.latvian.mods.kubejs.registry.BuilderBase;
-import dev.latvian.mods.rhino.util.ReturnsSelf;
+import dev.latvian.mods.kubejs.script.SourceLine;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -26,8 +25,9 @@ import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.*;
 
-@ReturnsSelf
-public class ResearchBuilder extends BuilderBase<Research> {
+public class ResearchBuilder {
+    public final ResourceLocation id;
+    public SourceLine sourceLine;
     private Item icon = Items.BOOK;
     private ResearchMethod researchMethod;
     private ResearchEffect researchEffect = EmptyResearchEffect.INSTANCE;
@@ -37,7 +37,8 @@ public class ResearchBuilder extends BuilderBase<Research> {
     private String literalDescription = null;
 
     public ResearchBuilder(ResourceLocation id) {
-        super(id);
+        this.id = id;
+        this.sourceLine = SourceLine.UNKNOWN;
         this.researchMethod = new ConsumeItemResearchMethod(Ingredient.of(Items.BOOK), 1);
     }
 
@@ -151,8 +152,11 @@ public class ResearchBuilder extends BuilderBase<Research> {
         return this;
     }
 
-    @Override
     public Research createObject() {
+        if (parents.isEmpty() && requiresParent) {
+            throw new IllegalStateException("Research '" + id + "' requires a parent but has no parents defined. Set requiresParent to false or add parents.");
+        }
+        
         SimpleResearch.Builder builder = SimpleResearch.builder();
         builder.icon(icon);
         builder.method(researchMethod);

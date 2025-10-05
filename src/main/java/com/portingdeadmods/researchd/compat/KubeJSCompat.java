@@ -3,17 +3,23 @@ package com.portingdeadmods.researchd.compat;
 import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
+import com.portingdeadmods.researchd.compat.kubejs.event.RegisterResearchPacksKubeEvent;
+import com.portingdeadmods.researchd.compat.kubejs.event.RegisterResearchesKubeEvent;
 import com.portingdeadmods.researchd.compat.kubejs.event.ResearchCompletedKubeEvent;
 import com.portingdeadmods.researchd.compat.kubejs.event.ResearchProgressKubeEvent;
 import com.portingdeadmods.researchd.compat.kubejs.event.ResearchdEvents;
 import dev.latvian.mods.kubejs.KubeJSPaths;
+import dev.latvian.mods.kubejs.script.ScriptType;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.fml.ModList;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 
 public class KubeJSCompat {
     private static final String KUBEJS_MOD_ID = "kubejs";
@@ -79,6 +85,30 @@ public class KubeJSCompat {
         }
     }
 
+    public static Map<ResourceLocation, Research> getKubeJSResearches() {
+        if (!isKubeJSLoaded()) {
+            return Map.of();
+        }
+        try {
+            return KubeJSEventHandler.getResearches();
+        } catch (Exception e) {
+            Researchd.LOGGER.error("Failed to get KubeJS researches", e);
+            return Map.of();
+        }
+    }
+
+    public static Map<ResourceLocation, ResearchPack> getKubeJSResearchPacks() {
+        if (!isKubeJSLoaded()) {
+            return Map.of();
+        }
+        try {
+            return KubeJSEventHandler.getResearchPacks();
+        } catch (Exception e) {
+            Researchd.LOGGER.error("Failed to get KubeJS research packs", e);
+            return Map.of();
+        }
+    }
+
     private static class KubeJSEventHandler {
         static void fireResearchCompleted(ServerPlayer player, ResourceKey<Research> research) {
             ResearchdEvents.RESEARCH_COMPLETED.post(
@@ -90,6 +120,18 @@ public class KubeJSCompat {
             ResearchdEvents.RESEARCH_PROGRESS.post(
                 new ResearchProgressKubeEvent(player, research, progress)
             );
+        }
+
+        static Map<ResourceLocation, Research> getResearches() {
+            RegisterResearchesKubeEvent event = new RegisterResearchesKubeEvent();
+            ResearchdEvents.REGISTER_RESEARCHES.post(ScriptType.SERVER, event);
+            return event.getResearches();
+        }
+
+        static Map<ResourceLocation, ResearchPack> getResearchPacks() {
+            RegisterResearchPacksKubeEvent event = new RegisterResearchPacksKubeEvent();
+            ResearchdEvents.REGISTER_RESEARCH_PACKS.post(ScriptType.SERVER, event);
+            return event.getResearchPacks();
         }
     }
 }
