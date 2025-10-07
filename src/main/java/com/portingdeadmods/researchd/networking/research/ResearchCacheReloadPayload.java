@@ -1,5 +1,6 @@
 package com.portingdeadmods.researchd.networking.research;
 
+import com.portingdeadmods.portingdeadlibs.PortingDeadLibsClient;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
@@ -39,6 +40,8 @@ public record ResearchCacheReloadPayload() implements CustomPacketPayload {
             }
             ResearchGraphCache.clearCache();
             ClientResearchTeamHelper.refreshResearchScreenData();
+
+            PortingDeadLibsClient.markTabsDirty();
         }).exceptionally(err -> {
            Researchd.LOGGER.error("Encountered error while handling ResearchCacheReloadPayload", err);
            return null;
