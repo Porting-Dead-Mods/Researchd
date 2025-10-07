@@ -1,11 +1,11 @@
-package com.portingdeadmods.researchd.client.screens.graph;
+package com.portingdeadmods.researchd.client.screens.research.graph;
 
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;
-import com.portingdeadmods.researchd.client.screens.ResearchScreen;
-import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
-import com.portingdeadmods.researchd.client.screens.widgets.ResearchGraphWidget;
+import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
+import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
+import com.portingdeadmods.researchd.client.screens.research.widgets.ResearchGraphWidget;
 import com.portingdeadmods.researchd.utils.Spaghetti;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;

@@ -11,9 +11,9 @@ import com.portingdeadmods.researchd.api.ValueEffect;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
-import com.portingdeadmods.researchd.api.research.methods.ResearchMethodProgress;
 import com.portingdeadmods.researchd.api.team.*;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
+import com.portingdeadmods.researchd.impl.ResearchProgress;
 import com.portingdeadmods.researchd.utils.ResearchdCodecUtils;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -173,7 +173,7 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
     }
 
     @Override
-    public Map<ResourceKey<Research>, ResearchMethodProgress<?>> getResearchProgresses() {
+    public Map<ResourceKey<Research>, ResearchProgress> getResearchProgresses() {
         return this.researches.progress();
     }
 
@@ -251,11 +251,11 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
         this.getResearches().putAll(researchInstances);
 
-        Map<ResourceKey<Research>, ResearchMethodProgress<?>> rmps = new HashMap<>();
+        Map<ResourceKey<Research>, ResearchProgress> rps = new HashMap<>();
         for (ResourceKey<Research> key : CommonResearchCache.GLOBAL_RESEARCHES.keySet()) {
-            rmps.put(key, ResearchMethodProgress.fromResearch(level, key));
+            rps.put(key, ResearchProgress.forResearch(key, level));
         }
-        this.getResearchProgresses().putAll(rmps);
+        this.getResearchProgresses().putAll(rps);
     }
 
     public TeamResearches getTeamResearches() {

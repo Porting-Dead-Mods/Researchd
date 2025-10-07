@@ -4,7 +4,7 @@ import com.portingdeadmods.researchd.api.research.GlobalResearch;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
-import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
+import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
 import net.minecraft.resources.ResourceKey;
 
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.client.screens;
+package com.portingdeadmods.researchd.client.screens.research;
 
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;

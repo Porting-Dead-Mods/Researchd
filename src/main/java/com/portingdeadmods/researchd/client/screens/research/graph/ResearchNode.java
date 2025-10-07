@@ -1,11 +1,11 @@
-package com.portingdeadmods.researchd.client.screens.graph;
+package com.portingdeadmods.researchd.client.screens.research.graph;
 
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
-import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
-import com.portingdeadmods.researchd.client.screens.lines.ResearchHead;
+import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
+import com.portingdeadmods.researchd.client.screens.research.graph.lines.ResearchHead;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;

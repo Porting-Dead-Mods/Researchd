@@ -3,7 +3,6 @@ package com.portingdeadmods.researchd.client.screens.team;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
-import com.portingdeadmods.researchd.client.screens.BaseScreen;
 import com.portingdeadmods.researchd.client.screens.team.widgets.PlayerManagementDraggableWidget;
 import com.portingdeadmods.researchd.client.screens.team.widgets.RecentResearchesList;
 import com.portingdeadmods.researchd.client.screens.team.widgets.TeamMembersList;
@@ -27,7 +26,7 @@ import net.minecraft.util.FastColor;
 import java.util.List;
 import java.util.Objects;
 
-public class ResearchTeamScreen extends BaseScreen {
+public class ResearchTeamScreen extends BaseTeamScreen {
     public static final ResourceLocation SCREEN_TEXTURE = Researchd.rl("textures/gui/team_screen.png");
     public static final WidgetSprites TEAM_MEMBER_BUTTON_SPRITES = new WidgetSprites(Researchd.rl("team_member"), Researchd.rl("team_member_focused"));
     public static final WidgetSprites SETTINGS_BUTTON_SPRITES = new WidgetSprites(Researchd.rl("settings_button"), Researchd.rl("settings_button_disabled"), Researchd.rl("settings_button_focused"));

@@ -1,8 +1,8 @@
 package com.portingdeadmods.researchd.utils;
 
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.client.screens.ResearchScreen;
-import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
+import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
+import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.phys.AABB;
 

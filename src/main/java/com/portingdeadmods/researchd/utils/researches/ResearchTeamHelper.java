@@ -5,12 +5,12 @@ import com.portingdeadmods.researchd.api.research.GlobalResearch;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
-import com.portingdeadmods.researchd.api.research.methods.ResearchMethodProgress;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.ResearchTeamRole;
 import com.portingdeadmods.researchd.api.team.TeamMember;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
+import com.portingdeadmods.researchd.impl.ResearchProgress;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
 import com.portingdeadmods.researchd.networking.cache.ClearGraphCachePayload;
@@ -479,13 +479,13 @@ public final class ResearchTeamHelper {
     public static void initializeTeamResearches(ResearchTeamMap teamMap, Level level) {
         for (SimpleResearchTeam team : teamMap.researchTeams().values()) {
             Map<ResourceKey<Research>, ResearchInstance> researches = team.getResearches();
-            Map<ResourceKey<Research>, ResearchMethodProgress<?>> progress = team.getResearchProgresses();
+            Map<ResourceKey<Research>, ResearchProgress> progress = team.getResearchProgresses();
             Set<GlobalResearch> globalResearches = new HashSet<>(CommonResearchCache.GLOBAL_RESEARCHES.values());
 
             for (GlobalResearch research : globalResearches) {
                 if (progress.containsKey(research.getResearchKey())) continue;
 
-                progress.put(research.getResearchKey(), ResearchMethodProgress.fromResearch(level, research.getResearchKey()));
+                progress.put(research.getResearchKey(), ResearchProgress.forResearch(research.getResearchKey(), level));
             }
 
             researches.values().stream().map(ResearchInstance::getResearch).forEach(globalResearches::remove);

@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.client.screens.lines;
+package com.portingdeadmods.researchd.client.screens.research.graph.lines;
 
 import org.jetbrains.annotations.NotNull;
 

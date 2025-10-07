@@ -6,6 +6,7 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.content.blockentities.ResearchLabControllerBE;
+import com.portingdeadmods.researchd.impl.ResearchProgress;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
@@ -23,7 +24,9 @@ public interface ResearchMethod {
 
     ResourceLocation id();
 
-    void checkProgress(Level level, ResourceKey<Research> research, ResearchMethodProgress<?> progress, MethodContext context);
+    void checkProgress(Level level, ResourceKey<Research> research, ResearchProgress.Task task, MethodContext context);
+
+    ResearchProgress createProgress();
 
     float getMaxProgress();
 

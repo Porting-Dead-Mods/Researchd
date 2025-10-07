@@ -8,13 +8,13 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
-import com.portingdeadmods.researchd.api.research.methods.ResearchMethodProgress;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.content.items.ResearchPackItem;
 import com.portingdeadmods.researchd.content.menus.ResearchLabMenu;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
+import com.portingdeadmods.researchd.impl.ResearchProgress;
 import com.portingdeadmods.researchd.registries.ResearchdBlockEntityTypes;
 import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
@@ -127,14 +127,13 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
         super.commonTick();
 
         ResearchTeam team = ResearchTeamHelper.getTeamByMember(this.getLevel(), this.getData(ResearchdAttachments.PLACED_BY_UUID));
-        if (team == null) return;
 
         ResourceKey<Research> current = team.getCurrentResearch();
         if (current == null) return;
 
-        ResearchMethodProgress<?> progress = team.getResearchProgresses().get(current);
+        ResearchProgress progress = team.getResearchProgresses().get(current);
 
-        progress.getMethod().checkProgress(this.level, current, progress, new ResearchMethod.SimpleMethodContext(team, this));
+        progress.checkProgress(current, this.level, new ResearchMethod.SimpleMethodContext(team, this));
     }
 
     @Override

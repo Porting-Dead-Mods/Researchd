@@ -2,16 +2,17 @@ package com.portingdeadmods.researchd.events;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.methods.ResearchMethodProgress;
+import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.TeamMember;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.compat.KubeJSCompat;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
+import com.portingdeadmods.researchd.impl.ResearchProgress;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.networking.research.ResearchFinishedPayload;
-import com.portingdeadmods.researchd.networking.research.ResearchMethodProgressSyncPayload;
+import com.portingdeadmods.researchd.networking.research.ResearchProgressSyncPayload;
 import com.portingdeadmods.researchd.registries.ResearchdCommands;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.resources.ResourceKey;
@@ -25,14 +26,11 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @EventBusSubscriber(modid = Researchd.MODID)
@@ -72,7 +70,7 @@ public final class ResearchdCommonEvents {
                 if (research != null) {
                     ResourceKey<Research> currentResearchKey = team.getCurrentResearch();
                     Research currentResearch = ResearchHelperCommon.getResearch(currentResearchKey, level);
-                    ResearchMethodProgress<?> currentResearchProgress = team.getCurrentProgress();
+                    ResearchProgress currentResearchProgress = team.getCurrentProgress();
 
                     if (currentResearchProgress != null) {
                         if (level.getGameTime() % 4 == 0) {
@@ -80,7 +78,7 @@ public final class ResearchdCommonEvents {
                                 ServerPlayer player = server.getPlayerList().getPlayer(memberUUID.player());
                                 if (player == null) continue;
 
-                                PacketDistributor.sendToPlayer(player, new ResearchMethodProgressSyncPayload(team.getCurrentResearch(), currentResearchProgress));
+                                PacketDistributor.sendToPlayer(player, new ResearchProgressSyncPayload(team.getCurrentResearch(), currentResearchProgress));
                             }
                         }
 
@@ -118,9 +116,9 @@ public final class ResearchdCommonEvents {
 			ResourceKey<Research> firstInQueue = team.getQueue().getFirst();
 			if (firstInQueue == null) continue;
 
-            ResearchMethodProgress<?> researchProgresses = team.getResearchProgresses().get(team.getQueue().getFirst());
-			if (researchProgresses != null) {
-				researchProgresses.checkProgress(level, team, firstInQueue);
+            ResearchProgress rp = team.getResearchProgresses().get(firstInQueue);
+			if (rp != null) {
+				rp.checkProgress(firstInQueue, level, new ResearchMethod.SimpleMethodContext(team, null));
 			}
         }
     }

@@ -1,17 +1,17 @@
-package com.portingdeadmods.researchd.client.screens.widgets;
+package com.portingdeadmods.researchd.client.screens.research.widgets;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
-import com.portingdeadmods.researchd.client.screens.ResearchScreen;
-import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
-import com.portingdeadmods.researchd.client.screens.graph.GraphLayoutManager;
-import com.portingdeadmods.researchd.client.screens.graph.GraphStateManager;
-import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
-import com.portingdeadmods.researchd.client.screens.lines.PotentialOverlap;
-import com.portingdeadmods.researchd.client.screens.lines.ResearchHead;
-import com.portingdeadmods.researchd.client.screens.lines.ResearchLine;
+import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
+import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
+import com.portingdeadmods.researchd.client.screens.research.graph.GraphLayoutManager;
+import com.portingdeadmods.researchd.client.screens.research.graph.GraphStateManager;
+import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
+import com.portingdeadmods.researchd.client.screens.research.graph.lines.PotentialOverlap;
+import com.portingdeadmods.researchd.client.screens.research.graph.lines.ResearchHead;
+import com.portingdeadmods.researchd.client.screens.research.graph.lines.ResearchLine;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.SharedConstants;
@@ -27,11 +27,13 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.portingdeadmods.researchd.client.screens.ResearchScreenWidget.PANEL_HEIGHT;
-import static com.portingdeadmods.researchd.client.screens.ResearchScreenWidget.PANEL_WIDTH;
+import static com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget.PANEL_HEIGHT;
+import static com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget.PANEL_WIDTH;
 
 // TODO: Fix null node children and parents
 public class ResearchGraphWidget extends AbstractWidget {
+    public static final int LEFT_MARGIN_WIDTH = 174;
+
     private @Nullable ResearchGraph graph;
     private final Map<ResearchNode, ArrayList<ResearchLine>> researchLines;
 
@@ -78,7 +80,7 @@ public class ResearchGraphWidget extends AbstractWidget {
 
             int centerX = baseX + ResearchScreenWidget.PANEL_WIDTH / 2;
             int centerY = baseY + ResearchScreenWidget.PANEL_HEIGHT / 2;
-            translate(this.getWidth() / 2 - centerX + ResearchScreen.LEFT_MARGIN_WIDTH, this.getHeight() / 2 - centerY);
+            translate(this.getWidth() / 2 - centerX + LEFT_MARGIN_WIDTH, this.getHeight() / 2 - centerY);
 
             calculateLines();
         }

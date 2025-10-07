@@ -55,6 +55,8 @@ public class ExampleCommands {
                             .withUnderlined(true)
                             .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, filePath))
                             .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Open directory"))))), true);
+            // Detects the datapack
+            source.getServer().getPackRepository().reload();
             return 1;
         } else {
             Exception error = result.error();

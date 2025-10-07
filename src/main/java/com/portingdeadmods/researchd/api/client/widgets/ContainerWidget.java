@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.client.screens;
+package com.portingdeadmods.researchd.api.client.widgets;
 
 import com.portingdeadmods.researchd.Researchd;
 import net.minecraft.client.gui.GuiGraphics;
@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.Collection;
 
+// TODO: Move to pdl
 public abstract class ContainerWidget<E> extends AbstractWidget {
     public static final ResourceLocation SCROLLER_SMALL_SPRITE = Researchd.rl("scroller_small");
     private final int itemWidth;

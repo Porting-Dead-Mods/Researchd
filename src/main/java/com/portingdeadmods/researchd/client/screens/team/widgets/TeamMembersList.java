@@ -1,8 +1,8 @@
 package com.portingdeadmods.researchd.client.screens.team.widgets;
 
 import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
+import com.portingdeadmods.researchd.api.client.widgets.ContainerWidget;
 import com.portingdeadmods.researchd.api.team.TeamMember;
-import com.portingdeadmods.researchd.client.screens.ContainerWidget;
 import com.portingdeadmods.researchd.client.screens.team.ResearchTeamScreen;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;

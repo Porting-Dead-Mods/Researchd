@@ -110,9 +110,9 @@ public class NetworkEvents {
                 RefreshPlayerManagementPayload::refreshPlayerManagementAction
         );
         registrar.playToClient(
-                ResearchMethodProgressSyncPayload.TYPE,
-                ResearchMethodProgressSyncPayload.STREAM_CODEC,
-                ResearchMethodProgressSyncPayload::researchMethodProgressSyncAction
+                ResearchProgressSyncPayload.TYPE,
+                ResearchProgressSyncPayload.STREAM_CODEC,
+                ResearchProgressSyncPayload::researchMethodProgressSyncAction
         );
     }
 }

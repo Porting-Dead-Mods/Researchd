@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.client.screens.lines;
+package com.portingdeadmods.researchd.client.screens.research.graph.lines;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
@@ -6,12 +6,9 @@ import net.minecraft.util.FastColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.Point;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
+import java.awt.*;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 
 public class ResearchLine implements Renderable {
 	private final LinkedList<Point> points;

@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.api.team;
 
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
-import com.portingdeadmods.researchd.api.research.methods.ResearchMethodProgress;
+import com.portingdeadmods.researchd.impl.ResearchProgress;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
@@ -78,9 +78,9 @@ public interface ResearchTeam {
     /**
      * Fetches the progress of the research that is currently researching.
      *
-     * @return {@link ResearchMethodProgress} of the research or null if no research is currently in progress.
+     * @return {@link ResearchProgress} of the research or null if no research is currently in progress.
      */
-    default ResearchMethodProgress<?> getCurrentProgress() {
+    default ResearchProgress getCurrentProgress() {
         return this.getResearchProgresses().get(this.getCurrentResearch());
     }
 
@@ -90,7 +90,7 @@ public interface ResearchTeam {
 
     Map<ResourceKey<Research>, ResearchInstance> getResearches();
 
-    Map<ResourceKey<Research>, ResearchMethodProgress<?>> getResearchProgresses();
+    Map<ResourceKey<Research>, ResearchProgress> getResearchProgresses();
 
     void completeResearch(ResourceKey<Research> research, long completionTime, Level level);
 

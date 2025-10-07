@@ -7,11 +7,11 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
-import com.portingdeadmods.researchd.api.research.methods.ResearchMethodProgress;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
 import com.portingdeadmods.researchd.api.team.ValueEffectsHolder;
 import com.portingdeadmods.researchd.content.blockentities.ResearchLabControllerBE;
+import com.portingdeadmods.researchd.impl.ResearchProgress;
 import com.portingdeadmods.researchd.registries.ResearchdValueEffects;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -42,7 +42,7 @@ public record ConsumePackResearchMethod(List<ResourceKey<ResearchPack>> packs, i
     }
 
     @Override
-    public void checkProgress(Level level, ResourceKey<Research> research, ResearchMethodProgress<?> progress, MethodContext context) {
+    public void checkProgress(Level level, ResourceKey<Research> research, ResearchProgress.Task task, MethodContext context) {
         if (context instanceof SimpleMethodContext(ValueEffectsHolder team, ResearchLabControllerBE blockEntity) && blockEntity != null) {
             List<ResourceKey<ResearchPack>> packs = this.packs();
             blockEntity.currentResearchDuration = this.duration();
@@ -53,7 +53,7 @@ public record ConsumePackResearchMethod(List<ResourceKey<ResearchPack>> packs, i
             for (ResourceKey<ResearchPack> pack : packs) {
                 blockEntity.researchPackUsage.put(pack, Math.max(blockEntity.researchPackUsage.get(pack) - ((1f / blockEntity.currentResearchDuration) / team.getEffectValue(ResearchdValueEffects.RESEARCH_LAB_PRODUCTIVITY)), 0f));
             }
-            progress.addProgress(1f / blockEntity.currentResearchDuration);
+            task.addProgress(1f / blockEntity.currentResearchDuration);
         }
     }
 
@@ -65,6 +65,11 @@ public record ConsumePackResearchMethod(List<ResourceKey<ResearchPack>> packs, i
     @Override
     public float getMaxProgress() {
         return this.count;
+    }
+
+    @Override
+    public ResearchProgress createProgress() {
+        return ResearchProgress.single(this);
     }
 
     public List<ItemStack> asStacks() {

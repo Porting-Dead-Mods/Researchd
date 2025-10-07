@@ -6,7 +6,7 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
-import com.portingdeadmods.researchd.api.research.methods.ResearchMethodProgress;
+import com.portingdeadmods.researchd.impl.ResearchProgress;
 import com.portingdeadmods.researchd.impl.research.SimpleResearchQueue;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -20,7 +20,7 @@ import java.util.function.Function;
 
 public record TeamResearches(SimpleResearchQueue researchQueue,
                              HashMap<ResourceKey<Research>, ResearchInstance> researches,
-                             HashMap<ResourceKey<Research>, ResearchMethodProgress<?>> progress) {
+                             HashMap<ResourceKey<Research>, ResearchProgress> progress) {
     public static final TeamResearches EMPTY = new TeamResearches(
             new SimpleResearchQueue(),
             new HashMap<>(),
@@ -30,7 +30,7 @@ public record TeamResearches(SimpleResearchQueue researchQueue,
             SimpleResearchQueue.CODEC.fieldOf("researchQueue").forGetter(TeamResearches::researchQueue),
             Codec.unboundedMap(Research.RESOURCE_KEY_CODEC, ResearchInstance.CODEC).xmap(HashMap::new, Function.identity()).fieldOf("researchPacks")
                     .forGetter(TeamResearches::researches),
-            Codec.unboundedMap(Research.RESOURCE_KEY_CODEC, ResearchMethodProgress.CODEC).xmap(HashMap::new, Function.identity()).fieldOf("completionProgress")
+            Codec.unboundedMap(Research.RESOURCE_KEY_CODEC, ResearchProgress.CODEC).xmap(HashMap::new, Function.identity()).fieldOf("completionProgress")
                     .forGetter(TeamResearches::progress)
     ).apply(instance, TeamResearches::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, TeamResearches> STREAM_CODEC = StreamCodec.composite(
@@ -38,7 +38,7 @@ public record TeamResearches(SimpleResearchQueue researchQueue,
             TeamResearches::researchQueue,
             ByteBufCodecs.map(HashMap::new, Research.RESOURCE_KEY_STREAM_CODEC, ResearchInstance.STREAM_CODEC),
             TeamResearches::researches,
-            ByteBufCodecs.map(HashMap::new, Research.RESOURCE_KEY_STREAM_CODEC, ResearchMethodProgress.STREAM_CODEC),
+            ByteBufCodecs.map(HashMap::new, Research.RESOURCE_KEY_STREAM_CODEC, ResearchProgress.STREAM_CODEC),
             TeamResearches::progress,
             TeamResearches::new
     );
@@ -51,8 +51,8 @@ public record TeamResearches(SimpleResearchQueue researchQueue,
     /**
      * Gets the root progress of a research
      */
-    public <T extends ResearchMethod> ResearchMethodProgress<T> getProgress(ResourceKey<Research> research) {
-        return (ResearchMethodProgress<T>) this.progress().get(research);
+    public <T extends ResearchMethod> ResearchProgress getProgress(ResourceKey<Research> research) {
+        return this.progress().get(research);
     }
 
     public @Nullable ResourceKey<Research> currentResearch() {

@@ -1,18 +1,13 @@
-package com.portingdeadmods.researchd.client.screens.lines;
+package com.portingdeadmods.researchd.client.screens.research.graph.lines;
 
-import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
-import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
+import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
+import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.FastColor;
 
 import java.awt.*;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 public class ResearchHead {
 	private int x;

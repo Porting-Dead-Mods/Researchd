@@ -16,15 +16,16 @@ public final class ResearchdRegistries {
 	public static final ResourceKey<Registry<ResearchPack>> RESEARCH_PACK_KEY =
 			ResourceKey.createRegistryKey(Researchd.rl("research_pack"));
 
-	public static final ResourceKey<Registry<ResearchSerializer<?>>> RESEARCH_SERIALIZER_KEY =
+    public static final ResourceKey<Registry<ValueEffect>> VALUE_EFFECT_KEY =
+            ResourceKey.createRegistryKey(Researchd.rl("value_effect"));
+
+
+    public static final ResourceKey<Registry<ResearchSerializer<?>>> RESEARCH_SERIALIZER_KEY =
 			ResourceKey.createRegistryKey(Researchd.rl("research_serializer"));
 	public static final ResourceKey<Registry<ResearchMethodSerializer<?>>> RESEARCH_METHOD_SERIALIZER_KEY =
 			ResourceKey.createRegistryKey(Researchd.rl("research_method_serializer"));
 	public static final ResourceKey<Registry<ResearchEffectSerializer<?>>> RESEARCH_EFFECT_SERIALIZER_KEY =
 			ResourceKey.createRegistryKey(Researchd.rl("research_effect_serializer"));
-
-	public static final ResourceKey<Registry<ValueEffect>> VALUE_EFFECT_KEY =
-			ResourceKey.createRegistryKey(Researchd.rl("value_effect"));
 
 	public static final Registry<ResearchSerializer<?>> RESEARCH_SERIALIZER = new RegistryBuilder<>(RESEARCH_SERIALIZER_KEY).sync(true).create();
 	public static final Registry<ResearchMethodSerializer<?>> RESEARCH_METHOD_SERIALIZER = new RegistryBuilder<>(RESEARCH_METHOD_SERIALIZER_KEY).sync(true).create();

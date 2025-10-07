@@ -2,7 +2,6 @@ package com.portingdeadmods.researchd.client.renderers;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.utils.AABBUtils;
-import com.portingdeadmods.researchd.ResearchdClient;
 import com.portingdeadmods.researchd.content.blockentities.ResearchLabControllerBE;
 import com.portingdeadmods.researchd.registries.ResearchdBlocks;
 import net.minecraft.client.Minecraft;
@@ -29,12 +28,15 @@ public class ResearchLabBER implements BlockEntityRenderer<ResearchLabController
     private final BakedModel model;
     private final BlockState blockState;
 
-    private final double PACK_RENDERING_HEIGHT = 1.4;
-    private final double PACK_RENDERING_RADIUS = 0.75;
+    private static final double PACK_RENDERING_HEIGHT = 1.4;
+    private static final double PACK_RENDERING_RADIUS = 0.75;
 
     public ResearchLabBER(BlockEntityRendererProvider.Context context) {
+        Minecraft mc = Minecraft.getInstance();
+        BlockRenderDispatcher blockRenderer = mc.getBlockRenderer();
+
         this.context = context;
-        this.model = Minecraft.getInstance().getModelManager().getModel(ResearchdClient.RESEARCH_LAB_MODEL);
+        this.model = blockRenderer.getBlockModel(ResearchdBlocks.RESEARCH_LAB_CONTROLLER.get().defaultBlockState());
         this.blockState = ResearchdBlocks.RESEARCH_LAB_CONTROLLER.get().defaultBlockState();
     }
 
@@ -43,25 +45,25 @@ public class ResearchLabBER implements BlockEntityRenderer<ResearchLabController
         // Lab Model
         poseStack.pushPose();
         {
-        poseStack.scale(3f / 2.8f,  3f / 2.8f, 3f / 2.8f);
-        poseStack.translate(0.5, 0, 0.5);
-        BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
-        BlockState state = researchLabControllerBE.getBlockState();
-        BlockPos pos = researchLabControllerBE.getBlockPos();
-        blockRenderer.getModelRenderer().tesselateBlock(
-                researchLabControllerBE.getLevel(),
-                blockRenderer.getBlockModel(state),
-                state,
-                pos,
-                poseStack,
-                multiBufferSource.getBuffer(RenderTypeHelper.getEntityRenderType(RenderType.TRANSLUCENT, false)),
-                true,
-                researchLabControllerBE.getLevel().random,
-                state.getSeed(pos),
-                OverlayTexture.NO_OVERLAY,
-                ModelData.EMPTY,
-                RenderTypeHelper.getEntityRenderType(RenderType.TRANSLUCENT, false)
-        );
+            poseStack.scale(3f / 2.8f, 3f / 2.8f, 3f / 2.8f);
+            poseStack.translate(0.5, 0, 0.5);
+            BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
+            BlockState state = researchLabControllerBE.getBlockState();
+            BlockPos pos = researchLabControllerBE.getBlockPos();
+            blockRenderer.getModelRenderer().tesselateBlock(
+                    researchLabControllerBE.getLevel(),
+                    this.model,
+                    state,
+                    pos,
+                    poseStack,
+                    multiBufferSource.getBuffer(RenderTypeHelper.getEntityRenderType(RenderType.TRANSLUCENT, false)),
+                    true,
+                    researchLabControllerBE.getLevel().random,
+                    state.getSeed(pos),
+                    OverlayTexture.NO_OVERLAY,
+                    ModelData.EMPTY,
+                    RenderTypeHelper.getEntityRenderType(RenderType.TRANSLUCENT, false)
+            );
         }
 
         poseStack.popPose();

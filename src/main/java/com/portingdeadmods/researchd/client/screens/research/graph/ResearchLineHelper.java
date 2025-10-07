@@ -1,6 +1,6 @@
-package com.portingdeadmods.researchd.client.screens.graph;
+package com.portingdeadmods.researchd.client.screens.research.graph;
 
-import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
+import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
 import net.minecraft.client.gui.GuiGraphics;
 
 public class ResearchLineHelper {

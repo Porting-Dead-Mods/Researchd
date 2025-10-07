@@ -6,11 +6,11 @@ import com.portingdeadmods.portingdeadlibs.api.client.screens.widgets.AbstractSc
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
-import com.portingdeadmods.researchd.api.research.methods.ResearchMethodProgress;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
-import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
+import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.content.menus.ResearchLabMenu;
+import com.portingdeadmods.researchd.impl.ResearchProgress;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
@@ -220,8 +220,8 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
 
         int x = this.leftPos + 12;
         int y = this.topPos + 72;
-        ResearchMethodProgress<?> rmp = ClientResearchTeamHelper.getTeam().getResearchProgresses().get(team.getCurrentResearch());
-        float progress = rmp == null ? 0f : rmp.getProgressPercent();
+        ResearchProgress rp = ClientResearchTeamHelper.getTeam().getResearchProgresses().get(team.getCurrentResearch());
+        float progress = rp == null ? 0f : (rp.getProgress() / rp.getMaxProgress());
         int width = (int) (progress * PROGRESS_BAR_WIDTH);
         guiGraphics.fill(x, y, x + width, y + 6, PROGRESS_COLOR);
 

@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.client.screens.widgets;
+package com.portingdeadmods.researchd.client.screens.research.widgets;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
@@ -6,13 +6,13 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
-import com.portingdeadmods.researchd.api.research.methods.ResearchMethodProgress;
 import com.portingdeadmods.researchd.api.team.ResearchQueue;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
-import com.portingdeadmods.researchd.client.screens.ResearchScreen;
-import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
+import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
+import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
+import com.portingdeadmods.researchd.impl.ResearchProgress;
 import com.portingdeadmods.researchd.networking.research.ResearchQueueRemovePayload;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -148,8 +148,8 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
         ResearchStatus status = instance.getResearchStatus();
         GuiUtils.drawImg(guiGraphics, status.getSpriteTexture(spriteType), x, y, PANEL_WIDTH, spriteType.getHeight());
 
-        ResearchMethodProgress<?> rmp = ClientResearchTeamHelper.getTeam().getResearchProgresses().get(instance.getKey());
-        float progress = rmp == null ? 0f : rmp.getProgressPercent();
+        ResearchProgress rmp = ClientResearchTeamHelper.getTeam().getResearchProgresses().get(instance.getKey());
+        float progress = rmp == null ? 0f : (rmp.getProgress() / rmp.getMaxProgress());
 
         guiGraphics.blit(ResearchStatus.RESEARCHED.getSpriteTexture(spriteType), x, y, 0, 0, (int) (progress * PANEL_WIDTH), spriteType.getHeight(), PANEL_WIDTH, spriteType.getHeight());
 

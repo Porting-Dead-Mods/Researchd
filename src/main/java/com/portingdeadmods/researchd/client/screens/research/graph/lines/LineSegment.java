@@ -1,7 +1,6 @@
-package com.portingdeadmods.researchd.client.screens.lines;
+package com.portingdeadmods.researchd.client.screens.research.graph.lines;
 
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.client.screens.graph.ResearchNode;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
 

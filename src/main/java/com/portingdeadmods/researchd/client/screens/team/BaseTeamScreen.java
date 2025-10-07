@@ -1,14 +1,11 @@
-package com.portingdeadmods.researchd.client.screens;
+package com.portingdeadmods.researchd.client.screens.team;
 
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
-public abstract class BaseScreen extends Screen {
+public abstract class BaseTeamScreen extends Screen {
     protected int topPos;
     protected int leftPos;
     protected final int textureWidth;
@@ -16,7 +13,7 @@ public abstract class BaseScreen extends Screen {
     protected final int width;
     protected final int height;
 
-    protected BaseScreen(Component title, int textureWidth, int textureHeight, int width, int height) {
+    protected BaseTeamScreen(Component title, int textureWidth, int textureHeight, int width, int height) {
         super(title);
         this.textureWidth = textureWidth;
         this.textureHeight = textureHeight;

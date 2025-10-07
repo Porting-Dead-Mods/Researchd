@@ -3,7 +3,6 @@ package com.portingdeadmods.researchd.client.screens.team;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.ResearchTeamRole;
-import com.portingdeadmods.researchd.client.screens.BaseScreen;
 import com.portingdeadmods.researchd.client.screens.team.widgets.PlayerManagementDraggableWidget;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.networking.team.LeaveTeamPayload;
@@ -24,7 +23,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.Objects;
 
-public class ResearchTeamSettingsScreen extends BaseScreen {
+public class ResearchTeamSettingsScreen extends BaseTeamScreen {
     public static final ResourceLocation SCREEN_TEXTURE = Researchd.rl("textures/gui/team_settings_screen.png");
     private LinearLayout layout;
     private final Screen prevScreen;

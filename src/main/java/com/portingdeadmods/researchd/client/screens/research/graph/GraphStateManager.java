@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.client.screens.graph;
+package com.portingdeadmods.researchd.client.screens.research.graph;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;

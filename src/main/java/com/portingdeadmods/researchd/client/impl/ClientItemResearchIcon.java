@@ -3,7 +3,7 @@ package com.portingdeadmods.researchd.client.impl;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
 import com.portingdeadmods.researchd.api.client.renderers.CycledItemRenderer;
-import com.portingdeadmods.researchd.client.screens.ResearchScreenWidget;
+import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
 import com.portingdeadmods.researchd.impl.research.ItemResearchIcon;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
@@ -17,7 +17,7 @@ public final class ClientItemResearchIcon implements ClientResearchIcon<ItemRese
 
     public ClientItemResearchIcon(ItemResearchIcon icon) {
         this.icon = icon;
-        List<ItemStack> stacks = icon.getStacks();
+        List<ItemStack> stacks = icon.items();
         this.renderer = new CycledItemRenderer(stacks.size());
         this.renderer.setItems(stacks);
     }
