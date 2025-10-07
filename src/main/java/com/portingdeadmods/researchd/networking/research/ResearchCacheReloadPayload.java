@@ -8,9 +8,11 @@ import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
@@ -39,6 +41,12 @@ public record ResearchCacheReloadPayload() implements CustomPacketPayload {
             }
             ResearchGraphCache.clearCache();
             ClientResearchTeamHelper.refreshResearchScreenData();
+
+            var mc = Minecraft.getInstance();
+            if (mc.player != null) {
+                CreativeModeTabs.CACHED_PARAMETERS = null;
+                CreativeModeTabs.tryRebuildTabContents(mc.player.connection.enabledFeatures(), mc.player.canUseGameMasterBlocks() && mc.options.operatorItemsTab().get(), mc.level.registryAccess());
+            }
         }).exceptionally(err -> {
            Researchd.LOGGER.error("Encountered error while handling ResearchCacheReloadPayload", err);
            return null;
