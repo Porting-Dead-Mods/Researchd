@@ -124,5 +124,15 @@ public abstract class AbstractResearchEffectListWidget<T extends ResearchEffectL
         }
         return new Size2i(0, 0);
     }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        for (AbstractResearchInfoWidget<? extends ResearchEffect> effect : this.effects) {
+            if (effect.isHovered()) {
+                return effect.mouseClicked(mouseX, mouseY, button);
+            }
+        }
+        return false;
+    }
 }
 

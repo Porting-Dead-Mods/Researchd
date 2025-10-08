@@ -1,5 +1,6 @@
 package com.portingdeadmods.researchd.client.screens.team;
 
+import com.portingdeadmods.portingdeadlibs.utils.PlayerUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.ResearchTeamRole;
@@ -7,7 +8,6 @@ import com.portingdeadmods.researchd.client.screens.team.widgets.PlayerManagemen
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.networking.team.LeaveTeamPayload;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
-import com.portingdeadmods.researchd.utils.PlayerUtils;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -86,7 +86,7 @@ public class ResearchTeamSettingsScreen extends BaseTeamScreen {
             this.transferOwnershipWindow.setVisible(!this.transferOwnershipWindow.visible);
         }).size(112, 16).build();
         this.leaveButton = Button.builder(ResearchdTranslations.component(ResearchdTranslations.Team.BUTTON_LEAVE_TEAM), btn -> {
-	        PacketDistributor.sendToServer(new LeaveTeamPayload(PlayerUtils.EMPTY_UUID));
+	        PacketDistributor.sendToServer(new LeaveTeamPayload(PlayerUtils.EmptyUUID));
         }).size(112, 16).build();
 
         if (ClientResearchTeamHelper.getPlayerRole(Minecraft.getInstance().player.getUUID()) == ResearchTeamRole.OWNER) {

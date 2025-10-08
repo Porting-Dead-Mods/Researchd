@@ -144,6 +144,14 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (this.effectWidget.isHovered()) {
+            return this.effectWidget.mouseClicked(mouseX, mouseY, button);
+        }
+
+        if (this.methodWidget.isHovered()) {
+            return this.methodWidget.mouseClicked(mouseX, mouseY, button);
+        }
+
         int scrollerX = getX() + getWidth() - 9;
         int trackTop = getY() + PADDING_Y;
         int trackRange = 41;

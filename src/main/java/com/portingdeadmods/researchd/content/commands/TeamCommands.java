@@ -2,9 +2,9 @@ package com.portingdeadmods.researchd.content.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import com.portingdeadmods.portingdeadlibs.utils.PlayerUtils;
 import com.portingdeadmods.portingdeadlibs.utils.SuggestionUtils;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
-import com.portingdeadmods.researchd.utils.PlayerUtils;
 import com.portingdeadmods.researchd.utils.ResearchdSuggestionUtils;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
 import net.minecraft.commands.CommandSourceStack;
@@ -54,7 +54,7 @@ public class TeamCommands {
 							ServerPlayer player = source.getPlayer();
 
 							if (player != null) {
-								ResearchTeamHelper.handleLeaveTeam(player, PlayerUtils.EMPTY_UUID);
+								ResearchTeamHelper.handleLeaveTeam(player, PlayerUtils.EmptyUUID);
 							}
 
 							return 1;
@@ -67,7 +67,7 @@ public class TeamCommands {
 
 								if (player != null) {
 									if (StringArgumentType.getString(context, "nextToLead").equals("none"))
-										ResearchTeamHelper.handleLeaveTeam(player, PlayerUtils.EMPTY_UUID);
+										ResearchTeamHelper.handleLeaveTeam(player, PlayerUtils.EmptyUUID);
 									else {
 										ResearchTeamHelper.handleLeaveTeam(player, PlayerUtils.getPlayerUUIDFromName(context.getSource().getLevel(), StringArgumentType.getString(context, "nextToLead")));
 									}
