@@ -2,6 +2,8 @@ package com.portingdeadmods.researchd.client.impl.effects;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidget;
+import com.portingdeadmods.researchd.compat.JEICompat;
+import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import com.portingdeadmods.researchd.impl.research.effect.RecipeUnlockEffect;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.client.Minecraft;
@@ -16,6 +18,7 @@ import net.neoforged.neoforge.common.util.Size2i;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class RecipeUnlockEffectWidget extends AbstractResearchInfoWidget<RecipeUnlockEffect> {
     public static final ResourceLocation RECIPE_ICON_SPRITE = Researchd.rl("recipe_icon");
@@ -53,7 +56,7 @@ public class RecipeUnlockEffectWidget extends AbstractResearchInfoWidget<RecipeU
         if (this.icon != null) {
             guiGraphics.fill(this.getX(), this.getY(), this.getX() + 16, this.getY() + 16, FastColor.ARGB32.color(69, 69, 69));
             guiGraphics.renderItem(this.icon, this.getX(), this.getY());
-            guiGraphics.blitSprite(RECIPE_ICON_SPRITE, this.getX() + 7, this.getY() + 6, 16, 16);
+            guiGraphics.blitSprite(RECIPE_ICON_SPRITE, this.getX() + 7, this.getY() + 6, 200, 16, 16);
         } else {
             guiGraphics.drawString(font, "MISSING RECIPE", this.getX() + 2, this.getY() + 4, 0xFF5555, true);
         }
@@ -64,6 +67,17 @@ public class RecipeUnlockEffectWidget extends AbstractResearchInfoWidget<RecipeU
         if (this.isHovered()) {
             MutableComponent component = ResearchdTranslations.component(ResearchdTranslations.Research.RECIPE_UNLOCK_EFFECT_TOOLTIP, value.recipes().toString());
             guiGraphics.renderTooltip(this.font, component, mouseX, mouseY);
+        }
+    }
+
+    // TODO: Doesnt get called in list yet
+    @Override
+    public void onClick(double mouseX, double mouseY, int button) {
+        if (this.isHovered()) {
+            if (ResearchdCompatHandler.isJeiLoaded()) {
+                Set<RecipeHolder<?>> recipes1 = this.value.getRecipes(Minecraft.getInstance().level);
+                JEICompat.openRecipes(recipes1);
+            }
         }
     }
 }

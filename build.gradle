@@ -20,6 +20,11 @@ repositories {
     maven { url 'https://jitpack.io' }
     maven {url "https://maven.latvian.dev/releases" }
 
+    maven {
+        name = "Jared's maven"
+        url = "https://maven.blamejared.com/"
+    }
+
     exclusiveContent {
         forRepository {
             maven {
@@ -100,10 +105,15 @@ configurations {
 
 dependencies {
     implementation "com.github.Porting-Dead-Mods:Porting-Dead-Libs:${pdl_version}"
+
     compileOnly "dev.latvian.mods:kubejs-neoforge:${kubejs_version}"
     compileOnly "dev.latvian.mods:rhino-neoforge:${rhino_version}"
     localRuntime "dev.latvian.mods:kubejs-neoforge:${kubejs_version}"
     localRuntime "dev.latvian.mods:rhino-neoforge:${rhino_version}"
+
+    compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
+    compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
+    localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {

@@ -6,4 +6,9 @@ public class ResearchdCompatHandler {
     public static boolean isKubeJSLoaded() {
         return ModList.get().isLoaded("kubejs");
     }
+
+    public static boolean isJeiLoaded() {
+        return ModList.get().isLoaded("jei");
+    }
+
 }

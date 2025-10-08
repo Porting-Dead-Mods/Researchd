@@ -114,4 +114,14 @@ public abstract class AbstractResearchMethodListWidget<T extends ResearchMethodL
         }
         return new Size2i(0, 0);
     }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        for (AbstractResearchInfoWidget<? extends ResearchMethod> method : this.methods) {
+            if (method.isHovered()) {
+                return method.mouseClicked(mouseX, mouseY, button);
+            }
+        }
+        return false;
+    }
 }

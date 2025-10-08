@@ -1,12 +1,12 @@
 package com.portingdeadmods.researchd.client.screens.team.widgets;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.portingdeadmods.portingdeadlibs.utils.PlayerUtils;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.team.TeamMember;
 import com.portingdeadmods.researchd.client.screens.team.ResearchTeamScreen;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
-import com.portingdeadmods.researchd.utils.PlayerUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;

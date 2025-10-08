@@ -1,6 +1,7 @@
 package com.portingdeadmods.researchd.utils.researches;
 
 import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
+import com.portingdeadmods.portingdeadlibs.utils.PlayerUtils;
 import com.portingdeadmods.researchd.api.research.GlobalResearch;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
@@ -17,7 +18,6 @@ import com.portingdeadmods.researchd.networking.cache.ClearGraphCachePayload;
 import com.portingdeadmods.researchd.networking.team.RefreshPlayerManagementPayload;
 import com.portingdeadmods.researchd.networking.team.RefreshResearchesPayload;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
-import com.portingdeadmods.researchd.utils.PlayerUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
@@ -132,7 +132,7 @@ public final class ResearchTeamHelper {
             return;
         }
         if (team != null && (team.getSocialManager().containsSentInvite(requesterId))) {
-            ResearchTeamHelper.handleLeaveTeam(requester, PlayerUtils.EMPTY_UUID);
+            ResearchTeamHelper.handleLeaveTeam(requester, PlayerUtils.EmptyUUID);
 
             savedData.researchTeams().put(requesterId, team);
             requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.YOU_JOINED_TEAM, team.getName()));
@@ -183,7 +183,7 @@ public final class ResearchTeamHelper {
 
                 savedData.researchTeams().put(requesterId, SimpleResearchTeam.createDefaultTeam(requester));
             } else {
-                if (nextToLead == PlayerUtils.EMPTY_UUID || nextToLead == null) {
+                if (nextToLead == PlayerUtils.EmptyUUID || nextToLead == null) {
                     requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NO_NEXT_LEADER));
                     return;
                 }

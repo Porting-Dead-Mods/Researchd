@@ -10,7 +10,7 @@ import java.util.OptionalDouble;
 
 import static net.minecraft.client.renderer.RenderStateShard.*;
 
-public class ResearchdRenderTypes {
+public final class ResearchdRenderTypes {
 	public static final RenderType LINES_NONTRANSLUCENT = createDefault(
 			Researchd.MODID+":nontranslucent_lines", DefaultVertexFormat.POSITION_COLOR_NORMAL, VertexFormat.Mode.LINES,
 			RenderType.CompositeState.builder()

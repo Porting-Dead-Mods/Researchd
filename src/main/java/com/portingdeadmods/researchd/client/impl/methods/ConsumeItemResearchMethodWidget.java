@@ -2,6 +2,8 @@ package com.portingdeadmods.researchd.client.impl.methods;
 
 import com.portingdeadmods.researchd.api.client.renderers.CycledItemRenderer;
 import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidget;
+import com.portingdeadmods.researchd.compat.JEICompat;
+import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -11,6 +13,8 @@ import net.minecraft.util.FastColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.util.Size2i;
+
+import java.util.Arrays;
 
 public class ConsumeItemResearchMethodWidget extends AbstractResearchInfoWidget<ConsumeItemResearchMethod> {
     private final CycledItemRenderer itemRenderer;
@@ -36,6 +40,16 @@ public class ConsumeItemResearchMethodWidget extends AbstractResearchInfoWidget<
             Ingredient consume = value.toConsume();
             ItemStack stack = new ItemStack(consume.getItems()[0].getItem(), value.count());
             guiGraphics.renderTooltip(font, Screen.getTooltipFromItem(Minecraft.getInstance(), stack), stack.getTooltipImage(), stack, mouseX, mouseY);
+        }
+    }
+
+    @Override
+    public void onClick(double mouseX, double mouseY, int button) {
+        if (this.isHovered()) {
+            if (ResearchdCompatHandler.isJeiLoaded()) {
+                Ingredient recipes1 = this.value.toConsume();
+                JEICompat.openRecipes(Arrays.asList(recipes1.getItems()));
+            }
         }
     }
 

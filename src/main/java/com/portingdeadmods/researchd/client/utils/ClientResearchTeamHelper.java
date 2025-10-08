@@ -1,6 +1,7 @@
 package com.portingdeadmods.researchd.client.utils;
 
 import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
+import com.portingdeadmods.portingdeadlibs.utils.PlayerUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;
 import com.portingdeadmods.researchd.api.client.TechList;
@@ -19,7 +20,6 @@ import com.portingdeadmods.researchd.client.screens.team.widgets.PlayerManagemen
 import com.portingdeadmods.researchd.client.screens.team.widgets.TeamMembersList;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.networking.team.*;
-import com.portingdeadmods.researchd.utils.PlayerUtils;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;

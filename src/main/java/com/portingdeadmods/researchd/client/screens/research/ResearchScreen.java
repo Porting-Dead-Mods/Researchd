@@ -29,13 +29,18 @@ public class ResearchScreen extends Screen {
     // Singleton since whole client is a singleton
     public static final Map<ResourceLocation, ClientResearchIcon<?>> CLIENT_ICONS = new HashMap<>();
 
-    private final TechListWidget techListWidget;
-    private final ResearchQueueWidget researchQueueWidget;
-    private final ResearchGraphWidget researchGraphWidget;
-    private final SelectedResearchWidget selectedResearchWidget;
+    private TechListWidget techListWidget;
+    private ResearchQueueWidget researchQueueWidget;
+    private ResearchGraphWidget researchGraphWidget;
+    private SelectedResearchWidget selectedResearchWidget;
 
     public ResearchScreen() {
         super(ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_TITLE));
+    }
+
+    @Override
+    protected void init() {
+        super.init();
 
         // TECH LIST
         this.techListWidget = new TechListWidget(this, 0, 109, 7);
@@ -56,17 +61,11 @@ public class ResearchScreen extends Screen {
         if (CommonResearchCache.ROOT_RESEARCH != null) {
             this.researchGraphWidget.setGraph(ResearchGraphCache.computeIfAbsent(CommonResearchCache.ROOT_RESEARCH.getResearchKey()));
         }
-    }
-
-    @Override
-    protected void init() {
-        super.init();
 
         this.techListWidget.visitWidgets(this::addRenderableWidget);
-        addRenderableWidget(this.researchQueueWidget);
-        addRenderableOnly(this.selectedResearchWidget);
-        this.selectedResearchWidget.visitWidgets(this::addWidget);
-        addRenderableWidget(this.researchGraphWidget);
+        this.researchQueueWidget.visitWidgets(this::addRenderableWidget);
+        this.selectedResearchWidget.visitWidgets(this::addRenderableWidget);
+        this.researchGraphWidget.visitWidgets(this::addRenderableWidget);
     }
 
     @Override
