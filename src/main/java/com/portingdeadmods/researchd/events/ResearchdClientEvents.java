@@ -92,7 +92,7 @@ public final class ResearchdClientEvents {
 							)
 							.append(Component.literal("\n> ").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.BOLD))
 							.append(ResearchdTranslations.Game.WIKI.component(Researchd.MODID)
-									.withStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://porting-dead-mods.github.io/researchd")))
+										.withStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://porting-dead-mods.github.io/Researchd/")))
 							)
 			);
 
