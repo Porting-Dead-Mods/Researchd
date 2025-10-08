@@ -199,7 +199,7 @@ if (System.getenv('CURSEFORGE_TOKEN')) {
 if (System.getenv('MODRINTH_TOKEN')) {
     modrinth {
         token = System.getenv("MODRINTH_TOKEN")
-        projectId = "researchd"
+        projectId = System.getenv("MODRINTH_PROJECT_SLUG")
         versionNumber = mod_version
         versionType = System.getenv('RELEASE_TYPE') ?: 'release'
         uploadFile = jar

@@ -108,7 +108,9 @@ jobs:
       - name: Get previous tag
         id: prev_tag
         run: |
-          tag=$(git tag --sort=-creatordate | sed -n 2p || true)
+          # Get the most recent tag (for comparison against current commit)
+          tag=$(git tag --sort=-creatordate | head -1 || true)
+          echo "Most recent tag: $tag"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
       - name: Get commit log
@@ -117,9 +119,17 @@ jobs:
           if [ -z "${{ steps.prev_tag.outputs.tag }}" ]; then
             echo "log=- First release" >> "$GITHUB_OUTPUT"
           else
-            echo "log<<EOF" >> "$GITHUB_OUTPUT"
-            git log ${{ steps.prev_tag.outputs.tag }}..HEAD --pretty=format:"- %s (%an)" >> "$GITHUB_OUTPUT"
-            echo "EOF" >> "$GITHUB_OUTPUT"
+            # Use a temporary file to avoid heredoc delimiter issues
+            TEMP_LOG=$(mktemp)
+            git log ${{ steps.prev_tag.outputs.tag }}..HEAD --pretty=format:"- %s (%an)" > "$TEMP_LOG"
+          
+            # Use unique delimiter with timestamp (capture once to ensure consistency)
+            DELIMITER="COMMIT_LOG_DELIMITER_$(date +%s)"
+            echo "log<<$DELIMITER" >> "$GITHUB_OUTPUT"
+            cat "$TEMP_LOG" >> "$GITHUB_OUTPUT"
+            echo "" >> "$GITHUB_OUTPUT"
+            echo "$DELIMITER" >> "$GITHUB_OUTPUT"
+            rm "$TEMP_LOG"
           fi
 
       # Only create tag and release if version was found in commit message
