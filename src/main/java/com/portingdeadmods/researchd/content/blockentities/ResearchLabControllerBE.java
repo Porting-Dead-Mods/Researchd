@@ -132,6 +132,7 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
         if (current == null) return;
 
         ResearchProgress progress = team.getResearchProgresses().get(current);
+        if (progress == null) return;
 
         progress.checkProgress(current, this.level, new ResearchMethod.SimpleMethodContext(team, this));
     }

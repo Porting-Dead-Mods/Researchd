@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.events;
 
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.ResearchdClientConfig;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
@@ -9,12 +10,15 @@ import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.team.ResearchTeamScreen;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
+import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.neoforged.api.distmarker.Dist;
@@ -77,6 +81,21 @@ public final class ResearchdClientEvents {
 	@SubscribeEvent
 	public static void onClientPlayerLoggingIn(ClientPlayerNetworkEvent.LoggingIn event) {
 		LocalPlayer player = event.getPlayer();
+
+		if (ResearchdClientConfig.showJoinMessage)
+			player.sendSystemMessage(
+					ResearchdTranslations.Game.JOIN_MESSAGE.component(Researchd.MODID)
+							.append(Component.literal("\n> ").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.BOLD))
+							.append(
+									ResearchdTranslations.Game.GITHUB.component(Researchd.MODID)
+									.withStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/Porting-Dead-Mods/Researchd")))
+							)
+							.append(Component.literal("\n> ").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.BOLD))
+							.append(ResearchdTranslations.Game.WIKI.component(Researchd.MODID)
+									.withStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://porting-dead-mods.github.io/researchd")))
+							)
+			);
+
 		RegistryAccess registryAccess = player.registryAccess();
 		Map<ResourceKey<ResearchPack>, ResearchPack> packs = ResearchHelperCommon.getResearchPacks(player.level());
 

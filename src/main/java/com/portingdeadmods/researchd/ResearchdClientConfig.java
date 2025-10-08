@@ -1,26 +1,28 @@
 package com.portingdeadmods.researchd;
 
-// Fix configs :p
-//@EventBusSubscriber(modid = Researchd.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-public final class ResearchdClientConfig
-{
-    /*
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.config.ModConfigEvent;
+import net.neoforged.neoforge.common.ModConfigSpec;
+
+@EventBusSubscriber(modid = Researchd.MODID)
+public final class ResearchdClientConfig {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
-    private static final ModConfigSpec.BooleanValue CONSOLE_DEBUG = BUILDER
-            .comment("Whether to enable console debug messages for Researchd")
-            .define("enable_console_debug", false);
+    private static final ModConfigSpec.BooleanValue SHOW_JOIN_MESSAGE = BUILDER
+            .comment("Whether to show the join message on world load")
+            .define("show_join_message", true);
 
     static final ModConfigSpec SPEC = BUILDER.build();
 
-    public static boolean consoleDebug;
+    public static boolean showJoinMessage;
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event)
     {
-        consoleDebug = CONSOLE_DEBUG.get();
+        if (event.getConfig().getSpec() != SPEC) return;
+        showJoinMessage = SHOW_JOIN_MESSAGE.get();
     }
-     */
 }
 
 

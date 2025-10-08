@@ -121,10 +121,26 @@ public final class ResearchdTranslations {
         }
     }
 
+    public static final class Game {
+        public static final TranslatableConstant JOIN_MESSAGE = create("join_message", AQUA_AT + WHITE + "Welcome to " + RESET + GREEN + "Researchd Alpha" + RESET + WHITE + "! Please note that thing may break completely between updates. Feel free to report any issues on the GitHub page!" + RESET);
+        public static final TranslatableConstant GITHUB = create("github", GREEN + "GitHub" + RESET);
+        public static final TranslatableConstant WIKI = create("wiki", GREEN + "Wiki" + RESET);
+
+        private static TranslatableConstant create(String key, String defaultValue) {
+            TranslatableConstant constant = new TranslatableConstant(key, "game");
+            TRANSLATIONS.put(constant.key(Researchd.MODID), defaultValue);
+            return constant;
+        }
+
+        private static void init() {
+        }
+    }
+
     public static void init() {
         Team.init();
         Research.init();
         Errors.init();
         Gui.init();
+        Game.init();
     }
 }

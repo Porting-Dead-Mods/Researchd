@@ -17,7 +17,6 @@ public final class ResearchdCommonConfig {
             .comment("Whether to load the examples resourcepack that can be enabled in the world creation screen.")
             .define("load_examples_datapack", true);
 
-    // To be moved to client
     private static final ModConfigSpec.BooleanValue CONSOLE_DEBUG = BUILDER
             .comment("Whether to enable console debug messages for Researchd")
             .define("enable_console_debug", false);
@@ -31,6 +30,7 @@ public final class ResearchdCommonConfig {
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event)
     {
+        if (event.getConfig().getSpec() != SPEC) return;
         researchQueueLength = RESEARCH_QUEUE_LENGTH.get();
         consoleDebug = CONSOLE_DEBUG.get();
         loadExamplesDatapack = LOAD_EXAMPLES_RESOURCES.get();

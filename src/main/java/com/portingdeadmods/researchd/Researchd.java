@@ -88,7 +88,7 @@ public final class Researchd {
 
         NeoForge.EVENT_BUS.addListener(this::onDatapacksSynced);
 
-        //modContainer.registerConfig(ModConfig.Type.CLIENT, ResearchdClientConfig.SPEC);
+        modContainer.registerConfig(ModConfig.Type.CLIENT, ResearchdClientConfig.SPEC);
         modContainer.registerConfig(ModConfig.Type.COMMON, ResearchdCommonConfig.SPEC);
     }
 
