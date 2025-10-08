@@ -74,6 +74,7 @@ jobs:
           MOD_ID=$(sed -n 's/^mod_id=//p' gradle.properties | tr -d ' \r\n')
           MOD_NAME=$(sed -n 's/^mod_name=//p' gradle.properties | tr -d ' \r\n')
           CURSEFORGE_PROJECT_ID=$(sed -n 's/^curseforge_project_id=//p' gradle.properties | tr -d ' \r\n')
+          MODRINTH_PROJECT_SLUG=$(sed -n 's/^modrinth_project_slug=//p' gradle.properties | tr -d ' \r\n')
           
           echo "Mod version: $MOD_VERSION"
           echo "Minecraft version: $MC_VERSION"
@@ -86,6 +87,7 @@ jobs:
           MOD_ID=${MOD_ID}
           MOD_NAME=${MOD_NAME}
           CURSEFORGE_PROJECT_ID=${CURSEFORGE_PROJECT_ID}
+          MODRINTH_PROJECT_SLUG=${MODRINTH_PROJECT_SLUG}
           EOF
 
       - name: Find built JAR files
@@ -166,6 +168,20 @@ jobs:
           CURSEFORGE_PROJECT_ID: ${{ steps.mod_info.outputs.CURSEFORGE_PROJECT_ID }}
 
         run: ./gradlew curseforge
+
+      - name: Upload to Modrinth
+        if: steps.check_version.outputs.SHOULD_RELEASE == 'true' && env.CURSEFORGE_TOKEN != ''
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          RELEASE_TYPE: ${{ steps.check_version.outputs.RELEASE_TYPE }}
+          CHANGELOG: ${{ github.event.head_commit.message }}
+          MOD_VERSION: ${{ steps.mod_info.outputs.MOD_VERSION }}
+          MC_VERSION: ${{ steps.mod_info.outputs.MC_VERSION }}
+          MOD_ID: ${{ steps.mod_info.outputs.MOD_ID }}
+          MOD_NAME: ${{ steps.mod_info.outputs.MOD_NAME }}
+          MODRINTH_PROJECT_SLUG: ${{ steps.mod_info.outputs.MODRINTH_PROJECT_SLUG }}
+
+        run: ./gradlew modrinth
 
       # Always upload artifacts for every build (even without release)
       - name: Upload build artifacts

@@ -3,7 +3,9 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'net.neoforged.moddev' version '1.0.23'
+
     id 'net.darkhax.curseforgegradle' version '1.1.15'
+    id "com.modrinth.minotaur" version "2.+"
 }
 
 tasks.named('wrapper', Wrapper).configure {
@@ -183,6 +185,7 @@ if (System.getenv('CURSEFORGE_TOKEN')) {
         mainFile.displayName = "${mod_id}-${mod_version}-${minecraft_version}"
         mainFile.addGameVersion minecraft_version
         mainFile.addModLoader 'NeoForge'
+        mainFile.addRequirement "porting-dead-libs"
 
         // Add sources and javadoc as additional files
         def sourcesFile = mainFile.withAdditionalFile(sourcesJar)
@@ -190,5 +193,22 @@ if (System.getenv('CURSEFORGE_TOKEN')) {
 
         def javadocFile = mainFile.withAdditionalFile(javadocJar)
         javadocFile.displayName = "${mod_id}-${mod_version}-${minecraft_version}-javadoc"
+    }
+}
+
+if (System.getenv('MODRINTH_TOKEN')) {
+    modrinth {
+        token = System.getenv("MODRINTH_TOKEN")
+        projectId = "researchd"
+        versionNumber = mod_version
+        versionType = System.getenv('RELEASE_TYPE') ?: 'release'
+        uploadFile = jar
+        additionalFiles = [sourcesJar, javadocJar]
+        changelog = System.getenv('CHANGELOG') ?: 'See GitHub for changes'
+        gameVersions = [minecraft_version]
+        loaders = ["NeoForge"]
+        dependencies {
+            required.project "porting-dead-libs"
+        }
     }
 }
