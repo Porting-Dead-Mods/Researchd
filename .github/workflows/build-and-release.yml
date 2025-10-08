@@ -180,7 +180,7 @@ jobs:
         run: ./gradlew curseforge
 
       - name: Upload to Modrinth
-        if: steps.check_version.outputs.SHOULD_RELEASE == 'true' && env.CURSEFORGE_TOKEN != ''
+        if: steps.check_version.outputs.SHOULD_RELEASE == 'true' && env.MODRINTH_TOKEN != ''
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           RELEASE_TYPE: ${{ steps.check_version.outputs.RELEASE_TYPE }}
