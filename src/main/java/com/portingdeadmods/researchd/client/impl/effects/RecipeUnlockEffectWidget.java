@@ -70,7 +70,6 @@ public class RecipeUnlockEffectWidget extends AbstractResearchInfoWidget<RecipeU
         }
     }
 
-    // TODO: Doesnt get called in list yet
     @Override
     public void onClick(double mouseX, double mouseY, int button) {
         if (this.isHovered()) {

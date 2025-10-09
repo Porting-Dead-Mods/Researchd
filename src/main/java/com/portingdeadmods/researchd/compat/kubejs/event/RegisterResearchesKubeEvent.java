@@ -1,8 +1,7 @@
 package com.portingdeadmods.researchd.compat.kubejs.event;
 
-import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.compat.kubejs.ResearchBuilder;
+import com.portingdeadmods.researchd.compat.kubejs.builders.ResearchBuilder;
 import dev.latvian.mods.kubejs.event.KubeEvent;
 import dev.latvian.mods.kubejs.script.SourceLine;
 import net.minecraft.resources.ResourceLocation;

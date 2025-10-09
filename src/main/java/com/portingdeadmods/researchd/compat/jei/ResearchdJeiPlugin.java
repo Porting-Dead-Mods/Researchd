@@ -9,12 +9,17 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
 @JeiPlugin
-public class ResearchdJeiPlugin implements IModPlugin {
+public final class ResearchdJeiPlugin implements IModPlugin {
     public static final ResourceLocation UID = Researchd.rl("researchd_jei_plugin");
 
     @Override
     public void onRuntimeAvailable(IJeiRuntime jeiRuntime) {
         JEICompat.RUNTIME = jeiRuntime;
+    }
+
+    @Override
+    public void onRuntimeUnavailable() {
+        JEICompat.RUNTIME = null;
     }
 
     @Override

@@ -15,7 +15,7 @@ import com.portingdeadmods.researchd.impl.research.effect.data.DimensionUnlockEf
 import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
-import com.portingdeadmods.researchd.utils.TimeUtils;
+import com.portingdeadmods.researchd.utils.TimeDifference;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -141,7 +141,7 @@ public final class ResearchHelperCommon {
     }
 
     public static String getResearchCompletionTime(long teamCreationTime, long time) {
-        return new TimeUtils.TimeDifference(teamCreationTime, time).getFormatted();
+        return new TimeDifference(teamCreationTime, time).getFormatted();
     }
 
     public static ResearchPack getResearchPack(ResourceKey<ResearchPack> key, Level level) {

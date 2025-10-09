@@ -4,7 +4,7 @@ Researchd provides full support for KubeJS for both event scripting and data gen
 
 ## Creating Researches and Packs
 
-You can create new researches and research packs using the `ServerEvents.registry` event in your KubeJS startup scripts. The KubeJS builders are wrappers around the Java builders. For a full list of available methods, see `com.portingdeadmods.researchd.compat.kubejs.ResearchBuilder`.
+You can create new researches and research packs using the `ServerEvents.registry` event in your KubeJS startup scripts. The KubeJS builders are wrappers around the Java builders. For a full list of available methods, see `com.portingdeadmods.researchd.compat.kubejs.builders.ResearchBuilder`.
 
 ### Creating a Research Pack
 

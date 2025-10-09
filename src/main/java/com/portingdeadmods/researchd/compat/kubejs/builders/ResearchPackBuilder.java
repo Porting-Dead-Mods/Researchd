@@ -1,7 +1,6 @@
-package com.portingdeadmods.researchd.compat.kubejs;
+package com.portingdeadmods.researchd.compat.kubejs.builders;
 
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
-import dev.latvian.mods.kubejs.color.KubeColor;
 import dev.latvian.mods.kubejs.script.SourceLine;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
@@ -20,18 +19,7 @@ public class ResearchPackBuilder {
         this.sourceLine = SourceLine.UNKNOWN;
     }
 
-    public ResearchPackBuilder color(Object color) {
-        if (color instanceof KubeColor kubeColor) {
-            this.color = kubeColor.kjs$getRGB();
-        } else if (color instanceof Number) {
-            this.color = ((Number) color).intValue();
-        } else {
-            throw new IllegalArgumentException("Color must be a KubeColor or hex integer");
-        }
-        return this;
-    }
-
-    public ResearchPackBuilder colorRGB(int r, int g, int b) {
+    public ResearchPackBuilder color(int r, int g, int b) {
         this.color = FastColor.ARGB32.color(r, g, b);
         return this;
     }
