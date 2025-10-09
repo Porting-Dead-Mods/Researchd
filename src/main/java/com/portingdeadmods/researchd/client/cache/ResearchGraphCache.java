@@ -24,7 +24,8 @@ public final class ResearchGraphCache {
         GRAPH_CACHE.clear();
     }
 
-    public static ResearchGraph computeIfAbsent(ResourceKey<Research> key) {
+    public static ResearchGraph computeIfAbsent(ResourceKey<Research> key)  {
         return GRAPH_CACHE.computeIfAbsent(key, k -> ResearchGraph.formRootResearch(key, ClientResearchTeamHelper.getTeam().getResearches()));
     }
+
 }

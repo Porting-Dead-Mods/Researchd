@@ -144,11 +144,11 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (this.effectWidget.isHovered()) {
+        if (this.effectWidget != null && this.effectWidget.isHovered()) {
             return this.effectWidget.mouseClicked(mouseX, mouseY, button);
         }
 
-        if (this.methodWidget.isHovered()) {
+        if (this.methodWidget != null && this.methodWidget.isHovered()) {
             return this.methodWidget.mouseClicked(mouseX, mouseY, button);
         }
 

@@ -113,6 +113,11 @@ public record SimpleResearch(ItemResearchIcon researchIcon, ResearchMethod resea
             return this;
         }
 
+        public Builder icon(ItemResearchIcon icon) {
+            this.icon = icon;
+            return this;
+        }
+
         public Builder method(ResearchMethod researchMethod) {
             this.researchMethod = researchMethod;
             return this;

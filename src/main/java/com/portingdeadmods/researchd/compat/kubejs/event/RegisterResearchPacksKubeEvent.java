@@ -1,10 +1,7 @@
 package com.portingdeadmods.researchd.compat.kubejs.event;
 
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
-import com.portingdeadmods.researchd.compat.kubejs.ResearchPackBuilder;
-import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
-import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
-import com.portingdeadmods.researchd.registries.ResearchdItems;
+import com.portingdeadmods.researchd.compat.kubejs.builders.ResearchPackBuilder;
 import dev.latvian.mods.kubejs.event.KubeEvent;
 import dev.latvian.mods.kubejs.script.SourceLine;
 import net.minecraft.resources.ResourceKey;
@@ -15,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public class RegisterResearchPacksKubeEvent implements KubeEvent {
     private final Map<ResourceLocation, ResearchPack> researchPacks = new HashMap<>();

@@ -4,13 +4,8 @@ import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
-import com.portingdeadmods.researchd.compat.kubejs.event.RegisterResearchPacksKubeEvent;
-import com.portingdeadmods.researchd.compat.kubejs.event.RegisterResearchesKubeEvent;
-import com.portingdeadmods.researchd.compat.kubejs.event.ResearchCompletedKubeEvent;
-import com.portingdeadmods.researchd.compat.kubejs.event.ResearchProgressKubeEvent;
-import com.portingdeadmods.researchd.compat.kubejs.event.ResearchdEvents;
+import com.portingdeadmods.researchd.compat.kubejs.ResearchdKJSEvents;
 import dev.latvian.mods.kubejs.KubeJSPaths;
-import dev.latvian.mods.kubejs.script.ScriptType;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,7 +16,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
-public class KubeJSCompat {
+/*
+ * Directly called in mod code, do not import KubeJS classes
+ */
+public final class KubeJSCompat {
     private static final String KUBEJS_MOD_ID = "kubejs";
     private static boolean kubeJSLoaded = false;
     private static boolean checked = false;
@@ -90,7 +88,7 @@ public class KubeJSCompat {
     public static void fireResearchCompletedEvent(ServerPlayer player, ResourceKey<Research> research) {
         if (isKubeJSLoaded()) {
             try {
-                KubeJSEventHandler.fireResearchCompleted(player, research);
+                ResearchdKJSEvents.fireResearchCompleted(player, research);
             } catch (Exception e) {
                 Researchd.LOGGER.error("Failed to fire KubeJS research completed event", e);
             }
@@ -100,7 +98,7 @@ public class KubeJSCompat {
     public static void fireResearchProgressEvent(ServerPlayer player, ResourceKey<com.portingdeadmods.researchd.api.research.Research> research, double progress) {
         if (isKubeJSLoaded()) {
             try {
-                KubeJSEventHandler.fireResearchProgress(player, research, progress);
+                ResearchdKJSEvents.fireResearchProgress(player, research, progress);
             } catch (Exception e) {
                 Researchd.LOGGER.error("Failed to fire KubeJS research progress event", e);
             }
@@ -112,7 +110,7 @@ public class KubeJSCompat {
             return Map.of();
         }
         try {
-            return KubeJSEventHandler.getResearches();
+            return ResearchdKJSEvents.fireRegisterResearchesEvent();
         } catch (Exception e) {
             Researchd.LOGGER.error("Failed to get KubeJS researches", e);
             return Map.of();
@@ -124,7 +122,7 @@ public class KubeJSCompat {
             return Map.of();
         }
         try {
-            return KubeJSEventHandler.getResearchPacks();
+            return ResearchdKJSEvents.fireRegisterResearchPacksEvent();
         } catch (Exception e) {
             Researchd.LOGGER.error("Failed to get KubeJS research packs", e);
             return Map.of();
@@ -132,28 +130,8 @@ public class KubeJSCompat {
     }
 
     private static class KubeJSEventHandler {
-        static void fireResearchCompleted(ServerPlayer player, ResourceKey<Research> research) {
-            ResearchdEvents.RESEARCH_COMPLETED.post(
-                new ResearchCompletedKubeEvent(player, research)
-            );
-        }
-
-        static void fireResearchProgress(ServerPlayer player, ResourceKey<Research> research, double progress) {
-            ResearchdEvents.RESEARCH_PROGRESS.post(
-                new ResearchProgressKubeEvent(player, research, progress)
-            );
-        }
-
-        static Map<ResourceLocation, Research> getResearches() {
-            RegisterResearchesKubeEvent event = new RegisterResearchesKubeEvent();
-            ResearchdEvents.REGISTER_RESEARCHES.post(ScriptType.SERVER, event);
-            return event.getResearches();
-        }
-
-        static Map<ResourceLocation, ResearchPack> getResearchPacks() {
-            RegisterResearchPacksKubeEvent event = new RegisterResearchPacksKubeEvent();
-            ResearchdEvents.REGISTER_RESEARCH_PACKS.post(ScriptType.SERVER, event);
-            return event.getResearchPacks();
-        }
     }
+
+
+
 }

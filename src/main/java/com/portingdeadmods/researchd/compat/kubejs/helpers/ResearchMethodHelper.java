@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.compat.kubejs;
+package com.portingdeadmods.researchd.compat.kubejs.helpers;
 
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;

@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.utils.researches;
 
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
-import com.portingdeadmods.researchd.utils.RegistryManagersGetter;
+import com.portingdeadmods.researchd.resources.RegistryManagersGetter;
 import net.minecraft.server.ReloadableServerResources;
 import net.minecraft.world.level.Level;
 

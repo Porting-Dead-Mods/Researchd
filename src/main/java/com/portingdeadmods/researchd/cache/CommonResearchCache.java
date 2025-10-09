@@ -6,10 +6,12 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.GlobalResearch;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
+import com.portingdeadmods.researchd.utils.researches.ResearchdManagers;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +51,14 @@ public final class CommonResearchCache {
                     continue;
                 } else {
                     // Found multiple root instances
-                    throw new IllegalStateException("Multiple research roots (Researches without parents), prev root research: %s, other root research: %s".formatted(ROOT_RESEARCH.getResearchKey().location(), research.getResearchKey().location()));
+                    try {
+                        throw new IllegalStateException("Multiple research roots (Researches without parents), prev root research: %s, other root research: %s".formatted(ROOT_RESEARCH.getResearchKey().location(), research.getResearchKey().location()));
+                    } catch (Exception e) {
+                        Researchd.LOGGER.error(e.getMessage());
+                        GLOBAL_RESEARCHES = Collections.emptyMap();
+                        ResearchdManagers.getResearchesManager(level).fail();
+                        return;
+                    }
                 }
             }
 
@@ -57,9 +66,6 @@ public final class CommonResearchCache {
                 research.getParents().add(globalResearchMap.get(parent));
             }
         }
-
-        Researchd.LOGGER.debug("Researches: {}", researchLookup);
-        Researchd.LOGGER.debug("Research map: {}", globalResearchMap);
 
         // Lock global researchLookup
         for (GlobalResearch research : globalResearchMap.values()) {

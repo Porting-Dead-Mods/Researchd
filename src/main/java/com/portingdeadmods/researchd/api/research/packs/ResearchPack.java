@@ -21,8 +21,8 @@ import java.util.Optional;
 public record ResearchPack(int color, int sortingValue, Optional<ResourceLocation> customTexture) {
     public static final Codec<ResearchPack> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             RGBAColor.CODEC.fieldOf("color").forGetter(ResearchPack::colorAsRgba),
-            Codec.INT.fieldOf("sortingValue").forGetter(ResearchPack::sortingValue),
-            ResourceLocation.CODEC.optionalFieldOf("customTexture").forGetter(ResearchPack::customTexture)
+            Codec.INT.fieldOf("sorting_value").forGetter(ResearchPack::sortingValue),
+            ResourceLocation.CODEC.optionalFieldOf("custom_texture").forGetter(ResearchPack::customTexture)
     ).apply(instance, ResearchPack::new));
     public static final StreamCodec<? super RegistryFriendlyByteBuf, ResearchPack> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.INT,

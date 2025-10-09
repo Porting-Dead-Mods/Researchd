@@ -21,6 +21,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,7 @@ public class ReloadableRegistryManager<T> extends SimpleJsonResourceReloadListen
     private final ResourceKey<Registry<T>> registry;
     private final Codec<T> codec;
     private Map<ResourceKey<T>, T> byName;
+    private boolean failed;
 
     public ReloadableRegistryManager(HolderLookup.Provider lookup, ResourceKey<Registry<T>> registry, Codec<T> codec) {
         super(GSON, Registries.elementsDirPath(registry));
@@ -102,6 +104,15 @@ public class ReloadableRegistryManager<T> extends SimpleJsonResourceReloadListen
         return this.byName.entrySet().stream()
                 .map(e -> Pair.of(e.getKey().location(), e.getValue()))
                 .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
+    }
+
+    public boolean isFailed() {
+        return failed;
+    }
+
+    public void fail() {
+        this.byName = Collections.emptyMap();
+        this.failed = true;
     }
 
 }

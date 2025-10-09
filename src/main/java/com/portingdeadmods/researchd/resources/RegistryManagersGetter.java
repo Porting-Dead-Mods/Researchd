@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.utils;
+package com.portingdeadmods.researchd.resources;
 
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
