@@ -12,7 +12,7 @@
         <link rel="prev" href="../java/">
       
       
-        <link rel="next" href="../../gameplay/">
+        <link rel="next" href="../../data/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -379,6 +379,21 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Creating a Research Pack">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#researchpackbuilder-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      ResearchPackBuilder Methods
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -387,6 +402,54 @@
       Creating a Research
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Creating a Research">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#researchbuilder-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      ResearchBuilder Methods
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#helpers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Helpers
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Helpers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#researchmethodhelper" class="md-nav__link">
+    <span class="md-ellipsis">
+      ResearchMethodHelper
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#researcheffecthelper" class="md-nav__link">
+    <span class="md-ellipsis">
+      ResearchEffectHelper
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -440,6 +503,28 @@
           </ul>
         </nav>
       
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Data
+    
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -531,6 +616,21 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Creating a Research Pack">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#researchpackbuilder-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      ResearchPackBuilder Methods
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -539,6 +639,54 @@
       Creating a Research
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Creating a Research">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#researchbuilder-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      ResearchBuilder Methods
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#helpers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Helpers
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Helpers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#researchmethodhelper" class="md-nav__link">
+    <span class="md-ellipsis">
+      ResearchMethodHelper
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#researcheffecthelper" class="md-nav__link">
+    <span class="md-ellipsis">
+      ResearchEffectHelper
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -602,42 +750,230 @@
 <h1 id="kubejs-data-generation">KubeJS Data Generation</h1>
 <p>Researchd provides full support for KubeJS for both event scripting and data generation.</p>
 <h2 id="creating-researches-and-packs">Creating Researches and Packs</h2>
-<p>You can create new researches and research packs using the <code>ServerEvents.registry</code> event in your KubeJS startup scripts. The KubeJS builders are wrappers around the Java builders. For a full list of available methods, see <code>com.portingdeadmods.researchd.compat.kubejs.builders.ResearchBuilder</code>.</p>
+<p>You can create new researches and research packs using the <code>ResearchdEvents</code> group in your KubeJS startup scripts.</p>
 <h3 id="creating-a-research-pack">Creating a Research Pack</h3>
-<p>Use the <code>researchd:research_pack</code> registry to create new packs.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nx">ServerEvents</span><span class="p">.</span><span class="nx">registry</span><span class="p">(</span><span class="s2">&quot;researchd:research_pack&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">event</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<p>Use the <code>ResearchdEvents.registerResearchPacks</code> event to create new packs.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nx">ResearchdEvents</span><span class="p">.</span><span class="nx">registerResearchPacks</span><span class="p">(</span><span class="nx">event</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="nx">event</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="s2">&quot;kubejs:my_custom_pack&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">        </span><span class="p">.</span><span class="nx">sortingValue</span><span class="p">(</span><span class="mf">100</span><span class="p">)</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">        </span><span class="p">.</span><span class="nx">color</span><span class="p">(</span><span class="mf">123</span><span class="p">,</span><span class="w"> </span><span class="mf">45</span><span class="p">,</span><span class="w"> </span><span class="mf">67</span><span class="p">);</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">});</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="nx">event</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="s2">&quot;kubejs:another_pack&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">        </span><span class="p">.</span><span class="nx">sortingValue</span><span class="p">(</span><span class="mf">101</span><span class="p">)</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">        </span><span class="p">.</span><span class="nx">colorRGB</span><span class="p">(</span><span class="mf">12</span><span class="p">,</span><span class="w"> </span><span class="mf">34</span><span class="p">,</span><span class="w"> </span><span class="mf">56</span><span class="p">);</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">});</span>
 </code></pre></div>
+<h4 id="researchpackbuilder-methods">ResearchPackBuilder Methods</h4>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>color(color)</code></td>
+<td>Sets the color of the pack. Can be a hex integer or a <code>KubeColor</code>.</td>
+</tr>
+<tr>
+<td><code>colorRGB(r, g, b)</code></td>
+<td>Sets the color of the pack using RGB values.</td>
+</tr>
+<tr>
+<td><code>customTexture(texture)</code></td>
+<td>Sets a custom texture for the pack. The texture should be a <code>ResourceLocation</code> string.</td>
+</tr>
+<tr>
+<td><code>sortingValue(value)</code></td>
+<td>A value to dictate where in the progression the research pack should be. Lower = earlier, higher = later.</td>
+</tr>
+</tbody>
+</table>
 <h3 id="creating-a-research">Creating a Research</h3>
-<p>Use the <code>researchd:research</code> registry to create new researches. You can use the <code>prefix to access Java classes like</code>ConsumeItemResearchMethod<code>and</code>Ingredient` directly in your script.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nx">ServerEvents</span><span class="p">.</span><span class="nx">registry</span><span class="p">(</span><span class="s2">&quot;researchd:research&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">event</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<p>Use the <code>ResearchdEvents.registerResearches</code> event to create new researches.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nx">ResearchdEvents</span><span class="p">.</span><span class="nx">registerResearches</span><span class="p">(</span><span class="nx">event</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="nx">event</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="s2">&quot;kubejs:my_custom_research&quot;</span><span class="p">)</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">        </span><span class="p">.</span><span class="nx">icon</span><span class="p">(</span><span class="s2">&quot;minecraft:diamond&quot;</span><span class="p">)</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">        </span><span class="p">.</span><span class="nx">parents</span><span class="p">(</span><span class="s2">&quot;researchd:wood&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// You can reference existing researches here</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">        </span><span class="p">.</span><span class="nx">method</span><span class="p">(</span><span class="ow">new</span><span class="w"> </span><span class="nx">$ConsumeItemResearchMethod</span><span class="p">(</span><span class="nx">$Ingredient</span><span class="p">.</span><span class="k">of</span><span class="p">(</span><span class="s2">&quot;minecraft:dirt&quot;</span><span class="p">),</span><span class="w"> </span><span class="mf">16</span><span class="p">))</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">        </span><span class="p">.</span><span class="nx">effect</span><span class="p">(</span><span class="ow">new</span><span class="w"> </span><span class="nx">$RecipeUnlockEffect</span><span class="p">(</span><span class="s2">&quot;minecraft:diamond_block&quot;</span><span class="p">));</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">});</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">        </span><span class="p">.</span><span class="nx">method</span><span class="p">(</span><span class="nx">ResearchMethodHelper</span><span class="p">.</span><span class="nx">consumeItem</span><span class="p">(</span><span class="s2">&quot;minecraft:dirt&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">16</span><span class="p">))</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">        </span><span class="p">.</span><span class="nx">effect</span><span class="p">(</span><span class="nx">ResearchEffectHelper</span><span class="p">.</span><span class="nx">unlockRecipe</span><span class="p">(</span><span class="s2">&quot;minecraft:diamond_block&quot;</span><span class="p">));</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="nx">event</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="s2">&quot;kubejs:another_research&quot;</span><span class="p">)</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">        </span><span class="p">.</span><span class="nx">icon</span><span class="p">(</span><span class="s2">&quot;minecraft:stone_bricks&quot;</span><span class="p">)</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">        </span><span class="p">.</span><span class="nx">parent</span><span class="p">(</span><span class="s2">&quot;researchd:cobblestone&quot;</span><span class="p">)</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">        </span><span class="p">.</span><span class="nx">consumePack</span><span class="p">(</span><span class="s2">&quot;kubejs:my_custom_pack&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">5</span><span class="p">,</span><span class="w"> </span><span class="mf">10</span><span class="p">)</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">        </span><span class="p">.</span><span class="nx">effect</span><span class="p">(</span><span class="nx">ResearchEffectHelper</span><span class="p">.</span><span class="nx">unlockRecipe</span><span class="p">(</span><span class="s2">&quot;minecraft:stone_bricks&quot;</span><span class="p">))</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">        </span><span class="p">.</span><span class="nx">literalName</span><span class="p">(</span><span class="s1">&#39;Example Research&#39;</span><span class="p">)</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">        </span><span class="p">.</span><span class="nx">literalDescription</span><span class="p">(</span><span class="s1">&#39;This is an example research created with KubeJS.&#39;</span><span class="p">);</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="p">});</span>
 </code></pre></div>
+<h4 id="researchbuilder-methods">ResearchBuilder Methods</h4>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>icon(itemId)</code></td>
+<td>Sets the icon for the research.</td>
+</tr>
+<tr>
+<td><code>method(researchMethod)</code></td>
+<td>Sets the research method. Use <code>ResearchMethodHelper</code> to create methods.</td>
+</tr>
+<tr>
+<td><code>consumeItem(itemId, count)</code></td>
+<td>Shortcut for <code>.method(ResearchMethodHelper.consumeItem(itemId, count))</code>.</td>
+</tr>
+<tr>
+<td><code>consumePack(packId, ...args)</code></td>
+<td>Shortcut for <code>.method(ResearchMethodHelper.consumePack(packId, ...args))</code>.</td>
+</tr>
+<tr>
+<td><code>requireAllMethods(...methods)</code></td>
+<td>Shortcut for <code>.method(ResearchMethodHelper.and(...methods))</code>.</td>
+</tr>
+<tr>
+<td><code>requireAnyMethod(...methods)</code></td>
+<td>Shortcut for <code>.method(ResearchMethodHelper.or(...methods))</code>.</td>
+</tr>
+<tr>
+<td><code>effect(researchEffect)</code></td>
+<td>Sets the research effect. Use <code>ResearchEffectHelper</code> to create effects.</td>
+</tr>
+<tr>
+<td><code>unlockRecipe(recipeId)</code></td>
+<td>Shortcut for <code>.effect(ResearchEffectHelper.unlockRecipe(recipeId))</code>.</td>
+</tr>
+<tr>
+<td><code>unlockMultipleRecipes(...recipeIds)</code></td>
+<td>Shortcut for <code>.effect(ResearchEffectHelper.unlockRecipes(...recipeIds))</code>.</td>
+</tr>
+<tr>
+<td><code>unlockDimension(dimensionId, ...args)</code></td>
+<td>Shortcut for <code>.effect(ResearchEffectHelper.unlockDimension(dimensionId, ...args))</code>.</td>
+</tr>
+<tr>
+<td><code>combineEffects(...effects)</code></td>
+<td>Shortcut for <code>.effect(ResearchEffectHelper.and(...effects))</code>.</td>
+</tr>
+<tr>
+<td><code>parent(researchId)</code></td>
+<td>Adds a parent research.</td>
+</tr>
+<tr>
+<td><code>parents(...researchIds)</code></td>
+<td>Adds multiple parent researches.</td>
+</tr>
+<tr>
+<td><code>noParentRequired()</code></td>
+<td>Sets that this research does not require its parents to be completed.</td>
+</tr>
+<tr>
+<td><code>literalName(name)</code></td>
+<td>Sets a literal name for the research, ignoring translations.</td>
+</tr>
+<tr>
+<td><code>literalDescription(desc)</code></td>
+<td>Sets a literal description for the research, ignoring translations.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="helpers">Helpers</h3>
+<h4 id="researchmethodhelper">ResearchMethodHelper</h4>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>consumeItem(itemId, count)</code></td>
+<td>Creates a method that requires consuming a certain amount of an item.</td>
+</tr>
+<tr>
+<td><code>consumePack(packId, count)</code></td>
+<td>Creates a method that requires consuming a certain amount of a research pack.</td>
+</tr>
+<tr>
+<td><code>consumePack(packId, count, duration)</code></td>
+<td>Creates a method that requires consuming a certain amount of a research pack with a specific duration.</td>
+</tr>
+<tr>
+<td><code>and(...methods)</code></td>
+<td>Creates a method that requires all of the specified methods to be completed.</td>
+</tr>
+<tr>
+<td><code>or(...methods)</code></td>
+<td>Creates a method that requires any of the specified methods to be completed.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="researcheffecthelper">ResearchEffectHelper</h4>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>empty()</code></td>
+<td>Creates an empty effect that does nothing.</td>
+</tr>
+<tr>
+<td><code>unlockRecipe(recipeId)</code></td>
+<td>Creates an effect that unlocks a single recipe.</td>
+</tr>
+<tr>
+<td><code>unlockRecipes(...recipeIds)</code></td>
+<td>Creates an effect that unlocks multiple recipes.</td>
+</tr>
+<tr>
+<td><code>unlockDimension(dimensionId)</code></td>
+<td>Creates an effect that unlocks a dimension.</td>
+</tr>
+<tr>
+<td><code>unlockNether()</code></td>
+<td>Creates an effect that unlocks the Nether.</td>
+</tr>
+<tr>
+<td><code>unlockEnd()</code></td>
+<td>Creates an effect that unlocks the End.</td>
+</tr>
+<tr>
+<td><code>and(...effects)</code></td>
+<td>Combines multiple effects into one, executing all of them.</td>
+</tr>
+<tr>
+<td><code>combine(effects)</code></td>
+<td>Combines a list of effects into one, executing all of them.</td>
+</tr>
+</tbody>
+</table>
 <h2 id="event-scripting">Event Scripting</h2>
 <p>You can listen for the following events in your KubeJS scripts:</p>
 <h3 id="research-completed">Research Completed</h3>
 <p>This event is fired when a player completes a research.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">// Example event listener</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nx">ResearchdEvents</span><span class="p">.</span><span class="nx">RESEARCH_COMPLETED</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="nx">event</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Player </span><span class="si">${</span><span class="nx">event</span><span class="p">.</span><span class="nx">player</span><span class="p">.</span><span class="nx">username</span><span class="si">}</span><span class="sb"> completed research </span><span class="si">${</span><span class="nx">event</span><span class="p">.</span><span class="nx">research</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nx">ResearchdEvents</span><span class="p">.</span><span class="nx">researchCompleted</span><span class="p">(</span><span class="nx">event</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Player </span><span class="si">${</span><span class="nx">event</span><span class="p">.</span><span class="nx">player</span><span class="p">.</span><span class="nx">username</span><span class="si">}</span><span class="sb"> completed research </span><span class="si">${</span><span class="nx">event</span><span class="p">.</span><span class="nx">researchId</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="p">});</span>
 </code></pre></div>
 <h3 id="research-progress">Research Progress</h3>
 <p>This event is fired when a player makes progress on a research.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">// Example event listener</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nx">ResearchdEvents</span><span class="p">.</span><span class="nx">RESEARCH_PROGRESS</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="nx">event</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Player </span><span class="si">${</span><span class="nx">event</span><span class="p">.</span><span class="nx">player</span><span class="p">.</span><span class="nx">username</span><span class="si">}</span><span class="sb"> has </span><span class="si">${</span><span class="nx">event</span><span class="p">.</span><span class="nx">progress</span><span class="si">}</span><span class="sb">% progress on research </span><span class="si">${</span><span class="nx">event</span><span class="p">.</span><span class="nx">research</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nx">ResearchdEvents</span><span class="p">.</span><span class="nx">researchProgress</span><span class="p">(</span><span class="nx">event</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Player </span><span class="si">${</span><span class="nx">event</span><span class="p">.</span><span class="nx">player</span><span class="p">.</span><span class="nx">username</span><span class="si">}</span><span class="sb"> has </span><span class="si">${</span><span class="nx">event</span><span class="p">.</span><span class="nx">progressPercent</span><span class="si">}</span><span class="sb">% progress on research </span><span class="si">${</span><span class="nx">event</span><span class="p">.</span><span class="nx">researchId</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">});</span>
 </code></pre></div>
-<p>The event handling is set up in <code>com.portingdeadmods.researchd.compat.KubeJSCompat</code>.</p>
 
 
 
