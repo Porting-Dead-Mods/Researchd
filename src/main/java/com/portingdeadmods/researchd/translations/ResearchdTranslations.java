@@ -122,7 +122,7 @@ public final class ResearchdTranslations {
     }
 
     public static final class Game {
-        public static final TranslatableConstant JOIN_MESSAGE = create("join_message", AQUA_AT + WHITE + "Welcome to " + RESET + GREEN + "Researchd Alpha" + RESET + WHITE + "! Please note that thing may break completely between updates. Feel free to report any issues on the GitHub page!" + RESET);
+        public static final TranslatableConstant JOIN_MESSAGE = create("join_message", AQUA_AT + WHITE + "Welcome to " + RESET + GREEN + "Researchd Alpha" + RESET + WHITE + "! Please note that things may break completely between updates. Feel free to report any issues on the GitHub page!" + RESET);
         public static final TranslatableConstant GITHUB = create("github", GREEN + "GitHub" + RESET);
         public static final TranslatableConstant WIKI = create("wiki", GREEN + "Wiki" + RESET);
 
