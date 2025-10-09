@@ -35,7 +35,29 @@ public class KubeJSCompat {
     }
 
     public static final String EXAMPLE_CODE = """
-            console.log("Researches :3")
+            ResearchdEvents.registerResearchPacks(event => {
+                event.create('kubejs:example_pack')
+                    .colorRGB(255, 51, 51)
+                    .sortingValue(1); // Progression/Sorting order. Higher -> Later in game
+            });
+
+            ResearchdEvents.registerResearches(event => {
+                event.create('kubejs:start_research')
+                    .icon('minecraft:book')
+                    .consumeItem('minecraft:dirt', 1)
+                    .effect(ResearchEffectHelper.empty())
+                    .literalName('Getting Started')
+                    .literalDescription('A simple starting research.')
+                    .noParentRequired();
+                
+                event.create('kubejs:automation_research')
+                    .icon('minecraft:iron_ingot')
+                    .parent('kubejs:start_research')
+                    .consumePack('kubejs:example_pack', 10, 5)
+                    .effect(ResearchEffectHelper.unlockRecipe('minecraft:hopper'))
+                    .literalName('Basic Automation')
+                    .literalDescription('Learn the fundamentals of automated production.');
+            });
             """;
 
     /**

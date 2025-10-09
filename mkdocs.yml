@@ -5,6 +5,7 @@ nav:
   - DataGen:
     - Java: datagen/java.md
     - KubeJS: datagen/kubejs.md
+  - Data: data.md
   - Gameplay: gameplay.md
   - Addons: addons.md
 theme:
