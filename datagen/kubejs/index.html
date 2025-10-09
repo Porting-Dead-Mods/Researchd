@@ -602,7 +602,7 @@
 <h1 id="kubejs-data-generation">KubeJS Data Generation</h1>
 <p>Researchd provides full support for KubeJS for both event scripting and data generation.</p>
 <h2 id="creating-researches-and-packs">Creating Researches and Packs</h2>
-<p>You can create new researches and research packs using the <code>ServerEvents.registry</code> event in your KubeJS startup scripts. The KubeJS builders are wrappers around the Java builders. For a full list of available methods, see <code>com.portingdeadmods.researchd.compat.kubejs.ResearchBuilder</code>.</p>
+<p>You can create new researches and research packs using the <code>ServerEvents.registry</code> event in your KubeJS startup scripts. The KubeJS builders are wrappers around the Java builders. For a full list of available methods, see <code>com.portingdeadmods.researchd.compat.kubejs.builders.ResearchBuilder</code>.</p>
 <h3 id="creating-a-research-pack">Creating a Research Pack</h3>
 <p>Use the <code>researchd:research_pack</code> registry to create new packs.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nx">ServerEvents</span><span class="p">.</span><span class="nx">registry</span><span class="p">(</span><span class="s2">&quot;researchd:research_pack&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">event</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
