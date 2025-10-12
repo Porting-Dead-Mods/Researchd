@@ -58,7 +58,7 @@ For how to get started in pack dev, there are both in-game and online resources:
 
 - The online wiki at <https://porting-dead-mods.github.io/Researchd/>
 
-# Addon-dev info
+## Addon-dev info
 
 For info and help on developing addons visit the online wiki <https://porting-dead-mods.github.io/Researchd/>
 
