@@ -84,7 +84,11 @@ modding community.
 
 ## Dependencies
 
-Researchd relies on our library mod called Porting Dead Mods
+Researchd relies on our library mod **Porting Dead Mods**
+
+If **JEI** is installed, there is also integration for recipe unlock effects and consume item methods, which allow the player to look at the recipes in **JEI**
+
+If **KubeJS** is installed, the mod will load **KubeJS** scripts, allowing you to add custom researches and packs.
 
 ## Discord
 
