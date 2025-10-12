@@ -29,6 +29,22 @@ The Research Lab is a multiblock structure that is essential for progressing thr
 
 ## The Team Research Screen
 
-It can be opened by pressing 'M' (default).
+The Team Research screen allows you to manage your research team. It can be opened by pressing 'M' (default).
 
-!Currently WIP!
+### Main Screen
+
+The main screen provides an overview of your team:
+
+-   **Members List**: A list of all current team members and their roles.
+-   **Recent Researches**: A list of the most recently completed researches by your team.
+-   **Invite Player**: A button to invite other players to your team. (Required Permission: 1 - Moderator)
+-   **Settings**: A button to open the team settings screen. (Required Permission: 1+ - Moderator / Owner)
+
+### Team Settings
+
+The settings screen provides more advanced options for managing your team:
+
+-   **Change Team Name**: (Required Permission: 2 - Owner)
+-   **Manage Members**: (Owner: Promote / Demote / Kick - Moderator: Kick)
+-   **Transfer Ownership**: (Required Permission: 2 - Owner)
+-   **Leave Team**: Owner must transfer ownership to someone else before leaving.
