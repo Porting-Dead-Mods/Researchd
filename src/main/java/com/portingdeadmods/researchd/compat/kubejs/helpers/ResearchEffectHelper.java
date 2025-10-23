@@ -1,11 +1,7 @@
 package com.portingdeadmods.researchd.compat.kubejs.helpers;
 
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
-import com.portingdeadmods.researchd.impl.research.effect.AndResearchEffect;
-import com.portingdeadmods.researchd.impl.research.effect.DimensionUnlockEffect;
-import com.portingdeadmods.researchd.impl.research.effect.EmptyResearchEffect;
-import com.portingdeadmods.researchd.impl.research.effect.RecipeUnlockEffect;
-import net.minecraft.resources.ResourceKey;
+import com.portingdeadmods.researchd.impl.research.effect.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 
@@ -18,42 +14,47 @@ public class ResearchEffectHelper {
         return EmptyResearchEffect.INSTANCE;
     }
     
-    public static ResearchEffect unlockRecipe(ResourceLocation recipeId) {
-        return new RecipeUnlockEffect(recipeId);
-    }
-    
     public static ResearchEffect unlockRecipe(String recipeId) {
         return new RecipeUnlockEffect(ResourceLocation.parse(recipeId));
     }
-    
-    
+
     public static ResearchEffect unlockRecipes(String... recipeIds) {
         if (recipeIds.length == 0) {
             return EmptyResearchEffect.INSTANCE;
         }
         if (recipeIds.length == 1) {
-            return new RecipeUnlockEffect(ResourceLocation.parse(recipeIds[0]));
+            return unlockRecipe(recipeIds[0]);
         }
         List<ResearchEffect> list = new ArrayList<>();
         for (String id : recipeIds) {
-            list.add(new RecipeUnlockEffect(ResourceLocation.parse(id)));
+            list.add(unlockRecipe(id));
         }
         return new AndResearchEffect(list);
     }
-    
-    public static ResearchEffect unlockDimension(ResourceKey<Level> dimension) {
-        return new DimensionUnlockEffect(dimension.location(), DimensionUnlockEffect.DEFAULT_SPRITE);
+
+    public static ResearchEffect unlockItem(String itemId) {
+        return new UnlockItemEffect(ResourceLocation.parse(itemId));
     }
-    
-    public static ResearchEffect unlockDimension(ResourceLocation dimension) {
-        return new DimensionUnlockEffect(dimension, DimensionUnlockEffect.DEFAULT_SPRITE);
+
+    public static ResearchEffect unlockItems(String... itemIds) {
+        if (itemIds.length == 0) {
+            return EmptyResearchEffect.INSTANCE;
+        }
+        if (itemIds.length == 1) {
+            return unlockItem(itemIds[0]);
+        }
+        List<ResearchEffect> list = new ArrayList<>();
+        for (String itemId : itemIds) {
+            list.add(unlockItem(itemId));
+        }
+        return new AndResearchEffect(list);
     }
     
     public static ResearchEffect unlockDimension(String dimension) {
         return new DimensionUnlockEffect(ResourceLocation.parse(dimension), DimensionUnlockEffect.DEFAULT_SPRITE);
     }
     
-    public static ResearchEffect unlockDimensions(ResourceKey<Level>... dimensions) {
+    public static ResearchEffect unlockDimensions(String... dimensions) {
         if (dimensions.length == 0) {
             return EmptyResearchEffect.INSTANCE;
         }
@@ -61,8 +62,8 @@ public class ResearchEffectHelper {
             return unlockDimension(dimensions[0]);
         }
         List<ResearchEffect> list = new ArrayList<>();
-        for (ResourceKey<Level> dim : dimensions) {
-            list.add(new DimensionUnlockEffect(dim.location(), DimensionUnlockEffect.DEFAULT_SPRITE));
+        for (String dim : dimensions) {
+            list.add(unlockDimension(dim));
         }
         return new AndResearchEffect(list);
     }

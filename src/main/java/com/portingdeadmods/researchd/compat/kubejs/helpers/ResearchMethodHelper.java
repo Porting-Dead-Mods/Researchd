@@ -4,6 +4,7 @@ import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
+import com.portingdeadmods.researchd.impl.research.method.CheckItemPresenceResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.OrResearchMethod;
@@ -31,6 +32,11 @@ public class ResearchMethodHelper {
     public static ResearchMethod consumePack(String packId, int count, int duration) {
         ResourceKey<ResearchPack> key = ResourceKey.create(ResearchdRegistries.RESEARCH_PACK_KEY, ResourceLocation.parse(packId));
         return new ConsumePackResearchMethod(List.of(key), count, duration);
+    }
+
+    public static ResearchMethod checkItemPresence(String itemId, int count) {
+        Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(itemId));
+        return new CheckItemPresenceResearchMethod(Ingredient.of(item), count);
     }
     
     public static ResearchMethod and(ResearchMethod... methods) {

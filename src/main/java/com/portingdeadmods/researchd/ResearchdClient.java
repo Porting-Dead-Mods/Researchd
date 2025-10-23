@@ -12,10 +12,8 @@ import com.portingdeadmods.researchd.client.impl.effects.AndResearchEffectWidget
 import com.portingdeadmods.researchd.client.impl.effects.DimensionUnlockEffectWidget;
 import com.portingdeadmods.researchd.client.impl.effects.EmptyResearchEffectWidget;
 import com.portingdeadmods.researchd.client.impl.effects.RecipeUnlockEffectWidget;
-import com.portingdeadmods.researchd.client.impl.methods.AndResearchMethodWidget;
-import com.portingdeadmods.researchd.client.impl.methods.ConsumeItemResearchMethodWidget;
-import com.portingdeadmods.researchd.client.impl.methods.ConsumePackResearchMethodWidget;
-import com.portingdeadmods.researchd.client.impl.methods.OrResearchMethodWidget;
+import com.portingdeadmods.researchd.client.impl.effects.UnlockItemEffectWidget;
+import com.portingdeadmods.researchd.client.impl.methods.*;
 import com.portingdeadmods.researchd.client.renderers.ResearchLabBER;
 import com.portingdeadmods.researchd.client.screens.lab.ResearchLabScreen;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
@@ -24,7 +22,9 @@ import com.portingdeadmods.researchd.impl.research.effect.AndResearchEffect;
 import com.portingdeadmods.researchd.impl.research.effect.DimensionUnlockEffect;
 import com.portingdeadmods.researchd.impl.research.effect.EmptyResearchEffect;
 import com.portingdeadmods.researchd.impl.research.effect.RecipeUnlockEffect;
+import com.portingdeadmods.researchd.impl.research.effect.UnlockItemEffect;
 import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
+import com.portingdeadmods.researchd.impl.research.method.CheckItemPresenceResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.OrResearchMethod;
@@ -78,6 +78,7 @@ public final class ResearchdClient {
         event.enqueueWork(() -> {
             addMethodWidget(ConsumePackResearchMethod.ID, ConsumePackResearchMethodWidget::new);
             addMethodWidget(ConsumeItemResearchMethod.ID, ConsumeItemResearchMethodWidget::new);
+            addMethodWidget(CheckItemPresenceResearchMethod.ID, CheckItemPresenceResearchMethodWidget::new);
             addMethodWidget(OrResearchMethod.ID, OrResearchMethodWidget::new);
             addMethodWidget(AndResearchMethod.ID, AndResearchMethodWidget::new);
 
@@ -85,6 +86,7 @@ public final class ResearchdClient {
             addEffectWidget(DimensionUnlockEffect.ID, DimensionUnlockEffectWidget::new);
             addEffectWidget(EmptyResearchEffect.ID, EmptyResearchEffectWidget::new);
             addEffectWidget(RecipeUnlockEffect.ID, RecipeUnlockEffectWidget::new);
+            addEffectWidget(UnlockItemEffect.ID, UnlockItemEffectWidget::new);
 
             addClientResearchIcon(ItemResearchIcon.ID, ClientItemResearchIcon::new);
 

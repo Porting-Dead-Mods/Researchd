@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
 import com.portingdeadmods.researchd.impl.research.effect.RecipeUnlockEffect;
+import com.portingdeadmods.researchd.impl.research.effect.UnlockItemEffect;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
@@ -24,9 +25,21 @@ public record RecipeUnlockEffectData(Set<RecipeHolder<?>> blockedRecipes) implem
         return new RecipeUnlockEffectData(recipes);
     }
 
+    public RecipeUnlockEffectData add(UnlockItemEffect effect, Level level) {
+        Set<RecipeHolder<?>> recipes = new HashSet<>(this.blockedRecipes());
+        recipes.addAll(effect.getRecipes(level));
+        return new RecipeUnlockEffectData(recipes);
+    }
+
     public RecipeUnlockEffectData remove(RecipeUnlockEffect recipe, Level level) {
         Set<RecipeHolder<?>> recipes = new HashSet<>(this.blockedRecipes());
         recipes.removeAll(recipe.getRecipes(level));
+        return new RecipeUnlockEffectData(recipes);
+    }
+
+    public RecipeUnlockEffectData remove(UnlockItemEffect effect, Level level) {
+        Set<RecipeHolder<?>> recipes = new HashSet<>(this.blockedRecipes());
+        recipes.removeAll(effect.getRecipes(level));
         return new RecipeUnlockEffectData(recipes);
     }
 
@@ -41,11 +54,16 @@ public record RecipeUnlockEffectData(Set<RecipeHolder<?>> blockedRecipes) implem
      */
     @Override
     public RecipeUnlockEffectData getDefault(Level level) {
-        Collection<RecipeUnlockEffect> rps =  ResearchHelperCommon.getResearchEffects(RecipeUnlockEffect.class, level);
+        Collection<RecipeUnlockEffect> recipeEffects =  ResearchHelperCommon.getResearchEffects(RecipeUnlockEffect.class, level);
+        Collection<UnlockItemEffect> unlockItemEffects = ResearchHelperCommon.getResearchEffects(UnlockItemEffect.class, level);
         Set<RecipeHolder<?>> blockedRecipes = new HashSet<>();
 
-        for (RecipeUnlockEffect rp : rps) {
+        for (RecipeUnlockEffect rp : recipeEffects) {
             blockedRecipes.addAll(rp.getRecipes(level));
+        }
+
+        for (UnlockItemEffect effect : unlockItemEffects) {
+            blockedRecipes.addAll(effect.getRecipes(level));
         }
 
         return new RecipeUnlockEffectData(blockedRecipes);

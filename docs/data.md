@@ -80,6 +80,9 @@ This example is for a research that unlocks oak planks after the player consumes
 -   **`researchd:consume_item`**: Requires the player to have a certain amount of an item in their inventory, which will be consumed.
     -   `item`: An `Ingredient` object representing the item to consume.
     -   `count`: The number of items to consume.
+-   **`researchd:check_item_presence`**: Requires the entire team to collectively hold a certain amount of an item; no items are consumed when the condition is met.
+    -   `item`: An `Ingredient` object representing the item that must be present.
+    -   `count`: The combined number of items the team must have at the same time.
 -   **`researchd:consume_pack`**: Requires the player to use a research pack in the Research Lab.
     -   `packs`: A list of research pack resource locations.
     -   `count`: The number of packs to consume.
@@ -98,6 +101,8 @@ This example is for a research that unlocks oak planks after the player consumes
 
 -   **`researchd:unlock_recipe`**: Unlocks one or more recipes.
     -   `recipes`: An array of recipe resource locations.
+-   **`researchd:unlock_item`**: Unlocks an item and allows any recipes that produce or consume it.
+    -   `item`: The resource location of the item to unlock.
 -   **`researchd:dimension_unlock`**: Unlocks a dimension for the player.
     -   `dimension`: The resource location of the dimension to unlock.
     -   `icon_sprite` (optional): The resource location of the icon to display for this effect.

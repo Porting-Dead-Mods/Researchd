@@ -10,10 +10,8 @@ import com.portingdeadmods.researchd.impl.research.SimpleResearch;
 import com.portingdeadmods.researchd.impl.research.effect.AndResearchEffect;
 import com.portingdeadmods.researchd.impl.research.effect.DimensionUnlockEffect;
 import com.portingdeadmods.researchd.impl.research.effect.RecipeUnlockEffect;
-import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
-import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
-import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
-import com.portingdeadmods.researchd.impl.research.method.OrResearchMethod;
+import com.portingdeadmods.researchd.impl.research.effect.UnlockItemEffect;
+import com.portingdeadmods.researchd.impl.research.method.*;
 import com.portingdeadmods.researchd.registries.ResearchdItems;
 import com.portingdeadmods.researchd.resources.ResearchdDatagenProvider;
 import net.minecraft.resources.ResourceKey;
@@ -71,6 +69,15 @@ public class ResearchdResearches implements ResearchdDatagenProvider<Research> {
                                 unlockRecipe(modLoc("nether_pack")),
                                 unlockDimension(mcLoc("the_nether"), DimensionUnlockEffect.NETHER_SPRITE)
                         )
+                ));
+        ResourceKey<Research> cake = simpleResearch("cake", builder -> builder
+                .icon(Items.CAKE)
+                .parents(nether)
+                .method(
+                        hasItem(Items.CAKE, 1)
+                )
+                .effect(
+                        unlockItem(Items.CAKE)
                 ));
         ResourceKey<Research> end = simpleResearch("the_end", builder -> builder
                 .icon(Items.END_STONE)
@@ -138,6 +145,10 @@ public class ResearchdResearches implements ResearchdDatagenProvider<Research> {
         return new DimensionUnlockEffect(location, sprite);
     }
 
+    protected @NotNull UnlockItemEffect unlockItem(ItemLike item) {
+        return new UnlockItemEffect(item.asItem());
+    }
+
     @SafeVarargs
     protected final @NotNull ConsumePackResearchMethod consumePack(int count, int duration, ResourceKey<ResearchPack>... packs) {
         return new ConsumePackResearchMethod(Arrays.asList(packs), count, duration);
@@ -149,6 +160,10 @@ public class ResearchdResearches implements ResearchdDatagenProvider<Research> {
 
     protected @NotNull ConsumeItemResearchMethod consumeItem(ItemLike item, int count) {
         return new ConsumeItemResearchMethod(Ingredient.of(item), count);
+    }
+
+    protected @NotNull CheckItemPresenceResearchMethod hasItem(ItemLike item, int count) {
+        return new CheckItemPresenceResearchMethod(Ingredient.of(item), count);
     }
 
     protected ResourceKey<Research> key(String name) {
