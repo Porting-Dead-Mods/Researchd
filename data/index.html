@@ -765,6 +765,11 @@ This is an in-game example that can be created with the command <code>/researchd
 <li><code>count</code>: The number of items to consume.</li>
 </ul>
 </li>
+<li><strong><code>researchd:check_item_presence</code></strong>: Requires the entire team to collectively hold a certain amount of an item; no items are consumed when the condition is met.<ul>
+<li><code>item</code>: An <code>Ingredient</code> object representing the item that must be present.</li>
+<li><code>count</code>: The combined number of items the team must have at the same time.</li>
+</ul>
+</li>
 <li><strong><code>researchd:consume_pack</code></strong>: Requires the player to use a research pack in the Research Lab.<ul>
 <li><code>packs</code>: A list of research pack resource locations.</li>
 <li><code>count</code>: The number of packs to consume.</li>
@@ -789,6 +794,10 @@ This is an in-game example that can be created with the command <code>/researchd
 <ul>
 <li><strong><code>researchd:unlock_recipe</code></strong>: Unlocks one or more recipes.<ul>
 <li><code>recipes</code>: An array of recipe resource locations.</li>
+</ul>
+</li>
+<li><strong><code>researchd:unlock_item</code></strong>: Unlocks an item and allows any recipes that produce or consume it.<ul>
+<li><code>item</code>: The resource location of the item to unlock.</li>
 </ul>
 </li>
 <li><strong><code>researchd:dimension_unlock</code></strong>: Unlocks a dimension for the player.<ul>
