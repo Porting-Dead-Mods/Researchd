@@ -13,6 +13,7 @@ import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.research.effect.data.DimensionUnlockEffectData;
 import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
+import com.portingdeadmods.researchd.impl.research.effect.data.UnlockItemEffectData;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
 import com.portingdeadmods.researchd.utils.TimeDifference;
@@ -20,6 +21,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
@@ -127,6 +129,12 @@ public final class ResearchHelperCommon {
                     for (RecipeHolder<?> rec : blockedRecipes) {
                         Researchd.debug("Effect Data", " - " + rec.id());
 
+                    }
+                }
+
+                if (effectData.getDefault(level) instanceof UnlockItemEffectData(Set<ResourceKey<Item>> blockedItems)) {
+                    for (ResourceKey<Item> item : blockedItems) {
+                        Researchd.debug("Effect Data", " - " + item.location());
                     }
                 }
             }

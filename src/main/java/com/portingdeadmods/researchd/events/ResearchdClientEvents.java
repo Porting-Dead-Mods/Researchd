@@ -1,6 +1,5 @@
 package com.portingdeadmods.researchd.events;
 
-import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdClientConfig;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
@@ -9,7 +8,7 @@ import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.team.ResearchTeamScreen;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
-import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
+import com.portingdeadmods.researchd.impl.research.effect.data.UnlockItemEffectData;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.ChatFormatting;
@@ -66,14 +65,8 @@ public final class ResearchdClientEvents {
 		LocalPlayer player = (LocalPlayer) event.getEntity();
 		Item item = event.getItemStack().getItem();
 
-		RecipeUnlockEffectData recipeData = player.getData(ResearchdAttachments.RECIPE_PREDICATE.get());
-		UniqueArray<Item> blockedItems = new UniqueArray<>();
-
-		recipeData.blockedRecipes().forEach(recipe -> {
-			blockedItems.add(recipe.value().getResultItem(player.registryAccess()).getItem());
-		});
-
-		if (blockedItems.contains(item)) {
+		UnlockItemEffectData itemData = player.getData(ResearchdAttachments.ITEM_PREDICATE.get());
+		if (itemData.isBlocked(item)) {
 			event.getToolTip().add(Component.literal("")); // Add a blank line for spacing
 			event.getToolTip().add(Component.literal("This item is blocked by a research!").withStyle(ChatFormatting.RED, ChatFormatting.ITALIC));
 		}

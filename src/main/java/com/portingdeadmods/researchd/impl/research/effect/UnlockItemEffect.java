@@ -8,7 +8,7 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectSerializer;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
-import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
+import com.portingdeadmods.researchd.impl.research.effect.data.UnlockItemEffectData;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -63,8 +63,8 @@ public record UnlockItemEffect(Optional<ItemStack> icon, Optional<String> name, 
 
     @Override
     public void onUnlock(Level level, Player player, ResourceKey<Research> research) {
-        RecipeUnlockEffectData data = player.getData(ResearchdAttachments.RECIPE_PREDICATE.get());
-        player.setData(ResearchdAttachments.RECIPE_PREDICATE.get(), data.remove(this, level));
+        UnlockItemEffectData data = player.getData(ResearchdAttachments.ITEM_PREDICATE.get());
+        player.setData(ResearchdAttachments.ITEM_PREDICATE.get(), data.remove(this, level));
     }
 
     @Override
