@@ -18,6 +18,7 @@ import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
 import com.portingdeadmods.researchd.utils.TimeDifference;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -125,9 +126,9 @@ public final class ResearchHelperCommon {
                     }
                 }
 
-                if (effectData.getDefault(level) instanceof RecipeUnlockEffectData(Set<RecipeHolder<?>> blockedRecipes)) {
-                    for (RecipeHolder<?> rec : blockedRecipes) {
-                        Researchd.debug("Effect Data", " - " + rec.id());
+                if (effectData.getDefault(level) instanceof RecipeUnlockEffectData(Set<ResourceLocation> blockedRecipes)) {
+                    for (ResourceLocation rec : blockedRecipes) {
+                        Researchd.debug("Effect Data", " - " + rec);
 
                     }
                 }
