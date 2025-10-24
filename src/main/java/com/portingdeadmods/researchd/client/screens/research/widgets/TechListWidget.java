@@ -121,7 +121,7 @@ public class TechListWidget extends ResearchScreenWidget {
     }
 
     private void refreshSearchResult() {
-        this.displayTechList = this.techList.getListForSearch(this.searchBox.getValue());
+        this.displayTechList = this.techList.getListForSearch(this.searchBox.getValue(), Minecraft.getInstance().level);
         this.scrollOffset = 0;
 
         this.rows = this.displayTechList.entries().size() / this.cols + (this.displayTechList.entries().size() % this.cols != 0 ? 1 : 0);

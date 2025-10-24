@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.api.client;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
+import net.minecraft.world.level.Level;
 
 import java.util.HashSet;
 import java.util.List;
@@ -30,10 +31,23 @@ public record TechList(UniqueArray<ResearchInstance> entries) {
         this.entries.addAll(sorted);
     }
 
-    public TechList getListForSearch(String searchVal) {
+    public TechList getListForSearch(String searchVal, Level level) {
         Set<ResearchInstance> entries = new UniqueArray<>();
+        String searchLower = searchVal.strip().toLowerCase();
+
         for (ResearchInstance entry : this.entries()) {
-            if (entry.getDisplayName().getString().toLowerCase().contains(searchVal.strip().toLowerCase())) {
+            // Search by resource location
+            String resourceLocation = entry.getKey().location().toString().toLowerCase();
+
+            // Search by localized display name
+            String displayName = entry.getDisplayName().getString().toLowerCase();
+
+            // Search by localized description
+            String description = entry.getDescription(level).getString().toLowerCase();
+
+            if (resourceLocation.contains(searchLower) ||
+                displayName.contains(searchLower) ||
+                description.contains(searchLower)) {
                 entries.add(entry);
             }
         }
