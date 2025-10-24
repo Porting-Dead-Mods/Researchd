@@ -1,8 +1,7 @@
 package com.portingdeadmods.researchd.api.research.effects;
 
+import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import net.minecraft.world.level.Level;
-
-import java.util.Set;
 
 public interface ResearchEffectData<T extends ResearchEffect> {
     /**
@@ -14,5 +13,5 @@ public interface ResearchEffectData<T extends ResearchEffect> {
     // Storage methods
     ResearchEffectData<T> add(T effect, Level level);
     ResearchEffectData<T> remove(T effect, Level level);
-    Set<?> getAll();
+    UniqueArray<?> getAll();
 }

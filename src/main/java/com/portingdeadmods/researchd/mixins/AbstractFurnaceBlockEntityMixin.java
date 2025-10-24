@@ -45,10 +45,10 @@ public class AbstractFurnaceBlockEntityMixin {
                     return null;
                 }
 
-                if (!recipeData.getAll().isEmpty()) {
+                if (!recipeData.isEmpty()) {
                     Researchd.debug("Furnace Mixin", "RecipePredicateData: " + recipeData.blockedRecipes());
                     Researchd.debug("Furnace Mixin","RecipeHolder id: " + recipeholder.id());
-                    if (recipeData.blockedRecipes().contains(recipeholder)) {
+                    if (recipeData.contains(recipeholder)) {
                         Researchd.debug("Furnace Mixin","Recipe for " + recipeholder.value().getResultItem(level.registryAccess()) + " blocked!");
                         return null;
                     }

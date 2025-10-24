@@ -16,15 +16,23 @@ public final class ResearchdAttachments {
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENTS = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, Researchd.MODID);
 
     public static final Supplier<AttachmentType<DimensionUnlockEffectData>> DIMENSION_PREDICATE = ATTACHMENTS.register("dimension_predicate",
-            () -> AttachmentType.builder(() -> DimensionUnlockEffectData.EMPTY).serialize(DimensionUnlockEffectData.CODEC).build());
+            () -> AttachmentType.builder(() -> DimensionUnlockEffectData.EMPTY)
+                    .serialize(DimensionUnlockEffectData.CODEC)
+                    .sync(DimensionUnlockEffectData.STREAM_CODEC)
+                    .build());
 
     public static final Supplier<AttachmentType<RecipeUnlockEffectData>> RECIPE_PREDICATE = ATTACHMENTS.register("recipe_predicate",
-            () -> AttachmentType.builder(() -> RecipeUnlockEffectData.EMPTY).serialize(RecipeUnlockEffectData.CODEC).build());
+            () -> AttachmentType.builder(() -> RecipeUnlockEffectData.EMPTY)
+                    .serialize(RecipeUnlockEffectData.CODEC)
+                    .sync(RecipeUnlockEffectData.STREAM_CODEC)
+                    .build());
 
     public static final Supplier<AttachmentType<UnlockItemEffectData>> ITEM_PREDICATE = ATTACHMENTS.register("item_predicate",
-            () -> AttachmentType.builder(() -> UnlockItemEffectData.EMPTY).serialize(UnlockItemEffectData.CODEC).build());
+            () -> AttachmentType.builder(() -> UnlockItemEffectData.EMPTY)
+                    .serialize(UnlockItemEffectData.CODEC)
+                    .sync(UnlockItemEffectData.STREAM_CODEC)
+                    .build());
 
     public static final Supplier<AttachmentType<UUID>> PLACED_BY_UUID = ATTACHMENTS.register("placed_by_uuid",
             () -> AttachmentType.builder(() -> UUID.fromString("00000000-0000-0000-0000-000000000000")).serialize(UUIDUtil.CODEC).build());
 }
-

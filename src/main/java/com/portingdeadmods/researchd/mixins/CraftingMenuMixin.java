@@ -53,7 +53,7 @@ public abstract class CraftingMenuMixin {
                 return ItemStack.EMPTY;
             }
 
-            if (!recipeData.blockedRecipes().isEmpty() && recipeData.blockedRecipes().contains(holder)) {
+            if (!recipeData.isEmpty() && recipeData.contains(holder)) {
                 Researchd.debug("Crafting Mixin","Recipe for " + craftingRecipe.getResultItem(level.registryAccess()) + " blocked!");
                 return ItemStack.EMPTY;
             }
