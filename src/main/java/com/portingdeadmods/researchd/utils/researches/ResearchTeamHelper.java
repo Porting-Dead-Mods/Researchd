@@ -194,7 +194,7 @@ public final class ResearchTeamHelper {
 			else {
 
 				// Team Leader Not Specified
-                if (nextToLead == PlayerUtils.EmptyUUID || nextToLead == null) {
+                if (nextToLead == null || nextToLead.equals(PlayerUtils.EmptyUUID)) {
                     requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NO_NEXT_LEADER));
                     return;
                 }
@@ -234,7 +234,7 @@ public final class ResearchTeamHelper {
         ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
 
 		// Error safety (handling yourself)
-        if (requester.getUUID() == member) {
+        if (requester.getUUID().equals(member)) {
             requester.sendSystemMessage(getIllegalMessage());
             return;
         }
@@ -279,7 +279,7 @@ public final class ResearchTeamHelper {
         ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
 
 		// Error Safety (handling yourself)
-        if (requester.getUUID() == moderator) {
+        if (requester.getUUID().equals(moderator)) {
             requester.sendSystemMessage(getIllegalMessage());
             return;
         }
@@ -374,6 +374,13 @@ public final class ResearchTeamHelper {
 
     public static void handleSendInviteToPlayer(ServerPlayer requester, UUID invited, boolean remove) {
         ResearchTeam team = getTeamByMember(requester);
+
+		// Error Safety (inviting yourself)
+	    if (requester.getUUID().equals(invited)) {
+		    requester.sendSystemMessage(getIllegalMessage());
+		    return;
+	    }
+
         if (remove) {
             team.getSocialManager().removeSentInvite(invited);
             requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.REMOVED_INVITE, AllPlayersCache.getName(invited)));
