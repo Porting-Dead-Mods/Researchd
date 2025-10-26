@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.api.team;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
 import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -24,8 +25,8 @@ public record TeamMember(UUID player, ResearchTeamRole role) {
             TeamMember::new
     );
 
-    public Component getName(EntityGetter levelAccess) {
-        return levelAccess.getPlayerByUUID(this.player()).getName();
+    public String getName() {
+        return AllPlayersCache.getName(this.player);
     }
 
 }

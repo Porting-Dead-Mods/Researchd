@@ -26,7 +26,7 @@ public record IgnoreTeamPayload(UUID memberOfTeam) implements CustomPacketPayloa
         return TYPE;
     }
 
-    public static void enterTeamAction(IgnoreTeamPayload payload, IPayloadContext context) {
+    public static void ignoreTeamAction(IgnoreTeamPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer sp)
                 ResearchTeamHelper.handleIgnoreTeam(sp, payload.memberOfTeam());

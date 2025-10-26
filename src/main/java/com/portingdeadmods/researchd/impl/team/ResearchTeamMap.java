@@ -5,7 +5,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
+import com.portingdeadmods.researchd.api.team.TeamMember;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
+import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.utils.ResearchdCodecUtils;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -58,14 +60,46 @@ public record ResearchTeamMap(Map<UUID, SimpleResearchTeam> researchTeams) {
         return this.researchTeams.get(teamUuid);
     }
 
-    public static void onSync(Player player) {
-        if (player.level().isClientSide) {
+    public static void afterSync(Player player) {
+	    Level level = player.level();
+	    if (level.isClientSide) {
             ResearchHelperClient.refreshResearches(player);
             ClientResearchTeamHelper.resolveInstances(ClientResearchTeamHelper.getTeam());
         } else {
             // TODO: Reenable this
             //ResearchHelperCommon.refreshResearches((ServerPlayer) player);
         }
+
+		// Resolve Map pointers to single team objects for all members
+	    ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
+	    Map<UUID, SimpleResearchTeam> temp = new HashMap<>();
+	    Map<UUID, SimpleResearchTeam> memberToTeam = new HashMap<>();
+
+	    for (Map.Entry<UUID, SimpleResearchTeam> entry : data.researchTeams().entrySet()) {
+		    UUID uuid = entry.getKey();
+		    SimpleResearchTeam team = entry.getValue();
+
+		    // Check if this UUID is already associated with a team
+		    SimpleResearchTeam existingTeam = memberToTeam.get(uuid);
+		    if (existingTeam != null) {
+			    temp.put(uuid, existingTeam);
+			    continue;
+		    }
+
+		    // Otherwise, this is a new unique team
+		    temp.put(uuid, team);
+		    for (TeamMember member : team.getMembers()) {
+			    memberToTeam.put(member.player(), team);
+		    }
+	    }
+
+	    System.out.println("PEX");
+		if (temp.equals(data.researchTeams()))
+			return;
+
+	    data.researchTeams().clear();
+	    data.researchTeams().putAll(temp);
+		ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
     }
 
 	public void setDefaultTeam(UUID uuid, Level level) {

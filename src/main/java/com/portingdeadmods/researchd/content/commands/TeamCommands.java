@@ -54,7 +54,7 @@ public class TeamCommands {
 							ServerPlayer player = source.getPlayer();
 
 							if (player != null) {
-								ResearchTeamHelper.handleLeaveTeam(player, PlayerUtils.EmptyUUID);
+								ResearchTeamHelper.handleLeaveTeam(player);
 							}
 
 							return 1;
@@ -67,7 +67,7 @@ public class TeamCommands {
 
 								if (player != null) {
 									if (StringArgumentType.getString(context, "nextToLead").equals("none"))
-										ResearchTeamHelper.handleLeaveTeam(player, PlayerUtils.EmptyUUID);
+										ResearchTeamHelper.handleLeaveTeam(player);
 									else {
 										ResearchTeamHelper.handleLeaveTeam(player, PlayerUtils.getPlayerUUIDFromName(context.getSource().getLevel(), StringArgumentType.getString(context, "nextToLead")));
 									}

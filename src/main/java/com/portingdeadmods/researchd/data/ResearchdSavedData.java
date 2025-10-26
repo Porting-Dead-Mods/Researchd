@@ -14,7 +14,7 @@ public final class ResearchdSavedData {
     public static final Supplier<PDLSavedData<ResearchTeamMap>> TEAM_RESEARCH = SAVED_DATA.register("team_research",
             () -> PDLSavedData.builder(ResearchTeamMap.CODEC, () -> ResearchTeamMap.EMPTY)
                     .synced(ResearchTeamMap.STREAM_CODEC)
-                    .postSync(ResearchTeamMap::onSync)
+                    .postSync(ResearchTeamMap::afterSync)
 		            .global()
                     .build());
 

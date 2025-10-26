@@ -127,12 +127,15 @@ public final class ResearchTeamHelper {
         ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
         SimpleResearchTeam team = savedData.getTeamByMember(memberOfTeam);
 
+		// Already in Team (with multiple people) -> Return with error msg
         if (getTeamByMember(requester).getMembersAmount() > 1) {
             requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.ALREADY_IN_TEAM));
             return;
         }
+
+	    // Alone in team -> Enter the new team
         if (team != null && (team.getSocialManager().containsSentInvite(requesterId))) {
-            ResearchTeamHelper.handleLeaveTeam(requester, PlayerUtils.EmptyUUID);
+            ResearchTeamHelper.handleLeaveTeam(requester);
 
             savedData.researchTeams().put(requesterId, team);
             requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.YOU_JOINED_TEAM, team.getName()));
@@ -174,26 +177,39 @@ public final class ResearchTeamHelper {
 
         ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
 
-        // Handle the case of transfering ownership
         ResearchTeam team = getTeamByMember(requester);
+
+		// Is Owner -> Handle cases of being alone / with multiple people
         if (team.isOwner(requesterId)) {
+
+			// Alone In Team -> Leaving creates default team for player
             if (team.getMembersAmount() <= 1) {
                 savedData.researchTeams().remove(requesterId);
                 requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.LEFT_TEAM));
 
                 savedData.researchTeams().put(requesterId, SimpleResearchTeam.createDefaultTeam(requester));
-            } else {
+            }
+
+			// Not Alone In Team -> Transfer Ownership
+			else {
+
+				// Team Leader Not Specified
                 if (nextToLead == PlayerUtils.EmptyUUID || nextToLead == null) {
                     requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NO_NEXT_LEADER));
                     return;
                 }
+
+				// Team Leader Specified
                 handleTransferOwnership(requester, nextToLead);
             }
 
             ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
             ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
             PacketDistributor.sendToPlayer(requester, new RefreshResearchesPayload());
-        } else {
+        }
+
+	    // Is not Owner -> Just remove member out of the team and create a default one.
+		else {
             removeMember(requester);
             requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.LEFT_TEAM));
             savedData.researchTeams().put(requesterId, SimpleResearchTeam.createDefaultTeam(requester));
@@ -204,19 +220,32 @@ public final class ResearchTeamHelper {
 
     }
 
+	/**
+	 *
+	 * @param requester
+	 */
+	public static void handleLeaveTeam(ServerPlayer requester) {
+		ResearchTeamHelper.handleLeaveTeam(requester, PlayerUtils.EmptyUUID);
+	}
+
     public static void handleManageMember(ServerPlayer requester, UUID member, boolean remove) {
         MinecraftServer server = requester.getServer();
         ServerLevel level = server.overworld();
         ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
 
+		// Error safety (handling yourself)
         if (requester.getUUID() == member) {
             requester.sendSystemMessage(getIllegalMessage());
             return;
         }
 
+		// Error safety
 	    if (!arePlayersSameTeam(requester, member)) return;
 
+		// Permission Check
         if (getPermissionLevel(requester) >= 1 && (getPermissionLevel(requester) > getPermissionLevel(member, requester.level()))) {
+
+			// Remove member and put them into a default team with a status message
             if (remove) {
                 getTeamByMember(requester).removeMember(member);
                 requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.REMOVED, PlayerUtils.getPlayerNameFromUUID(level, member)));
@@ -228,7 +257,10 @@ public final class ResearchTeamHelper {
                 }
 
 				savedData.setDefaultTeam(member, requester.level());
-            } else {
+            }
+
+			// Invite Member
+			else {
                 getTeamByMember(requester).getSocialManager().addSentInvite(member);
             }
 
@@ -242,16 +274,17 @@ public final class ResearchTeamHelper {
     }
 
     public static void handleManageModerator(ServerPlayer requester, UUID moderator, boolean remove) {
-        UUID requesterId = requester.getUUID();
         MinecraftServer server = requester.getServer();
         ServerLevel level = server.overworld();
         ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
 
+		// Error Safety (handling yourself)
         if (requester.getUUID() == moderator) {
             requester.sendSystemMessage(getIllegalMessage());
             return;
         }
 
+		// Permission Check (is Owner)
         if (getPermissionLevel(requester) == 2) {
             if (arePlayersSameTeam(requester, moderator)) {
                 ResearchTeam team = getTeamByMember(requester);
@@ -281,6 +314,7 @@ public final class ResearchTeamHelper {
         ServerLevel level = server.overworld();
         ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
 
+	    // Permission Check (is Owner)
         if (getPermissionLevel(requester) == 2) {
             String oldname = getTeamByMember(requester).getName();
             getTeamByMember(requester).setName(name);
@@ -299,6 +333,7 @@ public final class ResearchTeamHelper {
         UUID requesterId = requester.getUUID();
         ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(requester.level());
 
+	    // Permission Check (is Owner)
         if (getPermissionLevel(requester) == 2) {
             if (arePlayersSameTeam(level, requesterId, nextToLead)) {
                 ResearchTeam team = getTeamByMember(requester);
@@ -346,6 +381,8 @@ public final class ResearchTeamHelper {
             team.getSocialManager().addSentInvite(invited);
             ServerPlayer invitedPlayer = (ServerPlayer) requester.serverLevel().getPlayerByUUID(invited);
             if (invitedPlayer != null) {
+
+				// Accept / Decline prompt
                 invitedPlayer.sendSystemMessage(
                         ResearchdTranslations.component(ResearchdTranslations.Team.RECEIVED_INVITE, team.getName())
                                 .append(Component.literal("\n"))
@@ -375,12 +412,14 @@ public final class ResearchTeamHelper {
 
     public static Component getFormattedDump(Level level) {
         List<Component> dump = new ArrayList<>();
+	    Set<SimpleResearchTeam> uniqueTeams = new HashSet<>(ResearchdSavedData.TEAM_RESEARCH.get().getData(level).researchTeams().values());
+
         dump.add(Component.literal("---- Researchd Teams ----").withStyle(ChatFormatting.GOLD));
-        for (Iterator<SimpleResearchTeam> iterator = ResearchdSavedData.TEAM_RESEARCH.get().getData(level).researchTeams().values().iterator(); iterator.hasNext(); ) {
+        for (Iterator<SimpleResearchTeam> iterator = uniqueTeams.iterator(); iterator.hasNext(); ) {
             ResearchTeam team = iterator.next();
             dump.add(Component.literal(ChatFormatting.GREEN + team.getName() + ChatFormatting.RESET).append(" with %s member%s".formatted(ChatFormatting.GREEN.toString() + team.getMembersAmount() + ChatFormatting.RESET, team.getMembersAmount() == 1 ? "" : "s")));
             for (TeamMember member : team.getMembers()) {
-                dump.add(Component.literal("┣ ").append(member.getName(level)).withStyle(ChatFormatting.GRAY));
+                dump.add(Component.literal("┣ ").append(member.getName()).withStyle(ChatFormatting.GRAY));
             }
             if (iterator.hasNext()) {
                 dump.add(Component.literal("┣━━").withStyle(ChatFormatting.GRAY));
