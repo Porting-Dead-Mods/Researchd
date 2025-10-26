@@ -93,7 +93,6 @@ public record ResearchTeamMap(Map<UUID, SimpleResearchTeam> researchTeams) {
 		    }
 	    }
 
-	    System.out.println("PEX");
 		if (temp.equals(data.researchTeams()))
 			return;
 

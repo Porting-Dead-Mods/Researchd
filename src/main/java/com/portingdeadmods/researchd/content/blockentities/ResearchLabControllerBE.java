@@ -54,9 +54,9 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
         this.partPos = LazyFinal.create();
         this.currentResearchDuration = -1;
         this.researchPackUsage = new HashMap<>();
-        this.researchPacks = new ArrayList<>();
 
-        addItemHandler(0, this::isItemValid);
+	    this.researchPacks = new ArrayList<>();
+	    this.addItemHandler(0, this::isItemValid);
     }
 
     @Override
@@ -64,13 +64,10 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
         super.setLevel(level);
 
         this.researchPacks = ResearchHelperCommon.getResearchPackKeys(level);
+		this.researchPacks.forEach(key -> {
+			this.researchPackUsage.computeIfAbsent(key, $ -> 0f);
+		});
         this.addItemHandler(this.researchPacks.size(), this::isItemValid);
-        if (this.researchPackUsage.isEmpty()) {
-            this.researchPackUsage = ResearchHelperCommon.getResearchPacks(level).keySet().stream()
-                    .collect(Collectors.toConcurrentMap(Function.identity(), $ -> 0f));
-        } else {
-            // TODO: add new packs to pack usage
-        }
     }
 
     private boolean isItemValid(int slot, ItemStack stack) {
