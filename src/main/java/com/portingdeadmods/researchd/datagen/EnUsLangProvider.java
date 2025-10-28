@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.datagen;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
+import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceKey;
@@ -43,7 +43,7 @@ public final class EnUsLangProvider extends LanguageProvider {
         add("research_method." + key.getNamespace() + "." + key.getPath(), name);
     }
 
-    private void addResearchPack(ResourceKey<ResearchPack> key, String name) {
+    private void addResearchPack(ResourceKey<ResearchPackImpl> key, String name) {
         add("item.researchd.research_pack_" + key.location().toString().replace(':', '_'), name);
     }
 

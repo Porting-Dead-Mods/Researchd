@@ -10,6 +10,7 @@ import com.portingdeadmods.researchd.impl.research.effect.EmptyResearchEffect;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
 import dev.latvian.mods.kubejs.script.SourceLine;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -30,8 +31,8 @@ public class ResearchBuilder {
     private ResearchEffect researchEffect = EmptyResearchEffect.INSTANCE;
     private final List<ResourceKey<Research>> parents = new ArrayList<>();
     private boolean requiresParent = false;
-    private String literalName = null;
-    private String literalDescription = null;
+    private Component literalName = null;
+    private Component literalDescription = null;
 
     public ResearchBuilder(ResourceLocation id) {
         this.id = id;
@@ -81,12 +82,22 @@ public class ResearchBuilder {
     }
 
     public ResearchBuilder literalName(String name) {
-        this.literalName = name;
+        this.literalName = Component.literal(name);
         return this;
     }
 
     public ResearchBuilder literalDescription(String description) {
-        this.literalDescription = description;
+        this.literalDescription = Component.literal(description);
+        return this;
+    }
+
+    public ResearchBuilder translatableName(String key) {
+        this.literalName = Component.translatable(key);
+        return this;
+    }
+
+    public ResearchBuilder translatableDescription(String key) {
+        this.literalDescription = Component.translatable(key);
         return this;
     }
 
@@ -95,20 +106,20 @@ public class ResearchBuilder {
             throw new IllegalStateException("Research '" + id + "' requires a parent but has no parents defined. Set requiresParent to false or add parents.");
         }
         
-        SimpleResearch.Builder builder = SimpleResearch.builder();
-        builder.icon(icon);
-        builder.method(researchMethod);
-        builder.effect(researchEffect);
-        for (ResourceKey<Research> parent : parents) {
-            builder.parents(parent);
-        }
-        builder.requiresParent(requiresParent);
+        SimpleResearch.Builder builder = SimpleResearch.builder()
+                .icon(this.icon)
+                .method(this.researchMethod)
+                .effect(this.researchEffect)
+                .parents(this.parents)
+                .requiresParent(this.requiresParent);
+
         if (literalName != null) {
             builder.literalName(literalName);
         }
         if (literalDescription != null) {
             builder.literalDescription(literalDescription);
         }
+
         return builder.build();
     }
 }

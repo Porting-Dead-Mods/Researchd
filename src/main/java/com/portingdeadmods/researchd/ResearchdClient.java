@@ -4,7 +4,7 @@ import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
 import com.portingdeadmods.researchd.api.research.ResearchIcon;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
-import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
+import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.client.ResearchdRenderTypes;
 import com.portingdeadmods.researchd.client.impl.ClientItemResearchIcon;
@@ -116,7 +116,7 @@ public final class ResearchdClient {
             ResearchPackComponent researchPackComponent = stack.get(ResearchdDataComponents.RESEARCH_PACK);
             ClientLevel level = Minecraft.getInstance().level;
             if (layer == 1 && researchPackComponent.researchPackKey().isPresent()) {
-                ResearchPack researchPack = ResearchHelperCommon.getResearchPack(researchPackComponent.researchPackKey().get(), level);
+                ResearchPackImpl researchPack = ResearchHelperCommon.getResearchPack(researchPackComponent.researchPackKey().get(), level);
                 if (researchPack != null) {
                     return researchPack.color();
                 }

@@ -33,8 +33,8 @@ public class ExampleCommands {
                         // Optional "pack-name" param
                         .then(Commands.argument("pack-name", StringArgumentType.string())
                                 .executes(ExampleCommands::createDatapackExample)
-                        // Optional "pack-description" param
-                        .then(Commands.argument("pack-description", StringArgumentType.string())
+                        // Optional "pack-desc" param
+                        .then(Commands.argument("pack-desc", StringArgumentType.string())
                                 .executes(ExampleCommands::createDatapackExample))))
                 .build();
     }
@@ -43,7 +43,7 @@ public class ExampleCommands {
     private static int createDatapackExample(CommandContext<CommandSourceStack> ctx) {
         CommandSourceStack source = ctx.getSource();
         String name = getArgOrDefault(ctx, "pack-name", String.class, "researchd_examples_pack");
-        String description = getArgOrDefault(ctx, "pack-description", String.class, "Auto-created researchd example pack");
+        String description = getArgOrDefault(ctx, "pack-desc", String.class, "Auto-created researchd example pack");
         Result<Path, Exception> result = ExampleDatapack.createExample(ctx.getSource().getServer().getWorldPath(LevelResource.DATAPACK_DIR), name, description);
         if (result instanceof Result.Ok(Path value)) {
             String filePath = value.toString();

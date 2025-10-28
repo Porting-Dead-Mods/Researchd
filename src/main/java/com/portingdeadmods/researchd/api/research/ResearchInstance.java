@@ -70,29 +70,24 @@ public final class ResearchInstance {
         return new ResearchInstance(research, researchStatus, researchedPlayer, researchedTime);
     }
 
-    public Component getDisplayName() {
-        return Utils.registryTranslation(this.getKey());
-    }
-
     public Component getDisplayName(Level level) {
         Research r = this.research.getResearch(level);
-        if (r instanceof SimpleResearch simple) {
-            if (simple.literalName().isPresent()) {
-                return Component.literal(simple.literalName().get());
-            }
+
+        if (r instanceof RegistryDisplay<?> display) {
+            ResourceKey<?> researchKey = this.research.getResearchKey();
+            return display.getDisplayNameUnsafe(researchKey);
         }
-        return Utils.registryTranslation(this.getKey());
+        return Research.getLangName(this.research.getResearchKey());
     }
 
     public Component getDescription(Level level) {
         Research r = this.research.getResearch(level);
-        if (r instanceof SimpleResearch simple) {
-            if (simple.literalDescription().isPresent()) {
-                return Component.literal(simple.literalDescription().get());
-            }
+
+        if (r instanceof RegistryDisplay<?> display) {
+            ResourceKey<?> researchKey = this.research.getResearchKey();
+            return display.getDisplayDescriptionUnsafe(researchKey);
         }
-        ResourceKey<Research> key = this.getKey();
-        return Component.translatable("research." + key.location().getNamespace() + "." + key.location().getPath() + ".description");
+        return Research.getLangDesc(this.research.getResearchKey());
     }
 
     public GlobalResearch getResearch() {

@@ -1,6 +1,6 @@
 package com.portingdeadmods.researchd.compat.kubejs.event;
 
-import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
+import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.compat.kubejs.builders.ResearchPackBuilder;
 import dev.latvian.mods.kubejs.event.KubeEvent;
 import dev.latvian.mods.kubejs.script.SourceLine;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 public class RegisterResearchPacksKubeEvent implements KubeEvent {
-    private final Map<ResourceLocation, ResearchPack> researchPacks = new HashMap<>();
+    private final Map<ResourceLocation, ResearchPackImpl> researchPacks = new HashMap<>();
     private final List<ResearchPackBuilder> builders = new ArrayList<>();
 
     public ResearchPackBuilder create(String id) {
@@ -27,14 +27,14 @@ public class RegisterResearchPacksKubeEvent implements KubeEvent {
 
     public ItemStack createItem(String packId) {
         ResourceLocation location = ResourceLocation.parse(packId);
-        ResourceKey<ResearchPack> key = ResourceKey.create(com.portingdeadmods.researchd.ResearchdRegistries.RESEARCH_PACK_KEY, location);
-        return ResearchPack.asStack(key);
+        ResourceKey<ResearchPackImpl> key = ResourceKey.create(com.portingdeadmods.researchd.ResearchdRegistries.RESEARCH_PACK_KEY, location);
+        return ResearchPackImpl.asStack(key);
     }
 
-    public Map<ResourceLocation, ResearchPack> getResearchPacks() {
+    public Map<ResourceLocation, ResearchPackImpl> getResearchPacks() {
         for (ResearchPackBuilder builder : builders) {
             try {
-                ResearchPack pack = builder.createObject();
+                ResearchPackImpl pack = builder.createObject();
                 researchPacks.put(builder.id, pack);
             } catch (Exception e) {
                 throw new RuntimeException("Failed to create research pack " + builder.id, e);

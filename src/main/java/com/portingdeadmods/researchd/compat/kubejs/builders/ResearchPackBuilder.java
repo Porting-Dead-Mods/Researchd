@@ -1,7 +1,9 @@
 package com.portingdeadmods.researchd.compat.kubejs.builders;
 
-import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
+import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
+import com.portingdeadmods.researchd.impl.utils.DisplayImpl;
 import dev.latvian.mods.kubejs.script.SourceLine;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 
@@ -12,7 +14,9 @@ public class ResearchPackBuilder {
     public SourceLine sourceLine;
     private int color = -1;
     private ResourceLocation customTexture;
-    private int sorting_value = 0;
+    private int sortingValue = 0;
+    private Component literalName;
+    private Component literalDescription;
 
     public ResearchPackBuilder(ResourceLocation id) {
         this.id = id;
@@ -34,11 +38,31 @@ public class ResearchPackBuilder {
      * Lower = earlier, higher = later
      */
     public ResearchPackBuilder sortingValue(int value) {
-        this.sorting_value = value;
+        this.sortingValue = value;
         return this;
     }
 
-    public ResearchPack createObject() {
-        return new ResearchPack(color, sorting_value, Optional.ofNullable(customTexture));
+    public ResearchPackBuilder literalName(String name) {
+        this.literalName = Component.literal(name);
+        return this;
+    }
+
+    public ResearchPackBuilder literalDescription(String name) {
+        this.literalDescription = Component.literal(name);
+        return this;
+    }
+
+    public ResearchPackBuilder translatableName(String key) {
+        this.literalName = Component.translatable(key);
+        return this;
+    }
+
+    public ResearchPackBuilder translatableDescription(String key) {
+        this.literalDescription = Component.translatable(key);
+        return this;
+    }
+
+    public ResearchPackImpl createObject() {
+        return new ResearchPackImpl(color, sortingValue, Optional.ofNullable(customTexture), new DisplayImpl(Optional.ofNullable(this.literalName), Optional.ofNullable(this.literalDescription)));
     }
 }

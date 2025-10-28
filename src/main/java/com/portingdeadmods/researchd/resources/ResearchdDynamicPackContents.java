@@ -8,7 +8,7 @@ import com.mojang.serialization.JsonOps;
 import com.portingdeadmods.portingdeadlibs.api.resources.DynamicPack;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
+import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.resources.contents.ResearchdLang;
 import com.portingdeadmods.researchd.resources.contents.ResearchdResearchPacks;
 import com.portingdeadmods.researchd.resources.contents.ResearchdResearches;
@@ -19,7 +19,7 @@ import java.util.function.Function;
 
 public class ResearchdDynamicPackContents {
     public static void writeData(DynamicPack pack) {
-        writeRegistry(pack, ResearchdResearchPacks::new, ResearchPack.CODEC, "research_pack");
+        writeRegistry(pack, ResearchdResearchPacks::new, ResearchPackImpl.CODEC, "research_pack");
         writeRegistry(pack, ResearchdResearches::new, Research.CODEC, "research");
 
     }

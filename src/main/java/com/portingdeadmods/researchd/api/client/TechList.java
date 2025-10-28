@@ -42,7 +42,7 @@ public record TechList(UniqueArray<ResearchInstance> entries) {
             // Search by localized display name
             String displayName = entry.getDisplayName(level).getString().toLowerCase();
 
-            // Search by localized description
+            // Search by localized desc
             String description = entry.getDescription(level).getString().toLowerCase();
 
             if (resourceLocation.contains(searchLower) ||

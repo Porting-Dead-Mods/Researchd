@@ -5,7 +5,7 @@ import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
-import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
+import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
 import com.portingdeadmods.researchd.impl.research.effect.AndResearchEffect;
 import com.portingdeadmods.researchd.impl.research.effect.DimensionUnlockEffect;
@@ -109,15 +109,21 @@ public class ResearchdResearches implements ResearchdDatagenProvider<Research> {
 
     public void buildExampleDatapack() {
         ResourceKey<Research> wood = simpleResearch("wood", builder -> builder
+                .literalName("Wood")
+                .literalDescription("Boxing match")
                 .icon(Items.OAK_LOG)
                 .method(and(consumeItem(Items.DIRT, 8), consumeItem(Items.WHEAT_SEEDS, 1)))
                 .effect(unlockRecipe(mcLoc("oak_planks"))));
         ResourceKey<Research> iron = simpleResearch("iron", builder -> builder
+                .literalName("Iron")
+                .literalDescription("Acquire software")
                 .icon(Items.IRON_INGOT)
                 .parents(wood)
                 .method(or(consumeItem(Items.FURNACE, 1), consumeItem(Items.COBBLESTONE, 8)))
                 .effect(unlockRecipe(mcLoc("iron_pickaxe"))));
         simpleResearch("nether_dim", builder -> builder
+                .literalName("Nether")
+                .literalDescription("The second dimension")
                 .icon(Items.NETHERRACK)
                 .parents(iron)
                 .method(consumePack(50, 200, pack(modLoc("test_pack"))))
@@ -150,7 +156,7 @@ public class ResearchdResearches implements ResearchdDatagenProvider<Research> {
     }
 
     @SafeVarargs
-    protected final @NotNull ConsumePackResearchMethod consumePack(int count, int duration, ResourceKey<ResearchPack>... packs) {
+    protected final @NotNull ConsumePackResearchMethod consumePack(int count, int duration, ResourceKey<ResearchPackImpl>... packs) {
         return new ConsumePackResearchMethod(Arrays.asList(packs), count, duration);
     }
 
@@ -170,7 +176,7 @@ public class ResearchdResearches implements ResearchdDatagenProvider<Research> {
         return ResourceKey.create(ResearchdRegistries.RESEARCH_KEY, modLoc(name));
     }
 
-    protected ResourceKey<ResearchPack> pack(ResourceLocation location) {
+    protected ResourceKey<ResearchPackImpl> pack(ResourceLocation location) {
         return ResourceKey.create(ResearchdRegistries.RESEARCH_PACK_KEY, location);
     }
 

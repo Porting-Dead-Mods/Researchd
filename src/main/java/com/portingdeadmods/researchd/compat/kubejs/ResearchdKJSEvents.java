@@ -1,7 +1,7 @@
 package com.portingdeadmods.researchd.compat.kubejs;
 
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
+import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.compat.kubejs.event.RegisterResearchPacksKubeEvent;
 import com.portingdeadmods.researchd.compat.kubejs.event.RegisterResearchesKubeEvent;
 import com.portingdeadmods.researchd.compat.kubejs.event.ResearchCompletedKubeEvent;
@@ -36,7 +36,7 @@ public final class ResearchdKJSEvents {
         return event.getResearches();
     }
 
-    public static Map<ResourceLocation, ResearchPack> fireRegisterResearchPacksEvent() {
+    public static Map<ResourceLocation, ResearchPackImpl> fireRegisterResearchPacksEvent() {
         RegisterResearchPacksKubeEvent event = new RegisterResearchPacksKubeEvent();
         ResearchdKJSEvents.REGISTER_RESEARCH_PACKS.post(ScriptType.SERVER, event);
         return event.getResearchPacks();

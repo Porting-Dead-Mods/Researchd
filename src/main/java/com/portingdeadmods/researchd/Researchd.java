@@ -3,7 +3,7 @@ package com.portingdeadmods.researchd;
 import com.mojang.logging.LogUtils;
 import com.portingdeadmods.portingdeadlibs.api.resources.DynamicPack;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
+import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.content.blockentities.ResearchLabPartBE;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
@@ -120,7 +120,7 @@ public final class Researchd {
 
     private void registerDatapackRegistries(DataPackRegistryEvent.NewRegistry event) {
         event.dataPackRegistry(ResearchdRegistries.RESEARCH_KEY, Research.CODEC, Research.CODEC);
-        event.dataPackRegistry(ResearchdRegistries.RESEARCH_PACK_KEY, ResearchPack.CODEC, ResearchPack.CODEC);
+        event.dataPackRegistry(ResearchdRegistries.RESEARCH_PACK_KEY, ResearchPackImpl.CODEC, ResearchPackImpl.CODEC);
     }
 
     private void onDatapacksSynced(OnDatapackSyncEvent event) {

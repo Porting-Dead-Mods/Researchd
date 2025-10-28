@@ -3,7 +3,7 @@ package com.portingdeadmods.researchd.compat;
 import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
+import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.compat.kubejs.ResearchdKJSEvents;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 import net.minecraft.resources.ResourceKey;
@@ -117,7 +117,7 @@ public final class KubeJSCompat {
         }
     }
 
-    public static Map<ResourceLocation, ResearchPack> getKubeJSResearchPacks() {
+    public static Map<ResourceLocation, ResearchPackImpl> getKubeJSResearchPacks() {
         if (!isKubeJSLoaded()) {
             return Map.of();
         }

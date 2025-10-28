@@ -8,7 +8,7 @@ Here is an example of how to register a new research pack:
 
 ```java
 import com.portingdeadmods.researchd.ResearchdRegistries;
-import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
+import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 

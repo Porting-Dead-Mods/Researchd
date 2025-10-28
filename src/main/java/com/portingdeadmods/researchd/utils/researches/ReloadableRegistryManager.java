@@ -10,7 +10,7 @@ import com.mojang.serialization.DataResult;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
+import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.compat.KubeJSCompat;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
@@ -71,8 +71,8 @@ public class ReloadableRegistryManager<T> extends SimpleJsonResourceReloadListen
             }
             Researchd.LOGGER.info("Loaded {} KubeJS researches", kubeJSResearches.size());
         } else if (this.registry.equals(ResearchdRegistries.RESEARCH_PACK_KEY)) {
-            Map<ResourceLocation, ResearchPack> kubeJSPacks = KubeJSCompat.getKubeJSResearchPacks();
-            for (Map.Entry<ResourceLocation, ResearchPack> entry : kubeJSPacks.entrySet()) {
+            Map<ResourceLocation, ResearchPackImpl> kubeJSPacks = KubeJSCompat.getKubeJSResearchPacks();
+            for (Map.Entry<ResourceLocation, ResearchPackImpl> entry : kubeJSPacks.entrySet()) {
                 ResourceKey<T> key = ResourceKey.create(this.registry, entry.getKey());
                 builder.put(key, (T) entry.getValue());
             }

@@ -3,7 +3,7 @@ package com.portingdeadmods.researchd.mixins;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
+import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.resources.RegistryManagersGetter;
 import com.portingdeadmods.researchd.utils.researches.ReloadableRegistryManager;
 import net.minecraft.commands.Commands;
@@ -31,12 +31,12 @@ public class ReloadableServerResourcesMixin implements RegistryManagersGetter {
     @Unique
     @Final
     @Mutable
-    private ReloadableRegistryManager<ResearchPack> researchd$researchPacksManager;
+    private ReloadableRegistryManager<ResearchPackImpl> researchd$researchPacksManager;
 
     @Inject(method = "<init>", at = @At("TAIL"))
     private void researchd$init(RegistryAccess.Frozen registryAccess, FeatureFlagSet enabledFeatures, Commands.CommandSelection commandSelection, int functionCompilationLevel, CallbackInfo ci) {
         this.researchd$researchesManager = new ReloadableRegistryManager<>(registryAccess, ResearchdRegistries.RESEARCH_KEY, Research.CODEC);
-        this.researchd$researchPacksManager = new ReloadableRegistryManager<>(registryAccess, ResearchdRegistries.RESEARCH_PACK_KEY, ResearchPack.CODEC);
+        this.researchd$researchPacksManager = new ReloadableRegistryManager<>(registryAccess, ResearchdRegistries.RESEARCH_PACK_KEY, ResearchPackImpl.CODEC);
     }
 
     @ModifyReturnValue(method = "listeners", at = @At("RETURN"))
@@ -53,7 +53,7 @@ public class ReloadableServerResourcesMixin implements RegistryManagersGetter {
     }
 
     @Override
-    public ReloadableRegistryManager<ResearchPack> researchd$getResearchPackManager() {
+    public ReloadableRegistryManager<ResearchPackImpl> researchd$getResearchPackManager() {
         return this.researchd$researchPacksManager;
     }
 

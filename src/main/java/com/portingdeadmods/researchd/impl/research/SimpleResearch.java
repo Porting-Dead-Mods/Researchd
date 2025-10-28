@@ -5,52 +5,44 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.research.RegistryDisplay;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchSerializer;
 import com.portingdeadmods.researchd.impl.research.effect.EmptyResearchEffect;
+import com.portingdeadmods.researchd.impl.utils.DisplayImpl;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
-import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 public record SimpleResearch(ItemResearchIcon researchIcon, ResearchMethod researchMethod, ResearchEffect researchEffect,
                              List<ResourceKey<Research>> parents, boolean requiresParent,
-                             Optional<String> literalName, Optional<String> literalDescription) implements Research {
-    public SimpleResearch {
-        Researchd.LOGGER.debug("Creating simple research");
-    }
-
+                             DisplayImpl display) implements Research, RegistryDisplay<Research> {
     @Override
     public ResearchSerializer<?> getSerializer() {
         return Serializer.INSTANCE;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof SimpleResearch(
-                ItemResearchIcon icon1, ResearchMethod method, ResearchEffect effect, List<ResourceKey<Research>> parents1,
-                boolean parent, Optional<String> name, Optional<String> desc
-        ))) return false;
-        return requiresParent == parent && Objects.equals(researchIcon, icon1) && Objects.equals(researchMethod, method)
-                && Objects.equals(researchEffect, effect) && Objects.equals(parents, parents1)
-                && Objects.equals(literalName, name) && Objects.equals(literalDescription, desc);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(researchIcon, researchMethod, researchEffect, parents, requiresParent, literalName, literalDescription);
-    }
-
     public static Builder builder() {
         return new Builder();
+    }
+
+    @Override
+    public Component getDisplayName(ResourceKey<Research> key) {
+        return this.display.name().orElse(Research.getLangName(key));
+    }
+
+    @Override
+    public Component getDisplayDescription(ResourceKey<Research> key) {
+        return this.display.desc().orElse(Research.getLangDesc(key));
     }
 
     public static class Serializer implements ResearchSerializer<SimpleResearch> {
@@ -61,10 +53,9 @@ public record SimpleResearch(ItemResearchIcon researchIcon, ResearchMethod resea
                 ResearchEffect.CODEC.optionalFieldOf("effect", EmptyResearchEffect.INSTANCE).forGetter(SimpleResearch::researchEffect),
                 Research.RESOURCE_KEY_CODEC.listOf().fieldOf("parents").forGetter(SimpleResearch::parents),
                 Codec.BOOL.fieldOf("requires_parent").forGetter(SimpleResearch::requiresParent),
-                Codec.STRING.optionalFieldOf("literal_name").forGetter(SimpleResearch::literalName),
-                Codec.STRING.optionalFieldOf("literal_description").forGetter(SimpleResearch::literalDescription)
+                DisplayImpl.CODEC.optionalFieldOf("display", DisplayImpl.EMPTY).forGetter(SimpleResearch::display)
         ).apply(instance, SimpleResearch::new));
-        public static final StreamCodec<? super RegistryFriendlyByteBuf, SimpleResearch> STREAM_CODEC = NeoForgeStreamCodecs.composite(
+        public static final StreamCodec<? super RegistryFriendlyByteBuf, SimpleResearch> STREAM_CODEC = StreamCodec.composite(
                 ItemResearchIcon.STREAM_CODEC,
                 SimpleResearch::researchIcon,
                 ResearchMethod.STREAM_CODEC,
@@ -75,10 +66,8 @@ public record SimpleResearch(ItemResearchIcon researchIcon, ResearchMethod resea
                 SimpleResearch::parents,
                 ByteBufCodecs.BOOL,
                 SimpleResearch::requiresParent,
-                ByteBufCodecs.optional(ByteBufCodecs.STRING_UTF8),
-                SimpleResearch::literalName,
-                ByteBufCodecs.optional(ByteBufCodecs.STRING_UTF8),
-                SimpleResearch::literalDescription,
+                DisplayImpl.STREAM_CODEC,
+                SimpleResearch::display,
                 SimpleResearch::new
         );
 
@@ -102,8 +91,8 @@ public record SimpleResearch(ItemResearchIcon researchIcon, ResearchMethod resea
         private ResearchEffect researchEffect = EmptyResearchEffect.INSTANCE;
         private final UniqueArray<ResourceKey<Research>> parents = new UniqueArray<>();
         private boolean requiresParent = false;
-        private Optional<String> literalName = Optional.empty();
-        private Optional<String> literalDescription = Optional.empty();
+        private Optional<Component> literalName = Optional.empty();
+        private Optional<Component> literalDescription = Optional.empty();
 
         private Builder() {
         }
@@ -134,23 +123,38 @@ public record SimpleResearch(ItemResearchIcon researchIcon, ResearchMethod resea
             return this;
         }
 
+        public Builder parents(Collection<ResourceKey<Research>> parents) {
+            this.parents.addAll(parents);
+            return this;
+        }
+
         public Builder requiresParent(boolean requiresParent) {
             this.requiresParent = requiresParent;
             return this;
         }
 
         public Builder literalName(String name) {
-            this.literalName = Optional.of(name);
+            this.literalName = Optional.of(Component.literal(name));
             return this;
         }
 
         public Builder literalDescription(String description) {
+            this.literalDescription = Optional.of(Component.literal(description));
+            return this;
+        }
+
+        public Builder literalName(Component name) {
+            this.literalName = Optional.of(name);
+            return this;
+        }
+
+        public Builder literalDescription(Component description) {
             this.literalDescription = Optional.of(description);
             return this;
         }
 
         public SimpleResearch build() {
-            return new SimpleResearch(this.icon, this.researchMethod, this.researchEffect, this.parents, this.requiresParent, this.literalName, this.literalDescription);
+            return new SimpleResearch(this.icon, this.researchMethod, this.researchEffect, this.parents, this.requiresParent, new DisplayImpl(this.literalName, this.literalDescription));
         }
     }
 }

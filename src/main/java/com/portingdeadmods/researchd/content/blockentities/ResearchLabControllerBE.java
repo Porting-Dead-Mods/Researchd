@@ -8,7 +8,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
-import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
+import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.content.items.ResearchPackItem;
 import com.portingdeadmods.researchd.content.menus.ResearchLabMenu;
@@ -40,14 +40,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class ResearchLabControllerBE extends ContainerBlockEntity implements MenuProvider {
     public LazyFinal<List<BlockPos>> partPos;
-    public Map<ResourceKey<ResearchPack>, Float> researchPackUsage; // Usage is between 0 and 1. It decreases with 1/DURATION per tick.
+    public Map<ResourceKey<ResearchPackImpl>, Float> researchPackUsage; // Usage is between 0 and 1. It decreases with 1/DURATION per tick.
     public int currentResearchDuration; // Just initialized to -1
-    public List<ResourceKey<ResearchPack>> researchPacks;
+    public List<ResourceKey<ResearchPackImpl>> researchPacks;
 
     public ResearchLabControllerBE(BlockPos pos, BlockState blockState) {
         super(ResearchdBlockEntityTypes.RESEARCH_LAB_CONTROLLER.get(), pos, blockState);
@@ -73,8 +71,8 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
     private boolean isItemValid(int slot, ItemStack stack) {
         if (stack.has(ResearchdDataComponents.RESEARCH_PACK.get())) {
             if (this.researchPacks.size() > slot) {
-                ResourceKey<ResearchPack> packKey = this.researchPacks.get(slot);
-                Optional<ResourceKey<ResearchPack>> itemPackKey = stack.get(ResearchdDataComponents.RESEARCH_PACK.get()).researchPackKey();
+                ResourceKey<ResearchPackImpl> packKey = this.researchPacks.get(slot);
+                Optional<ResourceKey<ResearchPackImpl>> itemPackKey = stack.get(ResearchdDataComponents.RESEARCH_PACK.get()).researchPackKey();
                 if (itemPackKey.isPresent()) {
                     return packKey.compareTo(itemPackKey.get()) == 0;
                 }
@@ -84,8 +82,8 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
     }
 
     // Param passed is not mutated.
-    public boolean containsNecessaryPacks(List<ResourceKey<ResearchPack>> packs) {
-        List<ResourceKey<ResearchPack>> packsCopy = new ArrayList<>(packs);
+    public boolean containsNecessaryPacks(List<ResourceKey<ResearchPackImpl>> packs) {
+        List<ResourceKey<ResearchPackImpl>> packsCopy = new ArrayList<>(packs);
 
         IItemHandler handler = getItemHandler();
         for (int i = 0; i < handler.getSlots(); i++) {
@@ -93,7 +91,7 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
             if (stack.isEmpty() || !(stack.getItem() instanceof ResearchPackItem)) continue;
 
             ResearchPackComponent component = stack.get(ResearchdDataComponents.RESEARCH_PACK);
-            ResourceKey<ResearchPack> key = component.researchPackKey().get(); // Placing item into a lab slot condition alr makes it such that key is present
+            ResourceKey<ResearchPackImpl> key = component.researchPackKey().get(); // Placing item into a lab slot condition alr makes it such that key is present
 
             if (packsCopy.contains(key) || researchPackUsage.getOrDefault(key, 0f) > 0) {
                 packsCopy.remove(key);
@@ -103,14 +101,14 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
         return packsCopy.isEmpty();
     }
 
-    public void decreaseNecessaryPackCount(List<ResourceKey<ResearchPack>> packs) {
+    public void decreaseNecessaryPackCount(List<ResourceKey<ResearchPackImpl>> packs) {
         IItemHandler handler = getItemHandler();
         for (int i = 0; i < handler.getSlots(); i++) {
             ItemStack stack = handler.getStackInSlot(i);
             if (stack.isEmpty() || !(stack.getItem() instanceof ResearchPackItem)) continue;
 
             ResearchPackComponent component = stack.get(ResearchdDataComponents.RESEARCH_PACK);
-            ResourceKey<ResearchPack> key = component.researchPackKey().get(); // Placing item into a lab slot condition alr makes it such that key is present
+            ResourceKey<ResearchPackImpl> key = component.researchPackKey().get(); // Placing item into a lab slot condition alr makes it such that key is present
 
             if (packs.contains(key) && (researchPackUsage.getOrDefault(key, 0f) == 0)) { // Only decrease if the pack is necessary and not already used
                 stack.shrink(1);
@@ -141,7 +139,7 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
         });
 
         CompoundTag researchPackUsageTag = new CompoundTag();
-        for (Map.Entry<ResourceKey<ResearchPack>, Float> entry : researchPackUsage.entrySet()) {
+        for (Map.Entry<ResourceKey<ResearchPackImpl>, Float> entry : researchPackUsage.entrySet()) {
             researchPackUsageTag.putFloat(entry.getKey().location().toString(), entry.getValue());
         }
         tag.put("research_pack_usage", researchPackUsageTag);

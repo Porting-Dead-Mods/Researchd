@@ -7,6 +7,7 @@ import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchSerializer;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
@@ -57,5 +58,19 @@ public interface Research {
      * @return serializer providing typed codecs for the Research
      */
     ResearchSerializer<?> getSerializer();
+
+    static Component getLangName(ResourceKey<Research> key) {
+        String registryPath = ResearchdRegistries.RESEARCH_KEY.location().getPath();
+        String keyNamespace = key.location().getNamespace();
+        String keyPath = key.location().getPath();
+        return Component.translatable(String.format("%s.%s.%s_name", registryPath, keyNamespace, keyPath));
+    }
+
+    static Component getLangDesc(ResourceKey<Research> key) {
+        String registryPath = ResearchdRegistries.RESEARCH_KEY.location().getPath();
+        String keyNamespace = key.location().getNamespace();
+        String keyPath = key.location().getPath();
+        return Component.translatable(String.format("%s.%s.%s_desc", registryPath, keyNamespace, keyPath));
+    }
 
 }

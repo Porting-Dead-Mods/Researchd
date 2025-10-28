@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.registries;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
-import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
+import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
 import com.portingdeadmods.researchd.resources.RegistryManagersGetter;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
@@ -31,8 +31,8 @@ public final class ResearchdTab {
             .title(Component.literal(Researchd.MODID))
             .displayItems((params, output) -> {
                 output.accept(ResearchdItems.RESEARCH_LAB.toStack());
-                Optional<HolderLookup.RegistryLookup<ResearchPack>> lookup = params.holders().lookup(ResearchdRegistries.RESEARCH_PACK_KEY);
-                Collection<ResourceKey<ResearchPack>> packs;
+                Optional<HolderLookup.RegistryLookup<ResearchPackImpl>> lookup = params.holders().lookup(ResearchdRegistries.RESEARCH_PACK_KEY);
+                Collection<ResourceKey<ResearchPackImpl>> packs;
                 if (!FMLEnvironment.dist.isClient()) {
                     MinecraftServer currentServer = ServerLifecycleHooks.getCurrentServer();
                     if (currentServer != null) {
@@ -43,13 +43,13 @@ public final class ResearchdTab {
                 } else {
                     packs = ResearchHelperClient.getResearchPacks().keySet();
                 }
-                for (ResourceKey<ResearchPack> pack : packs) {
+                for (ResourceKey<ResearchPackImpl> pack : packs) {
                     addResearchPack(output, pack);
                 }
             })
             .build());
 
-    private static void addResearchPack(CreativeModeTab.Output output, ResourceKey<ResearchPack> elem) {
+    private static void addResearchPack(CreativeModeTab.Output output, ResourceKey<ResearchPackImpl> elem) {
         ItemStack stack = ResearchdItems.RESEARCH_PACK.toStack();
 
         stack.set(ResearchdDataComponents.RESEARCH_PACK.get(), new ResearchPackComponent(Optional.of(elem)));
