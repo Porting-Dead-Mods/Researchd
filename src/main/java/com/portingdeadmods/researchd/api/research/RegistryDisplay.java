@@ -13,7 +13,7 @@ public interface RegistryDisplay<T> {
     Component getDisplayDescription(ResourceKey<T> key);
 
     default Component getDisplayDescriptionUnsafe(ResourceKey<?> key) {
-        return this.getDisplayName((ResourceKey<T>) key);
+        return this.getDisplayDescription((ResourceKey<T>) key);
     }
 
 }
