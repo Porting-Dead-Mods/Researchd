@@ -617,6 +617,7 @@ public class ResearchGraphWidget extends AbstractWidget {
                 } else {
                     guiGraphics.renderComponentTooltip(mc.font, List.of(
                             node.getInstance().getDisplayName(mc.level),
+                            node.getInstance().getDescription(mc.level),
                             Component.literal("x: %d, y: %d".formatted(node.getX(), node.getY())),
                             Component.literal("w: %d, h: %d".formatted(node.getWidth(), node.getHeight())),
                             Component.literal("hovered: %s".formatted(node.isHovered())),
