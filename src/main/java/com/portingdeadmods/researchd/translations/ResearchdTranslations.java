@@ -51,6 +51,7 @@ public final class ResearchdTranslations {
 		public static final TranslatableConstant NO_NEXT_LEADER = create("no_next_leader", BOLD.toString() + RED + "You gotta specify the next leader..." + RESET);
 		public static final TranslatableConstant NO_PERMS = create("no_perms", BOLD.toString() + RED + "You don't have the permissions to do that..." + RESET);
 		public static final TranslatableConstant KICKED = create("kicked", AQUA_AT + AQUA + "You got kicked from " + STR_PARAM + RESET + AQUA + " :< " + RESET);
+	    public static final TranslatableConstant NAME_CANNOT_BE_EMPTY = create("name_cannot_be_empty", RED + "Team name cannot be empty" + RESET);
 
 		public static final TranslatableConstant BAD_INPUT = create("bad_input", BOLD.toString() + RED + "Invalid input... how even..." + RESET);
 

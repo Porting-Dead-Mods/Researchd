@@ -316,6 +316,11 @@ public final class ResearchTeamHelper {
 
 	    // Permission Check (is Owner)
         if (getPermissionLevel(requester) == 2) {
+			if (name.isEmpty()) {
+				requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NAME_CANNOT_BE_EMPTY));
+				return;
+			}
+
             String oldname = getTeamByMember(requester).getName();
             getTeamByMember(requester).setName(name);
             requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NEW_TEAM_NAME, oldname, name));
