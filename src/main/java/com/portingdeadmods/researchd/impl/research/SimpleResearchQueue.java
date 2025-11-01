@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.impl.research;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.portingdeadmods.researchd.ResearchdCommonConfig;
+import com.portingdeadmods.researchd.ResearchdConfig;
 import com.portingdeadmods.researchd.api.research.GlobalResearch;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
@@ -29,7 +29,7 @@ public record SimpleResearchQueue(List<ResourceKey<Research>> entries) implement
             SimpleResearchQueue::entries,
             SimpleResearchQueue::new
     );
-    public static final IntSupplier QUEUE_LENGTH = () -> ResearchdCommonConfig.researchQueueLength;
+    public static final IntSupplier QUEUE_LENGTH = () -> ResearchdConfig.Common.researchQueueLength;
 
     public SimpleResearchQueue(List<ResourceKey<Research>> entries) {
         this.entries = new ArrayList<>(entries);

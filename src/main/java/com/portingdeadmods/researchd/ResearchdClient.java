@@ -32,6 +32,7 @@ import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMet
 import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.OrResearchMethod;
 import com.portingdeadmods.researchd.mixins.LevelRendererMixin;
+import com.portingdeadmods.researchd.pdl.config.PDLConfigHelper;
 import com.portingdeadmods.researchd.registries.*;
 import com.portingdeadmods.researchd.utils.WidgetConstructor;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
@@ -52,8 +53,11 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.*;
+import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
@@ -79,6 +83,8 @@ public final class ResearchdClient {
 
         NeoForge.EVENT_BUS.addListener(this::renderOutline);
         NeoForge.EVENT_BUS.addListener(this::addTooltip);
+
+        modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
     }
 
     private void clientSetup(FMLClientSetupEvent event) {

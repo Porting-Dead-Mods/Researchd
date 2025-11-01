@@ -1,8 +1,10 @@
 package com.portingdeadmods.researchd.datagen;
 
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.ResearchdConfig;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
+import com.portingdeadmods.researchd.pdl.config.PDLConfigHelper;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceKey;
@@ -29,6 +31,9 @@ public final class EnUsLangProvider extends LanguageProvider {
 
         addBlock(RESEARCH_LAB_PART, "Research Lab Part");
         addBlock(RESEARCH_LAB_CONTROLLER, "Research Lab");
+
+        PDLConfigHelper.generateConfigNames(ResearchdConfig.Client.class, Researchd.MODID, this::add);
+        PDLConfigHelper.generateConfigNames(ResearchdConfig.Common.class, Researchd.MODID, this::add);
     }
 
     private void addResearch(ResourceKey<Research> key, String name) {

@@ -12,6 +12,7 @@ import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.networking.registries.UpdateResearchPacksPayload;
 import com.portingdeadmods.researchd.networking.registries.UpdateResearchesPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchCacheReloadPayload;
+import com.portingdeadmods.researchd.pdl.config.PDLConfigHelper;
 import com.portingdeadmods.researchd.registries.*;
 import com.portingdeadmods.researchd.registries.serializers.ResearchEffectSerializers;
 import com.portingdeadmods.researchd.registries.serializers.ResearchMethodSerializers;
@@ -63,7 +64,7 @@ public final class Researchd {
         for (Object msg : message) {
             sb.append(msg.toString());
         }
-        if (ResearchdCommonConfig.consoleDebug) {
+        if (ResearchdConfig.Common.consoleDebug) {
             LOGGER.debug(sb.toString());
         }
     }
@@ -90,12 +91,15 @@ public final class Researchd {
 
         NeoForge.EVENT_BUS.addListener(this::onDatapacksSynced);
 
-        modContainer.registerConfig(ModConfig.Type.CLIENT, ResearchdClientConfig.SPEC);
-        modContainer.registerConfig(ModConfig.Type.COMMON, ResearchdCommonConfig.SPEC);
+        PDLConfigHelper.registerConfig(ResearchdConfig.Client.class, ModConfig.Type.CLIENT)
+                .register(modContainer);
+        PDLConfigHelper.registerConfig(ResearchdConfig.Common.class, ModConfig.Type.COMMON)
+                .register(modContainer);
+
     }
 
     private void addPackFinders(AddPackFindersEvent event) {
-        if (ResearchdCommonConfig.loadExamplesDatapack) {
+        if (ResearchdConfig.Common.loadExamplesDatapack) {
             DynamicPack pack = new DynamicPack(Researchd.rl("example_researches"), event.getPackType(), PackSource.FEATURE);
             switch (event.getPackType()) {
                 case CLIENT_RESOURCES -> {

@@ -1,9 +1,8 @@
 package com.portingdeadmods.researchd.events;
 
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.ResearchdClientConfig;
+import com.portingdeadmods.researchd.ResearchdConfig;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
-import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
@@ -77,44 +76,27 @@ public final class ResearchdClientEvents {
 	public static void onClientPlayerLoggingIn(ClientPlayerNetworkEvent.LoggingIn event) {
 		LocalPlayer player = event.getPlayer();
 
-		if (ResearchdClientConfig.showJoinMessage)
-			player.sendSystemMessage(
-					ResearchdTranslations.Game.JOIN_MESSAGE.component(Researchd.MODID)
-							.append(Component.literal("\n> ").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.BOLD))
-							.append(
-									ResearchdTranslations.Game.GITHUB.component(Researchd.MODID)
-									.withStyle(Style.EMPTY
-											.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/Porting-Dead-Mods/Researchd"))
-											.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Go to the GitHub page")))
-									)
-							)
-							.append(Component.literal("\n> ").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.BOLD))
-							.append(
-									ResearchdTranslations.Game.WIKI.component(Researchd.MODID)
-									.withStyle(Style.EMPTY
-											.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://porting-dead-mods.github.io/Researchd/"))
-											.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Go to the Wiki")))
-									)
-							)
-			);
-
-		RegistryAccess registryAccess = player.registryAccess();
-		Map<ResourceKey<ResearchPack>, ResearchPack> packs = ResearchHelperCommon.getResearchPacks(player.level());
-
-//		if (Researchd.RESEARCH_PACKS.isEmpty()) {
-//			Researchd.RESEARCH_PACKS.addAll(packs.values().stream().sorted(Comparator.comparingInt(ResearchPack::sortingValue)).toList());
-//			Researchd.debug("Researchd Constants Client", "Initialized research packs: ", Researchd.RESEARCH_PACKS, "");
-//		}
-//
-//		if (!Researchd.RESEARCH_PACK_COUNT.isInitialized()) {
-//			Researchd.RESEARCH_PACK_COUNT.initialize(packs.size());
-//			Researchd.debug("Researchd Constants Client", "Initialized research pack count: ", Researchd.RESEARCH_PACK_COUNT.get());
-//		}
-//
-//		if (!Researchd.RESEARCH_PACK_REGISTRY.isInitialized()) {
-//			Researchd.RESEARCH_PACK_REGISTRY.initialize(registryAccess.lookupOrThrow(ResearchdRegistries.RESEARCH_PACK_KEY));
-//			Researchd.debug("Researchd Constants Client", "Initialized research pack registry.");
-//		}
+		if (ResearchdConfig.Client.showJoinMessage) {
+            player.sendSystemMessage(
+                    ResearchdTranslations.Game.JOIN_MESSAGE.component(Researchd.MODID)
+                            .append(Component.literal("\n> ").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.BOLD))
+                            .append(
+                                    ResearchdTranslations.Game.GITHUB.component(Researchd.MODID)
+                                            .withStyle(Style.EMPTY
+                                                    .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/Porting-Dead-Mods/Researchd"))
+                                                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Go to the GitHub page")))
+                                            )
+                            )
+                            .append(Component.literal("\n> ").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.BOLD))
+                            .append(
+                                    ResearchdTranslations.Game.WIKI.component(Researchd.MODID)
+                                            .withStyle(Style.EMPTY
+                                                    .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://porting-dead-mods.github.io/Researchd/"))
+                                                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Go to the Wiki")))
+                                            )
+                            )
+            );
+        }
 	}
 
 	@SubscribeEvent
