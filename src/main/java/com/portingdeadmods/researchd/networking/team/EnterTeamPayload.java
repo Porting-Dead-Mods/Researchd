@@ -26,7 +26,7 @@ public record EnterTeamPayload(UUID memberOfTeam) implements CustomPacketPayload
         return TYPE;
     }
 
-    public static void enterTeamAction(EnterTeamPayload payload, IPayloadContext context) {
+    public static void handle(EnterTeamPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer sp)
                 ResearchTeamHelper.handleEnterTeam(sp, payload.memberOfTeam());

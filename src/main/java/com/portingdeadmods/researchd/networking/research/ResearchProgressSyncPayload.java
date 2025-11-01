@@ -26,7 +26,7 @@ public record ResearchProgressSyncPayload(ResourceKey<Research> key, ResearchPro
 		return TYPE;
 	}
 
-	public void researchMethodProgressSyncAction(IPayloadContext context) {
+	public void handle(IPayloadContext context) {
 		context.enqueueWork(() -> {
 			ClientResearchTeamHelper.getTeam().getResearchProgresses().put(this.key, this.progress);
 		}).exceptionally(err -> {

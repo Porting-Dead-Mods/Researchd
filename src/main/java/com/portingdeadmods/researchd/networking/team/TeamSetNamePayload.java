@@ -24,7 +24,7 @@ public record TeamSetNamePayload(String name) implements CustomPacketPayload {
         return TYPE;
     }
 
-    public static void setNameAction(TeamSetNamePayload payload, IPayloadContext context) {
+    public static void handle(TeamSetNamePayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer sp)
                 ResearchTeamHelper.handleSetName(sp, payload.name);

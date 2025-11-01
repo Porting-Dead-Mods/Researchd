@@ -32,7 +32,7 @@ public class ClientLevelMixin implements RegistryManagersGetter {
     @Inject(method = "<init>", at = @At("TAIL"))
     private void researchd$init(ClientPacketListener connection, ClientLevel.ClientLevelData clientLevelData, ResourceKey<Level> dimension, Holder<DimensionType> dimensionType, int viewDistance, int serverSimulationDistance, Supplier<ProfilerFiller> profiler, LevelRenderer levelRenderer, boolean isDebug, long biomeZoomSeed, CallbackInfo ci) {
         this.researchd$researchesManager = new ReloadableRegistryManager<>(connection.registryAccess(), ResearchdRegistries.RESEARCH_KEY, Research.CODEC);
-        this.researchd$researchPacks = new ReloadableRegistryManager<>(connection.registryAccess(), ResearchdRegistries.RESEARCH_PACK_KEY, ResearchPackImpl.CODEC);
+        this.researchd$researchPacks = new ReloadableRegistryManager<>(connection.registryAccess(), ResearchdRegistries.RESEARCH_PACK_KEY, ResearchPack.CODEC);
     }
 
     @Override

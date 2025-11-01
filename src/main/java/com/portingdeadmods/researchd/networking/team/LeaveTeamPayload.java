@@ -26,7 +26,7 @@ public record LeaveTeamPayload(UUID nextToLead) implements CustomPacketPayload {
         return TYPE;
     }
 
-    public static void leaveTeamAction(LeaveTeamPayload payload, IPayloadContext context) {
+    public static void handle(LeaveTeamPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer sp)
                 ResearchTeamHelper.handleLeaveTeam(sp, payload.nextToLead());

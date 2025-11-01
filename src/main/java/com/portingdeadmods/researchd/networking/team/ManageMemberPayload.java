@@ -29,7 +29,7 @@ public record ManageMemberPayload(UUID member, boolean remove) implements Custom
         return TYPE;
     }
 
-    public static void manageMemberAction(ManageMemberPayload payload, IPayloadContext context) {
+    public static void handle(ManageMemberPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer sp)
                 ResearchTeamHelper.handleManageMember(sp, payload.member(), payload.remove());

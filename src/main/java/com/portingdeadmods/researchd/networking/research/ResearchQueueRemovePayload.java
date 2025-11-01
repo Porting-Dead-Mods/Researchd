@@ -27,7 +27,7 @@ public record ResearchQueueRemovePayload(ResourceKey<Research> researchKey) impl
         return TYPE;
     }
 
-    public void researchQueueRemoveAction(IPayloadContext context) {
+    public void handle(IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer serverPlayer) {
                 Level level = serverPlayer.level();

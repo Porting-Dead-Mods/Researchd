@@ -29,7 +29,7 @@ public record ManageModeratorPayload(UUID moderator, boolean remove) implements 
         return TYPE;
     }
 
-    public static void manageModeratorAction(ManageModeratorPayload payload, IPayloadContext context) {
+    public static void handle(ManageModeratorPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer sp)
                 ResearchTeamHelper.handleManageModerator(sp, payload.moderator(), payload.remove());

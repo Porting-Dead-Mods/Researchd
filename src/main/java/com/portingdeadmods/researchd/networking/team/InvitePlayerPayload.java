@@ -29,7 +29,7 @@ public record InvitePlayerPayload(UUID invited, boolean remove) implements Custo
         return TYPE;
     }
 
-    public static void invitePlayerAction(InvitePlayerPayload payload, IPayloadContext context) {
+    public static void handle(InvitePlayerPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer sp)
                 ResearchTeamHelper.handleSendInviteToPlayer(sp, payload.invited, payload.remove);

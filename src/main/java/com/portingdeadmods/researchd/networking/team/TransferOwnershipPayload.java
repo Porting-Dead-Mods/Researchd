@@ -26,7 +26,7 @@ public record TransferOwnershipPayload(UUID nextToLead) implements CustomPacketP
         return TYPE;
     }
 
-    public static void transferOwnershipAction(TransferOwnershipPayload payload, IPayloadContext context) {
+    public static void handle(TransferOwnershipPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer sp)
                 ResearchTeamHelper.handleTransferOwnership(sp, payload.nextToLead());
