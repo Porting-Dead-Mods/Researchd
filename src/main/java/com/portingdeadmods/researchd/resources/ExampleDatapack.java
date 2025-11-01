@@ -7,6 +7,7 @@ import com.mojang.serialization.JsonOps;
 import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.resources.contents.ResearchdResearchPacks;
 import com.portingdeadmods.researchd.resources.contents.ResearchdResearches;
@@ -84,8 +85,8 @@ public class ExampleDatapack {
         ResearchdResearchPacks packs = new ResearchdResearchPacks("rd_examples");
         packs.buildExampleDatapack();
 
-        for (Map.Entry<ResourceKey<ResearchPackImpl>, ResearchPackImpl> entry : packs.getContents().entrySet()) {
-            Codec<ResearchPackImpl> codec = ResearchPackImpl.CODEC;
+        for (Map.Entry<ResourceKey<ResearchPack>, ResearchPack> entry : packs.getContents().entrySet()) {
+            Codec<ResearchPack> codec = ResearchPack.CODEC;
             writeToFile(researchDir, codec.encodeStart(JsonOps.INSTANCE, entry.getValue()), entry.getKey().location());
         }
 

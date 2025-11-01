@@ -7,6 +7,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
+import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
 import com.portingdeadmods.researchd.api.team.ValueEffectsHolder;
@@ -33,7 +34,7 @@ import java.util.List;
  * @param count The amount of packs that will be used
  * @param duration The duration in ticks for a *base speed* machine to use 1 packs o' packs.
  */
-public record ConsumePackResearchMethod(List<ResourceKey<ResearchPackImpl>> packs, int count, int duration) implements ResearchMethod {
+public record ConsumePackResearchMethod(List<ResourceKey<ResearchPack>> packs, int count, int duration) implements ResearchMethod {
     public static final ResourceLocation ID = Researchd.rl("consume_pack");
 
     @Override
@@ -44,13 +45,13 @@ public record ConsumePackResearchMethod(List<ResourceKey<ResearchPackImpl>> pack
     @Override
     public void checkProgress(Level level, ResourceKey<Research> research, ResearchProgress.Task task, MethodContext context) {
         if (context instanceof SimpleMethodContext(ValueEffectsHolder team, ResearchLabControllerBE blockEntity) && blockEntity != null) {
-            List<ResourceKey<ResearchPackImpl>> packs = this.packs();
+            List<ResourceKey<ResearchPack>> packs = this.packs();
             blockEntity.currentResearchDuration = this.duration();
 
             if (!blockEntity.containsNecessaryPacks(packs)) return;
             blockEntity.decreaseNecessaryPackCount(packs);
 
-            for (ResourceKey<ResearchPackImpl> pack : packs) {
+            for (ResourceKey<ResearchPack> pack : packs) {
                 blockEntity.researchPackUsage.put(pack, Math.max(blockEntity.researchPackUsage.get(pack) - ((1f / blockEntity.currentResearchDuration) / team.getEffectValue(ResearchdValueEffects.RESEARCH_LAB_PRODUCTIVITY)), 0f));
             }
             task.addProgress(1f / blockEntity.currentResearchDuration);
@@ -74,7 +75,7 @@ public record ConsumePackResearchMethod(List<ResourceKey<ResearchPackImpl>> pack
 
     public List<ItemStack> asStacks() {
         List<ItemStack> stacks = new ArrayList<>();
-        for (ResourceKey<ResearchPackImpl> pack : this.packs) {
+        for (ResourceKey<ResearchPack> pack : this.packs) {
             ItemStack stack = ResearchPackImpl.asStack(pack);
             stacks.add(stack);
         }

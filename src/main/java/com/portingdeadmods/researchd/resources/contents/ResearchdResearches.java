@@ -5,6 +5,7 @@ import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
+import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
 import com.portingdeadmods.researchd.impl.research.effect.AndResearchEffect;
@@ -156,7 +157,7 @@ public class ResearchdResearches implements ResearchdDatagenProvider<Research> {
     }
 
     @SafeVarargs
-    protected final @NotNull ConsumePackResearchMethod consumePack(int count, int duration, ResourceKey<ResearchPackImpl>... packs) {
+    protected final @NotNull ConsumePackResearchMethod consumePack(int count, int duration, ResourceKey<ResearchPack>... packs) {
         return new ConsumePackResearchMethod(Arrays.asList(packs), count, duration);
     }
 
@@ -176,7 +177,7 @@ public class ResearchdResearches implements ResearchdDatagenProvider<Research> {
         return ResourceKey.create(ResearchdRegistries.RESEARCH_KEY, modLoc(name));
     }
 
-    protected ResourceKey<ResearchPackImpl> pack(ResourceLocation location) {
+    protected ResourceKey<ResearchPack> pack(ResourceLocation location) {
         return ResourceKey.create(ResearchdRegistries.RESEARCH_PACK_KEY, location);
     }
 

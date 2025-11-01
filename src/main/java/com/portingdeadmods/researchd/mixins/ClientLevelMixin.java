@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.mixins;
 
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.resources.RegistryManagersGetter;
 import com.portingdeadmods.researchd.utils.researches.ReloadableRegistryManager;
@@ -26,7 +27,7 @@ public class ClientLevelMixin implements RegistryManagersGetter {
     @Unique
     private ReloadableRegistryManager<Research> researchd$researchesManager;
     @Unique
-    private ReloadableRegistryManager<ResearchPackImpl> researchd$researchPacks;
+    private ReloadableRegistryManager<ResearchPack> researchd$researchPacks;
 
     @Inject(method = "<init>", at = @At("TAIL"))
     private void researchd$init(ClientPacketListener connection, ClientLevel.ClientLevelData clientLevelData, ResourceKey<Level> dimension, Holder<DimensionType> dimensionType, int viewDistance, int serverSimulationDistance, Supplier<ProfilerFiller> profiler, LevelRenderer levelRenderer, boolean isDebug, long biomeZoomSeed, CallbackInfo ci) {
@@ -40,7 +41,7 @@ public class ClientLevelMixin implements RegistryManagersGetter {
     }
 
     @Override
-    public ReloadableRegistryManager<ResearchPackImpl> researchd$getResearchPackManager() {
+    public ReloadableRegistryManager<ResearchPack> researchd$getResearchPackManager() {
         return this.researchd$researchPacks;
     }
 }

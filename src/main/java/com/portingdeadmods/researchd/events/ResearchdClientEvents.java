@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.events;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdClientConfig;
+import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
@@ -98,7 +99,7 @@ public final class ResearchdClientEvents {
 			);
 
 		RegistryAccess registryAccess = player.registryAccess();
-		Map<ResourceKey<ResearchPackImpl>, ResearchPackImpl> packs = ResearchHelperCommon.getResearchPacks(player.level());
+		Map<ResourceKey<ResearchPack>, ResearchPack> packs = ResearchHelperCommon.getResearchPacks(player.level());
 
 //		if (Researchd.RESEARCH_PACKS.isEmpty()) {
 //			Researchd.RESEARCH_PACKS.addAll(packs.values().stream().sorted(Comparator.comparingInt(ResearchPack::sortingValue)).toList());

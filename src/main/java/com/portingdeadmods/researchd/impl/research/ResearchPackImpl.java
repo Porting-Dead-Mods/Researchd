@@ -1,11 +1,13 @@
 package com.portingdeadmods.researchd.impl.research;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.portingdeadlibs.api.utils.RGBAColor;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.RegistryDisplay;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
+import com.portingdeadmods.researchd.api.research.serializers.ResearchPackSerializer;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
 import com.portingdeadmods.researchd.impl.utils.DisplayImpl;
 import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
@@ -22,27 +24,8 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.Optional;
 
-public record ResearchPackImpl(int color, int sortingValue, Optional<ResourceLocation> customTexture, DisplayImpl display) implements ResearchPack, RegistryDisplay<ResearchPack> {
-    public static final Codec<ResearchPackImpl> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            RGBAColor.CODEC.fieldOf("color").forGetter(ResearchPackImpl::colorAsRgba),
-            Codec.INT.fieldOf("sorting_value").forGetter(ResearchPackImpl::sortingValue),
-            ResourceLocation.CODEC.optionalFieldOf("custom_texture").forGetter(ResearchPackImpl::customTexture),
-            DisplayImpl.CODEC.optionalFieldOf("display", DisplayImpl.EMPTY).forGetter(ResearchPackImpl::display)
-    ).apply(instance, ResearchPackImpl::new));
-    public static final StreamCodec<? super RegistryFriendlyByteBuf, ResearchPackImpl> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.INT,
-            ResearchPackImpl::color,
-            ByteBufCodecs.INT,
-            ResearchPackImpl::sortingValue,
-            ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
-            ResearchPackImpl::customTexture,
-            DisplayImpl.STREAM_CODEC,
-            ResearchPackImpl::display,
-            ResearchPackImpl::new
-    );
-
-    public static final Codec<ResourceKey<ResearchPackImpl>> RESOURCE_KEY_CODEC = ResourceKey.codec(ResearchdRegistries.RESEARCH_PACK_KEY);
-    public static final StreamCodec<ByteBuf, ResourceKey<ResearchPackImpl>> RESOURCE_KEY_STREAM_CODEC = ResourceKey.streamCodec(ResearchdRegistries.RESEARCH_PACK_KEY);
+public record ResearchPackImpl(int color, int sortingValue, Optional<ResourceLocation> customTexture,
+                               DisplayImpl display) implements ResearchPack, RegistryDisplay<ResearchPack> {
 
     public static final ResearchPackImpl EMPTY = new ResearchPackImpl(-1, -1, Optional.empty(), DisplayImpl.EMPTY);
 
@@ -62,7 +45,7 @@ public record ResearchPackImpl(int color, int sortingValue, Optional<ResourceLoc
         return new RGBAColor(red, green, blue, alpha);
     }
 
-    public static ItemStack asStack(ResourceKey<ResearchPackImpl> key) {
+    public static ItemStack asStack(ResourceKey<ResearchPack> key) {
         ItemStack stack = ResearchdItems.RESEARCH_PACK.toStack();
         stack.set(ResearchdDataComponents.RESEARCH_PACK, new ResearchPackComponent(Optional.of(key)));
         return stack;
@@ -80,6 +63,46 @@ public record ResearchPackImpl(int color, int sortingValue, Optional<ResourceLoc
     @Override
     public Component getDisplayDescription(ResourceKey<ResearchPack> key) {
         return this.display.desc().orElse(ResearchPack.getLangDesc(key));
+    }
+
+    @Override
+    public ResearchPackSerializer<?> getSerializer() {
+        return Serializer.INSTANCE;
+    }
+
+    public static final class Serializer implements ResearchPackSerializer<ResearchPackImpl> {
+        public static final Serializer INSTANCE = new Serializer();
+        public static final MapCodec<ResearchPackImpl> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                RGBAColor.CODEC.fieldOf("color").forGetter(ResearchPackImpl::colorAsRgba),
+                Codec.INT.fieldOf("sorting_value").forGetter(ResearchPackImpl::sortingValue),
+                ResourceLocation.CODEC.optionalFieldOf("custom_texture").forGetter(ResearchPackImpl::customTexture),
+                DisplayImpl.CODEC.optionalFieldOf("display", DisplayImpl.EMPTY).forGetter(ResearchPackImpl::display)
+        ).apply(instance, ResearchPackImpl::new));
+        public static final StreamCodec<? super RegistryFriendlyByteBuf, ResearchPackImpl> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.INT,
+                ResearchPackImpl::color,
+                ByteBufCodecs.INT,
+                ResearchPackImpl::sortingValue,
+                ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
+                ResearchPackImpl::customTexture,
+                DisplayImpl.STREAM_CODEC,
+                ResearchPackImpl::display,
+                ResearchPackImpl::new
+        );
+
+        private Serializer() {
+        }
+
+        @Override
+        public MapCodec<ResearchPackImpl> codec() {
+            return CODEC;
+        }
+
+        @Override
+        public StreamCodec<? super RegistryFriendlyByteBuf, ResearchPackImpl> streamCodec() {
+            return STREAM_CODEC;
+        }
+
     }
 
     public static final class Builder {

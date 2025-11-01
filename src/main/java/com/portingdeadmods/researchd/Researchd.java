@@ -15,6 +15,7 @@ import com.portingdeadmods.researchd.networking.research.ResearchCacheReloadPayl
 import com.portingdeadmods.researchd.registries.*;
 import com.portingdeadmods.researchd.registries.serializers.ResearchEffectSerializers;
 import com.portingdeadmods.researchd.registries.serializers.ResearchMethodSerializers;
+import com.portingdeadmods.researchd.registries.serializers.ResearchPackSerializers;
 import com.portingdeadmods.researchd.registries.serializers.ResearchSerializers;
 import com.portingdeadmods.researchd.resources.ResearchdDynamicPackContents;
 import com.portingdeadmods.researchd.resources.ResearchdExamplesSource;
@@ -80,6 +81,7 @@ public final class Researchd {
         ResearchdBlockEntityTypes.BLOCK_ENTITY_TYPES.register(modEventBus);
         ResearchdMenuTypes.MENU_TYPES.register(modEventBus);
         ResearchdValueEffects.VALUE_EFFECTS.register(modEventBus);
+        ResearchPackSerializers.SERIALIZERS.register(modEventBus);
 
         modEventBus.addListener(this::registerCapabilities);
         modEventBus.addListener(this::registerRegistries);
@@ -113,6 +115,7 @@ public final class Researchd {
 
     private void registerRegistries(NewRegistryEvent event) {
         event.register(ResearchdRegistries.RESEARCH_SERIALIZER);
+        event.register(ResearchdRegistries.RESEARCH_PACK_SERIALIZER);
         event.register(ResearchdRegistries.RESEARCH_EFFECT_SERIALIZER);
         event.register(ResearchdRegistries.RESEARCH_METHOD_SERIALIZER);
         event.register(ResearchdRegistries.VALUE_EFFECT);

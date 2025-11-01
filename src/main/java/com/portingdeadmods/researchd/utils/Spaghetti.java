@@ -4,6 +4,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 
 import javax.annotation.Nullable;
@@ -39,5 +40,10 @@ public final class Spaghetti {
 		Researchd.debug("AABB Debug","maxY: " + aabb.maxY);
 		Researchd.debug("AABB Debug","maxZ: " + aabb.maxZ);
 	}
+
+    public static Level getClientLevel() {
+        return Minecraft.getInstance().level;
+    }
+
 }
 

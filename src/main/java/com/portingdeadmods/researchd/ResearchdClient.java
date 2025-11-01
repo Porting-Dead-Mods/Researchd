@@ -1,9 +1,12 @@
 package com.portingdeadmods.researchd;
 
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
+import com.portingdeadmods.researchd.api.research.RegistryDisplay;
 import com.portingdeadmods.researchd.api.research.ResearchIcon;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
+import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
+import com.portingdeadmods.researchd.content.items.ResearchPackItem;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.client.ResearchdRenderTypes;
@@ -38,6 +41,7 @@ import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -51,9 +55,11 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 @Mod(value = Researchd.MODID, dist = Dist.CLIENT)
@@ -72,6 +78,7 @@ public final class ResearchdClient {
         eventBus.addListener(this::registerBER);
 
         NeoForge.EVENT_BUS.addListener(this::renderOutline);
+        NeoForge.EVENT_BUS.addListener(this::addTooltip);
     }
 
     private void clientSetup(FMLClientSetupEvent event) {
@@ -116,7 +123,7 @@ public final class ResearchdClient {
             ResearchPackComponent researchPackComponent = stack.get(ResearchdDataComponents.RESEARCH_PACK);
             ClientLevel level = Minecraft.getInstance().level;
             if (layer == 1 && researchPackComponent.researchPackKey().isPresent()) {
-                ResearchPackImpl researchPack = ResearchHelperCommon.getResearchPack(researchPackComponent.researchPackKey().get(), level);
+                ResearchPack researchPack = ResearchHelperCommon.getResearchPack(researchPackComponent.researchPackKey().get(), level);
                 if (researchPack != null) {
                     return researchPack.color();
                 }
@@ -154,4 +161,18 @@ public final class ResearchdClient {
             }
         }
     }
+
+    private void addTooltip(ItemTooltipEvent event) {
+        if (event.getItemStack().has(ResearchdDataComponents.RESEARCH_PACK)) {
+            Optional<ResourceKey<ResearchPack>> key = event.getItemStack().get(ResearchdDataComponents.RESEARCH_PACK).researchPackKey();
+            if (key.isPresent()) {
+                ResearchPack pack = ResearchHelperCommon.getResearchPack(key.get(), event.getContext().level());
+                if (pack instanceof RegistryDisplay<?> display) {
+                    event.getToolTip().set(0, display.getDisplayNameUnsafe(key.get()));
+                    event.getToolTip().add(1, display.getDisplayDescriptionUnsafe(key.get()));
+                }
+            }
+        }
+    }
+
 }

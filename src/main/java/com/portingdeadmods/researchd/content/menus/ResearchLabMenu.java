@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.content.menus;
 import com.google.common.collect.ImmutableList;
 import com.portingdeadmods.portingdeadlibs.api.gui.menus.PDLAbstractContainerMenu;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.content.blockentities.ResearchLabControllerBE;
 import com.portingdeadmods.researchd.registries.ResearchdMenuTypes;
@@ -19,7 +20,7 @@ import java.util.List;
 
 public class ResearchLabMenu extends PDLAbstractContainerMenu<ResearchLabControllerBE> {
     private final List<ItemStack> researchPackItems;
-    private final List<ResourceKey<ResearchPackImpl>> researchPacks;
+    private final List<ResourceKey<ResearchPack>> researchPacks;
 
 	public final ImmutableList<Integer> labSlotsX;
 	public final ImmutableList<Slot> labSlots;
@@ -57,7 +58,7 @@ public class ResearchLabMenu extends PDLAbstractContainerMenu<ResearchLabControl
 		addPlayerHotbar(inv, 174);
 	}
 
-    public List<ResourceKey<ResearchPackImpl>> getResearchPacks() {
+    public List<ResourceKey<ResearchPack>> getResearchPacks() {
         return researchPacks;
     }
 

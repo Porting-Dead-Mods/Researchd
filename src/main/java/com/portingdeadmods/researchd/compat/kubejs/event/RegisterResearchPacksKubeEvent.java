@@ -1,5 +1,6 @@
 package com.portingdeadmods.researchd.compat.kubejs.event;
 
+import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.compat.kubejs.builders.ResearchPackBuilder;
 import dev.latvian.mods.kubejs.event.KubeEvent;
@@ -27,7 +28,7 @@ public class RegisterResearchPacksKubeEvent implements KubeEvent {
 
     public ItemStack createItem(String packId) {
         ResourceLocation location = ResourceLocation.parse(packId);
-        ResourceKey<ResearchPackImpl> key = ResourceKey.create(com.portingdeadmods.researchd.ResearchdRegistries.RESEARCH_PACK_KEY, location);
+        ResourceKey<ResearchPack> key = ResourceKey.create(com.portingdeadmods.researchd.ResearchdRegistries.RESEARCH_PACK_KEY, location);
         return ResearchPackImpl.asStack(key);
     }
 

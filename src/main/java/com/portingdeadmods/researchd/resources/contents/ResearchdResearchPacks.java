@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.resources.contents;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
+import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
 import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
@@ -16,13 +17,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.UnaryOperator;
 
-public class ResearchdResearchPacks implements ResearchdDatagenProvider<ResearchPackImpl> {
+public class ResearchdResearchPacks implements ResearchdDatagenProvider<ResearchPack> {
     public static final ResourceLocation OVERWORLD_PACK_LOC = Researchd.rl("overworld");
     public static final ResourceLocation NETHER_PACK_LOC = Researchd.rl("nether");
     public static final ResourceLocation END_PACK_LOC = Researchd.rl("end");
 
     private final String modid;
-    private final Map<ResourceKey<ResearchPackImpl>, ResearchPackImpl> researchPacks;
+    private final Map<ResourceKey<ResearchPack>, ResearchPack> researchPacks;
 
     public ResearchdResearchPacks(String modid) {
         this.modid = modid;
@@ -48,25 +49,25 @@ public class ResearchdResearchPacks implements ResearchdDatagenProvider<Research
                 .color(120, 150, 90));
     }
 
-	protected ResourceKey<ResearchPackImpl> researchPack(String name, UnaryOperator<ResearchPackImpl.Builder> builder) {
-		ResourceKey<ResearchPackImpl> key = key(name);
+	protected ResourceKey<ResearchPack> researchPack(String name, UnaryOperator<ResearchPackImpl.Builder> builder) {
+		ResourceKey<ResearchPack> key = key(name);
 		researchPacks.put(key, builder.apply(ResearchPackImpl.builder()).build());
 
 		return key;
 	}
 
-	protected ResourceKey<ResearchPackImpl> key(String name) {
+	protected ResourceKey<ResearchPack> key(String name) {
 		return ResourceKey.create(ResearchdRegistries.RESEARCH_PACK_KEY, ResourceLocation.fromNamespaceAndPath(this.modid, name));
 	}
 
-	public static ItemStack asStack(ResourceKey<ResearchPackImpl> key, int count) {
+	public static ItemStack asStack(ResourceKey<ResearchPack> key, int count) {
 		ItemStack pack = ResearchdItems.RESEARCH_PACK.toStack();
 		pack.set(ResearchdDataComponents.RESEARCH_PACK.get(), new ResearchPackComponent(Optional.of(key)));
 		pack.setCount(count);
 		return pack;
 	}
 
-	public static ItemStack asStack(ResourceKey<ResearchPackImpl> key) {
+	public static ItemStack asStack(ResourceKey<ResearchPack> key) {
 		return asStack(key, 1);
 	}
 
@@ -75,7 +76,7 @@ public class ResearchdResearchPacks implements ResearchdDatagenProvider<Research
     }
 
     @Override
-    public Map<ResourceKey<ResearchPackImpl>, ResearchPackImpl> getContents() {
+    public Map<ResourceKey<ResearchPack>, ResearchPack> getContents() {
         return this.researchPacks;
     }
 }

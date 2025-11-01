@@ -8,6 +8,7 @@ import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectList;
+import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
@@ -94,12 +95,12 @@ public final class ResearchHelperCommon {
         return effData.stream().sorted(Comparator.comparing(a -> a.getClass().getName())).toList();
     }
 
-    public static Map<ResourceKey<ResearchPackImpl>, ResearchPackImpl> getResearchPacks(Level level) {
+    public static Map<ResourceKey<ResearchPack>, ResearchPack> getResearchPacks(Level level) {
         return ResearchdManagers.getResearchPacksManager(level).getLookup();
     }
 
-    public static List<ResourceKey<ResearchPackImpl>> getResearchPackKeys(Level level) {
-        Map<ResourceKey<ResearchPackImpl>, ResearchPackImpl> lookup = ResearchdManagers.getResearchPacksManager(level).getLookup();
+    public static List<ResourceKey<ResearchPack>> getResearchPackKeys(Level level) {
+        Map<ResourceKey<ResearchPack>, ResearchPack> lookup = ResearchdManagers.getResearchPacksManager(level).getLookup();
         return lookup.entrySet().stream()
                 .sorted(Comparator.comparingInt(entry -> entry.getValue().sortingValue()))
                 .map(Map.Entry::getKey)
@@ -152,7 +153,7 @@ public final class ResearchHelperCommon {
         return new TimeDifference(teamCreationTime, time).getFormatted();
     }
 
-    public static ResearchPackImpl getResearchPack(ResourceKey<ResearchPackImpl> key, Level level) {
+    public static ResearchPack getResearchPack(ResourceKey<ResearchPack> key, Level level) {
         return ResearchdManagers.getResearchPacksManager(level).getLookup().get(key);
     }
 }
