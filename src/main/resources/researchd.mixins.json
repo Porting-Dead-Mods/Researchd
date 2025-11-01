@@ -9,8 +9,7 @@
     "ReloadableServerResourcesMixin"
   ],
   "client": [
-    "ClientLevelMixin",
-    "LevelRendererMixin"
+    "ClientLevelMixin"
   ],
   "injectors": {
     "defaultRequire": 1

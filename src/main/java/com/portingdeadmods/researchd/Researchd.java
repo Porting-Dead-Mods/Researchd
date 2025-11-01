@@ -5,7 +5,6 @@ import com.portingdeadmods.portingdeadlibs.api.resources.DynamicPack;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
-import com.portingdeadmods.researchd.content.blockentities.ResearchLabPartBE;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
@@ -114,7 +113,7 @@ public final class Researchd {
     }
 
     private void registerCapabilities(RegisterCapabilitiesEvent event) {
-        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ResearchdBlockEntityTypes.RESEARCH_LAB_PART.get(), ResearchLabPartBE::exposeItemHandler);
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ResearchdBlockEntityTypes.RESEARCH_LAB_PART.get(), (be, dir) -> be.getControllerItemHandler());
     }
 
     private void registerRegistries(NewRegistryEvent event) {

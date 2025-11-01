@@ -1,6 +1,7 @@
 package com.portingdeadmods.researchd.content.blockentities;
 
-import com.portingdeadmods.portingdeadlibs.api.blockentities.ContainerBlockEntity;
+import com.portingdeadmods.portingdeadlibs.api.ghost.GhostMultiblockControllerBE;
+import com.portingdeadmods.portingdeadlibs.api.gui.menus.PDLAbstractContainerMenu;
 import com.portingdeadmods.portingdeadlibs.api.utils.IOAction;
 import com.portingdeadmods.portingdeadlibs.utils.LazyFinal;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
@@ -9,7 +10,6 @@ import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
-import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.content.items.ResearchPackItem;
 import com.portingdeadmods.researchd.content.menus.ResearchLabMenu;
@@ -31,18 +31,18 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class ResearchLabControllerBE extends ContainerBlockEntity implements MenuProvider {
+public class ResearchLabControllerBE extends GhostMultiblockControllerBE implements MenuProvider {
     public LazyFinal<List<BlockPos>> partPos;
     public Map<ResourceKey<ResearchPack>, Float> researchPackUsage; // Usage is between 0 and 1. It decreases with 1/DURATION per tick.
     public int currentResearchDuration; // Just initialized to -1
@@ -53,9 +53,7 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
         this.partPos = LazyFinal.create();
         this.currentResearchDuration = -1;
         this.researchPackUsage = new HashMap<>();
-
 	    this.researchPacks = new ArrayList<>();
-	    this.addItemHandler(0, this::isItemValid);
     }
 
     @Override
@@ -66,7 +64,30 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
 		this.researchPacks.forEach(key -> {
 			this.researchPackUsage.computeIfAbsent(key, $ -> 0f);
 		});
-        this.addItemHandler(this.researchPacks.size(), this::isItemValid);
+        this.addItemHandler(
+		        (validator, slotLimit, onChanged, slots) ->
+				        new ItemStackHandler(slots) {
+					        @Override
+					        public boolean isItemValid(int slot, ItemStack stack) {
+						        return validator.test(slot, stack);
+					        }
+
+					        @Override
+					        protected void onContentsChanged(int slot) {
+						        onChanged.accept(slot);
+					        }
+
+					        @Override
+					        public int getSlotLimit(int slot) {
+						        return slotLimit.applyAsInt(slot);
+					        }
+				        },
+
+		        builder -> builder
+				        .slots(this.researchPacks.size())
+				        .validator(this::isItemValid)
+				        .slotLimit($ -> 64)
+        );
     }
 
     private boolean isItemValid(int slot, ItemStack stack) {
@@ -119,8 +140,8 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
     }
 
     @Override
-    public void commonTick() {
-        super.commonTick();
+    public void tick() {
+        super.tick();
 
         ResearchTeam team = ResearchTeamHelper.getTeamByMember(this.getLevel(), this.getData(ResearchdAttachments.PLACED_BY_UUID));
 
@@ -191,8 +212,8 @@ public class ResearchLabControllerBE extends ContainerBlockEntity implements Men
         return Component.literal("Research Lab");
     }
 
-    @Override
-    public @Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-        return new ResearchLabMenu(i, inventory, this);
-    }
+	@Override
+	protected PDLAbstractContainerMenu<?> createControllerMenu(int containerId, Inventory inventory, Player player) {
+		return new ResearchLabMenu(containerId, inventory, this);
+	}
 }

@@ -8,7 +8,6 @@ import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
-import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;

@@ -23,9 +23,9 @@ public class ResearchdLang {
         addResearch(ResearchdResearches.BEACON_LOC, "The beam looks funny");
         addResearch(ResearchdResearches.END_CRYSTAL_LOC, "If you look at it, it spins...");
 
-        addResearchPack(ResearchdResearchPacks.END_PACK_LOC, "End Research Pack");
-        addResearchPack(ResearchdResearchPacks.NETHER_PACK_LOC, "Nether Research Pack");
-        addResearchPack(ResearchdResearchPacks.OVERWORLD_PACK_LOC, "Overworld Research Pack");
+        addResearchPackName(ResearchdResearchPacks.END_PACK_LOC, "End Research Pack");
+        addResearchPackName(ResearchdResearchPacks.NETHER_PACK_LOC, "Nether Research Pack");
+        addResearchPackName(ResearchdResearchPacks.OVERWORLD_PACK_LOC, "Overworld Research Pack");
     }
 
     private void addResearch(ResourceLocation key, String name) {
@@ -36,9 +36,13 @@ public class ResearchdLang {
         add("research_method." + key.getNamespace() + "." + key.getPath(), name);
     }
 
-    private void addResearchPack(ResourceLocation key, String name) {
-        add("item.researchd.research_pack_" + key.toString().replace(':', '_'), name);
+    private void addResearchPackName(ResourceLocation key, String name) {
+        add("research_pack." + key.toString().replace(':', '.') + "_name", name);
     }
+
+	private void addResearchPackDescription(ResourceLocation key, String name) {
+		add("research_pack" + key.toString().replace(':', '.') + "_desc", name);
+	}
 
     private void add(String key, String name) {
         this.translations.put(key, name);

@@ -1,7 +1,6 @@
 package com.portingdeadmods.researchd;
 
 import com.portingdeadmods.researchd.pdl.config.ConfigValue;
-import net.neoforged.fml.common.EventBusSubscriber;
 
 public final class ResearchdConfig {
     public static class Common {

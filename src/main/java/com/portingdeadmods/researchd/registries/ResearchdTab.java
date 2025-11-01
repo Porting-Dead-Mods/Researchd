@@ -3,7 +3,6 @@ package com.portingdeadmods.researchd.registries;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
-import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
 import com.portingdeadmods.researchd.resources.RegistryManagersGetter;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;

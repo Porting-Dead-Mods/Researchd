@@ -4,7 +4,6 @@ import com.portingdeadmods.researchd.api.ValueEffect;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchPackSerializer;
-import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectSerializer;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchSerializer;

@@ -3,7 +3,6 @@ package com.portingdeadmods.researchd.registries;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.content.blockentities.ResearchLabControllerBE;
 import com.portingdeadmods.researchd.content.blockentities.ResearchLabPartBE;
-import com.portingdeadmods.researchd.content.blocks.ResearchLabController;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.neoforge.registries.DeferredRegister;

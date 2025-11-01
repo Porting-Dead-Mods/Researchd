@@ -3,15 +3,12 @@ package com.portingdeadmods.researchd.impl.team;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
-import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
 import com.portingdeadmods.researchd.api.team.TeamSocialManager;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 public record SimpleTeamSocialManager(UniqueArray<UUID> receivedInvites, UniqueArray<UUID> sentInvites, UniqueArray<UUID> ignores) implements TeamSocialManager {

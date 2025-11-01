@@ -6,9 +6,7 @@ import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
 import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.world.level.EntityGetter;
 
 import java.util.UUID;
 

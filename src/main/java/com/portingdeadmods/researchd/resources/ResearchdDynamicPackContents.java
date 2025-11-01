@@ -21,7 +21,6 @@ public class ResearchdDynamicPackContents {
     public static void writeData(DynamicPack pack) {
         writeRegistry(pack, ResearchdResearchPacks::new, ResearchPackImpl.CODEC, "research_pack");
         writeRegistry(pack, ResearchdResearches::new, Research.CODEC, "research");
-
     }
 
     public static void writeAssets(DynamicPack pack) {
@@ -39,7 +38,6 @@ public class ResearchdDynamicPackContents {
         }
 
         pack.put(Researchd.rl("lang/en_us"), object);
-
     }
 
     private static <T, P extends ResearchdDatagenProvider<T>> void writeRegistry(DynamicPack pack, Function<String, P> providerFactory, Codec<T> codec, String path) {
