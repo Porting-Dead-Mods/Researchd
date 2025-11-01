@@ -76,7 +76,7 @@ public final class Researchd {
         ResearchMethodSerializers.SERIALIZERS.register(modEventBus);
         ResearchdItems.ITEMS.register(modEventBus);
         ResearchdDataComponents.COMPONENTS.register(modEventBus);
-        ResearchdTab.TABS.register(modEventBus);
+        //ResearchdTab.TABS.register(modEventBus);
         ResearchdSavedData.SAVED_DATA.register(modEventBus);
         ResearchdBlocks.BLOCKS.register(modEventBus);
         ResearchdBlockEntityTypes.BLOCK_ENTITY_TYPES.register(modEventBus);
@@ -102,12 +102,8 @@ public final class Researchd {
         if (ResearchdConfig.Common.loadExamplesDatapack) {
             DynamicPack pack = new DynamicPack(Researchd.rl("example_researches"), event.getPackType(), PackSource.FEATURE);
             switch (event.getPackType()) {
-                case CLIENT_RESOURCES -> {
-                    ResearchdDynamicPackContents.writeAssets(pack);
-                }
-                case SERVER_DATA -> {
-                    ResearchdDynamicPackContents.writeData(pack);
-                }
+                case CLIENT_RESOURCES -> ResearchdDynamicPackContents.writeAssets(pack);
+                case SERVER_DATA -> ResearchdDynamicPackContents.writeData(pack);
             }
             event.addRepositorySource(new ResearchdExamplesSource(pack.packId(), event.getPackType(), Pack.Position.BOTTOM, pack));
         }

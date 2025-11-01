@@ -38,7 +38,7 @@ public record ResearchFinishedPayload(ResourceKey<Research> key, int timeStamp) 
         return TYPE;
     }
 
-    public void researchFinishedAction(IPayloadContext context) {
+    public void handle(IPayloadContext context) {
         context.enqueueWork(() -> {
             Player player = context.player();
             ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level());

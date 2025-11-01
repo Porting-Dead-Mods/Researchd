@@ -19,7 +19,7 @@ public record ClearGraphCachePayload() implements CustomPacketPayload {
         return TYPE;
     }
 
-    public static void clearCache(ClearGraphCachePayload payload, IPayloadContext context) {
+    public static void handle(ClearGraphCachePayload payload, IPayloadContext context) {
         context.enqueueWork(ResearchGraphCache::clearCache).exceptionally(e -> {
             context.disconnect(Component.literal("Failed to clear graph cache: " + e.getMessage()));
             return null;

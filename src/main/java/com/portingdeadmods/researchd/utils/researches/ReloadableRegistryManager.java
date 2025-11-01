@@ -58,7 +58,7 @@ public class ReloadableRegistryManager<T> extends SimpleJsonResourceReloadListen
                         builder.put(key, pair.getFirst());
                     });
                 } catch (Exception e) {
-                    Researchd.LOGGER.error("Parsing error loading shop entry {}", location, e);
+                    Researchd.LOGGER.error("Parsing error loading registry entry {}", location, e);
                 }
             }
         }

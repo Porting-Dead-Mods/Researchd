@@ -19,40 +19,40 @@ public class NetworkEvents {
         registrar.playToServer(
                 EnterTeamPayload.TYPE,
                 EnterTeamPayload.STREAM_CODEC,
-                EnterTeamPayload::enterTeamAction
+                EnterTeamPayload::handle
         );
         registrar.playToServer(
                 LeaveTeamPayload.TYPE,
                 LeaveTeamPayload.STREAM_CODEC,
-                LeaveTeamPayload::leaveTeamAction
+                LeaveTeamPayload::handle
         );
 
         registrar.playToServer(
                 ManageMemberPayload.TYPE,
                 ManageMemberPayload.STREAM_CODEC,
-                ManageMemberPayload::manageMemberAction
+                ManageMemberPayload::handle
         );
         registrar.playToServer(
                 ManageModeratorPayload.TYPE,
                 ManageModeratorPayload.STREAM_CODEC,
-                ManageModeratorPayload::manageModeratorAction
+                ManageModeratorPayload::handle
         );
         registrar.playToServer(
                 TransferOwnershipPayload.TYPE,
                 TransferOwnershipPayload.STREAM_CODEC,
-                TransferOwnershipPayload::transferOwnershipAction
+                TransferOwnershipPayload::handle
         );
 
         registrar.playToServer(
                 TeamSetNamePayload.TYPE,
                 TeamSetNamePayload.STREAM_CODEC,
-                TeamSetNamePayload::setNameAction
+                TeamSetNamePayload::handle
         );
 
         registrar.playToServer(
                 InvitePlayerPayload.TYPE,
                 InvitePlayerPayload.STREAM_CODEC,
-                InvitePlayerPayload::invitePlayerAction
+                InvitePlayerPayload::handle
         );
         registrar.playToServer(
                 RequestToJoinPayload.TYPE,
@@ -68,13 +68,13 @@ public class NetworkEvents {
         registrar.playToServer(
                 ResearchQueueRemovePayload.TYPE,
                 ResearchQueueRemovePayload.STREAM_CODEC,
-                ResearchQueueRemovePayload::researchQueueRemoveAction
+                ResearchQueueRemovePayload::handle
         );
 
         registrar.playToClient(
                 ClearGraphCachePayload.TYPE,
                 ClearGraphCachePayload.STREAM_CODEC,
-                ClearGraphCachePayload::clearCache
+                ClearGraphCachePayload::handle
         );
 
         registrar.playToClient(
@@ -97,22 +97,22 @@ public class NetworkEvents {
         registrar.playToClient(
                 ResearchFinishedPayload.TYPE,
                 ResearchFinishedPayload.STREAM_CODEC,
-                ResearchFinishedPayload::researchFinishedAction
+                ResearchFinishedPayload::handle
         );
         registrar.playToClient(
                 RefreshResearchesPayload.TYPE,
                 RefreshResearchesPayload.STREAM_CODEC,
-                RefreshResearchesPayload::refreshResearchesAction
+                RefreshResearchesPayload::handle
         );
         registrar.playToClient(
                 RefreshPlayerManagementPayload.TYPE,
                 RefreshPlayerManagementPayload.STREAM_CODEC,
-                RefreshPlayerManagementPayload::refreshPlayerManagementAction
+                RefreshPlayerManagementPayload::handle
         );
         registrar.playToClient(
                 ResearchProgressSyncPayload.TYPE,
                 ResearchProgressSyncPayload.STREAM_CODEC,
-                ResearchProgressSyncPayload::researchMethodProgressSyncAction
+                ResearchProgressSyncPayload::handle
         );
     }
 }

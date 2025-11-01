@@ -19,7 +19,7 @@ public record RefreshResearchesPayload() implements CustomPacketPayload {
         return TYPE;
     }
 
-    public static void refreshResearchesAction(RefreshResearchesPayload payload, IPayloadContext context) {
+    public static void handle(RefreshResearchesPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             ResearchHelperClient.refreshResearches(context.player());
         }).exceptionally(e -> {

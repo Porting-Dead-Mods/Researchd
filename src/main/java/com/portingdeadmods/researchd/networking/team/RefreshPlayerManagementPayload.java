@@ -19,7 +19,7 @@ public record RefreshPlayerManagementPayload() implements CustomPacketPayload {
         return TYPE;
     }
 
-    public static void refreshPlayerManagementAction(RefreshPlayerManagementPayload payload, IPayloadContext context) {
+    public static void handle(RefreshPlayerManagementPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             ClientResearchTeamHelper.refreshResearchTeamScreenData();
         }).exceptionally(e -> {
