@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 public final class CommonResearchCache {
-    public static Map<ResourceKey<Research>, GlobalResearch> GLOBAL_RESEARCHES;
-    public static @Nullable GlobalResearch ROOT_RESEARCH;
+    public static Map<ResourceKey<Research>, GlobalResearch> globalResearches;
+    public static @Nullable GlobalResearch rootResearch;
 
     public static void initialize(Level level) {
         reset();
@@ -46,16 +46,16 @@ public final class CommonResearchCache {
             List<ResourceKey<Research>> parents = research1.parents();
 
             if (parents.isEmpty()) {
-                if (ROOT_RESEARCH == null) {
-                    ROOT_RESEARCH = research;
+                if (rootResearch == null) {
+                    rootResearch = research;
                     continue;
                 } else {
                     // Found multiple root instances
                     try {
-                        throw new IllegalStateException("Multiple research roots (Researches without parents), prev root research: %s, other root research: %s".formatted(ROOT_RESEARCH.getResearchKey().location(), research.getResearchKey().location()));
+                        throw new IllegalStateException("Multiple research roots (Researches without parents), prev root research: %s, other root research: %s".formatted(rootResearch.getResearchKey().location(), research.getResearchKey().location()));
                     } catch (Exception e) {
                         Researchd.LOGGER.error(e.getMessage());
-                        GLOBAL_RESEARCHES = Collections.emptyMap();
+                        globalResearches = Collections.emptyMap();
                         ResearchdManagers.getResearchesManager(level).fail();
                         return;
                     }
@@ -72,7 +72,7 @@ public final class CommonResearchCache {
             research.lock();
         }
 
-        GLOBAL_RESEARCHES = ImmutableMap.copyOf(globalResearchMap);
+        globalResearches = ImmutableMap.copyOf(globalResearchMap);
 
     }
 
@@ -87,7 +87,7 @@ public final class CommonResearchCache {
 
     public static List<GlobalResearch> allChildrenOf(ResourceKey<Research> key) {
         List<GlobalResearch> list = new UniqueArray<>();
-        _collectChildren(GLOBAL_RESEARCHES.get(key), list);
+        _collectChildren(globalResearches.get(key), list);
 
         return list;
     }
@@ -103,15 +103,15 @@ public final class CommonResearchCache {
 
     public static List<GlobalResearch> allParentsOf(ResourceKey<Research> key) {
         List<GlobalResearch> list = new UniqueArray<>();
-        _collectParents(GLOBAL_RESEARCHES.get(key), list);
+        _collectParents(globalResearches.get(key), list);
 
         return list;
     }
 
     public static void reset() {
-        if (GLOBAL_RESEARCHES != null) {
-            ROOT_RESEARCH = null;
-            GLOBAL_RESEARCHES = null;
+        if (globalResearches != null) {
+            rootResearch = null;
+            globalResearches = null;
         }
     }
 }

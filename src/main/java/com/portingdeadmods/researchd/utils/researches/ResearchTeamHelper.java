@@ -531,7 +531,7 @@ public final class ResearchTeamHelper {
         for (SimpleResearchTeam team : teamMap.researchTeams().values()) {
             Map<ResourceKey<Research>, ResearchInstance> researches = team.getResearches();
             Map<ResourceKey<Research>, ResearchProgress> progress = team.getResearchProgresses();
-            Set<GlobalResearch> globalResearches = new HashSet<>(CommonResearchCache.GLOBAL_RESEARCHES.values());
+            Set<GlobalResearch> globalResearches = new HashSet<>(CommonResearchCache.globalResearches.values());
 
             for (GlobalResearch research : globalResearches) {
                 if (progress.containsKey(research.getResearchKey())) continue;
@@ -541,7 +541,7 @@ public final class ResearchTeamHelper {
 
             researches.values().stream().map(ResearchInstance::getResearch).forEach(globalResearches::remove);
             for (GlobalResearch globalResearch : globalResearches) {
-                ResearchStatus status = CommonResearchCache.ROOT_RESEARCH != null && CommonResearchCache.ROOT_RESEARCH.is(globalResearch.getResearchKey())
+                ResearchStatus status = CommonResearchCache.rootResearch != null && CommonResearchCache.rootResearch.is(globalResearch.getResearchKey())
                         ? ResearchStatus.RESEARCHABLE
                         : ResearchStatus.LOCKED;
                 researches.put(globalResearch.getResearchKey(), new ResearchInstance(globalResearch, status));
@@ -552,7 +552,7 @@ public final class ResearchTeamHelper {
     public static void resolveGlobalResearches(ResearchTeamMap researchTeamMap) {
         for (ResearchTeam team : researchTeamMap.researchTeams().values()) {
             for (Map.Entry<ResourceKey<Research>, ResearchInstance> entry : team.getResearches().entrySet()) {
-                entry.setValue(new ResearchInstance(CommonResearchCache.GLOBAL_RESEARCHES.get(entry.getKey()), entry.getValue().getResearchStatus(), entry.getValue().getResearchedPlayer(), entry.getValue().getResearchedTime()));
+                entry.setValue(new ResearchInstance(CommonResearchCache.globalResearches.get(entry.getKey()), entry.getValue().getResearchStatus(), entry.getValue().getResearchedPlayer(), entry.getValue().getResearchedTime()));
             }
         }
     }

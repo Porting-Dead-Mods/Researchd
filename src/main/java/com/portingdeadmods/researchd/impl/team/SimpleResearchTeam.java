@@ -244,15 +244,15 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
     }
 
     public void init(Level level) {
-        Map<ResourceKey<Research>, ResearchInstance> researchInstances = CommonResearchCache.GLOBAL_RESEARCHES.entrySet().stream()
-                .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), new ResearchInstance(e.getValue(), CommonResearchCache.ROOT_RESEARCH.is(e.getKey())
+        Map<ResourceKey<Research>, ResearchInstance> researchInstances = CommonResearchCache.globalResearches.entrySet().stream()
+                .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), new ResearchInstance(e.getValue(), CommonResearchCache.rootResearch.is(e.getKey())
                         ? ResearchStatus.RESEARCHABLE
                         : ResearchStatus.LOCKED)))
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
         this.getResearches().putAll(researchInstances);
 
         Map<ResourceKey<Research>, ResearchProgress> rps = new HashMap<>();
-        for (ResourceKey<Research> key : CommonResearchCache.GLOBAL_RESEARCHES.keySet()) {
+        for (ResourceKey<Research> key : CommonResearchCache.globalResearches.keySet()) {
             rps.put(key, ResearchProgress.forResearch(key, level));
         }
         this.getResearchProgresses().putAll(rps);

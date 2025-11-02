@@ -58,8 +58,8 @@ public class ResearchScreen extends Screen {
         // GRAPH
         int x = 174;
         this.researchGraphWidget = new ResearchGraphWidget(this, x, 8, 300, 253 - 16);
-        if (CommonResearchCache.ROOT_RESEARCH != null) {
-            this.researchGraphWidget.setGraph(ResearchGraphCache.computeIfAbsent(CommonResearchCache.ROOT_RESEARCH.getResearchKey()));
+        if (CommonResearchCache.rootResearch != null) {
+            this.researchGraphWidget.setGraph(ResearchGraphCache.computeIfAbsent(CommonResearchCache.rootResearch.getResearchKey()));
         }
 
         this.techListWidget.visitWidgets(this::addRenderableWidget);

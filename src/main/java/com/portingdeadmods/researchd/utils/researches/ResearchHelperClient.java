@@ -53,7 +53,7 @@ public final class ResearchHelperClient {
 
     // Called at the end of the initialization phase of the research cache
     public static void initIconRenderers(Level level) {
-        CommonResearchCache.GLOBAL_RESEARCHES.forEach((k, v) -> {
+        CommonResearchCache.globalResearches.forEach((k, v) -> {
             ResearchIcon icon = v.getResearch(level).researchIcon();
             ResearchScreen.CLIENT_ICONS.put(k.location(), ResearchdClient.RESEARCH_ICONS.get(icon.id()).apply(icon));
         });

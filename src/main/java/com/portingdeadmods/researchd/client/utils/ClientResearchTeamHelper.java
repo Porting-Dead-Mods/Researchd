@@ -145,7 +145,7 @@ public class ClientResearchTeamHelper {
         Map<ResourceKey<Research>, ResearchInstance> researches = team.getResearches();
 
         for (Map.Entry<ResourceKey<Research>, ResearchInstance> research : researches.entrySet()) {
-            GlobalResearch globalResearch = CommonResearchCache.GLOBAL_RESEARCHES.get(research.getKey());
+            GlobalResearch globalResearch = CommonResearchCache.globalResearches.get(research.getKey());
             if (globalResearch != null) {
                 research.setValue(research.getValue().withResearch(globalResearch));
             } else {

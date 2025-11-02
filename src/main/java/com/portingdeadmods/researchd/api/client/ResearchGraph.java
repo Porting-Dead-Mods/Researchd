@@ -24,7 +24,7 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
     private ResearchGraph(GlobalResearch researchRoot, Map<ResourceKey<Research>, ResearchInstance> researches) {
         this(new ResearchNode(researches.get(researchRoot.getResearchKey())), new HashMap<>());
 
-        createNodes(rootNode.getInstance(), 0, CommonResearchCache.ROOT_RESEARCH != null && CommonResearchCache.ROOT_RESEARCH.is(rootNode.getInstance().getKey())
+        createNodes(rootNode.getInstance(), 0, CommonResearchCache.rootResearch != null && CommonResearchCache.rootResearch.is(rootNode.getInstance().getKey())
                 ? -1
                 : RESEARCH_GRAPH_LAYERS, researches);
         this.rootNode.setRootNode(true);
@@ -88,6 +88,6 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
     }
 
     public static ResearchGraph formRootResearch(ResourceKey<Research> root, Map<ResourceKey<Research>, ResearchInstance> researches) {
-        return new ResearchGraph(CommonResearchCache.GLOBAL_RESEARCHES.get(root), researches);
+        return new ResearchGraph(CommonResearchCache.globalResearches.get(root), researches);
     }
 }
