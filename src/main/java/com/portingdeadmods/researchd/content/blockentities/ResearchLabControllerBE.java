@@ -5,6 +5,7 @@ import com.portingdeadmods.portingdeadlibs.api.gui.menus.PDLAbstractContainerMen
 import com.portingdeadmods.portingdeadlibs.api.utils.IOAction;
 import com.portingdeadmods.portingdeadlibs.utils.LazyFinal;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
+import com.portingdeadmods.portingdeadlibs.utils.capabilities.HandlerUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
@@ -36,6 +37,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -53,7 +55,13 @@ public class ResearchLabControllerBE extends GhostMultiblockControllerBE impleme
         this.partPos = LazyFinal.create();
         this.currentResearchDuration = -1;
         this.researchPackUsage = new HashMap<>();
-	    this.researchPacks = new ArrayList<>();
+
+        this.addItemHandler(
+                HandlerUtils::newItemStackHandler,
+                builder -> builder
+                        .onChange(slot -> this.updateData())
+                        .validator(this::isItemValid)
+        );
     }
 
     @Override
@@ -64,30 +72,16 @@ public class ResearchLabControllerBE extends GhostMultiblockControllerBE impleme
 		this.researchPacks.forEach(key -> {
 			this.researchPackUsage.computeIfAbsent(key, $ -> 0f);
 		});
-        this.addItemHandler(
-		        (validator, slotLimit, onChanged, slots) ->
-				        new ItemStackHandler(slots) {
-					        @Override
-					        public boolean isItemValid(int slot, ItemStack stack) {
-						        return validator.test(slot, stack);
-					        }
 
-					        @Override
-					        protected void onContentsChanged(int slot) {
-						        onChanged.accept(slot);
-					        }
-
-					        @Override
-					        public int getSlotLimit(int slot) {
-						        return slotLimit.applyAsInt(slot);
-					        }
-				        },
-
-		        builder -> builder
-				        .slots(this.researchPacks.size())
-				        .validator(this::isItemValid)
-				        .slotLimit($ -> 64)
-        );
+        List<ItemStack> stacks = new ArrayList<>();
+        for (int i = 0; i < this.getItemHandler().getSlots(); i++) {
+            stacks.add(this.getItemHandler().getStackInSlot(i));
+        }
+        ItemStackHandler itemHandler = (ItemStackHandler) this.getItemHandler();
+        itemHandler.setSize(this.researchPacks.size());
+        for (int i = 0; i < stacks.size(); i++) {
+            itemHandler.setStackInSlot(i, stacks.get(i));
+        }
     }
 
     private boolean isItemValid(int slot, ItemStack stack) {
@@ -186,11 +180,6 @@ public class ResearchLabControllerBE extends GhostMultiblockControllerBE impleme
         }
     }
 
-    @Override
-    public <T> Map<Direction, Pair<IOAction, int[]>> getSidedInteractions(BlockCapability<T, @Nullable Direction> capability) {
-        return Map.of();
-    }
-
     public void setPartPositions(List<BlockPos> partPositions) {
         if (!this.partPos.isInitialized())
             this.partPos.initialize(partPositions);
@@ -200,11 +189,9 @@ public class ResearchLabControllerBE extends GhostMultiblockControllerBE impleme
 
     public boolean shouldExposeHandler(ResearchLabPartBE part) {
         if (this.getBlockPos().relative(Direction.SOUTH).equals(part.getBlockPos())) return true;
-        if (this.getBlockPos().relative(Direction.EAST).equals(part.getBlockPos())) return true;
-        if (this.getBlockPos().relative(Direction.NORTH).equals(part.getBlockPos())) return true;
-        if (this.getBlockPos().relative(Direction.WEST).equals(part.getBlockPos())) return true;
-
-        return false;
+        else if (this.getBlockPos().relative(Direction.EAST).equals(part.getBlockPos())) return true;
+        else if (this.getBlockPos().relative(Direction.NORTH).equals(part.getBlockPos())) return true;
+        return this.getBlockPos().relative(Direction.WEST).equals(part.getBlockPos());
     }
 
     @Override
