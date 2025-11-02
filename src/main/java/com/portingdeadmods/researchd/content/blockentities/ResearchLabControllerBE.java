@@ -2,11 +2,8 @@ package com.portingdeadmods.researchd.content.blockentities;
 
 import com.portingdeadmods.portingdeadlibs.api.ghost.GhostMultiblockControllerBE;
 import com.portingdeadmods.portingdeadlibs.api.gui.menus.PDLAbstractContainerMenu;
-import com.portingdeadmods.portingdeadlibs.api.utils.IOAction;
 import com.portingdeadmods.portingdeadlibs.utils.LazyFinal;
-import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.portingdeadlibs.utils.capabilities.HandlerUtils;
-import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
@@ -21,9 +18,7 @@ import com.portingdeadmods.researchd.registries.ResearchdBlockEntityTypes;
 import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
-import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -35,12 +30,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -52,7 +44,6 @@ public class ResearchLabControllerBE extends GhostMultiblockControllerBE impleme
 
     public ResearchLabControllerBE(BlockPos pos, BlockState blockState) {
         super(ResearchdBlockEntityTypes.RESEARCH_LAB_CONTROLLER.get(), pos, blockState);
-        this.partPos = LazyFinal.create();
         this.currentResearchDuration = -1;
         this.researchPackUsage = new HashMap<>();
 
@@ -150,48 +141,21 @@ public class ResearchLabControllerBE extends GhostMultiblockControllerBE impleme
 
     @Override
     protected void saveData(CompoundTag tag, HolderLookup.Provider registries) {
-        partPos.ifInitialized(pos -> {
-            tag.putLongArray("part_positions", pos.stream().mapToLong(BlockPos::asLong).toArray());
-        });
-
         CompoundTag researchPackUsageTag = new CompoundTag();
         for (Map.Entry<ResourceKey<ResearchPack>, Float> entry : researchPackUsage.entrySet()) {
             researchPackUsageTag.putFloat(entry.getKey().location().toString(), entry.getValue());
         }
         tag.put("research_pack_usage", researchPackUsageTag);
+		super.saveData(tag, registries);
     }
 
     @Override
     protected void loadData(CompoundTag tag, HolderLookup.Provider registries) {
-        if (tag.contains("part_positions")) {
-            long[] partPositions = tag.getLongArray("part_positions");
-            List<BlockPos> positions = new UniqueArray<>();
-            for (long posLong : partPositions) {
-                BlockPos pos = BlockPos.of(posLong);
-                positions.add(pos);
-            }
-
-            this.setPartPositions(positions);
-        }
-
         CompoundTag researchPackUsageTag = tag.getCompound("research_pack_usage");
         for (String key : researchPackUsageTag.getAllKeys()) {
             this.researchPackUsage.put(ResourceKey.create(ResearchdRegistries.RESEARCH_PACK_KEY, ResourceLocation.parse(key)), researchPackUsageTag.getFloat(key));
         }
-    }
-
-    public void setPartPositions(List<BlockPos> partPositions) {
-        if (!this.partPos.isInitialized())
-            this.partPos.initialize(partPositions);
-        else
-            Researchd.debug("Research Lab Controller BE", "Part positions are already initialized, ignoring new values: ", partPositions);
-    }
-
-    public boolean shouldExposeHandler(ResearchLabPartBE part) {
-        if (this.getBlockPos().relative(Direction.SOUTH).equals(part.getBlockPos())) return true;
-        else if (this.getBlockPos().relative(Direction.EAST).equals(part.getBlockPos())) return true;
-        else if (this.getBlockPos().relative(Direction.NORTH).equals(part.getBlockPos())) return true;
-        return this.getBlockPos().relative(Direction.WEST).equals(part.getBlockPos());
+		super.loadData(tag, registries);
     }
 
     @Override

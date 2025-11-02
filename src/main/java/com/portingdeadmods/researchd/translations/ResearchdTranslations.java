@@ -95,6 +95,7 @@ public final class ResearchdTranslations {
     public static final class Errors {
         public static final TranslatableConstant RESEARCH_QUEUE_DESYNC = create("research_queue_desync", "A small desynchronization happened regarding the Research Queue, please relog.");
         public static final TranslatableConstant NO_RESEARCH_TEAM = create("no_research_team", "Research related packet handled to player lacking a team");
+	    public static final TranslatableConstant NO_RESEARCH_PACKS_PRESENT = create("no_research_packs", AQUA_AT + WHITE + "There are no Research Packs present on this world. :< " + RESET);
 
         private static TranslatableConstant create(String key, String defaultValue) {
             TranslatableConstant constant = new TranslatableConstant(key, "error");

@@ -36,6 +36,8 @@ public class ResearchLabPart extends SimpleGhostMultiblockPart {
 
     @Override
     public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
+		if (level.isClientSide) return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+
         if (level.getBlockEntity(pos) instanceof SimpleGhostMultiblockPartBE partBE) {
             BlockPos controllerPos = partBE.getControllerPos();
             if (level.getBlockState(controllerPos).getBlock() instanceof GhostMultiblockController) {
