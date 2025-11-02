@@ -169,7 +169,7 @@ jobs:
         if: steps.check_version.outputs.SHOULD_RELEASE == 'true' && env.CURSEFORGE_TOKEN != ''
         env:
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
-          RELEASE_TYPE: ${{ steps.check_version.outputs.RELEASE_TYPE }}
+          RELEASE_TYPE: release
           CHANGELOG: ${{ github.event.head_commit.message }}
           MOD_VERSION: ${{ steps.mod_info.outputs.MOD_VERSION }}
           MC_VERSION: ${{ steps.mod_info.outputs.MC_VERSION }}
