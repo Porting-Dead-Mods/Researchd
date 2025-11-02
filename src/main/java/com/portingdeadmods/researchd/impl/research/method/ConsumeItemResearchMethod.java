@@ -30,43 +30,44 @@ public record ConsumeItemResearchMethod(Ingredient toConsume, int count) impleme
 
     @Override
     public void checkProgress(Level level, ResourceKey<Research> research, ResearchProgress.Task task, MethodContext context) {
-        for (TeamMember member : context.team().getMembers()) {
-            List<ItemStack> matchingItems = new ArrayList<>(8);
-            int found = 0;
+	    List<ItemStack> matchingItems = new ArrayList<>(8);
+		int remaining = this.count() - (int) task.getProgress(); // Cast should be safe, consume item should only get int progress
+	    int found = 0;
 
-            Player player = level.getPlayerByUUID(member.player());
-            if (player != null) {
-                int containerSize = player.getInventory().getContainerSize();
-                for (int i = 0; i < containerSize; i++) {
-                    ItemStack stack = player.getInventory().getItem(i);
-                    if (this.toConsume.test(stack)) {
-                        matchingItems.add(stack);
-                        found = Math.min(this.count, found + stack.getCount());
-                    }
+		findItems: {
+			for (TeamMember member : context.team().getMembers()) {
+				Player player = level.getPlayerByUUID(member.player());
+				if (player != null) {
+					int containerSize = player.getInventory().getContainerSize();
+					for (int i = 0; i < containerSize; i++) {
+						ItemStack stack = player.getInventory().getItem(i);
+						if (this.toConsume.test(stack)) {
+							matchingItems.add(stack);
+							found = Math.min(remaining, found + stack.getCount());
+							if (found == remaining) break findItems;
+						}
+					}
+				}
+			}
+		}
 
-                    if (found >= this.count) {
-                        int shrunkCount = 0;
-                        List<ItemStack> itemsByLowestCount = matchingItems.stream().sorted(Comparator.comparingInt(ItemStack::getCount)).toList().reversed();
-                        for (ItemStack itemStack : itemsByLowestCount) {
-                            int shrinkBy = Math.min(itemStack.getCount(), this.count() - shrunkCount);
-                            shrunkCount += shrinkBy;
-                            itemStack.shrink(shrinkBy);
-                            if (shrunkCount >= this.count()) {
-                                task.addProgress(this.getMaxProgress());
-                                break;
-                            }
-                        }
-                        break;
-                    }
+		task.addProgress(found);
+		matchingItems.sort(Comparator.comparingInt(ItemStack::getCount).reversed());
 
-                }
-            }
-        }
+		for (ItemStack stack : matchingItems) {
+			int size = stack.getCount();
+			int reduction = Math.min(found, size);
+
+			stack.shrink(reduction);
+			found = found - reduction;
+
+			if (found == 0) return;
+		}
     }
 
     @Override
     public float getMaxProgress() {
-        return 1f;
+        return (float) this.count();
     }
 
     @Override
