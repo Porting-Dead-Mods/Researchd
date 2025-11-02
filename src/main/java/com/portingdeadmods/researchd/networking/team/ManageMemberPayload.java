@@ -34,6 +34,7 @@ public record ManageMemberPayload(UUID member, boolean remove) implements Custom
             if (context.player() instanceof ServerPlayer sp)
                 ResearchTeamHelper.handleManageMember(sp, payload.member(), payload.remove());
         }).exceptionally(e -> {
+            Researchd.LOGGER.error("Failed to handle ManageMemberPayload", e);
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
             return null;
         });

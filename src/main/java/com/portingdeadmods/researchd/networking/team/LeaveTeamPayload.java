@@ -31,6 +31,7 @@ public record LeaveTeamPayload(UUID nextToLead) implements CustomPacketPayload {
             if (context.player() instanceof ServerPlayer sp)
                 ResearchTeamHelper.handleLeaveTeam(sp, payload.nextToLead());
         }).exceptionally(e -> {
+            Researchd.LOGGER.error("Failed to handle LeaveTeamPayload", e);
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
             return null;
         });

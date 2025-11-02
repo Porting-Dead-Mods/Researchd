@@ -29,6 +29,7 @@ public record TeamSetNamePayload(String name) implements CustomPacketPayload {
             if (context.player() instanceof ServerPlayer sp)
                 ResearchTeamHelper.handleSetName(sp, payload.name);
         }).exceptionally(e -> {
+            Researchd.LOGGER.error("Failed to handle TeamSetNamePayload", e);
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
             return null;
         });

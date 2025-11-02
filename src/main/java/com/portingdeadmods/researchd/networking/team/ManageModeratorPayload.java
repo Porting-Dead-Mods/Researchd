@@ -34,6 +34,7 @@ public record ManageModeratorPayload(UUID moderator, boolean remove) implements 
             if (context.player() instanceof ServerPlayer sp)
                 ResearchTeamHelper.handleManageModerator(sp, payload.moderator(), payload.remove());
         }).exceptionally(e -> {
+            Researchd.LOGGER.error("Failed to handle ManageModeratorPayload", e);
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
             return null;
         });

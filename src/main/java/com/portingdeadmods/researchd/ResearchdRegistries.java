@@ -16,11 +16,10 @@ public final class ResearchdRegistries {
 			ResourceKey.createRegistryKey(Researchd.rl("research"));
 	public static final ResourceKey<Registry<ResearchPack>> RESEARCH_PACK_KEY =
 			ResourceKey.createRegistryKey(Researchd.rl("research_pack"));
-
     public static final ResourceKey<Registry<ValueEffect>> VALUE_EFFECT_KEY =
             ResourceKey.createRegistryKey(Researchd.rl("value_effect"));
 
-
+    // SERIALIZERS
     public static final ResourceKey<Registry<ResearchSerializer<?>>> RESEARCH_SERIALIZER_KEY =
 			ResourceKey.createRegistryKey(Researchd.rl("research_serializer"));
     public static final ResourceKey<Registry<ResearchPackSerializer<?>>> RESEARCH_PACK_SERIALIZER_KEY =

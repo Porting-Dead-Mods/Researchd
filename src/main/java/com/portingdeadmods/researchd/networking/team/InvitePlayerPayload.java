@@ -29,11 +29,12 @@ public record InvitePlayerPayload(UUID invited, boolean remove) implements Custo
         return TYPE;
     }
 
-    public static void handle(InvitePlayerPayload payload, IPayloadContext context) {
+    public void handle(IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer sp)
-                ResearchTeamHelper.handleSendInviteToPlayer(sp, payload.invited, payload.remove);
+                ResearchTeamHelper.handleSendInviteToPlayer(sp, this.invited(), this.remove());
         }).exceptionally(e -> {
+            Researchd.LOGGER.error("Failed to handle InvitePlayerPayload", e);
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
             return null;
         });

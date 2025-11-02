@@ -31,6 +31,7 @@ public record TransferOwnershipPayload(UUID nextToLead) implements CustomPacketP
             if (context.player() instanceof ServerPlayer sp)
                 ResearchTeamHelper.handleTransferOwnership(sp, payload.nextToLead());
         }).exceptionally(e -> {
+            Researchd.LOGGER.error("Failed to handle TransferOwnershipPayload", e);
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
             return null;
         });

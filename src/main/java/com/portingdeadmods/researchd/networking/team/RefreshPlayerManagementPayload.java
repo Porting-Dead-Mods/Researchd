@@ -23,6 +23,7 @@ public record RefreshPlayerManagementPayload() implements CustomPacketPayload {
         context.enqueueWork(() -> {
             ClientResearchTeamHelper.refreshResearchTeamScreenData();
         }).exceptionally(e -> {
+            Researchd.LOGGER.error("Failed to handle RefreshPlayerManagementPayload", e);
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
             return null;
         });

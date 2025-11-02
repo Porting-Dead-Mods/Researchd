@@ -27,7 +27,7 @@ public record UpdateResearchPacksPayload(HashMap<ResourceLocation, ResearchPack>
         context.enqueueWork(() -> {
             ResearchdManagers.getResearchPacksManager(context.player().level()).replaceContents(this.researchPacks);
         }).exceptionally(err -> {
-           Researchd.LOGGER.error("Encountered error while handling UpdateResearchPacksPayload", err);
+           Researchd.LOGGER.error("Failed to handle UpdateResearchPacksPayload", err);
            return null;
         });
     }

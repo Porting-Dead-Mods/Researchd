@@ -26,11 +26,12 @@ public record EnterTeamPayload(UUID memberOfTeam) implements CustomPacketPayload
         return TYPE;
     }
 
-    public static void handle(EnterTeamPayload payload, IPayloadContext context) {
+    public void handle(IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer sp)
-                ResearchTeamHelper.handleEnterTeam(sp, payload.memberOfTeam());
+                ResearchTeamHelper.handleEnterTeam(sp, this.memberOfTeam());
         }).exceptionally(e -> {
+            Researchd.LOGGER.error("Failed to handle EnterTeamPayload", e);
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
             return null;
         });

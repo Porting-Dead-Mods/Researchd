@@ -56,6 +56,7 @@ public record RequestToJoinPayload(UUID toJoin, boolean remove) implements Custo
                 }
             }
         }).exceptionally(e -> {
+            Researchd.LOGGER.error("Failed to handle RequestToJoinPayload", e);
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
             return null;
         });

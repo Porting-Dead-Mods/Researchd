@@ -66,8 +66,8 @@ public final class ResearchHelperCommon {
                 .toList();
     }
 
-    public static Research getResearch(ResourceKey<Research> resourceKey, Level level) {
-        return getLevelResearches(level).get(resourceKey);
+    public static Research getResearch(ResourceKey<Research> key, Level level) {
+        return getLevelResearches(level).get(key);
     }
 
     public static @Nullable ResearchInstance getInstanceByResearch(Set<ResearchInstance> researches, ResourceKey<Research> key) {
