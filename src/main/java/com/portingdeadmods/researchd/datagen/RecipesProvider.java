@@ -22,44 +22,6 @@ public class RecipesProvider extends RecipeProvider {
 
     @Override
     protected void buildRecipes(@NotNull RecipeOutput pRecipeOutput) {
-        ItemStack basePack = ResearchdItems.RESEARCH_PACK.asItem().getDefaultInstance();
-
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ResearchdResearchPacks.asStack(ResearchdResearchPacks.OVERWORLD_PACK_LOC))
-                .pattern(" A ")
-                .pattern("BGC")
-                .pattern(" D ")
-                .define('G', Items.GLASS_BOTTLE)
-                .define('A', Items.COBBLESTONE)
-                .define('B', Items.IRON_INGOT)
-                .define('C', Items.COPPER_INGOT)
-                .define('D', Items.REDSTONE)
-                .unlockedBy("has_item", has(Items.GLASS))
-                .save(pRecipeOutput, Researchd.rl("overworld_pack"));
-
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ResearchdResearchPacks.asStack(ResearchdResearchPacks.NETHER_PACK_LOC))
-                .pattern(" A ")
-                .pattern("BGC")
-                .pattern(" D ")
-                .define('G', Items.GLASS_BOTTLE)
-                .define('A', Items.NETHERRACK)
-                .define('B', Items.BASALT)
-                .define('C', Items.SOUL_SAND)
-                .define('D', Items.GLOWSTONE_DUST)
-                .unlockedBy("has_item", has(Items.NETHERRACK))
-                .save(pRecipeOutput, Researchd.rl("nether_pack"));
-
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ResearchdResearchPacks.asStack(ResearchdResearchPacks.END_PACK_LOC))
-                .pattern(" A ")
-                .pattern("BGC")
-                .pattern(" D ")
-                .define('G', Items.GLASS_BOTTLE)
-                .define('A', Items.END_STONE)
-                .define('B', Items.PURPUR_BLOCK)
-                .define('C', Items.OBSIDIAN)
-                .define('D', Items.ENDER_PEARL)
-                .unlockedBy("has_item", has(Items.END_STONE))
-                .save(pRecipeOutput, Researchd.rl("end_pack"));
-
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ResearchdItems.RESEARCH_LAB, 1)
                 .pattern("GGG")
                 .pattern("GCG")

@@ -33,12 +33,15 @@ public class ResearchdResearchPacks implements ResearchdDatagenProvider<Research
     @Override
     public void build() {
         researchPack("overworld", builder -> builder
+                .literalName("Overworld Pack")
                 .sortingValue(1)
                 .color(20, 240, 20));
         researchPack("nether", builder -> builder
+                .literalName("Nether Pack")
                 .sortingValue(2)
                 .color(160, 20, 20));
         researchPack("end", builder -> builder
+                .literalName("End Pack")
                 .sortingValue(3)
                 .color(63, 36, 83));
     }

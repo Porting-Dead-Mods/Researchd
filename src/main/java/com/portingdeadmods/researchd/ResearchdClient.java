@@ -174,7 +174,7 @@ public final class ResearchdClient {
                 ResearchPack pack = ResearchHelperCommon.getResearchPack(key.get(), Minecraft.getInstance().level);
                 if (pack instanceof RegistryDisplay<?> display) {
                     event.getToolTip().set(0, display.getDisplayNameUnsafe(key.get()));
-                    event.getToolTip().addFirst(display.getDisplayDescriptionUnsafe(key.get()));
+                    event.getToolTip().add(1, display.getDisplayDescriptionUnsafe(key.get()));
                 }
             }
         }

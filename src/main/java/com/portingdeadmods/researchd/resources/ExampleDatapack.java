@@ -8,6 +8,8 @@ import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
+import com.portingdeadmods.researchd.resources.contents.ResearchdLang;
+import com.portingdeadmods.researchd.resources.contents.ResearchdRecipes;
 import com.portingdeadmods.researchd.resources.contents.ResearchdResearchPacks;
 import com.portingdeadmods.researchd.resources.contents.ResearchdResearches;
 import com.portingdeadmods.researchd.utils.researches.ReloadableRegistryManager;
@@ -35,6 +37,7 @@ public class ExampleDatapack {
                 Files.writeString(packFile, getPackFile(packDescription));
 
                 Path packContentRootDir = exampleDataPackDir.resolve("data").resolve("rd_examples");
+
                 Path packResearchdRegistriesDir = packContentRootDir.resolve("researchd");
                 Files.createDirectories(packResearchdRegistriesDir);
 

@@ -29,7 +29,7 @@ public class ResearchdLang {
     }
 
     private void addResearch(ResourceLocation key, String name) {
-        add(ResearchdRegistries.RESEARCH_KEY.location().getPath() + "." + key.getNamespace() + "." + key.getPath(), name);
+        add(ResearchdRegistries.RESEARCH_KEY.location().getPath() + "." + key.getNamespace() + "." + key.getPath() + "_name", name);
     }
 
     private void addResearchMethod(ResourceLocation key, String name) {
