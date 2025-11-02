@@ -94,7 +94,6 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
                 ResearchInstance instance = ClientResearchTeamHelper.getTeam().getResearches().get(researchKey);
                 this.screen.getSelectedResearchWidget().setSelectedResearch(instance);
                 this.screen.getResearchGraphWidget().setGraph(ResearchGraphCache.computeIfAbsent(researchKey));
-                ClientResearchTeamHelper.refreshGraphData();
                 return super.mouseClicked(mouseX, mouseY, button);
             }
         }

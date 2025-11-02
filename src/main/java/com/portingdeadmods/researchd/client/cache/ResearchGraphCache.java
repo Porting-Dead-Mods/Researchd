@@ -1,5 +1,6 @@
 package com.portingdeadmods.researchd.client.cache;
 
+import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
@@ -7,6 +8,7 @@ import net.minecraft.resources.ResourceKey;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class ResearchGraphCache {
@@ -19,6 +21,8 @@ public final class ResearchGraphCache {
     public static @Nullable ResearchGraph get(ResourceKey<Research> key) {
         return GRAPH_CACHE.get(key);
     }
+
+	public static List<ResearchGraph> getAll() { return new UniqueArray<>(GRAPH_CACHE.values()); }
 
     public static void clearCache() {
         GRAPH_CACHE.clear();

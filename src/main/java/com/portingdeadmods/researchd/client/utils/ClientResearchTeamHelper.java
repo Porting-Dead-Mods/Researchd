@@ -12,6 +12,7 @@ import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.ResearchTeamRole;
 import com.portingdeadmods.researchd.api.team.TeamMember;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
+import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.team.ResearchTeamScreen;
 import com.portingdeadmods.researchd.client.screens.team.ResearchTeamSettingsScreen;
@@ -159,6 +160,8 @@ public class ClientResearchTeamHelper {
             ResearchGraph graph = screen.getResearchGraph();
             graph.nodes().forEach((key, node) -> node.fetchInstanceFromTeam());
         }
+
+	    ResearchGraphCache.getAll().forEach(graph -> graph.nodes().forEach((key, node) -> node.fetchInstanceFromTeam()));
     }
 
     public static void refreshTechListData() {

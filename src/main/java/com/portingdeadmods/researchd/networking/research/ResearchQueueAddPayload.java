@@ -9,6 +9,7 @@ import com.portingdeadmods.researchd.api.team.TeamMember;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
+import com.portingdeadmods.researchd.networking.client.RefreshResearchScreenData;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.UUIDUtil;
@@ -20,6 +21,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
@@ -49,6 +51,7 @@ public record ResearchQueueAddPayload(ResourceKey<Research> researchKey, UUID pl
                 ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
                 SimpleResearchTeam team = data.getTeamByPlayer(serverPlayer);
 
+				if (team == null) return;
 				if (team.getQueue().size() >= ResearchdConfig.Common.researchQueueLength) return;
 
                 ResearchInstance instance = team.getResearches().get(researchKey);
@@ -75,6 +78,13 @@ public record ResearchQueueAddPayload(ResourceKey<Research> researchKey, UUID pl
                 team.getTeamResearches().refreshResearchStatus();
                 ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
 	            ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
+
+	            for (TeamMember member : team.getMembers()) {
+					if (level.getPlayerByUUID(member.player()) == null) continue;
+
+		            ServerPlayer player = (ServerPlayer) level.getPlayerByUUID(member.player());
+		            PacketDistributor.sendToPlayer(player, RefreshResearchScreenData.ALL);
+	            }
             }
         }).exceptionally(err -> {
             Researchd.LOGGER.error("Failed to handle ResearchQueueAdd payload", err);

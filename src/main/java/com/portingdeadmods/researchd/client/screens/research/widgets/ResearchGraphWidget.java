@@ -12,7 +12,6 @@ import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
 import com.portingdeadmods.researchd.client.screens.research.graph.lines.PotentialOverlap;
 import com.portingdeadmods.researchd.client.screens.research.graph.lines.ResearchHead;
 import com.portingdeadmods.researchd.client.screens.research.graph.lines.ResearchLine;
-import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
@@ -657,7 +656,6 @@ public class ResearchGraphWidget extends AbstractWidget {
         for (ResearchNode node : this.graph.nodes().values()) {
             if (node.isHovered()) {
                 this.setGraph(ResearchGraphCache.computeIfAbsent(node.getInstance().getKey()));
-                ClientResearchTeamHelper.refreshGraphData();
                 List<ResearchInstance> entries = this.researchScreen.getTechList().entries();
                 int index = entries.indexOf(node.getInstance());
                 if (index != -1) {

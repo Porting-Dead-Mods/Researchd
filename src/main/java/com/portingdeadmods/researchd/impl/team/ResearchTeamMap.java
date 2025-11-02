@@ -52,10 +52,12 @@ public record ResearchTeamMap(Map<UUID, SimpleResearchTeam> researchTeams) {
         throw new IllegalStateException("Player %s not in a team".formatted(AllPlayersCache.getName(memberUuid).equals("!Unknown Player!") ? memberUuid : AllPlayersCache.getName(memberUuid)));
     }
 
+	@Nullable
     public SimpleResearchTeam getTeamByPlayer(Player player) {
         return this.researchTeams.get(player.getUUID());
     }
 
+	@Nullable
     public SimpleResearchTeam getTeamByUUID(UUID teamUuid) {
         return this.researchTeams.get(teamUuid);
     }
