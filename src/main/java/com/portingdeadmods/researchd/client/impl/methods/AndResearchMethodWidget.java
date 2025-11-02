@@ -10,7 +10,7 @@ public class AndResearchMethodWidget extends AbstractResearchMethodListWidget<An
 
     @Override
     public @NotNull String getSeparatorText() {
-        return "and";
+        return "+";
     }
 
 }

@@ -10,6 +10,6 @@ public class AndResearchEffectWidget extends AbstractResearchEffectListWidget<An
 
     @Override
     public @NotNull String getSeparatorText() {
-        return "and";
+        return "+";
     }
 }

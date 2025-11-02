@@ -99,6 +99,16 @@ public class ConsumePackResearchMethodWidget extends AbstractResearchInfoWidget<
     }
 
     @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        return false;
+    }
+
+    @Override
     public Size2i getSize() {
         return new Size2i(16, 16);
     }

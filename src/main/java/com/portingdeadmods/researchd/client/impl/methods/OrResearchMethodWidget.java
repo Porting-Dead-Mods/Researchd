@@ -10,6 +10,6 @@ public class OrResearchMethodWidget extends AbstractResearchMethodListWidget<OrR
 
     @Override
     public @NotNull String getSeparatorText() {
-        return "or";
+        return "|";
     }
 }

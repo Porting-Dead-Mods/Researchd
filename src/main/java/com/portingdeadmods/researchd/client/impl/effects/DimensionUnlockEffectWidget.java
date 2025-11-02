@@ -34,4 +34,14 @@ public class DimensionUnlockEffectWidget extends AbstractResearchInfoWidget<Dime
             guiGraphics.renderTooltip(this.font, ResearchdTranslations.component(ResearchdTranslations.Research.DIMENSION_UNLOCK_EFFECT_TOOLTIP, Utils.registryTranslation(this.value.getDimension())), mouseX, mouseY);
         }
     }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        return false;
+    }
 }

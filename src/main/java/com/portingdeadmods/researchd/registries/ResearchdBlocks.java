@@ -11,7 +11,7 @@ public final class ResearchdBlocks {
 	public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(Researchd.MODID);
 
 	public static final DeferredBlock<ResearchLabPart> RESEARCH_LAB_PART = BLOCKS.register("research_lab_part",
-			() -> new ResearchLabPart(BlockBehaviour.Properties.of().strength(3.0F, 3.0F).noOcclusion()));
+			() -> new ResearchLabPart(BlockBehaviour.Properties.of().strength(3.0F, 3.0F).requiresCorrectToolForDrops().noOcclusion()));
 	public static final DeferredBlock<ResearchLabController> RESEARCH_LAB_CONTROLLER = BLOCKS.register("research_lab_controller",
-			() -> new ResearchLabController(BlockBehaviour.Properties.of().strength(3.0F, 3.0F).noOcclusion()));
+			() -> new ResearchLabController(BlockBehaviour.Properties.of().strength(3.0F, 3.0F).requiresCorrectToolForDrops().noOcclusion()));
 }
