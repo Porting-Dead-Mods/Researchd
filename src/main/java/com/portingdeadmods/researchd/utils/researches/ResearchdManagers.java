@@ -12,7 +12,7 @@ public final class ResearchdManagers {
             ReloadableServerResources resources = level.getServer().getServerResources().managers();
             return ((RegistryManagersGetter) resources).researchd$getResearchesManager();
         } else {
-            return null; //((RegistryManagersGetter) level).researchd$getResearchesManager();
+            return ((RegistryManagersGetter) level).researchd$getResearchesManager();
         }
     }
 
@@ -21,7 +21,7 @@ public final class ResearchdManagers {
             ReloadableServerResources resources = level.getServer().getServerResources().managers();
             return ((RegistryManagersGetter) resources).researchd$getResearchPackManager();
         } else {
-            return null; // ((RegistryManagersGetter) level).researchd$getResearchPackManager();
+            return ((RegistryManagersGetter) level).researchd$getResearchPackManager();
         }
     }
 

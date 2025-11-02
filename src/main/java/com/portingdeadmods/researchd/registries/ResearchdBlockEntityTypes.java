@@ -9,7 +9,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;
 
-public class ResearchdBlockEntityTypes {
+public final class ResearchdBlockEntityTypes {
 	public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, Researchd.MODID);
 
 	public static final Supplier<BlockEntityType<ResearchLabPartBE>> RESEARCH_LAB_PART = BLOCK_ENTITY_TYPES.register("research_lab_part",

@@ -8,7 +8,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;
 
-public class ResearchdValueEffects {
+public final class ResearchdValueEffects {
     public static final DeferredRegister<ValueEffect> VALUE_EFFECTS = DeferredRegister.create(ResearchdRegistries.VALUE_EFFECT, Researchd.MODID);
 
     public static final Supplier<ValueEffect> RESEARCH_LAB_PRODUCTIVITY = register("research_lab_productivity");

@@ -75,7 +75,7 @@ public final class Researchd {
         ResearchMethodSerializers.SERIALIZERS.register(modEventBus);
         ResearchdItems.ITEMS.register(modEventBus);
         ResearchdDataComponents.COMPONENTS.register(modEventBus);
-        //ResearchdTab.TABS.register(modEventBus);
+        ResearchdTab.TABS.register(modEventBus);
         ResearchdSavedData.SAVED_DATA.register(modEventBus);
         ResearchdBlocks.BLOCKS.register(modEventBus);
         ResearchdBlockEntityTypes.BLOCK_ENTITY_TYPES.register(modEventBus);

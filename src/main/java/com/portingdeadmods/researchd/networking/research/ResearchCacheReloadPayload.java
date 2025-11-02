@@ -41,12 +41,6 @@ public record ResearchCacheReloadPayload() implements CustomPacketPayload {
             }
             ResearchGraphCache.clearCache();
             ClientResearchTeamHelper.refreshResearchScreenData();
-
-            var mc = Minecraft.getInstance();
-            if (mc.player != null) {
-                CreativeModeTabs.CACHED_PARAMETERS = null;
-                CreativeModeTabs.tryRebuildTabContents(mc.player.connection.enabledFeatures(), mc.player.canUseGameMasterBlocks() && mc.options.operatorItemsTab().get(), mc.level.registryAccess());
-            }
         }).exceptionally(err -> {
            Researchd.LOGGER.error("Encountered error while handling ResearchCacheReloadPayload", err);
            return null;
