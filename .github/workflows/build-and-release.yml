@@ -177,7 +177,7 @@ jobs:
           MOD_NAME: ${{ steps.mod_info.outputs.MOD_NAME }}
           CURSEFORGE_PROJECT_ID: ${{ steps.mod_info.outputs.CURSEFORGE_PROJECT_ID }}
 
-        run: ./gradlew curseforge
+        run: ./gradlew curseforge --no-configuration-cache
 
       - name: Upload to Modrinth
         if: steps.check_version.outputs.SHOULD_RELEASE == 'true' && env.MODRINTH_TOKEN != ''
