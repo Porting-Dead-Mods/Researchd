@@ -69,9 +69,9 @@ public class ResearchLabBER implements BlockEntityRenderer<ResearchLabController
         poseStack.popPose();
 
         // Research Packs
-        for (ItemStack pack : researchLabControllerBE.getItemHandlerStacksList()) {
-            double len = researchLabControllerBE.getItemHandlerStacksList().size();
-            double idx = researchLabControllerBE.getItemHandlerStacksList().indexOf(pack);
+        for (ItemStack pack : researchLabControllerBE.getItemHandlerStacksList(researchLabControllerBE.getItemHandler())) {
+            double len = researchLabControllerBE.getItemHandlerStacksList(researchLabControllerBE.getItemHandler()).size();
+            double idx = researchLabControllerBE.getItemHandlerStacksList(researchLabControllerBE.getItemHandler()).indexOf(pack);
 
             float duration = 50f * (float) len; // ticks per rotation
             double theta;

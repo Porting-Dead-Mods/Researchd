@@ -127,7 +127,7 @@ public final class ResearchdCommonEvents {
     public static void onWorldLoad(LevelEvent.Load event) {
         if (!event.getLevel().isClientSide()) {
             // Initialize the research cache
-            // CommonResearchCache.initialize(event.getLevel());
+            CommonResearchCache.initialize(event.getLevel().getServer().overworld());
         }
     }
 

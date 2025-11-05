@@ -10,6 +10,7 @@ import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.utils.ResearchdCodecUtils;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -68,8 +69,7 @@ public record ResearchTeamMap(Map<UUID, SimpleResearchTeam> researchTeams) {
             ResearchHelperClient.refreshResearches(player);
             ClientResearchTeamHelper.resolveInstances(ClientResearchTeamHelper.getTeam());
         } else {
-            // TODO: Reenable this
-            //ResearchHelperCommon.refreshResearches((ServerPlayer) player);
+            ResearchHelperCommon.refreshResearches((ServerPlayer) player);
         }
 
 		// Resolve Map pointers to single team objects for all members

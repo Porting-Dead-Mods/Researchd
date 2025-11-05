@@ -5,16 +5,20 @@ import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidg
 import com.portingdeadmods.researchd.compat.JEICompat;
 import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.util.Size2i;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class ConsumeItemResearchMethodWidget extends AbstractResearchInfoWidget<ConsumeItemResearchMethod> {
     private final CycledItemRenderer itemRenderer;
@@ -39,7 +43,13 @@ public class ConsumeItemResearchMethodWidget extends AbstractResearchInfoWidget<
         if (this.isHovered()) {
             Ingredient consume = value.toConsume();
             ItemStack stack = new ItemStack(consume.getItems()[0].getItem(), value.count());
-            guiGraphics.renderTooltip(font, Screen.getTooltipFromItem(Minecraft.getInstance(), stack), stack.getTooltipImage(), stack, mouseX, mouseY);
+            List<Component> tooltip = new ArrayList<>(Screen.getTooltipFromItem(Minecraft.getInstance(), stack));
+            tooltip.addFirst(
+                    Component.literal("Consume ").withStyle(ChatFormatting.WHITE).append(
+                    Component.literal("%d".formatted(value.count())).withStyle(ChatFormatting.GOLD)).append(
+                    Component.literal(":").withStyle(ChatFormatting.WHITE))
+            );
+            guiGraphics.renderTooltip(font, tooltip, stack.getTooltipImage(), stack, mouseX, mouseY);
         }
     }
 

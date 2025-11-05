@@ -88,7 +88,15 @@ public abstract class AbstractResearchEffectListWidget<T extends ResearchEffectL
         for (AbstractResearchInfoWidget<? extends ResearchEffect> effect : this.effects) {
             effect.setY(y + 1);
         }
+    }
 
+    @Override
+    public void setX(int x) {
+        super.setX(x);
+
+        for (AbstractResearchInfoWidget<? extends ResearchEffect> effect : this.effects) {
+            effect.setX(x + 1 + getSizeFor(this.effects.indexOf(effect), false).width + this.effects.indexOf(effect) * (int) getPadding());
+        }
     }
 
     public float getPadding() {

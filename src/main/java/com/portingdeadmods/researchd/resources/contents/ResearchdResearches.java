@@ -34,6 +34,7 @@ public class ResearchdResearches implements ResearchdDatagenProvider<Research> {
     public static final ResourceLocation END_LOC = Researchd.rl("the_end");
     public static final ResourceLocation END_CRYSTAL_LOC = Researchd.rl("end_crystal");
     public static final ResourceLocation BEACON_LOC = Researchd.rl("beacon");
+    public static final ResourceLocation STONE_LOC = Researchd.rl("stone");
 
     private final String modid;
     private final Map<ResourceKey<Research>, Research> researches;
@@ -51,14 +52,28 @@ public class ResearchdResearches implements ResearchdDatagenProvider<Research> {
                 .effect(
                         and(unlockRecipe(mcLoc("stone_pickaxe")), unlockRecipe(mcLoc("furnace")))
                 ));
-        ResourceKey<Research> overworldPack = simpleResearch("overworld_pack", builder -> builder
+        ResourceKey<Research> stone = simpleResearch("stone", builder -> builder
+                .icon(Items.COBBLESTONE)
+                .method(hasItem(Items.COBBLESTONE, 64))
+                .parents(cobblestone)
+                .effect(
+                        and(
+                                unlockItem(Items.STONE),
+                                unlockItem(Items.STONE_BRICKS),
+                                unlockItem(Items.STONE_BRICK_SLAB),
+                                unlockItem(Items.STONE_BRICK_STAIRS),
+                                unlockItem(Items.SMOOTH_STONE),
+                                unlockItem(Items.STONECUTTER)
+                        )
+                ));
+         ResourceKey<Research> overworldPack = simpleResearch("overworld_pack", builder -> builder
                 .icon(ResearchdItems.RESEARCH_LAB.asItem())
                 .parents(cobblestone)
                 .method(consumeItem(Items.IRON_INGOT, 4))
                 .effect(
                         and(unlockRecipe(modLoc("research_lab")), unlockRecipe(modLoc("overworld_pack")))
                 ));
-        ResourceKey<Research> nether = simpleResearch("nether", builder -> builder
+         ResourceKey<Research> nether = simpleResearch("nether", builder -> builder
                 .icon(Items.NETHERRACK)
                 .parents(overworldPack)
                 .method(
@@ -70,7 +85,7 @@ public class ResearchdResearches implements ResearchdDatagenProvider<Research> {
                                 unlockDimension(mcLoc("the_nether"), DimensionUnlockEffect.NETHER_SPRITE)
                         )
                 ));
-        ResourceKey<Research> cake = simpleResearch("cake", builder -> builder
+         ResourceKey<Research> cake = simpleResearch("cake", builder -> builder
                 .icon(Items.CAKE)
                 .parents(nether)
                 .method(
@@ -79,7 +94,7 @@ public class ResearchdResearches implements ResearchdDatagenProvider<Research> {
                 .effect(
                         unlockItem(Items.CAKE)
                 ));
-        ResourceKey<Research> end = simpleResearch("the_end", builder -> builder
+         ResourceKey<Research> end = simpleResearch("the_end", builder -> builder
                 .icon(Items.END_STONE)
                 .parents(nether)
                 .method(consumePack(100, 200, pack(ResearchdResearchPacks.OVERWORLD_PACK_LOC), pack(ResearchdResearchPacks.NETHER_PACK_LOC)))
@@ -89,14 +104,14 @@ public class ResearchdResearches implements ResearchdDatagenProvider<Research> {
                                 unlockDimension(mcLoc("the_end"), DimensionUnlockEffect.END_SPRITE)
                         )
                 ));
-        simpleResearch("end_crystal", builder -> builder
+         simpleResearch("end_crystal", builder -> builder
                 .icon(Items.END_CRYSTAL)
                 .parents(end)
                 .method(consumePack(250, 200, pack(ResearchdResearchPacks.OVERWORLD_PACK_LOC), pack(ResearchdResearchPacks.NETHER_PACK_LOC), pack(ResearchdResearchPacks.END_PACK_LOC)))
                 .effect(
                         and(unlockRecipe(mcLoc("end_crystal")))
                 ));
-        simpleResearch("beacon", builder -> builder
+         simpleResearch("beacon", builder -> builder
                 .icon(Items.BEACON)
                 .parents(end)
                 .method(

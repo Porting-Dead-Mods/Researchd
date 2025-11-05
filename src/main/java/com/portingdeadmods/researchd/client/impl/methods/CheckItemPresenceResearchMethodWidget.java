@@ -5,16 +5,20 @@ import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidg
 import com.portingdeadmods.researchd.compat.JEICompat;
 import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import com.portingdeadmods.researchd.impl.research.method.CheckItemPresenceResearchMethod;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.util.Size2i;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class CheckItemPresenceResearchMethodWidget extends AbstractResearchInfoWidget<CheckItemPresenceResearchMethod> {
     private final CycledItemRenderer itemRenderer;
@@ -37,9 +41,15 @@ public class CheckItemPresenceResearchMethodWidget extends AbstractResearchInfoW
     public void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         Font font = Minecraft.getInstance().font;
         if (this.isHovered()) {
-            Ingredient consume = value.target();
-            ItemStack stack = new ItemStack(consume.getItems()[0].getItem(), value.count());
-            guiGraphics.renderTooltip(font, Screen.getTooltipFromItem(Minecraft.getInstance(), stack), stack.getTooltipImage(), stack, mouseX, mouseY);
+            Ingredient target = value.target();
+            ItemStack stack = new ItemStack(target.getItems()[0].getItem(), value.count());
+            List<Component> tooltip = new ArrayList<>(Screen.getTooltipFromItem(Minecraft.getInstance(), stack));
+            tooltip.addFirst(
+                    Component.literal("Obtain ").withStyle(ChatFormatting.WHITE).append(
+                    Component.literal("%d".formatted(value.count())).withStyle(ChatFormatting.GOLD)).append(
+                    Component.literal(":").withStyle(ChatFormatting.WHITE))
+            );
+            guiGraphics.renderTooltip(font, tooltip, stack.getTooltipImage(), stack, mouseX, mouseY);
         }
     }
 

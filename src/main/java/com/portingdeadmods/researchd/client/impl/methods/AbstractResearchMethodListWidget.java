@@ -82,7 +82,15 @@ public abstract class AbstractResearchMethodListWidget<T extends ResearchMethodL
         for (AbstractResearchInfoWidget<? extends ResearchMethod> method : this.methods) {
             method.setY(y + 1);
         }
+    }
 
+    @Override
+    public void setX(int x) {
+        super.setX(x);
+
+        for (AbstractResearchInfoWidget<? extends ResearchMethod> method : this.methods) {
+            method.setX(x + 1 + getSizeFor(this.methods.indexOf(method), false).width + this.methods.indexOf(method) * (int) getPadding());
+        }
     }
 
     public float getPadding() {

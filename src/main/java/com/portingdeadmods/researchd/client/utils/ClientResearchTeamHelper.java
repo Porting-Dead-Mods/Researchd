@@ -158,7 +158,7 @@ public class ClientResearchTeamHelper {
     public static void refreshGraphData() {
         if (Minecraft.getInstance().screen instanceof ResearchScreen screen) {
             ResearchGraph graph = screen.getResearchGraph();
-            graph.nodes().forEach((key, node) -> node.fetchInstanceFromTeam());
+            if (graph != null) graph.nodes().forEach((key, node) -> node.fetchInstanceFromTeam());
         }
 
 	    ResearchGraphCache.getAll().forEach(graph -> graph.nodes().forEach((key, node) -> node.fetchInstanceFromTeam()));
