@@ -11,6 +11,7 @@ import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
+import com.portingdeadmods.researchd.networking.research.ResearchCacheReloadPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchFinishedPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchProgressSyncPayload;
 import com.portingdeadmods.researchd.registries.ResearchdCommands;
@@ -26,6 +27,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
@@ -135,6 +137,14 @@ public final class ResearchdCommonEvents {
     public static void onWorldUnload(LevelEvent.Unload event) {
         // Reset the research cache
         CommonResearchCache.reset();
+    }
+
+    @SubscribeEvent
+    public static void onDimensionChanged(PlayerEvent.PlayerChangedDimensionEvent event) {
+        Level level = event.getEntity().level();
+        if (!level.isClientSide()) {
+            PacketDistributor.sendToPlayer(((ServerPlayer) event.getEntity()), new ResearchCacheReloadPayload());
+        }
     }
 
     @SubscribeEvent

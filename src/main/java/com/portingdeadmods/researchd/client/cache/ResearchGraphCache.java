@@ -29,7 +29,7 @@ public final class ResearchGraphCache {
     }
 
     public static ResearchGraph computeIfAbsent(ResourceKey<Research> key)  {
-        return GRAPH_CACHE.computeIfAbsent(key, k -> ResearchGraph.formRootResearch(key, ClientResearchTeamHelper.getTeam().getResearches()));
+        return GRAPH_CACHE.computeIfAbsent(key, k -> ResearchGraph.fromRootResearch(key, ClientResearchTeamHelper.getTeam().getResearches()));
     }
 
 }

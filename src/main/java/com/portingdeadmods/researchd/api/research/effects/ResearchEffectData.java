@@ -12,6 +12,9 @@ public interface ResearchEffectData<T extends ResearchEffect> {
 
     // Storage methods
     ResearchEffectData<T> add(T effect, Level level);
+
     ResearchEffectData<T> remove(T effect, Level level);
+
     UniqueArray<?> getAll();
+
 }

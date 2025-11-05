@@ -87,7 +87,7 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
         }
     }
 
-    public static ResearchGraph formRootResearch(ResourceKey<Research> root, Map<ResourceKey<Research>, ResearchInstance> researches) {
+    public static ResearchGraph fromRootResearch(ResourceKey<Research> root, Map<ResourceKey<Research>, ResearchInstance> researches) {
         return new ResearchGraph(CommonResearchCache.globalResearches.get(root), researches);
     }
 }

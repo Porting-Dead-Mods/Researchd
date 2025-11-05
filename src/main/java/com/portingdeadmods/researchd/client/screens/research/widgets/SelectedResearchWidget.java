@@ -106,7 +106,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
             guiGraphics.enableScissor(53, startY, 53 + DESCRIPTION_WIDTH, startY + DESCRIPTION_HEIGHT - horizontalScrollerArea);
             {
                 int yPosMethodLabel = startY + LABEL_PADDING_TOP_1;
-                guiGraphics.drawString(font, ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_LABEL_RESEARCH_METHODS), 53 + METHOD_WIDGET_PADDING, offsetY + yPosMethodLabel, -1);
+                guiGraphics.drawString(font, ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_LABEL_RESEARCH_METHODS), 53 + METHOD_WIDGET_PADDING - this.sideScroller.getScrollOffset(), offsetY + yPosMethodLabel, -1);
 
                 this.methodWidget.render(guiGraphics, mouseX, mouseY, v);
 
@@ -114,7 +114,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
                 guiGraphics.fill(53, offsetY + yPosLine, 53 + DESCRIPTION_WIDTH, offsetY + yPosLine + LINE_HEIGHT, -1);
 
                 int yPosEffectsLabel = yPosLine + LINE_HEIGHT + LABEL_PADDING_TOP_2;
-                guiGraphics.drawString(font, ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_LABEL_RESEARCH_EFFECTS), 56, offsetY + yPosEffectsLabel, -1);
+                guiGraphics.drawString(font, ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_LABEL_RESEARCH_EFFECTS), 53 + METHOD_WIDGET_PADDING - this.sideScroller.getScrollOffset(), offsetY + yPosEffectsLabel, -1);
 
                 this.effectWidget.render(guiGraphics, mouseX, mouseY, v);
                 //guiGraphics.fill(53, startY + offsetY, 53 + DESCRIPTION_WIDTH, startY + offsetY + this.getInfoHeight(), FastColor.ARGB32.color(100, 0, 0, 155));
