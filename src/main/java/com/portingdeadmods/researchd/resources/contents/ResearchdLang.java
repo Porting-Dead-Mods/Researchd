@@ -23,6 +23,7 @@ public class ResearchdLang {
         addResearch(ResearchdResearches.BEACON_LOC, "The beam looks funny");
         addResearch(ResearchdResearches.END_CRYSTAL_LOC, "If you look at it, it spins...");
         addResearch(ResearchdResearches.STONE_LOC, "Nah it's just stone");
+        addResearch(ResearchdResearches.DIFFERENT_ROCKS_LOC, "It's... just stone?");
 
         addResearchPackName(ResearchdResearchPacks.END_PACK_LOC, "End Research Pack");
         addResearchPackName(ResearchdResearchPacks.NETHER_PACK_LOC, "Nether Research Pack");

@@ -35,6 +35,7 @@ public class ResearchdResearches implements ResearchdDatagenProvider<Research> {
     public static final ResourceLocation END_CRYSTAL_LOC = Researchd.rl("end_crystal");
     public static final ResourceLocation BEACON_LOC = Researchd.rl("beacon");
     public static final ResourceLocation STONE_LOC = Researchd.rl("stone");
+    public static final ResourceLocation DIFFERENT_ROCKS_LOC = Researchd.rl("different_rocks");
 
     private final String modid;
     private final Map<ResourceKey<Research>, Research> researches;
@@ -53,9 +54,32 @@ public class ResearchdResearches implements ResearchdDatagenProvider<Research> {
                         and(unlockRecipe(mcLoc("stone_pickaxe")), unlockRecipe(mcLoc("furnace")))
                 ));
         ResourceKey<Research> stone = simpleResearch("stone", builder -> builder
-                .icon(Items.COBBLESTONE)
+                .icon(Items.STONE)
                 .method(hasItem(Items.COBBLESTONE, 64))
                 .parents(cobblestone)
+                .effect(
+                        and(
+                                unlockItem(Items.STONE),
+                                unlockItem(Items.STONE_BRICKS),
+                                unlockItem(Items.STONE_BRICK_SLAB),
+                                unlockItem(Items.STONE_BRICK_STAIRS),
+                                unlockItem(Items.SMOOTH_STONE),
+                                unlockItem(Items.STONECUTTER)
+                        )
+                ));
+        ResourceKey<Research> different_rocks = simpleResearch("different_rocks", builder -> builder
+                .icon(Items.DIORITE)
+                .method(
+                    and(
+                        or(
+                                hasItem(Items.DIORITE, 16),
+                                hasItem(Items.ANDESITE, 16),
+                                hasItem(Items.GRANITE, 16)
+                        ),
+                        hasItem(Items.STONE, 64)
+                    )
+                )
+                .parents(stone)
                 .effect(
                         and(
                                 unlockItem(Items.STONE),

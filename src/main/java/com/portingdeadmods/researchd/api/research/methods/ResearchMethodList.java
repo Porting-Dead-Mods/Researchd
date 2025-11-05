@@ -12,6 +12,8 @@ public interface ResearchMethodList extends ResearchMethod {
 
     @Override
     default void checkProgress(Level level, ResourceKey<Research> research, ResearchProgress.Task task, MethodContext context) {
-        throw new IllegalStateException("Cannot check progress on method list");
+        for (ResearchMethod method : methods()) {
+            if (shouldCheckProgress()) method.checkProgress(level, research, task, context);
+        }
     }
 }
