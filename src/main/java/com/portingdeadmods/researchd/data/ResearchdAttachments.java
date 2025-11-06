@@ -1,6 +1,7 @@
 package com.portingdeadmods.researchd.data;
 
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.research.ResearchInteractionType;
 import com.portingdeadmods.researchd.impl.research.effect.data.DimensionUnlockEffectData;
 import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
 import com.portingdeadmods.researchd.impl.research.effect.data.UnlockItemEffectData;
@@ -34,5 +35,13 @@ public final class ResearchdAttachments {
                     .build());
 
     public static final Supplier<AttachmentType<UUID>> PLACED_BY_UUID = ATTACHMENTS.register("placed_by_uuid",
-            () -> AttachmentType.builder(() -> UUID.fromString("00000000-0000-0000-0000-000000000000")).serialize(UUIDUtil.CODEC).build());
+            () -> AttachmentType.builder(() -> UUID.fromString("00000000-0000-0000-0000-000000000000"))
+                    .serialize(UUIDUtil.CODEC)
+                    .build());
+
+    public static final Supplier<AttachmentType<ResearchInteractionType>> RESEARCH_INTERACTION_TYPE = ATTACHMENTS.register("research_interaction_type",
+            () -> AttachmentType.builder(() -> ResearchInteractionType.DEFAULT)
+                    .serialize(ResearchInteractionType.CODEC)
+                    .sync(ResearchInteractionType.STREAM_CODEC)
+                    .build());
 }

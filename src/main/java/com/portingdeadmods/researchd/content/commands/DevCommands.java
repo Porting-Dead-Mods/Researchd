@@ -1,8 +1,11 @@
 package com.portingdeadmods.researchd.content.commands;
 
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
+import com.portingdeadmods.researchd.api.research.ResearchInteractionType;
+import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -37,7 +40,14 @@ public class DevCommands {
                 .then(Commands.literal("dimensions-dump")
                         .then(Commands.literal("current").executes(DevCommands::dumpCurrentDimension))
                         .then(Commands.literal("all").executes(DevCommands::dumpAllDimensions)))
+                .then(Commands.literal("edit-mode")
+                        .then(Commands.argument("enabled", BoolArgumentType.bool()).executes(DevCommands::enableEditMode)))
                 .build();
+    }
+
+    private static int enableEditMode(CommandContext<CommandSourceStack> ctx) {
+        ctx.getSource().getPlayer().setData(ResearchdAttachments.RESEARCH_INTERACTION_TYPE, ctx.getArgument("enabled", boolean.class) ? ResearchInteractionType.EDIT : ResearchInteractionType.DEFAULT);
+        return 1;
     }
 
     private static int dumpCurrentDimension(CommandContext<CommandSourceStack> ctx) {
