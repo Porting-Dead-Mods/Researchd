@@ -5,19 +5,33 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;
 import com.portingdeadmods.researchd.api.client.TechList;
+import com.portingdeadmods.researchd.api.research.ResearchInteractionType;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.EditorPopupWidget;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.widgets.ResearchGraphWidget;
 import com.portingdeadmods.researchd.client.screens.research.widgets.ResearchQueueWidget;
 import com.portingdeadmods.researchd.client.screens.research.widgets.SelectedResearchWidget;
 import com.portingdeadmods.researchd.client.screens.research.widgets.TechListWidget;
+import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.StringRepresentable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class ResearchScreen extends Screen {
     public static final ResourceLocation TOP_RIGHT_EDGE = Researchd.rl("textures/gui/research_screen/edges/top_right.png");
@@ -25,6 +39,9 @@ public class ResearchScreen extends Screen {
     public static final ResourceLocation TOP_BAR = Researchd.rl("textures/gui/research_screen/bars/top.png");
     public static final ResourceLocation BOTTOM_BAR = Researchd.rl("textures/gui/research_screen/bars/bottom.png");
     public static final ResourceLocation RIGHT_BAR = Researchd.rl("textures/gui/research_screen/bars/right.png");
+    public static final ResourceLocation EDIT_BUTTON_CORNER = Researchd.rl("textures/gui/research_screen/edit_button_corner.png");
+
+    public static final WidgetSprites EDITOR_BUTTON_SPRITES = new WidgetSprites(Researchd.rl("editor_button"), Researchd.rl("editor_button_highlighted"));
 
     // Singleton since whole client is a singleton
     public static final Map<ResourceLocation, ClientResearchIcon<?>> CLIENT_ICONS = new HashMap<>();
@@ -34,14 +51,18 @@ public class ResearchScreen extends Screen {
     private ResearchGraphWidget researchGraphWidget;
     private SelectedResearchWidget selectedResearchWidget;
 
+    private final List<AbstractWidget> popupWidgets;
+
+    private boolean editorOpen;
+    private EditorPopupWidget editorPopupWidget;
+
     public ResearchScreen() {
         super(ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_TITLE));
+        this.popupWidgets = new ArrayList<>();
     }
 
     @Override
     protected void init() {
-        super.init();
-
         // TECH LIST
         this.techListWidget = new TechListWidget(this, 0, 109, 7);
         this.techListWidget.setTechList(TechList.getClientTechList());
@@ -62,10 +83,45 @@ public class ResearchScreen extends Screen {
             this.researchGraphWidget.setGraph(ResearchGraphCache.computeIfAbsent(CommonResearchCache.rootResearch.getResearchKey()));
         }
 
+        Minecraft mc = Minecraft.getInstance();
+
+        if (mc.player.getData(ResearchdAttachments.RESEARCH_INTERACTION_TYPE) == ResearchInteractionType.EDIT) {
+            // TODO: Add tooltip
+            this.addRenderableWidget(new ImageButton(this.width - 16 - 8, this.height - 16 - 8, 16, 16, EDITOR_BUTTON_SPRITES, this::openEditor, Component.literal("Editor")));
+        }
+
         this.techListWidget.visitWidgets(this::addRenderableWidget);
         this.researchQueueWidget.visitWidgets(this::addRenderableWidget);
         this.selectedResearchWidget.visitWidgets(this::addRenderableWidget);
         this.researchGraphWidget.visitWidgets(this::addRenderableWidget);
+
+    }
+
+    private void openEditor(Button button) {
+        if (!this.editorOpen) {
+            this.editorPopupWidget = this.openPopupCentered(new EditorPopupWidget());
+        } else {
+            this.closePopup(this.editorPopupWidget);
+        }
+        this.editorOpen = !this.editorOpen;
+    }
+
+    private <W extends PopupWidget> W openPopupCentered(W widget) {
+        int x = (this.width - widget.getWidth()) / 2;
+        int y = (this.height - widget.getHeight()) / 2;
+        widget.setPosition(x, y);
+
+        return this.openPopup(widget);
+    }
+
+    private <W extends PopupWidget> W  openPopup(W widget) {
+        widget.visitWidgets(this.popupWidgets::add);
+        return widget;
+    }
+
+    private <W extends PopupWidget> void closePopup(W widget) {
+        widget.close();
+        widget.visitWidgets(this.popupWidgets::remove);
     }
 
     @Override
@@ -86,11 +142,21 @@ public class ResearchScreen extends Screen {
         guiGraphics.blit(TOP_BAR, w, 0, 0, 0, guiGraphics.guiWidth() - w - 8, 8, 256, 8);
         guiGraphics.blit(BOTTOM_BAR, w, guiGraphics.guiHeight() - 8, 0, 0, guiGraphics.guiWidth() - w - 8, 8, 256, 8);
         guiGraphics.blit(RIGHT_BAR, width - 8, 8, 0, 0, 8, guiGraphics.guiHeight() - 8 - 8, 8, 256);
+
+        Minecraft mc = Minecraft.getInstance();
+
+        if (mc.player.getData(ResearchdAttachments.RESEARCH_INTERACTION_TYPE) == ResearchInteractionType.EDIT) {
+            guiGraphics.blit(EDIT_BUTTON_CORNER, width - 24 - 4, height - 24 - 4, 0, 0, 24, 24, 24, 24);
+        }
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
+
+        for (AbstractWidget widget : this.popupWidgets) {
+            widget.render(guiGraphics, mouseX, mouseY, partialTick);
+        }
 
         int w = 174;
         this.researchGraphWidget.setSize(guiGraphics.guiWidth() - 8 - w, guiGraphics.guiHeight() - 8 * 2);
@@ -111,7 +177,9 @@ public class ResearchScreen extends Screen {
         return researchQueueWidget;
     }
 
-    public TechListWidget getTechListWidget() { return techListWidget; }
+    public TechListWidget getTechListWidget() {
+        return techListWidget;
+    }
 
     public ResearchGraph getResearchGraph() {
         return this.researchGraphWidget.getCurrentGraph();
