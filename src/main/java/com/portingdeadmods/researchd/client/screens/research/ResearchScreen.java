@@ -6,6 +6,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;
 import com.portingdeadmods.researchd.api.client.TechList;
+import com.portingdeadmods.researchd.api.research.EditModeSettings;
 import com.portingdeadmods.researchd.api.research.ResearchInteractionType;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
@@ -14,17 +15,17 @@ import com.portingdeadmods.researchd.client.screens.editor.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.widgets.*;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
+import com.portingdeadmods.researchd.utils.ClientEditorHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ResearchScreen extends Screen {
     public static final ResourceLocation TOP_RIGHT_EDGE = Researchd.rl("textures/gui/research_screen/edges/top_right.png");
@@ -34,7 +35,7 @@ public class ResearchScreen extends Screen {
     public static final ResourceLocation RIGHT_BAR = Researchd.rl("textures/gui/research_screen/bars/right.png");
     public static final ResourceLocation EDIT_BUTTON_CORNER = Researchd.rl("textures/gui/research_screen/edit_button_corner.png");
 
-    public static final WidgetSprites EDITOR_BUTTON_SPRITES = new WidgetSprites(Researchd.rl("editor_button"), Researchd.rl("editor_button_highlighted"));
+    public static final WidgetSprites EDITOR_BUTTON_SPRITES = new WidgetSprites(Researchd.rl("editor_open_button"), Researchd.rl("editor_open_button_highlighted"));
 
     // Singleton since whole client is a singleton
     public static final Map<ResourceLocation, ClientResearchIcon<?>> CLIENT_ICONS = new HashMap<>();
@@ -44,14 +45,15 @@ public class ResearchScreen extends Screen {
     private ResearchGraphWidget researchGraphWidget;
     private SelectedResearchWidget selectedResearchWidget;
 
-    private final List<AbstractWidget> popupWidgets;
+    private final Map<PopupWidget, List<AbstractWidget>> popupWidgets;
+    private PopupWidget focusedPopupWidget;
 
     private boolean editorOpen;
     private SelectPackPopupWidget selectPackPopupWidget;
 
     public ResearchScreen() {
         super(ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_TITLE));
-        this.popupWidgets = new ArrayList<>();
+        this.popupWidgets = new LinkedHashMap<>();
     }
 
     @Override
@@ -96,14 +98,15 @@ public class ResearchScreen extends Screen {
 
     private void openEditor(PDLImageButton button) {
         if (!this.editorOpen) {
-            this.selectPackPopupWidget = this.openPopupCentered(new SelectPackPopupWidget());
+            EditModeSettings settings = ClientEditorHelper.getEditModeSettings();
+            this.selectPackPopupWidget = this.openPopupCentered(new SelectPackPopupWidget(this, settings));
         } else {
             this.closePopup(this.selectPackPopupWidget);
         }
         this.editorOpen = !this.editorOpen;
     }
 
-    private <W extends PopupWidget> W openPopupCentered(W widget) {
+    public <W extends PopupWidget> W openPopupCentered(W widget) {
         int x = (this.width - widget.getWidth()) / 2;
         int y = (this.height - widget.getHeight()) / 2;
         widget.setPosition(x, y);
@@ -111,12 +114,17 @@ public class ResearchScreen extends Screen {
         return this.openPopup(widget);
     }
 
-    private <W extends PopupWidget> W openPopup(W widget) {
-        widget.visitWidgets(this.popupWidgets::add);
+    public <W extends PopupWidget> W openPopup(W widget) {
+        this.popupWidgets.computeIfAbsent(widget, w -> {
+            List<AbstractWidget> widgets = new ArrayList<>();
+            w.visitWidgets(widgets::add);
+            return widgets;
+        });
+        this.setFocused(widget);
         return widget;
     }
 
-    private <W extends PopupWidget> void closePopup(W widget) {
+    public <W extends PopupWidget> void closePopup(W widget) {
         widget.close();
         widget.visitWidgets(this.popupWidgets::remove);
     }
@@ -156,8 +164,20 @@ public class ResearchScreen extends Screen {
         poseStack.pushPose();
         {
             poseStack.translate(0, 0, 300);
-            for (AbstractWidget widget : this.popupWidgets) {
-                widget.render(guiGraphics, mouseX, mouseY, partialTick);
+            for (Map.Entry<PopupWidget, List<AbstractWidget>> entry : this.popupWidgets.entrySet()) {
+                boolean focused = entry.getKey() == this.focusedPopupWidget;
+                if (focused) {
+                    poseStack.pushPose();
+                    poseStack.translate(0, 0, 1);
+                }
+
+                for (AbstractWidget widget : entry.getValue()) {
+                    widget.render(guiGraphics, mouseX, mouseY, partialTick);
+                }
+
+                if (focused) {
+                    poseStack.popPose();
+                }
             }
         }
         poseStack.popPose();
@@ -167,6 +187,64 @@ public class ResearchScreen extends Screen {
         this.researchGraphWidget.renderNodeTooltips(guiGraphics, mouseX, mouseY, partialTick);
 
         this.selectedResearchWidget.renderTooltip(guiGraphics, mouseX, mouseY, partialTick);
+    }
+
+    private Optional<GuiEventListener> getPopupChildAt(double mouseX, double mouseY) {
+        if (this.focusedPopupWidget != null && this.focusedPopupWidget.isHovered()) return Optional.of(this.focusedPopupWidget);
+
+        for (List<AbstractWidget> widgets : this.popupWidgets.values()) {
+            for (AbstractWidget widget : widgets) {
+                if (widget.isMouseOver(mouseX, mouseY)) {
+                    return Optional.of(widget);
+                }
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (this.focusedPopupWidget != null && this.focusedPopupWidget.mouseClicked(mouseX, mouseY, button)) {
+            this.setFocused(this.focusedPopupWidget);
+            if (button == 0) {
+                this.setDragging(true);
+            }
+
+            return true;
+        }
+
+        for (List<AbstractWidget> widgets : this.popupWidgets.values()) {
+            for (AbstractWidget widget : widgets) {
+                if (widget.mouseClicked(mouseX, mouseY, button)) {
+                    this.setFocused(widget);
+                    if (button == 0) {
+                        this.setDragging(true);
+                    }
+
+                    return true;
+                }
+            }
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public void setFocused(@Nullable GuiEventListener listener) {
+        super.setFocused(listener);
+
+        if (listener instanceof PopupWidget popupWidget && this.popupWidgets.containsKey(popupWidget)) {
+            this.focusedPopupWidget = popupWidget;
+        }
+
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (this.getPopupChildAt(mouseX, mouseY).filter(p_293596_ -> p_293596_.mouseScrolled(mouseX, mouseY, scrollX, scrollY)).isPresent()) {
+            return true;
+        }
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
 
     public ResearchGraphWidget getResearchGraphWidget() {
