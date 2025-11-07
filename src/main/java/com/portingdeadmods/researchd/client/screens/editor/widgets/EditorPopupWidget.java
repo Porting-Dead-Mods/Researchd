@@ -7,8 +7,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.StringWidget;
-import net.minecraft.client.gui.layouts.FrameLayout;
-import net.minecraft.client.gui.layouts.LinearLayout;
+import net.minecraft.client.gui.layouts.*;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -30,10 +29,11 @@ public class EditorPopupWidget extends PopupWidget {
 
         Font font = Minecraft.getInstance().font;
 
-        this.layout = LinearLayout.vertical().spacing(4);
-        this.layout.addChild(new StringWidget(Component.literal("Editor"), font));
-        this.layout.addChild(Button.builder(Component.literal("Add Research"), this::onAddResearchPressed).size(128, 16).build());
-        this.layout.addChild(Button.builder(Component.literal("Add Research Pack"), this::onAddResearchPackPressed).size(128, 16).build());
+
+        this.layout = LinearLayout.vertical().spacing(6);
+        this.layout.addChild(new StringWidget(Component.literal("Editor"), font), LayoutSettings::alignHorizontallyCenter);
+        this.layout.addChild(Button.builder(Component.literal("Select Datapack"), this::onAddResearchPressed).size(128, 16).build());
+        this.layout.addChild(Button.builder(Component.literal("Create Datapack"), this::onAddResearchPackPressed).size(128, 16).build());
 
         this.layout.arrangeElements();
         FrameLayout.alignInRectangle(this.layout, x, y, this.width, this.height, 0.5F, 0.25F);
