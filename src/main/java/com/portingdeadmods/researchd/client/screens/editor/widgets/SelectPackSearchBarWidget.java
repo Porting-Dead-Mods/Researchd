@@ -1,9 +1,12 @@
 package com.portingdeadmods.researchd.client.screens.editor.widgets;
 
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.client.screens.research.widgets.BackgroundStringWidget;
 import com.portingdeadmods.researchd.client.screens.research.widgets.PDLImageButton;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.layouts.LinearLayout;
@@ -16,27 +19,28 @@ import java.util.function.Consumer;
 
 public class SelectPackSearchBarWidget extends AbstractWidget {
     public static final ResourceLocation SEARCH_BAR_SPRITE = Researchd.rl("editor_search_bar");
-    public static final WidgetSprites CREATE_PACK_SPRITES = new WidgetSprites(Researchd.rl("editor_create_pack"), Researchd.rl("editor_create_pack"));
-    public static final WidgetSprites SELECT_PACK_SPRITES = new WidgetSprites(Researchd.rl("editor_select_pack"), Researchd.rl("editor_select_pack"));
+    public static final WidgetSprites CREATE_PACK_SPRITES = new WidgetSprites(Researchd.rl("editor_create_pack"), Researchd.rl("editor_create_pack_highlighted"));
+    public static final WidgetSprites SELECT_PACK_SPRITES = new WidgetSprites(Researchd.rl("editor_select_pack"), Researchd.rl("editor_select_pack_highlighted"));
     private final LinearLayout layout;
     private final PDLImageButton selectPackDirectoryButton;
     private final PDLImageButton createPackButton;
 
     public SelectPackSearchBarWidget() {
         super(0, 0, 192, 16, CommonComponents.EMPTY);
-        this.layout = LinearLayout.horizontal();
+        this.layout = LinearLayout.horizontal().spacing(-2);
 
+        this.layout.addChild(new BackgroundStringWidget(128, 16, Component.empty(), Minecraft.getInstance().font, SEARCH_BAR_SPRITE));
         this.selectPackDirectoryButton = this.layout.addChild(PDLImageButton.builder(this::selectPackDirectory)
                 .tooltip(Tooltip.create(Component.literal("Select Pack Directory")))
                 .sprites(SELECT_PACK_SPRITES)
-                .size(14, 14)
+                .size(16, 16)
                 .pos(128, 0)
                 .build());
         this.createPackButton = this.layout.addChild(PDLImageButton.builder(this::createPack)
                 .tooltip(Tooltip.create(Component.literal("Create Pack")))
                 .sprites(CREATE_PACK_SPRITES)
-                .size(14, 14)
-                .pos(128 + 14, 0)
+                .size(16, 16)
+                .pos(128 + 16, 0)
                 .build());
     }
 

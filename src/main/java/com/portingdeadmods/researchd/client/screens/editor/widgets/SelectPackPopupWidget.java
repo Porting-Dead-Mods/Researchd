@@ -1,6 +1,7 @@
 package com.portingdeadmods.researchd.client.screens.editor.widgets;
 
 import com.portingdeadmods.researchd.Researchd;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -29,13 +30,14 @@ public class SelectPackPopupWidget extends PopupWidget {
 
         Font font = Minecraft.getInstance().font;
 
-        this.layout = LinearLayout.vertical().spacing(6);
-        this.layout.addChild(new SpacerElement(0, 0));
+        this.layout = LinearLayout.vertical().spacing(4);
+        this.layout.addChild(new SpacerElement(0, 1));
         this.layout.addChild(new StringWidget(Component.literal("Editor"), font), s -> s.alignHorizontallyCenter().alignVerticallyTop());
-        this.layout.addChild(new StringWidget(Component.literal("Selected Pack: [-]"), font), LayoutSettings::alignHorizontallyCenter);
+        this.layout.addChild(new SpacerElement(0, 32));
+        this.layout.addChild(new StringWidget(Component.literal("Datapack:").withStyle(ChatFormatting.WHITE), font), LayoutSettings::alignHorizontallyCenter);
         this.layout.addChild(new SelectPackSearchBarWidget().getLayout());
-        this.layout.addChild(Button.builder(Component.literal("Select Datapack"), this::onAddResearchPressed).size(128, 16).build());
-        this.layout.addChild(Button.builder(Component.literal("Create Datapack"), this::onAddResearchPackPressed).size(128, 16).build());
+        this.layout.addChild(new StringWidget(Component.literal("Resource Pack:").withStyle(ChatFormatting.WHITE), font), LayoutSettings::alignHorizontallyCenter);
+        this.layout.addChild(new SelectPackSearchBarWidget().getLayout());
         this.layout.addChild(Button.builder(Component.literal("Start Editing"), this::onAddResearchPackPressed).size(128, 16).build(), s -> s.alignHorizontallyCenter().alignVerticallyBottom());
 
         this.layout.arrangeElements();
@@ -69,7 +71,7 @@ public class SelectPackPopupWidget extends PopupWidget {
         super.setY(y);
         this.layout.setY(y);
         //FrameLayout.alignInRectangle(this.layout, x, y, this.width, this.height, 0.5F, 0.25F);
-        FrameLayout.alignInDimension(y, height, this.layout.getHeight(), this.layout::setY, 0.5f);
+        //FrameLayout.alignInDimension(y, height, this.layout.getHeight(), this.layout::setY, 0.5f);
     }
 
     @Override
