@@ -15,28 +15,32 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.function.Consumer;
 
-public class EditorPopupWidget extends PopupWidget {
+public class SelectPackPopupWidget extends PopupWidget {
     public static final ResourceLocation SPRITE = Researchd.rl("widget/editor_popup");
 
     private final LinearLayout layout;
 
-    public EditorPopupWidget() {
+    public SelectPackPopupWidget() {
         this(0, 0);
     }
 
-    public EditorPopupWidget(int x, int y) {
+    public SelectPackPopupWidget(int x, int y) {
         super(x, y, 256, 192, CommonComponents.EMPTY);
 
         Font font = Minecraft.getInstance().font;
 
-
         this.layout = LinearLayout.vertical().spacing(6);
-        this.layout.addChild(new StringWidget(Component.literal("Editor"), font), LayoutSettings::alignHorizontallyCenter);
+        this.layout.addChild(new SpacerElement(0, 0));
+        this.layout.addChild(new StringWidget(Component.literal("Editor"), font), s -> s.alignHorizontallyCenter().alignVerticallyTop());
+        this.layout.addChild(new StringWidget(Component.literal("Selected Pack: [-]"), font), LayoutSettings::alignHorizontallyCenter);
+        this.layout.addChild(new SelectPackSearchBarWidget().getLayout());
         this.layout.addChild(Button.builder(Component.literal("Select Datapack"), this::onAddResearchPressed).size(128, 16).build());
         this.layout.addChild(Button.builder(Component.literal("Create Datapack"), this::onAddResearchPackPressed).size(128, 16).build());
+        this.layout.addChild(Button.builder(Component.literal("Start Editing"), this::onAddResearchPackPressed).size(128, 16).build(), s -> s.alignHorizontallyCenter().alignVerticallyBottom());
 
         this.layout.arrangeElements();
-        FrameLayout.alignInRectangle(this.layout, x, y, this.width, this.height, 0.5F, 0.25F);
+        //FrameLayout.alignInRectangle(this.layout, x, y, this.width, this.height, 0.5F, 0.25F);
+        FrameLayout.alignInDimension(x, width, this.layout.getWidth(), this.layout::setX, 0.5f);
     }
 
     private void onAddResearchPackPressed(Button button) {
@@ -56,14 +60,16 @@ public class EditorPopupWidget extends PopupWidget {
     public void setX(int x) {
         super.setX(x);
         this.layout.setX(x);
-        FrameLayout.alignInRectangle(this.layout, x, this.getY(), this.width, this.height, 0.5F, 0.25F);
+        //FrameLayout.alignInRectangle(this.layout, x, y, this.width, this.height, 0.5F, 0.25F);
+        FrameLayout.alignInDimension(x, width, this.layout.getWidth(), this.layout::setX, 0.5f);
     }
 
     @Override
     public void setY(int y) {
         super.setY(y);
         this.layout.setY(y);
-        FrameLayout.alignInRectangle(this.layout, this.getX(), y, this.width, this.height, 0.5F, 0.25F);
+        //FrameLayout.alignInRectangle(this.layout, x, y, this.width, this.height, 0.5F, 0.25F);
+        FrameLayout.alignInDimension(y, height, this.layout.getHeight(), this.layout::setY, 0.5f);
     }
 
     @Override

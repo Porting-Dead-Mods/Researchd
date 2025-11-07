@@ -1,5 +1,6 @@
 package com.portingdeadmods.researchd.client.screens.research;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
@@ -8,30 +9,22 @@ import com.portingdeadmods.researchd.api.client.TechList;
 import com.portingdeadmods.researchd.api.research.ResearchInteractionType;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
-import com.portingdeadmods.researchd.client.screens.editor.widgets.EditorPopupWidget;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.SelectPackPopupWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.PopupWidget;
-import com.portingdeadmods.researchd.client.screens.research.widgets.ResearchGraphWidget;
-import com.portingdeadmods.researchd.client.screens.research.widgets.ResearchQueueWidget;
-import com.portingdeadmods.researchd.client.screens.research.widgets.SelectedResearchWidget;
-import com.portingdeadmods.researchd.client.screens.research.widgets.TechListWidget;
+import com.portingdeadmods.researchd.client.screens.research.widgets.*;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.ImageButton;
-import net.minecraft.client.gui.components.WidgetSprites;
+import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.StringRepresentable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 public class ResearchScreen extends Screen {
     public static final ResourceLocation TOP_RIGHT_EDGE = Researchd.rl("textures/gui/research_screen/edges/top_right.png");
@@ -54,7 +47,7 @@ public class ResearchScreen extends Screen {
     private final List<AbstractWidget> popupWidgets;
 
     private boolean editorOpen;
-    private EditorPopupWidget editorPopupWidget;
+    private SelectPackPopupWidget selectPackPopupWidget;
 
     public ResearchScreen() {
         super(ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_TITLE));
@@ -86,8 +79,12 @@ public class ResearchScreen extends Screen {
         Minecraft mc = Minecraft.getInstance();
 
         if (mc.player.getData(ResearchdAttachments.RESEARCH_INTERACTION_TYPE) == ResearchInteractionType.EDIT) {
-            // TODO: Add tooltip
-            this.addRenderableWidget(new ImageButton(this.width - 16 - 8, this.height - 16 - 8, 16, 16, EDITOR_BUTTON_SPRITES, this::openEditor, Component.literal("Editor")));
+            this.addRenderableWidget(PDLImageButton.builder(this::openEditor)
+                    .pos(this.width - 16 - 8, this.height - 16 - 8)
+                    .size(16, 16)
+                    .sprites(EDITOR_BUTTON_SPRITES)
+                    .tooltip(Tooltip.create(Component.literal("Editor")))
+                    .build());
         }
 
         this.techListWidget.visitWidgets(this::addRenderableWidget);
@@ -97,11 +94,11 @@ public class ResearchScreen extends Screen {
 
     }
 
-    private void openEditor(Button button) {
+    private void openEditor(PDLImageButton button) {
         if (!this.editorOpen) {
-            this.editorPopupWidget = this.openPopupCentered(new EditorPopupWidget());
+            this.selectPackPopupWidget = this.openPopupCentered(new SelectPackPopupWidget());
         } else {
-            this.closePopup(this.editorPopupWidget);
+            this.closePopup(this.selectPackPopupWidget);
         }
         this.editorOpen = !this.editorOpen;
     }
@@ -114,7 +111,7 @@ public class ResearchScreen extends Screen {
         return this.openPopup(widget);
     }
 
-    private <W extends PopupWidget> W  openPopup(W widget) {
+    private <W extends PopupWidget> W openPopup(W widget) {
         widget.visitWidgets(this.popupWidgets::add);
         return widget;
     }
@@ -154,9 +151,16 @@ public class ResearchScreen extends Screen {
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
 
-        for (AbstractWidget widget : this.popupWidgets) {
-            widget.render(guiGraphics, mouseX, mouseY, partialTick);
+        PoseStack poseStack = guiGraphics.pose();
+
+        poseStack.pushPose();
+        {
+            poseStack.translate(0, 0, 300);
+            for (AbstractWidget widget : this.popupWidgets) {
+                widget.render(guiGraphics, mouseX, mouseY, partialTick);
+            }
         }
+        poseStack.popPose();
 
         int w = 174;
         this.researchGraphWidget.setSize(guiGraphics.guiWidth() - 8 - w, guiGraphics.guiHeight() - 8 * 2);
@@ -181,12 +185,12 @@ public class ResearchScreen extends Screen {
         return techListWidget;
     }
 
-    public ResearchGraph getResearchGraph() {
-        return this.researchGraphWidget.getCurrentGraph();
-    }
-
     public TechList getTechList() {
         return this.techListWidget.getTechList();
+    }
+
+    public ResearchGraph getResearchGraph() {
+        return this.researchGraphWidget.getCurrentGraph();
     }
 
     @Override

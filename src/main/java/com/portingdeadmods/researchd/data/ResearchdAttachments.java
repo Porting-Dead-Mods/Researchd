@@ -1,7 +1,9 @@
 package com.portingdeadmods.researchd.data;
 
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.research.EditModeSettings;
 import com.portingdeadmods.researchd.api.research.ResearchInteractionType;
+import com.portingdeadmods.researchd.impl.editor.EditModeSettingsImpl;
 import com.portingdeadmods.researchd.impl.research.effect.data.DimensionUnlockEffectData;
 import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
 import com.portingdeadmods.researchd.impl.research.effect.data.UnlockItemEffectData;
@@ -43,5 +45,11 @@ public final class ResearchdAttachments {
             () -> AttachmentType.builder(() -> ResearchInteractionType.DEFAULT)
                     .serialize(ResearchInteractionType.CODEC)
                     .sync(ResearchInteractionType.STREAM_CODEC)
+                    .build());
+
+    public static final Supplier<AttachmentType<EditModeSettingsImpl>> EDIT_MODE_SETTINGS = ATTACHMENTS.register("edit_mode_settings",
+            () -> AttachmentType.builder(() -> EditModeSettingsImpl.EMPTY)
+                    .serialize(EditModeSettingsImpl.CODEC)
+                    .sync(EditModeSettingsImpl.STREAM_CODEC)
                     .build());
 }
