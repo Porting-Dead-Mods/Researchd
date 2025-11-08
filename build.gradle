@@ -121,6 +121,9 @@ dependencies {
     //runtimeOnly "curse.maven:ender-io-64578:7134432"
 }
 
+def parts = pdl_version.tokenize('.')
+def pdl_nextMinor = "${parts[0]}.${(parts[1].toInteger() + 1)}.0"
+
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
     var replaceProperties = [
             minecraft_version      : minecraft_version,
@@ -134,7 +137,8 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             mod_version            : mod_version,
             mod_authors            : mod_authors,
             mod_description        : mod_description,
-            pdl_version            : pdl_version
+            pdl_version            : pdl_version,
+            pdl_nextMinor          : pdl_nextMinor
     ]
     inputs.properties replaceProperties
     expand replaceProperties
