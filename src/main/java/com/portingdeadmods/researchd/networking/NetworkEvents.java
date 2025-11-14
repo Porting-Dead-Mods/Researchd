@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.networking;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.networking.cache.ClearGraphCachePayload;
 import com.portingdeadmods.researchd.networking.client.RefreshResearchScreenData;
+import com.portingdeadmods.researchd.networking.edit.CreateDatapackPayload;
 import com.portingdeadmods.researchd.networking.registries.UpdateResearchPacksPayload;
 import com.portingdeadmods.researchd.networking.registries.UpdateResearchesPayload;
 import com.portingdeadmods.researchd.networking.research.*;
@@ -59,6 +60,12 @@ public class NetworkEvents {
                 RequestToJoinPayload.TYPE,
                 RequestToJoinPayload.STREAM_CODEC,
                 RequestToJoinPayload::handle
+        );
+
+        registrar.playToServer(
+                CreateDatapackPayload.TYPE,
+                CreateDatapackPayload.STREAM_CODEC,
+                CreateDatapackPayload::handle
         );
 
         registrar.playToServer(

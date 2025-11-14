@@ -44,7 +44,7 @@ public class ExampleCommands {
         CommandSourceStack source = ctx.getSource();
         String name = getArgOrDefault(ctx, "pack-name", String.class, "researchd_examples_pack");
         String description = getArgOrDefault(ctx, "pack-desc", String.class, "Auto-created researchd example pack");
-        Result<Path, Exception> result = ExampleDatapack.createExample(ctx.getSource().getServer().getWorldPath(LevelResource.DATAPACK_DIR), name, description);
+        Result<Path, Exception> result = ExampleDatapack.createExample(ctx.getSource().getServer().getWorldPath(LevelResource.DATAPACK_DIR), name, description, "rd_examples", true);
         if (result instanceof Result.Ok(Path value)) {
             String filePath = value.toString();
             String gameDirPath = FMLPaths.GAMEDIR.get().toString();

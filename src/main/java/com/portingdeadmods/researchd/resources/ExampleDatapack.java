@@ -28,7 +28,7 @@ import java.util.Map;
  * Helpers to create the example datapack that can be created using a command
  */
 public class ExampleDatapack {
-    public static Result<Path, Exception> createExample(Path datapacksDir, String packName, String packDescription) {
+    public static Result<Path, Exception> createExample(Path datapacksDir, String packName, String packDescription, String namespace, boolean generateExamples) {
         Path exampleDataPackDir = datapacksDir.resolve(packName);
         try {
             if (Files.notExists(exampleDataPackDir)) {
@@ -36,20 +36,25 @@ public class ExampleDatapack {
                 Path packFile = exampleDataPackDir.resolve("pack.mcmeta");
                 Files.writeString(packFile, getPackFile(packDescription));
 
-                Path packContentRootDir = exampleDataPackDir.resolve("data").resolve("rd_examples");
+                Path dataDir = exampleDataPackDir.resolve("data");
+                Files.createDirectory(dataDir);
 
-                Path packResearchdRegistriesDir = packContentRootDir.resolve("researchd");
-                Files.createDirectories(packResearchdRegistriesDir);
+                if (generateExamples) {
+                    Path packContentRootDir = dataDir.resolve(namespace);
 
-                Path packResearchesDir = packResearchdRegistriesDir.resolve("research");
-                Files.createDirectory(packResearchesDir);
+                    Path packResearchdRegistriesDir = packContentRootDir.resolve("researchd");
+                    Files.createDirectories(packResearchdRegistriesDir);
 
-                createResearches(packResearchesDir);
+                    Path packResearchesDir = packResearchdRegistriesDir.resolve("research");
+                    Files.createDirectory(packResearchesDir);
 
-                Path packResearchPacksDir = packResearchdRegistriesDir.resolve("research_pack");
-                Files.createDirectory(packResearchPacksDir);
+                    createResearches(packResearchesDir);
 
-                createResearchPacks(packResearchPacksDir);
+                    Path packResearchPacksDir = packResearchdRegistriesDir.resolve("research_pack");
+                    Files.createDirectory(packResearchPacksDir);
+
+                    createResearchPacks(packResearchPacksDir);
+                }
                 return Result.ok(exampleDataPackDir);
             }
             return Result.err("Example Datapack already exists");

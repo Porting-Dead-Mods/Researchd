@@ -71,7 +71,10 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
         this.sideScroller = new AbstractScroller(this.researchScreen, HORIZONTAL_SCROLLER_X, HORIZONTAL_SCROLLER_Y, HORIZONTAL_SCROLLER_WIDTH, HORIZONTAL_SCROLLER_HEIGHT, HORIZONTAL_SCROLLER_TRACK_LENGTH, AbstractScroller.Mode.HORIZONTAL, Researchd.rl("scroller_small_horizontal")) {
             @Override
             public int getContentLength() {
-                return METHOD_WIDGET_PADDING * 2 + Math.max(methodWidget.getWidth(), effectWidget.getWidth());
+                if (methodWidget != null && effectWidget != null) {
+                    return METHOD_WIDGET_PADDING * 2 + Math.max(methodWidget.getWidth(), effectWidget.getWidth());
+                }
+                return 0;
             }
 
             @Override

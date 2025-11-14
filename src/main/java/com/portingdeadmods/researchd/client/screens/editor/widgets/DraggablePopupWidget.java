@@ -1,10 +1,12 @@
 package com.portingdeadmods.researchd.client.screens.editor.widgets;
 
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.layouts.Layout;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.Nullable;
 
-public class DraggablePopupWidget extends PopupWidget {
+public abstract class DraggablePopupWidget extends PopupWidget {
     private boolean isHovered;
     private boolean updateIsHovered = true;
 
@@ -14,6 +16,26 @@ public class DraggablePopupWidget extends PopupWidget {
 
     protected void onMoved() {
     }
+
+    @Override
+    public void setX(int x) {
+        super.setX(x);
+
+        if (this.getLayout() != null) {
+            this.getLayout().setX(x);
+        }
+    }
+
+    @Override
+    public void setY(int y) {
+        super.setY(y);
+
+        if (this.getLayout() != null) {
+            this.getLayout().setY(y);
+        }
+    }
+
+    protected abstract @Nullable Layout getLayout();
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {

@@ -28,7 +28,7 @@ public final class ResearchdTab {
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN = TABS.register("main", () -> CreativeModeTab.builder()
             .icon(ResearchdItems.RESEARCH_LAB::toStack)
-            .title(Component.literal(Researchd.MODID))
+            .title(Component.literal(Researchd.MODNAME))
             .displayItems((params, output) -> {
                 output.accept(ResearchdItems.RESEARCH_LAB.toStack());
                 Optional<HolderLookup.RegistryLookup<ResearchPack>> lookup = params.holders().lookup(ResearchdRegistries.RESEARCH_PACK_KEY);

@@ -45,7 +45,7 @@ public class ResearchScreen extends Screen {
     private ResearchGraphWidget researchGraphWidget;
     private SelectedResearchWidget selectedResearchWidget;
 
-    private final Map<PopupWidget, List<AbstractWidget>> popupWidgets;
+    private final LinkedHashMap<PopupWidget, List<AbstractWidget>> popupWidgets;
     private PopupWidget focusedPopupWidget;
 
     private boolean editorOpen;
@@ -115,18 +115,18 @@ public class ResearchScreen extends Screen {
     }
 
     public <W extends PopupWidget> W openPopup(W widget) {
-        this.popupWidgets.computeIfAbsent(widget, w -> {
+        if (!this.popupWidgets.containsKey(widget)) {
             List<AbstractWidget> widgets = new ArrayList<>();
-            w.visitWidgets(widgets::add);
-            return widgets;
-        });
+            widget.visitWidgets(widgets::add);
+            this.popupWidgets.putLast(widget, widgets);
+        }
         this.setFocused(widget);
         return widget;
     }
 
     public <W extends PopupWidget> void closePopup(W widget) {
         widget.close();
-        widget.visitWidgets(this.popupWidgets::remove);
+        this.popupWidgets.remove(widget);
     }
 
     @Override
@@ -164,20 +164,13 @@ public class ResearchScreen extends Screen {
         poseStack.pushPose();
         {
             poseStack.translate(0, 0, 300);
-            for (Map.Entry<PopupWidget, List<AbstractWidget>> entry : this.popupWidgets.entrySet()) {
-                boolean focused = entry.getKey() == this.focusedPopupWidget;
-                if (focused) {
-                    poseStack.pushPose();
-                    poseStack.translate(0, 0, 1);
-                }
+            for (Map.Entry<PopupWidget, List<AbstractWidget>> entry : this.popupWidgets.sequencedEntrySet()) {
+                poseStack.translate(0, 0, 100);
 
                 for (AbstractWidget widget : entry.getValue()) {
                     widget.render(guiGraphics, mouseX, mouseY, partialTick);
                 }
 
-                if (focused) {
-                    poseStack.popPose();
-                }
             }
         }
         poseStack.popPose();
@@ -205,22 +198,22 @@ public class ResearchScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (this.focusedPopupWidget != null && this.focusedPopupWidget.mouseClicked(mouseX, mouseY, button)) {
-            this.setFocused(this.focusedPopupWidget);
-            if (button == 0) {
-                this.setDragging(true);
-            }
+//        if (this.focusedPopupWidget != null && this.focusedPopupWidget.mouseClicked(mouseX, mouseY, button)) {
+//            this.setFocused(this.focusedPopupWidget);
+//            if (button == 0) {
+//                this.setDragging(true);
+//            }
+//
+//            return true;
+//        }
 
-            return true;
-        }
-
-        for (List<AbstractWidget> widgets : this.popupWidgets.values()) {
+        for (List<AbstractWidget> widgets : this.popupWidgets.sequencedValues().reversed()) {
             for (AbstractWidget widget : widgets) {
                 if (widget.mouseClicked(mouseX, mouseY, button)) {
-                    this.setFocused(widget);
-                    if (button == 0) {
-                        this.setDragging(true);
-                    }
+//                    this.setFocused(widget);
+//                    if (button == 0) {
+//                        this.setDragging(true);
+//                    }
 
                     return true;
                 }
@@ -235,6 +228,7 @@ public class ResearchScreen extends Screen {
 
         if (listener instanceof PopupWidget popupWidget && this.popupWidgets.containsKey(popupWidget)) {
             this.focusedPopupWidget = popupWidget;
+            this.popupWidgets.putLast(popupWidget, this.popupWidgets.get(popupWidget));
         }
 
     }
