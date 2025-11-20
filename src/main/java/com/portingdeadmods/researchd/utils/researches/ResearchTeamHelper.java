@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.utils.researches;
 
 import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
 import com.portingdeadmods.portingdeadlibs.utils.PlayerUtils;
+import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.GlobalResearch;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
@@ -42,7 +43,7 @@ public final class ResearchTeamHelper {
      * @param player The player whose team you want to get
      * @return The team the player is a member of
      */
-    public static @NotNull ResearchTeam getTeamByMember(Player player) {
+    public static @NotNull ResearchTeam getTeamByMember(@NotNull Player player) {
         UUID uuid = player.getUUID();
         return getTeamByMember(player.level(), uuid);
     }
@@ -84,7 +85,7 @@ public final class ResearchTeamHelper {
      * @param player The player whose permission level you want to get
      * @return integer value permission level ( {@link ResearchTeamRole#getPermissionLevel()} )
      */
-    public static int getPermissionLevel(Player player) {
+    public static int getPermissionLevel(@NotNull Player player) {
         SimpleResearchTeam team = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeamByMember(player.getUUID());
 		if (team == null) return -1;
 
@@ -98,20 +99,20 @@ public final class ResearchTeamHelper {
 		return team.getMember(player).role().getPermissionLevel();
 	}
 
-    public static boolean arePlayersSameTeam(Player player1, Player player2) {
+    public static boolean arePlayersSameTeam(@NotNull Player player1, @NotNull Player player2) {
         UUID uuid1 = player1.getUUID();
         UUID uuid2 = player2.getUUID();
 
         return arePlayersSameTeam(player1.level(), uuid1, uuid2);
     }
 
-    public static boolean arePlayersSameTeam(Player player1, UUID uuid2) {
+    public static boolean arePlayersSameTeam(@NotNull Player player1, UUID uuid2) {
         UUID uuid1 = player1.getUUID();
 
         return arePlayersSameTeam(player1.level(), uuid1, uuid2);
     }
 
-    public static boolean arePlayersSameTeam(Level level, UUID uuid1, UUID uuid2) {
+    public static boolean arePlayersSameTeam(@NotNull Level level, UUID uuid1, UUID uuid2) {
         ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
 
         ResearchTeam team1 = savedData.getTeamByMemberOrThrow(uuid1);
@@ -120,7 +121,7 @@ public final class ResearchTeamHelper {
         return team1.getId().equals(team2.getId());
     }
 
-    public static void handleEnterTeam(ServerPlayer requester, UUID memberOfTeam) {
+    public static void handleEnterTeam(@NotNull ServerPlayer requester, UUID memberOfTeam) {
         Level level = requester.level();
         UUID requesterId = requester.getUUID();
 
@@ -129,16 +130,18 @@ public final class ResearchTeamHelper {
 
 		// Already in Team (with multiple people) -> Return with error msg
         if (getTeamByMember(requester).getMembersAmount() > 1) {
-            requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.ALREADY_IN_TEAM));
+            if (!Researchd.isFTBTeamsEnabled())
+                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.ALREADY_IN_TEAM));
             return;
         }
 
-	    // Alone in team -> Enter the new team
-        if (team != null && (team.getSocialManager().containsSentInvite(requesterId))) {
+	    // Alone in team -> Enter the new team | TODO: Add Invite Syncs from FTB Teams for the sake of compat. Currently it should work without
+        if (team != null && ((team.getSocialManager().containsSentInvite(requesterId)) || Researchd.isFTBTeamsEnabled())) {
             ResearchTeamHelper.handleLeaveTeam(requester);
 
             savedData.researchTeams().put(requesterId, team);
-            requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.YOU_JOINED_TEAM, team.getName()));
+            if (!Researchd.isFTBTeamsEnabled())
+                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.YOU_JOINED_TEAM, team.getName()));
 
             for (TeamMember member : team.getMembers()) {
                 Player memberPlayer = level.getPlayerByUUID(member.player());
@@ -158,7 +161,7 @@ public final class ResearchTeamHelper {
     }
 
 
-    public static void handleIgnoreTeam(ServerPlayer requester, UUID memberOfTeam) {
+    public static void handleIgnoreTeam(@NotNull ServerPlayer requester, UUID memberOfTeam) {
         Level level = requester.level();
 
         ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
@@ -166,11 +169,12 @@ public final class ResearchTeamHelper {
 
         if (team != null) {
             team.getSocialManager().addIgnore(requester.getUUID());
-            requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.IGNORE, team.getName()));
+            if (!Researchd.isFTBTeamsEnabled())
+                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.IGNORE, team.getName()));
         }
     }
 
-    public static void handleLeaveTeam(ServerPlayer requester, @Nullable UUID nextToLead) {
+    public static void handleLeaveTeam(@NotNull ServerPlayer requester, @Nullable UUID nextToLead) {
         MinecraftServer server = requester.getServer();
         ServerLevel level = server.overworld();
         UUID requesterId = requester.getUUID();
@@ -185,7 +189,8 @@ public final class ResearchTeamHelper {
 			// Alone In Team -> Leaving creates default team for player
             if (team.getMembersAmount() <= 1) {
                 savedData.researchTeams().remove(requesterId);
-                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.LEFT_TEAM));
+                if (!Researchd.isFTBTeamsEnabled())
+                    requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.LEFT_TEAM));
 
                 savedData.researchTeams().put(requesterId, SimpleResearchTeam.createDefaultTeam(requester));
             }
@@ -195,7 +200,8 @@ public final class ResearchTeamHelper {
 
 				// Team Leader Not Specified
                 if (nextToLead == null || nextToLead.equals(PlayerUtils.EmptyUUID)) {
-                    requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NO_NEXT_LEADER));
+                    if (!Researchd.isFTBTeamsEnabled())
+                        requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NO_NEXT_LEADER));
                     return;
                 }
 
@@ -211,7 +217,8 @@ public final class ResearchTeamHelper {
 	    // Is not Owner -> Just remove member out of the team and create a default one.
 		else {
             removeMember(requester);
-            requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.LEFT_TEAM));
+            if (!Researchd.isFTBTeamsEnabled())
+                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.LEFT_TEAM));
             savedData.researchTeams().put(requesterId, SimpleResearchTeam.createDefaultTeam(requester));
             PacketDistributor.sendToPlayer(requester, ClearGraphCachePayload.INSTANCE);
             ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
@@ -224,18 +231,19 @@ public final class ResearchTeamHelper {
 	 *
 	 * @param requester
 	 */
-	public static void handleLeaveTeam(ServerPlayer requester) {
+	public static void handleLeaveTeam(@NotNull ServerPlayer requester) {
 		ResearchTeamHelper.handleLeaveTeam(requester, PlayerUtils.EmptyUUID);
 	}
 
-    public static void handleManageMember(ServerPlayer requester, UUID member, boolean remove) {
+    public static void handleManageMember(@NotNull ServerPlayer requester, UUID member, boolean remove) {
         MinecraftServer server = requester.getServer();
         ServerLevel level = server.overworld();
         ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
 
 		// Error safety (handling yourself)
         if (requester.getUUID().equals(member)) {
-            requester.sendSystemMessage(getIllegalMessage());
+            if (!Researchd.isFTBTeamsEnabled())
+                requester.sendSystemMessage(getIllegalMessage());
             return;
         }
 
@@ -248,7 +256,8 @@ public final class ResearchTeamHelper {
 			// Remove member and put them into a default team with a status message
             if (remove) {
                 getTeamByMember(requester).removeMember(member);
-                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.REMOVED, PlayerUtils.getPlayerNameFromUUID(level, member)));
+                if (!Researchd.isFTBTeamsEnabled())
+                    requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.REMOVED, PlayerUtils.getPlayerNameFromUUID(level, member)));
 
 				ServerPlayer kickedPlayer = server.getPlayerList().getPlayer(member);
                 if (kickedPlayer != null) {
@@ -268,19 +277,21 @@ public final class ResearchTeamHelper {
             ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
             refreshPlayerManagement(getTeamByMember(requester), level);
         } else {
-            requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NO_PERMS));
+            if (!Researchd.isFTBTeamsEnabled())
+                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NO_PERMS));
         }
         ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
     }
 
-    public static void handleManageModerator(ServerPlayer requester, UUID moderator, boolean remove) {
+    public static void handleManageModerator(@NotNull ServerPlayer requester, UUID moderator, boolean remove) {
         MinecraftServer server = requester.getServer();
         ServerLevel level = server.overworld();
         ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
 
 		// Error Safety (handling yourself)
         if (requester.getUUID().equals(moderator)) {
-            requester.sendSystemMessage(getIllegalMessage());
+            if (!Researchd.isFTBTeamsEnabled())
+                requester.sendSystemMessage(getIllegalMessage());
             return;
         }
 
@@ -291,24 +302,28 @@ public final class ResearchTeamHelper {
 
                 if (remove) {
                     team.setRole(moderator, ResearchTeamRole.MEMBER);
-                    requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.DEMOTED, PlayerUtils.getPlayerNameFromUUID(level, moderator)));
+                    if (!Researchd.isFTBTeamsEnabled())
+                        requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.DEMOTED, PlayerUtils.getPlayerNameFromUUID(level, moderator)));
                 } else {
                     team.setRole(moderator, ResearchTeamRole.MODERATOR);
-                    requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.PROMOTED, PlayerUtils.getPlayerNameFromUUID(level, moderator)));
+                    if (!Researchd.isFTBTeamsEnabled())
+                        requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.PROMOTED, PlayerUtils.getPlayerNameFromUUID(level, moderator)));
                 }
 
                 ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
                 ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
                 refreshPlayerManagement(getTeamByMember(requester), level);
             } else {
-                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.BAD_INPUT));
+                if (!Researchd.isFTBTeamsEnabled())
+                    requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.BAD_INPUT));
             }
         } else {
-            requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NO_PERMS));
+            if (!Researchd.isFTBTeamsEnabled())
+                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NO_PERMS));
         }
     }
 
-    public static void handleSetName(ServerPlayer requester, String name) {
+    public static void handleSetName(@NotNull ServerPlayer requester, String name) {
         UUID requesterId = requester.getUUID();
         MinecraftServer server = requester.getServer();
         ServerLevel level = server.overworld();
@@ -317,22 +332,25 @@ public final class ResearchTeamHelper {
 	    // Permission Check (is Owner)
         if (getPermissionLevel(requester) == 2) {
 			if (name.isEmpty()) {
-				requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NAME_CANNOT_BE_EMPTY));
+				if (!Researchd.isFTBTeamsEnabled())
+                    requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NAME_CANNOT_BE_EMPTY));
 				return;
 			}
 
             String oldname = getTeamByMember(requester).getName();
             getTeamByMember(requester).setName(name);
-            requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NEW_TEAM_NAME, oldname, name));
+            if (!Researchd.isFTBTeamsEnabled())
+                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NEW_TEAM_NAME, oldname, name));
             ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
             ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
             refreshPlayerManagement(getTeamByMember(requester), level);
         } else {
-            requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NO_PERMS));
+            if (!Researchd.isFTBTeamsEnabled())
+                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NO_PERMS));
         }
     }
 
-    public static void handleTransferOwnership(ServerPlayer requester, UUID nextToLead) {
+    public static void handleTransferOwnership(@NotNull ServerPlayer requester, UUID nextToLead) {
         MinecraftServer server = requester.getServer();
         ServerLevel level = server.overworld();
         UUID requesterId = requester.getUUID();
@@ -351,15 +369,17 @@ public final class ResearchTeamHelper {
 
                 ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
                 ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
-                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.TRANSFERRED_OWNERSHIP, PlayerUtils.getPlayerNameFromUUID(level, nextToLead)));
+                if (!Researchd.isFTBTeamsEnabled())
+                    requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.TRANSFERRED_OWNERSHIP, PlayerUtils.getPlayerNameFromUUID(level, nextToLead)));
                 refreshPlayerManagement(team, level);
             } else {
-                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.BAD_INPUT));
+                if (!Researchd.isFTBTeamsEnabled())
+                    requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.BAD_INPUT));
             }
         }
     }
 
-    public static void handleListMembers(ServerPlayer requester) {
+    public static void handleListMembers(@NotNull ServerPlayer requester) {
         ResearchTeam team = getTeamByMember(requester);
         requester.sendSystemMessage(formatMembers(team, requester.level()));
     }
@@ -377,7 +397,7 @@ public final class ResearchTeamHelper {
         return formattedTeam;
     }
 
-    public static void handleSendInviteToPlayer(ServerPlayer requester, UUID invited, boolean remove) {
+    public static void handleSendInviteToPlayer(@NotNull ServerPlayer requester, UUID invited, boolean remove) {
         ResearchTeam team = getTeamByMember(requester);
 
 		// Error Safety (inviting yourself)
@@ -388,7 +408,8 @@ public final class ResearchTeamHelper {
 
         if (remove) {
             team.getSocialManager().removeSentInvite(invited);
-            requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.REMOVED_INVITE, AllPlayersCache.getName(invited)));
+            if (!Researchd.isFTBTeamsEnabled())
+                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.REMOVED_INVITE, AllPlayersCache.getName(invited)));
         } else {
             team.getSocialManager().addSentInvite(invited);
             ServerPlayer invitedPlayer = (ServerPlayer) requester.serverLevel().getPlayerByUUID(invited);
@@ -408,7 +429,8 @@ public final class ResearchTeamHelper {
                                 )))
                 );
             }
-            requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.SENT_INVITE, AllPlayersCache.getName(invited), team.getName()));
+            if (!Researchd.isFTBTeamsEnabled())
+                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.SENT_INVITE, AllPlayersCache.getName(invited), team.getName()));
         }
         Level level = requester.level();
 

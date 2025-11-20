@@ -12,11 +12,13 @@ public final class ResearchdConfig {
 
         @ConfigValue(name = "Console Debug", comment = "Whether to enable console debug messages for Researchd", category = "debug")
         public static boolean consoleDebug = false;
+
+        @ConfigValue(name = "Use FTB Teams if present", comment = "Whether to use FTB Teams' API for team logic instead of Researchd's own.\nThis disables the team screen and team command", key="use_ftb_teams")
+        public static boolean useFTBTeams = false;
     }
 
     public static class Client {
         @ConfigValue(name = "Show Join Message", comment = "Whether to show the join message on world load")
         public static boolean showJoinMessage = true;
     }
-
 }
