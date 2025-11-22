@@ -72,7 +72,6 @@ public class ResearchGraphWidget extends AbstractWidget {
                 node.refreshHeads();
             }
 
-
             // Center the graph to the center of the widget
             int baseX = this.graph.rootNode().getX();
             int baseY = this.graph.rootNode().getY();

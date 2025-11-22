@@ -9,16 +9,28 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public abstract class PopupWidget extends AbstractWidget {
     private final Map<LayoutElement, DropDownWidget<?>> dropDownWidgets;
+    private Consumer<PopupWidget> additionalOnCloseAction = w -> {};
 
     public PopupWidget(int x, int y, int width, int height, Component message) {
         super(x, y, width, height, message);
         this.dropDownWidgets = new HashMap<>();
     }
 
-    public void close() {
+    public <W extends PopupWidget> void setOnCloseAction(Consumer<W> onClose) {
+        this.additionalOnCloseAction = (Consumer<PopupWidget>) onClose;
+    }
+
+    public final void close() {
+        this.onClose();
+        this.additionalOnCloseAction.accept(this);
+    }
+
+    protected void onClose() {
+
     }
 
     public static @NotNull Font getFont() {

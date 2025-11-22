@@ -1,18 +1,25 @@
 package com.portingdeadmods.researchd.client.screens.editor.widgets;
 
+import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.widgets.PDLButton;
 import com.portingdeadmods.researchd.networking.edit.CreateDatapackPayload;
+import com.portingdeadmods.researchd.networking.edit.SetResourcePackPayload;
+import com.portingdeadmods.researchd.utils.ClientEditorHelper;
+import com.portingdeadmods.researchd.utils.PrettyPath;
+import com.portingdeadmods.researchd.utils.ResearchdUtils;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.layouts.LayoutSettings;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.file.Path;
 import java.util.function.Consumer;
 
 public class CreatePackPopupWidget extends DraggablePopupWidget {
@@ -20,15 +27,17 @@ public class CreatePackPopupWidget extends DraggablePopupWidget {
 
     private final WidgetHeaderAndFooterLayout layout;
     private final ResearchScreen screen;
+    private final PackType packType;
 
     private EditBox nameEditBox;
     private MultiLineEditBox descEditBox;
     private Checkbox checkbox;
     private PDLButton createPackButton;
 
-    public CreatePackPopupWidget(ResearchScreen screen) {
+    public CreatePackPopupWidget(ResearchScreen screen, PackType packType) {
         super(0, 0, 160, 176, CommonComponents.EMPTY);
         this.screen = screen;
+        this.packType = packType;
         this.layout = new WidgetHeaderAndFooterLayout(this.width, 15, 139, 19);
 
         this.layout.withHeader(header -> {
@@ -67,7 +76,14 @@ public class CreatePackPopupWidget extends DraggablePopupWidget {
         String description = this.descEditBox.getValue();
         boolean generateExamples = this.checkbox.selected();
 
-        PacketDistributor.sendToServer(new CreateDatapackPayload(name, description, generateExamples));
+        if (this.packType == PackType.SERVER_DATA) {
+            PacketDistributor.sendToServer(new CreateDatapackPayload(name, description, generateExamples));
+        } else if (this.packType == PackType.CLIENT_RESOURCES) {
+            Result<PrettyPath, Exception> resourcePack = ClientEditorHelper.createResourcePack(name, description, ResearchdUtils.trimSpecialCharacterAndConvertToSnake(name), generateExamples);
+            if (resourcePack instanceof Result.Ok(PrettyPath value)) {
+                PacketDistributor.sendToServer(new SetResourcePackPayload(value));
+            }
+        }
         this.screen.closePopup(this);
     }
 

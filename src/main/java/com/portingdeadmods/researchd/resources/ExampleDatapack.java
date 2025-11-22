@@ -12,6 +12,7 @@ import com.portingdeadmods.researchd.resources.contents.ResearchdLang;
 import com.portingdeadmods.researchd.resources.contents.ResearchdRecipes;
 import com.portingdeadmods.researchd.resources.contents.ResearchdResearchPacks;
 import com.portingdeadmods.researchd.resources.contents.ResearchdResearches;
+import com.portingdeadmods.researchd.utils.ResourceUtils;
 import com.portingdeadmods.researchd.utils.researches.ReloadableRegistryManager;
 import net.minecraft.SharedConstants;
 import net.minecraft.resources.ResourceKey;
@@ -34,7 +35,7 @@ public class ExampleDatapack {
             if (Files.notExists(exampleDataPackDir)) {
                 Files.createDirectories(exampleDataPackDir);
                 Path packFile = exampleDataPackDir.resolve("pack.mcmeta");
-                Files.writeString(packFile, getPackFile(packDescription));
+                Files.writeString(packFile, ResourceUtils.getPackFile(packDescription, PackType.SERVER_DATA));
 
                 Path dataDir = exampleDataPackDir.resolve("data");
                 Files.createDirectory(dataDir);
@@ -62,19 +63,6 @@ public class ExampleDatapack {
             Researchd.LOGGER.error("Encountered error while creating files and directories for example datapack", e);
             return Result.err("File/Directory creation failed");
         }
-    }
-
-    private static String getPackFile(String desc) {
-        return """
-                {
-                  "pack": {
-                    "description": {
-                      "text": "%s"
-                    },
-                    "pack_format": %d
-                  }
-                }
-                """.formatted(desc, SharedConstants.getCurrentVersion().getPackVersion(PackType.SERVER_DATA));
     }
 
     private static void createResearches(Path researchDir) {

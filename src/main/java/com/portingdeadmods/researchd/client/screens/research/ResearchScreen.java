@@ -49,7 +49,7 @@ public class ResearchScreen extends Screen {
     private PopupWidget focusedPopupWidget;
 
     private boolean editorOpen;
-    private SelectPackPopupWidget selectPackPopupWidget;
+    public SelectPackPopupWidget selectPackPopupWidget;
 
     public ResearchScreen() {
         super(ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_TITLE));
@@ -98,12 +98,19 @@ public class ResearchScreen extends Screen {
 
     private void openEditor(PDLImageButton button) {
         if (!this.editorOpen) {
-            EditModeSettings settings = ClientEditorHelper.getEditModeSettings();
-            this.selectPackPopupWidget = this.openPopupCentered(new SelectPackPopupWidget(this, settings));
+            if (!ClientEditorHelper.getEditModeSettings().isConfigured()) {
+                this.selectPackPopupWidget = this.openPopupCentered(new SelectPackPopupWidget(this));
+            } else {
+                
+            }
         } else {
             this.closePopup(this.selectPackPopupWidget);
         }
         this.editorOpen = !this.editorOpen;
+    }
+
+    public void setEditorOpen(boolean editorOpen) {
+        this.editorOpen = editorOpen;
     }
 
     public <W extends PopupWidget> W openPopupCentered(W widget) {
@@ -159,11 +166,13 @@ public class ResearchScreen extends Screen {
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
 
+        int z = 300;
+
         PoseStack poseStack = guiGraphics.pose();
 
         poseStack.pushPose();
         {
-            poseStack.translate(0, 0, 300);
+            poseStack.translate(0, 0, z);
             for (Map.Entry<PopupWidget, List<AbstractWidget>> entry : this.popupWidgets.sequencedEntrySet()) {
                 poseStack.translate(0, 0, 100);
 
@@ -171,15 +180,30 @@ public class ResearchScreen extends Screen {
                     widget.render(guiGraphics, mouseX, mouseY, partialTick);
                 }
 
+                z += 100;
+
             }
         }
         poseStack.popPose();
 
         int w = 174;
         this.researchGraphWidget.setSize(guiGraphics.guiWidth() - 8 - w, guiGraphics.guiHeight() - 8 * 2);
-        this.researchGraphWidget.renderNodeTooltips(guiGraphics, mouseX, mouseY, partialTick);
 
-        this.selectedResearchWidget.renderTooltip(guiGraphics, mouseX, mouseY, partialTick);
+        boolean popupHovered = false;
+        for (PopupWidget widget : this.popupWidgets.keySet()) {
+            popupHovered = widget.isHovered();
+            if (popupHovered) break;
+        }
+        if (!popupHovered) {
+            this.researchGraphWidget.renderNodeTooltips(guiGraphics, mouseX, mouseY, partialTick);
+        }
+
+        poseStack.pushPose();
+        {
+            poseStack.translate(0, 0, z);
+            this.selectedResearchWidget.renderTooltip(guiGraphics, mouseX, mouseY, partialTick);
+        }
+        poseStack.popPose();
     }
 
     private Optional<GuiEventListener> getPopupChildAt(double mouseX, double mouseY) {
@@ -229,6 +253,8 @@ public class ResearchScreen extends Screen {
         if (listener instanceof PopupWidget popupWidget && this.popupWidgets.containsKey(popupWidget)) {
             this.focusedPopupWidget = popupWidget;
             this.popupWidgets.putLast(popupWidget, this.popupWidgets.get(popupWidget));
+        } else if (listener == null) {
+            this.focusedPopupWidget = null;
         }
 
     }
