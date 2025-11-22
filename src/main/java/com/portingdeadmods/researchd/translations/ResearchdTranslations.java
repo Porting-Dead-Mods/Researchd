@@ -128,6 +128,7 @@ public final class ResearchdTranslations {
         public static final TranslatableConstant JOIN_MESSAGE = create("join_message", AQUA_AT + WHITE + "Welcome to " + RESET + GREEN + "Researchd Alpha" + RESET + WHITE + "! Please note that things may break completely between updates. Feel free to report any issues on the GitHub page!" + RESET);
         public static final TranslatableConstant GITHUB = create("github", GREEN + "GitHub" + RESET);
         public static final TranslatableConstant WIKI = create("wiki", GREEN + "Wiki" + RESET);
+        public static final TranslatableConstant FTB_TEAMS_INSTALLED = create("ftbteams", AQUA_AT + GREEN + "FTB Teams" + RESET + WHITE + " is currently installed and 'use_ftb_teams' config option is enabled. Please use FTB Teams for team logic!" + RESET);
 
         private static TranslatableConstant create(String key, String defaultValue) {
             TranslatableConstant constant = new TranslatableConstant(key, "game");

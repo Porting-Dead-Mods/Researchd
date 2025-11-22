@@ -33,7 +33,8 @@ public final class ResearchdClientEvents {
 		}
 
 		if (ResearchdKeybinds.OPEN_RESEARCH_TEAM_SCREEN.get().consumeClick()) {
-			Minecraft.getInstance().setScreen(new ResearchTeamScreen());
+			if (Researchd.isFTBTeamsEnabled()) Minecraft.getInstance().player.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
+			else Minecraft.getInstance().setScreen(new ResearchTeamScreen());
 		}
 	}
 

@@ -109,6 +109,17 @@ dependencies {
     implementation "com.github.Porting-Dead-Mods:Porting-Dead-Libs:${pdl_version}"
     //implementation files("pdl_cicd/portingdeadlibs-${pdl_version}-1.21.1.jar") // Local Deploy
 
+    compileOnly "curse.maven:ftb-teams-forge-404468:7209616"
+    compileOnly "curse.maven:architectury-api-419699:5786327"
+    compileOnly "curse.maven:ftb-library-forge-404465:7182154"
+
+    if (enable_ftb) {
+        // FTB Teams n Dependencies
+        localRuntime "curse.maven:ftb-teams-forge-404468:7209616"
+        localRuntime "curse.maven:architectury-api-419699:5786327"
+        localRuntime "curse.maven:ftb-library-forge-404465:7182154"
+    }
+
     compileOnly "dev.latvian.mods:kubejs-neoforge:${kubejs_version}"
     compileOnly "dev.latvian.mods:rhino-neoforge:${rhino_version}"
     localRuntime "dev.latvian.mods:kubejs-neoforge:${kubejs_version}"
