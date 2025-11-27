@@ -55,4 +55,5 @@ public final class ResearchdTab {
         stack.set(ResearchdDataComponents.RESEARCH_PACK.get(), new ResearchPackComponent(Optional.of(elem)));
         output.accept(stack);
     }
+
 }

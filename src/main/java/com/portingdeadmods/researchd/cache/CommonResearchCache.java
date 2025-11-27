@@ -21,7 +21,7 @@ public final class CommonResearchCache {
     public static @Nullable GlobalResearch rootResearch;
 
     public static void initialize(Level level) {
-        reset();
+        CommonResearchCache.reset();
 
         Map<ResourceKey<Research>, Research> researchLookup = ResearchHelperCommon.getLevelResearches(level);
         Map<ResourceKey<Research>, GlobalResearch> globalResearchMap = new HashMap<>(researchLookup.size());
