@@ -3,11 +3,11 @@ package com.portingdeadmods.researchd;
 import com.mojang.logging.LogUtils;
 import com.portingdeadmods.portingdeadlibs.api.resources.DynamicPack;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.compat.ftbteams.FTBTeamsCompat;
-import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
+import com.portingdeadmods.researchd.compat.ftbteams.FTBTeamsCompat;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
+import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.networking.registries.UpdateResearchPacksPayload;
 import com.portingdeadmods.researchd.networking.registries.UpdateResearchesPayload;
@@ -22,12 +22,18 @@ import com.portingdeadmods.researchd.resources.ResearchdDynamicPackContents;
 import com.portingdeadmods.researchd.resources.ResearchdExamplesSource;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
 import com.portingdeadmods.researchd.utils.researches.ResearchdManagers;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
@@ -167,5 +173,30 @@ public final class Researchd {
 
     public static boolean isFTBTeamsEnabled() {
         return ModList.get().isLoaded("ftbteams") && ResearchdConfig.Common.useFTBTeams;
+    }
+
+    // Mod Helpers
+    public static boolean isRecipeBlocked(Player player, ResourceLocation recipeId) {
+        return player.getData(ResearchdAttachments.RECIPE_PREDICATE).blockedRecipes().contains(recipeId);
+    }
+
+    public static boolean isItemBlocked(Player player, ResourceLocation itemId) {
+        return player.getData(ResearchdAttachments.ITEM_PREDICATE).blockedItems().stream().anyMatch(key -> key.location().equals(itemId));
+    }
+
+    public static boolean isItemBlocked(Player player, ResourceKey<Item> item) {
+        return player.getData(ResearchdAttachments.ITEM_PREDICATE).blockedItems().contains(item);
+    }
+
+    public static boolean isItemBlocked(Player player, ItemLike item) {
+        return player.getData(ResearchdAttachments.ITEM_PREDICATE).blockedItems().stream().anyMatch(key -> key.location().equals(BuiltInRegistries.ITEM.getKey(item.asItem())));
+    }
+
+    public static boolean isDimensionBlocked(Player player, ResourceLocation dimensionId) {
+        return player.getData(ResearchdAttachments.DIMENSION_PREDICATE).blockedDimensions().stream().anyMatch(key -> key.location().equals(dimensionId));
+    }
+
+    public static boolean isDimensionBlocked(Player player, ResourceKey<DimensionType> dimension) {
+        return player.getData(ResearchdAttachments.DIMENSION_PREDICATE).blockedDimensions().contains(dimension);
     }
 }
