@@ -20,6 +20,7 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public final class ResearchHelperClient {
@@ -48,6 +49,9 @@ public final class ResearchHelperClient {
     }
 
     public static Map<ResourceKey<ResearchPack>, ResearchPack> getResearchPacks() {
+        if (Minecraft.getInstance().level == null) {
+            return new HashMap<>();
+        }
         return ResearchHelperCommon.getResearchPacks(Minecraft.getInstance().level);
     }
 
