@@ -4,8 +4,8 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.portingdeadmods.portingdeadlibs.utils.PlayerUtils;
 import com.portingdeadmods.portingdeadlibs.utils.SuggestionUtils;
-import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
+import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import com.portingdeadmods.researchd.utils.ResearchdSuggestionUtils;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
@@ -21,7 +21,7 @@ public class TeamCommands {
                 .then(Commands.literal("help")
                         .executes(ctx -> {
                             CommandSourceStack source = ctx.getSource();
-							if (Researchd.isFTBTeamsEnabled())
+							if (ResearchdCompatHandler.isFTBTeamsEnabled())
 								source.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
                             else
 								ResearchTeamHelper.sendHelpMessage(source::sendSystemMessage);
@@ -30,7 +30,7 @@ public class TeamCommands {
 				.then(Commands.literal("members")
 						.executes(context -> {
 							CommandSourceStack source = context.getSource();
-							if (Researchd.isFTBTeamsEnabled()) {
+							if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
 								source.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
 								return 1;
 							}
@@ -49,7 +49,7 @@ public class TeamCommands {
 								.suggests(SuggestionUtils::playerNames)
 								.executes(context -> {
 									CommandSourceStack source = context.getSource();
-									if (Researchd.isFTBTeamsEnabled()) {
+									if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
 										source.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
 										return 1;
 									}
@@ -66,7 +66,7 @@ public class TeamCommands {
 				.then(Commands.literal("leave")
 						.executes(context -> {
 							CommandSourceStack source = context.getSource();
-							if (Researchd.isFTBTeamsEnabled()) {
+							if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
 								source.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
 								return 1;
 							}
@@ -83,7 +83,7 @@ public class TeamCommands {
 							.suggests(ResearchdSuggestionUtils::teamMemberNames)
 							.executes(context -> {
 								CommandSourceStack source = context.getSource();
-								if (Researchd.isFTBTeamsEnabled()) {
+								if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
 									source.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
 									return 1;
 								}
@@ -106,7 +106,7 @@ public class TeamCommands {
 						.suggests(SuggestionUtils::playerNames)
 						.executes(context -> {
 							CommandSourceStack source = context.getSource();
-							if (Researchd.isFTBTeamsEnabled()) {
+							if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
 								source.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
 								return 1;
 							}
@@ -125,7 +125,7 @@ public class TeamCommands {
 								.suggests(SuggestionUtils::playerNames)
 								.executes(context -> {
 									CommandSourceStack source = context.getSource();
-									if (Researchd.isFTBTeamsEnabled()) {
+									if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
 										source.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
 										return 1;
 									}
@@ -144,7 +144,7 @@ public class TeamCommands {
 								.suggests(ResearchdSuggestionUtils::teamMemberNames)
 								.executes(context -> {
 									CommandSourceStack source = context.getSource();
-									if (Researchd.isFTBTeamsEnabled()) {
+									if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
 										source.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
 										return 1;
 									}
@@ -165,7 +165,7 @@ public class TeamCommands {
 								.suggests(ResearchdSuggestionUtils::teamMemberNames)
 								.executes(context -> {
 									CommandSourceStack source = context.getSource();
-									if (Researchd.isFTBTeamsEnabled()) {
+									if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
 										source.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
 										return 1;
 									}
@@ -186,7 +186,7 @@ public class TeamCommands {
 								.suggests(ResearchdSuggestionUtils::teamMemberNames)
 								.executes(context -> {
 									CommandSourceStack source = context.getSource();
-									if (Researchd.isFTBTeamsEnabled()) {
+									if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
 										source.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
 										return 1;
 									}
@@ -208,7 +208,7 @@ public class TeamCommands {
 								.suggests(ResearchdSuggestionUtils::teamMemberNames)
 								.executes(context -> {
 									CommandSourceStack source = context.getSource();
-									if (Researchd.isFTBTeamsEnabled()) {
+									if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
 										source.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
 										return 1;
 									}
@@ -230,7 +230,7 @@ public class TeamCommands {
 						.then(Commands.argument("name", StringArgumentType.string())
 								.executes(context -> {
 									CommandSourceStack source = context.getSource();
-									if (Researchd.isFTBTeamsEnabled()) {
+									if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
 										source.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
 										return 1;
 									}

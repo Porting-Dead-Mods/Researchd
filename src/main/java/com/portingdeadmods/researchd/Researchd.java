@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import com.portingdeadmods.portingdeadlibs.api.resources.DynamicPack;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
+import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import com.portingdeadmods.researchd.compat.ftbteams.FTBTeamsCompat;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
@@ -36,7 +37,6 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -103,7 +103,7 @@ public final class Researchd {
         PDLConfigHelper.registerConfig(ResearchdConfig.Common.class, ModConfig.Type.COMMON)
                 .register(modContainer);
 
-		if (isFTBTeamsEnabled())
+		if (ResearchdCompatHandler.isFTBTeamsEnabled())
             FTBTeamsCompat.init();
     }
 
@@ -170,10 +170,6 @@ public final class Researchd {
 
     public static ResourceLocation rl(String path) {
         return ResourceLocation.fromNamespaceAndPath(MODID, path);
-    }
-
-    public static boolean isFTBTeamsEnabled() {
-        return ModList.get().isLoaded("ftbteams") && ResearchdConfig.Common.useFTBTeams;
     }
 
     // Mod Helpers

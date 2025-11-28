@@ -2,7 +2,6 @@ package com.portingdeadmods.researchd.utils.researches;
 
 import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
 import com.portingdeadmods.portingdeadlibs.utils.PlayerUtils;
-import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.GlobalResearch;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
@@ -11,6 +10,7 @@ import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.ResearchTeamRole;
 import com.portingdeadmods.researchd.api.team.TeamMember;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
+import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
@@ -130,17 +130,17 @@ public final class ResearchTeamHelper {
 
 		// Already in Team (with multiple people) -> Return with error msg
         if (getTeamByMember(requester).getMembersAmount() > 1) {
-            if (!Researchd.isFTBTeamsEnabled())
+            if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                 requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.ALREADY_IN_TEAM));
             return;
         }
 
 	    // Alone in team -> Enter the new team | TODO: Add Invite Syncs from FTB Teams for the sake of compat. Currently it should work without
-        if (team != null && ((team.getSocialManager().containsSentInvite(requesterId)) || Researchd.isFTBTeamsEnabled())) {
+        if (team != null && ((team.getSocialManager().containsSentInvite(requesterId)) || ResearchdCompatHandler.isFTBTeamsEnabled())) {
             ResearchTeamHelper.handleLeaveTeam(requester);
 
             savedData.researchTeams().put(requesterId, team);
-            if (!Researchd.isFTBTeamsEnabled())
+            if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                 requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.YOU_JOINED_TEAM, team.getName()));
 
             for (TeamMember member : team.getMembers()) {
@@ -169,7 +169,7 @@ public final class ResearchTeamHelper {
 
         if (team != null) {
             team.getSocialManager().addIgnore(requester.getUUID());
-            if (!Researchd.isFTBTeamsEnabled())
+            if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                 requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.IGNORE, team.getName()));
         }
     }
@@ -189,7 +189,7 @@ public final class ResearchTeamHelper {
 			// Alone In Team -> Leaving creates default team for player
             if (team.getMembersAmount() <= 1) {
                 savedData.researchTeams().remove(requesterId);
-                if (!Researchd.isFTBTeamsEnabled())
+                if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                     requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.LEFT_TEAM));
 
                 savedData.researchTeams().put(requesterId, SimpleResearchTeam.createDefaultTeam(requester));
@@ -200,7 +200,7 @@ public final class ResearchTeamHelper {
 
 				// Team Leader Not Specified
                 if (nextToLead == null || nextToLead.equals(PlayerUtils.EmptyUUID)) {
-                    if (!Researchd.isFTBTeamsEnabled())
+                    if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                         requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NO_NEXT_LEADER));
                     return;
                 }
@@ -217,7 +217,7 @@ public final class ResearchTeamHelper {
 	    // Is not Owner -> Just remove member out of the team and create a default one.
 		else {
             removeMember(requester);
-            if (!Researchd.isFTBTeamsEnabled())
+            if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                 requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.LEFT_TEAM));
             savedData.researchTeams().put(requesterId, SimpleResearchTeam.createDefaultTeam(requester));
             PacketDistributor.sendToPlayer(requester, ClearGraphCachePayload.INSTANCE);
@@ -242,7 +242,7 @@ public final class ResearchTeamHelper {
 
 		// Error safety (handling yourself)
         if (requester.getUUID().equals(member)) {
-            if (!Researchd.isFTBTeamsEnabled())
+            if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                 requester.sendSystemMessage(getIllegalMessage());
             return;
         }
@@ -256,7 +256,7 @@ public final class ResearchTeamHelper {
 			// Remove member and put them into a default team with a status message
             if (remove) {
                 getTeamByMember(requester).removeMember(member);
-                if (!Researchd.isFTBTeamsEnabled())
+                if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                     requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.REMOVED, PlayerUtils.getPlayerNameFromUUID(level, member)));
 
 				ServerPlayer kickedPlayer = server.getPlayerList().getPlayer(member);
@@ -277,7 +277,7 @@ public final class ResearchTeamHelper {
             ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
             refreshPlayerManagement(getTeamByMember(requester), level);
         } else {
-            if (!Researchd.isFTBTeamsEnabled())
+            if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                 requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NO_PERMS));
         }
         ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
@@ -290,7 +290,7 @@ public final class ResearchTeamHelper {
 
 		// Error Safety (handling yourself)
         if (requester.getUUID().equals(moderator)) {
-            if (!Researchd.isFTBTeamsEnabled())
+            if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                 requester.sendSystemMessage(getIllegalMessage());
             return;
         }
@@ -302,11 +302,11 @@ public final class ResearchTeamHelper {
 
                 if (remove) {
                     team.setRole(moderator, ResearchTeamRole.MEMBER);
-                    if (!Researchd.isFTBTeamsEnabled())
+                    if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                         requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.DEMOTED, PlayerUtils.getPlayerNameFromUUID(level, moderator)));
                 } else {
                     team.setRole(moderator, ResearchTeamRole.MODERATOR);
-                    if (!Researchd.isFTBTeamsEnabled())
+                    if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                         requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.PROMOTED, PlayerUtils.getPlayerNameFromUUID(level, moderator)));
                 }
 
@@ -314,11 +314,11 @@ public final class ResearchTeamHelper {
                 ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
                 refreshPlayerManagement(getTeamByMember(requester), level);
             } else {
-                if (!Researchd.isFTBTeamsEnabled())
+                if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                     requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.BAD_INPUT));
             }
         } else {
-            if (!Researchd.isFTBTeamsEnabled())
+            if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                 requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NO_PERMS));
         }
     }
@@ -332,20 +332,20 @@ public final class ResearchTeamHelper {
 	    // Permission Check (is Owner)
         if (getPermissionLevel(requester) == 2) {
 			if (name.isEmpty()) {
-				if (!Researchd.isFTBTeamsEnabled())
+				if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                     requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NAME_CANNOT_BE_EMPTY));
 				return;
 			}
 
             String oldname = getTeamByMember(requester).getName();
             getTeamByMember(requester).setName(name);
-            if (!Researchd.isFTBTeamsEnabled())
+            if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                 requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NEW_TEAM_NAME, oldname, name));
             ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
             ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
             refreshPlayerManagement(getTeamByMember(requester), level);
         } else {
-            if (!Researchd.isFTBTeamsEnabled())
+            if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                 requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NO_PERMS));
         }
     }
@@ -369,11 +369,11 @@ public final class ResearchTeamHelper {
 
                 ResearchdSavedData.TEAM_RESEARCH.get().setData(level, savedData);
                 ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
-                if (!Researchd.isFTBTeamsEnabled())
+                if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                     requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.TRANSFERRED_OWNERSHIP, PlayerUtils.getPlayerNameFromUUID(level, nextToLead)));
                 refreshPlayerManagement(team, level);
             } else {
-                if (!Researchd.isFTBTeamsEnabled())
+                if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                     requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.BAD_INPUT));
             }
         }
@@ -408,7 +408,7 @@ public final class ResearchTeamHelper {
 
         if (remove) {
             team.getSocialManager().removeSentInvite(invited);
-            if (!Researchd.isFTBTeamsEnabled())
+            if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                 requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.REMOVED_INVITE, AllPlayersCache.getName(invited)));
         } else {
             team.getSocialManager().addSentInvite(invited);
@@ -429,7 +429,7 @@ public final class ResearchTeamHelper {
                                 )))
                 );
             }
-            if (!Researchd.isFTBTeamsEnabled())
+            if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                 requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.SENT_INVITE, AllPlayersCache.getName(invited), team.getName()));
         }
         Level level = requester.level();

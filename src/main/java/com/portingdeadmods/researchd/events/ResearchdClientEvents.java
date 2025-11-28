@@ -6,6 +6,7 @@ import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.team.ResearchTeamScreen;
+import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.impl.research.effect.data.UnlockItemEffectData;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
@@ -33,7 +34,7 @@ public final class ResearchdClientEvents {
 		}
 
 		if (ResearchdKeybinds.OPEN_RESEARCH_TEAM_SCREEN.get().consumeClick()) {
-			if (Researchd.isFTBTeamsEnabled()) Minecraft.getInstance().player.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
+			if (ResearchdCompatHandler.isFTBTeamsEnabled()) Minecraft.getInstance().player.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
 			else Minecraft.getInstance().setScreen(new ResearchTeamScreen());
 		}
 	}
