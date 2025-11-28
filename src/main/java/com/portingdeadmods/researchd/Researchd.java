@@ -103,7 +103,8 @@ public final class Researchd {
         PDLConfigHelper.registerConfig(ResearchdConfig.Common.class, ModConfig.Type.COMMON)
                 .register(modContainer);
 
-        FTBTeamsCompat.init();
+		if (isFTBTeamsEnabled())
+            FTBTeamsCompat.init();
     }
 
     private void addPackFinders(AddPackFindersEvent event) {

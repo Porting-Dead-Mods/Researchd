@@ -36,8 +36,8 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
     public static final int PROGRESS_BAR_WIDTH = 105;
     public static final int SLOT_WIDTH = 18;
     public static final int SLOT_HEIGHT = 20;
-    public static final int SCROLLER_X = 8;
-    public static final int SCROLLER_Y = 41;
+    public static final int SCROLLER_X = 160;
+    public static final int SCROLLER_Y = 69;
     public static final int SCROLLER_WIDTH = 7;
     public static final int SCROLLER_HEIGHT = 4;
     public static final int SCROLLER_TRACK_LENGTH = 154;
