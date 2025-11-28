@@ -113,7 +113,7 @@ dependencies {
     compileOnly "curse.maven:architectury-api-419699:5786327"
     compileOnly "curse.maven:ftb-library-forge-404465:7182154"
 
-    if (enable_ftb) {
+    if (enable_ftb.toBoolean()) {
         // FTB Teams n Dependencies
         localRuntime "curse.maven:ftb-teams-forge-404468:7209616"
         localRuntime "curse.maven:architectury-api-419699:5786327"
@@ -128,6 +128,13 @@ dependencies {
     compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
     compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
     localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
+
+    // Fixes
+    compileOnly "blusunrize.immersiveengineering:ImmersiveEngineering:${ie_version}"
+    if (enable_ie.toBoolean()) {
+        localRuntime "blusunrize.immersiveengineering:ImmersiveEngineering:${ie_version}"
+    }
+
 
     //runtimeOnly "curse.maven:ender-io-64578:7134432"
 }

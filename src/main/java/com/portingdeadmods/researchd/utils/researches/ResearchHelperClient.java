@@ -1,5 +1,6 @@
 package com.portingdeadmods.researchd.utils.researches;
 
+import blusunrize.immersiveengineering.common.register.IEDataAttachments;
 import com.portingdeadmods.researchd.ResearchdClient;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchIcon;
@@ -17,6 +18,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
@@ -33,6 +35,11 @@ public final class ResearchHelperClient {
         ResearchTeam team = researchData.getTeamByMember(player.getUUID());
 
         for (Map.Entry<ResourceKey<AttachmentType<?>>, AttachmentType<?>> entry : NeoForgeRegistries.ATTACHMENT_TYPES.entrySet()) {
+			// Wire Networks being loaded, to anything but levels, crashes
+	        if (ModList.get().isLoaded("immersiveengineering")) {
+		        if (entry.getValue().equals(IEDataAttachments.WIRE_NETWORK.get())) continue;
+	        }
+
             Object data = player.getData(entry.getValue());
             if (data instanceof ResearchEffectData<?> effectData) {
                 player.setData((AttachmentType<ResearchEffectData<?>>) entry.getValue(), effectData.getDefault(level));
