@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd;
 import com.mojang.logging.LogUtils;
 import com.portingdeadmods.portingdeadlibs.api.resources.DynamicPack;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import com.portingdeadmods.researchd.compat.ftbteams.FTBTeamsCompat;
@@ -39,6 +40,8 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.NeoForge;
@@ -50,11 +53,26 @@ import net.neoforged.neoforge.registries.NewRegistryEvent;
 import org.slf4j.Logger;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Supplier;
 
 @Mod(Researchd.MODID)
 public final class Researchd {
     public static final String MODID = "researchd";
     public static final String MODNAME = "Researchd";
+
+	/**
+	 * Mods will need to register all of their different ResearchEffectData entries here to be picked up by refreshResearches();
+	 * Anything registered should only be of form {@code Supplier<AttachmentType<ResearchEffectData<?>>>}
+	 * <br>
+	 * Also PS: I will always hate generics <3
+	 */
+	public static final Set<Supplier<? extends AttachmentType<? extends ResearchEffectData<?>>>> RESEARCH_EFFECT_DATA_TYPES = new HashSet<>();
+
+	public static void registerResearchEffectData(Supplier<? extends AttachmentType<? extends ResearchEffectData<?>>> data) {
+		RESEARCH_EFFECT_DATA_TYPES.add(data);
+	}
 
     public static final Logger LOGGER = LogUtils.getLogger();
 
@@ -95,6 +113,7 @@ public final class Researchd {
         modEventBus.addListener(this::registerRegistries);
         modEventBus.addListener(this::registerDatapackRegistries);
         modEventBus.addListener(this::addPackFinders);
+		modEventBus.addListener(this::onCommonSetup);
 
         NeoForge.EVENT_BUS.addListener(this::onDatapacksSynced);
 
@@ -106,6 +125,14 @@ public final class Researchd {
 		if (ResearchdCompatHandler.isFTBTeamsEnabled())
             FTBTeamsCompat.init();
     }
+
+	private void onCommonSetup(FMLCommonSetupEvent event) {
+		event.enqueueWork(() -> {
+			registerResearchEffectData(ResearchdAttachments.DIMENSION_PREDICATE);
+			registerResearchEffectData(ResearchdAttachments.ITEM_PREDICATE);
+			registerResearchEffectData(ResearchdAttachments.RECIPE_PREDICATE);
+		});
+	}
 
     private void addPackFinders(AddPackFindersEvent event) {
         if (ResearchdConfig.Common.loadExamplesDatapack) {

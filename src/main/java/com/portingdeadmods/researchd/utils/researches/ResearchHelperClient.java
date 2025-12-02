@@ -1,6 +1,6 @@
 package com.portingdeadmods.researchd.utils.researches;
 
-import blusunrize.immersiveengineering.common.register.IEDataAttachments;
+import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdClient;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchIcon;
@@ -18,12 +18,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.attachment.AttachmentType;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public final class ResearchHelperClient {
     public static void refreshResearches(Player player) {
@@ -31,19 +30,12 @@ public final class ResearchHelperClient {
         level = Minecraft.getInstance().level;
 
         ResearchTeamMap researchData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
-
         ResearchTeam team = researchData.getTeamByMember(player.getUUID());
 
-        for (Map.Entry<ResourceKey<AttachmentType<?>>, AttachmentType<?>> entry : NeoForgeRegistries.ATTACHMENT_TYPES.entrySet()) {
-			// Wire Networks being loaded, to anything but levels, crashes
-	        if (ModList.get().isLoaded("immersiveengineering")) {
-		        if (entry.getValue().equals(IEDataAttachments.WIRE_NETWORK.get())) continue;
-	        }
-
-            Object data = player.getData(entry.getValue());
-            if (data instanceof ResearchEffectData<?> effectData) {
-                player.setData((AttachmentType<ResearchEffectData<?>>) entry.getValue(), effectData.getDefault(level));
-            }
+        for (Supplier<? extends AttachmentType<? extends ResearchEffectData<?>>> entry : Researchd.RESEARCH_EFFECT_DATA_TYPES) {
+			AttachmentType<ResearchEffectData<?>> attachment = (AttachmentType<ResearchEffectData<?>>) entry.get();
+	        ResearchEffectData<?> data = player.getData(attachment);
+			player.setData(attachment, data.getDefault(level));
         }
 
         for (ResearchInstance res : team.getResearches().values()) {

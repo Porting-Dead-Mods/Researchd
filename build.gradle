@@ -129,13 +129,6 @@ dependencies {
     compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
     localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
 
-    // Fixes
-    compileOnly "blusunrize.immersiveengineering:ImmersiveEngineering:${ie_version}"
-    if (enable_ie.toBoolean()) {
-        localRuntime "blusunrize.immersiveengineering:ImmersiveEngineering:${ie_version}"
-    }
-
-
     //runtimeOnly "curse.maven:ender-io-64578:7134432"
 }
 

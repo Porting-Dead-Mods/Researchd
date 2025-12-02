@@ -1,6 +1,5 @@
 package com.portingdeadmods.researchd.utils.researches;
 
-import blusunrize.immersiveengineering.common.register.IEDataAttachments;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
@@ -26,12 +25,12 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
-import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 public final class ResearchHelperCommon {
     public static Map<ResourceKey<Research>, Research> getLevelResearches(Level level) {
@@ -116,33 +115,28 @@ public final class ResearchHelperCommon {
         ResearchTeamMap researchData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
 
         SimpleResearchTeam team = researchData.getTeamByMember(player.getUUID());
-        for (Map.Entry<ResourceKey<AttachmentType<?>>, AttachmentType<?>> entry : NeoForgeRegistries.ATTACHMENT_TYPES.entrySet()) {
-	        // Wire Networks being loaded, to anything but levels, crashes
-			if (ModList.get().isLoaded("immersiveengineering")) {
-				if (entry.getValue().equals(IEDataAttachments.WIRE_NETWORK.get())) continue;
-			}
-
-            Object data = player.getData(entry.getValue());
-            if (data instanceof ResearchEffectData<?> effectData) {
-                player.setData((AttachmentType<ResearchEffectData<?>>) entry.getValue(), effectData.getDefault(level));
-                Researchd.debug("Effect Data", "Refreshing " + data.getClass().getSimpleName() + ": ");
-                if (effectData.getDefault(level) instanceof DimensionUnlockEffectData(Set<ResourceKey<DimensionType>> blockedDimensions)) {
-                    for (ResourceKey<DimensionType> dim : blockedDimensions) {
-                        Researchd.debug("Effect Data", " - " + dim);
-                    }
+	    Researchd.LOGGER.info("Refreshing effect data for player {}", player.getName().getString());
+	    for (Supplier<? extends AttachmentType<? extends ResearchEffectData<?>>> entry : Researchd.RESEARCH_EFFECT_DATA_TYPES) {
+		    AttachmentType<ResearchEffectData<?>> attachment = (AttachmentType<ResearchEffectData<?>>) entry.get();
+			ResearchEffectData<?> effectData = player.getData(attachment);
+            player.setData(attachment, effectData.getDefault(level));
+            Researchd.debug("Effect Data", "Refreshing " + effectData.getClass().getSimpleName() + ": ");
+            if (effectData.getDefault(level) instanceof DimensionUnlockEffectData(Set<ResourceKey<DimensionType>> blockedDimensions)) {
+                for (ResourceKey<DimensionType> dim : blockedDimensions) {
+                    Researchd.debug("Effect Data", " - " + dim);
                 }
+            }
 
-                if (effectData.getDefault(level) instanceof RecipeUnlockEffectData(Set<ResourceLocation> blockedRecipes)) {
-                    for (ResourceLocation rec : blockedRecipes) {
-                        Researchd.debug("Effect Data", " - " + rec);
+            if (effectData.getDefault(level) instanceof RecipeUnlockEffectData(Set<ResourceLocation> blockedRecipes)) {
+                for (ResourceLocation rec : blockedRecipes) {
+                    Researchd.debug("Effect Data", " - " + rec);
 
-                    }
                 }
+            }
 
-                if (effectData.getDefault(level) instanceof UnlockItemEffectData(Set<ResourceKey<Item>> blockedItems)) {
-                    for (ResourceKey<Item> item : blockedItems) {
-                        Researchd.debug("Effect Data", " - " + item.location());
-                    }
+            if (effectData.getDefault(level) instanceof UnlockItemEffectData(Set<ResourceKey<Item>> blockedItems)) {
+                for (ResourceKey<Item> item : blockedItems) {
+                    Researchd.debug("Effect Data", " - " + item.location());
                 }
             }
         }
