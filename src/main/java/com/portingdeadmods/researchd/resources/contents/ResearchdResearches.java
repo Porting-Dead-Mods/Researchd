@@ -130,7 +130,7 @@ public class ResearchdResearches implements ResearchdDatagenProvider<Research> {
                 ));
          simpleResearch("end_crystal", builder -> builder
                 .icon(Items.END_CRYSTAL)
-                .parents(end)
+                .researchPage(Researchd.rl("end_crystal"))
                 .method(consumePack(250, 200, pack(ResearchdResearchPacks.OVERWORLD_PACK_LOC), pack(ResearchdResearchPacks.NETHER_PACK_LOC), pack(ResearchdResearchPacks.END_PACK_LOC)))
                 .effect(
                         and(unlockRecipe(mcLoc("end_crystal")))

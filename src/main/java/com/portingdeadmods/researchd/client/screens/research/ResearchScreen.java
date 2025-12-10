@@ -6,19 +6,21 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;
 import com.portingdeadmods.researchd.api.client.TechList;
-import com.portingdeadmods.researchd.api.research.EditModeSettings;
 import com.portingdeadmods.researchd.api.research.ResearchInteractionType;
+import com.portingdeadmods.researchd.api.research.ResearchPage;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
-import com.portingdeadmods.researchd.client.screens.editor.widgets.SelectPackPopupWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.PopupWidget;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.SelectPackPopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.widgets.*;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import com.portingdeadmods.researchd.utils.ClientEditorHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.*;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -44,6 +46,7 @@ public class ResearchScreen extends Screen {
     private ResearchQueueWidget researchQueueWidget;
     private ResearchGraphWidget researchGraphWidget;
     private SelectedResearchWidget selectedResearchWidget;
+    private ResearchPagesList researchPagesList;
 
     private final LinkedHashMap<PopupWidget, List<AbstractWidget>> popupWidgets;
     private PopupWidget focusedPopupWidget;
@@ -71,10 +74,21 @@ public class ResearchScreen extends Screen {
             this.selectedResearchWidget.setSelectedResearch(this.techListWidget.getTechList().entries().getFirst());
         }
 
-        // GRAPH
+        // RESEARCH PAGES LIST
         int x = 174;
+        this.researchPagesList = new ResearchPagesList(this, x, 12);
+
+        // GRAPH
         this.researchGraphWidget = new ResearchGraphWidget(this, x, 8, 300, 253 - 16);
-        if (CommonResearchCache.rootResearch != null) {
+
+        // Initialize graph with selected page (or default page)
+        ResearchPage selectedPage = this.researchPagesList.getSelectedPage();
+        if (selectedPage != null) {
+            ResearchGraph graph = ResearchGraphCache.computeIfAbsentForPage(selectedPage);
+            if (graph != null) {
+                this.researchGraphWidget.setGraph(graph);
+            }
+        } else if (CommonResearchCache.rootResearch != null) {
             this.researchGraphWidget.setGraph(ResearchGraphCache.computeIfAbsent(CommonResearchCache.rootResearch.getResearchKey()));
         }
 
@@ -94,6 +108,21 @@ public class ResearchScreen extends Screen {
         this.selectedResearchWidget.visitWidgets(this::addRenderableWidget);
         this.researchGraphWidget.visitWidgets(this::addRenderableWidget);
 
+        // This needs to be last
+        this.researchPagesList.visitWidgets(this::addRenderableWidget);
+    }
+
+    /**
+     * Called when a research page is selected from the ResearchPagesList.
+     * Updates the graph to show researches from the selected page.
+     */
+    public void onResearchPageChanged(ResearchPage page) {
+        if (page != null) {
+            ResearchGraph graph = ResearchGraphCache.computeIfAbsentForPage(page);
+            if (graph != null) {
+                this.researchGraphWidget.setGraph(graph);
+            }
+        }
     }
 
     private void openEditor(PDLImageButton button) {
@@ -281,6 +310,10 @@ public class ResearchScreen extends Screen {
 
     public TechListWidget getTechListWidget() {
         return techListWidget;
+    }
+
+    public ResearchPagesList getResearchPagesList() {
+        return researchPagesList;
     }
 
     public TechList getTechList() {

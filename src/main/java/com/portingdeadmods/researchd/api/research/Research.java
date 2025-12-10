@@ -11,6 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
 
@@ -53,6 +54,16 @@ public interface Research {
      * @return whether the parent researchPacks need to be completed to start this research
      */
     boolean requiresParent();
+
+    /**
+     * @return The {@link ResourceLocation} id of the research page this research belongs to.
+     * Only root researches (without parents) should explicitly define this.
+     * Child researches inherit the page from their parents.
+     * Defaults to {@link ResearchPage#DEFAULT_PAGE_ID}
+     */
+    default ResourceLocation researchPage() {
+        return ResearchPage.DEFAULT_PAGE_ID;
+    }
 
     /**
      * @return serializer providing typed codecs for the Research

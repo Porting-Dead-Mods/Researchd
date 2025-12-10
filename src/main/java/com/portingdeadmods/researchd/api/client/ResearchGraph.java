@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.api.client;
 import com.portingdeadmods.researchd.api.research.GlobalResearch;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.api.research.ResearchPage;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
 import net.minecraft.resources.ResourceKey;
@@ -89,5 +90,16 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
 
     public static ResearchGraph fromRootResearch(ResourceKey<Research> root, Map<ResourceKey<Research>, ResearchInstance> researches) {
         return new ResearchGraph(CommonResearchCache.globalResearches.get(root), researches);
+    }
+
+    /**
+     * @param page The research page containing all researches to include
+     * @param rootNode The root node to use for this graph - TODO: Parse researches from the page to get the root directly
+     * @param researches Lookup
+     * @return A new ResearchGraph for the page
+     */
+    public static ResearchGraph fromResearchPage(ResearchPage page, GlobalResearch rootNode, Map<ResourceKey<Research>, ResearchInstance> researches) {
+        // TODO: FINISH
+        return new ResearchGraph(rootNode, researches);
     }
 }
