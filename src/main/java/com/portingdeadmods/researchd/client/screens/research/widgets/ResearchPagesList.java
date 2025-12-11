@@ -1,5 +1,7 @@
 package com.portingdeadmods.researchd.client.screens.research.widgets;
 
+import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
+import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
 import com.portingdeadmods.researchd.api.research.ResearchPage;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
@@ -8,6 +10,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,15 +20,20 @@ import java.util.function.Consumer;
  *
  */
 public class ResearchPagesList extends AbstractWidget {
-    private static final int BUTTON_SIZE = 24;
-    private static final int BUTTON_PADDING = 2;
+    public static final ResourceLocation PAGE_BUTTON_ACTIVE = Researchd.rl("textures/gui/research_screen/research_page_button_active.png");
+    public static final ResourceLocation PAGE_BUTTON_INACTIVE = Researchd.rl("textures/gui/research_screen/research_page_button_inactive.png");
+    public static final ResourceLocation PAGE_BUTTON_INACTIVE_HOVER = Researchd.rl("textures/gui/research_screen/research_page_button_inactive_hover.png");
+
+
+    private static final int BUTTON_SIZE = 10;
+    public static final int HEIGHT = 243;
 
     private final ResearchScreen screen;
     private final List<ResearchPage> pages;
     private ResearchPage selectedPage;
 
     public ResearchPagesList(ResearchScreen screen, int x, int y) {
-        super(x, y, BUTTON_SIZE, 0, CommonComponents.EMPTY);
+        super(x, y, BUTTON_SIZE, HEIGHT, CommonComponents.EMPTY);
         this.screen = screen;
         this.pages = new ArrayList<>();
 
@@ -38,8 +46,6 @@ public class ResearchPagesList extends AbstractWidget {
                 }
             }
         }
-
-        this.height = this.pages.size() * (BUTTON_SIZE + BUTTON_PADDING) - BUTTON_PADDING;
     }
 
     public void refreshPages() {
@@ -53,7 +59,6 @@ public class ResearchPagesList extends AbstractWidget {
                 }
             }
         }
-        this.height = this.pages.size() * (BUTTON_SIZE + BUTTON_PADDING) - BUTTON_PADDING;
     }
 
     @Override
@@ -68,19 +73,29 @@ public class ResearchPagesList extends AbstractWidget {
             // TODO: Add a blur as a background for the list itself, the tab hover should lighten the blur or smth
 
             // Render icon using the research key (same as ResearchNode does)
-            if (page.iconResearchKey() != null) {
-                ClientResearchIcon<?> clientIcon = ResearchScreen.CLIENT_ICONS.get(page.iconResearchKey().location());
-                if (clientIcon != null) {
-                    clientIcon.render(guiGraphics, getX() + 4, buttonY + 4, mouseX, mouseY, 1.0f, partialTick);
+            if (isSelected) {
+                GuiUtils.drawImg(guiGraphics, PAGE_BUTTON_ACTIVE, getX(), buttonY, BUTTON_SIZE, BUTTON_SIZE);
+            } else {
+                if (isButtonHovered(i, mouseX, mouseY)) {
+                    GuiUtils.drawImg(guiGraphics, PAGE_BUTTON_INACTIVE_HOVER, getX(), buttonY, BUTTON_SIZE, BUTTON_SIZE);
+                } else {
+                    GuiUtils.drawImg(guiGraphics, PAGE_BUTTON_INACTIVE, getX(), buttonY, BUTTON_SIZE, BUTTON_SIZE);
                 }
             }
 
-            buttonY += BUTTON_SIZE + BUTTON_PADDING;
+            if (page.iconResearchKey() != null) {
+                ClientResearchIcon<?> clientIcon = ResearchScreen.CLIENT_ICONS.get(page.iconResearchKey().location());
+                if (clientIcon != null) {
+                    clientIcon.render(guiGraphics, getX(), buttonY, mouseX, mouseY, 0.48f, partialTick);
+                }
+            }
+
+            buttonY += BUTTON_SIZE;
         }
     }
 
     private boolean isButtonHovered(int index, int mouseX, int mouseY) {
-        int buttonY = getY() + index * (BUTTON_SIZE + BUTTON_PADDING);
+        int buttonY = getY() + index * BUTTON_SIZE;
         return mouseX >= getX() && mouseX < getX() + BUTTON_SIZE
                 && mouseY >= buttonY && mouseY < buttonY + BUTTON_SIZE;
     }

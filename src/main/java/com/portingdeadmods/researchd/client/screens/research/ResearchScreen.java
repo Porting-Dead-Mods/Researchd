@@ -39,6 +39,8 @@ public class ResearchScreen extends Screen {
 
     public static final WidgetSprites EDITOR_BUTTON_SPRITES = new WidgetSprites(Researchd.rl("editor_open_button"), Researchd.rl("editor_open_button_highlighted"));
 
+    public static final ResourceLocation RESEARCH_PAGES_LIST_BACKGROUND = Researchd.rl("textures/gui/research_screen/research_pages_list.png");
+
     // Singleton since whole client is a singleton
     public static final Map<ResourceLocation, ClientResearchIcon<?>> CLIENT_ICONS = new HashMap<>();
 
@@ -53,6 +55,8 @@ public class ResearchScreen extends Screen {
 
     private boolean editorOpen;
     public SelectPackPopupWidget selectPackPopupWidget;
+
+    private boolean listOpen;
 
     public ResearchScreen() {
         super(ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_TITLE));
@@ -76,10 +80,10 @@ public class ResearchScreen extends Screen {
 
         // RESEARCH PAGES LIST
         int x = 174;
-        this.researchPagesList = new ResearchPagesList(this, x, 12);
+        this.researchPagesList = new ResearchPagesList(this, x, 8);
 
         // GRAPH
-        this.researchGraphWidget = new ResearchGraphWidget(this, x, 8, 300, 253 - 16);
+        this.researchGraphWidget = new ResearchGraphWidget(this, x + 13, 8, 300 - 13, 253 - 16);
 
         // Initialize graph with selected page (or default page)
         ResearchPage selectedPage = this.researchPagesList.getSelectedPage();
@@ -185,6 +189,8 @@ public class ResearchScreen extends Screen {
         guiGraphics.blit(RIGHT_BAR, width - 8, 8, 0, 0, 8, guiGraphics.guiHeight() - 8 - 8, 8, 256);
 
         Minecraft mc = Minecraft.getInstance();
+
+        guiGraphics.blit(RESEARCH_PAGES_LIST_BACKGROUND, 174, 8, 0, 0, 13, guiGraphics.guiHeight() - 16, 13, 239);
 
         if (mc.player.getData(ResearchdAttachments.RESEARCH_INTERACTION_TYPE) == ResearchInteractionType.EDIT) {
             guiGraphics.blit(EDIT_BUTTON_CORNER, width - 24 - 4, height - 24 - 4, 0, 0, 24, 24, 24, 24);

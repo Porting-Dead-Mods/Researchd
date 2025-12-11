@@ -31,7 +31,7 @@ import static com.portingdeadmods.researchd.client.screens.research.ResearchScre
 
 // TODO: Fix null node children and parents
 public class ResearchGraphWidget extends AbstractWidget {
-    public static final int LEFT_MARGIN_WIDTH = 174;
+    public static final int LEFT_MARGIN_WIDTH = 174 + 13;
 
     private @Nullable ResearchGraph graph;
     private final Map<ResearchNode, ArrayList<ResearchLine>> researchLines;
@@ -543,7 +543,7 @@ public class ResearchGraphWidget extends AbstractWidget {
             return;
         }
 
-        int w = 174;
+        int w = 174 + 13;
         guiGraphics.enableScissor(w, 8, guiGraphics.guiWidth() - 8, guiGraphics.guiHeight() - 8);
         {
             if (this.researchLines != null) {
