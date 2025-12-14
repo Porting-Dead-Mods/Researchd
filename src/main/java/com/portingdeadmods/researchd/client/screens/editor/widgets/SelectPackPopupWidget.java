@@ -2,6 +2,8 @@ package com.portingdeadmods.researchd.client.screens.editor.widgets;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.EditModeSettings;
+import com.portingdeadmods.researchd.client.screens.layouts.WidgetHeaderAndFooterLayout;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.widgets.PDLButton;
 import com.portingdeadmods.researchd.utils.ClientEditorHelper;

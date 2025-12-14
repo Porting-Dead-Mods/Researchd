@@ -6,12 +6,14 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;
 import com.portingdeadmods.researchd.api.client.TechList;
-import com.portingdeadmods.researchd.api.research.EditModeSettings;
 import com.portingdeadmods.researchd.api.research.ResearchInteractionType;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.GraphDropDownWidget;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.DropDownWidget;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.EditorSideBarWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.SelectPackPopupWidget;
-import com.portingdeadmods.researchd.client.screens.editor.widgets.PopupWidget;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.widgets.*;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
@@ -20,10 +22,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
 
@@ -44,12 +48,16 @@ public class ResearchScreen extends Screen {
     private ResearchQueueWidget researchQueueWidget;
     private ResearchGraphWidget researchGraphWidget;
     private SelectedResearchWidget selectedResearchWidget;
+    private EditorSideBarWidget editorSideBarWidget;
+    private PDLImageButton openEditorButton;
 
     private final LinkedHashMap<PopupWidget, List<AbstractWidget>> popupWidgets;
     private PopupWidget focusedPopupWidget;
 
     private boolean editorOpen;
     public SelectPackPopupWidget selectPackPopupWidget;
+
+    private DropDownWidget<?> dropDownWidget;
 
     public ResearchScreen() {
         super(ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_TITLE));
@@ -78,10 +86,13 @@ public class ResearchScreen extends Screen {
             this.researchGraphWidget.setGraph(ResearchGraphCache.computeIfAbsent(CommonResearchCache.rootResearch.getResearchKey()));
         }
 
+        this.editorSideBarWidget = new EditorSideBarWidget(this.width - 174, 0);
+        this.editorSideBarWidget.visible = false;
+
         Minecraft mc = Minecraft.getInstance();
 
         if (mc.player.getData(ResearchdAttachments.RESEARCH_INTERACTION_TYPE) == ResearchInteractionType.EDIT) {
-            this.addRenderableWidget(PDLImageButton.builder(this::openEditor)
+            this.openEditorButton = this.addWidget(PDLImageButton.builder(this::openEditor)
                     .pos(this.width - 16 - 8, this.height - 16 - 8)
                     .size(16, 16)
                     .sprites(EDITOR_BUTTON_SPRITES)
@@ -93,18 +104,20 @@ public class ResearchScreen extends Screen {
         this.researchQueueWidget.visitWidgets(this::addRenderableWidget);
         this.selectedResearchWidget.visitWidgets(this::addRenderableWidget);
         this.researchGraphWidget.visitWidgets(this::addRenderableWidget);
+        this.editorSideBarWidget.visitWidgets(this::addRenderableWidget);
 
     }
 
     private void openEditor(PDLImageButton button) {
-        if (!this.editorOpen) {
-            if (!ClientEditorHelper.getEditModeSettings().isConfigured()) {
+        boolean configured = ClientEditorHelper.getEditModeSettings().isConfigured();
+        if (!configured) {
+            if (!this.editorOpen) {
                 this.selectPackPopupWidget = this.openPopupCentered(new SelectPackPopupWidget(this));
-            } else {
-                
+            } else if (this.selectPackPopupWidget != null) {
+                this.closePopup(this.selectPackPopupWidget);
             }
         } else {
-            this.closePopup(this.selectPackPopupWidget);
+            this.editorSideBarWidget.visible = !this.editorSideBarWidget.visible;
         }
         this.editorOpen = !this.editorOpen;
     }
@@ -154,12 +167,6 @@ public class ResearchScreen extends Screen {
         guiGraphics.blit(TOP_BAR, w, 0, 0, 0, guiGraphics.guiWidth() - w - 8, 8, 256, 8);
         guiGraphics.blit(BOTTOM_BAR, w, guiGraphics.guiHeight() - 8, 0, 0, guiGraphics.guiWidth() - w - 8, 8, 256, 8);
         guiGraphics.blit(RIGHT_BAR, width - 8, 8, 0, 0, 8, guiGraphics.guiHeight() - 8 - 8, 8, 256);
-
-        Minecraft mc = Minecraft.getInstance();
-
-        if (mc.player.getData(ResearchdAttachments.RESEARCH_INTERACTION_TYPE) == ResearchInteractionType.EDIT) {
-            guiGraphics.blit(EDIT_BUTTON_CORNER, width - 24 - 4, height - 24 - 4, 0, 0, 24, 24, 24, 24);
-        }
     }
 
     @Override
@@ -204,10 +211,23 @@ public class ResearchScreen extends Screen {
             this.selectedResearchWidget.renderTooltip(guiGraphics, mouseX, mouseY, partialTick);
         }
         poseStack.popPose();
+
+        Minecraft mc = Minecraft.getInstance();
+
+        if (mc.player.getData(ResearchdAttachments.RESEARCH_INTERACTION_TYPE) == ResearchInteractionType.EDIT) {
+            guiGraphics.blit(EDIT_BUTTON_CORNER, width - 24 - 4, height - 24 - 4, 0, 0, 24, 24, 24, 24);
+            this.openEditorButton.render(guiGraphics, mouseX, mouseY, partialTick);
+        }
+
+        if (dropDownWidget instanceof GraphDropDownWidget dropDownWidget) {
+            dropDownWidget.render(guiGraphics, mouseX, mouseY, partialTick);
+        }
+
     }
 
     private Optional<GuiEventListener> getPopupChildAt(double mouseX, double mouseY) {
-        if (this.focusedPopupWidget != null && this.focusedPopupWidget.isHovered()) return Optional.of(this.focusedPopupWidget);
+        if (this.focusedPopupWidget != null && this.focusedPopupWidget.isHovered())
+            return Optional.of(this.focusedPopupWidget);
 
         for (List<AbstractWidget> widgets : this.popupWidgets.values()) {
             for (AbstractWidget widget : widgets) {
@@ -243,6 +263,15 @@ public class ResearchScreen extends Screen {
                 }
             }
         }
+
+        if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && this.researchGraphWidget.isHovered() && !this.openEditorButton.isHovered()) {
+            this.setDropDown(new GraphDropDownWidget((int) mouseX, (int) mouseY));
+        } else if (this.dropDownWidget != null && this.dropDownWidget.isHovered() && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+            this.dropDownWidget.mouseClicked(mouseX, mouseY, button);
+        } else {
+            this.setDropDown(null);
+        }
+
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
@@ -289,6 +318,13 @@ public class ResearchScreen extends Screen {
 
     public ResearchGraph getResearchGraph() {
         return this.researchGraphWidget.getCurrentGraph();
+    }
+
+    public void setDropDown(@Nullable DropDownWidget<?> dropDownWidget) {
+        this.dropDownWidget = dropDownWidget;
+        if (this.dropDownWidget != null) {
+            this.dropDownWidget.rebuildOptions();
+        }
     }
 
     @Override

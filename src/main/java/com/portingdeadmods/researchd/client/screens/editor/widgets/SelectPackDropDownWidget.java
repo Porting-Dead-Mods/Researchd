@@ -1,5 +1,6 @@
 package com.portingdeadmods.researchd.client.screens.editor.widgets;
 
+import com.portingdeadmods.researchd.client.screens.lib.widgets.DropDownWidget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackRepository;

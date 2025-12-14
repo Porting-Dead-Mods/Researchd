@@ -2,6 +2,9 @@ package com.portingdeadmods.researchd.client.screens.editor.widgets;
 
 import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.client.screens.layouts.WidgetHeaderAndFooterLayout;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.DraggablePopupWidget;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.widgets.PDLButton;
 import com.portingdeadmods.researchd.networking.edit.CreateDatapackPayload;
@@ -19,7 +22,6 @@ import net.minecraft.server.packs.PackType;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
-import java.nio.file.Path;
 import java.util.function.Consumer;
 
 public class CreatePackPopupWidget extends DraggablePopupWidget {
