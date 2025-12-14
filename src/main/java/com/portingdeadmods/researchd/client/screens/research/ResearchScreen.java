@@ -265,7 +265,7 @@ public class ResearchScreen extends Screen {
         }
 
         if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && this.researchGraphWidget.isHovered() && !this.openEditorButton.isHovered()) {
-            this.setDropDown(new GraphDropDownWidget((int) mouseX, (int) mouseY));
+            this.setDropDown(new GraphDropDownWidget(this, (int) mouseX, (int) mouseY));
         } else if (this.dropDownWidget != null && this.dropDownWidget.isHovered() && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             this.dropDownWidget.mouseClicked(mouseX, mouseY, button);
         } else {
