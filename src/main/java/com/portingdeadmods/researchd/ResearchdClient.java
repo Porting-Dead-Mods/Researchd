@@ -1,19 +1,23 @@
 package com.portingdeadmods.researchd;
 
+import com.portingdeadmods.researchd.api.client.ClientResearch;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
 import com.portingdeadmods.researchd.api.research.RegistryDisplay;
+import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchIcon;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.client.impl.ClientItemResearchIcon;
+import com.portingdeadmods.researchd.client.impl.SimpleClientResearch;
 import com.portingdeadmods.researchd.client.impl.effects.*;
 import com.portingdeadmods.researchd.client.impl.methods.*;
 import com.portingdeadmods.researchd.client.renderers.ResearchLabBER;
 import com.portingdeadmods.researchd.client.screens.lab.ResearchLabScreen;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
 import com.portingdeadmods.researchd.impl.research.ItemResearchIcon;
+import com.portingdeadmods.researchd.impl.research.SimpleResearch;
 import com.portingdeadmods.researchd.impl.research.effect.*;
 import com.portingdeadmods.researchd.impl.research.method.*;
 import com.portingdeadmods.researchd.registries.*;
@@ -47,6 +51,7 @@ public final class ResearchdClient {
     public static final Map<ResourceLocation, WidgetConstructor<? extends ResearchMethod>> RESEARCH_METHOD_WIDGETS = new HashMap<>();
     public static final Map<ResourceLocation, WidgetConstructor<? extends ResearchEffect>> RESEARCH_EFFECT_WIDGETS = new HashMap<>();
     public static final Map<ResourceLocation, Function<ResearchIcon, ClientResearchIcon<?>>> RESEARCH_ICONS = new HashMap<>();
+    public static final Map<ResourceLocation, ClientResearch> CLIENT_RESEARCHES = new HashMap<>();
     public static final ModelResourceLocation RESEARCH_LAB_MODEL = ModelResourceLocation.standalone(Researchd.rl("block/research_lab"));
 
     public ResearchdClient(IEventBus eventBus, ModContainer modContainer) {
@@ -78,6 +83,8 @@ public final class ResearchdClient {
             addEffectWidget(UnlockItemEffect.ID, UnlockItemEffectWidget::new);
 
             addClientResearchIcon(ItemResearchIcon.ID, ClientItemResearchIcon::new);
+
+            CLIENT_RESEARCHES.put(Researchd.rl(SimpleResearch.ID), SimpleClientResearch.INSTANCE);
 
             ItemBlockRenderTypes.setRenderLayer(ResearchdBlocks.RESEARCH_LAB_CONTROLLER.get(), RenderType.solid()); // Should fiddle with render types till it works ngl
         });

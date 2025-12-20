@@ -25,6 +25,8 @@ import java.util.Optional;
 public record SimpleResearch(ItemResearchIcon researchIcon, ResearchMethod researchMethod, ResearchEffect researchEffect,
                              List<ResourceKey<Research>> parents, boolean requiresParent,
                              DisplayImpl display) implements Research, RegistryDisplay<Research> {
+    public static final String ID = "simple";
+
     @Override
     public ResearchSerializer<?> getSerializer() {
         return Serializer.INSTANCE;

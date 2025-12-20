@@ -290,10 +290,18 @@ public class ResearchScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        if (this.getPopupChildAt(mouseX, mouseY).filter(p_293596_ -> p_293596_.mouseScrolled(mouseX, mouseY, scrollX, scrollY)).isPresent()) {
+        if (this.getPopupChildAt(mouseX, mouseY).filter(widget -> widget.mouseScrolled(mouseX, mouseY, scrollX, scrollY)).isPresent()) {
             return true;
         }
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (this.getPopupChildAt(mouseX, mouseY).filter(widget -> widget.mouseDragged(mouseX, mouseY, button, dragX, dragY)).isPresent()) {
+            return true;
+        }
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 
     public ResearchGraphWidget getResearchGraphWidget() {

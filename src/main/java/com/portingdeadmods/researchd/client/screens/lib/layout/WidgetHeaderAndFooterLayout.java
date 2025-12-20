@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.client.screens.layouts;
+package com.portingdeadmods.researchd.client.screens.lib.layout;
 
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.layouts.FrameLayout;

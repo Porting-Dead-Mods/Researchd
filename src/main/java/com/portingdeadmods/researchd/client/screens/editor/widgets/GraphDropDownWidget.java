@@ -31,7 +31,7 @@ public class GraphDropDownWidget extends DropDownWidget<LayoutElement> {
     }
 
     private void createNewResearch(StringOption opt) {
-        this.screen.openPopupCentered(new CreateResearchPopupWidget(this.screen));
+        this.screen.openPopupCentered(new ResearchCreationPopupWidget(this.screen, 0, 0, 128, 128));
         this.screen.setDropDown(null);
     }
 }

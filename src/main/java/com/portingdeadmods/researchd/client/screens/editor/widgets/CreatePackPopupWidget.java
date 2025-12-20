@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.client.screens.editor.widgets;
 
 import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.client.screens.layouts.WidgetHeaderAndFooterLayout;
+import com.portingdeadmods.researchd.client.screens.lib.layout.WidgetHeaderAndFooterLayout;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.DraggablePopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;

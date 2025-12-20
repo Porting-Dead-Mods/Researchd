@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.client.screens.editor.widgets;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.client.screens.lib.layout.AbstractLayoutWidget;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.AbstractLayoutWidget;
 import com.portingdeadmods.researchd.client.screens.research.widgets.PDLImageButton;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
