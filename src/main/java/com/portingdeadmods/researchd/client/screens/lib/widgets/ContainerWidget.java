@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.api.client.widgets;
+package com.portingdeadmods.researchd.client.screens.lib.widgets;
 
 import com.portingdeadmods.researchd.Researchd;
 import net.minecraft.client.gui.GuiGraphics;
@@ -32,17 +32,38 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
-        guiGraphics.enableScissor(this.getLeft(), this.getTop(), this.getX() + this.getItemWidth(), this.getY() + this.getHeight());
+        guiGraphics.enableScissor(this.getLeft(), this.getTop(), this.getX() + getScissorsWidth(), this.getY() + getScissorsHeight());
         {
             this.renderContainer(guiGraphics, mouseX, mouseY);
         }
         guiGraphics.disableScissor();
 
         if (renderScroller) {
-            float percentage = (float) this.scrollOffset / (this.getContentHeight() - this.getHeight());
-            guiGraphics.blitSprite(SCROLLER_SMALL_SPRITE, this.getLeft() + this.getItemWidth() + 3, (int) (this.getTop() + percentage * (this.getHeight() - 7)), 4, 7);
+            renderScroller(guiGraphics, mouseX, mouseY, v);
         }
 
+        renderTooltips(guiGraphics, mouseX, mouseY, v);
+
+    }
+
+    protected void renderTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
+
+    }
+
+    protected void renderScroller(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        float percentage = (float) this.scrollOffset / (this.getContentHeight() - this.getHeight());
+        if (Float.isNaN(percentage)) {
+            percentage = 0;
+        }
+        guiGraphics.blitSprite(SCROLLER_SMALL_SPRITE, this.getLeft() + this.getItemWidth() + 3, (int) (this.getTop() + percentage * (this.getHeight() - 7)), 4, 7);
+    }
+
+    protected int getScissorsHeight() {
+        return this.getHeight();
+    }
+
+    protected int getScissorsWidth() {
+        return this.getItemWidth();
     }
 
     @Override
@@ -55,7 +76,7 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
                 this.scrollOffset = (int) rawScrollOffset;
             }
         }
-        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+        return true;
     }
 
     public boolean isScrollbarHovered(int mouseX, int mouseY) {
@@ -102,15 +123,15 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
         return this.getItems().size() * this.getItemHeight();
     }
 
-    private int getTop() {
+    protected int getTop() {
         return this.getY() + 1;
     }
 
-    private int getLeft() {
+    protected int getLeft() {
         return this.getX() + 1;
     }
 
-    public void renderContainer(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+    protected void renderContainer(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         int index = 0;
         for (E item : this.items) {
             this.renderItem(guiGraphics, item, index, this.getLeft(), this.getTop() + index * this.getItemHeight() - this.scrollOffset, mouseX, mouseY);
@@ -119,10 +140,14 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
     }
 
     public boolean isItemHovered(int index, int mouseX, int mouseY) {
-        return mouseX > this.getLeft()
-                && mouseX < this.getLeft() + this.getItemWidth()
-                && mouseY > this.getTop() + (this.itemHeight * index) - this.scrollOffset
-                && mouseY < this.getTop() + (this.itemHeight * (index + 1)) - this.scrollOffset;
+        return this.isItemHovered(0, index, mouseX, mouseY);
+    }
+
+    public boolean isItemHovered(int indexX, int indexY, int mouseX, int mouseY) {
+        return mouseX > this.getLeft() + (this.getItemWidth() * indexX)
+                && mouseX < this.getLeft() + (this.getItemWidth() * (indexX + 1))
+                && mouseY > this.getTop() + (this.getItemHeight() * indexY) - this.scrollOffset
+                && mouseY < this.getTop() + (this.getItemHeight() * (indexY + 1)) - this.scrollOffset;
     }
 
 	protected void sortEntriesBy(java.util.Comparator<? super E> comparator) {
@@ -133,7 +158,12 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
 
     public abstract void clickedItem(E item, int index, int left, int top, int mouseX, int mouseY);
 
-    public abstract void renderItem(GuiGraphics guiGraphics, E item, int index, int left, int top, int mouseX, int mouseY);
+    public void renderItem(GuiGraphics guiGraphics, E item, int index, int left, int top, int mouseX, int mouseY) {
+        this.renderItem(guiGraphics, item, 0, index, left, top, mouseX, mouseY);
+    }
+
+    public abstract void renderItem(GuiGraphics guiGraphics, E item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY);
+
 
     @Override
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {

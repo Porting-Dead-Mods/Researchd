@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.client.screens.team.widgets;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.utils.PlayerUtils;
-import com.portingdeadmods.researchd.api.client.widgets.ContainerWidget;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.ContainerWidget;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.team.ResearchTeamScreen;
@@ -33,7 +33,7 @@ public class RecentResearchesList extends ContainerWidget<ResearchInstance> {
     }
 
     @Override
-    public void renderItem(GuiGraphics guiGraphics, ResearchInstance research, int index, int left, int top, int mouseX, int mouseY) {
+    public void renderItem(GuiGraphics guiGraphics, ResearchInstance research, int xIndex, int index, int left, int top, int mouseX, int mouseY) {
         ResourceLocation resourcelocation = ResearchTeamScreen.RECENT_RESEARCH_SPRITES.get(true, this.isItemHovered(index, mouseX, mouseY));
         guiGraphics.blitSprite(resourcelocation, left, top, this.getItemWidth(), this.getItemHeight());
 

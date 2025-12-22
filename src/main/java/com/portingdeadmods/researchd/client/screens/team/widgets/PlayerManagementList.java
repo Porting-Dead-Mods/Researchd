@@ -3,7 +3,7 @@ package com.portingdeadmods.researchd.client.screens.team.widgets;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.client.widgets.ContainerWidget;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.ContainerWidget;
 import com.portingdeadmods.researchd.api.team.ResearchTeamRole;
 import com.portingdeadmods.researchd.api.team.TeamMember;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
@@ -100,7 +100,7 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
     }
 
     @Override
-    public void renderItem(GuiGraphics guiGraphics, PlayerManagementList.Entry item, int index, int left, int top, int mouseX, int mouseY) {
+    public void renderItem(GuiGraphics guiGraphics, PlayerManagementList.Entry item, int xIndex, int index, int left, int top, int mouseX, int mouseY) {
         PoseStack poseStack = guiGraphics.pose();
         poseStack.pushPose();
         {

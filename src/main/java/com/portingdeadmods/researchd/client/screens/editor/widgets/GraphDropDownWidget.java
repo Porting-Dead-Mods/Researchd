@@ -5,6 +5,7 @@ import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.layouts.LayoutElement;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
 public class GraphDropDownWidget extends DropDownWidget<LayoutElement> {
@@ -27,7 +28,10 @@ public class GraphDropDownWidget extends DropDownWidget<LayoutElement> {
     protected void buildOptions() {
         this.addOption(new StringOption(Component.literal("New Research"), Minecraft.getInstance().font, this::createNewResearch));
         this.addOption(new StringOption(Component.literal("Uwu"), Minecraft.getInstance().font));
-        this.addOption(new StringOption(Component.literal("Close Screen lol"), Minecraft.getInstance().font, opt -> Minecraft.getInstance().setScreen(null)));
+        this.addOption(new StringOption(Component.literal("Select item"), Minecraft.getInstance().font, opt -> {
+            this.screen.openPopupCentered(new ItemSelectorWidget.SelectorPopupWidget(0, 0, CommonComponents.EMPTY));
+            this.screen.setDropDown(null);
+        }));
     }
 
     private void createNewResearch(StringOption opt) {
