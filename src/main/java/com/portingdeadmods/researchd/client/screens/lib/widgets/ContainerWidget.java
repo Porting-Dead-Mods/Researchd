@@ -6,6 +6,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
@@ -14,9 +15,12 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
     public static final ResourceLocation SCROLLER_SMALL_SPRITE = Researchd.rl("scroller_small");
     private final int itemWidth;
     private final int itemHeight;
-    private final Collection<E> items;
+    private Collection<E> items;
     private final boolean renderScroller;
     protected int scrollOffset;
+    protected @Nullable E hoveredItem;
+    protected int hoveredXIndex;
+    protected int hoveredYIndex;
 
     public ContainerWidget(int width, int height, int itemWidth, int itemHeight, Collection<E> items, boolean renderScroller) {
         this(0, 0, width, height, itemWidth, itemHeight, items, renderScroller);
@@ -31,7 +35,11 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
+    protected final void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
+        this.hoveredItem = null;
+        this.hoveredXIndex = -1;
+        this.hoveredYIndex = -1;
+
         guiGraphics.enableScissor(this.getLeft(), this.getTop(), this.getX() + getScissorsWidth(), this.getY() + getScissorsHeight());
         {
             this.renderContainer(guiGraphics, mouseX, mouseY);
@@ -86,6 +94,9 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (this.isHovered() && !this.isScrollbarHovered((int) mouseX, (int) mouseY)) {
+            int left = this.getLeft() + (this.hoveredXIndex * this.getItemWidth());
+            int top = this.getTop() + (this.hoveredYIndex * this.getItemHeight());
+            this.clickedItem(this.hoveredItem, this.hoveredXIndex, this.hoveredYIndex, left, top, (int) mouseX, (int) mouseY);
             return super.mouseClicked(mouseX, mouseY, button);
         } else if (this.isHovered() && this.isScrollbarHovered((int) mouseX, (int) mouseY) && this.renderScroller) {
             int scrollableHeight = this.getContentHeight() - this.getHeight();
@@ -105,6 +116,10 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
         if (this.isScrollbarHovered((int) mouseX, (int) mouseY)) {
             this.mouseClicked(mouseX, mouseY, 0);
         }
+    }
+
+    public void setItems(Collection<E> items) {
+        this.items = items;
     }
 
     public Collection<E> getItems() {
@@ -156,14 +171,27 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
 		}
 	}
 
-    public abstract void clickedItem(E item, int index, int left, int top, int mouseX, int mouseY);
+    public void clickedItem(E item, int index, int left, int top, int mouseX, int mouseY) {
+        this.clickedItem(item, 0, index, left, top, mouseX, mouseY);
+    }
 
-    public void renderItem(GuiGraphics guiGraphics, E item, int index, int left, int top, int mouseX, int mouseY) {
+
+    public abstract void clickedItem(E item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY);
+
+    public final void renderItem(GuiGraphics guiGraphics, E item, int index, int left, int top, int mouseX, int mouseY) {
         this.renderItem(guiGraphics, item, 0, index, left, top, mouseX, mouseY);
     }
 
-    public abstract void renderItem(GuiGraphics guiGraphics, E item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY);
+    public final void renderItem(GuiGraphics guiGraphics, E item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {
+        if (guiGraphics.containsPointInScissor(mouseX, mouseY) && this.isItemHovered(xIndex, yIndex, mouseX, mouseY)) {
+            this.hoveredItem = item;
+            this.hoveredXIndex = xIndex;
+            this.hoveredYIndex = yIndex;
+        }
+        this.internalRenderItem(guiGraphics, item, xIndex, yIndex, left, top, mouseX, mouseY);
+    }
 
+    protected abstract void internalRenderItem(GuiGraphics guiGraphics, E item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY);
 
     @Override
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {

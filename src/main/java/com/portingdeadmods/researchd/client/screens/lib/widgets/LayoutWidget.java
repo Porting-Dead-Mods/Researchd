@@ -6,7 +6,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.layouts.Layout;
 import net.minecraft.client.gui.layouts.LayoutElement;
 
-public interface LayoutWidget<L extends Layout> extends GuiEventListener, Renderable {
+public interface LayoutWidget<L extends Layout> {
     L getLayout();
     
     Iterable<? extends LayoutElement> getElements();
@@ -15,8 +15,7 @@ public interface LayoutWidget<L extends Layout> extends GuiEventListener, Render
         this.getLayout().arrangeElements();
     }
 
-    @Override
-    default void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    default void renderElements(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         for (LayoutElement child : this.getElements()) {
             if (child instanceof Renderable renderable) {
                 renderable.render(guiGraphics, mouseX, mouseY, partialTick);
@@ -24,8 +23,7 @@ public interface LayoutWidget<L extends Layout> extends GuiEventListener, Render
         }
     }
 
-    @Override
-    default void mouseMoved(double mouseX, double mouseY) {
+    default void mouseMovedElements(double mouseX, double mouseY) {
         for (LayoutElement child : this.getElements()) {
             if (child instanceof GuiEventListener guiEventListener) {
                 guiEventListener.mouseMoved(mouseX, mouseY);
@@ -33,8 +31,7 @@ public interface LayoutWidget<L extends Layout> extends GuiEventListener, Render
         }
     }
 
-    @Override
-    default boolean mouseClicked(double mouseX, double mouseY, int button) {
+    default boolean mouseClickedElements(double mouseX, double mouseY, int button) {
         for (LayoutElement child : this.getElements()) {
             if (child instanceof GuiEventListener guiEventListener) {
                 if (guiEventListener.mouseClicked(mouseX, mouseY, button)) {
@@ -45,8 +42,7 @@ public interface LayoutWidget<L extends Layout> extends GuiEventListener, Render
         return false;
     }
 
-    @Override
-    default boolean mouseReleased(double mouseX, double mouseY, int button) {
+    default boolean mouseReleasedElements(double mouseX, double mouseY, int button) {
         for (LayoutElement child : this.getElements()) {
             if (child instanceof GuiEventListener guiEventListener) {
                 if (guiEventListener.mouseReleased(mouseX, mouseY, button)) {
@@ -57,8 +53,7 @@ public interface LayoutWidget<L extends Layout> extends GuiEventListener, Render
         return false;
     }
 
-    @Override
-    default boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+    default boolean mouseDraggedElements(double mouseX, double mouseY, int button, double dragX, double dragY) {
         for (LayoutElement child : this.getElements()) {
             if (child instanceof GuiEventListener guiEventListener) {
                 if (guiEventListener.mouseDragged(mouseX, mouseY, button, dragX, dragY)) {
@@ -69,8 +64,7 @@ public interface LayoutWidget<L extends Layout> extends GuiEventListener, Render
         return false;
     }
 
-    @Override
-    default boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+    default boolean mouseScrolledElements(double mouseX, double mouseY, double scrollX, double scrollY) {
         for (LayoutElement child : this.getElements()) {
             if (child instanceof GuiEventListener guiEventListener) {
                 if (guiEventListener.mouseScrolled(mouseX, mouseY, scrollX, scrollY)) {
@@ -81,8 +75,7 @@ public interface LayoutWidget<L extends Layout> extends GuiEventListener, Render
         return false;
     }
 
-    @Override
-    default boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    default boolean keyPressedElements(int keyCode, int scanCode, int modifiers) {
         for (LayoutElement child : this.getElements()) {
             if (child instanceof GuiEventListener guiEventListener) {
                 if (guiEventListener.keyPressed(keyCode, scanCode, modifiers)) {
@@ -93,8 +86,7 @@ public interface LayoutWidget<L extends Layout> extends GuiEventListener, Render
         return false;
     }
 
-    @Override
-    default boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+    default boolean keyReleasedElements(int keyCode, int scanCode, int modifiers) {
         for (LayoutElement child : this.getElements()) {
             if (child instanceof GuiEventListener guiEventListener) {
                 if (guiEventListener.keyReleased(keyCode, scanCode, modifiers)) {
@@ -105,8 +97,7 @@ public interface LayoutWidget<L extends Layout> extends GuiEventListener, Render
         return false;
     }
 
-    @Override
-    default boolean charTyped(char codePoint, int modifiers) {
+    default boolean charTypedElements(char codePoint, int modifiers) {
         for (LayoutElement child : this.getElements()) {
             if (child instanceof GuiEventListener guiEventListener) {
                 if (guiEventListener.charTyped(codePoint, modifiers)) {

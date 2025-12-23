@@ -70,7 +70,7 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
 	}
 
     @Override
-    public void clickedItem(PlayerManagementList.Entry item, int index, int left, int top, int mouseX, int mouseY) {
+    public void clickedItem(PlayerManagementList.Entry item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {
     }
 
     @Override
@@ -100,7 +100,7 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
     }
 
     @Override
-    public void renderItem(GuiGraphics guiGraphics, PlayerManagementList.Entry item, int xIndex, int index, int left, int top, int mouseX, int mouseY) {
+    public void internalRenderItem(GuiGraphics guiGraphics, PlayerManagementList.Entry item, int xIndex, int index, int left, int top, int mouseX, int mouseY) {
         PoseStack poseStack = guiGraphics.pose();
         poseStack.pushPose();
         {

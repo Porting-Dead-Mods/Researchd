@@ -22,12 +22,12 @@ public class TeamMembersList extends ContainerWidget<TeamMember> {
     }
 
     @Override
-    public void clickedItem(TeamMember item, int index, int left, int top, int mouseX, int mouseY) {
+    public void clickedItem(TeamMember item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {
 
     }
 
     @Override
-    public void renderItem(GuiGraphics guiGraphics, TeamMember item, int xIndex, int index, int left, int top, int mouseX, int mouseY) {
+    public void internalRenderItem(GuiGraphics guiGraphics, TeamMember item, int xIndex, int index, int left, int top, int mouseX, int mouseY) {
         ResourceLocation resourcelocation = ResearchTeamScreen.TEAM_MEMBER_BUTTON_SPRITES.get(this.isActive(), this.isItemHovered(index, mouseX, mouseY));
         guiGraphics.blitSprite(resourcelocation, left, top, this.getItemWidth(), this.getItemHeight());
 

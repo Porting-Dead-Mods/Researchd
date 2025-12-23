@@ -12,10 +12,13 @@ import net.minecraft.client.gui.components.MultiLineEditBox;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Optional;
 
 public final class ClientEditorHelper {
@@ -76,4 +79,7 @@ public final class ClientEditorHelper {
         return new DisplayImpl(Optional.of(Component.literal(nameEditBox.getValue())), Optional.of(Component.literal(descEditBox.getValue())));
     }
 
+    public static Inventory getPlayerInventory() {
+        return Minecraft.getInstance().player.getInventory();
+    }
 }

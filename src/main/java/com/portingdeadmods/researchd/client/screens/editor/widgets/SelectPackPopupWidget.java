@@ -101,6 +101,11 @@ public class SelectPackPopupWidget extends PopupWidget {
 
     }
 
+    @Override
+    public WidgetHeaderAndFooterLayout getLayout() {
+        return layout;
+    }
+
     private void onCreateNewProjectPressed(PDLButton button) {
         this.screen.openPopupCentered(new CreatePackPopupWidget(this.screen, PackType.SERVER_DATA));
     }

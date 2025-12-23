@@ -242,22 +242,14 @@ public class ResearchScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-//        if (this.focusedPopupWidget != null && this.focusedPopupWidget.mouseClicked(mouseX, mouseY, button)) {
-//            this.setFocused(this.focusedPopupWidget);
-//            if (button == 0) {
-//                this.setDragging(true);
-//            }
-//
-//            return true;
-//        }
-
-        for (List<AbstractWidget> widgets : this.popupWidgets.sequencedValues().reversed()) {
+        SequencedCollection<List<AbstractWidget>> reversed = new ArrayList<>(this.popupWidgets.sequencedValues().reversed());
+        for (List<AbstractWidget> widgets : reversed) {
             for (AbstractWidget widget : widgets) {
                 if (widget.mouseClicked(mouseX, mouseY, button)) {
-//                    this.setFocused(widget);
-//                    if (button == 0) {
-//                        this.setDragging(true);
-//                    }
+                    this.setFocused(widget);
+                    if (button == 0) {
+                        this.setDragging(true);
+                    }
 
                     return true;
                 }

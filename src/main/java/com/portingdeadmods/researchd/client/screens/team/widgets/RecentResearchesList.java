@@ -28,12 +28,12 @@ public class RecentResearchesList extends ContainerWidget<ResearchInstance> {
     }
 
     @Override
-    public void clickedItem(ResearchInstance item, int index, int left, int top, int mouseX, int mouseY) {
+    public void clickedItem(ResearchInstance item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {
 
     }
 
     @Override
-    public void renderItem(GuiGraphics guiGraphics, ResearchInstance research, int xIndex, int index, int left, int top, int mouseX, int mouseY) {
+    public void internalRenderItem(GuiGraphics guiGraphics, ResearchInstance research, int xIndex, int index, int left, int top, int mouseX, int mouseY) {
         ResourceLocation resourcelocation = ResearchTeamScreen.RECENT_RESEARCH_SPRITES.get(true, this.isItemHovered(index, mouseX, mouseY));
         guiGraphics.blitSprite(resourcelocation, left, top, this.getItemWidth(), this.getItemHeight());
 
