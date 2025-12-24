@@ -23,7 +23,7 @@ public class SimpleClientResearch implements ClientResearch {
     @Override
     public void buildLayout(RememberingLinearLayout layout, Context context) {
         layout.getLayout().spacing(2);
-        layout.addWidget("icon", new ItemSelectorWidget(context.parentScreen(), 0, 0, CommonComponents.EMPTY));
+        layout.addWidget("icon", new ItemSelectorWidget(context.parentScreen(), context.parentPopupWidget(), 0, 0, CommonComponents.EMPTY));
         layout.addWidget("requires_parents", Checkbox.builder(Component.literal("Requires Parents"), PopupWidget.getFont()).build());
     }
 

@@ -42,7 +42,7 @@ public class ResearchCreationPopupWidget extends DraggablePopupWidget {
 
     protected void buildLayout() {
         if (this.clientResearch != null) {
-            this.clientResearch.buildLayout(this.layout, new ClientResearch.Context(this.screen));
+            this.clientResearch.buildLayout(this.layout, new ClientResearch.Context(this.screen, this));
             this.layout.getLayout().arrangeElements();
             this.layout.getChildren().forEach(this::addRenderableWidget);
         }

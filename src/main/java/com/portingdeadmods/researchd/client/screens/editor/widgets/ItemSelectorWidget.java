@@ -23,6 +23,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,11 +33,14 @@ import java.util.function.Supplier;
 
 public class ItemSelectorWidget extends AbstractWidget {
     private final ResearchScreen screen;
+    @Nullable
+    private final PopupWidget parentPopupWidget;
     private ItemStack selected;
 
-    public ItemSelectorWidget(ResearchScreen screen, int x, int y, Component message) {
+    public ItemSelectorWidget(ResearchScreen screen, @Nullable PopupWidget parentPopupWidget, int x, int y, Component message) {
         super(x, y, 18, 18, message);
         this.screen = screen;
+        this.parentPopupWidget = parentPopupWidget;
         this.setTooltip(Tooltip.create(Component.literal("Select Icon")));
         this.selected = new ItemStack(Items.DIRT);
     }
@@ -50,7 +54,12 @@ public class ItemSelectorWidget extends AbstractWidget {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        this.screen.openPopupCentered(new SelectorPopupWidget(this.screen, 0, 0, CommonComponents.EMPTY));
+        if (this.isHovered()) {
+            if (this.parentPopupWidget != null) {
+                this.screen.closePopup(this.parentPopupWidget);
+            }
+            this.screen.openPopupCentered(new SelectorPopupWidget(this.screen, this, this.parentPopupWidget, 0, 0, CommonComponents.EMPTY));
+        }
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
@@ -76,13 +85,18 @@ public class ItemSelectorWidget extends AbstractWidget {
         private final SelectorContainerWidget containerWidget;
         private final PDLImageButton doneButton;
         private final ResearchScreen screen;
+        private final ItemSelectorWidget parentSelectorWidget;
+        @Nullable
+        private final PopupWidget parentPopupWidget;
         private Collection<ItemStack> allItems;
         private Collection<ItemStack> filteredItems;
         private Category category;
 
-        public SelectorPopupWidget(ResearchScreen screen, int x, int y, Component message) {
+        public SelectorPopupWidget(ResearchScreen screen, ItemSelectorWidget parentSelectorWidget, @Nullable PopupWidget parentPopupWidget, int x, int y, Component message) {
             super(x, y, 180, 194, message);
             this.screen = screen;
+            this.parentSelectorWidget = parentSelectorWidget;
+            this.parentPopupWidget = parentPopupWidget;
             this.category = Category.JEI.exists() ? Category.JEI : Category.ALL;
             this.allItems = this.category.getItems();
             this.filteredItems = allItems;
@@ -102,6 +116,10 @@ public class ItemSelectorWidget extends AbstractWidget {
 
         private void onDoneClicked(PDLImageButton button) {
             this.screen.closePopup(this);
+            if (this.parentPopupWidget != null) {
+                this.screen.openPopupCentered(this.parentPopupWidget);
+                this.parentSelectorWidget.selected = this.containerWidget.selectedItem;
+            }
         }
 
         private void onSearchBarValueChanged(String val) {
@@ -265,9 +283,14 @@ public class ItemSelectorWidget extends AbstractWidget {
         }
 
         @Override
-        public void clickedItem(ItemStack item, int yIndex, int xIndex, int left, int top, int mouseX, int mouseY) {
-            this.selectedItem = item;
-            this.selectorWidget.doneButton.active = true;
+        public void clickedItem(ItemStack item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {
+            if (this.isItemHovered(xIndex, yIndex, mouseX, mouseY)) {
+                this.selectedItem = item.copy();
+                this.selectorWidget.doneButton.active = true;
+            } else {
+                this.selectedItem = null;
+                this.selectorWidget.doneButton.active = false;
+            }
         }
 
         @Override
