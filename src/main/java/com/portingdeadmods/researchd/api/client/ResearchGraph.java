@@ -1,8 +1,10 @@
 package com.portingdeadmods.researchd.api.client;
 
+import com.portingdeadmods.portingdeadlibs.utils.LazyFinal;
 import com.portingdeadmods.researchd.api.research.GlobalResearch;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.api.research.ResearchPage;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
 import net.minecraft.resources.ResourceKey;
@@ -17,12 +19,12 @@ import java.util.Set;
  * @param rootNode Root node that is displayed bigger than the rest of the nodes
  * @param nodes    All the nodes in the current graph
  */
-public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, ResearchNode> nodes) {
+public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, ResearchNode> nodes, ResearchPage page) {
     private static final int RESEARCH_GRAPH_LAYERS = 2;
 
     // TODO: Add researchPacks to the team's research progress
     private ResearchGraph(GlobalResearch researchRoot, Map<ResourceKey<Research>, ResearchInstance> researches) {
-        this(new ResearchNode(researches.get(researchRoot.getResearchKey())), new HashMap<>());
+        this(new ResearchNode(researches.get(researchRoot.getResearchKey())), new HashMap<>(), CommonResearchCache.pageOf(researchRoot));
 
         createNodes(rootNode.getInstance(), 0, CommonResearchCache.rootResearch != null && CommonResearchCache.rootResearch.is(rootNode.getInstance().getKey())
                 ? -1
@@ -34,7 +36,6 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
         for (ResearchNode node : this.nodes.values()) {
             node.graph = this;
         }
-
     }
 
     private void collectRelatedNodes() {
@@ -89,5 +90,16 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
 
     public static ResearchGraph fromRootResearch(ResourceKey<Research> root, Map<ResourceKey<Research>, ResearchInstance> researches) {
         return new ResearchGraph(CommonResearchCache.globalResearches.get(root), researches);
+    }
+
+    /**
+     * @param page The research page containing all researches to include
+     * @param rootNode The root node to use for this graph - TODO: Parse researches from the page to get the root directly
+     * @param researches Lookup
+     * @return A new ResearchGraph for the page
+     */
+    public static ResearchGraph fromResearchPage(ResearchPage page, GlobalResearch rootNode, Map<ResourceKey<Research>, ResearchInstance> researches) {
+        // TODO: FINISH
+        return new ResearchGraph(rootNode, researches);
     }
 }

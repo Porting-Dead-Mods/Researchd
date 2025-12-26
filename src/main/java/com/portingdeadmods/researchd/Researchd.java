@@ -66,7 +66,7 @@ public final class Researchd {
 	 * Mods will need to register all of their different ResearchEffectData entries here to be picked up by refreshResearches();
 	 * Anything registered should only be of form {@code Supplier<AttachmentType<ResearchEffectData<?>>>}
 	 * <br>
-	 * Also PS: I will always hate generics <3
+	 * Also PS: I will always hate generics (heart)
 	 */
 	public static final Set<Supplier<? extends AttachmentType<? extends ResearchEffectData<?>>>> RESEARCH_EFFECT_DATA_TYPES = new HashSet<>();
 
