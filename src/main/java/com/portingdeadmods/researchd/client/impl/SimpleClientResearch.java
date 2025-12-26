@@ -8,6 +8,7 @@ import com.portingdeadmods.researchd.client.screens.editor.widgets.ResearchSelec
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
 import com.portingdeadmods.researchd.impl.utils.DisplayImpl;
+import com.portingdeadmods.researchd.resources.contents.ResearchdResearchPages;
 import com.portingdeadmods.researchd.utils.ClientEditorHelper;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.EditBox;
@@ -48,6 +49,7 @@ public class SimpleClientResearch implements ClientResearch {
                 null,
                 layout.getChild("parents_selector", ResearchSelectorListWidget.class).getResearches(),
                 layout.getChild("requires_parents", Checkbox.class).selected(),
+		        ResearchdResearchPages.DEFAULT, // TODO: Research Page into editor
                 display
         );
     }

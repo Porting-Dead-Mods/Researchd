@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.client.screens.research.graph;
 
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;
+import com.portingdeadmods.researchd.api.research.GlobalResearch;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
@@ -209,4 +210,8 @@ public class ResearchNode extends AbstractWidget {
         int dy = y - getY();
         downStream(0, dy);
     }
+
+	public GlobalResearch getResearch() {
+		return this.getInstance().getResearch();
+	}
 }

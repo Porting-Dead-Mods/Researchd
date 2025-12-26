@@ -3,6 +3,8 @@ package com.portingdeadmods.researchd.client.screens.research.widgets;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.api.research.ResearchPage;
+import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
@@ -11,14 +13,18 @@ import com.portingdeadmods.researchd.client.screens.research.graph.GraphStateMan
 import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
 import com.portingdeadmods.researchd.client.screens.research.graph.lines.PotentialOverlap;
 import com.portingdeadmods.researchd.client.screens.research.graph.lines.ResearchHead;
+import com.portingdeadmods.researchd.utils.TextUtils;
 import com.portingdeadmods.researchd.client.screens.research.graph.lines.ResearchLine;
 import it.unimi.dsi.fastutil.Pair;
+import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
@@ -31,7 +37,7 @@ import static com.portingdeadmods.researchd.client.screens.research.ResearchScre
 
 // TODO: Fix null node children and parents
 public class ResearchGraphWidget extends AbstractWidget {
-    public static final int LEFT_MARGIN_WIDTH = 174;
+    public static final int LEFT_MARGIN_WIDTH = 174 + 13;
 
     private @Nullable ResearchGraph graph;
     private final Map<ResearchNode, ArrayList<ResearchLine>> researchLines;
@@ -51,6 +57,7 @@ public class ResearchGraphWidget extends AbstractWidget {
     public void setGraph(ResearchGraph graph) {
         if (this.graph != graph) {
             this.graph = graph;
+			this.researchScreen.getResearchPagesList().setSelectedPage(CommonResearchCache.pageOf(graph.rootNode().getResearch()));
             this.researchLines.clear();
 
             if (graph == null || graph.nodes().isEmpty()) {
@@ -537,13 +544,52 @@ public class ResearchGraphWidget extends AbstractWidget {
         return this.graph;
     }
 
+    private void renderHeader(GuiGraphics guiGraphics, int x) {
+        if (this.graph == null) return;
+
+        Minecraft mc = Minecraft.getInstance();
+        Font font = mc.font;
+
+        int y = 12;
+
+        ResearchPage page = this.researchScreen.getResearchPagesList().getSelectedPage();
+        ResourceLocation pageId = page != null ? page.id() : ResearchPage.DEFAULT_PAGE_ID;
+
+        // Completion text pos is used to wrap title so it needs to be done before
+        int completed = (int) this.graph.nodes().values().stream()
+                .filter(node -> node.getInstance().isResearched())
+                .count();
+        int total = this.graph.nodes().size();
+        Component completionText = Component.literal(completed + "/" + total).withStyle(ChatFormatting.GOLD);
+        int completionTextWidth = font.width(completionText);
+        int completionTextX = guiGraphics.guiWidth() - 8 - completionTextWidth - 5;
+
+        // Title
+        Component title = Component.translatable("researchpage." + pageId.getNamespace() + "." + pageId.getPath() + ".title");
+        int titleMaxWidth = completionTextX - x - 4;
+        TextUtils.drawWrappedText(guiGraphics, title, x, y, titleMaxWidth, 0xFFFFFF, true);
+
+        // Description
+        Component description = Component.translatable("researchpage." + pageId.getNamespace() + "." + pageId.getPath() + ".description");
+        int rightPadding = Math.max(8, guiGraphics.guiWidth() - x - 250);
+        int descMaxWidth = Math.min(guiGraphics.guiWidth() - x - rightPadding, 250);
+        TextUtils.drawWrappedText(guiGraphics, description.copy().withStyle(ChatFormatting.GRAY), x, y + 12, descMaxWidth, 0xAAAAAA, false);
+
+        // Completion count (right-aligned)
+        guiGraphics.drawString(font, completionText, completionTextX, y, 0xFFFFFF, true);
+    }
+
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
         if (this.graph == null || this.graph.nodes() == null) {
             return;
         }
 
-        int w = 174;
+        int w = 174 + 13;
+
+        // title, description, completion count
+        renderHeader(guiGraphics, w + 5);
+
         guiGraphics.enableScissor(w, 8, guiGraphics.guiWidth() - 8, guiGraphics.guiHeight() - 8);
         {
             if (this.researchLines != null) {
