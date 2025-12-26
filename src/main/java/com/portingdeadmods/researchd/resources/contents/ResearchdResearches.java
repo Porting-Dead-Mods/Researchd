@@ -1,33 +1,18 @@
 package com.portingdeadmods.researchd.resources.contents;
 
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
-import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
-import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
-import com.portingdeadmods.researchd.impl.research.SimpleResearch;
-import com.portingdeadmods.researchd.impl.research.effect.AndResearchEffect;
 import com.portingdeadmods.researchd.impl.research.effect.DimensionUnlockEffect;
-import com.portingdeadmods.researchd.impl.research.effect.RecipeUnlockEffect;
-import com.portingdeadmods.researchd.impl.research.effect.UnlockItemEffect;
-import com.portingdeadmods.researchd.impl.research.method.*;
 import com.portingdeadmods.researchd.registries.ResearchdItems;
 import com.portingdeadmods.researchd.resources.ResearchdDatagenProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.ItemLike;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.function.UnaryOperator;
 
-public class ResearchdResearches implements ResearchdDatagenProvider<Research> {
+public class ResearchdResearches implements ResearchdDatagenProvider<Research>, ResearchdResearchProvider {
     public static final ResourceLocation COBBLESTONE_LOC = Researchd.rl("cobblestone");
     public static final ResourceLocation OVERWORLD_PACK_LOC = Researchd.rl("overworld_pack");
     public static final ResourceLocation NETHER_LOC = Researchd.rl("nether");
@@ -43,6 +28,16 @@ public class ResearchdResearches implements ResearchdDatagenProvider<Research> {
     public ResearchdResearches(String modid) {
         this.modid = modid;
         this.researches = new HashMap<>();
+    }
+
+    @Override
+    public String getModid() {
+        return modid;
+    }
+
+    @Override
+    public Map<ResourceKey<Research>, Research> getResearches() {
+        return researches;
     }
 
     @Override
@@ -130,7 +125,7 @@ public class ResearchdResearches implements ResearchdDatagenProvider<Research> {
                 ));
          simpleResearch("end_crystal", builder -> builder
                 .icon(Items.END_CRYSTAL)
-                .researchPage(Researchd.rl("end_crystal"))
+                .researchPage(ResearchdResearchPages.END_CRYSTAL)
                 .method(consumePack(250, 200, pack(ResearchdResearchPacks.OVERWORLD_PACK_LOC), pack(ResearchdResearchPacks.NETHER_PACK_LOC), pack(ResearchdResearchPacks.END_PACK_LOC)))
                 .effect(
                         and(unlockRecipe(mcLoc("end_crystal")))
@@ -173,69 +168,4 @@ public class ResearchdResearches implements ResearchdDatagenProvider<Research> {
     public Map<ResourceKey<Research>, Research> getContents() {
         return this.researches;
     }
-
-    protected @NotNull ResourceLocation mcLoc(String path) {
-        return ResourceLocation.withDefaultNamespace(path);
-    }
-
-    protected @NotNull ResourceLocation modLoc(String path) {
-        return ResourceLocation.fromNamespaceAndPath(this.modid, path);
-    }
-
-    protected @NotNull ResourceLocation loc(String namespace, String path) {
-        return ResourceLocation.fromNamespaceAndPath(namespace, path);
-    }
-
-    protected @NotNull DimensionUnlockEffect unlockDimension(ResourceLocation location, ResourceLocation sprite) {
-        return new DimensionUnlockEffect(location, sprite);
-    }
-
-    protected @NotNull UnlockItemEffect unlockItem(ItemLike item) {
-        return new UnlockItemEffect(item.asItem());
-    }
-
-    @SafeVarargs
-    protected final @NotNull ConsumePackResearchMethod consumePack(int count, int duration, ResourceKey<ResearchPack>... packs) {
-        return new ConsumePackResearchMethod(Arrays.asList(packs), count, duration);
-    }
-
-    protected @NotNull RecipeUnlockEffect unlockRecipe(ResourceLocation location) {
-        return new RecipeUnlockEffect(location);
-    }
-
-    protected @NotNull ConsumeItemResearchMethod consumeItem(ItemLike item, int count) {
-        return new ConsumeItemResearchMethod(Ingredient.of(item), count);
-    }
-
-    protected @NotNull CheckItemPresenceResearchMethod hasItem(ItemLike item, int count) {
-        return new CheckItemPresenceResearchMethod(Ingredient.of(item), count);
-    }
-
-    protected ResourceKey<Research> key(String name) {
-        return ResourceKey.create(ResearchdRegistries.RESEARCH_KEY, modLoc(name));
-    }
-
-    protected ResourceKey<ResearchPack> pack(ResourceLocation location) {
-        return ResourceKey.create(ResearchdRegistries.RESEARCH_PACK_KEY, location);
-    }
-
-    protected ResearchMethod and(ResearchMethod... methods) {
-        return new AndResearchMethod(List.of(methods));
-    }
-
-    protected ResearchMethod or(ResearchMethod... methods) {
-        return new OrResearchMethod(List.of(methods));
-    }
-
-    protected ResearchEffect and(ResearchEffect... methods) {
-        return new AndResearchEffect(List.of(methods));
-    }
-
-    protected ResourceKey<Research> simpleResearch(String name, UnaryOperator<SimpleResearch.Builder> builder) {
-        ResourceKey<Research> key = key(name);
-        this.researches.put(key, builder.apply(SimpleResearch.builder())
-                .build());
-        return key;
-    }
-
 }

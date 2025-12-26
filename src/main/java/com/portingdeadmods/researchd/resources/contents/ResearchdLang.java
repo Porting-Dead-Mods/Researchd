@@ -1,18 +1,18 @@
 package com.portingdeadmods.researchd.resources.contents;
 
-import com.portingdeadmods.researchd.ResearchdRegistries;
-import net.minecraft.resources.ResourceLocation;
-
 import java.util.HashMap;
 import java.util.Map;
 
-public class ResearchdLang {
+public class ResearchdLang implements ResearchdLangProvider {
     private final Map<String, String> translations;
-    private final String modid;
 
     public ResearchdLang(String modid) {
-        this.modid = modid;
         this.translations = new HashMap<>();
+    }
+
+    @Override
+    public Map<String, String> getTranslations() {
+        return translations;
     }
 
     public void build() {
@@ -28,26 +28,9 @@ public class ResearchdLang {
         addResearchPackName(ResearchdResearchPacks.END_PACK_LOC, "End Research Pack");
         addResearchPackName(ResearchdResearchPacks.NETHER_PACK_LOC, "Nether Research Pack");
         addResearchPackName(ResearchdResearchPacks.OVERWORLD_PACK_LOC, "Overworld Research Pack");
-    }
 
-    private void addResearch(ResourceLocation key, String name) {
-        add(ResearchdRegistries.RESEARCH_KEY.location().getPath() + "." + key.getNamespace() + "." + key.getPath() + "_name", name);
-    }
-
-    private void addResearchMethod(ResourceLocation key, String name) {
-        add("research_method." + key.getNamespace() + "." + key.getPath(), name);
-    }
-
-    private void addResearchPackName(ResourceLocation key, String name) {
-        add("research_pack." + key.toString().replace(':', '.') + "_name", name);
-    }
-
-	private void addResearchPackDescription(ResourceLocation key, String name) {
-		add("research_pack" + key.toString().replace(':', '.') + "_desc", name);
-	}
-
-    private void add(String key, String name) {
-        this.translations.put(key, name);
+		addResearchPage(ResearchdResearchPages.DEFAULT, "Welcome to Researchd", "This page contains example researches to showcase what the mod is capable of!");
+		addResearchPage(ResearchdResearchPages.END_CRYSTAL, "Another Research Page", "Researches can be split into separate pages for organization!");
     }
 
     public Map<String, String> getContents() {
