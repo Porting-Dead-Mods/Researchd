@@ -107,13 +107,13 @@ public class ResearchScreen extends Screen {
                     .build());
         }
 
+	    // This needs to be first
+	    this.researchPagesList.visitWidgets(this::addRenderableWidget);
+
         this.techListWidget.visitWidgets(this::addRenderableWidget);
         this.researchQueueWidget.visitWidgets(this::addRenderableWidget);
         this.selectedResearchWidget.visitWidgets(this::addRenderableWidget);
         this.researchGraphWidget.visitWidgets(this::addRenderableWidget);
-
-        // This needs to be last
-        this.researchPagesList.visitWidgets(this::addRenderableWidget);
     }
 
     /**
