@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.utils.researches;
 
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.research.RegistryDisplay;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
@@ -17,6 +18,7 @@ import com.portingdeadmods.researchd.impl.research.effect.data.UnlockItemEffectD
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
 import com.portingdeadmods.researchd.utils.TimeDifference;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -105,6 +107,14 @@ public final class ResearchHelperCommon {
                 .sorted(Comparator.comparingInt(entry -> entry.getValue().sortingValue()))
                 .map(Map.Entry::getKey)
                 .toList();
+    }
+
+    public static Component getResearchName(ResourceKey<Research> key, Research research) {
+        if (research instanceof RegistryDisplay<?> registryDisplay) {
+            return registryDisplay.getDisplayNameUnsafe(key);
+        } else {
+            return Research.getLangName(key);
+        }
     }
 
     public static void refreshResearches(ServerPlayer player) {

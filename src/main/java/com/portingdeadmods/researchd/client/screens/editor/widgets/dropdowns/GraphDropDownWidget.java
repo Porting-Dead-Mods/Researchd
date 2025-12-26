@@ -1,5 +1,7 @@
-package com.portingdeadmods.researchd.client.screens.editor.widgets;
+package com.portingdeadmods.researchd.client.screens.editor.widgets.dropdowns;
 
+import com.portingdeadmods.researchd.client.screens.editor.widgets.ItemSelectorWidget;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.ResearchCreationPopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.DropDownWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import net.minecraft.client.Minecraft;

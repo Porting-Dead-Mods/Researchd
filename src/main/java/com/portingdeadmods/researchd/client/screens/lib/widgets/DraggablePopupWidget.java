@@ -13,9 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class DraggablePopupWidget extends PopupWidget {
-    private GuiEventListener focused;
     private boolean isHovered;
-    private boolean dragging;
     private boolean updateIsHovered = true;
 
     public DraggablePopupWidget(int x, int y, int width, int height, Component message) {
@@ -25,17 +23,6 @@ public abstract class DraggablePopupWidget extends PopupWidget {
     @Override
     public Iterable<? extends LayoutElement> getElements() {
         return this.widgets;
-    }
-
-    @Override
-    public void setFocused(GuiEventListener focused) {
-        this.focused = focused;
-        this.focused.setFocused(true);
-    }
-
-    @Override
-    public GuiEventListener getFocused() {
-        return focused;
     }
 
     protected void onMoved() {

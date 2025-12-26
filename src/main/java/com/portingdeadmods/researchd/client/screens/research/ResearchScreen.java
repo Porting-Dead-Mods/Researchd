@@ -9,10 +9,10 @@ import com.portingdeadmods.researchd.api.client.TechList;
 import com.portingdeadmods.researchd.api.research.ResearchInteractionType;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
-import com.portingdeadmods.researchd.client.screens.editor.widgets.GraphDropDownWidget;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.dropdowns.GraphDropDownWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.DropDownWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.EditorSideBarWidget;
-import com.portingdeadmods.researchd.client.screens.editor.widgets.SelectPackPopupWidget;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.SelectPackPopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.widgets.*;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
@@ -22,7 +22,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -256,7 +255,7 @@ public class ResearchScreen extends Screen {
             }
         }
 
-        if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && this.researchGraphWidget.isHovered() && !this.openEditorButton.isHovered()) {
+        if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && this.researchGraphWidget.isHovered() && (this.openEditorButton == null || !this.openEditorButton.isHovered())) {
             this.setDropDown(new GraphDropDownWidget(this, (int) mouseX, (int) mouseY));
         } else if (this.dropDownWidget != null && this.dropDownWidget.isHovered() && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             this.dropDownWidget.mouseClicked(mouseX, mouseY, button);

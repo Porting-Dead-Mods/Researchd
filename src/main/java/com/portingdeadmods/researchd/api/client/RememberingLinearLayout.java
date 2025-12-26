@@ -37,13 +37,17 @@ public final class RememberingLinearLayout {
     }
 
     public void addWidget(String id, AbstractWidget child) {
-        this.widgets.put(id, child);
+        if (id != null) {
+            this.widgets.put(id, child);
+        }
         this.children.add(child);
         this.getLayout().addChild(child);
     }
 
     public void addWidget(String id, AbstractWidget child, Consumer<LayoutSettings> layoutSettingsFactory) {
-        this.widgets.put(id, child);
+        if (id != null) {
+            this.widgets.put(id, child);
+        }
         this.children.add(child);
         this.getLayout().addChild(child, layoutSettingsFactory);
     }

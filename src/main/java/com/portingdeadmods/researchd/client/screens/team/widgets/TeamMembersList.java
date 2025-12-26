@@ -17,13 +17,18 @@ import java.util.Comparator;
 
 public class TeamMembersList extends ContainerWidget<TeamMember> {
     public TeamMembersList(int width, int height, int itemWidth, int itemHeight, Collection<TeamMember> items, boolean renderScroller) {
-        super(width, height, itemWidth, itemHeight, items, renderScroller);
-        resort();
+        super(width, height, itemWidth, itemHeight, Orientation.VERTICAL, 1, 10, items, renderScroller);
+        this.resort();
     }
 
     @Override
     public void clickedItem(TeamMember item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {
 
+    }
+
+    @Override
+    protected int getScissorsHeight() {
+        return this.getHeight();
     }
 
     @Override

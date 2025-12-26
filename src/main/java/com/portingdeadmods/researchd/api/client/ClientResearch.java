@@ -10,7 +10,8 @@ public interface ClientResearch {
 
     Research createResearch(RememberingLinearLayout layout);
 
-    record Context(ResearchScreen parentScreen, @Nullable PopupWidget parentPopupWidget) {
+    record Context(ResearchScreen parentScreen, @Nullable PopupWidget parentPopupWidget, int widgetWidth,
+                   int widgetHeight, int innerWidth, int innerHeight, int padding) {
 
     }
 

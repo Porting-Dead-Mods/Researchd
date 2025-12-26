@@ -19,7 +19,7 @@ import java.util.UUID;
 
 public class RecentResearchesList extends ContainerWidget<ResearchInstance> {
     public RecentResearchesList(int width, int height, int itemWidth, int itemHeight, Collection<ResearchInstance> items, boolean renderScroller) {
-        super(width, height, itemWidth, itemHeight, items, renderScroller);
+        super(width, height, itemWidth, itemHeight, Orientation.VERTICAL, 1, 10, items, renderScroller);
     }
 
     @Override
@@ -30,6 +30,11 @@ public class RecentResearchesList extends ContainerWidget<ResearchInstance> {
     @Override
     public void clickedItem(ResearchInstance item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {
 
+    }
+
+    @Override
+    protected int getScissorsHeight() {
+        return this.getHeight();
     }
 
     @Override

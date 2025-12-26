@@ -23,7 +23,7 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
     private final Map<Entry, List<DraggableWidgetImageButton>> buttonWidgets;
     private final AbstractWidget parent;
 
-	private boolean _should_add_button(Entry item, PlayerManagementDraggableWidget.PlayerManagementButtonType type) {
+	private boolean shouldAddButton(Entry item, PlayerManagementDraggableWidget.PlayerManagementButtonType type) {
 		ResearchTeamRole clientRole = ClientResearchTeamHelper.getRole();
 		ResearchTeamRole targetRole = item.teamMember.role();
 
@@ -38,7 +38,7 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
 	}
 
     public PlayerManagementList(int width, int height, int itemWidth, int itemHeight, Collection<PlayerManagementList.Entry> items, boolean renderScroller, AbstractWidget parent) {
-        super(width, height, itemWidth, itemHeight, items, renderScroller);
+        super(width, height, itemWidth, itemHeight, Orientation.VERTICAL, 1, 10, items, renderScroller);
         this.buttonWidgets = new HashMap<>();
         this.parent = parent;
         for (Entry item : items) {
@@ -46,7 +46,8 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
 
             if (item.teamMember.role() != ResearchTeamRole.OWNER) {
                 for (Map.Entry<PlayerManagementDraggableWidget.PlayerManagementButtonType, WidgetSprites> entry : item.buttonSettings().getSprites().entrySet()) {
-					if (!this._should_add_button(item, entry.getKey())) continue;
+					if (!this.shouldAddButton(item, entry.getKey())) continue;
+
                     this.buttonWidgets.get(item).add(new DraggableWidgetImageButton(0, 0, 12, 12, entry.getValue(), btn -> {
                         switch (entry.getKey()) {
                             case PROMOTE -> ClientResearchTeamHelper.promoteTeamMemberSynced(item.teamMember());
@@ -66,8 +67,13 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
             }
         }
 
-		resort();
+		this.resort();
 	}
+
+    @Override
+    protected int getScissorsHeight() {
+        return this.getHeight();
+    }
 
     @Override
     public void clickedItem(PlayerManagementList.Entry item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {
@@ -130,8 +136,8 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
         poseStack.popPose();
     }
 
-	public void resort() {
-		sortEntriesBy(Comparator.comparing(entry -> ClientResearchTeamHelper.getPlayerRole(entry.teamMember().player()).getPermissionLevel(), Comparator.reverseOrder()));
+	private void resort() {
+		this.sortEntriesBy(Comparator.comparing(entry -> ClientResearchTeamHelper.getPlayerRole(entry.teamMember().player()).getPermissionLevel(), Comparator.reverseOrder()));
 	}
 
     public void refreshEntries(Collection<PlayerManagementList.Entry> newEntries) {
@@ -143,7 +149,7 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
 
             if (item.teamMember.role() != ResearchTeamRole.OWNER) {
                 for (Map.Entry<PlayerManagementDraggableWidget.PlayerManagementButtonType, WidgetSprites> entry : item.buttonSettings().getSprites().entrySet()) {
-                    if (!this._should_add_button(item, entry.getKey())) continue;
+                    if (!this.shouldAddButton(item, entry.getKey())) continue;
                     this.buttonWidgets.get(item).add(new DraggableWidgetImageButton(0, 0, 12, 12, entry.getValue(), btn -> {
                         switch (entry.getKey()) {
                             case PROMOTE -> ClientResearchTeamHelper.promoteTeamMemberSynced(item.teamMember());
@@ -163,7 +169,7 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
             }
         }
 
-        resort();
+        this.resort();
     }
 
     public record Entry(TeamMember teamMember, PlayerManagementDraggableWidget.PlayerManagementButtons buttonSettings) {

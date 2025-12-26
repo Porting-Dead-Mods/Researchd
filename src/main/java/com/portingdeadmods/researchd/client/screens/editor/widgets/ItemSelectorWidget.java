@@ -9,6 +9,7 @@ import com.portingdeadmods.researchd.compat.JEICompat;
 import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import com.portingdeadmods.researchd.impl.research.ItemResearchIcon;
 import com.portingdeadmods.researchd.utils.ClientEditorHelper;
+import com.portingdeadmods.researchd.utils.Search;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -82,6 +83,7 @@ public class ItemSelectorWidget extends AbstractWidget {
         public static final ResourceLocation TAB_SMALL_SPRITE = Researchd.rl("tab_small");
 
         private final EditBox searchBar;
+        private final Search search;
         private final SelectorContainerWidget containerWidget;
         private final PDLImageButton doneButton;
         private final ResearchScreen screen;
@@ -97,6 +99,7 @@ public class ItemSelectorWidget extends AbstractWidget {
             this.screen = screen;
             this.parentSelectorWidget = parentSelectorWidget;
             this.parentPopupWidget = parentPopupWidget;
+            this.search = new Search();
             this.category = Category.JEI.exists() ? Category.JEI : Category.ALL;
             this.allItems = this.category.getItems();
             this.filteredItems = allItems;
@@ -124,9 +127,8 @@ public class ItemSelectorWidget extends AbstractWidget {
 
         private void onSearchBarValueChanged(String val) {
             List<ItemStack> items = new ArrayList<>(this.allItems.size());
-            String lowerCaseVal = val.toLowerCase();
             for (ItemStack item : allItems) {
-                if (item.getHoverName().getString().toLowerCase().contains(lowerCaseVal)) {
+                if (this.search.matches(item.getHoverName().getString(), val)) {
                     items.add(item);
                 }
             }
@@ -237,26 +239,8 @@ public class ItemSelectorWidget extends AbstractWidget {
         private ItemStack selectedItem;
 
         public SelectorContainerWidget(ItemSelectorWidget.SelectorPopupWidget selectorWidget, int width, int height, int itemWidth, int itemHeight, Collection<ItemStack> items, boolean renderScroller) {
-            super(width, height, itemWidth, itemHeight, items, renderScroller);
+            super(width, height, itemWidth, itemHeight, Orientation.VERTICAL, 9, 10, items, renderScroller);
             this.selectorWidget = selectorWidget;
-        }
-
-        @Override
-        public void renderContainer(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-            int x = 0;
-            int y = 0;
-            for (ItemStack item : this.getItems()) {
-                if (this.isItemHovered(x, y, mouseX, mouseY) && guiGraphics.containsPointInScissor(mouseX, mouseY)) {
-                    this.hoveredItem = item;
-                }
-                this.renderItem(guiGraphics, item, x, y, this.getLeft() + x * this.getItemWidth(), this.getTop() + y * this.getItemHeight() - this.scrollOffset, mouseX, mouseY);
-                if (x < (this.width / this.getItemWidth()) - 1) {
-                    x++;
-                } else {
-                    x = 0;
-                    y++;
-                }
-            }
         }
 
         @Override
@@ -283,14 +267,24 @@ public class ItemSelectorWidget extends AbstractWidget {
         }
 
         @Override
-        public void clickedItem(ItemStack item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {
-            if (this.isItemHovered(xIndex, yIndex, mouseX, mouseY)) {
-                this.selectedItem = item.copy();
-                this.selectorWidget.doneButton.active = true;
-            } else {
+        protected int getScissorsHeight() {
+            return super.getScissorsHeight() + 1;
+        }
+
+        @Override
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            boolean clicked = super.mouseClicked(mouseX, mouseY, button);
+            if (this.hoveredItem == null && this.isHovered()) {
                 this.selectedItem = null;
                 this.selectorWidget.doneButton.active = false;
             }
+            return clicked;
+        }
+
+        @Override
+        public void clickedItem(ItemStack item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {
+            this.selectedItem = item.copy();
+            this.selectorWidget.doneButton.active = true;
         }
 
         @Override

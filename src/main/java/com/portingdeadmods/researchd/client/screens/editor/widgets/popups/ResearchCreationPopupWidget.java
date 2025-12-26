@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.client.screens.editor.widgets;
+package com.portingdeadmods.researchd.client.screens.editor.widgets.popups;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdClient;
@@ -8,7 +8,6 @@ import com.portingdeadmods.researchd.client.screens.lib.widgets.DraggablePopupWi
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.layouts.FrameLayout;
 import net.minecraft.client.gui.layouts.Layout;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.network.chat.CommonComponents;
@@ -42,7 +41,7 @@ public class ResearchCreationPopupWidget extends DraggablePopupWidget {
 
     protected void buildLayout() {
         if (this.clientResearch != null) {
-            this.clientResearch.buildLayout(this.layout, new ClientResearch.Context(this.screen, this));
+            this.clientResearch.buildLayout(this.layout, new ClientResearch.Context(this.screen, this, this.getWidth(), this.getHeight(), this.getWidth() - 14, this.getHeight() - 14, 7));
             this.layout.getLayout().arrangeElements();
             this.layout.getChildren().forEach(this::addRenderableWidget);
         }

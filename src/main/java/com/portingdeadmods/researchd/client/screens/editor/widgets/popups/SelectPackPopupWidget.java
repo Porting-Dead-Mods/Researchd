@@ -1,7 +1,9 @@
-package com.portingdeadmods.researchd.client.screens.editor.widgets;
+package com.portingdeadmods.researchd.client.screens.editor.widgets.popups;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.EditModeSettings;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.SelectPackDropDownWidget;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.SelectPackSearchBarWidget;
 import com.portingdeadmods.researchd.client.screens.lib.layout.WidgetHeaderAndFooterLayout;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
