@@ -1,17 +1,41 @@
-package com.portingdeadmods.researchd.client.screens.editor.widgets;
+package com.portingdeadmods.researchd.client.screens.lib.widgets;
 
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.events.ContainerEventHandler;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.layouts.Layout;
+import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
-import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class DraggablePopupWidget extends PopupWidget {
+    private GuiEventListener focused;
     private boolean isHovered;
+    private boolean dragging;
     private boolean updateIsHovered = true;
 
     public DraggablePopupWidget(int x, int y, int width, int height, Component message) {
         super(x, y, width, height, message);
+    }
+
+    @Override
+    public Iterable<? extends LayoutElement> getElements() {
+        return this.widgets;
+    }
+
+    @Override
+    public void setFocused(GuiEventListener focused) {
+        this.focused = focused;
+        this.focused.setFocused(true);
+    }
+
+    @Override
+    public GuiEventListener getFocused() {
+        return focused;
     }
 
     protected void onMoved() {
@@ -35,17 +59,13 @@ public abstract class DraggablePopupWidget extends PopupWidget {
         }
     }
 
-    protected abstract @Nullable Layout getLayout();
-
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         if (this.updateIsHovered) {
             this.isHovered = this.isRectHovered(guiGraphics, mouseX, mouseY, this.getWidth(), 12);
         }
-    }
 
-    @Override
-    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
+        super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     @Override

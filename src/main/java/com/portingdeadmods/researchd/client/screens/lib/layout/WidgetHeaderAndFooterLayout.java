@@ -1,11 +1,10 @@
-package com.portingdeadmods.researchd.client.screens.editor.widgets;
+package com.portingdeadmods.researchd.client.screens.lib.layout;
 
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.layouts.FrameLayout;
 import net.minecraft.client.gui.layouts.Layout;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.layouts.LinearLayout;
-import net.minecraft.world.item.enchantment.LevelBasedValue;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

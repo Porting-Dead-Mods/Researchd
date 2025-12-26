@@ -5,13 +5,21 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.EditModeSettings;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.impl.editor.EditModeSettingsImpl;
+import com.portingdeadmods.researchd.impl.utils.DisplayImpl;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.MultiLineEditBox;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.Optional;
 
 public final class ClientEditorHelper {
     public static EditModeSettings getEditModeSettings() {
@@ -65,5 +73,13 @@ public final class ClientEditorHelper {
             Researchd.LOGGER.error("Encountered error while creating files and directories for example resourcepack", e);
             return Result.err("File/Directory creation failed");
         }
+    }
+
+    public static DisplayImpl createDisplay(EditBox nameEditBox, MultiLineEditBox descEditBox) {
+        return new DisplayImpl(Optional.of(Component.literal(nameEditBox.getValue())), Optional.of(Component.literal(descEditBox.getValue())));
+    }
+
+    public static Inventory getPlayerInventory() {
+        return Minecraft.getInstance().player.getInventory();
     }
 }

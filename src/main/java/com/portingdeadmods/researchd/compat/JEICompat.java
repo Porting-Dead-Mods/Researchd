@@ -42,4 +42,8 @@ public final class JEICompat {
             recipesGui.show(List.copyOf(focuses.values()));
         }
     }
+
+    public static Collection<ItemStack> getItems() {
+        return RUNTIME.getIngredientManager().getAllItemStacks();
+    }
 }

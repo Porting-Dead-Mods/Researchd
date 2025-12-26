@@ -2,6 +2,8 @@ package com.portingdeadmods.researchd.client.screens.editor.widgets;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.EditModeSettings;
+import com.portingdeadmods.researchd.client.screens.lib.layout.WidgetHeaderAndFooterLayout;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.widgets.PDLButton;
 import com.portingdeadmods.researchd.utils.ClientEditorHelper;
@@ -97,6 +99,11 @@ public class SelectPackPopupWidget extends PopupWidget {
 
         this.layout.arrangeElements();
 
+    }
+
+    @Override
+    public WidgetHeaderAndFooterLayout getLayout() {
+        return layout;
     }
 
     private void onCreateNewProjectPressed(PDLButton button) {
