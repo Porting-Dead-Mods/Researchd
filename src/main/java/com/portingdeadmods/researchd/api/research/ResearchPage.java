@@ -22,6 +22,10 @@ public record ResearchPage(
         ResourceKey<Research> iconResearchKey,
         UniqueArray<GlobalResearch> researches
 ) {
+	public boolean contains(GlobalResearch res) {
+		return researches.contains(res);
+	}
+
     public static final ResourceLocation DEFAULT_PAGE_ID = Researchd.rl("default");
 
     public static Builder builder(ResourceLocation id) {

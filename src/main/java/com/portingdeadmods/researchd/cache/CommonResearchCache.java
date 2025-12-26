@@ -2,19 +2,15 @@ package com.portingdeadmods.researchd.cache;
 
 import com.google.common.collect.ImmutableMap;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
-import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.GlobalResearch;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchPage;
-import com.portingdeadmods.researchd.impl.research.ItemResearchIcon;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
-import com.portingdeadmods.researchd.utils.researches.ResearchdManagers;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +18,7 @@ import java.util.Map;
 public final class CommonResearchCache {
     public static Map<ResourceKey<Research>, GlobalResearch> globalResearches;
     public static Map<ResourceLocation, ResearchPage> researchPages;
+
     /**
      * Map of ResearchPage id to list of root nodes (GlobalResearches with no parents within that page)
      */
@@ -74,7 +71,7 @@ public final class CommonResearchCache {
         // Build research pages
         Map<ResourceLocation, UniqueArray<GlobalResearch>> pageGroups = new HashMap<>();
         for (GlobalResearch research : globalResearchMap.values()) {
-            ResourceLocation pageId = resolvePageId(research, researchLookup);
+            ResourceLocation pageId = resolvePage(research, researchLookup);
             pageGroups.computeIfAbsent(pageId, k -> new UniqueArray<>()).add(research);
         }
 
@@ -103,18 +100,41 @@ public final class CommonResearchCache {
         pageRoots = ImmutableMap.copyOf(pageRootsMap);
     }
 
-    private static ResourceLocation resolvePageId(GlobalResearch research, Map<ResourceKey<Research>, Research> lookup) {
+    private static ResourceLocation resolvePage(GlobalResearch research, Map<ResourceKey<Research>, Research> lookup) {
         Research r = lookup.get(research.getResearchKey());
         ResourceLocation pageId = r.researchPage();
 
         // If this is not root and has default page, inherit from parent
         if (!research.getParents().isEmpty() && pageId.equals(ResearchPage.DEFAULT_PAGE_ID)) {
-            // Get first parent's page (they should all be same page)
-            GlobalResearch parent = research.getParents().iterator().next();
-            return resolvePageId(parent, lookup);
+	        GlobalResearch firstParent = research.getParents().stream().findFirst().get();
+			ResourceLocation page = resolvePage(firstParent, lookup);
+
+			for (GlobalResearch parent : research.getParents()) {
+				if (resolvePage(parent, lookup) != page) throw new RuntimeException("Research Parent is on a different page than child");
+			}
+
+            return resolvePage(firstParent, lookup);
         }
         return pageId;
     }
+
+	/**
+	 * @return ResourceLocation of the page that contains the research, null if no page contains it
+	 */
+	public static @Nullable ResourceLocation rlPageOf(GlobalResearch res) {
+		for (Map.Entry<ResourceLocation, ResearchPage> entry : researchPages.entrySet()) {
+			if (entry.getValue().contains(res)) return entry.getKey();
+		}
+
+		return null;
+	}
+
+	/**
+	 * @return ResearchPage that contains the research, null if no page contains it
+	 */
+	public static @Nullable ResearchPage pageOf(GlobalResearch res) {
+		return researchPages.get(rlPageOf(res));
+	}
 
     private static void _collectChildren(GlobalResearch research, List<GlobalResearch> list) {
         for (GlobalResearch child : research.getChildren()) {

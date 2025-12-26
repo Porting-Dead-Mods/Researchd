@@ -9,7 +9,7 @@ import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ public class ResearchPagesList extends AbstractWidget {
     private ResearchPage selectedPage;
 
     public ResearchPagesList(ResearchScreen screen, int x, int y) {
-        super(x, y, BUTTON_SIZE, HEIGHT, CommonComponents.EMPTY);
+        super(x, y, BUTTON_SIZE, HEIGHT, Component.empty());
         this.screen = screen;
         this.pages = new ArrayList<>();
 
@@ -69,8 +69,6 @@ public class ResearchPagesList extends AbstractWidget {
             ResearchPage page = this.pages.get(i);
             boolean isHovered = isButtonHovered(i, mouseX, mouseY);
             boolean isSelected = page == this.selectedPage;
-
-            // TODO: Add a blur as a background for the list itself, the tab hover should lighten the blur or smth
 
             // Render icon using the research key (same as ResearchNode does)
             if (isSelected) {
