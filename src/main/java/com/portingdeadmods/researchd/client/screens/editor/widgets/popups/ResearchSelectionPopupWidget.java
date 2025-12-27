@@ -170,7 +170,7 @@ public class ResearchSelectionPopupWidget extends PopupWidget {
 
         @Override
         protected int getScrollerX(float percentage) {
-            return super.getScrollerX(percentage) - 1;
+            return super.getScrollerX(percentage);
         }
 
         @Override

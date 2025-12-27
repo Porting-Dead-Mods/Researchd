@@ -17,6 +17,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public class PlayerManagementList extends ContainerWidget<PlayerManagementList.Entry> {
     public static final ResourceLocation PLAYER_ENTRY_TEXTURE = Researchd.rl("player");

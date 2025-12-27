@@ -44,7 +44,7 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
     }
 
     @Override
-    protected final void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
+    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
         this.hoveredItem = null;
         this.hoveredXIndex = -1;
         this.hoveredYIndex = -1;
@@ -64,7 +64,6 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
     }
 
     protected void renderTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
-
     }
 
     protected void renderScroller(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
@@ -85,14 +84,14 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
         if (this.orientation == Orientation.VERTICAL) {
             return (int) (this.getTop() + scrollPercentage * (this.getHeight() - 7));
         }
-        return this.getTop() + (this.rows * this.getItemHeight()) + 1;
+        return this.getTop() + (this.rows * this.getItemHeight());
     }
 
     protected int getScrollerX(float scrollPercentage) {
         if (this.orientation == Orientation.HORIZONTAL) {
             return (int) (this.getLeft() + scrollPercentage * (this.getWidth() - 7));
         }
-        return this.getLeft() + (this.cols * this.getItemWidth()) + 1;
+        return this.getLeft() + (this.cols * this.getItemWidth());
     }
 
     protected int getScissorsHeight() {
@@ -132,8 +131,10 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
         if (this.isHovered() && !this.isScrollbarHovered((int) mouseX, (int) mouseY)) {
             int left = this.getLeft() + (this.hoveredXIndex * this.getItemWidth());
             int top = this.getTop() + (this.hoveredYIndex * this.getItemHeight());
-            this.clickedItem(this.hoveredItem, this.hoveredXIndex, this.hoveredYIndex, left, top, (int) mouseX, (int) mouseY);
-            return super.mouseClicked(mouseX, mouseY, button);
+            if (this.hoveredItem != null) {
+                this.clickedItem(this.hoveredItem, this.hoveredXIndex, this.hoveredYIndex, left, top, (int) mouseX, (int) mouseY);
+                return super.mouseClicked(mouseX, mouseY, button);
+            }
         } else if (this.isHovered() && this.isScrollbarHovered((int) mouseX, (int) mouseY) && this.renderScroller) {
             int scrollableDistance = this.getMaxScrollDistance();
             int minPos = (this.orientation == Orientation.HORIZONTAL ? this.getX() : this.getY()) + 7;
@@ -203,7 +204,7 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
                 top -= this.scrollOffset;
             }
             this.renderItem(guiGraphics, item, xIndex, yIndex, left, top, mouseX, mouseY);
-            if (this.orientation == Orientation.HORIZONTAL || xIndex < cols) {
+            if (this.orientation == Orientation.HORIZONTAL || xIndex < cols - 1) {
                 xIndex++;
             } else {
                 xIndex = 0;

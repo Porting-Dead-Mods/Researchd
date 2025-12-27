@@ -31,7 +31,7 @@ public class SimpleClientResearch implements ClientResearch {
         layout.addWidget(null, new StringWidget(Component.literal("Icon:"), PopupWidget.getFont()));
         layout.addWidget("icon", new ItemSelectorWidget(context.parentScreen(), context.parentPopupWidget(), 0, 0, CommonComponents.EMPTY));
         layout.addWidget(null, new StringWidget(Component.literal("Parents:"), PopupWidget.getFont()));
-        layout.addWidget("parents_selector", new ResearchSelectorListWidget(context.parentPopupWidget(), context.innerWidth() - 2, 20, Collections.emptyList(), true));
+        layout.addWidget("parents_selector", new ResearchSelectorListWidget(context.parentPopupWidget(), context.innerWidth() - 4, 24, Collections.emptyList(), true));
         layout.addWidget("requires_parents", Checkbox.builder(Component.literal("Requires Parents"), PopupWidget.getFont()).build());
         layout.addWidget(null, new StringWidget(Component.literal("Method:"), PopupWidget.getFont()));
     }

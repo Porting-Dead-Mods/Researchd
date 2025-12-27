@@ -10,6 +10,7 @@ import com.portingdeadmods.researchd.client.screens.lib.widgets.ContainerWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.utils.Spaghetti;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.resources.ResourceKey;
@@ -20,14 +21,21 @@ import java.util.*;
 
 // Widget for selecting a list of elements horizontally, scrollable with a popup for selecting the element
 public class ResearchSelectorListWidget extends ContainerWidget<ResearchSelectorListWidget.Element> {
+    public static final ResourceLocation BACKGROUND_SPRITES = Researchd.rl("editor_background_research_list");
+
     private final PopupWidget parentPopupWidget;
     private UniqueArray<Element> items;
 
     public ResearchSelectorListWidget(@Nullable PopupWidget parentPopupWidget, int width, int height, Collection<Element> items, boolean renderScroller) {
-        super(width, height, 16, 16, Orientation.HORIZONTAL, width / 16, 1, items, renderScroller);
+        super(width, height, 18, 18, Orientation.HORIZONTAL, width, 1, items, renderScroller);
         this.parentPopupWidget = parentPopupWidget;
         this.items = new UniqueArray<>(items);
         this.getItems().add(Element.SelectorElement.INSTANCE);
+    }
+
+    @Override
+    protected int getScissorsWidth() {
+        return this.getWidth();
     }
 
     public void addItem(Element item) {
@@ -54,6 +62,13 @@ public class ResearchSelectorListWidget extends ContainerWidget<ResearchSelector
                 .filter(elem -> elem instanceof Element.SimpleElement)
                 .map(elem -> ((Element.SimpleElement) elem).researchKey())
                 .toList();
+    }
+
+    @Override
+    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
+        guiGraphics.blitSprite(BACKGROUND_SPRITES, this.getX(), this.getY(), this.getWidth() + 2, this.getHeight());
+
+        super.renderWidget(guiGraphics, mouseX, mouseY, v);
     }
 
     @Override
@@ -84,6 +99,16 @@ public class ResearchSelectorListWidget extends ContainerWidget<ResearchSelector
         item.render(guiGraphics, left, top, this.getItemWidth(), this.getItemHeight(), this.isItemHovered(xIndex, yIndex, mouseX, mouseY), mouseX, mouseY, 1);
     }
 
+    @Override
+    protected void renderTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
+        super.renderTooltips(guiGraphics, mouseX, mouseY, v);
+
+        if (this.hoveredItem instanceof Element.SimpleElement(ResourceKey<Research> researchKey, Research research)) {
+            guiGraphics.renderTooltip(PopupWidget.getFont(), ResearchHelperCommon.getResearchName(researchKey, research), mouseX, mouseY);
+        }
+
+    }
+
     public sealed interface Element permits Element.SimpleElement, Element.SelectorElement {
         WidgetSprites SPRITES = new WidgetSprites(Researchd.rl("editor_background"), Researchd.rl("editor_background_highlighted"));
 
@@ -95,13 +120,13 @@ public class ResearchSelectorListWidget extends ContainerWidget<ResearchSelector
             @Override
             public void render(GuiGraphics guiGraphics, int x, int y, int width, int height, boolean hovered, int mouseX, int mouseY, float partialTick) {
                 guiGraphics.blitSprite(SPRITES.get(true, hovered), x, y, width, height);
-                ClientResearchIcon.getClientIcon(research.researchIcon()).render(guiGraphics, x, y, mouseX, mouseY, 1, partialTick);
+                ClientResearchIcon.getClientIcon(research.researchIcon()).render(guiGraphics, x + 1, y + 1, mouseX, mouseY, 1, partialTick);
                 if (hovered) {
                     PoseStack poseStack  = guiGraphics.pose();
                     poseStack.pushPose();
                     {
                         poseStack.translate(0, 0, 160);
-                        guiGraphics.blitSprite(REMOVE_ELEMENT_HOVER_SPRITE, x + 1, y + 1, 14, 14);
+                        guiGraphics.blitSprite(REMOVE_ELEMENT_HOVER_SPRITE, x + 2, y + 2, 14, 14);
                     }
                     poseStack.popPose();
                 }

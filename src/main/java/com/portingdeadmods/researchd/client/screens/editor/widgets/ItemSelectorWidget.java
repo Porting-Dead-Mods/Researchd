@@ -1,5 +1,6 @@
 package com.portingdeadmods.researchd.client.screens.editor.widgets;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.ContainerWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
@@ -33,13 +34,15 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 public class ItemSelectorWidget extends AbstractWidget {
+    public static final ResourceLocation BACKGROUND_SPRITE = Researchd.rl("editor_background_inverted");
+    public static final ResourceLocation EDIT_ELEMENT_HOVER_SPRITE = Researchd.rl("edit_element_hover");
     private final ResearchScreen screen;
     @Nullable
     private final PopupWidget parentPopupWidget;
     private ItemStack selected;
 
     public ItemSelectorWidget(ResearchScreen screen, @Nullable PopupWidget parentPopupWidget, int x, int y, Component message) {
-        super(x, y, 18, 18, message);
+        super(x, y, 20, 20, message);
         this.screen = screen;
         this.parentPopupWidget = parentPopupWidget;
         this.setTooltip(Tooltip.create(Component.literal("Select Icon")));
@@ -48,8 +51,18 @@ public class ItemSelectorWidget extends AbstractWidget {
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        guiGraphics.blitSprite(BACKGROUND_SPRITE, this.getX(), this.getY(), this.getWidth(), this.getHeight());
         if (this.selected != null) {
-            guiGraphics.renderItem(this.selected, this.getX() + 1, this.getY() + 1);
+            guiGraphics.renderItem(this.selected, this.getX() + 2, this.getY() + 2);
+        }
+        if (this.isHovered()) {
+            PoseStack poseStack  = guiGraphics.pose();
+            poseStack.pushPose();
+            {
+                poseStack.translate(0, 0, 160);
+                guiGraphics.blitSprite(EDIT_ELEMENT_HOVER_SPRITE, this.getX() + 3, this.getY() + 3, 14, 14);
+            }
+            poseStack.popPose();
         }
     }
 
@@ -107,7 +120,7 @@ public class ItemSelectorWidget extends AbstractWidget {
             this.searchBar.setBordered(false);
             this.searchBar.setEditable(true);
             this.searchBar.setResponder(this::onSearchBarValueChanged);
-            this.containerWidget = this.addRenderableWidget(new SelectorContainerWidget(this, 160 - 14, 160 - 13, 16, 16, this.filteredItems, true));
+            this.containerWidget = this.addRenderableWidget(new SelectorContainerWidget(this, 160 - 15, 160 - 15, 16, 16, this.filteredItems, true));
             this.doneButton = this.addRenderableWidget(PDLImageButton.builder(this::onDoneClicked)
                     .size(14, 14)
                     .tooltip(Tooltip.create(Component.literal("Select Item")))
@@ -121,7 +134,7 @@ public class ItemSelectorWidget extends AbstractWidget {
             this.screen.closePopup(this);
             if (this.parentPopupWidget != null) {
                 this.screen.openPopupCentered(this.parentPopupWidget);
-                this.parentSelectorWidget.selected = this.containerWidget.selectedItem;
+                this.parentSelectorWidget.selected = this.containerWidget.selectedItem.copy();
             }
         }
 
@@ -179,6 +192,7 @@ public class ItemSelectorWidget extends AbstractWidget {
                         this.allItems = category.getItems();
                         this.filteredItems = this.allItems;
                         this.searchBar.setValue("");
+                        this.containerWidget.resetScrollOffset();
                         return true;
                     }
                 }
@@ -261,6 +275,10 @@ public class ItemSelectorWidget extends AbstractWidget {
             guiGraphics.blitSprite(SCROLLER_SMALL_SPRITE, this.getLeft() + this.getWidth() + 3, (int) (this.getTop() + percentage * (this.getHeight() - 7)), 4, 7);
         }
 
+        public void resetScrollOffset() {
+            this.scrollOffset = 0;
+        }
+
         @Override
         protected int getScissorsWidth() {
             return this.getWidth();
@@ -283,8 +301,10 @@ public class ItemSelectorWidget extends AbstractWidget {
 
         @Override
         public void clickedItem(ItemStack item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {
-            this.selectedItem = item.copy();
-            this.selectorWidget.doneButton.active = true;
+            if (item != null) {
+                this.selectedItem = item;
+                this.selectorWidget.doneButton.active = true;
+            }
         }
 
         @Override
