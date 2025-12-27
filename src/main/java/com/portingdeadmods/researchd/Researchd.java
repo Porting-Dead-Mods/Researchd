@@ -25,11 +25,13 @@ import com.portingdeadmods.researchd.resources.ResearchdExamplesSource;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
 import com.portingdeadmods.researchd.utils.researches.ResearchdManagers;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.world.entity.player.Player;
@@ -143,6 +145,8 @@ public final class Researchd {
             }
             event.addRepositorySource(new ResearchdExamplesSource(pack.packId(), event.getPackType(), Pack.Position.BOTTOM, pack));
         }
+
+		event.addPackFinders(rl("assets/researchd/darkmode"), PackType.CLIENT_RESOURCES, Component.literal("Researchd Dark Mode Assets"), PackSource.BUILT_IN, false, Pack.Position.TOP);
     }
 
     private void registerCapabilities(RegisterCapabilitiesEvent event) {
