@@ -7,12 +7,14 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
+import com.portingdeadmods.researchd.api.research.methods.ResearchMethodType;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
 import com.portingdeadmods.researchd.api.team.ValueEffectsHolder;
 import com.portingdeadmods.researchd.content.blockentities.ResearchLabControllerBE;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
+import com.portingdeadmods.researchd.registries.ResearchMethodTypes;
 import com.portingdeadmods.researchd.registries.ResearchdValueEffects;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -40,6 +42,11 @@ public record ConsumePackResearchMethod(List<ResourceKey<ResearchPack>> packs, i
     @Override
     public ResourceLocation id() {
         return ID;
+    }
+
+    @Override
+    public ResearchMethodType type() {
+        return ResearchMethodTypes.CONSUME_PACK.get();
     }
 
     @Override

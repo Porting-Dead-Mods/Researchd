@@ -7,9 +7,11 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.ValueEffect;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
+import com.portingdeadmods.researchd.api.research.effects.ResearchEffectType;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectSerializer;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.ValueEffectsHolder;
+import com.portingdeadmods.researchd.registries.ResearchEffectTypes;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -48,6 +50,11 @@ public record DecreaseValueEffect(ValueEffect value, Float decrement) implements
     @Override
     public ResourceLocation id() {
         return ID;
+    }
+
+    @Override
+    public ResearchEffectType type() {
+        return ResearchEffectTypes.DECREASE_VALUE.get();
     }
 
     @Override

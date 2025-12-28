@@ -36,20 +36,22 @@ public final class RememberingLinearLayout {
         return this.getLayout().addChild(element, layoutSettingsFactory);
     }
 
-    public void addWidget(String id, AbstractWidget child) {
+    public <W extends AbstractWidget> W addWidget(String id, W child) {
         if (id != null) {
             this.widgets.put(id, child);
         }
         this.children.add(child);
         this.getLayout().addChild(child);
+        return child;
     }
 
-    public void addWidget(String id, AbstractWidget child, Consumer<LayoutSettings> layoutSettingsFactory) {
+    public <W extends AbstractWidget> W addWidget(String id, W child, Consumer<LayoutSettings> layoutSettingsFactory) {
         if (id != null) {
             this.widgets.put(id, child);
         }
         this.children.add(child);
         this.getLayout().addChild(child, layoutSettingsFactory);
+        return child;
     }
 
     public LinearLayout getLayout() {

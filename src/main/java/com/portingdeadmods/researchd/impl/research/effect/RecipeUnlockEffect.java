@@ -7,9 +7,11 @@ import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
+import com.portingdeadmods.researchd.api.research.effects.ResearchEffectType;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectSerializer;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
+import com.portingdeadmods.researchd.registries.ResearchEffectTypes;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -61,6 +63,11 @@ public record RecipeUnlockEffect(Optional<ItemStack> icon, Optional<String> name
     @Override
     public ResourceLocation id() {
         return ID;
+    }
+
+    @Override
+    public ResearchEffectType type() {
+        return ResearchEffectTypes.RECIPE_UNLOCK.get();
     }
 
     public Set<RecipeHolder<?>> getRecipes(Level level) {

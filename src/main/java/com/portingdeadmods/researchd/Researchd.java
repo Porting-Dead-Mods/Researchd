@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import com.portingdeadmods.portingdeadlibs.api.resources.DynamicPack;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
+import com.portingdeadmods.researchd.api.research.effects.ResearchEffectType;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import com.portingdeadmods.researchd.compat.ftbteams.FTBTeamsCompat;
@@ -16,10 +17,7 @@ import com.portingdeadmods.researchd.networking.registries.UpdateResearchesPaylo
 import com.portingdeadmods.researchd.networking.research.ResearchCacheReloadPayload;
 import com.portingdeadmods.researchd.pdl.config.PDLConfigHelper;
 import com.portingdeadmods.researchd.registries.*;
-import com.portingdeadmods.researchd.registries.serializers.ResearchEffectSerializers;
-import com.portingdeadmods.researchd.registries.serializers.ResearchMethodSerializers;
-import com.portingdeadmods.researchd.registries.serializers.ResearchPackSerializers;
-import com.portingdeadmods.researchd.registries.serializers.ResearchSerializers;
+import com.portingdeadmods.researchd.registries.serializers.*;
 import com.portingdeadmods.researchd.resources.ResearchdDynamicPackContents;
 import com.portingdeadmods.researchd.resources.ResearchdExamplesSource;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
@@ -95,10 +93,13 @@ public final class Researchd {
     }
 
     public Researchd(IEventBus modEventBus, ModContainer modContainer) {
-        ResearchdAttachments.ATTACHMENTS.register(modEventBus);
         ResearchSerializers.SERIALIZERS.register(modEventBus);
         ResearchEffectSerializers.SERIALIZERS.register(modEventBus);
         ResearchMethodSerializers.SERIALIZERS.register(modEventBus);
+        ResearchPackSerializers.SERIALIZERS.register(modEventBus);
+        ResearchIconSerializers.SERIALIZERS.register(modEventBus);
+
+        ResearchdAttachments.ATTACHMENTS.register(modEventBus);
         ResearchdItems.ITEMS.register(modEventBus);
         ResearchdDataComponents.COMPONENTS.register(modEventBus);
         ResearchdTab.TABS.register(modEventBus);
@@ -106,8 +107,9 @@ public final class Researchd {
         ResearchdBlocks.BLOCKS.register(modEventBus);
         ResearchdBlockEntityTypes.BLOCK_ENTITY_TYPES.register(modEventBus);
         ResearchdMenuTypes.MENU_TYPES.register(modEventBus);
+        ResearchMethodTypes.TYPES.register(modEventBus);
+        ResearchEffectTypes.TYPES.register(modEventBus);
         ResearchdValueEffects.VALUE_EFFECTS.register(modEventBus);
-        ResearchPackSerializers.SERIALIZERS.register(modEventBus);
 
         modEventBus.addListener(this::registerCapabilities);
         modEventBus.addListener(this::registerRegistries);
@@ -153,8 +155,11 @@ public final class Researchd {
         event.register(ResearchdRegistries.RESEARCH_SERIALIZER);
         event.register(ResearchdRegistries.RESEARCH_PACK_SERIALIZER);
         event.register(ResearchdRegistries.RESEARCH_EFFECT_SERIALIZER);
+        event.register(ResearchdRegistries.RESEARCH_ICON_SERIALIZER);
         event.register(ResearchdRegistries.RESEARCH_METHOD_SERIALIZER);
         event.register(ResearchdRegistries.VALUE_EFFECT);
+        event.register(ResearchdRegistries.RESEARCH_METHOD_TYPE);
+        event.register(ResearchdRegistries.RESEARCH_EFFECT_TYPE);
     }
 
     private void registerDatapackRegistries(DataPackRegistryEvent.NewRegistry event) {

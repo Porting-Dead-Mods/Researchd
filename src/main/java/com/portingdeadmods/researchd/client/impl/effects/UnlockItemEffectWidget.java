@@ -3,7 +3,7 @@ package com.portingdeadmods.researchd.client.impl.effects;
 import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidget;
 import com.portingdeadmods.researchd.compat.JEICompat;
 import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
-import com.portingdeadmods.researchd.impl.research.effect.UnlockItemEffect;
+import com.portingdeadmods.researchd.impl.research.effect.ItemUnlockEffect;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -16,10 +16,10 @@ import net.neoforged.neoforge.common.util.Size2i;
 
 import java.util.Set;
 
-public class UnlockItemEffectWidget extends AbstractResearchInfoWidget<UnlockItemEffect> {
+public class UnlockItemEffectWidget extends AbstractResearchInfoWidget<ItemUnlockEffect> {
     private final ItemStack icon;
 
-    public UnlockItemEffectWidget(int x, int y, UnlockItemEffect effect) {
+    public UnlockItemEffectWidget(int x, int y, ItemUnlockEffect effect) {
         super(x, y, effect);
         this.icon = effect.getDisplayStack();
     }

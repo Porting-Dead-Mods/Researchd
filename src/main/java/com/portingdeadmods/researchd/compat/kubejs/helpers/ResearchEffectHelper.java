@@ -33,7 +33,7 @@ public class ResearchEffectHelper {
     }
 
     public static ResearchEffect unlockItem(String itemId) {
-        return new UnlockItemEffect(ResourceLocation.parse(itemId));
+        return new ItemUnlockEffect(ResourceLocation.parse(itemId));
     }
 
     public static ResearchEffect unlockItems(String... itemIds) {

@@ -7,7 +7,7 @@ import com.portingdeadmods.researchd.impl.research.effect.AndResearchEffect;
 import com.portingdeadmods.researchd.impl.research.effect.DimensionUnlockEffect;
 import com.portingdeadmods.researchd.impl.research.effect.EmptyResearchEffect;
 import com.portingdeadmods.researchd.impl.research.effect.RecipeUnlockEffect;
-import com.portingdeadmods.researchd.impl.research.effect.UnlockItemEffect;
+import com.portingdeadmods.researchd.impl.research.effect.ItemUnlockEffect;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class ResearchEffectSerializers {
@@ -16,7 +16,7 @@ public final class ResearchEffectSerializers {
 	static {
 		SERIALIZERS.register("unlock_dimension", () -> DimensionUnlockEffect.SERIALIZER);
 		SERIALIZERS.register("unlock_recipe", () -> RecipeUnlockEffect.SERIALIZER);
-		SERIALIZERS.register("unlock_item", () -> UnlockItemEffect.SERIALIZER);
+		SERIALIZERS.register("unlock_item", () -> ItemUnlockEffect.SERIALIZER);
 		SERIALIZERS.register("and", () -> AndResearchEffect.SERIALIZER);
 		SERIALIZERS.register("empty", () -> EmptyResearchEffect.SERIALIZER);
 	}

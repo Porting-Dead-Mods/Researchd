@@ -9,7 +9,8 @@
     "ReloadableServerResourcesMixin"
   ],
   "client": [
-    "ClientLevelMixin"
+    "ClientLevelMixin",
+    "EditBoxMixin"
   ],
   "injectors": {
     "defaultRequire": 1

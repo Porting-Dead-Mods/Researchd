@@ -2,13 +2,14 @@ package com.portingdeadmods.researchd.client.screens.editor.widgets;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.client.screens.editor.EditorSharedSprites;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.ContainerWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.widgets.PDLImageButton;
 import com.portingdeadmods.researchd.compat.JEICompat;
 import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
-import com.portingdeadmods.researchd.impl.research.ItemResearchIcon;
+import com.portingdeadmods.researchd.impl.research.icons.ItemResearchIcon;
 import com.portingdeadmods.researchd.utils.ClientEditorHelper;
 import com.portingdeadmods.researchd.utils.Search;
 import net.minecraft.client.Minecraft;
@@ -25,6 +26,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -34,7 +36,6 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 public class ItemSelectorWidget extends AbstractWidget {
-    public static final ResourceLocation BACKGROUND_SPRITE = Researchd.rl("editor_background_inverted");
     public static final ResourceLocation EDIT_ELEMENT_HOVER_SPRITE = Researchd.rl("edit_element_hover");
     private final ResearchScreen screen;
     @Nullable
@@ -51,7 +52,7 @@ public class ItemSelectorWidget extends AbstractWidget {
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        guiGraphics.blitSprite(BACKGROUND_SPRITE, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        guiGraphics.blitSprite(EditorSharedSprites.EDITOR_BACKGROUND_INVERTED_SPRITE, this.getX(), this.getY(), this.getWidth(), this.getHeight());
         if (this.selected != null) {
             guiGraphics.renderItem(this.selected, this.getX() + 2, this.getY() + 2);
         }
@@ -88,6 +89,10 @@ public class ItemSelectorWidget extends AbstractWidget {
 
     public ItemResearchIcon createIcon() {
         return new ItemResearchIcon(this.getSelected());
+    }
+
+    public Ingredient createIngredient() {
+        return Ingredient.of(selected);
     }
 
     public static class SelectorPopupWidget extends PopupWidget {

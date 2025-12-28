@@ -6,11 +6,13 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.research.RegistryDisplay;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.ResearchIcon;
 import com.portingdeadmods.researchd.api.research.ResearchPage;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchSerializer;
 import com.portingdeadmods.researchd.impl.research.effect.EmptyResearchEffect;
+import com.portingdeadmods.researchd.impl.research.icons.ItemResearchIcon;
 import com.portingdeadmods.researchd.impl.utils.DisplayImpl;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -25,7 +27,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public record SimpleResearch(ItemResearchIcon researchIcon, ResearchMethod researchMethod, ResearchEffect researchEffect,
+public record SimpleResearch(ResearchIcon researchIcon, ResearchMethod researchMethod, ResearchEffect researchEffect,
                              List<ResourceKey<Research>> parents, boolean requiresParent,
                              ResourceLocation researchPage, DisplayImpl display) implements Research, RegistryDisplay<Research> {
     public static final String ID = "simple";
@@ -57,7 +59,7 @@ public record SimpleResearch(ItemResearchIcon researchIcon, ResearchMethod resea
     public static class Serializer implements ResearchSerializer<SimpleResearch> {
         public static final Serializer INSTANCE = new Serializer();
         public static final MapCodec<SimpleResearch> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                ItemResearchIcon.CODEC.fieldOf("icon").forGetter(SimpleResearch::researchIcon),
+                ResearchIcon.CODEC.fieldOf("icon").forGetter(SimpleResearch::researchIcon),
                 ResearchMethod.CODEC.fieldOf("method").forGetter(SimpleResearch::researchMethod),
                 ResearchEffect.CODEC.optionalFieldOf("effect", EmptyResearchEffect.INSTANCE).forGetter(SimpleResearch::researchEffect),
                 Research.RESOURCE_KEY_CODEC.listOf().fieldOf("parents").forGetter(SimpleResearch::parents),
@@ -66,7 +68,7 @@ public record SimpleResearch(ItemResearchIcon researchIcon, ResearchMethod resea
                 DisplayImpl.CODEC.optionalFieldOf("display", DisplayImpl.EMPTY).forGetter(SimpleResearch::display)
         ).apply(instance, SimpleResearch::new));
         public static final StreamCodec<? super RegistryFriendlyByteBuf, SimpleResearch> STREAM_CODEC = NeoForgeStreamCodecs.composite(
-                ItemResearchIcon.STREAM_CODEC,
+                ResearchIcon.STREAM_CODEC,
                 SimpleResearch::researchIcon,
                 ResearchMethod.STREAM_CODEC,
                 SimpleResearch::researchMethod,

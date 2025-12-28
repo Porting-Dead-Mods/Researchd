@@ -4,6 +4,7 @@ import com.portingdeadmods.researchd.api.client.ClientResearch;
 import com.portingdeadmods.researchd.api.client.RememberingLinearLayout;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.ItemSelectorWidget;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.ResearchMethodSelectionWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.ResearchSelectorListWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
@@ -16,6 +17,7 @@ import net.minecraft.client.gui.components.MultiLineEditBox;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.packs.repository.PackSource;
 
 import java.util.Collections;
 
@@ -34,6 +36,7 @@ public class SimpleClientResearch implements ClientResearch {
         layout.addWidget("parents_selector", new ResearchSelectorListWidget(context.parentPopupWidget(), context.innerWidth() - 4, 24, Collections.emptyList(), true));
         layout.addWidget("requires_parents", Checkbox.builder(Component.literal("Requires Parents"), PopupWidget.getFont()).build());
         layout.addWidget(null, new StringWidget(Component.literal("Method:"), PopupWidget.getFont()));
+        layout.addWidget("method", new ResearchMethodSelectionWidget(context.parentPopupWidget(), 0, 0, context.innerWidth() - 4, 32, CommonComponents.EMPTY));
     }
 
     @SuppressWarnings("DataFlowIssue")

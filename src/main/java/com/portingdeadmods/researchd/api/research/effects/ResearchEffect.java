@@ -26,6 +26,8 @@ public interface ResearchEffect {
 
     ResourceLocation id();
 
+    ResearchEffectType type();
+
     default Component getTranslation() {
         ResourceLocation id = id();
         return Component.translatable("research_method." + id.getNamespace() + "." + id.getPath());

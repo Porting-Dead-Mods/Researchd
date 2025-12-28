@@ -6,7 +6,9 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectList;
+import com.portingdeadmods.researchd.api.research.effects.ResearchEffectType;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectSerializer;
+import com.portingdeadmods.researchd.registries.ResearchEffectTypes;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -41,6 +43,11 @@ public record AndResearchEffect(List<ResearchEffect> effects) implements Researc
     @Override
     public ResourceLocation id() {
         return ID;
+    }
+
+    @Override
+    public ResearchEffectType type() {
+        return ResearchEffectTypes.AND.get();
     }
 
     @Override

@@ -24,6 +24,8 @@ public interface ResearchMethod {
 
     ResourceLocation id();
 
+    ResearchMethodType type();
+
     void checkProgress(Level level, ResourceKey<Research> research, ResearchProgress.Task task, MethodContext context);
 
     ResearchProgress createProgress();

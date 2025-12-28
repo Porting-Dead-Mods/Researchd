@@ -2,11 +2,10 @@ package com.portingdeadmods.researchd;
 
 import com.portingdeadmods.researchd.api.ValueEffect;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.effects.ResearchEffectType;
+import com.portingdeadmods.researchd.api.research.methods.ResearchMethodType;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
-import com.portingdeadmods.researchd.api.research.serializers.ResearchPackSerializer;
-import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectSerializer;
-import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
-import com.portingdeadmods.researchd.api.research.serializers.ResearchSerializer;
+import com.portingdeadmods.researchd.api.research.serializers.*;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.neoforged.neoforge.registries.RegistryBuilder;
@@ -18,6 +17,10 @@ public final class ResearchdRegistries {
 			ResourceKey.createRegistryKey(Researchd.rl("research_pack"));
     public static final ResourceKey<Registry<ValueEffect>> VALUE_EFFECT_KEY =
             ResourceKey.createRegistryKey(Researchd.rl("value_effect"));
+    public static final ResourceKey<Registry<ResearchEffectType>> RESEARCH_EFFECT_TYPE_KEY =
+            ResourceKey.createRegistryKey(Researchd.rl("research_effect_type"));
+    public static final ResourceKey<Registry<ResearchMethodType>> RESEARCH_METHOD_TYPE_KEY =
+            ResourceKey.createRegistryKey(Researchd.rl("research_method_type"));
 
     // SERIALIZERS
     public static final ResourceKey<Registry<ResearchSerializer<?>>> RESEARCH_SERIALIZER_KEY =
@@ -28,11 +31,16 @@ public final class ResearchdRegistries {
 			ResourceKey.createRegistryKey(Researchd.rl("research_method_serializer"));
 	public static final ResourceKey<Registry<ResearchEffectSerializer<?>>> RESEARCH_EFFECT_SERIALIZER_KEY =
 			ResourceKey.createRegistryKey(Researchd.rl("research_effect_serializer"));
+    public static final ResourceKey<Registry<ResearchIconSerializer<?>>> RESEARCH_ICON_SERIALIZER_KEY =
+            ResourceKey.createRegistryKey(Researchd.rl("research_icon_serializer"));
 
 	public static final Registry<ResearchSerializer<?>> RESEARCH_SERIALIZER = new RegistryBuilder<>(RESEARCH_SERIALIZER_KEY).sync(true).create();
     public static final Registry<ResearchPackSerializer<?>> RESEARCH_PACK_SERIALIZER = new RegistryBuilder<>(RESEARCH_PACK_SERIALIZER_KEY).sync(true).create();
 	public static final Registry<ResearchMethodSerializer<?>> RESEARCH_METHOD_SERIALIZER = new RegistryBuilder<>(RESEARCH_METHOD_SERIALIZER_KEY).sync(true).create();
 	public static final Registry<ResearchEffectSerializer<?>> RESEARCH_EFFECT_SERIALIZER = new RegistryBuilder<>(RESEARCH_EFFECT_SERIALIZER_KEY).sync(true).create();
+    public static final Registry<ResearchIconSerializer<?>> RESEARCH_ICON_SERIALIZER = new RegistryBuilder<>(RESEARCH_ICON_SERIALIZER_KEY).sync(true).create();
 
+    public static final Registry<ResearchMethodType> RESEARCH_METHOD_TYPE = new RegistryBuilder<>(RESEARCH_METHOD_TYPE_KEY).sync(true).create();
+    public static final Registry<ResearchEffectType> RESEARCH_EFFECT_TYPE = new RegistryBuilder<>(RESEARCH_EFFECT_TYPE_KEY).sync(true).create();
 	public static final Registry<ValueEffect> VALUE_EFFECT = new RegistryBuilder<>(VALUE_EFFECT_KEY).sync(true).create();
 }

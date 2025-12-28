@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.api.research;
 
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.impl.research.ItemResearchIcon;
+import com.portingdeadmods.researchd.impl.research.icons.ItemResearchIcon;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;

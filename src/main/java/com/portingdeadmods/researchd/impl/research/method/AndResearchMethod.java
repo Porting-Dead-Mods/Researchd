@@ -5,8 +5,10 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethodList;
+import com.portingdeadmods.researchd.api.research.methods.ResearchMethodType;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
+import com.portingdeadmods.researchd.registries.ResearchMethodTypes;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -18,13 +20,11 @@ public record AndResearchMethod(List<ResearchMethod> methods) implements Researc
     private static final MapCodec<AndResearchMethod> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
             ResearchMethod.CODEC.listOf().fieldOf("methods").forGetter(AndResearchMethod::methods)
     ).apply(inst, AndResearchMethod::new));
-
     private static final StreamCodec<RegistryFriendlyByteBuf, AndResearchMethod> STREAM_CODEC = StreamCodec.composite(
             ResearchMethod.STREAM_CODEC.apply(ByteBufCodecs.list()),
             AndResearchMethod::methods,
             AndResearchMethod::new
     );
-
     public static final ResearchMethodSerializer<AndResearchMethod> SERIALIZER = ResearchMethodSerializer.simple(CODEC, STREAM_CODEC);
     public static final ResourceLocation ID = Researchd.rl("and");
 
@@ -45,6 +45,11 @@ public record AndResearchMethod(List<ResearchMethod> methods) implements Researc
     @Override
     public ResourceLocation id() {
         return ID;
+    }
+
+    @Override
+    public ResearchMethodType type() {
+        return ResearchMethodTypes.AND.get();
     }
 
     @Override

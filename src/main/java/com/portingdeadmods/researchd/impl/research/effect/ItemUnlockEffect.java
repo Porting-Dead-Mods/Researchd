@@ -6,9 +6,11 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
+import com.portingdeadmods.researchd.api.research.effects.ResearchEffectType;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectSerializer;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.impl.research.effect.data.UnlockItemEffectData;
+import com.portingdeadmods.researchd.registries.ResearchEffectTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -29,35 +31,35 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-public record UnlockItemEffect(Optional<ItemStack> icon, Optional<String> name, ResourceLocation item) implements ResearchEffect {
-    private static final MapCodec<UnlockItemEffect> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            ItemStack.CODEC.optionalFieldOf("icon").forGetter(UnlockItemEffect::icon),
-            Codec.STRING.optionalFieldOf("name").forGetter(UnlockItemEffect::name),
-            ResourceLocation.CODEC.fieldOf("item").forGetter(UnlockItemEffect::item)
-    ).apply(instance, UnlockItemEffect::new));
+public record ItemUnlockEffect(Optional<ItemStack> icon, Optional<String> name, ResourceLocation item) implements ResearchEffect {
+    private static final MapCodec<ItemUnlockEffect> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            ItemStack.CODEC.optionalFieldOf("icon").forGetter(ItemUnlockEffect::icon),
+            Codec.STRING.optionalFieldOf("name").forGetter(ItemUnlockEffect::name),
+            ResourceLocation.CODEC.fieldOf("item").forGetter(ItemUnlockEffect::item)
+    ).apply(instance, ItemUnlockEffect::new));
 
-    private static final StreamCodec<RegistryFriendlyByteBuf, UnlockItemEffect> STREAM_CODEC = StreamCodec.composite(
+    private static final StreamCodec<RegistryFriendlyByteBuf, ItemUnlockEffect> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.optional(ItemStack.STREAM_CODEC),
-            UnlockItemEffect::icon,
+            ItemUnlockEffect::icon,
             ByteBufCodecs.optional(ByteBufCodecs.STRING_UTF8),
-            UnlockItemEffect::name,
+            ItemUnlockEffect::name,
             ResourceLocation.STREAM_CODEC,
-            UnlockItemEffect::item,
-            UnlockItemEffect::new
+            ItemUnlockEffect::item,
+            ItemUnlockEffect::new
     );
 
-    public static final ResearchEffectSerializer<UnlockItemEffect> SERIALIZER = ResearchEffectSerializer.simple(CODEC, STREAM_CODEC);
+    public static final ResearchEffectSerializer<ItemUnlockEffect> SERIALIZER = ResearchEffectSerializer.simple(CODEC, STREAM_CODEC);
     public static final ResourceLocation ID = Researchd.rl("unlock_item");
 
-    public UnlockItemEffect(ItemStack icon, String name, ResourceLocation item) {
+    public ItemUnlockEffect(ItemStack icon, String name, ResourceLocation item) {
         this(Optional.ofNullable(icon), Optional.ofNullable(name), item);
     }
 
-    public UnlockItemEffect(ResourceLocation item) {
+    public ItemUnlockEffect(ResourceLocation item) {
         this(Optional.empty(), Optional.empty(), item);
     }
 
-    public UnlockItemEffect(Item item) {
+    public ItemUnlockEffect(Item item) {
         this(BuiltInRegistries.ITEM.getKey(item));
     }
 
@@ -70,6 +72,11 @@ public record UnlockItemEffect(Optional<ItemStack> icon, Optional<String> name, 
     @Override
     public ResourceLocation id() {
         return ID;
+    }
+
+    @Override
+    public ResearchEffectType type() {
+        return ResearchEffectTypes.ITEM_UNLOCK.get();
     }
 
     public Item getItem() {
@@ -117,7 +124,7 @@ public record UnlockItemEffect(Optional<ItemStack> icon, Optional<String> name, 
     }
 
     @Override
-    public ResearchEffectSerializer<UnlockItemEffect> getSerializer() {
+    public ResearchEffectSerializer<ItemUnlockEffect> getSerializer() {
         return SERIALIZER;
     }
 }

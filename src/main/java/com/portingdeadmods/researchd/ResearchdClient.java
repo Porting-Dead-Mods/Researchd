@@ -2,23 +2,28 @@ package com.portingdeadmods.researchd;
 
 import com.portingdeadmods.researchd.api.client.ClientResearch;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
+import com.portingdeadmods.researchd.api.client.ClientResearchMethodType;
 import com.portingdeadmods.researchd.api.research.RegistryDisplay;
-import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchIcon;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
-import com.portingdeadmods.researchd.client.impl.ClientItemResearchIcon;
+import com.portingdeadmods.researchd.client.impl.icons.ClientItemResearchIcon;
 import com.portingdeadmods.researchd.client.impl.SimpleClientResearch;
 import com.portingdeadmods.researchd.client.impl.effects.*;
+import com.portingdeadmods.researchd.client.impl.icons.ClientSpriteResearchIcon;
+import com.portingdeadmods.researchd.client.impl.icons.ClientTextResearchIcon;
 import com.portingdeadmods.researchd.client.impl.methods.*;
+import com.portingdeadmods.researchd.client.impl.methods.types.ClientConsumeItemResearchMethodType;
 import com.portingdeadmods.researchd.client.renderers.ResearchLabBER;
 import com.portingdeadmods.researchd.client.screens.lab.ResearchLabScreen;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
-import com.portingdeadmods.researchd.impl.research.ItemResearchIcon;
+import com.portingdeadmods.researchd.impl.research.icons.ItemResearchIcon;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
 import com.portingdeadmods.researchd.impl.research.effect.*;
+import com.portingdeadmods.researchd.impl.research.icons.SpriteResearchIcon;
+import com.portingdeadmods.researchd.impl.research.icons.TextResearchIcon;
 import com.portingdeadmods.researchd.impl.research.method.*;
 import com.portingdeadmods.researchd.registries.*;
 import com.portingdeadmods.researchd.utils.WidgetConstructor;
@@ -52,6 +57,7 @@ public final class ResearchdClient {
     public static final Map<ResourceLocation, WidgetConstructor<? extends ResearchEffect>> RESEARCH_EFFECT_WIDGETS = new HashMap<>();
     public static final Map<ResourceLocation, Function<ResearchIcon, ClientResearchIcon<?>>> RESEARCH_ICONS = new HashMap<>();
     public static final Map<ResourceLocation, ClientResearch> CLIENT_RESEARCHES = new HashMap<>();
+    public static final Map<ResourceLocation, ClientResearchMethodType> CLIENT_RESEARCH_METHOD_TYPES = new HashMap<>();
     public static final ModelResourceLocation RESEARCH_LAB_MODEL = ModelResourceLocation.standalone(Researchd.rl("block/research_lab"));
 
     public ResearchdClient(IEventBus eventBus, ModContainer modContainer) {
@@ -80,11 +86,15 @@ public final class ResearchdClient {
             addEffectWidget(DimensionUnlockEffect.ID, DimensionUnlockEffectWidget::new);
             addEffectWidget(EmptyResearchEffect.ID, EmptyResearchEffectWidget::new);
             addEffectWidget(RecipeUnlockEffect.ID, RecipeUnlockEffectWidget::new);
-            addEffectWidget(UnlockItemEffect.ID, UnlockItemEffectWidget::new);
+            addEffectWidget(ItemUnlockEffect.ID, UnlockItemEffectWidget::new);
 
             addClientResearchIcon(ItemResearchIcon.ID, ClientItemResearchIcon::new);
+            addClientResearchIcon(TextResearchIcon.ID, ClientTextResearchIcon::new);
+            addClientResearchIcon(SpriteResearchIcon.ID, ClientSpriteResearchIcon::new);
 
             CLIENT_RESEARCHES.put(Researchd.rl(SimpleResearch.ID), SimpleClientResearch.INSTANCE);
+
+            CLIENT_RESEARCH_METHOD_TYPES.put(ConsumeItemResearchMethod.ID, ClientConsumeItemResearchMethodType.INSTANCE);
 
             ItemBlockRenderTypes.setRenderLayer(ResearchdBlocks.RESEARCH_LAB_CONTROLLER.get(), RenderType.solid()); // Should fiddle with render types till it works ngl
         });

@@ -9,7 +9,7 @@ import com.portingdeadmods.researchd.impl.research.SimpleResearch;
 import com.portingdeadmods.researchd.impl.research.effect.AndResearchEffect;
 import com.portingdeadmods.researchd.impl.research.effect.DimensionUnlockEffect;
 import com.portingdeadmods.researchd.impl.research.effect.RecipeUnlockEffect;
-import com.portingdeadmods.researchd.impl.research.effect.UnlockItemEffect;
+import com.portingdeadmods.researchd.impl.research.effect.ItemUnlockEffect;
 import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.CheckItemPresenceResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
@@ -46,8 +46,8 @@ public interface ResearchdResearchProvider {
         return new DimensionUnlockEffect(location, sprite);
     }
 
-    default @NotNull UnlockItemEffect unlockItem(ItemLike item) {
-        return new UnlockItemEffect(item.asItem());
+    default @NotNull ItemUnlockEffect unlockItem(ItemLike item) {
+        return new ItemUnlockEffect(item.asItem());
     }
 
     default @NotNull ConsumePackResearchMethod consumePack(int count, int duration, ResourceKey<ResearchPack>... packs) {

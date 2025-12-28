@@ -4,6 +4,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdClient;
 import com.portingdeadmods.researchd.api.client.ClientResearch;
 import com.portingdeadmods.researchd.api.client.RememberingLinearLayout;
+import com.portingdeadmods.researchd.client.screens.editor.EditorSharedSprites;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.DraggablePopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
@@ -15,7 +16,6 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 public class ResearchCreationPopupWidget extends DraggablePopupWidget {
-    public static final ResourceLocation BACKGROUND_SPRITE = Researchd.rl("widget/data_creation_widget");
     public static final ResourceLocation DEFAULT_ID = Researchd.rl(SimpleResearch.ID);
 
     private final RememberingLinearLayout layout;
@@ -25,7 +25,7 @@ public class ResearchCreationPopupWidget extends DraggablePopupWidget {
     public ResearchCreationPopupWidget(ResearchScreen screen, int x, int y, int width, int height) {
         super(x, y, width, height, CommonComponents.EMPTY);
         this.screen = screen;
-        LinearLayout l = LinearLayout.vertical();
+        LinearLayout l = new LinearLayout(width - 14, height - 14, LinearLayout.Orientation.VERTICAL);
         this.layout = new RememberingLinearLayout(l);
         this.clientResearch = ResearchdClient.CLIENT_RESEARCHES.get(DEFAULT_ID);
         this.buildLayout();
@@ -41,7 +41,7 @@ public class ResearchCreationPopupWidget extends DraggablePopupWidget {
 
     protected void buildLayout() {
         if (this.clientResearch != null) {
-            this.clientResearch.buildLayout(this.layout, new ClientResearch.Context(this.screen, this, this.getWidth(), this.getHeight(), this.getWidth() - 14, this.getHeight() - 14, 7));
+            this.clientResearch.buildLayout(this.layout, new ClientResearch.Context(this.screen, this, this.getWidth(), this.getHeight(), this.getWidth() - 16, this.getHeight() - 16, 7));
             this.layout.getLayout().arrangeElements();
             this.layout.getChildren().forEach(this::addRenderableWidget);
         }
@@ -69,7 +69,7 @@ public class ResearchCreationPopupWidget extends DraggablePopupWidget {
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
 
-        guiGraphics.blitSprite(BACKGROUND_SPRITE, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        guiGraphics.blitSprite(EditorSharedSprites.EDITOR_WIDGET_BACKGROUND_SPRITE, this.getX(), this.getY(), this.getWidth(), this.getHeight());
 
         super.renderElements(guiGraphics, mouseX, mouseY, partialTick);
 

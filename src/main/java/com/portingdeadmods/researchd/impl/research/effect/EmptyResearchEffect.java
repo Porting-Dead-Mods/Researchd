@@ -4,7 +4,9 @@ import com.mojang.serialization.Codec;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
+import com.portingdeadmods.researchd.api.research.effects.ResearchEffectType;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectSerializer;
+import com.portingdeadmods.researchd.registries.ResearchEffectTypes;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
@@ -25,6 +27,11 @@ public class EmptyResearchEffect implements ResearchEffect {
     @Override
     public ResourceLocation id() {
         return ID;
+    }
+
+    @Override
+    public ResearchEffectType type() {
+        return ResearchEffectTypes.EMPTY.get();
     }
 
     @Override

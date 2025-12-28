@@ -3,7 +3,7 @@ package com.portingdeadmods.researchd.impl.research.effect.data;
 import com.mojang.serialization.Codec;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
-import com.portingdeadmods.researchd.impl.research.effect.UnlockItemEffect;
+import com.portingdeadmods.researchd.impl.research.effect.ItemUnlockEffect;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.registries.Registries;
@@ -15,7 +15,7 @@ import net.minecraft.world.level.Level;
 
 import java.util.Collection;
 
-public record UnlockItemEffectData(UniqueArray<ResourceKey<Item>> blockedItems) implements ResearchEffectData<UnlockItemEffect> {
+public record UnlockItemEffectData(UniqueArray<ResourceKey<Item>> blockedItems) implements ResearchEffectData<ItemUnlockEffect> {
     public static final UnlockItemEffectData EMPTY = new UnlockItemEffectData(new UniqueArray<>());
 
     public static final Codec<UnlockItemEffectData> CODEC = UniqueArray.CODEC(ResourceKey.codec(Registries.ITEM))
@@ -28,14 +28,14 @@ public record UnlockItemEffectData(UniqueArray<ResourceKey<Item>> blockedItems) 
 	);
 
     @Override
-    public UnlockItemEffectData add(UnlockItemEffect effect, Level level) {
+    public UnlockItemEffectData add(ItemUnlockEffect effect, Level level) {
         UniqueArray<ResourceKey<Item>> items = new UniqueArray<>(this.blockedItems());
         items.add(effect.getItemKey());
         return new UnlockItemEffectData(items);
     }
 
     @Override
-    public UnlockItemEffectData remove(UnlockItemEffect effect, Level level) {
+    public UnlockItemEffectData remove(ItemUnlockEffect effect, Level level) {
         UniqueArray<ResourceKey<Item>> items = new UniqueArray<>(this.blockedItems());
         items.remove(effect.getItemKey());
         return new UnlockItemEffectData(items);
@@ -51,10 +51,10 @@ public record UnlockItemEffectData(UniqueArray<ResourceKey<Item>> blockedItems) 
 
     @Override
     public UnlockItemEffectData getDefault(Level level) {
-        Collection<UnlockItemEffect> unlockItemEffects = ResearchHelperCommon.getResearchEffects(UnlockItemEffect.class, level);
+        Collection<ItemUnlockEffect> unlockItemEffects = ResearchHelperCommon.getResearchEffects(ItemUnlockEffect.class, level);
         UniqueArray<ResourceKey<Item>> blockedItems = new UniqueArray<>();
 
-        for (UnlockItemEffect effect : unlockItemEffects) {
+        for (ItemUnlockEffect effect : unlockItemEffects) {
             blockedItems.add(effect.getItemKey());
         }
 

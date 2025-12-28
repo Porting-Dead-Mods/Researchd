@@ -1,17 +1,17 @@
-package com.portingdeadmods.researchd.client.impl;
+package com.portingdeadmods.researchd.client.impl.icons;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
 import com.portingdeadmods.researchd.api.client.renderers.CycledItemRenderer;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
-import com.portingdeadmods.researchd.impl.research.ItemResearchIcon;
+import com.portingdeadmods.researchd.impl.research.icons.ItemResearchIcon;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 import java.util.Objects;
 
-public final class ClientItemResearchIcon implements ClientResearchIcon<ItemResearchIcon> {
+public class ClientItemResearchIcon implements ClientResearchIcon<ItemResearchIcon> {
     private final ItemResearchIcon icon;
     private final CycledItemRenderer renderer;
 
@@ -45,25 +45,6 @@ public final class ClientItemResearchIcon implements ClientResearchIcon<ItemRese
     @Override
     public ItemResearchIcon icon() {
         return icon;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
-        var that = (ClientItemResearchIcon) obj;
-        return Objects.equals(this.icon, that.icon);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(icon);
-    }
-
-    @Override
-    public String toString() {
-        return "ClientItemResearchIcon[" +
-                "icon=" + icon + ']';
     }
 
 }
