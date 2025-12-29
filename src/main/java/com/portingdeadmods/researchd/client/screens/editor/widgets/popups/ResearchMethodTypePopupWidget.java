@@ -1,6 +1,7 @@
 package com.portingdeadmods.researchd.client.screens.editor.widgets.popups;
 
 import com.portingdeadmods.researchd.client.screens.editor.EditorSharedSprites;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.ResearchMethodSelectionWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.ContainerWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
@@ -15,13 +16,15 @@ import java.util.function.Supplier;
 
 public class ResearchMethodTypePopupWidget extends PopupWidget {
     private final ResearchMethodTypeContainerWidget containerWidget;
+    private final ResearchMethodSelectionWidget parentSelectionWidget;
     @Nullable
     private final PopupWidget parentPopupWidget;
 
-    public ResearchMethodTypePopupWidget(@Nullable PopupWidget parentPopupWidget, Component message) {
+    public ResearchMethodTypePopupWidget(@Nullable PopupWidget parentPopupWidget, ResearchMethodSelectionWidget parentSelectionWidget, Component message) {
         super(0, 0, 160, 64, message);
         this.parentPopupWidget = parentPopupWidget;
         this.containerWidget = this.addRenderableWidget(new ResearchMethodTypeContainerWidget(parentPopupWidget, this, 160 - 16, 64 - 16));
+        this.parentSelectionWidget = parentSelectionWidget;
     }
 
     @Override
@@ -59,7 +62,7 @@ public class ResearchMethodTypePopupWidget extends PopupWidget {
                                 int mouseY) {
             ResearchScreen screen = Spaghetti.tryGetResearchScreen();
             screen.closePopup(this.popupWidget);
-            screen.openPopupCentered(new ResearchMethodSelectionPopupWidget(this.parentPopupWidget, item));
+            screen.openPopupCentered(new ResearchMethodSelectionPopupWidget(this.parentPopupWidget, this.popupWidget.parentSelectionWidget, item));
         }
 
         @Override

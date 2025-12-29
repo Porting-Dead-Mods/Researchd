@@ -41,7 +41,7 @@ public final class EnUsLangProvider extends LanguageProvider {
         addResearchMethodName(ResearchMethodTypes.AND, "And");
         addResearchMethodName(ResearchMethodTypes.CONSUME_ITEM, "Consume Item");
         addResearchMethodName(ResearchMethodTypes.CONSUME_PACK, "Consume Pack");
-        addResearchMethodName(ResearchMethodTypes.CHECK_ITEM_PRESENCE, "Check Item Presence");
+        addResearchMethodName(ResearchMethodTypes.CHECK_ITEM_PRESENCE, "Check For Item");
 
         PDLConfigHelper.generateConfigNames(ResearchdConfig.Client.class, Researchd.MODID, this::add);
         PDLConfigHelper.generateConfigNames(ResearchdConfig.Common.class, Researchd.MODID, this::add);

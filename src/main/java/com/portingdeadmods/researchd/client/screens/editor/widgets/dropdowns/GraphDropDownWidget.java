@@ -29,15 +29,11 @@ public class GraphDropDownWidget extends DropDownWidget<LayoutElement> {
     @Override
     protected void buildOptions() {
         this.addOption(new StringOption(Component.literal("New Research"), Minecraft.getInstance().font, this::createNewResearch));
-        this.addOption(new StringOption(Component.literal("Uwu"), Minecraft.getInstance().font));
-        this.addOption(new StringOption(Component.literal("Select item"), Minecraft.getInstance().font, opt -> {
-            this.screen.openPopupCentered(new ItemSelectorWidget.SelectorPopupWidget(this.screen, null, null, 0, 0, CommonComponents.EMPTY));
-            this.screen.setDropDown(null);
-        }));
+        this.addOption(new StringOption(Component.literal("New Research Pack"), Minecraft.getInstance().font));
     }
 
     private void createNewResearch(StringOption opt) {
-        this.screen.openPopupCentered(new ResearchCreationPopupWidget(this.screen, 0, 0, 128, 128));
+        this.screen.openPopupCentered(new ResearchCreationPopupWidget(this.screen, 0, 0, 128, 182));
         this.screen.setDropDown(null);
     }
 }

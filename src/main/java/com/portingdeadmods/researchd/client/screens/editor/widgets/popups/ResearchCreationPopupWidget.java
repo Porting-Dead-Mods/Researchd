@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.client.screens.editor.widgets.popups;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdClient;
-import com.portingdeadmods.researchd.api.client.ClientResearch;
+import com.portingdeadmods.researchd.api.client.editor.ClientResearch;
 import com.portingdeadmods.researchd.api.client.RememberingLinearLayout;
 import com.portingdeadmods.researchd.client.screens.editor.EditorSharedSprites;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.DraggablePopupWidget;
@@ -12,6 +12,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.layouts.Layout;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,12 +37,12 @@ public class ResearchCreationPopupWidget extends DraggablePopupWidget {
     }
 
     public int getVerticalPadding() {
-        return 8;
+        return 24;
     }
 
     protected void buildLayout() {
         if (this.clientResearch != null) {
-            this.clientResearch.buildLayout(this.layout, new ClientResearch.Context(this.screen, this, this.getWidth(), this.getHeight(), this.getWidth() - 16, this.getHeight() - 16, 7));
+            this.clientResearch.buildLayout(this.layout, new ClientResearch.Context(null, this.screen, this, this.getWidth(), this.getHeight(), this.getWidth() - 16, this.getHeight() - 16, 7));
             this.layout.getLayout().arrangeElements();
             this.layout.getChildren().forEach(this::addRenderableWidget);
         }
@@ -69,7 +70,9 @@ public class ResearchCreationPopupWidget extends DraggablePopupWidget {
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
 
-        guiGraphics.blitSprite(EditorSharedSprites.EDITOR_WIDGET_BACKGROUND_SPRITE, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        guiGraphics.blitSprite(ResearchMethodCreationPopupWidget.BACKGROUND_SPRITE, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+
+        guiGraphics.drawScrollingString(getFont(), Component.literal("Create Research"), this.getX() + 5, this.getX() + this.getWidth() - 5, this.getY() + 8, -1);
 
         super.renderElements(guiGraphics, mouseX, mouseY, partialTick);
 

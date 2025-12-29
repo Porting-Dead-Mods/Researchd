@@ -1,8 +1,8 @@
 package com.portingdeadmods.researchd;
 
-import com.portingdeadmods.researchd.api.client.ClientResearch;
+import com.portingdeadmods.researchd.api.client.editor.ClientResearch;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
-import com.portingdeadmods.researchd.api.client.ClientResearchMethodType;
+import com.portingdeadmods.researchd.api.client.editor.ClientResearchMethodType;
 import com.portingdeadmods.researchd.api.research.RegistryDisplay;
 import com.portingdeadmods.researchd.api.research.ResearchIcon;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
@@ -15,7 +15,9 @@ import com.portingdeadmods.researchd.client.impl.effects.*;
 import com.portingdeadmods.researchd.client.impl.icons.ClientSpriteResearchIcon;
 import com.portingdeadmods.researchd.client.impl.icons.ClientTextResearchIcon;
 import com.portingdeadmods.researchd.client.impl.methods.*;
+import com.portingdeadmods.researchd.client.impl.methods.types.ClientCheckItemPresenceMethodType;
 import com.portingdeadmods.researchd.client.impl.methods.types.ClientConsumeItemResearchMethodType;
+import com.portingdeadmods.researchd.client.impl.methods.types.ClientConsumePackResearchMethodType;
 import com.portingdeadmods.researchd.client.renderers.ResearchLabBER;
 import com.portingdeadmods.researchd.client.screens.lab.ResearchLabScreen;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
@@ -95,6 +97,8 @@ public final class ResearchdClient {
             CLIENT_RESEARCHES.put(Researchd.rl(SimpleResearch.ID), SimpleClientResearch.INSTANCE);
 
             CLIENT_RESEARCH_METHOD_TYPES.put(ConsumeItemResearchMethod.ID, ClientConsumeItemResearchMethodType.INSTANCE);
+            CLIENT_RESEARCH_METHOD_TYPES.put(ConsumePackResearchMethod.ID, ClientConsumePackResearchMethodType.INSTANCE);
+            CLIENT_RESEARCH_METHOD_TYPES.put(CheckItemPresenceResearchMethod.ID, ClientCheckItemPresenceMethodType.INSTANCE);
 
             ItemBlockRenderTypes.setRenderLayer(ResearchdBlocks.RESEARCH_LAB_CONTROLLER.get(), RenderType.solid()); // Should fiddle with render types till it works ngl
         });

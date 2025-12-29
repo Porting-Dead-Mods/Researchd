@@ -3,17 +3,15 @@ package com.portingdeadmods.researchd.client.screens.editor.widgets.popups;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
-import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.client.editor.ClientResearchMethodType;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethodType;
-import com.portingdeadmods.researchd.client.screens.editor.widgets.ResearchSelectorListWidget;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.ResearchMethodSelectionWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.ContainerWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.widgets.PDLImageButton;
 import com.portingdeadmods.researchd.utils.Search;
 import com.portingdeadmods.researchd.utils.Spaghetti;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -23,7 +21,6 @@ import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.layouts.Layout;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,11 +35,14 @@ public class ResearchMethodSelectionPopupWidget extends PopupWidget {
     private final SelectionContainerWidget selectionContainerWidget;
     private final PDLImageButton doneButton;
     private final PopupWidget parentPopupWidget;
+    private final ResearchMethodSelectionWidget originSelectionWidget;
     private final ResearchMethodTypePopupWidget.ResearchMethodListType listType;
+    private ResearchMethodType selectedResearchMethod;
 
-    public ResearchMethodSelectionPopupWidget(@Nullable PopupWidget parentPopupWidget, ResearchMethodTypePopupWidget.ResearchMethodListType listType) {
+    public ResearchMethodSelectionPopupWidget(@Nullable PopupWidget parentPopupWidget, ResearchMethodSelectionWidget parentSelectionWidget, ResearchMethodTypePopupWidget.ResearchMethodListType listType) {
         super(0, 0, 148, 160, CommonComponents.EMPTY);
         this.parentPopupWidget = parentPopupWidget;
+        this.originSelectionWidget = parentSelectionWidget;
         this.listType = listType;
         this.search = new Search();
         this.searchBar = this.addRenderableWidget(new EditBox(Minecraft.getInstance().font, 90, 12, CommonComponents.EMPTY));
@@ -61,7 +61,12 @@ public class ResearchMethodSelectionPopupWidget extends PopupWidget {
 
     private void onDoneClicked(PDLImageButton button) {
         ResearchScreen screen = Spaghetti.tryGetResearchScreen();
-        screen.openPopupCentered(new ResearchMethodCreationPopupWidget(0, 0, 64, 80));
+        int height = 128;
+        ClientResearchMethodType clientMethodType = ClientResearchMethodType.getClientMethodType(this.selectedResearchMethod);
+        if (clientMethodType != null) {
+            height = clientMethodType.getHeight();
+        }
+        screen.openPopupCentered(new ResearchMethodCreationPopupWidget(parentPopupWidget, this.selectedResearchMethod, this.originSelectionWidget, 0, 0, 112, height));
 //        screen.openPopupCentered(this.parentPopupWidget);
 //        Research research = ResearchHelperCommon.getResearch(this.selectionContainerWidget.selectedResearch, Minecraft.getInstance().level);
 //        this.selectorListWidget.addItem(new ResearchSelectorListWidget.Element.SimpleElement(this.selectionContainerWidget.selectedResearch, research));
@@ -115,7 +120,6 @@ public class ResearchMethodSelectionPopupWidget extends PopupWidget {
 
         private final Map<ResearchMethodType, Pair<ClientResearchIcon<?>, Component>> iconsAndNames;
         private final ResearchMethodSelectionPopupWidget parentWidget;
-        private ResearchMethodType selectedResearch;
 
         public SelectionContainerWidget(ResearchMethodSelectionPopupWidget parentWidget, int x, int y, int width, int height, boolean renderScroller) {
             super(x, y, width, height, width - 2, 18, Orientation.VERTICAL, 1, 10, new ArrayList<>(), renderScroller);
@@ -139,7 +143,7 @@ public class ResearchMethodSelectionPopupWidget extends PopupWidget {
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
             boolean clicked = super.mouseClicked(mouseX, mouseY, button);
             if (this.hoveredItem == null && this.isHovered()) {
-                this.selectedResearch = null;
+                this.parentWidget.selectedResearchMethod = null;
                 this.parentWidget.doneButton.active = false;
             }
             return clicked;
@@ -147,7 +151,7 @@ public class ResearchMethodSelectionPopupWidget extends PopupWidget {
 
         @Override
         public void clickedItem(ResearchMethodType item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {
-            this.selectedResearch = item;
+            this.parentWidget.selectedResearchMethod = item;
             this.parentWidget.doneButton.active = true;
         }
 
@@ -168,7 +172,7 @@ public class ResearchMethodSelectionPopupWidget extends PopupWidget {
 
         @Override
         protected void internalRenderItem(GuiGraphics guiGraphics, ResearchMethodType item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {
-            guiGraphics.blitSprite(SPRITES.get(true, this.isItemHovered(xIndex, yIndex, mouseX, mouseY) || this.selectedResearch == item), left, top, this.getItemWidth(), this.getItemHeight());
+            guiGraphics.blitSprite(SPRITES.get(true, this.isItemHovered(xIndex, yIndex, mouseX, mouseY) || this.parentWidget.selectedResearchMethod == item), left, top, this.getItemWidth(), this.getItemHeight());
             Pair<ClientResearchIcon<?>, Component> pair = this.iconsAndNames.get(item);
             ClientResearchIcon<?> icon = pair.left();
             Component name = pair.right();

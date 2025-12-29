@@ -37,4 +37,16 @@ public final class ResearchdUtils {
         return newString.toString();
     }
 
+    public static boolean isValidInt(String str) {
+        if (str == null) {
+            return false;
+        }
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
 }

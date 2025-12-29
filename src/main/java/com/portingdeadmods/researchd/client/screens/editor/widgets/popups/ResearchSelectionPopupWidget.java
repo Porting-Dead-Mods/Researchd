@@ -1,19 +1,15 @@
 package com.portingdeadmods.researchd.client.screens.editor.widgets.popups;
 
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.client.ClientResearch;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
-import com.portingdeadmods.researchd.api.research.RegistryDisplay;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.ResearchSelectorListWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.ContainerWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
-import com.portingdeadmods.researchd.client.screens.research.widgets.PDLButton;
 import com.portingdeadmods.researchd.client.screens.research.widgets.PDLImageButton;
 import com.portingdeadmods.researchd.utils.Search;
 import com.portingdeadmods.researchd.utils.Spaghetti;
-import com.portingdeadmods.researchd.utils.SpaghettiCommon;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import it.unimi.dsi.fastutil.Pair;

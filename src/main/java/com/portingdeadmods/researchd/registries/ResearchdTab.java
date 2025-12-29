@@ -27,7 +27,7 @@ public final class ResearchdTab {
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Researchd.MODID);
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN = TABS.register("main", () -> CreativeModeTab.builder()
-            .icon(ResearchdItems.RESEARCH_LAB::toStack)
+            .icon(ResearchdItems.GREEN_RESEARCH_PACK_ICON::toStack)
             .title(Component.literal(Researchd.MODNAME))
             .displayItems((params, output) -> {
                 output.accept(ResearchdItems.RESEARCH_LAB.toStack());
