@@ -30,7 +30,7 @@ public class SimpleClientResearch implements ClientResearch {
     public void buildLayout(RememberingLinearLayout layout, Context context) {
         layout.getLayout().spacing(2);
         layout.addWidget(null, new StringWidget(Component.literal("Icon:"), PopupWidget.getFont()));
-        layout.addWidget("icon", new ItemSelectorWidget(context.parentPopupWidget(), 0, 0, 20, 20));
+        layout.addWidget("icon", new ItemSelectorWidget(context.parentPopupWidget(), 0, 0, 20, 20, false, true));
         layout.addWidget(null, new StringWidget(Component.literal("Parents:"), PopupWidget.getFont()));
         layout.addWidget("parents_selector", new ResearchSelectorListWidget(context.parentPopupWidget(), context.innerWidth() - 4, 24, Collections.emptyList(), true));
         layout.addWidget("requires_parents", Checkbox.builder(Component.literal("Requires Parents"), PopupWidget.getFont()).build());
@@ -41,18 +41,18 @@ public class SimpleClientResearch implements ClientResearch {
     @SuppressWarnings("DataFlowIssue")
     @Override
     public Research createResearch(RememberingLinearLayout layout) {
-        DisplayImpl display = ClientEditorHelper.createDisplay(
-                layout.getChild("name_edit_box", EditBox.class),
-                layout.getChild("desc_edit_box", MultiLineEditBox.class)
-        );
+        //DisplayImpl display = ClientEditorHelper.createDisplay(
+        //        layout.getChild("name_edit_box", EditBox.class),
+        //        layout.getChild("desc_edit_box", MultiLineEditBox.class)
+        //);
         return new SimpleResearch(
                 layout.getChild("icon", ItemSelectorWidget.class).createIcon(),
-                null,
+                layout.getChild("method", ResearchMethodSelectionWidget.class).getMethod(),
                 null,
                 layout.getChild("parents_selector", ResearchSelectorListWidget.class).getResearches(),
                 layout.getChild("requires_parents", Checkbox.class).selected(),
 		        ResearchdResearchPages.DEFAULT, // TODO: Research Page into editor
-                display
+                null
         );
     }
 }

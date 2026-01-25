@@ -4,10 +4,16 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdClient;
 import com.portingdeadmods.researchd.api.client.editor.ClientResearch;
 import com.portingdeadmods.researchd.api.client.RememberingLinearLayout;
+import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.client.screens.editor.EditorSharedSprites;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.DraggablePopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
+import com.portingdeadmods.researchd.client.screens.research.widgets.PDLButton;
+import com.portingdeadmods.researchd.data.ResearchdAttachments;
+import com.portingdeadmods.researchd.impl.editor.EditModeSettingsImpl;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
+import com.portingdeadmods.researchd.utils.PrettyPath;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.layouts.Layout;
 import net.minecraft.client.gui.layouts.LinearLayout;
@@ -22,6 +28,7 @@ public class ResearchCreationPopupWidget extends DraggablePopupWidget {
     private final RememberingLinearLayout layout;
     private final ClientResearch clientResearch;
     private final ResearchScreen screen;
+    private PDLButton createButton;
 
     public ResearchCreationPopupWidget(ResearchScreen screen, int x, int y, int width, int height) {
         super(x, y, width, height, CommonComponents.EMPTY);
@@ -46,6 +53,18 @@ public class ResearchCreationPopupWidget extends DraggablePopupWidget {
             this.layout.getLayout().arrangeElements();
             this.layout.getChildren().forEach(this::addRenderableWidget);
         }
+        this.createButton = this.addRenderableWidget(PDLButton.builder(this::onCreatePressed)
+                .message(Component.literal("Create"))
+                .sprites(SelectPackPopupWidget.EDITOR_BUTTON_SPRITES)
+                        .size(100, 16)
+                .build());
+    }
+
+    private void onCreatePressed(PDLButton pdlButton) {
+        Research research = this.clientResearch.createResearch(this.layout);
+        EditModeSettingsImpl settings = Minecraft.getInstance().player.getData(ResearchdAttachments.EDIT_MODE_SETTINGS);
+        PrettyPath prettyPath = settings.currentDatapack();
+        Researchd.LOGGER.debug("Full Path: {}", prettyPath.fullPath());
     }
 
     @Override
@@ -54,6 +73,7 @@ public class ResearchCreationPopupWidget extends DraggablePopupWidget {
 
         if (this.getLayout() != null) {
             this.getLayout().setX(x + this.getHorizontalPadding());
+            this.createButton.setPosition(this.getX() + (width - this.createButton.getWidth()) / 2, this.createButton.getY());
         }
     }
 
@@ -63,6 +83,7 @@ public class ResearchCreationPopupWidget extends DraggablePopupWidget {
 
         if (this.getLayout() != null) {
             this.getLayout().setY(y + this.getVerticalPadding());
+            this.createButton.setPosition(this.createButton.getX(), this.getY() + (height - this.createButton.getHeight()) / 2 + 78);
         }
     }
 

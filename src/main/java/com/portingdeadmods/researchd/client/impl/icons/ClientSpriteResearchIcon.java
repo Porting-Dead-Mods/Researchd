@@ -3,23 +3,11 @@ package com.portingdeadmods.researchd.client.impl.icons;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
-import com.portingdeadmods.researchd.api.client.renderers.CycledItemRenderer;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
-import com.portingdeadmods.researchd.impl.research.icons.ItemResearchIcon;
 import com.portingdeadmods.researchd.impl.research.icons.SpriteResearchIcon;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 
-import java.util.List;
-
-public class ClientSpriteResearchIcon implements ClientResearchIcon<SpriteResearchIcon> {
-    private final SpriteResearchIcon icon;
-
-    public ClientSpriteResearchIcon(SpriteResearchIcon icon) {
-        this.icon = icon;
-    }
-
+public record ClientSpriteResearchIcon(SpriteResearchIcon icon) implements ClientResearchIcon<SpriteResearchIcon> {
     @Override
     public void render(GuiGraphics guiGraphics, int panelLeft, int panelTop, int mouseX, int mouseY, float scale, float partialTicks) {
         if (scale != 1) {
@@ -38,11 +26,6 @@ public class ClientSpriteResearchIcon implements ClientResearchIcon<SpriteResear
         } else {
             GuiUtils.drawImg(guiGraphics, this.icon.sprite(), panelLeft, panelTop, this.icon.width(), this.icon.height());
         }
-    }
-
-    @Override
-    public SpriteResearchIcon icon() {
-        return icon;
     }
 
 }

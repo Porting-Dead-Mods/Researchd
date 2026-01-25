@@ -7,7 +7,7 @@ import com.portingdeadmods.researchd.api.research.methods.ResearchMethodType;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.client.screens.editor.EditorSharedSprites;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.ItemSelectorWidget;
-import com.portingdeadmods.researchd.client.screens.editor.widgets.PackItemSelectorCategory;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.category.PackItemSelectorCategory;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.ItemSelectorPopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.BackgroundEditBox;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;

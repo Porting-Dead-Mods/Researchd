@@ -1,7 +1,6 @@
-package com.portingdeadmods.researchd.client.screens.editor.widgets;
+package com.portingdeadmods.researchd.client.screens.editor.widgets.popups.category;
 
 import com.google.common.base.Suppliers;
-import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.ItemSelectorCategory;
 import com.portingdeadmods.researchd.compat.JEICompat;
 import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import com.portingdeadmods.researchd.utils.ClientEditorHelper;

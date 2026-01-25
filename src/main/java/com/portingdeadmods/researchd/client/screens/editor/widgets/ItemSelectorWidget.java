@@ -4,6 +4,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.client.screens.editor.EditorSharedSprites;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.ItemSelectorPopupWidget;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.category.DefaultItemSelectorCategory;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.category.ItemSelectorCategory;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.category.TagItemSelectorCategory;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.impl.research.icons.ItemResearchIcon;
@@ -20,6 +23,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
 
@@ -30,8 +35,13 @@ public class ItemSelectorWidget extends AbstractWidget {
     private List<ItemStack> selected;
     private final BiFunction<ItemSelectorWidget, @Nullable PopupWidget, ? extends ItemSelectorPopupWidget> popupWidgetFactory;
 
-    public ItemSelectorWidget(@Nullable PopupWidget parentPopupWidget, int x, int y, int width, int height) {
-        this(parentPopupWidget, x, y, width, height, List.of(new ItemStack(Items.DIRT)), (self, parent) -> new ItemSelectorPopupWidget(self, parent, List.of(DefaultItemSelectorCategory.values()), DefaultItemSelectorCategory.getDefault(), 0, 0));
+    public ItemSelectorWidget(@Nullable PopupWidget parentPopupWidget, int x, int y, int width, int height, boolean tagSelector, boolean selectMultiple) {
+        this(parentPopupWidget, x, y, width, height, List.of(new ItemStack(Items.DIRT)), (self, parent) -> {
+            List<ItemSelectorCategory> categories = new ArrayList<>();
+            Collections.addAll(categories, DefaultItemSelectorCategory.values());
+            if (tagSelector) categories.add(TagItemSelectorCategory.INSTANCE);
+            return new ItemSelectorPopupWidget(self, parent, categories, DefaultItemSelectorCategory.getDefault(), 0, 0);
+        });
     }
 
     public ItemSelectorWidget(@Nullable PopupWidget parentPopupWidget, int x, int y, int width, int height, List<ItemStack> defaultSelected, BiFunction<ItemSelectorWidget, @Nullable PopupWidget, ? extends ItemSelectorPopupWidget> popupWidgetFactory) {

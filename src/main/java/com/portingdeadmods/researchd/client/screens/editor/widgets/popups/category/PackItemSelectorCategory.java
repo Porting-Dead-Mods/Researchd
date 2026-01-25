@@ -1,11 +1,8 @@
-package com.portingdeadmods.researchd.client.screens.editor.widgets;
+package com.portingdeadmods.researchd.client.screens.editor.widgets.popups.category;
 
-import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.ItemSelectorCategory;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
-import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
 import com.portingdeadmods.researchd.registries.ResearchdItems;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 

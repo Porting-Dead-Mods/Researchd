@@ -30,6 +30,7 @@ public class ResearchMethodSelectionWidget extends AbstractWidget {
     public void setCreatedMethod(ResearchMethod method) {
         this.createdMethod = method;
         this.createdMethodInfoWidget = ResearchdClient.RESEARCH_METHOD_WIDGETS.get(method.id()).createMethod(this.getX(), this.getY(), this.createdMethod);
+        this.createdMethodInfoWidget.setPosition(this.getX() + (this.width - this.createdMethodInfoWidget.getWidth()) / 2, this.getY() + (this.height - this.createdMethodInfoWidget.getHeight()) / 2);
     }
 
     @Override
@@ -56,6 +57,10 @@ public class ResearchMethodSelectionWidget extends AbstractWidget {
 
     @Override
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
+    }
+
+    public ResearchMethod getMethod() {
+        return this.createdMethod;
     }
 
 }

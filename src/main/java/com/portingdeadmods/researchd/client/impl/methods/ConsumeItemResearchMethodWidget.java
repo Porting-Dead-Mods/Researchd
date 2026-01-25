@@ -34,7 +34,7 @@ public class ConsumeItemResearchMethodWidget extends AbstractResearchInfoWidget<
         int y = getY();
         guiGraphics.fill(x, y, x + this.width, y + this.height, FastColor.ARGB32.color(69, 69, 69));
         this.itemRenderer.render(guiGraphics, x, y);
-        this.itemRenderer.tick();
+        this.itemRenderer.tick(v);
     }
 
     @Override

@@ -1,7 +1,9 @@
 package com.portingdeadmods.researchd.client.screens.editor.widgets.popups;
 
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.client.screens.editor.EditorSharedSprites;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.ItemSelectorWidget;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.category.ItemSelectorCategory;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.ContainerWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
@@ -10,6 +12,7 @@ import com.portingdeadmods.researchd.utils.Search;
 import com.portingdeadmods.researchd.utils.Spaghetti;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
@@ -26,13 +29,14 @@ import java.util.List;
 
 public class ItemSelectorPopupWidget extends PopupWidget {
     public static final ResourceLocation BACKGROUND_SPRITE = Researchd.rl("widget/item_selector_widget");
+    public static final ResourceLocation BACKGROUND_NO_SEARCHBAR_SPRITE = Researchd.rl("widget/item_selector_widget_no_searchbar");
     public static final ResourceLocation TAB_BIG_SPRITE = Researchd.rl("tab_big");
     public static final ResourceLocation TAB_SMALL_SPRITE = Researchd.rl("tab_small");
     public static final WidgetSprites SPRITES = new WidgetSprites(Researchd.rl("editor_checkmark_button"), Researchd.rl("editor_checkmark_button_disabled"), Researchd.rl("editor_checkmark_button_highlighted"));
 
-    private final EditBox searchBar;
+    private EditBox searchBar;
     private final Search search;
-    private final SelectorContainerWidget containerWidget;
+    private AbstractWidget containerWidget;
     private final PDLImageButton doneButton;
     private final ItemSelectorWidget parentSelectorWidget;
     @Nullable
@@ -51,11 +55,13 @@ public class ItemSelectorPopupWidget extends PopupWidget {
         this.selectedCategory = defaultCategory;
         this.allItems = this.selectedCategory.getItems();
         this.filteredItems = allItems;
-        this.searchBar = this.addRenderableWidget(new EditBox(Minecraft.getInstance().font, x, y, 132, 12, CommonComponents.EMPTY));
-        this.searchBar.setBordered(false);
-        this.searchBar.setEditable(true);
-        this.searchBar.setResponder(this::onSearchBarValueChanged);
-        this.containerWidget = this.addRenderableWidget(new SelectorContainerWidget(this, 160 - 15, 160 - 15, 16, 16, this.filteredItems, true));
+        if (this.selectedCategory.hasSearchBar()) {
+            this.createSearchBar(x, y);
+        } else {
+            this.searchBar = null;
+        }
+        AbstractWidget widget = this.selectedCategory.createBodyWidget(this, 160 - 15, 160 - 15, this.filteredItems);
+        this.containerWidget = this.addRenderableWidget(widget);
         this.doneButton = this.addRenderableWidget(PDLImageButton.builder(this::onDoneClicked)
                 .size(14, 14)
                 .tooltip(Tooltip.create(Component.literal("Select Item")))
@@ -65,13 +71,20 @@ public class ItemSelectorPopupWidget extends PopupWidget {
         this.setPosition(x, y);
     }
 
+    private void createSearchBar(int x, int y) {
+        this.searchBar = this.addRenderableWidget(new EditBox(Minecraft.getInstance().font, x, y, 132, 12, CommonComponents.EMPTY));
+        this.searchBar.setBordered(false);
+        this.searchBar.setEditable(true);
+        this.searchBar.setResponder(this::onSearchBarValueChanged);
+    }
+
     private void onDoneClicked(PDLImageButton button) {
         ResearchScreen screen = Spaghetti.tryGetResearchScreen();
 
         screen.closePopup(this);
         if (this.parentPopupWidget != null) {
             screen.openPopupCentered(this.parentPopupWidget);
-            this.parentSelectorWidget.setSelected(List.of(this.containerWidget.selectedItem.copy()));
+            this.parentSelectorWidget.setSelected(this.selectedCategory.getSelectedItems(this.containerWidget).stream().map(ItemStack::copy).toList());
         }
     }
 
@@ -83,7 +96,8 @@ public class ItemSelectorPopupWidget extends PopupWidget {
             }
         }
         this.filteredItems = items;
-        this.containerWidget.setItems(this.filteredItems);
+        this.selectedCategory.setItems(this.containerWidget, this.filteredItems);
+        this.selectedCategory.resetScrollOffset(this.containerWidget);
     }
 
     @Override
@@ -104,7 +118,7 @@ public class ItemSelectorPopupWidget extends PopupWidget {
             }
         }
 
-        guiGraphics.blitSprite(BACKGROUND_SPRITE, this.getX(), this.getY() + 18, this.width, 176);
+        guiGraphics.blitSprite(this.selectedCategory.hasSearchBar() ? BACKGROUND_SPRITE : BACKGROUND_NO_SEARCHBAR_SPRITE, this.getX(), this.getY() + 18, this.width, 176);
 
         super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
     }
@@ -122,8 +136,20 @@ public class ItemSelectorPopupWidget extends PopupWidget {
                     this.selectedCategory = category;
                     this.allItems = category.getItems();
                     this.filteredItems = this.allItems;
-                    this.searchBar.setValue("");
-                    this.containerWidget.resetScrollOffset();
+                    if (this.searchBar != null) {
+                        this.searchBar.setValue("");
+                    }
+                    this.selectedCategory.resetScrollOffset(this.containerWidget);
+                    this.widgets.remove(this.containerWidget);
+                    this.containerWidget = this.selectedCategory.createBodyWidget(this, 160 - 15, 160 - 15, this.filteredItems);
+                    if (this.selectedCategory.hasSearchBar()) {
+                        this.createSearchBar(x, y);
+                    } else {
+                        this.widgets.remove(this.searchBar);
+                        this.searchBar = null;
+                    }
+                    this.addRenderableWidget(this.containerWidget);
+                    this.setPosition(this.getX(), this.getY());
                     return true;
                 }
             }
@@ -134,7 +160,9 @@ public class ItemSelectorPopupWidget extends PopupWidget {
     @Override
     public void setX(int x) {
         super.setX(x);
-        this.searchBar.setX(x + 7);
+        if (this.searchBar != null) {
+            this.searchBar.setX(x + 7);
+        }
         this.containerWidget.setX(x + 7);
         this.doneButton.setX(x + 162);
     }
@@ -142,8 +170,12 @@ public class ItemSelectorPopupWidget extends PopupWidget {
     @Override
     public void setY(int y) {
         super.setY(y);
-        this.searchBar.setY(y + 26);
-        this.containerWidget.setY(y + 40);
+        if (this.searchBar != null) {
+            this.searchBar.setY(y + 26);
+            this.containerWidget.setY(y + 40);
+        } else {
+            this.containerWidget.setY(y + 26);
+        }
         this.doneButton.setY(y + 173);
     }
 
@@ -177,6 +209,10 @@ public class ItemSelectorPopupWidget extends PopupWidget {
                 percentage = 0;
             }
             guiGraphics.blitSprite(SCROLLER_SMALL_SPRITE, this.getLeft() + this.getWidth() + 3, (int) (this.getTop() + percentage * (this.getHeight() - 7)), 4, 7);
+        }
+
+        public List<ItemStack> getSelectedItems() {
+            return List.of(selectedItem);
         }
 
         public void resetScrollOffset() {

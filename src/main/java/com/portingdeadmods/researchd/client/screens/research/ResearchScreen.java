@@ -106,9 +106,8 @@ public class ResearchScreen extends Screen {
 	    this.editorSideBarWidget = new EditorSideBarWidget(this.width - 174, 0);
 	    this.editorSideBarWidget.visible = false;
 
-	    Minecraft mc = Minecraft.getInstance();
 
-	    if (mc.player.getData(ResearchdAttachments.RESEARCH_INTERACTION_TYPE) == ResearchInteractionType.EDIT) {
+	    if (this.editorModeActive()) {
 		    this.openEditorButton = this.addWidget(PDLImageButton.builder(this::openEditor)
 				    .pos(this.width - 16 - 8, this.height - 16 - 8)
 				    .size(16, 16)
@@ -127,7 +126,12 @@ public class ResearchScreen extends Screen {
 	    this.editorSideBarWidget.visitWidgets(this::addRenderableWidget);
     }
 
-	/**
+    public boolean editorModeActive() {
+        Minecraft mc = Minecraft.getInstance();
+        return mc.player.getData(ResearchdAttachments.RESEARCH_INTERACTION_TYPE) == ResearchInteractionType.EDIT;
+    }
+
+    /**
 	 * Called when a research page is selected from the ResearchPagesList.
 	 * Updates the graph to show researches from the selected page.
 	 */
@@ -246,9 +250,7 @@ public class ResearchScreen extends Screen {
         }
         poseStack.popPose();
 
-        Minecraft mc = Minecraft.getInstance();
-
-        if (mc.player.getData(ResearchdAttachments.RESEARCH_INTERACTION_TYPE) == ResearchInteractionType.EDIT) {
+        if (this.editorModeActive()) {
             guiGraphics.blit(EDIT_BUTTON_CORNER, width - 24 - 4, height - 24 - 4, 0, 0, 24, 24, 24, 24);
             this.openEditorButton.render(guiGraphics, mouseX, mouseY, partialTick);
         }
@@ -290,12 +292,14 @@ public class ResearchScreen extends Screen {
             }
         }
 
-        if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && this.researchGraphWidget.isHovered() && (this.openEditorButton == null || !this.openEditorButton.isHovered())) {
-            this.setDropDown(new GraphDropDownWidget(this, (int) mouseX, (int) mouseY));
-        } else if (this.dropDownWidget != null && this.dropDownWidget.isHovered() && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-            this.dropDownWidget.mouseClicked(mouseX, mouseY, button);
-        } else {
-            this.setDropDown(null);
+        if (this.editorModeActive()) {
+            if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && this.researchGraphWidget.isHovered() && (this.openEditorButton == null || !this.openEditorButton.isHovered())) {
+                this.setDropDown(new GraphDropDownWidget(this, (int) mouseX, (int) mouseY));
+            } else if (this.dropDownWidget != null && this.dropDownWidget.isHovered() && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+                this.dropDownWidget.mouseClicked(mouseX, mouseY, button);
+            } else {
+                this.setDropDown(null);
+            }
         }
 
         return super.mouseClicked(mouseX, mouseY, button);
