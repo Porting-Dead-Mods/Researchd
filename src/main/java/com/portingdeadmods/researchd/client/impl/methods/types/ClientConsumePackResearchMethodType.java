@@ -85,7 +85,7 @@ public class ClientConsumePackResearchMethodType implements ClientResearchMethod
     }
 
     @Override
-    public ResearchMethod createResearchMethod(RememberingLinearLayout layout) {
+    public ResearchMethod createResearchEffect(RememberingLinearLayout layout) {
         String time = layout.getChild("time", EditBox.class).getValue();
         return new ConsumePackResearchMethod(
                 List.of(layout.getChild("pack_selector", ItemSelectorWidget.class).getSelected().getFirst().get(ResearchdDataComponents.RESEARCH_PACK).researchPackKey().get()),

@@ -9,15 +9,16 @@ import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
 public abstract class AbstractLayoutWidget<L extends Layout> extends AbstractContainerWidget implements LayoutWidget<L> {
-    protected final L layout;
+    protected final @Nullable L layout;
     private final List<AbstractWidget> widgets;
 
-    public AbstractLayoutWidget(L layout, int x, int y, int width, int height, Component message) {
+    public AbstractLayoutWidget(@Nullable L layout, int x, int y, int width, int height, Component message) {
         super(x, y, width, height, message);
         this.layout = layout;
         if (this.layout != null) {
@@ -27,7 +28,7 @@ public abstract class AbstractLayoutWidget<L extends Layout> extends AbstractCon
     }
 
     @Override
-    public L getLayout() {
+    public @org.jetbrains.annotations.Nullable L getLayout() {
         return this.layout;
     }
 

@@ -23,7 +23,6 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-// TODO: Selected list entries are offset a bit so it looks like they are pressed (like keys on a keyboard)
 public class TechListWidget extends ResearchScreenWidget {
     private static final ResourceLocation SCROLLER_SPRITE = ResourceLocation.withDefaultNamespace("container/creative_inventory/scroller");
     private static final int SCROLLER_WIDTH = 12;

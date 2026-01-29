@@ -1,10 +1,13 @@
 package com.portingdeadmods.researchd.resources.contents;
 
+import com.mojang.serialization.Codec;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.impl.research.effect.DimensionUnlockEffect;
 import com.portingdeadmods.researchd.registries.ResearchdItems;
 import com.portingdeadmods.researchd.resources.ResearchdDatagenProvider;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
@@ -12,7 +15,7 @@ import net.minecraft.world.item.Items;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ResearchdResearches implements ResearchdDatagenProvider<Research>, ResearchdResearchProvider {
+public class ResearchdResearches implements ResearchdResearchProvider {
     public static final ResourceLocation COBBLESTONE_LOC = Researchd.rl("cobblestone");
     public static final ResourceLocation OVERWORLD_PACK_LOC = Researchd.rl("overworld_pack");
     public static final ResourceLocation NETHER_LOC = Researchd.rl("nether");
@@ -31,12 +34,22 @@ public class ResearchdResearches implements ResearchdDatagenProvider<Research>, 
     }
 
     @Override
-    public String getModid() {
+    public String modid() {
         return modid;
     }
 
     @Override
-    public Map<ResourceKey<Research>, Research> getResearches() {
+    public ResourceKey<Registry<Research>> registry() {
+        return ResearchdRegistries.RESEARCH_KEY;
+    }
+
+    @Override
+    public Codec<Research> codec() {
+        return Research.CODEC;
+    }
+
+    @Override
+    public Map<ResourceKey<Research>, Research> contents() {
         return researches;
     }
 
@@ -164,8 +177,4 @@ public class ResearchdResearches implements ResearchdDatagenProvider<Research>, 
                 .effect(and(unlockRecipe(mcLoc("netherite_ingot")), unlockRecipe(mcLoc("gold_block")))));
     }
 
-    @Override
-    public Map<ResourceKey<Research>, Research> getContents() {
-        return this.researches;
-    }
 }

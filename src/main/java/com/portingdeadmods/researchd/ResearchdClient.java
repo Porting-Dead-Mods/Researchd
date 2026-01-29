@@ -2,13 +2,16 @@ package com.portingdeadmods.researchd;
 
 import com.portingdeadmods.researchd.api.client.editor.ClientResearch;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
+import com.portingdeadmods.researchd.api.client.editor.ClientResearchEffectType;
 import com.portingdeadmods.researchd.api.client.editor.ClientResearchMethodType;
 import com.portingdeadmods.researchd.api.research.RegistryDisplay;
 import com.portingdeadmods.researchd.api.research.ResearchIcon;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
+import com.portingdeadmods.researchd.api.team.ResearchQueue;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
+import com.portingdeadmods.researchd.client.impl.effects.types.ClientDimensionUnlockEffectType;
 import com.portingdeadmods.researchd.client.impl.icons.ClientItemResearchIcon;
 import com.portingdeadmods.researchd.client.impl.SimpleClientResearch;
 import com.portingdeadmods.researchd.client.impl.effects.*;
@@ -61,6 +64,7 @@ public final class ResearchdClient {
     public static final Map<ResourceLocation, ClientResearch> CLIENT_RESEARCHES = new HashMap<>();
     public static final Map<ResourceLocation, ClientResearchMethodType> CLIENT_RESEARCH_METHOD_TYPES = new HashMap<>();
     public static final ModelResourceLocation RESEARCH_LAB_MODEL = ModelResourceLocation.standalone(Researchd.rl("block/research_lab"));
+    public static final Map<ResourceLocation, ClientResearchEffectType> CLIENT_RESEARCH_EFFECT_TYPES = new HashMap<>();
 
     public ResearchdClient(IEventBus eventBus, ModContainer modContainer) {
         eventBus.addListener(this::registerKeybinds);
@@ -99,6 +103,8 @@ public final class ResearchdClient {
             CLIENT_RESEARCH_METHOD_TYPES.put(ConsumeItemResearchMethod.ID, ClientConsumeItemResearchMethodType.INSTANCE);
             CLIENT_RESEARCH_METHOD_TYPES.put(ConsumePackResearchMethod.ID, ClientConsumePackResearchMethodType.INSTANCE);
             CLIENT_RESEARCH_METHOD_TYPES.put(CheckItemPresenceResearchMethod.ID, ClientCheckItemPresenceMethodType.INSTANCE);
+
+            CLIENT_RESEARCH_EFFECT_TYPES.put(ClientDimensionUnlockEffectType.ID, ClientDimensionUnlockEffectType.INSTANCE);
 
             ItemBlockRenderTypes.setRenderLayer(ResearchdBlocks.RESEARCH_LAB_CONTROLLER.get(), RenderType.solid()); // Should fiddle with render types till it works ngl
         });

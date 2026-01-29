@@ -1,15 +1,18 @@
 package com.portingdeadmods.researchd.resources.contents;
 
+import com.mojang.serialization.Codec;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.resources.ResearchdDatagenProvider;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ResearchdResearchPacks implements ResearchdDatagenProvider<ResearchPack>, ResearchdResearchPackProvider {
+public class ResearchdResearchPacks implements ResearchdResearchPackProvider {
     public static final ResourceLocation OVERWORLD_PACK_LOC = Researchd.rl("overworld");
     public static final ResourceLocation NETHER_PACK_LOC = Researchd.rl("nether");
     public static final ResourceLocation END_PACK_LOC = Researchd.rl("end");
@@ -23,13 +26,13 @@ public class ResearchdResearchPacks implements ResearchdDatagenProvider<Research
     }
 
     @Override
-    public String getModid() {
+    public String modid() {
         return modid;
     }
 
     @Override
-    public Map<ResourceKey<ResearchPack>, ResearchPack> getResearchPacks() {
-        return researchPacks;
+    public ResourceKey<Registry<ResearchPack>> registry() {
+        return ResearchdRegistries.RESEARCH_PACK_KEY;
     }
 
     @Override
@@ -55,7 +58,12 @@ public class ResearchdResearchPacks implements ResearchdDatagenProvider<Research
     }
 
     @Override
-    public Map<ResourceKey<ResearchPack>, ResearchPack> getContents() {
+    public Codec<ResearchPack> codec() {
+        return ResearchPack.CODEC;
+    }
+
+    @Override
+    public Map<ResourceKey<ResearchPack>, ResearchPack> contents() {
         return this.researchPacks;
     }
 }

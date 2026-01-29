@@ -8,7 +8,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.compat.KubeJSCompat;
 import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import com.portingdeadmods.researchd.compat.kubejs.example.KubeJSExample;
-import com.portingdeadmods.researchd.resources.ExampleDatapack;
+import com.portingdeadmods.researchd.resources.ExampleDatapackWriter;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -22,6 +22,7 @@ import net.neoforged.fml.loading.FMLPaths;
 import java.nio.file.Path;
 
 public class ExampleCommands {
+    public static final ExampleDatapackWriter EXAMPLE_DATAPACK_WRITER = new ExampleDatapackWriter(true);
 
     public static LiteralCommandNode<CommandSourceStack> build() {
         return Commands.literal("example")
@@ -44,7 +45,7 @@ public class ExampleCommands {
         CommandSourceStack source = ctx.getSource();
         String name = getArgOrDefault(ctx, "pack-name", String.class, "researchd_examples_pack");
         String description = getArgOrDefault(ctx, "pack-desc", String.class, "Auto-created researchd example pack");
-        Result<Path, Exception> result = ExampleDatapack.createExample(ctx.getSource().getServer().getWorldPath(LevelResource.DATAPACK_DIR), name, description, "rd_examples", true);
+        Result<Path, Exception> result = EXAMPLE_DATAPACK_WRITER.write(ctx.getSource().getServer().getWorldPath(LevelResource.DATAPACK_DIR), name, description, "rd_examples");
         if (result instanceof Result.Ok(Path value)) {
             String filePath = value.toString();
             String gameDirPath = FMLPaths.GAMEDIR.get().toString();

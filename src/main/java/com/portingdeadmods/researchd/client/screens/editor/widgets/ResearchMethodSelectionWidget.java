@@ -16,6 +16,7 @@ import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
+// The base widget that can be embedded and used as a button
 public class ResearchMethodSelectionWidget extends AbstractWidget {
     private ResearchMethodTypePopupWidget methodTypePopupWidget;
     private @Nullable PopupWidget parentPopupWidget;
@@ -53,6 +54,24 @@ public class ResearchMethodSelectionWidget extends AbstractWidget {
             this.methodTypePopupWidget = Spaghetti.tryGetResearchScreen().openPopupCentered(new ResearchMethodTypePopupWidget(this.parentPopupWidget, this, CommonComponents.EMPTY));
         }
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public void setX(int x) {
+        super.setX(x);
+
+        if (this.createdMethodInfoWidget != null) {
+            this.createdMethodInfoWidget.setX(x + (this.width - this.createdMethodInfoWidget.getWidth()) / 2);
+        }
+    }
+
+    @Override
+    public void setY(int y) {
+        super.setY(y);
+
+        if (this.createdMethodInfoWidget != null) {
+            this.createdMethodInfoWidget.setY(y + (this.height - this.createdMethodInfoWidget.getHeight()) / 2);
+        }
     }
 
     @Override

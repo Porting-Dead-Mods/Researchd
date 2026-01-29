@@ -58,7 +58,7 @@ public class ResearchdDynamicPackContents {
         P provider = providerFactory.apply(Researchd.MODID);
         provider.build();
 
-        for (Map.Entry<ResourceKey<T>, T> entry : provider.getContents().entrySet()) {
+        for (Map.Entry<ResourceKey<T>, T> entry : provider.contents().entrySet()) {
             T research = entry.getValue();
             DataResult<JsonElement> result = codec.encodeStart(JsonOps.INSTANCE, research);
             result.ifSuccess(json -> pack.put(entry.getKey().location().withPrefix("researchd/" + path + "/"), json));

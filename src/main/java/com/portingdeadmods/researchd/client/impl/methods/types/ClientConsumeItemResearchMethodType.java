@@ -46,7 +46,7 @@ public class ClientConsumeItemResearchMethodType implements ClientResearchMethod
     }
 
     @Override
-    public ResearchMethod createResearchMethod(RememberingLinearLayout layout) {
+    public ResearchMethod createResearchEffect(RememberingLinearLayout layout) {
         return new ConsumeItemResearchMethod(
                 layout.getChild("item_selector", ItemSelectorWidget.class).createIngredient(),
                 Integer.parseInt(layout.getChild("count", EditBox.class).getValue())

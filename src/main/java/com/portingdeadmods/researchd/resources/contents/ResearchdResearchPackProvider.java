@@ -6,6 +6,7 @@ import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
 import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
 import com.portingdeadmods.researchd.registries.ResearchdItems;
+import com.portingdeadmods.researchd.resources.ResearchdDatagenProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -14,18 +15,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.UnaryOperator;
 
-public interface ResearchdResearchPackProvider {
-    String getModid();
-    Map<ResourceKey<ResearchPack>, ResearchPack> getResearchPacks();
-
+public interface ResearchdResearchPackProvider extends ResearchdDatagenProvider<ResearchPack> {
     default ResourceKey<ResearchPack> researchPack(String name, UnaryOperator<ResearchPackImpl.Builder> builder) {
         ResourceKey<ResearchPack> key = packKey(name);
-        getResearchPacks().put(key, builder.apply(ResearchPackImpl.builder()).build());
+        this.contents().put(key, builder.apply(ResearchPackImpl.builder()).build());
         return key;
     }
 
     default ResourceKey<ResearchPack> packKey(String name) {
-        return ResourceKey.create(ResearchdRegistries.RESEARCH_PACK_KEY, ResourceLocation.fromNamespaceAndPath(getModid(), name));
+        return ResourceKey.create(ResearchdRegistries.RESEARCH_PACK_KEY, ResourceLocation.fromNamespaceAndPath(this.modid(), name));
     }
 
     static ItemStack asStack(ResourceKey<ResearchPack> key, int count) {

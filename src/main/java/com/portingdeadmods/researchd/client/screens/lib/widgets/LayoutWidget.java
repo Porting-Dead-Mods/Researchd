@@ -12,7 +12,9 @@ public interface LayoutWidget<L extends Layout> {
     Iterable<? extends LayoutElement> getElements();
 
     default void arrangeElements() {
-        this.getLayout().arrangeElements();
+        if (this.getLayout() != null){
+            this.getLayout().arrangeElements();
+        }
     }
 
     default void renderElements(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {

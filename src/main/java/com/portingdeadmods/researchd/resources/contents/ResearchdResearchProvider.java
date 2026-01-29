@@ -15,6 +15,7 @@ import com.portingdeadmods.researchd.impl.research.method.CheckItemPresenceResea
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.OrResearchMethod;
+import com.portingdeadmods.researchd.resources.ResearchdDatagenProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -26,16 +27,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-public interface ResearchdResearchProvider {
-    String getModid();
-    Map<ResourceKey<Research>, Research> getResearches();
-
+public interface ResearchdResearchProvider extends ResearchdDatagenProvider<Research> {
     default @NotNull ResourceLocation mcLoc(String path) {
         return ResourceLocation.withDefaultNamespace(path);
     }
 
     default @NotNull ResourceLocation modLoc(String path) {
-        return ResourceLocation.fromNamespaceAndPath(getModid(), path);
+        return ResourceLocation.fromNamespaceAndPath(this.modid(), path);
     }
 
     default @NotNull ResourceLocation loc(String namespace, String path) {
@@ -88,7 +86,7 @@ public interface ResearchdResearchProvider {
 
     default ResourceKey<Research> simpleResearch(String name, UnaryOperator<SimpleResearch.Builder> builder) {
         ResourceKey<Research> key = key(name);
-        getResearches().put(key, builder.apply(SimpleResearch.builder()).build());
+        contents().put(key, builder.apply(SimpleResearch.builder()).build());
         return key;
     }
 }

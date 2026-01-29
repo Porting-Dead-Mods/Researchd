@@ -36,6 +36,6 @@ public final class ResearchEffectTypes {
     );
 
     private static @NotNull DeferredHolder<ResearchEffectType, ResearchEffectType> registerEffectType(String id, ResearchIcon icon) {
-        return TYPES.register(id, () -> ResearchEffectType.simple(Researchd.rl(id), icon));
+        return TYPES.register(id, () -> ResearchEffectType.single(Researchd.rl(id), icon));
     }
 }

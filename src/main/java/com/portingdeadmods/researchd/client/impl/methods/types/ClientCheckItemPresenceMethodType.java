@@ -19,7 +19,7 @@ public class ClientCheckItemPresenceMethodType extends ClientConsumeItemResearch
     }
 
     @Override
-    public ResearchMethod createResearchMethod(RememberingLinearLayout layout) {
+    public ResearchMethod createResearchEffect(RememberingLinearLayout layout) {
         return new CheckItemPresenceResearchMethod(
                 layout.getChild("item_selector", ItemSelectorWidget.class).createIngredient(),
                 Integer.parseInt(layout.getChild("count", EditBox.class).getValue())

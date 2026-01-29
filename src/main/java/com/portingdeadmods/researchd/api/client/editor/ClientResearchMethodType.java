@@ -18,7 +18,7 @@ public interface ClientResearchMethodType {
 
     void buildLayout(RememberingLinearLayout layout, ClientResearchMethodType.Context context);
 
-    ResearchMethod createResearchMethod(RememberingLinearLayout layout);
+    ResearchMethod createResearchEffect(RememberingLinearLayout layout);
 
     static ClientResearchMethodType getClientMethodType(ResearchMethodType methodType) {
         return ResearchdClient.CLIENT_RESEARCH_METHOD_TYPES.get(methodType.id());

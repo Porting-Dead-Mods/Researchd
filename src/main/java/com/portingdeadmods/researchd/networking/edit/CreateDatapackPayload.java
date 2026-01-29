@@ -5,7 +5,7 @@ import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.impl.editor.EditModeSettingsImpl;
-import com.portingdeadmods.researchd.resources.ExampleDatapack;
+import com.portingdeadmods.researchd.resources.ExampleDatapackWriter;
 import com.portingdeadmods.researchd.utils.PrettyPath;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -38,7 +38,8 @@ public record CreateDatapackPayload(String name, String description,
         context.enqueueWork(() -> {
             Path datapackDir = context.player().getServer().getWorldPath(LevelResource.DATAPACK_DIR);
 
-            Result<Path, Exception> result = ExampleDatapack.createExample(datapackDir, this.name(), this.description(), PDLConfigHelper.camelToSnake(this.name()), this.generateExamples());
+            ExampleDatapackWriter writer = new ExampleDatapackWriter(this.generateExamples());
+            Result<Path, Exception> result = writer.write(datapackDir, this.name(), this.description(), PDLConfigHelper.camelToSnake(this.name()));
 
             if (result instanceof Result.Ok(Path value)) {
                 EditModeSettingsImpl settings = context.player().getData(ResearchdAttachments.EDIT_MODE_SETTINGS);

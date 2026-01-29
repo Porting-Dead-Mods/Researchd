@@ -83,5 +83,4 @@ public final class RememberingLinearLayout {
                 "widgets=" + widgets + ']';
     }
 
-
 }

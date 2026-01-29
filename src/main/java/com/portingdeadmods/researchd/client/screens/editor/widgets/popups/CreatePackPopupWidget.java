@@ -108,28 +108,4 @@ public class CreatePackPopupWidget extends DraggablePopupWidget {
         this.layout.visitWidgets(consumer);
     }
 
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (this.getLayout() != null) {
-            for (AbstractWidget child : this.getLayout().getChildren()) {
-                if (child.mouseClicked(mouseX, mouseY, button)) {
-                    this.screen.setFocused(child);
-                    if (button == 0) {
-                        this.screen.setDragging(true);
-                    }
-                    return true;
-                }
-            }
-        }
-        //return false;
-        if (super.mouseClicked(mouseX, mouseY, button)) {
-            this.screen.setFocused(this);
-            if (button == 0) {
-                this.screen.setDragging(true);
-            }
-            return true;
-        }
-        return false;
-    }
-
 }
