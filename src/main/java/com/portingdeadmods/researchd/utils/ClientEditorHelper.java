@@ -84,8 +84,16 @@ public final class ClientEditorHelper {
         }
     }
 
-    public static DisplayImpl createDisplay(EditBox nameEditBox, MultiLineEditBox descEditBox) {
-        return new DisplayImpl(Optional.of(Component.literal(nameEditBox.getValue())), Optional.of(Component.literal(descEditBox.getValue())));
+    public static DisplayImpl createDisplay(EditBox nameEditBox, EditBox descEditBox) {
+        Component name = null;
+        Component description = null;
+        if (!nameEditBox.getValue().isEmpty()) {
+            name = Component.literal(nameEditBox.getValue());
+        }
+        if (!descEditBox.getValue().isEmpty()) {
+            description = Component.literal(descEditBox.getValue());
+        }
+        return new DisplayImpl(Optional.ofNullable(name), Optional.ofNullable(description));
     }
 
     public static Inventory getPlayerInventory() {

@@ -123,7 +123,7 @@ public final class CommonResearchCache {
 	 */
 	public static @Nullable ResourceLocation rlPageOf(GlobalResearch res) {
 		for (Map.Entry<ResourceLocation, ResearchPage> entry : researchPages.entrySet()) {
-			if (entry.getValue().contains(res)) return entry.getKey();
+			if (entry.getValue().containsResearch(res)) return entry.getKey();
 		}
 
 		return null;

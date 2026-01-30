@@ -5,7 +5,7 @@ import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.ResearchSelectionPopupWidget;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.selection.ResearchSelectionPopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.ContainerWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;

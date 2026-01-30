@@ -18,12 +18,15 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -32,11 +35,11 @@ public class ItemSelectorWidget extends AbstractWidget {
     public static final ResourceLocation EDIT_ELEMENT_HOVER_SPRITE = Researchd.rl("edit_element_hover");
     @Nullable
     private final PopupWidget parentPopupWidget;
-    private List<ItemStack> selected;
+    private Ingredient selected;
     private final BiFunction<ItemSelectorWidget, @Nullable PopupWidget, ? extends ItemSelectorPopupWidget> popupWidgetFactory;
 
     public ItemSelectorWidget(@Nullable PopupWidget parentPopupWidget, int x, int y, int width, int height, boolean tagSelector, boolean selectMultiple) {
-        this(parentPopupWidget, x, y, width, height, List.of(new ItemStack(Items.DIRT)), (self, parent) -> {
+        this(parentPopupWidget, x, y, width, height, Ingredient.of(new ItemStack(Items.DIRT)), (self, parent) -> {
             List<ItemSelectorCategory> categories = new ArrayList<>();
             Collections.addAll(categories, DefaultItemSelectorCategory.values());
             if (tagSelector) categories.add(TagItemSelectorCategory.INSTANCE);
@@ -44,7 +47,7 @@ public class ItemSelectorWidget extends AbstractWidget {
         });
     }
 
-    public ItemSelectorWidget(@Nullable PopupWidget parentPopupWidget, int x, int y, int width, int height, List<ItemStack> defaultSelected, BiFunction<ItemSelectorWidget, @Nullable PopupWidget, ? extends ItemSelectorPopupWidget> popupWidgetFactory) {
+    public ItemSelectorWidget(@Nullable PopupWidget parentPopupWidget, int x, int y, int width, int height, Ingredient defaultSelected, BiFunction<ItemSelectorWidget, @Nullable PopupWidget, ? extends ItemSelectorPopupWidget> popupWidgetFactory) {
         super(x, y, width, height, CommonComponents.EMPTY);
         this.popupWidgetFactory = popupWidgetFactory;
         this.parentPopupWidget = parentPopupWidget;
@@ -55,8 +58,8 @@ public class ItemSelectorWidget extends AbstractWidget {
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         guiGraphics.blitSprite(EditorSharedSprites.EDITOR_BACKGROUND_INVERTED_SPRITE, this.getX(), this.getY(), this.getWidth(), this.getHeight());
-        if (this.selected != null) {
-            guiGraphics.renderItem(this.selected.getFirst(), this.getX() + (this.getWidth() - 16) / 2, this.getY() + (this.getWidth() - 16) / 2);
+        if (this.selected != null && this.selected.getItems().length > 0) {
+            guiGraphics.renderItem(this.selected.getItems()[0], this.getX() + (this.getWidth() - 16) / 2, this.getY() + (this.getWidth() - 16) / 2);
         }
         if (this.isHovered()) {
             PoseStack poseStack  = guiGraphics.pose();
@@ -87,19 +90,19 @@ public class ItemSelectorWidget extends AbstractWidget {
     }
 
     public void setSelected(List<ItemStack> selected) {
-        this.selected = selected;
+        this.selected = Ingredient.of(selected.stream());
     }
 
-    public List<ItemStack> getSelected() {
+    public void setSelected(TagKey<Item> tag) {
+        this.selected = Ingredient.of(tag);
+    }
+
+    public Ingredient getSelected() {
         return selected;
     }
 
     public ItemResearchIcon createIcon() {
-        return new ItemResearchIcon(this.getSelected());
-    }
-
-    public Ingredient createIngredient() {
-        return Ingredient.of(selected.stream());
+        return new ItemResearchIcon(Arrays.asList(this.getSelected().getItems()));
     }
 
 }

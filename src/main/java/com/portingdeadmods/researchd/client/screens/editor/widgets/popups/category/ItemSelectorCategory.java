@@ -4,6 +4,7 @@ import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.ItemSe
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -29,11 +30,11 @@ public interface ItemSelectorCategory {
         }
     }
 
-    default List<ItemStack> getSelectedItems(AbstractWidget widget) {
+    default Ingredient getSelected(AbstractWidget widget) {
         if (widget instanceof ItemSelectorPopupWidget.SelectorContainerWidget containerWidget) {
-            return containerWidget.getSelectedItems();
+            return Ingredient.of(containerWidget.getSelectedItems().stream());
         }
-        return Collections.emptyList();
+        return Ingredient.EMPTY;
     }
 
     default void setItems(AbstractWidget widget, Collection<ItemStack> items) {

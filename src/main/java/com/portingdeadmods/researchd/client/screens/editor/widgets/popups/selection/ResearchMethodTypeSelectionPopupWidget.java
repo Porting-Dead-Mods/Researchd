@@ -1,11 +1,12 @@
-package com.portingdeadmods.researchd.client.screens.editor.widgets.popups;
+package com.portingdeadmods.researchd.client.screens.editor.widgets.popups.selection;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
 import com.portingdeadmods.researchd.api.client.editor.ClientResearchMethodType;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethodType;
-import com.portingdeadmods.researchd.client.screens.editor.widgets.ResearchMethodSelectionWidget;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.BaseResearchMethodCreationWidget;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.creation.ResearchMethodCreationPopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.ContainerWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
@@ -27,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ResearchMethodSelectionPopupWidget extends PopupWidget {
+public class ResearchMethodTypeSelectionPopupWidget extends PopupWidget {
     public static final ResourceLocation BACKGROUND_SPRITE = Researchd.rl("widget/research_selector_widget");
 
     private final EditBox searchBar;
@@ -35,11 +36,11 @@ public class ResearchMethodSelectionPopupWidget extends PopupWidget {
     private final SelectionContainerWidget selectionContainerWidget;
     private final PDLImageButton doneButton;
     private final PopupWidget parentPopupWidget;
-    private final ResearchMethodSelectionWidget originSelectionWidget;
-    private final ResearchMethodTypePopupWidget.ResearchMethodListType listType;
+    private final BaseResearchMethodCreationWidget originSelectionWidget;
+    private final ResearchMethodListSelectionPopupWidget.ResearchMethodListType listType;
     private ResearchMethodType selectedResearchMethod;
 
-    public ResearchMethodSelectionPopupWidget(@Nullable PopupWidget parentPopupWidget, ResearchMethodSelectionWidget parentSelectionWidget, ResearchMethodTypePopupWidget.ResearchMethodListType listType) {
+    public ResearchMethodTypeSelectionPopupWidget(@Nullable PopupWidget parentPopupWidget, BaseResearchMethodCreationWidget parentSelectionWidget, ResearchMethodListSelectionPopupWidget.ResearchMethodListType listType) {
         super(0, 0, 148, 160, CommonComponents.EMPTY);
         this.parentPopupWidget = parentPopupWidget;
         this.originSelectionWidget = parentSelectionWidget;
@@ -119,9 +120,9 @@ public class ResearchMethodSelectionPopupWidget extends PopupWidget {
         public static final WidgetSprites SPRITES = new WidgetSprites(Researchd.rl("editor_background"), Researchd.rl("editor_background_highlighted"));
 
         private final Map<ResearchMethodType, Pair<ClientResearchIcon<?>, Component>> iconsAndNames;
-        private final ResearchMethodSelectionPopupWidget parentWidget;
+        private final ResearchMethodTypeSelectionPopupWidget parentWidget;
 
-        public SelectionContainerWidget(ResearchMethodSelectionPopupWidget parentWidget, int x, int y, int width, int height, boolean renderScroller) {
+        public SelectionContainerWidget(ResearchMethodTypeSelectionPopupWidget parentWidget, int x, int y, int width, int height, boolean renderScroller) {
             super(x, y, width, height, width - 2, 18, Orientation.VERTICAL, 1, 10, new ArrayList<>(), renderScroller);
             this.parentWidget = parentWidget;
             this.iconsAndNames = new HashMap<>();

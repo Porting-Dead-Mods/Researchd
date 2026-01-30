@@ -95,7 +95,7 @@ public record ConsumeItemResearchMethod(Ingredient toConsume, int count) impleme
     public static final class Serializer implements ResearchMethodSerializer<ConsumeItemResearchMethod> {
         public static final Serializer INSTANCE = new Serializer();
         public static final MapCodec<ConsumeItemResearchMethod> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                Ingredient.CODEC.fieldOf("item").forGetter(ConsumeItemResearchMethod::toConsume),
+                Ingredient.CODEC.fieldOf("items").forGetter(ConsumeItemResearchMethod::toConsume),
                 Codec.INT.fieldOf("count").forGetter(ConsumeItemResearchMethod::count)
         ).apply(instance, ConsumeItemResearchMethod::new));
 

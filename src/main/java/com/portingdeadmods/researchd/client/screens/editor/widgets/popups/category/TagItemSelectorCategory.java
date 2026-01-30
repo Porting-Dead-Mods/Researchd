@@ -4,14 +4,16 @@ import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.ItemSe
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.TagCreationWidget;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class TagItemSelectorCategory implements ItemSelectorCategory{
+public class TagItemSelectorCategory implements ItemSelectorCategory {
     public static final TagItemSelectorCategory INSTANCE = new TagItemSelectorCategory();
     private static final ItemStack ICON = new ItemStack(Items.NAME_TAG);
 
@@ -23,6 +25,14 @@ public class TagItemSelectorCategory implements ItemSelectorCategory{
     @Override
     public Collection<ItemStack> getItems() {
         return Collections.emptyList();
+    }
+
+    @Override
+    public Ingredient getSelected(AbstractWidget widget) {
+        if (widget instanceof TagCreationWidget tagCreationWidget) {
+            return Ingredient.of(tagCreationWidget.createTag());
+        }
+        return ItemSelectorCategory.super.getSelected(widget);
     }
 
     @Override
@@ -42,6 +52,6 @@ public class TagItemSelectorCategory implements ItemSelectorCategory{
 
     @Override
     public AbstractWidget createBodyWidget(ItemSelectorPopupWidget parentPopupWidget, int width, int height, Collection<ItemStack> filteredItems) {
-        return new TagCreationWidget(0, 0, width, height);
+        return new TagCreationWidget(parentPopupWidget, 0, 0, width, height);
     }
 }

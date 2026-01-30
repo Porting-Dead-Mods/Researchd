@@ -1,12 +1,10 @@
 package com.portingdeadmods.researchd.client.impl.methods.types;
 
 import com.portingdeadmods.researchd.api.client.RememberingLinearLayout;
-import com.portingdeadmods.researchd.api.client.editor.ClientResearchMethodType;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethodType;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.ItemSelectorWidget;
 import com.portingdeadmods.researchd.impl.research.method.CheckItemPresenceResearchMethod;
-import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
 import com.portingdeadmods.researchd.registries.ResearchMethodTypes;
 import net.minecraft.client.gui.components.EditBox;
 
@@ -21,7 +19,7 @@ public class ClientCheckItemPresenceMethodType extends ClientConsumeItemResearch
     @Override
     public ResearchMethod createResearchEffect(RememberingLinearLayout layout) {
         return new CheckItemPresenceResearchMethod(
-                layout.getChild("item_selector", ItemSelectorWidget.class).createIngredient(),
+                layout.getChild("item_selector", ItemSelectorWidget.class).getSelected(),
                 Integer.parseInt(layout.getChild("count", EditBox.class).getValue())
         );
     }

@@ -25,6 +25,7 @@ import net.minecraft.client.gui.layouts.LayoutSettings;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -53,7 +54,7 @@ public class ClientConsumePackResearchMethodType implements ClientResearchMethod
         layout.addWidget(null, new StringWidget(Component.literal("Pack:"), PopupWidget.getFont()), LayoutSettings::alignHorizontallyCenter);
         ResourceKey<ResearchPack> defaultPack = ClientEditorHelper.getDefaultResearchPack();
         ItemStack defaultSelectedPack = defaultPack != null ? ResearchPackImpl.asStack(defaultPack) : ResearchdItems.GREEN_RESEARCH_PACK_ICON.toStack();
-        layout.addWidget("pack_selector", new ItemSelectorWidget(context.parentPopupWidget(), 0, 0, 24, 24, List.of(defaultSelectedPack), this::createItemSelectorPopup), LayoutSettings::alignHorizontallyCenter);
+        layout.addWidget("pack_selector", new ItemSelectorWidget(context.parentPopupWidget(), 0, 0, 24, 24, Ingredient.of(defaultSelectedPack), this::createItemSelectorPopup), LayoutSettings::alignHorizontallyCenter);
         layout.addWidget(null, new StringWidget(Component.literal("Time:"), PopupWidget.getFont()), LayoutSettings::alignHorizontallyCenter);
         EditBox timeEditBox = layout.addWidget("time", new BackgroundEditBox(PopupWidget.getFont(), SPRITES, 36, 16, Component.literal("1")), LayoutSettings::alignHorizontallyCenter);
         timeEditBox.setValue("200t");
@@ -88,7 +89,7 @@ public class ClientConsumePackResearchMethodType implements ClientResearchMethod
     public ResearchMethod createResearchEffect(RememberingLinearLayout layout) {
         String time = layout.getChild("time", EditBox.class).getValue();
         return new ConsumePackResearchMethod(
-                List.of(layout.getChild("pack_selector", ItemSelectorWidget.class).getSelected().getFirst().get(ResearchdDataComponents.RESEARCH_PACK).researchPackKey().get()),
+                List.of(layout.getChild("pack_selector", ItemSelectorWidget.class).getSelected().getItems()[0].get(ResearchdDataComponents.RESEARCH_PACK).researchPackKey().get()),
                 Integer.parseInt(layout.getChild("count", EditBox.class).getValue()),
                 Integer.parseInt(time.substring(0, time.length() - 1))
         );

@@ -32,9 +32,12 @@ public class TagCreationWidget extends AbstractLayoutWidget<Layout> {
     private final StringWidget stringWidget;
     private final EditBox tagEditBox;
     private final CycledItemRenderer itemRenderer;
+    private final ItemSelectorPopupWidget parentPopupWidget;
+    private boolean valid;
 
-    public TagCreationWidget(int x, int y, int width, int height) {
+    public TagCreationWidget(ItemSelectorPopupWidget parentPopupWidget, int x, int y, int width, int height) {
         super(null, x, y, width, height, CommonComponents.EMPTY);
+        this.parentPopupWidget = parentPopupWidget;
         this.stringWidget = this.addRenderableWidget(new StringWidget(Component.literal("Hello"), PopupWidget.getFont()));
         this.itemRenderer = new CycledItemRenderer();
         this.tagEditBox = this.addRenderableWidget(new BackgroundEditBox(PopupWidget.getFont(), SPRITES, 72, 16, CommonComponents.EMPTY));
@@ -61,6 +64,8 @@ public class TagCreationWidget extends AbstractLayoutWidget<Layout> {
         if (_tag.isEmpty()) {
             this.tagEditBox.setTextColor(ChatFormatting.RED.getColor());
             this.itemRenderer.setItems(List.of());
+            this.valid = false;
+            this.parentPopupWidget.doneButton.active = false;
         } else {
             this.tagEditBox.setTextColor(-1);
             HolderSet.Named<Item> tag = _tag.get();
@@ -69,6 +74,8 @@ public class TagCreationWidget extends AbstractLayoutWidget<Layout> {
                 items.add(itemHolder.value().getDefaultInstance());
             }
             this.itemRenderer.setItems(items);
+            this.valid = true;
+            this.parentPopupWidget.doneButton.active = true;
         }
     }
 
@@ -85,4 +92,12 @@ public class TagCreationWidget extends AbstractLayoutWidget<Layout> {
         this.stringWidget.setY(y);
         this.tagEditBox.setY(y + 7);
     }
+
+    public TagKey<Item> createTag() {
+        if (this.valid) {
+            return TagKey.create(Registries.ITEM, ResourceLocation.parse(this.tagEditBox.getValue().substring(1)));
+        }
+        return null;
+    }
+
 }

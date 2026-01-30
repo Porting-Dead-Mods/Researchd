@@ -1,7 +1,6 @@
 package com.portingdeadmods.researchd.client.screens.editor.widgets.popups;
 
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.client.screens.editor.EditorSharedSprites;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.ItemSelectorWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.category.ItemSelectorCategory;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.ContainerWidget;
@@ -24,6 +23,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class ItemSelectorPopupWidget extends PopupWidget {
     private EditBox searchBar;
     private final Search search;
     private AbstractWidget containerWidget;
-    private final PDLImageButton doneButton;
+    public final PDLImageButton doneButton;
     private final ItemSelectorWidget parentSelectorWidget;
     @Nullable
     private final PopupWidget parentPopupWidget;
@@ -84,7 +84,7 @@ public class ItemSelectorPopupWidget extends PopupWidget {
         screen.closePopup(this);
         if (this.parentPopupWidget != null) {
             screen.openPopupCentered(this.parentPopupWidget);
-            this.parentSelectorWidget.setSelected(this.selectedCategory.getSelectedItems(this.containerWidget).stream().map(ItemStack::copy).toList());
+            this.parentSelectorWidget.setSelected(Arrays.stream(this.selectedCategory.getSelected(this.containerWidget).getItems()).map(ItemStack::copy).toList());
         }
     }
 

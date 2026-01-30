@@ -1,13 +1,11 @@
 package com.portingdeadmods.researchd.client.screens.editor.widgets.dropdowns;
 
-import com.portingdeadmods.researchd.client.screens.editor.widgets.ItemSelectorWidget;
-import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.ResearchCreationPopupWidget;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.creation.ResearchCreationPopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.DropDownWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.layouts.LayoutElement;
-import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
 public class GraphDropDownWidget extends DropDownWidget<LayoutElement> {

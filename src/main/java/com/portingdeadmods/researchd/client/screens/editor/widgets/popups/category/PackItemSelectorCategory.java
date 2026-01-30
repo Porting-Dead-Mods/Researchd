@@ -5,6 +5,7 @@ import com.portingdeadmods.researchd.registries.ResearchdItems;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.Collection;
 

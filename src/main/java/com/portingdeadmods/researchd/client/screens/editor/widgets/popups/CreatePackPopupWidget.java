@@ -7,8 +7,8 @@ import com.portingdeadmods.researchd.client.screens.lib.widgets.DraggablePopupWi
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.widgets.PDLButton;
-import com.portingdeadmods.researchd.networking.edit.CreateDatapackPayload;
-import com.portingdeadmods.researchd.networking.edit.SetResourcePackPayload;
+import com.portingdeadmods.researchd.networking.editor.CreateDatapackPayload;
+import com.portingdeadmods.researchd.networking.editor.SetResourcePackPayload;
 import com.portingdeadmods.researchd.utils.ClientEditorHelper;
 import com.portingdeadmods.researchd.utils.PrettyPath;
 import com.portingdeadmods.researchd.utils.ResearchdUtils;

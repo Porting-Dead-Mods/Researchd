@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.networking.edit;
+package com.portingdeadmods.researchd.networking.editor;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;

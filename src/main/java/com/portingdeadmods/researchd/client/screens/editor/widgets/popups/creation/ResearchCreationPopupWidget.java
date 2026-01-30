@@ -1,11 +1,13 @@
-package com.portingdeadmods.researchd.client.screens.editor.widgets.popups;
+package com.portingdeadmods.researchd.client.screens.editor.widgets.popups.creation;
 
 import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdClient;
+import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.client.editor.ClientResearch;
 import com.portingdeadmods.researchd.api.client.RememberingLinearLayout;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.SelectPackPopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.DraggablePopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.ScrollableWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
@@ -13,6 +15,7 @@ import com.portingdeadmods.researchd.client.screens.research.widgets.PDLButton;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.impl.editor.EditModeSettingsImpl;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
+import com.portingdeadmods.researchd.networking.editor.CreateResearchPayload;
 import com.portingdeadmods.researchd.resources.editor.EditorResearchProvider;
 import com.portingdeadmods.researchd.utils.PrettyPath;
 import com.portingdeadmods.researchd.utils.Spaghetti;
@@ -24,6 +27,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
@@ -57,33 +61,24 @@ public class ResearchCreationPopupWidget extends DraggablePopupWidget {
     }
 
     protected void buildLayout() {
-        if (this.clientResearch != null) {
-            this.clientResearch.buildLayout(this.layout, new ClientResearch.Context(null, this.screen, this, this.getWidth(), this.getHeight(), this.getWidth() - 16, this.getHeight() - 16, 7));
-            this.layout.getLayout().arrangeElements();
-            //this.layout.getChildren().forEach(this::addRenderableWidget);
-        }
         this.createButton = this.addRenderableWidget(PDLButton.builder(this::onCreatePressed)
                 .message(Component.literal("Create"))
                 .sprites(SelectPackPopupWidget.EDITOR_BUTTON_SPRITES)
-                        .size(100, 16)
+                .size(100, 16)
                 .build());
+        if (this.clientResearch != null) {
+            ClientResearch.Context context = new ClientResearch.Context(this.createButton, this.screen, this, this.getWidth(), this.getHeight(), this.getWidth() - 16, this.getHeight() - 16, 7);
+            this.clientResearch.buildLayout(this.layout, context);
+            this.clientResearch.updateResearch(this.layout, context);
+            this.layout.getLayout().arrangeElements();
+        }
     }
 
     private void onCreatePressed(PDLButton pdlButton) {
         Research research = this.clientResearch.createResearch(this.layout);
         ResourceLocation id = this.clientResearch.createId(this.layout);
-        EditModeSettingsImpl settings = Minecraft.getInstance().player.getData(ResearchdAttachments.EDIT_MODE_SETTINGS);
-        PrettyPath prettyPath = settings.currentDatapack();
-        Path datapacksDirectoryPath = prettyPath.fullPath();
-        Researchd.LOGGER.debug("Full Path: {}", datapacksDirectoryPath);
-        EditorResearchProvider researchProvider = settings.getWriter().getOrAddProvider(new EditorResearchProvider());
-        researchProvider.putResearch(ResourceKey.create(researchProvider.registry(), id), research);
-        Result<Path, ? extends Exception> result = settings.getWriter().write(datapacksDirectoryPath, "Test", "example");
-        if (result instanceof Result.Err<Path,? extends Exception>(Exception error)) {
-            Researchd.LOGGER.error("Failed to write datapack", error);
-        } else {
-            Spaghetti.tryGetResearchScreen().closePopup(this);
-        }
+        PacketDistributor.sendToServer(new CreateResearchPayload(ResourceKey.create(ResearchdRegistries.RESEARCH_KEY, id), research, true));
+        this.screen.closePopup(this);
     }
 
     @Override

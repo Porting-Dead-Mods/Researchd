@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.client.screens.editor.widgets.popups;
+package com.portingdeadmods.researchd.client.screens.editor.widgets.popups.creation;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdClient;
@@ -6,7 +6,8 @@ import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
 import com.portingdeadmods.researchd.api.client.editor.ClientResearchMethodType;
 import com.portingdeadmods.researchd.api.client.RememberingLinearLayout;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethodType;
-import com.portingdeadmods.researchd.client.screens.editor.widgets.ResearchMethodSelectionWidget;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.BaseResearchMethodCreationWidget;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.SelectPackPopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.DraggablePopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
@@ -28,9 +29,9 @@ public class ResearchMethodCreationPopupWidget extends DraggablePopupWidget {
     private final ClientResearchMethodType clientResearchMethod;
     private final PDLButton createButton;
     private final PopupWidget parentPopupWidget;
-    private final ResearchMethodSelectionWidget originSelectionWidget;
+    private final BaseResearchMethodCreationWidget originSelectionWidget;
 
-    public ResearchMethodCreationPopupWidget(@Nullable PopupWidget parentPopupWidget, ResearchMethodType type, ResearchMethodSelectionWidget originSelectionWidget, int x, int y, int width, int height) {
+    public ResearchMethodCreationPopupWidget(@Nullable PopupWidget parentPopupWidget, ResearchMethodType type, BaseResearchMethodCreationWidget originSelectionWidget, int x, int y, int width, int height) {
         super(x, y, width, height, CommonComponents.EMPTY);
         this.parentPopupWidget = parentPopupWidget;
         this.originSelectionWidget = originSelectionWidget;

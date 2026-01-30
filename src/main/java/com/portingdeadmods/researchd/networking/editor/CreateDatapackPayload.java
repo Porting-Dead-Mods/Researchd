@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.networking.edit;
+package com.portingdeadmods.researchd.networking.editor;
 
 import com.portingdeadmods.portingdeadlibs.api.config.PDLConfigHelper;
 import com.portingdeadmods.portingdeadlibs.utils.Result;

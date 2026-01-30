@@ -7,6 +7,7 @@ import com.portingdeadmods.researchd.api.research.methods.ResearchMethodType;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.widgets.PDLButton;
+import net.minecraft.client.gui.components.Tooltip;
 import org.jetbrains.annotations.Nullable;
 
 public interface ClientResearchMethodType {
@@ -34,6 +35,11 @@ public interface ClientResearchMethodType {
         @Override
         public void setCreateButtonActive(boolean active) {
             this.createButton.active = active;
+        }
+
+        @Override
+        public void setCreateButtonTooltip(Tooltip tooltip) {
+            this.createButton.setTooltip(tooltip);
         }
     }
 }

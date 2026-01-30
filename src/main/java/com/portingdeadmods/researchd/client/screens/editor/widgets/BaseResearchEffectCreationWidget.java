@@ -4,26 +4,24 @@ import com.portingdeadmods.researchd.ResearchdClient;
 import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidget;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.client.screens.editor.EditorSharedSprites;
-import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.ResearchEffectTypeSelectionPopupWidget;
-import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.ResearchMethodTypePopupWidget;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.selection.ResearchEffectTypeSelectionPopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.impl.research.effect.EmptyResearchEffect;
 import com.portingdeadmods.researchd.utils.Spaghetti;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
-public class ResearchEffectSelectionWidget extends AbstractWidget {
+public class BaseResearchEffectCreationWidget extends AbstractWidget {
     private ResearchEffectTypeSelectionPopupWidget effectTypePopupWidget;
     private final @Nullable PopupWidget parentPopupWidget;
     private ResearchEffect createdEffect;
     private AbstractResearchInfoWidget<? extends ResearchEffect> createdEffectInfoWidget;
 
-    public ResearchEffectSelectionWidget(@Nullable PopupWidget parentPopupWidget, int x, int y, int width, int height, Component message) {
+    public BaseResearchEffectCreationWidget(@Nullable PopupWidget parentPopupWidget, int x, int y, int width, int height, Component message) {
         super(x, y, width, height, message);
         this.createdEffect = EmptyResearchEffect.INSTANCE;
         this.parentPopupWidget = parentPopupWidget;
