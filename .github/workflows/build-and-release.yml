@@ -5,6 +5,23 @@ on:
     branches:
       - main
 
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version (ex: 1.2.3 or 1.2.3-beta)"
+        required: true
+        type: string
+
+      release_type:
+        description: "Release type"
+        required: true
+        type: choice
+        options:
+          - release
+          - beta
+          - alpha
+        default: release
+
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
@@ -19,23 +36,34 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
-      - name: Check for version in commit message
+      - name: Resolve version
         id: check_version
         run: |
-          COMMIT_MSG=$(git log -1 --pretty=%B)
-          echo "Commit message: $COMMIT_MSG"
+          # manual trigger
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ inputs.version }}"
+            TAG="$VERSION"
           
-          # Check if commit message contains a semver pattern
-          if [[ $COMMIT_MSG =~ v?([0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?) ]]; then
+            echo "Manual version: $VERSION"
+          
+            echo "SHOULD_RELEASE=true" >> $GITHUB_OUTPUT
+            echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+            echo "TAG=$TAG" >> $GITHUB_OUTPUT
+            echo "RELEASE_TYPE=${{ inputs.release_type }}" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # auto from commit message
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          
+          if [[ $COMMIT_MSG =~ v?([0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?) ]]; then
             VERSION="${BASH_REMATCH[1]}"
             TAG="$VERSION"
           
-            echo "Found version: $VERSION"
             echo "SHOULD_RELEASE=true" >> $GITHUB_OUTPUT
             echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
             echo "TAG=$TAG" >> $GITHUB_OUTPUT
           
-            # Determine release type
             if [[ "$VERSION" == *"-alpha"* ]]; then
               echo "RELEASE_TYPE=alpha" >> $GITHUB_OUTPUT
             elif [[ "$VERSION" == *"-beta"* ]]; then
@@ -43,10 +71,7 @@ jobs:
             else
               echo "RELEASE_TYPE=release" >> $GITHUB_OUTPUT
             fi
-          
-            echo "Release type: $RELEASE_TYPE"
           else
-            echo "No version found in commit message"
             echo "SHOULD_RELEASE=false" >> $GITHUB_OUTPUT
           fi
 
