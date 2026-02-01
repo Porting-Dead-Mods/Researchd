@@ -9,6 +9,8 @@ import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.widgets.PDLButton;
 import com.portingdeadmods.researchd.networking.editor.CreateDatapackPayload;
 import com.portingdeadmods.researchd.networking.editor.SetResourcePackPayload;
+import com.portingdeadmods.researchd.pdl.config.PDLConfig;
+import com.portingdeadmods.researchd.pdl.config.PDLConfigHelper;
 import com.portingdeadmods.researchd.utils.ClientEditorHelper;
 import com.portingdeadmods.researchd.utils.PrettyPath;
 import com.portingdeadmods.researchd.utils.ResearchdUtils;
@@ -79,7 +81,7 @@ public class CreatePackPopupWidget extends DraggablePopupWidget {
         boolean generateExamples = this.checkbox.selected();
 
         if (this.packType == PackType.SERVER_DATA) {
-            PacketDistributor.sendToServer(new CreateDatapackPayload(name, description, generateExamples));
+            PacketDistributor.sendToServer(new CreateDatapackPayload(name, description, PDLConfigHelper.camelToSnake(name), generateExamples));
         } else if (this.packType == PackType.CLIENT_RESOURCES) {
             Result<PrettyPath, Exception> resourcePack = ClientEditorHelper.createResourcePack(name, description, ResearchdUtils.trimSpecialCharacterAndConvertToSnake(name), generateExamples);
             if (resourcePack instanceof Result.Ok(PrettyPath value)) {

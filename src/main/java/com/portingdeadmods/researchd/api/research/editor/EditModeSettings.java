@@ -1,10 +1,10 @@
-package com.portingdeadmods.researchd.api.research;
+package com.portingdeadmods.researchd.api.research.editor;
 
 import com.portingdeadmods.researchd.utils.PrettyPath;
 import org.jetbrains.annotations.Nullable;
 
 public interface EditModeSettings {
-    @Nullable PrettyPath currentDatapack();
+    @Nullable Datapack currentDatapack();
 
     @Nullable PrettyPath currentResourcePack();
 

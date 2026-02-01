@@ -2,28 +2,25 @@ package com.portingdeadmods.researchd.utils;
 
 import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.research.EditModeSettings;
+import com.portingdeadmods.researchd.api.research.editor.Datapack;
+import com.portingdeadmods.researchd.api.research.editor.EditModeSettings;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.impl.editor.EditModeSettingsImpl;
 import com.portingdeadmods.researchd.impl.utils.DisplayImpl;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.MultiLineEditBox;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.Optional;
 
 public final class ClientEditorHelper {
@@ -35,16 +32,16 @@ public final class ClientEditorHelper {
         return ResearchHelperClient.getResearchPacks().keySet().stream().findFirst().orElse(null);
     }
 
-    public static void setCurrentDatapack(PrettyPath path) {
+    public static void setCurrentDatapack(Datapack datapack) {
         LocalPlayer player = Minecraft.getInstance().player;
         EditModeSettingsImpl settings = player.getData(ResearchdAttachments.EDIT_MODE_SETTINGS);
-        player.setData(ResearchdAttachments.EDIT_MODE_SETTINGS, new EditModeSettingsImpl(path, settings.currentResourcePack()));
+        player.setData(ResearchdAttachments.EDIT_MODE_SETTINGS, new EditModeSettingsImpl(datapack, settings.currentResourcePack()));
     }
 
     public static void setCurrentResourcePack(PrettyPath path) {
         LocalPlayer player = Minecraft.getInstance().player;
         EditModeSettingsImpl settings = player.getData(ResearchdAttachments.EDIT_MODE_SETTINGS);
-        player.setData(ResearchdAttachments.EDIT_MODE_SETTINGS, new EditModeSettingsImpl(settings.currentResourcePack(), path));
+        player.setData(ResearchdAttachments.EDIT_MODE_SETTINGS, new EditModeSettingsImpl(settings.currentDatapack(), path));
     }
 
     public static Result<PrettyPath, Exception> createResourcePack(String name, String description, String namespace, boolean generateExamples) {

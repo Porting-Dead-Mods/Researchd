@@ -18,6 +18,9 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.vehicle.Minecart;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.dimension.DimensionType;
+
+import java.util.Optional;
 
 public class ClientDimensionUnlockEffectType implements ClientResearchEffectType {
     public static final ResourceLocation ID = Researchd.rl("dimension_unlock");
@@ -30,8 +33,10 @@ public class ClientDimensionUnlockEffectType implements ClientResearchEffectType
 
     @Override
     public void buildLayout(RememberingLinearLayout layout, Context context) {
-        Registry<?> registry = Minecraft.getInstance().level.registryAccess().registryOrThrow(Registries.DIMENSION_TYPE);
-        layout.addWidget("id_edit_box", new RegistryVerifyEditBox(PopupWidget.getFont(), registry, context.innerWidth() - 8, 16, CommonComponents.EMPTY));
+        Optional<Registry<DimensionType>> registry = Minecraft.getInstance().level.registryAccess().registry(Registries.DIMENSION_TYPE);
+        registry.ifPresent(dimensionTypes -> {
+            layout.addWidget("id_edit_box", new RegistryVerifyEditBox(PopupWidget.getFont(), dimensionTypes, context.innerWidth() - 8, 16, CommonComponents.EMPTY));
+        });
     }
 
     @Override

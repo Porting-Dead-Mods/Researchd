@@ -1,7 +1,8 @@
 package com.portingdeadmods.researchd.client.screens.editor.widgets.popups;
 
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.research.EditModeSettings;
+import com.portingdeadmods.researchd.api.research.editor.Datapack;
+import com.portingdeadmods.researchd.api.research.editor.EditModeSettings;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.SelectPackDropDownWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.SelectPackSearchBarWidget;
 import com.portingdeadmods.researchd.client.screens.lib.layout.WidgetHeaderAndFooterLayout;
@@ -9,6 +10,7 @@ import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.widgets.PDLButton;
 import com.portingdeadmods.researchd.utils.ClientEditorHelper;
+import com.portingdeadmods.researchd.utils.PrettyPath;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -25,6 +27,7 @@ import net.minecraft.server.packs.repository.ServerPacksSource;
 import net.minecraft.util.FastColor;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.file.Path;
 import java.util.function.Consumer;
 
 public class SelectPackPopupWidget extends PopupWidget {
@@ -76,7 +79,8 @@ public class SelectPackPopupWidget extends PopupWidget {
                     .build(), LayoutSettings::alignHorizontallyCenter);
             contents.addChild(new SpacerElement(0, 4));
             contents.addChild(new StringWidget(Component.literal("Datapack:").withStyle(ChatFormatting.WHITE), font), LayoutSettings::alignHorizontallyCenter);
-            this.selectDatapackWidget = contents.addChild(new SelectPackSearchBarWidget(ClientEditorHelper.getEditModeSettings().currentDatapack(), select_btn -> {
+            Datapack datapack = ClientEditorHelper.getEditModeSettings().currentDatapack();
+            this.selectDatapackWidget = contents.addChild(new SelectPackSearchBarWidget(datapack != null ? datapack.path() : null, select_btn -> {
                 this.dropDownFor(this.selectDatapackWidget);
             }, create_btn -> {
                 this.screen.openPopupCentered(new CreatePackPopupWidget(this.screen, PackType.SERVER_DATA));
@@ -120,7 +124,8 @@ public class SelectPackPopupWidget extends PopupWidget {
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        this.selectDatapackWidget.updateSearchBarText(ClientEditorHelper.getEditModeSettings().currentDatapack());
+        Datapack datapack = ClientEditorHelper.getEditModeSettings().currentDatapack();
+        this.selectDatapackWidget.updateSearchBarText(datapack != null ? datapack.path() : null);
         this.selectResourcePackWidget.updateSearchBarText(ClientEditorHelper.getEditModeSettings().currentResourcePack());
 
         if (this.selectResourcePackWidget.hasPack() && this.selectDatapackWidget.hasPack()) {

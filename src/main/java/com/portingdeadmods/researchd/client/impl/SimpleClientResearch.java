@@ -5,6 +5,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.client.editor.ClientResearch;
 import com.portingdeadmods.researchd.api.client.RememberingLinearLayout;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.ResearchPage;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.BaseResearchEffectCreationWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.ItemSelectorWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.BaseResearchMethodCreationWidget;
@@ -43,6 +44,9 @@ public class SimpleClientResearch implements ClientResearch {
         descEditBox.setHint(Component.literal("<Desc>"));
         layout.addWidget(null, new StringWidget(Component.literal("Icon:"), PopupWidget.getFont()));
         layout.addWidget("icon", new ItemSelectorWidget(context.parentPopupWidget(), 0, 0, 20, 20, false, true));
+        layout.addWidget(null, new StringWidget(Component.literal("Page:"), PopupWidget.getFont()));
+        BackgroundEditBox pageEditBox = layout.addWidget("page", new BackgroundEditBox(PopupWidget.getFont(), context.innerWidth() - 4, 16, CommonComponents.EMPTY));
+        pageEditBox.setValue(ResearchPage.DEFAULT_PAGE_ID.toString());
         layout.addWidget(null, new StringWidget(Component.literal("Parents:"), PopupWidget.getFont()));
         layout.addWidget("parents_selector", new ResearchSelectorListWidget(context.parentPopupWidget(), context.innerWidth() - 4, 24, Collections.emptyList(), true));
         layout.addWidget("requires_parents", Checkbox.builder(Component.literal("Requires Parents"), PopupWidget.getFont()).build());
@@ -91,13 +95,14 @@ public class SimpleClientResearch implements ClientResearch {
                 layout.getChild("name_edit_box", BackgroundEditBox.class),
                 layout.getChild("desc_edit_box", BackgroundEditBox.class)
         );
+        String page = layout.getChild("page", BackgroundEditBox.class).getValue();
         return new SimpleResearch(
                 layout.getChild("icon", ItemSelectorWidget.class).createIcon(),
                 layout.getChild("method", BaseResearchMethodCreationWidget.class).getMethod(),
                 layout.getChild("effect", BaseResearchEffectCreationWidget.class).getEffect(),
                 layout.getChild("parents_selector", ResearchSelectorListWidget.class).getResearches(),
                 layout.getChild("requires_parents", Checkbox.class).selected(),
-		        ResearchdResearchPages.DEFAULT, // TODO: Research Page into editor
+		        !page.isEmpty() ? ResourceLocation.parse(page) : ResearchPage.DEFAULT_PAGE_ID,
                 display
         );
     }

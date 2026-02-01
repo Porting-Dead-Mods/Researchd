@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.util.Unit;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,11 +27,13 @@ public class EditorDatapackWriter implements DatapackWriter {
     }
 
     @Override
-    public Result<Path, Exception> write(Path datapackDirectory, String packDescription, String namespace) {
+    public Result<Path, Exception> write(Path datapackDirectory, @Nullable String packDescription, String namespace) {
         tryCreateDirectory(datapackDirectory);
 
-        Path packFile = datapackDirectory.resolve("pack.mcmeta");
-        tryWriteFile(packFile, ResourceUtils.getPackFile(packDescription, PackType.SERVER_DATA));
+        if (packDescription != null) {
+            Path packFile = datapackDirectory.resolve("pack.mcmeta");
+            tryWriteFile(packFile, ResourceUtils.getPackFile(packDescription, PackType.SERVER_DATA));
+        }
 
         Path dataDir = datapackDirectory.resolve("data");
         tryCreateDirectory(dataDir);
