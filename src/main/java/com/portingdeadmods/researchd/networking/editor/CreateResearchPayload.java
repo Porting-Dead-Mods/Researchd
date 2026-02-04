@@ -5,8 +5,12 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.impl.editor.EditModeSettingsImpl;
+import com.portingdeadmods.researchd.networking.research.ResearchCacheReloadPayload;
 import com.portingdeadmods.researchd.resources.editor.EditorResearchProvider;
 import com.portingdeadmods.researchd.utils.PrettyPath;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperServer;
+import com.portingdeadmods.researchd.utils.researches.ResearchdManagers;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -14,10 +18,13 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public record CreateResearchPayload(ResourceKey<Research> key, Research research,
                                     boolean reloadData) implements CustomPacketPayload {
@@ -52,9 +59,11 @@ public record CreateResearchPayload(ResourceKey<Research> key, Research research
                 }
 
                 if (this.reloadData) {
-                    MinecraftServer server = serverPlayer.getServer();
-                    // TODO: Use proper datapack id
-                    server.reloadResources(List.of("file/" + settings.currentDatapack().namespace()));
+                    ResearchdManagers.getResearchesManager(serverPlayer.level()).mergeContents(Collections.singletonMap(key.location(), research));
+                    // Reload researches on the server
+                    ResearchHelperServer.reloadResearches(serverPlayer.server, null, serverPlayer.server.getPlayerList().getPlayers());
+                    // Reload researches on the client
+                    PacketDistributor.sendToPlayer(serverPlayer, new ResearchCacheReloadPayload());
                 }
             } else {
                 throw new IllegalStateException("Handling payload on client");

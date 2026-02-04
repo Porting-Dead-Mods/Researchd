@@ -19,6 +19,8 @@ import com.portingdeadmods.researchd.networking.editor.CreateResearchPayload;
 import com.portingdeadmods.researchd.resources.editor.EditorResearchProvider;
 import com.portingdeadmods.researchd.utils.PrettyPath;
 import com.portingdeadmods.researchd.utils.Spaghetti;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
+import com.portingdeadmods.researchd.utils.researches.ResearchdManagers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.layouts.Layout;
@@ -31,6 +33,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
+import java.util.Collections;
 
 public class ResearchCreationPopupWidget extends DraggablePopupWidget {
     public static final ResourceLocation DEFAULT_ID = Researchd.rl(SimpleResearch.ID);
@@ -77,6 +80,7 @@ public class ResearchCreationPopupWidget extends DraggablePopupWidget {
     private void onCreatePressed(PDLButton pdlButton) {
         Research research = this.clientResearch.createResearch(this.layout);
         ResourceLocation id = this.clientResearch.createId(this.layout);
+        ResearchdManagers.getResearchesManager(Minecraft.getInstance().level).mergeContents(Collections.singletonMap(id, research));
         PacketDistributor.sendToServer(new CreateResearchPayload(ResourceKey.create(ResearchdRegistries.RESEARCH_KEY, id), research, true));
         this.screen.closePopup(this);
     }

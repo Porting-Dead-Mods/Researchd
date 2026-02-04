@@ -12,6 +12,7 @@ import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +31,7 @@ public final class CommonResearchCache {
         CommonResearchCache.reset();
 
         Map<ResourceKey<Research>, Research> researchLookup = ResearchHelperCommon.getLevelResearches(level);
-        Map<ResourceKey<Research>, GlobalResearch> globalResearchMap = new HashMap<>(researchLookup.size());
+        Map<ResourceKey<Research>, GlobalResearch> globalResearchMap = new LinkedHashMap<>(researchLookup.size());
         // Add the researchPacks to GLOBAL_RESEARCHES
         for (ResourceKey<Research> key : researchLookup.keySet()) {
             globalResearchMap.put(key, new GlobalResearch(key));
@@ -69,15 +70,15 @@ public final class CommonResearchCache {
         globalResearches = ImmutableMap.copyOf(globalResearchMap);
 
         // Build research pages
-        Map<ResourceLocation, UniqueArray<GlobalResearch>> pageGroups = new HashMap<>();
+        Map<ResourceLocation, UniqueArray<GlobalResearch>> pageGroups = new LinkedHashMap<>();
         for (GlobalResearch research : globalResearchMap.values()) {
             ResourceLocation pageId = resolvePage(research, researchLookup);
             pageGroups.computeIfAbsent(pageId, k -> new UniqueArray<>()).add(research);
         }
 
         // Build page roots map and convert page groups to ResearchPage objects
-        Map<ResourceLocation, ResearchPage> pagesMap = new HashMap<>();
-        Map<ResourceLocation, List<GlobalResearch>> pageRootsMap = new HashMap<>();
+        Map<ResourceLocation, ResearchPage> pagesMap = new LinkedHashMap<>();
+        Map<ResourceLocation, List<GlobalResearch>> pageRootsMap = new LinkedHashMap<>();
 
         for (Map.Entry<ResourceLocation, UniqueArray<GlobalResearch>> entry : pageGroups.entrySet()) {
             ResourceLocation pageId = entry.getKey();

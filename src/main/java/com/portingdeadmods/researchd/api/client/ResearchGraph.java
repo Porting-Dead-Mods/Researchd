@@ -10,6 +10,7 @@ import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
 import net.minecraft.resources.ResourceKey;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,7 +25,7 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
 
     // TODO: Add researchPacks to the team's research progress
     private ResearchGraph(GlobalResearch researchRoot, Map<ResourceKey<Research>, ResearchInstance> researches) {
-        this(new ResearchNode(researches.get(researchRoot.getResearchKey())), new HashMap<>(), CommonResearchCache.pageOf(researchRoot));
+        this(new ResearchNode(researches.get(researchRoot.getResearchKey())), new LinkedHashMap<>(), CommonResearchCache.pageOf(researchRoot));
 
         createNodes(rootNode.getInstance(), 0, CommonResearchCache.rootResearch != null && CommonResearchCache.rootResearch.is(rootNode.getInstance().getKey())
                 ? -1

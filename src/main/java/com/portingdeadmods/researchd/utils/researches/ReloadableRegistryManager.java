@@ -44,6 +44,7 @@ public class ReloadableRegistryManager<T> extends SimpleJsonResourceReloadListen
         this.codec = codec;
     }
 
+    // TODO: Replace with linked hashmap and sort it
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> registryEntries, ResourceManager resourceManager, ProfilerFiller profilerFiller) {
         ImmutableMap.Builder<ResourceKey<T>, T> builder = ImmutableMap.builder();
@@ -85,6 +86,16 @@ public class ReloadableRegistryManager<T> extends SimpleJsonResourceReloadListen
 
     public void replaceContents(Map<ResourceLocation, T> contents) {
         ImmutableMap.Builder<ResourceKey<T>, T> builder = ImmutableMap.builder();
+        for (Map.Entry<ResourceLocation, T> entry : contents.entrySet()) {
+            builder.put(ResourceKey.create(this.registry, entry.getKey()), entry.getValue());
+        }
+        this.byName = builder.build();
+    }
+
+    // TODO: Fire an event when this happens
+    public void mergeContents(Map<ResourceLocation, T> contents) {
+        ImmutableMap.Builder<ResourceKey<T>, T> builder = ImmutableMap.builder();
+        builder.putAll(this.byName);
         for (Map.Entry<ResourceLocation, T> entry : contents.entrySet()) {
             builder.put(ResourceKey.create(this.registry, entry.getKey()), entry.getValue());
         }

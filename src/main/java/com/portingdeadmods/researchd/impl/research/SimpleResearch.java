@@ -62,8 +62,8 @@ public record SimpleResearch(ResearchIcon researchIcon, ResearchMethod researchM
                 ResearchIcon.CODEC.fieldOf("icon").forGetter(SimpleResearch::researchIcon),
                 ResearchMethod.CODEC.fieldOf("method").forGetter(SimpleResearch::researchMethod),
                 ResearchEffect.CODEC.optionalFieldOf("effect", EmptyResearchEffect.INSTANCE).forGetter(SimpleResearch::researchEffect),
-                Research.RESOURCE_KEY_CODEC.listOf().fieldOf("parents").forGetter(SimpleResearch::parents),
-                Codec.BOOL.fieldOf("requires_parent").forGetter(SimpleResearch::requiresParent),
+                Research.RESOURCE_KEY_CODEC.listOf().optionalFieldOf("parents", List.of()).forGetter(SimpleResearch::parents),
+                Codec.BOOL.orElse(true).fieldOf("requires_parent").forGetter(SimpleResearch::requiresParent),
                 ResourceLocation.CODEC.optionalFieldOf("research_page", ResearchPage.DEFAULT_PAGE_ID).forGetter(SimpleResearch::researchPage),
                 DisplayImpl.CODEC.optionalFieldOf("display", DisplayImpl.EMPTY).forGetter(SimpleResearch::display)
         ).apply(instance, SimpleResearch::new));

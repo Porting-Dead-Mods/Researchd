@@ -20,6 +20,7 @@ import com.portingdeadmods.researchd.registries.*;
 import com.portingdeadmods.researchd.registries.serializers.*;
 import com.portingdeadmods.researchd.resources.ResearchdDynamicPackContents;
 import com.portingdeadmods.researchd.resources.ResearchdExamplesSource;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperServer;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
 import com.portingdeadmods.researchd.utils.researches.ResearchdManagers;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -54,8 +55,10 @@ import org.slf4j.Logger;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 @Mod(Researchd.MODID)
 public final class Researchd {
@@ -174,34 +177,9 @@ public final class Researchd {
     private void onDatapacksSynced(OnDatapackSyncEvent event) {
         ServerPlayer player = event.getPlayer();
         MinecraftServer server = event.getPlayerList().getServer();
-        CommonResearchCache.initialize(server.overworld());
+        List<ServerPlayer> relevantPlayers = event.getPlayer() == null ? event.getPlayerList().getPlayers() : List.of(event.getPlayer());
+        ResearchHelperServer.reloadResearches(server, player, relevantPlayers);
 
-        ServerLevel overworld = server.overworld();
-        ResearchTeamMap teamMap = ResearchdSavedData.TEAM_RESEARCH.get().getData(overworld);
-        ResearchTeamHelper.resolveGlobalResearches(teamMap);
-
-        // Add new researchPacks to teams in case new ones were added
-        // TODO: Remove old researchPacks from teams in cases ones were removed
-        ResearchTeamHelper.cleanupTeamResearches(teamMap, overworld);
-        ResearchTeamHelper.initializeTeamResearches(teamMap, overworld);
-        ResearchdSavedData.TEAM_RESEARCH.get().setData(overworld, teamMap);
-        ResearchdSavedData.TEAM_RESEARCH.get().sync(overworld);
-
-        if (player != null) {
-            updateReloadableRegistries(player);
-            PacketDistributor.sendToPlayer(player, ResearchCacheReloadPayload.INSTANCE);
-        } else {
-            event.getRelevantPlayers().forEach(Researchd::updateReloadableRegistries);
-            event.getRelevantPlayers().forEach(p -> {
-                PacketDistributor.sendToPlayer(p, ResearchCacheReloadPayload.INSTANCE);
-            });
-        }
-
-    }
-
-    private static void updateReloadableRegistries(ServerPlayer p) {
-        PacketDistributor.sendToPlayer(p, new UpdateResearchesPayload(new HashMap<>(ResearchdManagers.getResearchesManager(p.level()).getByName())));
-        PacketDistributor.sendToPlayer(p, new UpdateResearchPacksPayload(new HashMap<>(ResearchdManagers.getResearchPacksManager(p.level()).getByName())));
     }
 
     public static ResourceLocation rl(String path) {
