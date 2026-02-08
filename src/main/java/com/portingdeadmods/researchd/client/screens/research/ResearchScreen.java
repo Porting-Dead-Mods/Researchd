@@ -63,11 +63,15 @@ public class ResearchScreen extends Screen {
     public SelectPackPopupWidget selectPackPopupWidget;
 
     private DropDownWidget<?> dropDownWidget;
-    private boolean listOpen;
 
     public ResearchScreen() {
         super(ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_TITLE));
         this.popupWidgets = new LinkedHashMap<>();
+    }
+
+    @Override
+    public boolean shouldCloseOnEsc() {
+        return this.popupWidgets.isEmpty();
     }
 
     @Override
@@ -261,6 +265,15 @@ public class ResearchScreen extends Screen {
 
     }
 
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == GLFW.GLFW_KEY_ESCAPE && !this.popupWidgets.isEmpty() && this.focusedPopupWidget != null) {
+            this.closePopup(this.focusedPopupWidget);
+            return super.keyPressed(keyCode, scanCode, modifiers);
+        }
+        return false;
+    }
+
     private Optional<GuiEventListener> getPopupChildAt(double mouseX, double mouseY) {
         if (this.focusedPopupWidget != null && this.focusedPopupWidget.isHovered())
             return Optional.of(this.focusedPopupWidget);
@@ -293,7 +306,7 @@ public class ResearchScreen extends Screen {
         }
 
         if (this.editorModeActive()) {
-            if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && this.researchGraphWidget.isHovered() && (this.openEditorButton == null || !this.openEditorButton.isHovered())) {
+            if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && this.researchGraphWidget.isHovered() && (this.openEditorButton == null || !this.openEditorButton.isHovered()) && this.isEditorConfigured()) {
                 this.setDropDown(new GraphDropDownWidget(this, (int) mouseX, (int) mouseY));
             } else if (this.dropDownWidget != null && this.dropDownWidget.isHovered() && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
                 this.dropDownWidget.mouseClicked(mouseX, mouseY, button);
@@ -303,6 +316,10 @@ public class ResearchScreen extends Screen {
         }
 
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    private boolean isEditorConfigured() {
+        return ClientEditorHelper.getEditModeSettings().isConfigured();
     }
 
     @Override

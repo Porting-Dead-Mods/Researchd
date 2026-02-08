@@ -2,16 +2,13 @@ package com.portingdeadmods.researchd.utils;
 
 import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.research.editor.Datapack;
-import com.portingdeadmods.researchd.api.research.editor.EditModeSettings;
+import com.portingdeadmods.researchd.api.editor.EditModeSettings;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
-import com.portingdeadmods.researchd.impl.editor.EditModeSettingsImpl;
 import com.portingdeadmods.researchd.impl.utils.DisplayImpl;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.packs.PackType;
@@ -30,18 +27,6 @@ public final class ClientEditorHelper {
 
     public static @Nullable ResourceKey<ResearchPack> getDefaultResearchPack() {
         return ResearchHelperClient.getResearchPacks().keySet().stream().findFirst().orElse(null);
-    }
-
-    public static void setCurrentDatapack(Datapack datapack) {
-        LocalPlayer player = Minecraft.getInstance().player;
-        EditModeSettingsImpl settings = player.getData(ResearchdAttachments.EDIT_MODE_SETTINGS);
-        player.setData(ResearchdAttachments.EDIT_MODE_SETTINGS, new EditModeSettingsImpl(datapack, settings.currentResourcePack()));
-    }
-
-    public static void setCurrentResourcePack(PrettyPath path) {
-        LocalPlayer player = Minecraft.getInstance().player;
-        EditModeSettingsImpl settings = player.getData(ResearchdAttachments.EDIT_MODE_SETTINGS);
-        player.setData(ResearchdAttachments.EDIT_MODE_SETTINGS, new EditModeSettingsImpl(settings.currentDatapack(), path));
     }
 
     public static Result<PrettyPath, Exception> createResourcePack(String name, String description, String namespace, boolean generateExamples) {

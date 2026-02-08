@@ -91,10 +91,14 @@ public abstract class DropDownWidget<P extends LayoutElement> implements GuiEven
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (hoveredOption != null) {
-            hoveredOption.clicked((int) mouseX, (int) mouseY);
+            optionClicked(hoveredOption, (int) mouseX, (int) mouseY);
             this.playDownSound(Minecraft.getInstance().getSoundManager());
         }
         return false;
+    }
+
+    protected void optionClicked(Option option, int mouseX, int mouseY) {
+        option.clicked(mouseX, mouseY);
     }
 
     public void playDownSound(SoundManager handler) {

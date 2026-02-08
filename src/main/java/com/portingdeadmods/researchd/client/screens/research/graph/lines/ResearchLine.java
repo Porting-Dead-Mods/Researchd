@@ -65,7 +65,7 @@ public class ResearchLine implements Renderable {
 	}
 
 	/**
-	 * Adds a point to the line path
+	 * Adds a point to the line rootPath
 	 */
 	public ResearchLine then(Point point) {
 		points.add(point);
@@ -73,7 +73,7 @@ public class ResearchLine implements Renderable {
 	}
 
 	/**
-	 * Adds a point to the line path using coordinates
+	 * Adds a point to the line rootPath using coordinates
 	 */
 	public ResearchLine then(int x, int y) {
 		return then(new Point(x, y));
@@ -292,10 +292,10 @@ public class ResearchLine implements Renderable {
 
 	/**
 	 * Builds a connection between input and output points of research nodes
-	 * with an L-shaped path.
+	 * with an L-shaped rootPath.
 	 */
 	public static ResearchLine connectNodes(Point outputPoint, Point inputPoint, boolean verticalFirst) {
-		// Creates path from output -> input with a vertical segment followed by horizontal
+		// Creates rootPath from output -> input with a vertical segment followed by horizontal
 		return createLConnection(outputPoint, inputPoint, verticalFirst);
 	}
 

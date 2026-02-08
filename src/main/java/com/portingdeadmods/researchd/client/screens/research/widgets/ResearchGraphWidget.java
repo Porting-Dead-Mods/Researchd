@@ -131,7 +131,7 @@ public class ResearchGraphWidget extends AbstractWidget {
 
             ArrayList<ResearchLine> nodeLines = new ArrayList<>();
 
-            // Group children by layer for consistent path styles
+            // Group children by layer for consistent rootPath styles
             Map<Integer, List<ResearchNode>> childrenByLayer = new HashMap<>();
             for (ResearchNode child : parent.getChildren()) {
                 if (!this.graph.nodes().containsValue(child)) continue;
@@ -152,7 +152,7 @@ public class ResearchGraphWidget extends AbstractWidget {
                 // Sort children left to right
                 layerChildren.sort(Comparator.comparingInt(ResearchNode::getX));
 
-                // Choose consistent path style for this parent-layer combination
+                // Choose consistent rootPath style for this parent-layer combination
                 boolean preferVerticalFirst =
                         (parent.getX() + PANEL_WIDTH / 2) <
                                 (layerChildren.stream()
@@ -202,9 +202,9 @@ public class ResearchGraphWidget extends AbstractWidget {
 
                     // FIXME: Why could these two be null
                     if (bestHeads.left() != null && bestHeads.right() != null) {
-                        Researchd.debug("Research lines", "Generating optimal path between connection points");
+                        Researchd.debug("Research lines", "Generating optimal rootPath between connection points");
 
-                        // Generate the best path
+                        // Generate the best rootPath
                         ResearchLine bestLine = generateOptimalPath(
                                 bestHeads.left().getConnectionPoint(),
                                 bestHeads.right().getConnectionPoint(),
@@ -213,9 +213,9 @@ public class ResearchGraphWidget extends AbstractWidget {
                                 preferVerticalFirst
                         );
 
-                        Researchd.debug("Research lines", "Generated path with ", bestLine.getPoints().size(), " points");
+                        Researchd.debug("Research lines", "Generated rootPath with ", bestLine.getPoints().size(), " points");
 
-                        // Update vertical path zones with any new vertical segments
+                        // Update vertical rootPath zones with any new vertical segments
                         int verticalSegments = 0;
                         for (int j = 0; j < bestLine.getPoints().size() - 1; j++) {
                             Point p1 = bestLine.getPoints().get(j);
@@ -226,7 +226,7 @@ public class ResearchGraphWidget extends AbstractWidget {
                             }
                         }
 
-                        Researchd.debug("Research lines", "Added ", verticalSegments, " vertical segments to path tracking");
+                        Researchd.debug("Research lines", "Added ", verticalSegments, " vertical segments to rootPath tracking");
 
                         // Store the line
                         nodeLines.add(bestLine);
@@ -304,7 +304,7 @@ public class ResearchGraphWidget extends AbstractWidget {
     }
 
     /**
-     * Generates the optimal path between two points
+     * Generates the optimal rootPath between two points
      */
     private ResearchLine generateOptimalPath(
             Point start,
@@ -354,12 +354,12 @@ public class ResearchGraphWidget extends AbstractWidget {
                             .then(end);
                     candidates.add(path);
                 } catch (Exception e) {
-                    // Skip invalid path
+                    // Skip invalid rootPath
                 }
             }
         }
 
-        // Find the best path
+        // Find the best rootPath
         ResearchLine bestPath = null;
         double bestScore = Double.MAX_VALUE;
 
@@ -371,7 +371,7 @@ public class ResearchGraphWidget extends AbstractWidget {
             }
         }
 
-        // If all paths have significant overlaps, try a custom path
+        // If all paths have significant overlaps, try a custom rootPath
         if (bestScore > 2.0 && !existingLines.isEmpty()) {
             ResearchLine customPath = findCustomPath(start, end, existingLines, verticalPathXCoords);
             if (customPath != null) {
@@ -386,7 +386,7 @@ public class ResearchGraphWidget extends AbstractWidget {
     }
 
     /**
-     * Evaluates the quality of a path
+     * Evaluates the quality of a rootPath
      */
     private double evaluatePath(
             ResearchLine path,
@@ -396,7 +396,7 @@ public class ResearchGraphWidget extends AbstractWidget {
         // Start with a base score = complexity (number of segments)
         double score = path.getPoints().size() - 1;
 
-        // Check if path follows preferred direction
+        // Check if rootPath follows preferred direction
         List<Point> points = path.getPoints();
         if (points.size() >= 3) {
             Point p1 = points.get(0);
@@ -471,7 +471,7 @@ public class ResearchGraphWidget extends AbstractWidget {
     }
 
     /**
-     * Generates a custom path for difficult cases
+     * Generates a custom rootPath for difficult cases
      */
     private ResearchLine findCustomPath(
             Point start,
@@ -479,7 +479,7 @@ public class ResearchGraphWidget extends AbstractWidget {
             List<ResearchLine> existingLines,
             Set<Integer> verticalPathXCoords
     ) {
-        // First try to find a path using midpoints between start and end
+        // First try to find a rootPath using midpoints between start and end
         int minX = Math.min(start.x, end.x);
         int maxX = Math.max(start.x, end.x);
         int width = maxX - minX;
@@ -488,12 +488,12 @@ public class ResearchGraphWidget extends AbstractWidget {
         for (int i = 1; i <= 4; i++) {
             int midX = minX + (width * i / 5);
 
-            // Skip if this vertical path is already congested
+            // Skip if this vertical rootPath is already congested
             if (verticalPathXCoords.contains(midX)) {
                 continue;
             }
 
-            // Try a path with this midpoint
+            // Try a rootPath with this midpoint
             ResearchLine path = ResearchLine.start(start)
                     .then(midX, start.y)
                     .then(midX, end.y)
@@ -514,7 +514,7 @@ public class ResearchGraphWidget extends AbstractWidget {
         for (int offset = -20; offset <= 20; offset += 10) {
             int midX = (start.x + end.x) / 2 + offset;
 
-            // Try a custom stepped path (ensuring orthogonal segments)
+            // Try a custom stepped rootPath (ensuring orthogonal segments)
             ResearchLine path = ResearchLine.start(start)
                     .then(start.x, midY) // Vertical segment from start
                     .then(midX, midY)    // Horizontal segment to middle
@@ -527,7 +527,7 @@ public class ResearchGraphWidget extends AbstractWidget {
             }
         }
 
-        // Final fallback: Try a different stepped path with more segments
+        // Final fallback: Try a different stepped rootPath with more segments
         int quarterY = start.y + (end.y - start.y) / 3;
         int thirdX = start.x + (end.x - start.x) / 4;
 

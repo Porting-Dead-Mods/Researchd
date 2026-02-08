@@ -183,7 +183,6 @@ public class ClientResearchTeamHelper {
 		refreshResearchQueueData();
     }
 
-
 	public static void refreshTeamScreenData() {
 		if (Minecraft.getInstance().screen instanceof ResearchTeamScreen screen) {
 			PlayerManagementDraggableWidget inviteWidget = screen.getInviteWidget();

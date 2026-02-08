@@ -2,14 +2,14 @@ package com.portingdeadmods.researchd.client.screens.editor.widgets.popups;
 
 import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.editor.PackLocation;
 import com.portingdeadmods.researchd.client.screens.lib.layout.WidgetHeaderAndFooterLayout;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.DraggablePopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.widgets.PDLButton;
 import com.portingdeadmods.researchd.networking.editor.CreateDatapackPayload;
-import com.portingdeadmods.researchd.networking.editor.SetResourcePackPayload;
-import com.portingdeadmods.researchd.pdl.config.PDLConfig;
+import com.portingdeadmods.researchd.networking.editor.SetPackPayload;
 import com.portingdeadmods.researchd.pdl.config.PDLConfigHelper;
 import com.portingdeadmods.researchd.utils.ClientEditorHelper;
 import com.portingdeadmods.researchd.utils.PrettyPath;
@@ -83,9 +83,10 @@ public class CreatePackPopupWidget extends DraggablePopupWidget {
         if (this.packType == PackType.SERVER_DATA) {
             PacketDistributor.sendToServer(new CreateDatapackPayload(name, description, PDLConfigHelper.camelToSnake(name), generateExamples));
         } else if (this.packType == PackType.CLIENT_RESOURCES) {
-            Result<PrettyPath, Exception> resourcePack = ClientEditorHelper.createResourcePack(name, description, ResearchdUtils.trimSpecialCharacterAndConvertToSnake(name), generateExamples);
+            String namespace = ResearchdUtils.trimSpecialCharacterAndConvertToSnake(name);
+            Result<PrettyPath, Exception> resourcePack = ClientEditorHelper.createResourcePack(name, description, namespace, generateExamples);
             if (resourcePack instanceof Result.Ok(PrettyPath value)) {
-                PacketDistributor.sendToServer(new SetResourcePackPayload(value));
+                PacketDistributor.sendToServer(new SetPackPayload(new PackLocation(value.fullPath(), namespace, PackType.CLIENT_RESOURCES)));
             }
         }
         this.screen.closePopup(this);

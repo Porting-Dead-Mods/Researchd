@@ -51,7 +51,7 @@ public class KubeJSExample {
             """;
 
     /**
-     * @return The path the file was created or Exception if it failed
+     * @return The rootPath the file was created or Exception if it failed
      */
     public static Result<Path, Exception> createExample() {
         Path directory = KubeJSPaths.SERVER_SCRIPTS;

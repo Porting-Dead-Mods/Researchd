@@ -29,18 +29,7 @@ public record ResearchCacheReloadPayload() implements CustomPacketPayload {
 
     public void handle(IPayloadContext context) {
         context.enqueueWork(() -> {
-            Level level = context.player().level();
-            CommonResearchCache.initialize(level);
-
-            ResearchHelperClient.initIconRenderers(level);
-            ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
-            if (data != null) {
-                for (SimpleResearchTeam team : data.researchTeams().values()) {
-                    ClientResearchTeamHelper.resolveInstances(team);
-                }
-            }
-            ResearchGraphCache.clearCache();
-            ClientResearchTeamHelper.refreshResearchScreenData();
+            ResearchHelperClient.reloadResearches(context.player().level());
         }).exceptionally(err -> {
            Researchd.LOGGER.error("Encountered error while handling ResearchCacheReloadPayload", err);
            return null;
