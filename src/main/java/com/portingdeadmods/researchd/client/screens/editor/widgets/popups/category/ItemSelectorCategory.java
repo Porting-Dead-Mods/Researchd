@@ -32,7 +32,10 @@ public interface ItemSelectorCategory {
 
     default Ingredient getSelected(AbstractWidget widget) {
         if (widget instanceof ItemSelectorPopupWidget.SelectorContainerWidget containerWidget) {
-            return Ingredient.of(containerWidget.getSelectedItems().stream());
+            List<ItemStack> selectedItems = containerWidget.getSelectedItems();
+            if (selectedItems != null) {
+                return Ingredient.of(selectedItems.stream());
+            }
         }
         return Ingredient.EMPTY;
     }

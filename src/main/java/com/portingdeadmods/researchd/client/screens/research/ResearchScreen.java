@@ -71,7 +71,11 @@ public class ResearchScreen extends Screen {
 
     @Override
     public boolean shouldCloseOnEsc() {
-        return this.popupWidgets.isEmpty();
+        if (!this.popupWidgets.isEmpty() && this.focusedPopupWidget != null) {
+            this.closePopup(this.focusedPopupWidget);
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -263,15 +267,6 @@ public class ResearchScreen extends Screen {
             dropDownWidget.render(guiGraphics, mouseX, mouseY, partialTick);
         }
 
-    }
-
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == GLFW.GLFW_KEY_ESCAPE && !this.popupWidgets.isEmpty() && this.focusedPopupWidget != null) {
-            this.closePopup(this.focusedPopupWidget);
-            return super.keyPressed(keyCode, scanCode, modifiers);
-        }
-        return false;
     }
 
     private Optional<GuiEventListener> getPopupChildAt(double mouseX, double mouseY) {

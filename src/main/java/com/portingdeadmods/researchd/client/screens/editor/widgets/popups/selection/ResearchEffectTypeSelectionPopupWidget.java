@@ -71,6 +71,13 @@ public class ResearchEffectTypeSelectionPopupWidget extends PopupWidget {
 //        Research research = ResearchHelperCommon.getResearch(this.selectionContainerWidget.selectedResearch, Minecraft.getInstance().level);
 //        this.selectorListWidget.addItem(new ResearchSelectorListWidget.Element.SimpleElement(this.selectionContainerWidget.selectedResearch, research));
         screen.closePopup(this);
+    }
+
+    @Override
+    protected void onClose() {
+        super.onClose();
+        ResearchScreen screen = Spaghetti.tryGetResearchScreen();
+
         screen.openPopupCentered(this.parentPopupWidget);
     }
 

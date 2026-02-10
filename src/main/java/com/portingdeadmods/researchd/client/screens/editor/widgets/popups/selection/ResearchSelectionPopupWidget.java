@@ -69,6 +69,14 @@ public class ResearchSelectionPopupWidget extends PopupWidget {
     }
 
     @Override
+    protected void onClose() {
+        super.onClose();
+
+        ResearchScreen screen = Spaghetti.tryGetResearchScreen();
+        screen.openPopupCentered(this.parentPopupWidget);
+    }
+
+    @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         guiGraphics.blitSprite(BACKGROUND_SPRITE, this.getX(), this.getY(), 148, 160);
 

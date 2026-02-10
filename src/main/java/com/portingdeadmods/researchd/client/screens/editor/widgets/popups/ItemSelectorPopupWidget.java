@@ -20,6 +20,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -82,9 +83,18 @@ public class ItemSelectorPopupWidget extends PopupWidget {
         ResearchScreen screen = Spaghetti.tryGetResearchScreen();
 
         screen.closePopup(this);
+    }
+
+    @Override
+    protected void onClose() {
+        super.onClose();
+
         if (this.parentPopupWidget != null) {
-            screen.openPopupCentered(this.parentPopupWidget);
-            this.parentSelectorWidget.setSelected(Arrays.stream(this.selectedCategory.getSelected(this.containerWidget).getItems()).map(ItemStack::copy).toList());
+            Spaghetti.tryGetResearchScreen().openPopupCentered(this.parentPopupWidget);
+            Ingredient selected = this.selectedCategory.getSelected(this.containerWidget);
+            if (!selected.isEmpty()) {
+                this.parentSelectorWidget.setSelected(Arrays.stream(selected.getItems()).map(ItemStack::copy).toList());
+            }
         }
     }
 
@@ -212,7 +222,7 @@ public class ItemSelectorPopupWidget extends PopupWidget {
         }
 
         public List<ItemStack> getSelectedItems() {
-            return List.of(selectedItem);
+            return this.selectedItem != null ? List.of(selectedItem) : null;
         }
 
         public void resetScrollOffset() {

@@ -19,6 +19,8 @@ public class ResearchMethodListSelectionPopupWidget extends PopupWidget {
     private final BaseResearchMethodCreationWidget parentSelectionWidget;
     @Nullable
     private final PopupWidget parentPopupWidget;
+    private ResearchMethodListType selectedType;
+    private boolean typeClicked;
 
     public ResearchMethodListSelectionPopupWidget(@Nullable PopupWidget parentPopupWidget, BaseResearchMethodCreationWidget parentSelectionWidget, Component message) {
         super(0, 0, 160, 64, message);
@@ -42,6 +44,18 @@ public class ResearchMethodListSelectionPopupWidget extends PopupWidget {
     }
 
     @Override
+    protected void onClose() {
+        super.onClose();
+
+        ResearchScreen screen = Spaghetti.tryGetResearchScreen();
+        if (this.typeClicked) {
+            screen.openPopupCentered(new ResearchMethodTypeSelectionPopupWidget(this.parentPopupWidget, this.parentSelectionWidget, this.selectedType));
+        } else {
+            screen.openPopup(this.parentPopupWidget);
+        }
+    }
+
+    @Override
     public Layout getLayout() {
         return null;
     }
@@ -61,8 +75,9 @@ public class ResearchMethodListSelectionPopupWidget extends PopupWidget {
         public void clickedItem(ResearchMethodListType item, int xIndex, int yIndex, int left, int top, int mouseX,
                                 int mouseY) {
             ResearchScreen screen = Spaghetti.tryGetResearchScreen();
+            this.popupWidget.selectedType = item;
+            this.popupWidget.typeClicked = true;
             screen.closePopup(this.popupWidget);
-            screen.openPopupCentered(new ResearchMethodTypeSelectionPopupWidget(this.parentPopupWidget, this.popupWidget.parentSelectionWidget, item));
         }
 
         @Override

@@ -24,7 +24,6 @@ public class ResearchPagesList extends AbstractWidget {
     public static final ResourceLocation PAGE_BUTTON_INACTIVE = Researchd.rl("textures/gui/research_screen/research_page_button_inactive.png");
     public static final ResourceLocation PAGE_BUTTON_INACTIVE_HOVER = Researchd.rl("textures/gui/research_screen/research_page_button_inactive_hover.png");
 
-
     private static final int BUTTON_SIZE = 10;
     public static final int HEIGHT = 243;
 

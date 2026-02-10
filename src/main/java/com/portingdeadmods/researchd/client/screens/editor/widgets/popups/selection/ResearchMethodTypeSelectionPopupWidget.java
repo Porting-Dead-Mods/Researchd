@@ -39,6 +39,7 @@ public class ResearchMethodTypeSelectionPopupWidget extends PopupWidget {
     private final BaseResearchMethodCreationWidget originSelectionWidget;
     private final ResearchMethodListSelectionPopupWidget.ResearchMethodListType listType;
     private ResearchMethodType selectedResearchMethod;
+    private boolean doneClicked;
 
     public ResearchMethodTypeSelectionPopupWidget(@Nullable PopupWidget parentPopupWidget, BaseResearchMethodCreationWidget parentSelectionWidget, ResearchMethodListSelectionPopupWidget.ResearchMethodListType listType) {
         super(0, 0, 148, 160, CommonComponents.EMPTY);
@@ -57,21 +58,34 @@ public class ResearchMethodTypeSelectionPopupWidget extends PopupWidget {
                 .sprites(new WidgetSprites(Researchd.rl("editor_checkmark_button"), Researchd.rl("editor_checkmark_button_disabled"), Researchd.rl("editor_checkmark_button_highlighted")))
                 .build());
         this.doneButton.active = false;
+        this.doneClicked = false;
         this.setPosition(this.getX(), this.getY());
     }
 
     private void onDoneClicked(PDLImageButton button) {
-        ResearchScreen screen = Spaghetti.tryGetResearchScreen();
-        int height = 128;
-        ClientResearchMethodType clientMethodType = ClientResearchMethodType.getClientMethodType(this.selectedResearchMethod);
-        if (clientMethodType != null) {
-            height = clientMethodType.getHeight();
-        }
-        screen.openPopupCentered(new ResearchMethodCreationPopupWidget(parentPopupWidget, this.selectedResearchMethod, this.originSelectionWidget, 0, 0, 112, height));
 //        screen.openPopupCentered(this.parentPopupWidget);
 //        Research research = ResearchHelperCommon.getResearch(this.selectionContainerWidget.selectedResearch, Minecraft.getInstance().level);
 //        this.selectorListWidget.addItem(new ResearchSelectorListWidget.Element.SimpleElement(this.selectionContainerWidget.selectedResearch, research));
+        ResearchScreen screen = Spaghetti.tryGetResearchScreen();
+        this.doneClicked = true;
         screen.closePopup(this);
+    }
+
+    @Override
+    protected void onClose() {
+        super.onClose();
+        ResearchScreen screen = Spaghetti.tryGetResearchScreen();
+
+        if (this.doneClicked) {
+            int height = 128;
+            ClientResearchMethodType clientMethodType = ClientResearchMethodType.getClientMethodType(this.selectedResearchMethod);
+            if (clientMethodType != null) {
+                height = clientMethodType.getHeight();
+            }
+            screen.openPopupCentered(new ResearchMethodCreationPopupWidget(parentPopupWidget, this.selectedResearchMethod, this.originSelectionWidget, 0, 0, 112, height));
+        } else {
+            screen.openPopup(parentPopupWidget);
+        }
     }
 
     @Override

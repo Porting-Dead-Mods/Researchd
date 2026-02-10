@@ -51,6 +51,13 @@ public class ResearchMethodCreationPopupWidget extends DraggablePopupWidget {
         this.originSelectionWidget.setCreatedMethod(this.clientResearchMethod.createResearchEffect(this.layout));
         ResearchScreen screen = Spaghetti.tryGetResearchScreen();
         screen.closePopup(this);
+    }
+
+    @Override
+    protected void onClose() {
+        super.onClose();
+        ResearchScreen screen = Spaghetti.tryGetResearchScreen();
+
         if (this.parentPopupWidget != null) {
             screen.openPopupCentered(this.parentPopupWidget);
         }
