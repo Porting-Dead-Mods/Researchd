@@ -30,7 +30,7 @@ public class ResearchLine implements Renderable {
 	}
 
 	/**
-	 * Creates a new line builder starting at the given research head
+	 * Creates a new line builder starting at the given researchPack head
 	 */
 	public static ResearchLine start(ResearchHead start) {
 		ResearchLine line = new ResearchLine();
@@ -279,7 +279,7 @@ public class ResearchLine implements Renderable {
 	}
 
 	/**
-	 * Creates a direct connection between two research heads.
+	 * Creates a direct connection between two researchPack heads.
 	 * This will not create any bends or curves, just a straight line.
 	 * At the condition that either the X or the Y coordinate of the start and end points are the same.
 	 */
@@ -291,7 +291,7 @@ public class ResearchLine implements Renderable {
 	}
 
 	/**
-	 * Builds a connection between input and output points of research nodes
+	 * Builds a connection between input and output points of researchPack nodes
 	 * with an L-shaped rootPath.
 	 */
 	public static ResearchLine connectNodes(Point outputPoint, Point inputPoint, boolean verticalFirst) {
@@ -353,7 +353,7 @@ public class ResearchLine implements Renderable {
 	}
 
 	/**
-	 * Extracts all the line segments from a research line
+	 * Extracts all the line segments from a researchPack line
 	 */
 	private static List<LineSegment> getLineSegments(ResearchLine line) {
 		List<LineSegment> segments = new ArrayList<>();
@@ -367,7 +367,7 @@ public class ResearchLine implements Renderable {
 	}
 
 	/**
-	 * Finds all intersections/overlaps between two research lines
+	 * Finds all intersections/overlaps between two researchPack lines
 	 * @param line1 First ResearchLine
 	 * @param line2 Second ResearchLine
 	 * @return Set of PotentialOverlaps where the lines intersect or overlap

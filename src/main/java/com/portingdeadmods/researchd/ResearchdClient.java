@@ -1,29 +1,35 @@
 package com.portingdeadmods.researchd;
 
-import com.portingdeadmods.researchd.api.client.editor.ClientResearch;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
-import com.portingdeadmods.researchd.api.client.editor.ClientResearchEffectType;
-import com.portingdeadmods.researchd.api.client.editor.ClientResearchMethodType;
+import com.portingdeadmods.researchd.api.client.editor.StandaloneEditorObject;
+import com.portingdeadmods.researchd.api.client.editor.TypedEditorObject;
 import com.portingdeadmods.researchd.api.research.RegistryDisplay;
+import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchIcon;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
+import com.portingdeadmods.researchd.api.research.effects.ResearchEffectType;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
+import com.portingdeadmods.researchd.api.research.methods.ResearchMethodType;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
-import com.portingdeadmods.researchd.api.team.ResearchQueue;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
-import com.portingdeadmods.researchd.client.impl.effects.types.ClientDimensionUnlockEffectType;
+import com.portingdeadmods.researchd.client.impl.editor.ResearchPackObject;
+import com.portingdeadmods.researchd.client.impl.editor.effects.DimensionUnlockEffectObject;
+import com.portingdeadmods.researchd.client.impl.editor.effects.ItemUnlockEffectObject;
+import com.portingdeadmods.researchd.client.impl.editor.effects.RecipeUnlockEffectObject;
+import com.portingdeadmods.researchd.client.impl.editor.effects.ValueEffectModifierObject;
 import com.portingdeadmods.researchd.client.impl.icons.ClientItemResearchIcon;
-import com.portingdeadmods.researchd.client.impl.SimpleClientResearch;
-import com.portingdeadmods.researchd.client.impl.effects.*;
+import com.portingdeadmods.researchd.client.impl.editor.SimpleResearchObject;
+import com.portingdeadmods.researchd.client.impl.info.effects.*;
 import com.portingdeadmods.researchd.client.impl.icons.ClientSpriteResearchIcon;
 import com.portingdeadmods.researchd.client.impl.icons.ClientTextResearchIcon;
-import com.portingdeadmods.researchd.client.impl.methods.*;
-import com.portingdeadmods.researchd.client.impl.methods.types.ClientCheckItemPresenceMethodType;
-import com.portingdeadmods.researchd.client.impl.methods.types.ClientConsumeItemResearchMethodType;
-import com.portingdeadmods.researchd.client.impl.methods.types.ClientConsumePackResearchMethodType;
+import com.portingdeadmods.researchd.client.impl.info.methods.*;
+import com.portingdeadmods.researchd.client.impl.editor.methods.CheckItemPresenceMethodObject;
+import com.portingdeadmods.researchd.client.impl.editor.methods.ConsumeItemMethodObject;
+import com.portingdeadmods.researchd.client.impl.editor.methods.ConsumePackMethodObject;
 import com.portingdeadmods.researchd.client.renderers.ResearchLabBER;
 import com.portingdeadmods.researchd.client.screens.lab.ResearchLabScreen;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
+import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.impl.research.icons.ItemResearchIcon;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
 import com.portingdeadmods.researchd.impl.research.effect.*;
@@ -51,6 +57,7 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
+import javax.lang.model.element.ModuleElement;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -61,10 +68,13 @@ public final class ResearchdClient {
     public static final Map<ResourceLocation, WidgetConstructor<? extends ResearchMethod>> RESEARCH_METHOD_WIDGETS = new HashMap<>();
     public static final Map<ResourceLocation, WidgetConstructor<? extends ResearchEffect>> RESEARCH_EFFECT_WIDGETS = new HashMap<>();
     public static final Map<ResourceLocation, Function<ResearchIcon, ClientResearchIcon<?>>> RESEARCH_ICONS = new HashMap<>();
-    public static final Map<ResourceLocation, ClientResearch> CLIENT_RESEARCHES = new HashMap<>();
-    public static final Map<ResourceLocation, ClientResearchMethodType> CLIENT_RESEARCH_METHOD_TYPES = new HashMap<>();
+    public static final Map<ResourceLocation, StandaloneEditorObject<Research>> CLIENT_RESEARCHES = new HashMap<>();
+    public static final Map<ResourceLocation, StandaloneEditorObject<ResearchPack>> CLIENT_RESEARCH_PACKS = new HashMap<>();
+    public static final Map<ResourceLocation, TypedEditorObject<ResearchMethod, ResearchMethodType>> CLIENT_RESEARCH_METHOD_TYPES = new HashMap<>();
     public static final ModelResourceLocation RESEARCH_LAB_MODEL = ModelResourceLocation.standalone(Researchd.rl("block/research_lab"));
-    public static final Map<ResourceLocation, ClientResearchEffectType> CLIENT_RESEARCH_EFFECT_TYPES = new HashMap<>();
+    public static final Map<ResourceLocation, TypedEditorObject<ResearchEffect, ResearchEffectType>> CLIENT_RESEARCH_EFFECT_TYPES = new HashMap<>();
+
+    public static int previewRendererResearchPackColor = -1;
 
     public ResearchdClient(IEventBus eventBus, ModContainer modContainer) {
         eventBus.addListener(this::registerKeybinds);
@@ -78,6 +88,14 @@ public final class ResearchdClient {
         NeoForge.EVENT_BUS.addListener(this::addTooltip);
 
         modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+    }
+
+    public static TypedEditorObject<ResearchEffect, ResearchEffectType> getClientEffectType(ResearchEffectType effectType) {
+        return CLIENT_RESEARCH_EFFECT_TYPES.get(effectType.id());
+    }
+
+    public static TypedEditorObject<ResearchMethod, ResearchMethodType> getClientMethodType(ResearchMethodType methodType) {
+        return CLIENT_RESEARCH_METHOD_TYPES.get(methodType.id());
     }
 
     private void clientSetup(FMLClientSetupEvent event) {
@@ -94,17 +112,31 @@ public final class ResearchdClient {
             addEffectWidget(RecipeUnlockEffect.ID, RecipeUnlockEffectWidget::new);
             addEffectWidget(ItemUnlockEffect.ID, UnlockItemEffectWidget::new);
 
+            addEffectWidgetUnsafe(IncreaseValueEffect.ID, ValueEffectModifierEffectWidget::new);
+            addEffectWidgetUnsafe(DecreaseValueEffect.ID, ValueEffectModifierEffectWidget::new);
+            addEffectWidgetUnsafe(MultiplyValueEffect.ID, ValueEffectModifierEffectWidget::new);
+            addEffectWidgetUnsafe(DivideValueEffect.ID, ValueEffectModifierEffectWidget::new);
+
             addClientResearchIcon(ItemResearchIcon.ID, ClientItemResearchIcon::new);
             addClientResearchIcon(TextResearchIcon.ID, ClientTextResearchIcon::new);
             addClientResearchIcon(SpriteResearchIcon.ID, ClientSpriteResearchIcon::new);
 
-            CLIENT_RESEARCHES.put(Researchd.rl(SimpleResearch.ID), SimpleClientResearch.INSTANCE);
+            CLIENT_RESEARCHES.put(Researchd.rl(SimpleResearch.ID), SimpleResearchObject.INSTANCE);
 
-            CLIENT_RESEARCH_METHOD_TYPES.put(ConsumeItemResearchMethod.ID, ClientConsumeItemResearchMethodType.INSTANCE);
-            CLIENT_RESEARCH_METHOD_TYPES.put(ConsumePackResearchMethod.ID, ClientConsumePackResearchMethodType.INSTANCE);
-            CLIENT_RESEARCH_METHOD_TYPES.put(CheckItemPresenceResearchMethod.ID, ClientCheckItemPresenceMethodType.INSTANCE);
+            CLIENT_RESEARCH_PACKS.put(Researchd.rl(ResearchPackImpl.ID), ResearchPackObject.INSTANCE);
 
-            CLIENT_RESEARCH_EFFECT_TYPES.put(ClientDimensionUnlockEffectType.ID, ClientDimensionUnlockEffectType.INSTANCE);
+            CLIENT_RESEARCH_METHOD_TYPES.put(ConsumeItemResearchMethod.ID, ConsumeItemMethodObject.INSTANCE);
+            CLIENT_RESEARCH_METHOD_TYPES.put(ConsumePackResearchMethod.ID, ConsumePackMethodObject.INSTANCE);
+            CLIENT_RESEARCH_METHOD_TYPES.put(CheckItemPresenceResearchMethod.ID, CheckItemPresenceMethodObject.INSTANCE);
+
+            CLIENT_RESEARCH_EFFECT_TYPES.put(DimensionUnlockEffectObject.ID, DimensionUnlockEffectObject.INSTANCE);
+            CLIENT_RESEARCH_EFFECT_TYPES.put(ItemUnlockEffectObject.ID, ItemUnlockEffectObject.INSTANCE);
+            CLIENT_RESEARCH_EFFECT_TYPES.put(RecipeUnlockEffectObject.ID, RecipeUnlockEffectObject.INSTANCE);
+
+            CLIENT_RESEARCH_EFFECT_TYPES.put(IncreaseValueEffect.ID, new ValueEffectModifierObject(ResearchEffectTypes.INCREASE_VALUE.get(), IncreaseValueEffect::new));
+            CLIENT_RESEARCH_EFFECT_TYPES.put(DecreaseValueEffect.ID, new ValueEffectModifierObject(ResearchEffectTypes.DECREASE_VALUE.get(), DecreaseValueEffect::new));
+            CLIENT_RESEARCH_EFFECT_TYPES.put(DivideValueEffect.ID, new ValueEffectModifierObject(ResearchEffectTypes.DIVIDE_VALUE.get(), DivideValueEffect::new));
+            CLIENT_RESEARCH_EFFECT_TYPES.put(MultiplyValueEffect.ID, new ValueEffectModifierObject(ResearchEffectTypes.MULTIPLE_VALUE.get(), MultiplyValueEffect::new));
 
             ItemBlockRenderTypes.setRenderLayer(ResearchdBlocks.RESEARCH_LAB_CONTROLLER.get(), RenderType.solid()); // Should fiddle with render types till it works ngl
         });
@@ -118,10 +150,13 @@ public final class ResearchdClient {
         RESEARCH_METHOD_WIDGETS.put(id, constructor);
     }
 
-    private static <T extends ResearchEffect> void addEffectWidget(ResourceLocation id, WidgetConstructor<T> constructor) {
+    private static void addEffectWidgetUnsafe(ResourceLocation id, WidgetConstructor constructor) {
         RESEARCH_EFFECT_WIDGETS.put(id, constructor);
     }
 
+    private static <T extends ResearchEffect> void addEffectWidget(ResourceLocation id, WidgetConstructor<T> constructor) {
+        RESEARCH_EFFECT_WIDGETS.put(id, constructor);
+    }
     private void registerKeybinds(RegisterKeyMappingsEvent event) {
         event.register(ResearchdKeybinds.OPEN_RESEARCH_SCREEN.get());
         event.register(ResearchdKeybinds.OPEN_RESEARCH_TEAM_SCREEN.get());
@@ -129,6 +164,10 @@ public final class ResearchdClient {
 
     private void registerColorHandlers(RegisterColorHandlersEvent.Item event) {
         event.register((stack, layer) -> {
+            if (layer == 1 && previewRendererResearchPackColor != -1) {
+                return previewRendererResearchPackColor;
+            }
+
             ResearchPackComponent researchPackComponent = stack.get(ResearchdDataComponents.RESEARCH_PACK);
             ClientLevel level = Minecraft.getInstance().level;
             if (layer == 1 && researchPackComponent.researchPackKey().isPresent()) {

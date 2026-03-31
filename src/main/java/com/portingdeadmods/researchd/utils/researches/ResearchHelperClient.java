@@ -79,7 +79,7 @@ public final class ResearchHelperClient {
         return ResearchHelperCommon.getResearchPacks(Minecraft.getInstance().level);
     }
 
-    // Called at the end of the initialization phase of the research cache
+    // Called at the end of the initialization phase of the researchPack cache
     public static void initIconRenderers(Level level) {
         CommonResearchCache.globalResearches.forEach((k, v) -> {
             ResearchIcon icon = v.getResearch(level).researchIcon();

@@ -69,7 +69,7 @@ public class ResearchPagesList extends AbstractWidget {
             boolean isHovered = isButtonHovered(i, mouseX, mouseY);
             boolean isSelected = page == this.selectedPage;
 
-            // Render icon using the research key (same as ResearchNode does)
+            // Render icon using the researchPack key (same as ResearchNode does)
             if (isSelected) {
                 GuiUtils.drawImg(guiGraphics, PAGE_BUTTON_ACTIVE, getX(), buttonY, BUTTON_SIZE, BUTTON_SIZE);
             } else {

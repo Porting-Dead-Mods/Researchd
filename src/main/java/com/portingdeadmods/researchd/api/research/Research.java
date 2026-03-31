@@ -16,9 +16,9 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.List;
 
 /**
- * Most basic research, providing functionality and data for both displaying and research logic
+ * Most basic researchPack, providing functionality and data for both displaying and researchPack logic
  * <p>
- * The default research implementation is {@link com.portingdeadmods.researchd.impl.research.SimpleResearch}
+ * The default researchPack implementation is {@link com.portingdeadmods.researchd.impl.research.SimpleResearch}
  * which implements the methods listed here and should be suitable for most use-cases.
  */
 public interface Research {
@@ -28,35 +28,35 @@ public interface Research {
     StreamCodec<ByteBuf, ResourceKey<Research>> RESOURCE_KEY_STREAM_CODEC = ResourceKey.streamCodec(ResearchdRegistries.RESEARCH_KEY);
 
     /**
-     * @return The research icon of this research
+     * @return The researchPack icon of this researchPack
      */
     ResearchIcon researchIcon();
 
     /**
-     * @return The research method that is required
-     * for this research to be completed
+     * @return The researchPack method that is required
+     * for this researchPack to be completed
      */
     ResearchMethod researchMethod();
 
     /**
-     * @return The research effect that happens after
-     * the research is completed
+     * @return The researchPack effect that happens after
+     * the researchPack is completed
      */
     ResearchEffect researchEffect();
 
     /**
      * @return A {@link List} of {@link ResourceKey}
-     * pointing to the parent researchPacks of this research
+     * pointing to the parent researchPacks of this researchPack
      */
     List<ResourceKey<Research>> parents();
 
     /**
-     * @return whether the parent researchPacks need to be completed to start this research
+     * @return whether the parent researchPacks need to be completed to start this researchPack
      */
     boolean requiresParent();
 
     /**
-     * @return The {@link ResourceLocation} id of the research page this research belongs to.
+     * @return The {@link ResourceLocation} id of the researchPack page this researchPack belongs to.
      * Only root researches (without parents) should explicitly define this.
      * Child researches inherit the page from their parents.
      * Defaults to {@link ResearchPage#DEFAULT_PAGE_ID}

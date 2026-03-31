@@ -14,7 +14,7 @@ import net.minecraft.world.level.ItemLike;
  *
  * @param id The unique identifier for this page
  * @param icon The icon to display for this page
- * @param iconResearchKey The research key used to look up the ClientResearchIcon (usually the first root's key)
+ * @param iconResearchKey The researchPack key used to look up the ClientResearchIcon (usually the first root's key)
  * @param researches All researches belonging to this page
  */
 public record ResearchPage(

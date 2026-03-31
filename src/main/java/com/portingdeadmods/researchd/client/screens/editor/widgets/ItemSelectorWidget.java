@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 public class ItemSelectorWidget extends AbstractWidget {
     public static final ResourceLocation EDIT_ELEMENT_HOVER_SPRITE = Researchd.rl("edit_element_hover");
@@ -37,6 +38,7 @@ public class ItemSelectorWidget extends AbstractWidget {
     private final PopupWidget parentPopupWidget;
     private Ingredient selected;
     private final BiFunction<ItemSelectorWidget, @Nullable PopupWidget, ? extends ItemSelectorPopupWidget> popupWidgetFactory;
+    private Consumer<Ingredient> responder;
 
     public ItemSelectorWidget(@Nullable PopupWidget parentPopupWidget, int x, int y, int width, int height, boolean tagSelector, boolean selectMultiple) {
         this(parentPopupWidget, x, y, width, height, Ingredient.of(new ItemStack(Items.DIRT)), (self, parent) -> {
@@ -86,15 +88,20 @@ public class ItemSelectorWidget extends AbstractWidget {
 
     @Override
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-
     }
 
-    public void setSelected(List<ItemStack> selected) {
+    public void setSelected(List<ItemStack> selected, boolean respond) {
         this.selected = Ingredient.of(selected.stream());
+        if (respond) {
+            this.responder.accept(this.selected);
+        }
     }
 
-    public void setSelected(TagKey<Item> tag) {
+    public void setSelected(TagKey<Item> tag, boolean respond) {
         this.selected = Ingredient.of(tag);
+        if (respond) {
+            this.responder.accept(this.selected);
+        }
     }
 
     public Ingredient getSelected() {
@@ -105,4 +112,7 @@ public class ItemSelectorWidget extends AbstractWidget {
         return new ItemResearchIcon(Arrays.asList(this.getSelected().getItems()));
     }
 
+    public void setResponder(Consumer<Ingredient> responder) {
+        this.responder = responder;
+    }
 }

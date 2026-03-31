@@ -4,7 +4,7 @@ import com.portingdeadmods.researchd.pdl.config.ConfigValue;
 
 public final class ResearchdConfig {
     public static class Common {
-        @ConfigValue(name = "Research Queue Length", comment = "The length of the research queue", range = {1, 99})
+        @ConfigValue(name = "Research Queue Length", comment = "The length of the researchPack queue", range = {1, 99})
         public static int researchQueueLength = 7;
 
         @ConfigValue(name = "Load Examples Datapack", comment = "Whether to load the examples resourcepack that can be enabled in the world creation screen.")

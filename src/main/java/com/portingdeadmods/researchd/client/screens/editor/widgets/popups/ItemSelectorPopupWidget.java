@@ -93,7 +93,7 @@ public class ItemSelectorPopupWidget extends PopupWidget {
             Spaghetti.tryGetResearchScreen().openPopupCentered(this.parentPopupWidget);
             Ingredient selected = this.selectedCategory.getSelected(this.containerWidget);
             if (!selected.isEmpty()) {
-                this.parentSelectorWidget.setSelected(Arrays.stream(selected.getItems()).map(ItemStack::copy).toList());
+                this.parentSelectorWidget.setSelected(Arrays.stream(selected.getItems()).map(ItemStack::copy).toList(), true);
             }
         }
     }

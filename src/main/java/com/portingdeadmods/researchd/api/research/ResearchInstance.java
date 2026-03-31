@@ -19,7 +19,7 @@ import java.util.UUID;
 
 public final class ResearchInstance {
     public static final Codec<ResearchInstance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            GlobalResearch.CODEC.fieldOf("research").forGetter(ResearchInstance::getResearch),
+            GlobalResearch.CODEC.fieldOf("researchPack").forGetter(ResearchInstance::getResearch),
             ResearchStatus.CODEC.fieldOf("research_status").forGetter(ResearchInstance::getResearchStatus),
             UUIDUtil.CODEC.optionalFieldOf("researched_player").forGetter(r -> Optional.ofNullable(r.getResearchedPlayer())),
             Codec.LONG.fieldOf("researched_time").forGetter(ResearchInstance::getResearchedTime)
@@ -165,7 +165,7 @@ public final class ResearchInstance {
     @Override
     public String toString() {
         return "ResearchInstance{" +
-                "research=" + research +
+                "researchPack=" + research +
                 ", researchStatus=" + researchStatus +
                 '}';
     }

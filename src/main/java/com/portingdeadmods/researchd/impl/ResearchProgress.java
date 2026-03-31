@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-// TODO: Remove research progresses for removed researches
+// TODO: Remove researchPack progresses for removed researches
 public final class ResearchProgress {
     public static final Codec<ResearchProgress> CODEC = RecordCodecBuilder.create(inst -> inst.group(
             Task.CODEC.listOf().fieldOf("tasks").forGetter(ResearchProgress::tasks),

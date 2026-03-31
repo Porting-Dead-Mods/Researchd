@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Data of the research graph
+ * Data of the researchPack graph
  *
  * @param rootNode Root node that is displayed bigger than the rest of the nodes
  * @param nodes    All the nodes in the current graph
@@ -23,7 +23,7 @@ import java.util.Set;
 public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, ResearchNode> nodes, ResearchPage page) {
     private static final int RESEARCH_GRAPH_LAYERS = 2;
 
-    // TODO: Add researchPacks to the team's research progress
+    // TODO: Add researchPacks to the team's researchPack progress
     private ResearchGraph(GlobalResearch researchRoot, Map<ResourceKey<Research>, ResearchInstance> researches) {
         this(new ResearchNode(researches.get(researchRoot.getResearchKey())), new LinkedHashMap<>(), CommonResearchCache.pageOf(researchRoot));
 
@@ -94,7 +94,7 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
     }
 
     /**
-     * @param page The research page containing all researches to include
+     * @param page The researchPack page containing all researches to include
      * @param rootNode The root node to use for this graph - TODO: Parse researches from the page to get the root directly
      * @param researches Lookup
      * @return A new ResearchGraph for the page

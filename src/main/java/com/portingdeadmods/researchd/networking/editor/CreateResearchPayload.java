@@ -50,7 +50,7 @@ public record CreateResearchPayload(ResourceKey<Research> key, Research research
                 Result<Path, ? extends Exception> result = settings.getWriter().write(datapacksDirectoryPath, null, settings.currentDatapack().namespace());
                 switch (result) {
                     case Result.Err<Path, ? extends Exception>(Exception error) -> Researchd.LOGGER.error("Failed to write datapack", error);
-                    case Result.Ok<Path, ? extends Exception> ignored -> Researchd.LOGGER.info("Successfully wrote research {} to datapack {}", key.location(), datapacksDirectoryPath);
+                    case Result.Ok<Path, ? extends Exception> ignored -> Researchd.LOGGER.info("Successfully wrote researchPack {} to datapack {}", key.location(), datapacksDirectoryPath);
                 }
 
                 if (this.reloadData) {

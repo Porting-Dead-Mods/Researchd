@@ -226,7 +226,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
                 this.researchScreen.getTechListWidget().setResearchButtonMode(TechListWidget.ResearchButtonMode.START);
             }
 
-            // only call after first setting selected research
+            // only call after first setting selected researchPack
 
             Minecraft mc = Minecraft.getInstance();
             Font font = mc.font;
@@ -238,7 +238,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
             if (methodWidgetConstructor != null) {
                 this.methodWidget = methodWidgetConstructor.createMethod(53 + METHOD_WIDGET_PADDING, 60 + LABEL_PADDING_TOP_1 + font.lineHeight + LABEL_PADDING_BOTTOM_1, method);
             } else {
-                // in case the dev didn't implement a widget for the research method, we scream at them
+                // in case the dev didn't implement a widget for the researchPack method, we scream at them
                 MutableComponent message = Component.literal("!!%s does not have info widget!!".formatted(method.id().toString())).withStyle(ChatFormatting.RED);
                 this.methodWidget = new MultiLineTextWidget(53 + METHOD_WIDGET_PADDING + 1, 60 + LABEL_PADDING_TOP_1 + font.lineHeight + LABEL_PADDING_BOTTOM_1, message, font);
                 ((MultiLineTextWidget) this.methodWidget).setMaxWidth(108);
@@ -249,7 +249,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
             if (effectWidgetConstructor != null) {
                 this.effectWidget = effectWidgetConstructor.createEffect(53 + METHOD_WIDGET_PADDING, 60 + LABEL_PADDING_TOP_1 + font.lineHeight + LABEL_PADDING_BOTTOM_1 + methodWidget.getHeight() + METHOD_WIDGET_PADDING_BOTTOM + LINE_HEIGHT + LABEL_PADDING_TOP_2 + font.lineHeight + LABEL_PADDING_BOTTOM_2, effect);
             } else {
-                // in case the dev didn't implement a widget for the research method, we *aggressively* scream at them
+                // in case the dev didn't implement a widget for the researchPack method, we *aggressively* scream at them
                 MutableComponent message = Component.literal("!!%s does not have info widget!!".formatted(effect.id().toString())).withStyle(ChatFormatting.RED);
                 this.effectWidget = new MultiLineTextWidget(53 + METHOD_WIDGET_PADDING + 1, 64 + 36 + font.lineHeight + 4, message, font);
                 ((MultiLineTextWidget) this.effectWidget).setMaxWidth(108);

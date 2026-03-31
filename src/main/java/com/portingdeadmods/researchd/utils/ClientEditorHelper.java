@@ -47,7 +47,7 @@ public final class ClientEditorHelper {
                     Path packResearchdRegistriesDir = packContentRootDir.resolve("researchd");
                     Files.createDirectories(packResearchdRegistriesDir);
 
-                    Path packResearchesDir = packResearchdRegistriesDir.resolve("research");
+                    Path packResearchesDir = packResearchdRegistriesDir.resolve("researchPack");
                     Files.createDirectory(packResearchesDir);
 
                    // createResearches(packResearchesDir);

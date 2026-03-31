@@ -3,13 +3,15 @@ package com.portingdeadmods.researchd.client.screens.editor.widgets.popups.creat
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdClient;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
-import com.portingdeadmods.researchd.api.client.editor.ClientResearchMethodType;
 import com.portingdeadmods.researchd.api.client.RememberingLinearLayout;
+import com.portingdeadmods.researchd.client.impl.editor.EditorContextImpl;
+import com.portingdeadmods.researchd.api.client.editor.TypedEditorObject;
+import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethodType;
-import com.portingdeadmods.researchd.client.screens.editor.widgets.BaseResearchMethodCreationWidget;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.EmbeddedMethodCreationWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.SelectPackPopupWidget;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.selection.ResearchMethodTypeSelectionPopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.DraggablePopupWidget;
-import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.widgets.PDLButton;
 import com.portingdeadmods.researchd.utils.Spaghetti;
@@ -26,12 +28,12 @@ public class ResearchMethodCreationPopupWidget extends DraggablePopupWidget {
     public static final ResourceLocation BACKGROUND_SPRITE = Researchd.rl("widget/research_method_creation_widget");
 
     private final RememberingLinearLayout layout;
-    private final ClientResearchMethodType clientResearchMethod;
+    private final TypedEditorObject<ResearchMethod, ResearchMethodType> clientResearchMethod;
     private final PDLButton createButton;
-    private final PopupWidget parentPopupWidget;
-    private final BaseResearchMethodCreationWidget originSelectionWidget;
+    private final ResearchMethodTypeSelectionPopupWidget parentPopupWidget;
+    private final EmbeddedMethodCreationWidget originSelectionWidget;
 
-    public ResearchMethodCreationPopupWidget(@Nullable PopupWidget parentPopupWidget, ResearchMethodType type, BaseResearchMethodCreationWidget originSelectionWidget, int x, int y, int width, int height) {
+    public ResearchMethodCreationPopupWidget(ResearchMethodTypeSelectionPopupWidget parentPopupWidget, ResearchMethodType type, EmbeddedMethodCreationWidget originSelectionWidget, int x, int y, int width, int height) {
         super(x, y, width, height, CommonComponents.EMPTY);
         this.parentPopupWidget = parentPopupWidget;
         this.originSelectionWidget = originSelectionWidget;
@@ -48,9 +50,10 @@ public class ResearchMethodCreationPopupWidget extends DraggablePopupWidget {
     }
 
     private void onCreateButtonPressed(PDLButton button) {
-        this.originSelectionWidget.setCreatedMethod(this.clientResearchMethod.createResearchEffect(this.layout));
+        this.parentPopupWidget.addMethod(this.clientResearchMethod.create(this.layout));
         ResearchScreen screen = Spaghetti.tryGetResearchScreen();
         screen.closePopup(this);
+        screen.openPopupCentered(this.parentPopupWidget);
     }
 
     @Override
@@ -73,7 +76,7 @@ public class ResearchMethodCreationPopupWidget extends DraggablePopupWidget {
 
     protected void buildLayout() {
         if (this.clientResearchMethod != null) {
-            this.clientResearchMethod.buildLayout(this.layout, new ClientResearchMethodType.Context(this.createButton, Spaghetti.tryGetResearchScreen(), this, this.getWidth(), this.getHeight(), this.getWidth() - 14, this.getHeight() - 14, 7));
+            this.clientResearchMethod.buildLayout(this.layout, new EditorContextImpl(this.createButton, Spaghetti.tryGetResearchScreen(), this, this.getWidth(), this.getHeight(), this.getWidth() - 14, this.getHeight() - 14, 7));
             this.layout.getLayout().arrangeElements();
             FrameLayout.centerInRectangle(this.layout.getLayout(), this.getX(), this.getY(), this.getWidth(), this.getHeight());
             this.layout.getChildren().forEach(this::addRenderableWidget);

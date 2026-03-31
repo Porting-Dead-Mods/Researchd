@@ -54,6 +54,10 @@ public final class RememberingLinearLayout {
         return child;
     }
 
+    public Map<String, AbstractWidget> getWidgets() {
+        return widgets;
+    }
+
     public LinearLayout getLayout() {
         return layout;
     }

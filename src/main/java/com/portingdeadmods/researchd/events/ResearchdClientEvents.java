@@ -64,7 +64,7 @@ public final class ResearchdClientEvents {
 		UnlockItemEffectData itemData = player.getData(ResearchdAttachments.ITEM_PREDICATE.get());
 		if (itemData.isBlocked(item)) {
 			event.getToolTip().add(Component.literal("")); // Add a blank line for spacing
-			event.getToolTip().add(Component.literal("This item is blocked by a research!").withStyle(ChatFormatting.RED, ChatFormatting.ITALIC));
+			event.getToolTip().add(Component.literal("This item is blocked by a researchPack!").withStyle(ChatFormatting.RED, ChatFormatting.ITALIC));
 		}
 	}
 

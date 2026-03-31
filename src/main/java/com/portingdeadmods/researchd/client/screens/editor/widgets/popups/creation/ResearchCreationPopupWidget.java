@@ -1,25 +1,19 @@
 package com.portingdeadmods.researchd.client.screens.editor.widgets.popups.creation;
 
-import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdClient;
 import com.portingdeadmods.researchd.ResearchdRegistries;
-import com.portingdeadmods.researchd.api.client.editor.ClientResearch;
 import com.portingdeadmods.researchd.api.client.RememberingLinearLayout;
+import com.portingdeadmods.researchd.client.impl.editor.EditorContextImpl;
+import com.portingdeadmods.researchd.api.client.editor.StandaloneEditorObject;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.SelectPackPopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.DraggablePopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.ScrollableWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.widgets.PDLButton;
-import com.portingdeadmods.researchd.data.ResearchdAttachments;
-import com.portingdeadmods.researchd.impl.editor.EditModeSettingsImpl;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
 import com.portingdeadmods.researchd.networking.editor.CreateResearchPayload;
-import com.portingdeadmods.researchd.resources.editor.EditorResearchProvider;
-import com.portingdeadmods.researchd.utils.PrettyPath;
-import com.portingdeadmods.researchd.utils.Spaghetti;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
 import com.portingdeadmods.researchd.utils.researches.ResearchdManagers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -32,14 +26,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
-import java.nio.file.Path;
 import java.util.Collections;
 
 public class ResearchCreationPopupWidget extends DraggablePopupWidget {
     public static final ResourceLocation DEFAULT_ID = Researchd.rl(SimpleResearch.ID);
 
     private final RememberingLinearLayout layout;
-    private final ClientResearch clientResearch;
+    private final StandaloneEditorObject<Research> clientResearch;
     private final ResearchScreen screen;
     private PDLButton createButton;
     private final ScrollableWidget<LinearLayout> scrollableWidget;
@@ -53,6 +46,11 @@ public class ResearchCreationPopupWidget extends DraggablePopupWidget {
         this.buildLayout();
         this.scrollableWidget = new ScrollableWidget<>(this.layout.getLayout(), x + 7, y + 7, width - 14, height - 36 - 14, CommonComponents.EMPTY);
         this.addRenderableWidget(this.scrollableWidget);
+    }
+
+    @Override
+    protected void onOpen() {
+        //this.scrollableWidget.resetScrollOffset();
     }
 
     public int getHorizontalPadding() {
@@ -70,15 +68,15 @@ public class ResearchCreationPopupWidget extends DraggablePopupWidget {
                 .size(100, 16)
                 .build());
         if (this.clientResearch != null) {
-            ClientResearch.Context context = new ClientResearch.Context(this.createButton, this.screen, this, this.getWidth(), this.getHeight(), this.getWidth() - 16, this.getHeight() - 16, 7);
+            EditorContextImpl context = new EditorContextImpl(this.createButton, this.screen, this, this.getWidth(), this.getHeight(), this.getWidth() - 16, this.getHeight() - 16, 7);
             this.clientResearch.buildLayout(this.layout, context);
-            this.clientResearch.updateResearch(this.layout, context);
+            this.clientResearch.update(this.layout, context);
             this.layout.getLayout().arrangeElements();
         }
     }
 
     private void onCreatePressed(PDLButton pdlButton) {
-        Research research = this.clientResearch.createResearch(this.layout);
+        Research research = this.clientResearch.create(this.layout);
         ResourceLocation id = this.clientResearch.createId(this.layout);
         ResearchdManagers.getResearchesManager(Minecraft.getInstance().level).mergeContents(Collections.singletonMap(id, research));
         PacketDistributor.sendToServer(new CreateResearchPayload(ResourceKey.create(ResearchdRegistries.RESEARCH_KEY, id), research, true));

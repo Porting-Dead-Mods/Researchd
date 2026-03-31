@@ -40,7 +40,7 @@ public interface ResearchdDatagenProvider<T> {
             try {
                 result = this.codec().encodeStart(JsonOps.INSTANCE, value);
             } catch (Exception e) {
-                return Result.err("Failed to encode research: " + e);
+                return Result.err("Failed to encode researchPack: " + e);
             }
             if (result.isSuccess()) {
                 JsonElement json = result.getOrThrow();

@@ -77,7 +77,7 @@ public class ReloadableRegistryManager<T> extends SimpleJsonResourceReloadListen
                 ResourceKey<T> key = ResourceKey.create(this.registry, entry.getKey());
                 builder.put(key, (T) entry.getValue());
             }
-            Researchd.LOGGER.info("Loaded {} KubeJS research packs", kubeJSPacks.size());
+            Researchd.LOGGER.info("Loaded {} KubeJS researchPack packs", kubeJSPacks.size());
         }
 
         this.byName = builder.build();

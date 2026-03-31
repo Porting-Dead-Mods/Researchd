@@ -29,6 +29,7 @@ public abstract class DropDownWidget<P extends LayoutElement> implements GuiEven
     public DropDownWidget() {
         this.visible = false;
         this.focused = false;
+        this.setVisible(true);
     }
 
     public final void rebuildOptions() {
@@ -61,7 +62,7 @@ public abstract class DropDownWidget<P extends LayoutElement> implements GuiEven
     }
 
     public void render(GuiGraphics guiGraphics, int x, int y, int mouseX, int mouseY, float partialTicks) {
-        if (!this.visible || this.options == null) return;
+        if (!this.visible || this.options == null || this.options.isEmpty()) return;
 
         int width = 4;
         int height = 2;
@@ -90,7 +91,7 @@ public abstract class DropDownWidget<P extends LayoutElement> implements GuiEven
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (hoveredOption != null) {
+        if (hoveredOption != null && !this.options.isEmpty()) {
             optionClicked(hoveredOption, (int) mouseX, (int) mouseY);
             this.playDownSound(Minecraft.getInstance().getSoundManager());
         }

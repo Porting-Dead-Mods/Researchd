@@ -13,7 +13,7 @@ import com.portingdeadmods.researchd.networking.editor.SetPackPayload;
 import com.portingdeadmods.researchd.pdl.config.PDLConfigHelper;
 import com.portingdeadmods.researchd.utils.ClientEditorHelper;
 import com.portingdeadmods.researchd.utils.PrettyPath;
-import com.portingdeadmods.researchd.utils.ResearchdUtils;
+import com.portingdeadmods.researchd.utils.TextUtils;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.layouts.LayoutSettings;
@@ -83,7 +83,7 @@ public class CreatePackPopupWidget extends DraggablePopupWidget {
         if (this.packType == PackType.SERVER_DATA) {
             PacketDistributor.sendToServer(new CreateDatapackPayload(name, description, PDLConfigHelper.camelToSnake(name), generateExamples));
         } else if (this.packType == PackType.CLIENT_RESOURCES) {
-            String namespace = ResearchdUtils.trimSpecialCharacterAndConvertToSnake(name);
+            String namespace = TextUtils.trimSpecialCharacterAndConvertToSnake(name);
             Result<PrettyPath, Exception> resourcePack = ClientEditorHelper.createResourcePack(name, description, namespace, generateExamples);
             if (resourcePack instanceof Result.Ok(PrettyPath value)) {
                 PacketDistributor.sendToServer(new SetPackPayload(new PackLocation(value.fullPath(), namespace, PackType.CLIENT_RESOURCES)));

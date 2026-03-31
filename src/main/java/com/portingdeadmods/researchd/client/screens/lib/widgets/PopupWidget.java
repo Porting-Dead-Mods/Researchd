@@ -20,7 +20,6 @@ import java.util.function.Consumer;
 
 public abstract class PopupWidget extends AbstractContainerWidget implements LayoutWidget<Layout> {
     private final Map<LayoutElement, DropDownWidget<?>> dropDownWidgets;
-    private Consumer<PopupWidget> additionalOnCloseAction = w -> {};
     protected final List<AbstractWidget> widgets;
 
     public PopupWidget(int x, int y, int width, int height, Component message) {
@@ -37,6 +36,9 @@ public abstract class PopupWidget extends AbstractContainerWidget implements Lay
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         LayoutWidget.super.renderElements(guiGraphics, mouseX, mouseY, partialTick);
+    }
+
+    public void renderTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
     }
 
     protected void onPositionChanged(int x, int y) {
@@ -61,10 +63,6 @@ public abstract class PopupWidget extends AbstractContainerWidget implements Lay
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
     }
 
-    public <W extends PopupWidget> void setOnCloseAction(Consumer<W> onClose) {
-        this.additionalOnCloseAction = (Consumer<PopupWidget>) onClose;
-    }
-
     @Override
     public List<? extends GuiEventListener> children() {
         return widgets;
@@ -72,7 +70,14 @@ public abstract class PopupWidget extends AbstractContainerWidget implements Lay
 
     public final void close() {
         this.onClose();
-        this.additionalOnCloseAction.accept(this);
+    }
+
+    public final void open() {
+        this.onOpen();
+    }
+
+    protected void onOpen() {
+
     }
 
     protected void onClose() {

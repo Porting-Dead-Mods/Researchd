@@ -52,7 +52,7 @@ public final class CommonResearchCache {
             Research research1 = researchLookup.get(research.getResearchKey());
             List<ResourceKey<Research>> parents = research1.parents();
 
-            // Track first root research for backwards compatibility
+            // Track first root researchPack for backwards compatibility
             if (parents.isEmpty() && rootResearch == null) {
                 rootResearch = research;
             }
@@ -69,7 +69,7 @@ public final class CommonResearchCache {
 
         globalResearches = ImmutableMap.copyOf(globalResearchMap);
 
-        // Build research pages
+        // Build researchPack pages
         Map<ResourceLocation, UniqueArray<GlobalResearch>> pageGroups = new LinkedHashMap<>();
         for (GlobalResearch research : globalResearchMap.values()) {
             ResourceLocation pageId = resolvePage(research, researchLookup);
@@ -120,7 +120,7 @@ public final class CommonResearchCache {
     }
 
 	/**
-	 * @return ResourceLocation of the page that contains the research, null if no page contains it
+	 * @return ResourceLocation of the page that contains the researchPack, null if no page contains it
 	 */
 	public static @Nullable ResourceLocation rlPageOf(GlobalResearch res) {
 		for (Map.Entry<ResourceLocation, ResearchPage> entry : researchPages.entrySet()) {
@@ -131,7 +131,7 @@ public final class CommonResearchCache {
 	}
 
 	/**
-	 * @return ResearchPage that contains the research, null if no page contains it
+	 * @return ResearchPage that contains the researchPack, null if no page contains it
 	 */
 	public static @Nullable ResearchPage pageOf(GlobalResearch res) {
 		return researchPages.get(rlPageOf(res));

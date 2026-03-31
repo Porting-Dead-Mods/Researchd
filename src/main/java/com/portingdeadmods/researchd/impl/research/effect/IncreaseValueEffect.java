@@ -14,6 +14,7 @@ import com.portingdeadmods.researchd.api.team.ValueEffectsHolder;
 import com.portingdeadmods.researchd.registries.ResearchEffectTypes;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
@@ -21,17 +22,17 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
-public record IncreaseValueEffect(ValueEffect value, Float increment) implements ResearchEffect {
+public record IncreaseValueEffect(ValueEffect value, float amount) implements ValueEffectModifierEffect {
     private static final MapCodec<IncreaseValueEffect> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
             ValueEffect.CODEC.fieldOf("value").forGetter(IncreaseValueEffect::value),
-            Codec.FLOAT.fieldOf("decrement").forGetter(IncreaseValueEffect::increment)
+            Codec.FLOAT.fieldOf("amount").forGetter(IncreaseValueEffect::amount)
     ).apply(inst, IncreaseValueEffect::new));
 
     private static final StreamCodec<RegistryFriendlyByteBuf, IncreaseValueEffect> STREAM_CODEC = StreamCodec.composite(
             ValueEffect.STREAM_CODEC,
             IncreaseValueEffect::value,
             ByteBufCodecs.FLOAT,
-            IncreaseValueEffect::increment,
+            IncreaseValueEffect::amount,
             IncreaseValueEffect::new
     );
 
@@ -39,11 +40,21 @@ public record IncreaseValueEffect(ValueEffect value, Float increment) implements
     public static final ResourceLocation ID = Researchd.rl("increase_value");
 
     @Override
+    public String operator() {
+        return "+";
+    }
+
+    @Override
+    public Component desc() {
+        return makeDescription("Increase");
+    }
+
+    @Override
     public void onUnlock(Level level, Player player, ResourceKey<Research> research) {
         ResearchTeam researchTeam = ResearchTeamHelper.getTeamByMember(player);
         if (researchTeam instanceof ValueEffectsHolder effectsHolder) {
             float oldValue = effectsHolder.getEffectValue(value);
-            effectsHolder.setEffectValue(value, oldValue + this.increment());
+            effectsHolder.setEffectValue(value, oldValue + this.amount());
         }
     }
 

@@ -94,6 +94,11 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
         return this.getLeft() + (this.cols * this.getItemWidth());
     }
 
+    @Override
+    public void setY(int y) {
+        super.setY(y);
+    }
+
     protected int getScissorsHeight() {
         return Math.min(this.rows * this.getItemHeight(), this.getHeight());
     }
@@ -112,9 +117,9 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
         }
         if (canScroll) {
             double rawScrollOffset = Math.max(this.scrollOffset - scrollY * 7, 0);
-            int  maxScrollOffset = this.getMaxScrollDistance() + 1;
+            int maxScrollOffset = this.getMaxScrollDistance() + 1;
             if (rawScrollOffset > maxScrollOffset) {
-                this.scrollOffset = this.getMaxScrollDistance();
+                this.scrollOffset = this.getMaxScrollDistance() + 1;
             } else {
                 this.scrollOffset = (int) rawScrollOffset;
             }

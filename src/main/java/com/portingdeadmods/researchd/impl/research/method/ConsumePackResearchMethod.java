@@ -29,10 +29,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A 1:1 to the Factorio research. All the listed packs start getting consumed at once.
+ * A 1:1 to the Factorio researchPack. All the listed packs start getting consumed at once.
  * For researching to start, all the required packs must be present in the machine's inventory.'
  *
- * @param packs All the packs that get used in the research
+ * @param packs All the packs that get used in the researchPack
  * @param count The amount of packs that will be used
  * @param duration The duration in ticks for a *base speed* machine to use 1 packs o' packs.
  */

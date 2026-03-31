@@ -213,7 +213,7 @@ public class ResearchHead {
 	/**
 	 * Creates a specific number of input heads for a node, evenly distributed along the top edge.
 	 *
-	 * @param node The research node to create input heads for
+	 * @param node The researchPack node to create input heads for
 	 * @param count The number of input heads to create
 	 * @return A UniqueArray of evenly distributed input heads
 	 */
@@ -245,7 +245,7 @@ public class ResearchHead {
 	/**
 	 * Creates a specific number of output heads for a node, evenly distributed along the bottom edge.
 	 *
-	 * @param node The research node to create output heads for
+	 * @param node The researchPack node to create output heads for
 	 * @param count The number of output heads to create
 	 * @return A UniqueArray of evenly distributed output heads
 	 */

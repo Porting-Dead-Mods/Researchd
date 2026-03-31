@@ -96,7 +96,7 @@ public final class ResearchdCommonEvents {
 
                                 KubeJSCompat.fireResearchCompletedEvent(player, research);
 
-                                Researchd.debug("Researching", "Applying research effects for Research: " + team.getCurrentResearch() + " to player: " + player.getName().getString());
+                                Researchd.debug("Researching", "Applying researchPack effects for Research: " + team.getCurrentResearch() + " to player: " + player.getName().getString());
                                 currentResearch.researchEffect().onUnlock(level, player, team.getCurrentResearch());
                             }
 
@@ -104,7 +104,7 @@ public final class ResearchdCommonEvents {
                         }
                     }
 
-                    // Save and sync the whole team research teamMap every 20 ticks
+                    // Save and sync the whole team researchPack teamMap every 20 ticks
                     if (level.getGameTime() % 20 == 0) {
                         ResearchdSavedData.TEAM_RESEARCH.get().setData(level, teamMap);
                     }
@@ -128,14 +128,14 @@ public final class ResearchdCommonEvents {
     @SubscribeEvent
     public static void onWorldLoad(LevelEvent.Load event) {
         if (!event.getLevel().isClientSide()) {
-            // Initialize the research cache
+            // Initialize the researchPack cache
             CommonResearchCache.initialize(event.getLevel().getServer().overworld());
         }
     }
 
     @SubscribeEvent
     public static void onWorldUnload(LevelEvent.Unload event) {
-        // Reset the research cache
+        // Reset the researchPack cache
         CommonResearchCache.reset();
     }
 

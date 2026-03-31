@@ -67,18 +67,18 @@ public interface ResearchTeam {
     boolean isOwner(UUID member);
 
     /**
-     * Gets the research that is currently researching
+     * Gets the researchPack that is currently researching
      *
-     * @return {@link ResourceKey} of the research or null if no research is currently in progress
+     * @return {@link ResourceKey} of the researchPack or null if no researchPack is currently in progress
      */
     default ResourceKey<Research> getCurrentResearch() {
         return this.getQueue().getFirst();
     }
 
     /**
-     * Fetches the progress of the research that is currently researching.
+     * Fetches the progress of the researchPack that is currently researching.
      *
-     * @return {@link ResearchProgress} of the research or null if no research is currently in progress.
+     * @return {@link ResearchProgress} of the researchPack or null if no researchPack is currently in progress.
      */
     default ResearchProgress getCurrentProgress() {
         return this.getResearchProgresses().get(this.getCurrentResearch());

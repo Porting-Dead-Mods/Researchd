@@ -29,7 +29,7 @@ public class RegisterResearchesKubeEvent implements KubeEvent {
                 Research research = builder.createObject();
                 researches.put(builder.id, research);
             } catch (Exception e) {
-                throw new RuntimeException("Failed to create research " + builder.id, e);
+                throw new RuntimeException("Failed to create researchPack " + builder.id, e);
             }
         }
         return researches;

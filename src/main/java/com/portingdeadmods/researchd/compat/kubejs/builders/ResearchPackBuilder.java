@@ -34,7 +34,7 @@ public class ResearchPackBuilder {
     }
 
     /**
-     * A value to dictate where in the progression the research pack should be. <br>
+     * A value to dictate where in the progression the researchPack pack should be. <br>
      * Lower = earlier, higher = later
      */
     public ResearchPackBuilder sortingValue(int value) {

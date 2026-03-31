@@ -14,6 +14,7 @@ import com.portingdeadmods.researchd.api.team.ValueEffectsHolder;
 import com.portingdeadmods.researchd.registries.ResearchEffectTypes;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
@@ -21,17 +22,17 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
-public record MultiplyValueEffect(ValueEffect value, Float multiplier) implements ResearchEffect {
+public record MultiplyValueEffect(ValueEffect value, float amount) implements ValueEffectModifierEffect {
     private static final MapCodec<MultiplyValueEffect> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
             ValueEffect.CODEC.fieldOf("value").forGetter(MultiplyValueEffect::value),
-            Codec.FLOAT.fieldOf("decrement").forGetter(MultiplyValueEffect::multiplier)
+            Codec.FLOAT.fieldOf("amount").forGetter(MultiplyValueEffect::amount)
     ).apply(inst, MultiplyValueEffect::new));
 
     private static final StreamCodec<RegistryFriendlyByteBuf, MultiplyValueEffect> STREAM_CODEC = StreamCodec.composite(
             ValueEffect.STREAM_CODEC,
             MultiplyValueEffect::value,
             ByteBufCodecs.FLOAT,
-            MultiplyValueEffect::multiplier,
+            MultiplyValueEffect::amount,
             MultiplyValueEffect::new
     );
 
@@ -43,8 +44,18 @@ public record MultiplyValueEffect(ValueEffect value, Float multiplier) implement
         ResearchTeam researchTeam = ResearchTeamHelper.getTeamByMember(player);
         if (researchTeam instanceof ValueEffectsHolder effectsHolder) {
             float oldValue = effectsHolder.getEffectValue(value);
-            effectsHolder.setEffectValue(value, oldValue * this.multiplier());
+            effectsHolder.setEffectValue(value, oldValue * this.amount());
         }
+    }
+
+    @Override
+    public String operator() {
+        return "*";
+    }
+
+    @Override
+    public Component desc() {
+        return makeDescription("Multiply");
     }
 
     @Override

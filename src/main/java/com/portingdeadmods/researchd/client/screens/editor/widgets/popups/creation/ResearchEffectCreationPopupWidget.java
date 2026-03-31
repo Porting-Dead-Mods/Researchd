@@ -4,9 +4,11 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdClient;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
 import com.portingdeadmods.researchd.api.client.RememberingLinearLayout;
-import com.portingdeadmods.researchd.api.client.editor.ClientResearchEffectType;
+import com.portingdeadmods.researchd.client.impl.editor.EditorContextImpl;
+import com.portingdeadmods.researchd.api.client.editor.TypedEditorObject;
+import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectType;
-import com.portingdeadmods.researchd.client.screens.editor.widgets.BaseResearchEffectCreationWidget;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.EmbeddedEffectCreationWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.SelectPackPopupWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.selection.ResearchEffectTypeSelectionPopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
@@ -26,30 +28,34 @@ public class ResearchEffectCreationPopupWidget extends PopupWidget {
     public static final ResourceLocation BACKGROUND_SPRITE = Researchd.rl("widget/research_method_creation_widget");
 
     private final RememberingLinearLayout layout;
-    private final ClientResearchEffectType clientResearchEffect;
+    private final TypedEditorObject<ResearchEffect, ResearchEffectType> clientResearchEffect;
     private final PDLButton createButton;
     private final ResearchEffectTypeSelectionPopupWidget parentPopupWidget;
+    private final EmbeddedEffectCreationWidget originSelectionWidget;
     //private final BaseResearchEffectCreationWidget originSelectionWidget;
 
-    public ResearchEffectCreationPopupWidget(@Nullable ResearchEffectTypeSelectionPopupWidget parentPopupWidget, ResearchEffectType type, int x, int y, int width, int height) {
+    public ResearchEffectCreationPopupWidget(@Nullable ResearchEffectTypeSelectionPopupWidget parentPopupWidget, ResearchEffectType type, EmbeddedEffectCreationWidget originSelectionWidget, int x, int y, int width, int height) {
         super(x, y, width, height, CommonComponents.EMPTY);
         this.parentPopupWidget = parentPopupWidget;
-        //this.originSelectionWidget = originSelectionWidget;
+        this.originSelectionWidget = originSelectionWidget;
         LinearLayout l = new LinearLayout(width, height, LinearLayout.Orientation.VERTICAL);
         this.layout = new RememberingLinearLayout(l);
         this.clientResearchEffect = ResearchdClient.CLIENT_RESEARCH_EFFECT_TYPES.get(type.id());
-        this.buildLayout();
+        if (this.clientResearchEffect == null) {
+            throw new IllegalStateException("Cannot find client researchPack effect: " + type.id());
+        }
         this.createButton = this.addRenderableWidget(PDLButton.builder(this::onCreateButtonPressed)
                 .message(Component.literal("Create"))
                 .sprites(SelectPackPopupWidget.EDITOR_BUTTON_SPRITES)
                 .pos(x, y)
                 .size(this.getWidth() - 18, 16)
                 .build());
+        this.buildLayout();
     }
 
     private void onCreateButtonPressed(PDLButton button) {
         //this.originSelectionWidget.setCreatedEffect(this.clientResearchEffect.createResearchEffect(this.layout));
-        this.parentPopupWidget.addEffect(this.clientResearchEffect.createResearchEffect(this.layout));
+        this.parentPopupWidget.addEffect(this.clientResearchEffect.create(this.layout));
         ResearchScreen screen = Spaghetti.tryGetResearchScreen();
         screen.closePopup(this);
         if (this.parentPopupWidget != null) {
@@ -67,7 +73,9 @@ public class ResearchEffectCreationPopupWidget extends PopupWidget {
 
     protected void buildLayout() {
         if (this.clientResearchEffect != null) {
-            this.clientResearchEffect.buildLayout(this.layout, new ClientResearchEffectType.Context(this.createButton, Spaghetti.tryGetResearchScreen(), this, this.getWidth(), this.getHeight(), this.getWidth() - 14, this.getHeight() - 14, 7));
+            EditorContextImpl context = new EditorContextImpl(this.createButton, Spaghetti.tryGetResearchScreen(), this, this.getWidth(), this.getHeight(), this.getWidth() - 14, this.getHeight() - 14, 7);
+            this.clientResearchEffect.buildLayout(this.layout, context);
+            this.clientResearchEffect.update(this.layout, context);
             this.layout.getLayout().arrangeElements();
             FrameLayout.centerInRectangle(this.layout.getLayout(), this.getX(), this.getY(), this.getWidth(), this.getHeight());
             this.layout.getChildren().forEach(this::addRenderableWidget);
@@ -100,7 +108,7 @@ public class ResearchEffectCreationPopupWidget extends PopupWidget {
 
         super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
 
-        ClientResearchIcon.getClientIcon(this.clientResearchEffect.type().icon()).render(guiGraphics, this.getX() + 3, this.getY() + 3, mouseX, mouseY, 1, partialTick);
+        ClientResearchIcon.getClientIcon(this.clientResearchEffect.type().icon()).render(guiGraphics, this.getX() + 3, this.getY() + 3, mouseX, mouseY, 1, 14, 14, partialTick);
         Component name = this.clientResearchEffect.type().getName();
         guiGraphics.drawScrollingString(getFont(), name, this.getX() + 21, this.getX() + this.getWidth() - 6, this.getY() + 7, -1);
     }

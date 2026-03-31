@@ -68,7 +68,7 @@ public final class ResearchdTranslations {
     public static final class Research {
         public static final TranslatableConstant SCREEN_TITLE = create("screen.title", "Researches");
 
-        public static final TranslatableConstant QUEUE_ADDED = create("queue.added", "%s added %s to the research queue!");
+        public static final TranslatableConstant QUEUE_ADDED = create("queue.added", "%s added %s to the researchPack queue!");
         public static final TranslatableConstant QUEUE_FINISHED = create("queue.finished", "%s finished researching (%s)!");
 
         public static final TranslatableConstant SCREEN_LABEL_RESEARCH_METHODS = create("screen.label.researched_by", "Methods");
@@ -83,7 +83,7 @@ public final class ResearchdTranslations {
         public static final TranslatableConstant ENQUEUE_RESEARCH_BUTTON = create("screen.button.enqueue_research", "Enqueue");
 
         private static TranslatableConstant create(String key, String defaultValue) {
-            TranslatableConstant constant = new TranslatableConstant(key, "research");
+            TranslatableConstant constant = new TranslatableConstant(key, "researchPack");
             TRANSLATIONS.put(constant.key(Researchd.MODID), defaultValue);
             return constant;
         }

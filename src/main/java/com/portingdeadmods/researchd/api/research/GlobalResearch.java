@@ -18,7 +18,7 @@ import java.util.Set;
  */
 public final class GlobalResearch {
     public static final Codec<GlobalResearch> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Research.RESOURCE_KEY_CODEC.fieldOf("research").forGetter(GlobalResearch::getResearchKey)
+            Research.RESOURCE_KEY_CODEC.fieldOf("researchPack").forGetter(GlobalResearch::getResearchKey)
     ).apply(instance, GlobalResearch::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, GlobalResearch> STREAM_CODEC = StreamCodec.composite(
             Research.RESOURCE_KEY_STREAM_CODEC,
@@ -75,7 +75,7 @@ public final class GlobalResearch {
     @Override
     public String toString() {
         return "GlobalResearch{" +
-                "research=" + research +
+                "researchPack=" + research +
                 '}';
     }
 }

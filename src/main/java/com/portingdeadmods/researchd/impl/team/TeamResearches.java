@@ -49,7 +49,7 @@ public record TeamResearches(SimpleResearchQueue researchQueue,
     }
 
     /**
-     * Gets the root progress of a research
+     * Gets the root progress of a researchPack
      */
     public <T extends ResearchMethod> ResearchProgress getProgress(ResourceKey<Research> research) {
         return this.progress().get(research);

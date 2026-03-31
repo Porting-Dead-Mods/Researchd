@@ -14,6 +14,7 @@ import com.portingdeadmods.researchd.api.team.ValueEffectsHolder;
 import com.portingdeadmods.researchd.registries.ResearchEffectTypes;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
@@ -21,17 +22,17 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
-public record DivideValueEffect(ValueEffect value, Float divisor) implements ResearchEffect {
+public record DivideValueEffect(ValueEffect value, float amount) implements ValueEffectModifierEffect {
     private static final MapCodec<DivideValueEffect> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
             ValueEffect.CODEC.fieldOf("value").forGetter(DivideValueEffect::value),
-            Codec.FLOAT.fieldOf("decrement").forGetter(DivideValueEffect::divisor)
+            Codec.FLOAT.fieldOf("amount").forGetter(DivideValueEffect::amount)
     ).apply(inst, DivideValueEffect::new));
 
     private static final StreamCodec<RegistryFriendlyByteBuf, DivideValueEffect> STREAM_CODEC = StreamCodec.composite(
             ValueEffect.STREAM_CODEC,
             DivideValueEffect::value,
             ByteBufCodecs.FLOAT,
-            DivideValueEffect::divisor,
+            DivideValueEffect::amount,
             DivideValueEffect::new
     );
     
@@ -39,12 +40,22 @@ public record DivideValueEffect(ValueEffect value, Float divisor) implements Res
     public static final ResourceLocation ID = Researchd.rl("divide_value");
 
     @Override
+    public String operator() {
+        return "/";
+    }
+
+    @Override
     public void onUnlock(Level level, Player player, ResourceKey<Research> research) {
         ResearchTeam researchTeam = ResearchTeamHelper.getTeamByMember(player);
         if (researchTeam instanceof ValueEffectsHolder effectsHolder) {
             float oldValue = effectsHolder.getEffectValue(value);
-            effectsHolder.setEffectValue(value, oldValue / this.divisor());
+            effectsHolder.setEffectValue(value, oldValue / this.amount());
         }
+    }
+
+    @Override
+    public Component desc() {
+        return makeDescription("Divide");
     }
 
     @Override

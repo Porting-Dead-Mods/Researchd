@@ -38,7 +38,7 @@ public class RegisterResearchPacksKubeEvent implements KubeEvent {
                 ResearchPackImpl pack = builder.createObject();
                 researchPacks.put(builder.id, pack);
             } catch (Exception e) {
-                throw new RuntimeException("Failed to create research pack " + builder.id, e);
+                throw new RuntimeException("Failed to create researchPack pack " + builder.id, e);
             }
         }
         return researchPacks;

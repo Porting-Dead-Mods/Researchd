@@ -26,6 +26,7 @@ public record ResearchPackImpl(int color, int sortingValue, Optional<ResourceLoc
                                DisplayImpl display) implements ResearchPack, RegistryDisplay<ResearchPack> {
 
     public static final ResearchPackImpl EMPTY = new ResearchPackImpl(-1, -1, Optional.empty(), DisplayImpl.EMPTY);
+    public static final String ID = "simple";
 
     public ResearchPackImpl(ResourceLocation customTexture) {
         this(-1, -1, Optional.of(customTexture), DisplayImpl.EMPTY);
@@ -124,7 +125,7 @@ public record ResearchPackImpl(int color, int sortingValue, Optional<ResourceLoc
         }
 
         /**
-         * A value to dictate where in the progression the research pack should be. <br>
+         * A value to dictate where in the progression the researchPack pack should be. <br>
          * Lower = earlier, higher = later
          */
         public Builder sortingValue(int sortingValue) {

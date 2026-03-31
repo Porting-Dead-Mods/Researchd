@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.client.screens.lib.widgets;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.api.client.screens.widgets.AbstractScroller;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.layouts.Layout;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.network.chat.Component;
@@ -15,6 +16,7 @@ public class ScrollableWidget<L extends Layout> extends AbstractLayoutWidget<L> 
     private int initialY;
     private boolean horizontalScrollBar;
     private boolean verticalScrollBar;
+    private int contentHeight;
 
     public ScrollableWidget(@Nullable L layout, int x, int y, int width, int height, Component message) {
         super(layout, x, y, width, height, message);
@@ -43,6 +45,12 @@ public class ScrollableWidget<L extends Layout> extends AbstractLayoutWidget<L> 
 
     public void resetScrollOffset() {
         this.scrollOffset = 0;
+    }
+
+    @Override
+    protected <W extends AbstractWidget> W addRenderableWidget(W widget) {
+        this.contentHeight += widget.getHeight();
+        return super.addRenderableWidget(widget);
     }
 
     @Override
@@ -77,9 +85,10 @@ public class ScrollableWidget<L extends Layout> extends AbstractLayoutWidget<L> 
         boolean canScroll = this.getContentHeight() > this.getHeight();
         if (canScroll) {
             double rawScrollOffset = this.scrollOffset - scrollY * 7;
-            int  maxScrollOffset = this.getContentHeight() + 1;
+            int  maxScrollOffset = this.getContentHeight() - this.getHeight() + 1;
             if (rawScrollOffset > maxScrollOffset) {
-                this.scrollOffset = this.getContentHeight();
+                this.scrollOffset = maxScrollOffset;
+                this.layout.setY((int) (initialY - maxScrollOffset));
             } else {
                 this.scrollOffset = (int) rawScrollOffset;
                 this.layout.setY((int) (this.layout.getY() + scrollY * 7));
@@ -115,4 +124,5 @@ public class ScrollableWidget<L extends Layout> extends AbstractLayoutWidget<L> 
             this.initialY = this.layout.getY();
         }
     }
+
 }

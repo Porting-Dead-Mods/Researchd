@@ -17,7 +17,7 @@ public final class ResearchEffectTypes {
     public static final DeferredRegister<ResearchEffectType> TYPES = DeferredRegister.create(ResearchdRegistries.RESEARCH_EFFECT_TYPE, Researchd.MODID);
 
     public static final Supplier<ResearchEffectType> EMPTY = registerEffectType("empty", SpriteResearchIcon.EMPTY);
-    public static final Supplier<ResearchEffectType> AND = registerEffectType("and", new TextResearchIcon(Component.literal("&")));
+    public static final Supplier<ResearchEffectType> AND = registerMultipleEffectType("and", new TextResearchIcon(Component.literal("&")));
     public static final Supplier<ResearchEffectType> DECREASE_VALUE = registerEffectType("decrease_value", new TextResearchIcon(Component.literal("-")));
     public static final Supplier<ResearchEffectType> INCREASE_VALUE = registerEffectType("increase_value", new TextResearchIcon(Component.literal("+")));
     public static final Supplier<ResearchEffectType> MULTIPLE_VALUE = registerEffectType("multiply_value", new TextResearchIcon(Component.literal("*")));
@@ -37,5 +37,9 @@ public final class ResearchEffectTypes {
 
     private static @NotNull DeferredHolder<ResearchEffectType, ResearchEffectType> registerEffectType(String id, ResearchIcon icon) {
         return TYPES.register(id, () -> ResearchEffectType.single(Researchd.rl(id), icon));
+    }
+
+    private static @NotNull DeferredHolder<ResearchEffectType, ResearchEffectType> registerMultipleEffectType(String id, ResearchIcon icon) {
+        return TYPES.register(id, () -> ResearchEffectType.multiple(Researchd.rl(id), icon));
     }
 }

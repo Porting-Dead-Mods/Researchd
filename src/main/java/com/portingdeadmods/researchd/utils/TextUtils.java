@@ -1,14 +1,17 @@
 package com.portingdeadmods.researchd.utils;
 
+import it.unimi.dsi.fastutil.chars.CharPredicate;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 
 import java.util.List;
+import java.util.function.Predicate;
 
-public class TextUtils {
+public final class TextUtils {
     /**
      * Draws text wrapped to fit within a maximum width.
      *
@@ -90,4 +93,109 @@ public class TextUtils {
         List<FormattedCharSequence> lines = font.split(component, maxWidth);
         return lines.size() * (font.lineHeight + lineSpacing);
     }
+
+    public static String camelToSnake(String str, Predicate<Character> allowed) {
+        StringBuilder result = new StringBuilder();
+
+        char c = str.charAt(0);
+        result.append(Character.toLowerCase(c));
+
+        char lastChar = 0;
+
+        for (int i = 1; i < str.length(); i++) {
+
+            char ch = str.charAt(i);
+
+            if (allowed.test(ch) || Character.isSpaceChar(ch)) {
+                if (Character.isUpperCase(ch)) {
+                    if (lastChar != '_') {
+                        result.append('_');
+                    }
+                    result.append(Character.toLowerCase(ch));
+                    lastChar = 0;
+                } else if (Character.isSpaceChar(ch)) {
+                    if (lastChar != '_') {
+                        result.append('_');
+                        lastChar = '_';
+                    }
+                } else {
+                    result.append(ch);
+                    lastChar = 0;
+                }
+            }
+        }
+
+        return result.toString();
+    }
+
+    public static boolean isValidResourceLocation(String s) {
+        return ResourceLocation.tryBySeparator(s, ':') != null;
+    }
+
+    public static String trimSpecialCharacterAndConvertToSnake(String input) {
+        return toSnakeCase(input, c -> Character.isLetterOrDigit(c) || c == '_');
+    }
+
+    public static String toSnakeCase(String input, CharPredicate validChar) {
+        if (input == null || input.isEmpty()) {
+            return "";
+        }
+
+        StringBuilder newString = new StringBuilder(input.length());
+
+        String trimmedInput = input.trim();
+
+        int index = 0;
+        while (index < trimmedInput.length()) {
+            char c = trimmedInput.charAt(index);
+            if (Character.isWhitespace(c) || !validChar.test(c)) {
+                while ((Character.isWhitespace(c) || !validChar.test(c)) && index + 1 < trimmedInput.length()) {
+                    c = trimmedInput.charAt(++index);
+                }
+                newString.append('_');
+                newString.append(c);
+            } else if (Character.isUpperCase(c)) {
+                newString.append(Character.toLowerCase(c));
+            } else if (validChar.test(c)) {
+                newString.append(c);
+            }
+            index++;
+
+        }
+
+        return newString.toString();
+    }
+
+    public static boolean isValidInt(String str) {
+        if (str == null) {
+            return false;
+        }
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    public static boolean isValidFloat(String str) {
+        if (str == null) {
+            return false;
+        }
+        try {
+            Float.parseFloat(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    public static boolean isValidIntInRange(String str, int min, int max) {
+        if (isValidInt(str)) {
+            int i = Integer.parseInt(str);
+            return i >= min && i <= max;
+        }
+        return false;
+    }
+
 }

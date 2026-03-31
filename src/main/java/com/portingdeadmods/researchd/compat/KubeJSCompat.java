@@ -45,7 +45,7 @@ public final class KubeJSCompat {
                     .consumeItem('minecraft:dirt', 1)
                     .effect(ResearchEffectHelper.empty())
                     .literalName('Getting Started')
-                    .literalDescription('A simple starting research.')
+                    .literalDescription('A simple starting researchPack.')
                     .noParentRequired();
                 
                 event.create('kubejs:automation_research')
@@ -90,7 +90,7 @@ public final class KubeJSCompat {
             try {
                 ResearchdKJSEvents.fireResearchCompleted(player, research);
             } catch (Exception e) {
-                Researchd.LOGGER.error("Failed to fire KubeJS research completed event", e);
+                Researchd.LOGGER.error("Failed to fire KubeJS researchPack completed event", e);
             }
         }
     }
@@ -100,7 +100,7 @@ public final class KubeJSCompat {
             try {
                 ResearchdKJSEvents.fireResearchProgress(player, research, progress);
             } catch (Exception e) {
-                Researchd.LOGGER.error("Failed to fire KubeJS research progress event", e);
+                Researchd.LOGGER.error("Failed to fire KubeJS researchPack progress event", e);
             }
         }
     }
@@ -124,7 +124,7 @@ public final class KubeJSCompat {
         try {
             return ResearchdKJSEvents.fireRegisterResearchPacksEvent();
         } catch (Exception e) {
-            Researchd.LOGGER.error("Failed to get KubeJS research packs", e);
+            Researchd.LOGGER.error("Failed to get KubeJS researchPack packs", e);
             return Map.of();
         }
     }

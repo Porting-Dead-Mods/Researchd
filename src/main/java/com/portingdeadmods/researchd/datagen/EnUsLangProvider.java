@@ -9,8 +9,12 @@ import com.portingdeadmods.researchd.api.research.methods.ResearchMethodType;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.pdl.config.PDLConfigHelper;
 import com.portingdeadmods.researchd.registries.ResearchMethodTypes;
+import com.portingdeadmods.researchd.registries.ResearchdValueEffects;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.data.LanguageProvider;
@@ -43,8 +47,16 @@ public final class EnUsLangProvider extends LanguageProvider {
         addResearchMethodName(ResearchMethodTypes.CONSUME_PACK, "Consume Pack");
         addResearchMethodName(ResearchMethodTypes.CHECK_ITEM_PRESENCE, "Check For Item");
 
+        addRegistryObject(ResearchdRegistries.VALUE_EFFECT, ResearchdValueEffects.RESEARCH_LAB_PRODUCTIVITY.get(), "Lab Productivity");
+
         PDLConfigHelper.generateConfigNames(ResearchdConfig.Client.class, Researchd.MODID, this::add);
         PDLConfigHelper.generateConfigNames(ResearchdConfig.Common.class, Researchd.MODID, this::add);
+    }
+
+    private <T> void addRegistryObject(Registry<T> registry, T value, String name) {
+        ResourceLocation objLoc = registry.getKey(value);
+        String registryPath = registry.key().location().getPath();
+        this.add(registryPath + "." + objLoc.getNamespace() + "." + objLoc.getPath(), name);
     }
 
     private void addResearch(ResourceKey<Research> key, String name) {

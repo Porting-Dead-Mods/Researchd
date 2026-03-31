@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Handles layout calculations for research graphs with parents centered over children.
+ * Handles layout calculations for researchPack graphs with parents centered over children.
  */
 public class GraphLayoutManager {
 	// Layout constants
@@ -32,9 +32,9 @@ public class GraphLayoutManager {
 	public static Map<ResearchNode, Integer> nodeLayerMap = new HashMap<>();
 
 	/**
-	 * Apply layout to a research graph
+	 * Apply layout to a researchPack graph
 	 *
-	 * @param graph The research graph to layout
+	 * @param graph The researchPack graph to layout
 	 * @param offsetX Top-left X coordinate for the layout
 	 * @param offsetY Top-left Y coordinate for the layout
 	 */

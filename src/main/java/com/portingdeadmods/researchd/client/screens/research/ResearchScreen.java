@@ -45,6 +45,12 @@ public class ResearchScreen extends Screen {
 
     public static final ResourceLocation RESEARCH_PAGES_LIST_BACKGROUND = Researchd.rl("textures/gui/research_screen/research_pages_list.png");
 
+    private static List<Component> tooltip = null;
+
+    public static void setTooltip(List<Component> tooltipNew) {
+        tooltip = tooltipNew;
+    }
+
     // Singleton since whole client is a singleton
     public static final Map<ResourceLocation, ClientResearchIcon<?>> CLIENT_ICONS = new HashMap<>();
 
@@ -140,7 +146,7 @@ public class ResearchScreen extends Screen {
     }
 
     /**
-	 * Called when a research page is selected from the ResearchPagesList.
+	 * Called when a researchPack page is selected from the ResearchPagesList.
 	 * Updates the graph to show researches from the selected page.
 	 */
 	public void onResearchPageChanged(ResearchPage page) {
@@ -183,6 +189,7 @@ public class ResearchScreen extends Screen {
             List<AbstractWidget> widgets = new ArrayList<>();
             widget.visitWidgets(widgets::add);
             this.popupWidgets.putLast(widget, widgets);
+            widget.open();
         }
         this.setFocused(widget);
         return widget;
@@ -217,6 +224,8 @@ public class ResearchScreen extends Screen {
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        setTooltip(null);
+
         super.render(guiGraphics, mouseX, mouseY, partialTick);
 
         int z = 300;
@@ -255,6 +264,9 @@ public class ResearchScreen extends Screen {
         {
             poseStack.translate(0, 0, z);
             this.selectedResearchWidget.renderTooltip(guiGraphics, mouseX, mouseY, partialTick);
+            if (tooltip != null) {
+                guiGraphics.renderComponentTooltip(PopupWidget.getFont(), tooltip, mouseX, mouseY);
+            }
         }
         poseStack.popPose();
 

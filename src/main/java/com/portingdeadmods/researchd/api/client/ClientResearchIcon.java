@@ -26,6 +26,10 @@ public interface ClientResearchIcon<I extends ResearchIcon> {
      */
     void render(GuiGraphics guiGraphics, int panelLeft, int panelTop, int mouseX, int mouseY, float scale, float partialTicks);
 
+    default void render(GuiGraphics guiGraphics, int panelLeft, int panelTop, int mouseX, int mouseY, float scale, int width, int height, float partialTicks) {
+        this.render(guiGraphics, panelLeft, panelTop, mouseX, mouseY, scale, partialTicks);
+    }
+
     static <I extends ResearchIcon> ClientResearchIcon<I> getClientIcon(ResearchIcon icon) {
         return (ClientResearchIcon<I>) ResearchdClient.RESEARCH_ICONS.get(icon.id()).apply(icon);
     }

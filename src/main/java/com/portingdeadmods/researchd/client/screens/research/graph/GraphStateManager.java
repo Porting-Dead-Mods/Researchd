@@ -15,7 +15,7 @@ public class GraphStateManager {
     // Singleton instance
     private static final GraphStateManager INSTANCE = new GraphStateManager();
 
-    // Map from research key to node position and scale
+    // Map from researchPack key to node position and scale
     private final Map<ResourceKey<Research>, NodeState> lastSessionState = new HashMap<>();
 
     // Root node of last graph (for identification purposes)

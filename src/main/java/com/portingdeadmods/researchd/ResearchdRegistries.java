@@ -12,7 +12,7 @@ import net.neoforged.neoforge.registries.RegistryBuilder;
 
 public final class ResearchdRegistries {
 	public static final ResourceKey<Registry<Research>> RESEARCH_KEY =
-			ResourceKey.createRegistryKey(Researchd.rl("research"));
+			ResourceKey.createRegistryKey(Researchd.rl("researchPack"));
 	public static final ResourceKey<Registry<ResearchPack>> RESEARCH_PACK_KEY =
 			ResourceKey.createRegistryKey(Researchd.rl("research_pack"));
     public static final ResourceKey<Registry<ValueEffect>> VALUE_EFFECT_KEY =

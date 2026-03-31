@@ -40,7 +40,7 @@ public class TagCreationWidget extends AbstractLayoutWidget<Layout> {
         this.parentPopupWidget = parentPopupWidget;
         this.stringWidget = this.addRenderableWidget(new StringWidget(Component.literal("Hello"), PopupWidget.getFont()));
         this.itemRenderer = new CycledItemRenderer();
-        this.tagEditBox = this.addRenderableWidget(new BackgroundEditBox(PopupWidget.getFont(), SPRITES, 72, 16, CommonComponents.EMPTY));
+        this.tagEditBox = this.addRenderableWidget(new BackgroundEditBox(PopupWidget.getFont(), SPRITES, 72, 16, ""));
         this.tagEditBox.setResponder(this::onValueChanged);
         this.tagEditBox.setValue("#");
     }

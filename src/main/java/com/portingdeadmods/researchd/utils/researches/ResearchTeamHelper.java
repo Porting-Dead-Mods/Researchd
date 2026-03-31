@@ -60,7 +60,7 @@ public final class ResearchTeamHelper {
     }
 
     /**
-     * Removes the player from their research team.
+     * Removes the player from their researchPack team.
      * Updates the team map
      *
      * @param player the player to be removed from their team
