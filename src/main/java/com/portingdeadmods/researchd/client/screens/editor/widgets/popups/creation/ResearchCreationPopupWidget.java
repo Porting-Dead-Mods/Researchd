@@ -27,96 +27,23 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
+import java.util.function.Function;
 
-public class ResearchCreationPopupWidget extends DraggablePopupWidget {
+public class ResearchCreationPopupWidget extends AbstractStandaloneCreationPopupWidget<Research> {
     public static final ResourceLocation DEFAULT_ID = Researchd.rl(SimpleResearch.ID);
 
-    private final RememberingLinearLayout layout;
-    private final StandaloneEditorObject<Research> clientResearch;
-    private final ResearchScreen screen;
-    private PDLButton createButton;
-    private final ScrollableWidget<LinearLayout> scrollableWidget;
-
-    public ResearchCreationPopupWidget(ResearchScreen screen, int x, int y, int width, int height) {
-        super(x, y, width, height, CommonComponents.EMPTY);
-        this.screen = screen;
-        LinearLayout l = new LinearLayout(width - 14, height - 14, LinearLayout.Orientation.VERTICAL);
-        this.layout = new RememberingLinearLayout(l);
-        this.clientResearch = ResearchdClient.CLIENT_RESEARCHES.get(DEFAULT_ID);
-        this.buildLayout();
-        this.scrollableWidget = new ScrollableWidget<>(this.layout.getLayout(), x + 7, y + 7, width - 14, height - 36 - 14, CommonComponents.EMPTY);
-        this.addRenderableWidget(this.scrollableWidget);
+    public ResearchCreationPopupWidget(int x, int y, int width, int height) {
+        super(DEFAULT_ID, ResearchdClient.CLIENT_RESEARCHES::get, x, y, width, height);
     }
 
     @Override
-    protected void onOpen() {
-        //this.scrollableWidget.resetScrollOffset();
-    }
-
-    public int getHorizontalPadding() {
-        return 8;
-    }
-
-    public int getVerticalPadding() {
-        return 24;
-    }
-
-    protected void buildLayout() {
-        this.createButton = this.addRenderableWidget(PDLButton.builder(this::onCreatePressed)
-                .message(Component.literal("Create"))
-                .sprites(SelectPackPopupWidget.EDITOR_BUTTON_SPRITES)
-                .size(100, 16)
-                .build());
-        if (this.clientResearch != null) {
-            EditorContextImpl context = new EditorContextImpl(this.createButton, this.screen, this, this.getWidth(), this.getHeight(), this.getWidth() - 16, this.getHeight() - 16, 7);
-            this.clientResearch.buildLayout(this.layout, context);
-            this.clientResearch.update(this.layout, context);
-            this.layout.getLayout().arrangeElements();
-        }
-    }
-
-    private void onCreatePressed(PDLButton pdlButton) {
-        Research research = this.clientResearch.create(this.layout);
-        ResourceLocation id = this.clientResearch.createId(this.layout);
-        ResearchdManagers.getResearchesManager(Minecraft.getInstance().level).mergeContents(Collections.singletonMap(id, research));
-        PacketDistributor.sendToServer(new CreateResearchPayload(ResourceKey.create(ResearchdRegistries.RESEARCH_KEY, id), research, true));
-        this.screen.closePopup(this);
+    protected void insertObjectToData(ResourceLocation id, Research object) {
+        ResearchdManagers.getResearchesManager(Minecraft.getInstance().level).mergeContents(Collections.singletonMap(id, object));
+        PacketDistributor.sendToServer(new CreateResearchPayload(ResourceKey.create(ResearchdRegistries.RESEARCH_KEY, id), object, true));
     }
 
     @Override
-    public void setX(int x) {
-        super.setX(x);
-
-        if (this.getLayout() != null) {
-            this.scrollableWidget.setX(x + this.getHorizontalPadding());
-            this.createButton.setPosition(this.getX() + (width - this.createButton.getWidth()) / 2, this.createButton.getY());
-        }
-    }
-
-    @Override
-    public void setY(int y) {
-        super.setY(y);
-
-        if (this.getLayout() != null) {
-            this.scrollableWidget.setY(y + this.getVerticalPadding());
-            this.createButton.setPosition(this.createButton.getX(), this.getY() + (height - this.createButton.getHeight()) / 2 + 78);
-        }
-    }
-
-    @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
-
-        guiGraphics.blitSprite(ResearchMethodCreationPopupWidget.BACKGROUND_SPRITE, this.getX(), this.getY(), this.getWidth(), this.getHeight());
-
-        guiGraphics.drawScrollingString(getFont(), Component.literal("Create Research"), this.getX() + 5, this.getX() + this.getWidth() - 5, this.getY() + 8, -1);
-
-        super.renderElements(guiGraphics, mouseX, mouseY, partialTick);
-
-    }
-
-    @Override
-    public @Nullable Layout getLayout() {
-        return this.layout.getLayout();
+    protected Component getTitle() {
+        return Component.literal("Create Research");
     }
 }

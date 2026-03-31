@@ -93,51 +93,51 @@ public class ResearchScreen extends Screen {
         // QUEUE
         this.researchQueueWidget = new ResearchQueueWidget(this, 0, 0);
 
-	    // THIS NEEDS TO BE BEFORE THE GRAPH
-	    this.selectedResearchWidget = new SelectedResearchWidget(this, 0, 40, SelectedResearchWidget.BACKGROUND_WIDTH, SelectedResearchWidget.BACKGROUND_HEIGHT);
-	    if (!this.techListWidget.getTechList().entries().isEmpty()) {
-		    this.selectedResearchWidget.setSelectedResearch(this.techListWidget.getTechList().entries().getFirst());
-	    }
+        // THIS NEEDS TO BE BEFORE THE GRAPH
+        this.selectedResearchWidget = new SelectedResearchWidget(this, 0, 40, SelectedResearchWidget.BACKGROUND_WIDTH, SelectedResearchWidget.BACKGROUND_HEIGHT);
+        if (!this.techListWidget.getTechList().entries().isEmpty()) {
+            this.selectedResearchWidget.setSelectedResearch(this.techListWidget.getTechList().entries().getFirst());
+        }
 
-	    // RESEARCH PAGES LIST
-	    int x = 174;
-	    this.researchPagesList = new ResearchPagesList(this, x, 8);
+        // RESEARCH PAGES LIST
+        int x = 174;
+        this.researchPagesList = new ResearchPagesList(this, x, 8);
 
-	    // GRAPH
-	    this.researchGraphWidget = new ResearchGraphWidget(this, x + 13, 8, 300 - 13, 253 - 16);
+        // GRAPH
+        this.researchGraphWidget = new ResearchGraphWidget(this, x + 13, 8, 300 - 13, 253 - 16);
 
-	    // Initialize graph with selected page (or default page)
-	    ResearchPage selectedPage = this.researchPagesList.getSelectedPage();
-	    if (selectedPage != null) {
-		    ResearchGraph graph = ResearchGraphCache.computeIfAbsentForPage(selectedPage);
-		    if (graph != null) {
-			    this.researchGraphWidget.setGraph(graph);
-		    }
-	    } else if (CommonResearchCache.rootResearch != null) {
-		    this.researchGraphWidget.setGraph(ResearchGraphCache.computeIfAbsent(CommonResearchCache.rootResearch.getResearchKey()));
-	    }
+        // Initialize graph with selected page (or default page)
+        ResearchPage selectedPage = this.researchPagesList.getSelectedPage();
+        if (selectedPage != null) {
+            ResearchGraph graph = ResearchGraphCache.computeIfAbsentForPage(selectedPage);
+            if (graph != null) {
+                this.researchGraphWidget.setGraph(graph);
+            }
+        } else if (CommonResearchCache.rootResearch != null) {
+            this.researchGraphWidget.setGraph(ResearchGraphCache.computeIfAbsent(CommonResearchCache.rootResearch.getResearchKey()));
+        }
 
-	    this.editorSideBarWidget = new EditorSideBarWidget(this.width - 174, 0);
-	    this.editorSideBarWidget.visible = false;
+        this.editorSideBarWidget = new EditorSideBarWidget(this.width - 174, 0);
+        this.editorSideBarWidget.visible = false;
 
 
-	    if (this.editorModeActive()) {
-		    this.openEditorButton = this.addWidget(PDLImageButton.builder(this::openEditor)
-				    .pos(this.width - 16 - 8, this.height - 16 - 8)
-				    .size(16, 16)
-				    .sprites(EDITOR_BUTTON_SPRITES)
-				    .tooltip(Tooltip.create(Component.literal("Editor")))
-				    .build());
-	    }
+        if (this.editorModeActive()) {
+            this.openEditorButton = this.addWidget(PDLImageButton.builder(this::openEditor)
+                    .pos(this.width - 16 - 8, this.height - 16 - 8)
+                    .size(16, 16)
+                    .sprites(EDITOR_BUTTON_SPRITES)
+                    .tooltip(Tooltip.create(Component.literal("Editor")))
+                    .build());
+        }
 
-	    // This needs to be first
-	    this.researchPagesList.visitWidgets(this::addRenderableWidget);
+        // This needs to be first
+        this.researchPagesList.visitWidgets(this::addRenderableWidget);
 
-	    this.techListWidget.visitWidgets(this::addRenderableWidget);
-	    this.researchQueueWidget.visitWidgets(this::addRenderableWidget);
-	    this.selectedResearchWidget.visitWidgets(this::addRenderableWidget);
-	    this.researchGraphWidget.visitWidgets(this::addRenderableWidget);
-	    this.editorSideBarWidget.visitWidgets(this::addRenderableWidget);
+        this.techListWidget.visitWidgets(this::addRenderableWidget);
+        this.researchQueueWidget.visitWidgets(this::addRenderableWidget);
+        this.selectedResearchWidget.visitWidgets(this::addRenderableWidget);
+        this.researchGraphWidget.visitWidgets(this::addRenderableWidget);
+        this.editorSideBarWidget.visitWidgets(this::addRenderableWidget);
     }
 
     public boolean editorModeActive() {
@@ -146,11 +146,11 @@ public class ResearchScreen extends Screen {
     }
 
     /**
-	 * Called when a researchPack page is selected from the ResearchPagesList.
-	 * Updates the graph to show researches from the selected page.
-	 */
-	public void onResearchPageChanged(ResearchPage page) {
-		if (page != null) {
+     * Called when a researchPack page is selected from the ResearchPagesList.
+     * Updates the graph to show researches from the selected page.
+     */
+    public void onResearchPageChanged(ResearchPage page) {
+        if (page != null) {
             ResearchGraph graph = ResearchGraphCache.computeIfAbsentForPage(page);
             if (graph != null) {
                 this.researchGraphWidget.setGraph(graph);
@@ -159,15 +159,10 @@ public class ResearchScreen extends Screen {
     }
 
     private void openEditor(PDLImageButton button) {
-        boolean configured = ClientEditorHelper.getEditModeSettings().isConfigured();
-        if (!configured) {
-            if (!this.editorOpen) {
-                this.selectPackPopupWidget = this.openPopupCentered(new SelectPackPopupWidget(this));
-            } else if (this.selectPackPopupWidget != null) {
-                this.closePopup(this.selectPackPopupWidget);
-            }
-        } else {
-            this.editorSideBarWidget.visible = !this.editorSideBarWidget.visible;
+        if (!this.editorOpen) {
+            this.selectPackPopupWidget = this.openPopupCentered(new SelectPackPopupWidget(this));
+        } else if (this.selectPackPopupWidget != null) {
+            this.closePopup(this.selectPackPopupWidget);
         }
         this.editorOpen = !this.editorOpen;
     }
@@ -219,7 +214,7 @@ public class ResearchScreen extends Screen {
         guiGraphics.blit(BOTTOM_BAR, w, guiGraphics.guiHeight() - 8, 0, 0, guiGraphics.guiWidth() - w - 8, 8, 256, 8);
         guiGraphics.blit(RIGHT_BAR, width - 8, 8, 0, 0, 8, guiGraphics.guiHeight() - 8 - 8, 8, 256);
 
-	    guiGraphics.blit(RESEARCH_PAGES_LIST_BACKGROUND, 174, 8, 0, 0, 13, guiGraphics.guiHeight() - 16, 13, 239);
+        guiGraphics.blit(RESEARCH_PAGES_LIST_BACKGROUND, 174, 8, 0, 0, 13, guiGraphics.guiHeight() - 16, 13, 239);
     }
 
     @Override

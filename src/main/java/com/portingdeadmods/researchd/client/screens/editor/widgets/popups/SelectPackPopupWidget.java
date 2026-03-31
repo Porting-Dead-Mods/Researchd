@@ -113,6 +113,13 @@ public class SelectPackPopupWidget extends PopupWidget {
     }
 
     @Override
+    protected void onClose() {
+        super.onClose();
+
+        this.screen.setEditorOpen(false);
+    }
+
+    @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         this.selectDatapackWidget.updateSelectedPack(ClientEditorHelper.getEditModeSettings().currentDatapack());
         this.selectResourcePackWidget.updateSelectedPack(ClientEditorHelper.getEditModeSettings().currentResourcePack());

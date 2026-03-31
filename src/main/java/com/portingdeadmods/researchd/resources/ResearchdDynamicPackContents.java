@@ -23,7 +23,7 @@ import java.util.function.Function;
 public class ResearchdDynamicPackContents {
     public static void writeData(DynamicPack pack) {
         writeResearchdRegistry(pack, ResearchdResearchPacks::new, ResearchPackImpl.CODEC, "research_pack");
-        writeResearchdRegistry(pack, ResearchdResearches::new, Research.CODEC, "researchPack");
+        writeResearchdRegistry(pack, ResearchdResearches::new, Research.CODEC, "research");
         writeRecipeRegistry(pack, ResearchdRecipes::new, Recipe.CODEC, "recipe");
     }
 

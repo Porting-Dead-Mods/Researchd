@@ -105,7 +105,8 @@ public class ResearchPackObject implements StandaloneEditorObject<ResearchPack> 
 
     @Override
     public ResourceLocation createId(RememberingLinearLayout layout) {
-        return null;
+        String nameEditBox = TextUtils.camelToSnake(layout.getChild("name_edit_box", BackgroundEditBox.class).getValue(), c -> Character.isLetterOrDigit(c) || c == '_');
+        return ResourceLocation.parse(nameEditBox);
     }
 
     @Override

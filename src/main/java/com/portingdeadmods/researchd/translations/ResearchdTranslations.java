@@ -83,7 +83,7 @@ public final class ResearchdTranslations {
         public static final TranslatableConstant ENQUEUE_RESEARCH_BUTTON = create("screen.button.enqueue_research", "Enqueue");
 
         private static TranslatableConstant create(String key, String defaultValue) {
-            TranslatableConstant constant = new TranslatableConstant(key, "researchPack");
+            TranslatableConstant constant = new TranslatableConstant(key, "research");
             TRANSLATIONS.put(constant.key(Researchd.MODID), defaultValue);
             return constant;
         }
