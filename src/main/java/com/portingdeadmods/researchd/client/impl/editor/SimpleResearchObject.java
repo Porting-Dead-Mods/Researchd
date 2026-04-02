@@ -37,6 +37,7 @@ public class SimpleResearchObject implements StandaloneEditorObject<Research> {
         layout.addWidget(null, new StringWidget(Component.literal("Display:"), PopupWidget.getFont()));
         BackgroundEditBox nameEditBox = layout.addWidget("name_edit_box", new BackgroundEditBox(PopupWidget.getFont(), context.innerWidth() - 4, 16));
         nameEditBox.setHint(Component.literal("<Name>"));
+        nameEditBox.setFilter(TextUtils::isValidNamespace);
         nameEditBox.setResponder(newVal -> this.update(layout, context));
         BackgroundEditBox descEditBox = layout.addWidget("desc_edit_box", new BackgroundEditBox(PopupWidget.getFont(), context.innerWidth() - 4, 16));
         descEditBox.setHint(Component.literal("<Desc>"));

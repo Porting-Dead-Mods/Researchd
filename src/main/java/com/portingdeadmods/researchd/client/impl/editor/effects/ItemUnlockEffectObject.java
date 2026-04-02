@@ -32,7 +32,7 @@ public class ItemUnlockEffectObject implements TypedEditorObject<ResearchEffect,
     public void buildLayout(RememberingLinearLayout layout, EditorContext context) {
         layout.getLayout().spacing(2);
 
-        ItemSelectorWidget itemSelector = new ItemSelectorWidget(context.parentPopupWidget(), 0, 0, 20, 20, false, false);
+        ItemSelectorWidget itemSelector = new ItemSelectorWidget(context.parentPopupWidget(), 0, 0, 25, 20, false, false);
         RegistryVerifyEditBox idEditBox = RegistryVerifyEditBox.forRegistry(BuiltInRegistries.ITEM, context.innerWidth() - 8, 16);
         idEditBox.setResponder(newVal -> {
             ResourceLocation id = ResourceLocation.parse(newVal);

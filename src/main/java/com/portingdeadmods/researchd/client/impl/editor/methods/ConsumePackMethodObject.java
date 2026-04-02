@@ -53,7 +53,7 @@ public class ConsumePackMethodObject implements TypedEditorObject<ResearchMethod
         layout.addWidget(null, new StringWidget(Component.literal("Pack:"), PopupWidget.getFont()), LayoutSettings::alignHorizontallyCenter);
         ResourceKey<ResearchPack> defaultPack = ClientEditorHelper.getDefaultResearchPack();
         ItemStack defaultSelectedPack = defaultPack != null ? ResearchPackImpl.asStack(defaultPack) : ResearchdItems.GREEN_RESEARCH_PACK_ICON.toStack();
-        layout.addWidget("pack_selector", new ItemSelectorWidget(context.parentPopupWidget(), 0, 0, 24, 24, Ingredient.of(defaultSelectedPack), this::createItemSelectorPopup), LayoutSettings::alignHorizontallyCenter);
+        layout.addWidget("pack_selector", new ItemSelectorWidget(context.parentPopupWidget(), 0, 0, 25, 24, Ingredient.of(defaultSelectedPack), this::createItemSelectorPopup), LayoutSettings::alignHorizontallyCenter);
         layout.addWidget(null, new StringWidget(Component.literal("Time:"), PopupWidget.getFont()), LayoutSettings::alignHorizontallyCenter);
         EditBox timeEditBox = layout.addWidget("time", new BackgroundEditBox(PopupWidget.getFont(), SPRITES, 36, 16, "1"), LayoutSettings::alignHorizontallyCenter);
         timeEditBox.setValue("200t");

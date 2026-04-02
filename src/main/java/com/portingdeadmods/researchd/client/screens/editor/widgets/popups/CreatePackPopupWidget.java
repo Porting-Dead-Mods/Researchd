@@ -51,6 +51,7 @@ public class CreatePackPopupWidget extends DraggablePopupWidget {
             contents.spacing(4);
             this.nameEditBox = contents.addChild(new EditBox(PopupWidget.getFont(), 128, 16, Component.literal("Slaaay")));
             this.nameEditBox.setHint(Component.literal("<Pack Name>"));
+            this.nameEditBox.setFilter(TextUtils::isValidNamespace);
             this.nameEditBox.setResponder(val -> this.onNameChanged(this.nameEditBox, val));
             this.descEditBox = contents.addChild(new MultiLineEditBox(PopupWidget.getFont(), 0, 0, 128, 80, Component.literal("<Pack Description>"), Component.literal("msg")));
             //this.descEditBox.setValueListener(val -> this.onValueChanged(this.descEditBox, val));

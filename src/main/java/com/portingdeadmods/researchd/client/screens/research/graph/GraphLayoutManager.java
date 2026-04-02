@@ -1,449 +1,407 @@
 package com.portingdeadmods.researchd.client.screens.research.graph;
 
-import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
-import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;
-import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
-import com.portingdeadmods.researchd.client.screens.research.widgets.ResearchGraphWidget;
-import com.portingdeadmods.researchd.utils.Spaghetti;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
-import java.awt.*;
 import java.util.*;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
- * Handles layout calculations for researchPack graphs with parents centered over children.
+ * TW: This is not for the faint of heart
+ *
+ * Sugiyama-style layered graph layout with 4 phases:
+ *
+ * <h3>Phase 1 — Layer Assignment</h3>
+ * Topological sort (Kahn's algorithm). Each node's layer = max(parent layers) + 1.
+ * Root is layer 0, children go deeper. Guarantees all parents are above their children.
+ *
+ * <h3>Phase 2 — Crossing Minimization</h3>
+ * Barycenter heuristic: for each layer, position each node at the average index of its
+ * connected nodes in the adjacent layer, then sort. Alternates top-down and bottom-up
+ * passes (3 iterations) to converge on a low-crossing ordering.
+ *
+ * <h3>Phase 3 — X Coordinate Assignment</h3>
+ * Assigns X positions from the ordering in Phase 2 with guaranteed minimum spacing.
+ * Then centers parents over their children's midpoint and resolves any resulting overlaps
+ * with a left-to-right scan. Finally centers the whole graph.
+ *
+ * <h3>Phase 4 — Y Coordinate Assignment (dynamic spacing)</h3>
+ * Computes the number of routing channels needed between each pair of adjacent layers
+ * (one channel per non-straight edge). Y positions are set so the gap between layers
+ * grows to accommodate channels. Channel Y positions are stored in {@link LayoutResult}
+ * for the edge router in {@code ResearchGraphWidget}.
+ *
+ * <h3>Edge routing</h3>
+ * Done externally by {@code ResearchGraphWidget.calculateLines()}, which reads the
+ * channel assignments from {@link LayoutResult}. Each non-straight edge gets its own
+ * horizontal channel (1px line, 1px gap) — Factorio style.
  */
 public class GraphLayoutManager {
-	// Layout constants
-	private static final int HORIZONTAL_SPACING = 10;
-	private static final int VERTICAL_SPACING = 20;
-	private static final int NODE_WIDTH = ResearchScreenWidget.PANEL_WIDTH;
-	private static final int NODE_HEIGHT = ResearchScreenWidget.PANEL_HEIGHT;
+	// Sizes
+	public static final int NODE_WIDTH = ResearchScreenWidget.PANEL_WIDTH;   // 20
+	public static final int NODE_HEIGHT = ResearchScreenWidget.PANEL_HEIGHT; // 24
+	public static final int HORIZONTAL_SPACING = 10;
 
-	// Map from layer number to list of nodes in that layer (0 = bottom layer)
-	public static Int2ObjectMap<List<ResearchNode>> layerMap = new Int2ObjectOpenHashMap<>();
-
-	// Map to track which layer each node is assigned to
-	public static Map<ResearchNode, Integer> nodeLayerMap = new HashMap<>();
+	// Vertical layout: gap between layers is HEAD_GAP + channels + HEAD_GAP
+	public static final int HEAD_GAP = 6;        // 3px head stub + 3px padding
+	public static final int CHANNEL_SIZE = 2;   // 1px line + 1px gap per channel
+	public static final int MIN_VERTICAL_GAP = HEAD_GAP * 2 + 2; // minimum gap when 0 channels
 
 	/**
-	 * Apply layout to a researchPack graph
-	 *
-	 * @param graph The researchPack graph to layout
-	 * @param offsetX Top-left X coordinate for the layout
-	 * @param offsetY Top-left Y coordinate for the layout
+	 * Result of layout computation. Consumed by the edge router.
 	 */
-	public static void applyLayout(ResearchGraph graph, int offsetX, int offsetY) {
+	public static class LayoutResult {
+		/** Ordered nodes per layer (index = layer number). */
+		public final List<List<ResearchNode>> layers;
+		/** Y position of each layer's nodes. */
+		public final int[] layerY;
+		/** Number of routing channels between layer i and layer i+1. Index i corresponds to zone between layer i and i+1. */
+		public final int[] channelsPerZone;
+		/** Y position of channel 0 in each routing zone. Channels go downward: channelY = zoneBaseY[i] + channelIndex * CHANNEL_PITCH. */
+		public final int[] zoneBaseY;
+
+		/** For each edge (parent→child), which channel it's assigned in each routing zone it passes through.
+		 *  Key = edgeKey(parent, child), Value = map from zone index to channel index. */
+		public final Map<Long, Map<Integer, Integer>> edgeChannelAssignments;
+
+		public LayoutResult(List<List<ResearchNode>> layers, int[] layerY, int[] channelsPerZone, int[] zoneBaseY, Map<Long, Map<Integer, Integer>> edgeChannelAssignments) {
+			this.layers = layers;
+			this.layerY = layerY;
+			this.channelsPerZone = channelsPerZone;
+			this.zoneBaseY = zoneBaseY;
+			this.edgeChannelAssignments = edgeChannelAssignments;
+		}
+	}
+
+	/**
+	 * Applies Sugiyama layout to the graph and returns routing info for the edge router.
+	 */
+	public static LayoutResult applyLayout(ResearchGraph graph, int offsetX, int offsetY) {
 		if (graph == null || graph.nodes().isEmpty()) {
-			return;
+			return new LayoutResult(List.of(), new int[0], new int[0], new int[0], Map.of());
 		}
 
-		nodeLayerMap.clear();
-		layerMap.clear();
+		Collection<ResearchNode> allNodes = graph.nodes().values();
 
-		_addRightToLayer(0, graph.rootNode()); // Add root node manually since only children get added
-		calculateLayers(graph, graph.rootNode());
+		// Phase 1: Layer assignment
+		Map<ResearchNode, Integer> nodeToLayer = assignLayers(allNodes);
+		List<List<ResearchNode>> layers = buildLayerLists(nodeToLayer);
 
-		// First step: Position nodes in each layer
-		positionNodesInLayers(offsetX, offsetY);
+		// Set layer field on each node
+		for (var entry : nodeToLayer.entrySet()) {
+			entry.getKey().setLayer(entry.getValue());
+		}
 
-		// Second step: Center nodes based on layer size
-		centerNodesBasedOnLayers();
+		// Phase 2: Crossing minimization (barycenter, 3 iterations)
+		minimizeCrossings(layers, 3);
 
-		// 2.5'th step: Sort the nodes in each layer based on their parents on the layer above
-		sortNodesBasedOnParents();
+		// Phase 3: X coordinate assignment
+		assignXCoordinates(layers, offsetX);
 
-		// Third step: Shifting Step 1/2;
-		handleNodeShiftingFromAbove();
+		// Phase 4: Compute channels and Y coordinates
+		int numZones = Math.max(0, layers.size() - 1);
+		int[] channelsPerZone = new int[numZones];
+		Map<Long, Map<Integer, Integer>> edgeChannelAssignments = new HashMap<>();
 
-		// Fourth pass: Resolve any node overlaps
-		resolveOverlaps(4);
+		// First pass: count channels needed per zone and assign them
+		for (int zone = 0; zone < numZones; zone++) {
+			assignChannelsForZone(zone, layers, channelsPerZone, edgeChannelAssignments);
+		}
 
-		// Fifth step: Shifting Step 2/2;
-		handleNodeShiftingFromBelow();
+		// Compute Y positions
+		int[] layerY = new int[layers.size()];
+		layerY[0] = offsetY;
+		for (int i = 1; i < layers.size(); i++) {
+			int gapForChannels = channelsPerZone[i - 1] * CHANNEL_SIZE;
+			int totalGap = Math.max(MIN_VERTICAL_GAP, HEAD_GAP * 2 + gapForChannels);
+			layerY[i] = layerY[i - 1] + NODE_HEIGHT + totalGap;
+		}
 
-		// Final pass: Resolve any node overlaps #2
-		resolveOverlaps(6);
+		// Compute zone base Y (where channel 0 starts in each zone)
+		int[] zoneBaseY = new int[numZones];
+		for (int zone = 0; zone < numZones; zone++) {
+			// Zone starts after the parent layer's bottom + head gap
+			zoneBaseY[zone] = layerY[zone] + NODE_HEIGHT + HEAD_GAP;
+		}
 
-		// Polish: Center the root node and move every other node with it
-		centerGraph(graph, 7);
+		// Apply Y positions to nodes
+		for (int layerIdx = 0; layerIdx < layers.size(); layerIdx++) {
+			for (ResearchNode node : layers.get(layerIdx)) {
+				node.setYExt(layerY[layerIdx]);
+			}
+		}
+
+		return new LayoutResult(layers, layerY, channelsPerZone, zoneBaseY, edgeChannelAssignments);
 	}
 
-	public static int calculateDepth(ResearchNode node) {
-		return _calculateDepth(node, 0);
-	}
-
-	public static Point centerOf2Nodes(ResearchNode node1, ResearchNode node2) {
-		return new Point((node1.getX() + node2.getX() + NODE_WIDTH) / 2, (node1.getY() + node2.getY() + NODE_HEIGHT) / 2);
-	}
-
+	// ========================
+	// Phase 1: Layer Assignment
+	// ========================
 
 	/**
-	 * Utility method to stop the [0] and [size() - 1] spam
-	 *
-	 * @param nodes
-	 * @return
+	 * Assigns layers via topological sort (Kahn's algorithm).
+	 * Each node's layer = max(parent layers) + 1. Root nodes (no parents) = layer 0.
 	 */
-	public static Point centerOf2Nodes(List<ResearchNode> nodes) {
-		int MIN_X = nodes.stream().mapToInt(ResearchNode::getX).min().orElse(0);
-		int MAX_X = nodes.stream().mapToInt(ResearchNode::getX).max().orElse(0) + NODE_WIDTH;
-		int MIN_Y = nodes.stream().mapToInt(ResearchNode::getY).min().orElse(0);
-		int MAX_Y = nodes.stream().mapToInt(ResearchNode::getY).max().orElse(0) + NODE_HEIGHT;
+	private static Map<ResearchNode, Integer> assignLayers(Collection<ResearchNode> nodes) {
+		Map<ResearchNode, Integer> layerOf = new HashMap<>();
+		Map<ResearchNode, Integer> inDegree = new HashMap<>();
+		Deque<ResearchNode> queue = new ArrayDeque<>();
 
-		return new Point((MIN_X + MAX_X) / 2, (MIN_Y + MAX_Y) / 2);
-	}
-
-	public static int widthOf(List<ResearchNode> nodes) {
-		return nodes.size() * (NODE_WIDTH + HORIZONTAL_SPACING) - HORIZONTAL_SPACING;
-	}
-
-	private static int _calculateDepth(ResearchNode node, int depth) {
-		if (node != null) {
-			if (node.getParents().isEmpty()) {
-				return depth;
-			} else {
-				int maxDepth = depth;
-				for (ResearchNode parent : node.getParents()) {
-					maxDepth = Math.max(maxDepth, _calculateDepth(parent, depth + 1));
-				}
-				return maxDepth;
+		for (ResearchNode node : nodes) {
+			int parentCount = 0;
+			for (ResearchNode parent : node.getParents()) {
+				if (nodes.contains(parent)) parentCount++;
 			}
-		}
-		return depth;
-	}
-
-	// Thinking that [0] would be leftMost and [.length - 1] would be rightMost
-	private static void _addLeftToLayer(int layer, ResearchNode node) {
-		layerMap.computeIfAbsent(layer, k -> new ArrayList<>()).addFirst(node);
-		nodeLayerMap.put(node, layer);
-	}
-
-	// Thinking that [0] would be leftMost and [.length - 1] would be rightMost
-	private static void _addRightToLayer(int layer, ResearchNode node) {
-		layerMap.computeIfAbsent(layer, k -> new ArrayList<>()).addLast(node);
-		nodeLayerMap.put(node, layer);
-	}
-
-	/**
-	 * Start from root, every child should be placed from center outwards on layer - 1.
-	 */
-	private static void calculateLayers(ResearchGraph graph, ResearchNode node) {
-//		UniqueArray<ResearchNode> children = node.getChildren();
-//		int size = children.size();
-//
-//		/*
-//		* Logic here is to work from the center outwards by adding child by child recursively (down the tree first).
-//		*
-//		* If the children are even, we go directly to the left and right of the center splitting evenly,
-//		* otherwise take the center node out then resume the same logic as the even route.
-//		*/
-//		if (size % 2 == 0 ) {
-//			// Even number of children
-//			for (int i = 0; i < size / 2; i++) {
-//				ResearchNode child = children.get(size / 2 - 1 - i);
-//				_addRightToLayer(calculateDepth(child), child);
-//				calculateLayers(graph, child);
-//			}
-//			for (int i = size / 2; i < size; i++) {
-//				ResearchNode child = children.get(i);
-//				_addLeftToLayer(calculateDepth(child), child);
-//				calculateLayers(graph, child);
-//			}
-//		} else {
-//			// Odd number of children
-//			int center = size / 2;
-//			ResearchNode centerChild = children.get(center);
-//			_addLeftToLayer(calculateDepth(centerChild), centerChild); // Or Right doesn't matter
-//			calculateLayers(graph, centerChild);
-//
-//			for (int i = 0; i < size / 2; i++) {
-//				ResearchNode child = children.get(size / 2 - 1 - i);
-//				_addRightToLayer(calculateDepth(child), child);
-//				calculateLayers(graph, child);
-//			}
-//			for (int i = size / 2 + 1; i < size; i++) {
-//				ResearchNode child = children.get(i);
-//				_addLeftToLayer(calculateDepth(child), child);
-//				calculateLayers(graph, child);
-//			}
-//		}
-
-		// TODO: Remake this method to use the above logic, but with the : graph.nodes() instead of recursively going through the children.
-		// PS: It works, but the positioning gets *a bit messed up* and all the nodes are shifted to a direction and it looks weird imo
-		for (ResearchNode gNode : graph.nodes().values()) {
-			if (gNode != null) {
-				_addRightToLayer(calculateDepth(gNode), gNode);
-			}
-		}
-	}
-
-	/**
-	 * Position nodes in their layers (initial positioning)
-	 */
-	private static void positionNodesInLayers(int startX, int startY) {
-		Researchd.debug("Layout", "Step 1 - Positioning nodes in layers");
-		for (Map.Entry<Integer, List<ResearchNode>> layer : layerMap.int2ObjectEntrySet()) {
-			for (ResearchNode node : layer.getValue()) {
-				// Set node position
-				node.setYExt(startY + (layer.getKey() * (VERTICAL_SPACING + NODE_HEIGHT)));
-				node.setXExt(startX + ((layer.getValue().indexOf(node) + 1) * (NODE_WIDTH + HORIZONTAL_SPACING)));
-				Researchd.debug("Layout", "Node@1: " + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY());
-			}
-		}
-	}
-
-	/**
-	 * Center parents over their children
-	 */
-	private static void centerNodesBasedOnLayers() {
-		Researchd.debug("Layout", "Step 2 - Repositioning nodes in layers");
-
-		// Calculations
-		int _maxNodes = 0;
-		for (List<ResearchNode> nodesInLayer : layerMap.values()) {
-			_maxNodes = Math.max(_maxNodes, nodesInLayer.size());
-		}
-		int _centerX = (_maxNodes * (NODE_WIDTH + HORIZONTAL_SPACING)) / 2;
-
-		// Process each layer
-		for (int layerNum : layerMap.keySet()) {
-			List<ResearchNode> nodesInLayer = layerMap.get(layerNum);
-
-			// Calculate total width of this layer
-			int totalWidth = (nodesInLayer.size() * NODE_WIDTH) +
-				((nodesInLayer.size() - 1) * HORIZONTAL_SPACING);
-
-			// Calculate starting X position to center the layer
-			int startX = _centerX - (totalWidth / 2);
-
-			// Position all nodes in this layer
-			for (int i = 0; i < nodesInLayer.size(); i++) {
-				ResearchNode node = nodesInLayer.get(i);
-				node.setXExt(startX + (i * (NODE_WIDTH + HORIZONTAL_SPACING)));
+			inDegree.put(node, parentCount);
+			if (parentCount == 0) {
+				queue.add(node);
+				layerOf.put(node, 0);
 			}
 		}
 
-		for (Map.Entry<Integer, List<ResearchNode>> layer : layerMap.int2ObjectEntrySet()) {
-			for (ResearchNode node : layer.getValue()) {
-				Researchd.debug("Layout", "Node@2: " + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY());
-			}
-		}
-	}
+		while (!queue.isEmpty()) {
+			ResearchNode node = queue.poll();
+			int nodeLayer = layerOf.get(node);
 
-	/**
-	 * Gets every parent on the layer above, then literally puts each node in order for their parents <br><br>
-	 *
-	 * Iteration #11: 25-May-2025 - Please God, may this be the last refactor of this method.<br>
-	 */
-	private static void sortNodesBasedOnParents() {
-		Researchd.debug("Layout", "Step 2.5 - Sorting nodes based on parents");
+			for (ResearchNode child : node.getChildren()) {
+				if (!inDegree.containsKey(child)) continue; // not in this graph
 
-		List<Integer> layerNumbers = new ArrayList<>(layerMap.keySet());
-		if (layerNumbers.size() < 3) return;
+				// Child's layer = max of all parent layers + 1
+				int childLayer = Math.max(layerOf.getOrDefault(child, 0), nodeLayer + 1);
+				layerOf.put(child, childLayer);
 
-		layerNumbers.sort(Comparator.naturalOrder()); // Ascending order
-
-		for (Integer layer : layerNumbers) {
-			if (layerNumbers.indexOf(layer) == layerNumbers.size() - 1) break;
-			int nextLayer = layerNumbers.get(layerNumbers.indexOf(layer) + 1);
-
-			Researchd.debug("Layout", "Sorting layer: " + (layer + 1));
-			List<ResearchNode> layerNodes = layerMap.get(layer);
-			HashMap<ResearchNode, UniqueArray<ResearchNode>> subsequentChildrenMap = new HashMap<>();
-			UniqueArray<ResearchNode> allSubsequentChildren = new UniqueArray<>();
-
-			for (ResearchNode node : layerNodes) {
-				// Calculations
-				Researchd.debug("Layout", "Checking: " + node.getInstance().getResearch());
-
-				UniqueArray<ResearchNode> children = node.getChildren();
-
-				// One layer below, sorted by X position
-				UniqueArray<ResearchNode> subsequentChildren = children.stream()
-                        .filter((child) -> child != null && child.getLayer() == node.getLayer() + 1)
-						.sorted(Comparator.comparingInt(ResearchNode::getX))
-						.collect(Collectors.toCollection(UniqueArray::new));
-
-                allSubsequentChildren.addAll(subsequentChildren);
-				subsequentChildrenMap.put(node, subsequentChildren);
-			}
-
-			int currentNodeIdx = 0;
-			int firstNodeX = layerMap.get(nextLayer).stream().mapToInt(ResearchNode::getX).min().orElse(0);
-
-			for (ResearchNode node : layerNodes) {
-				// Get the subsequent children for this node
-				UniqueArray<ResearchNode> subsequentChildren = subsequentChildrenMap.get(node);
-
-				if (subsequentChildren.isEmpty()) {
-					continue; // No children to sort
-				}
-
-				for (ResearchNode child : subsequentChildren) {
-					// Calculate the new X position based on the first child's position
-					int newX = firstNodeX + (currentNodeIdx * (NODE_WIDTH + HORIZONTAL_SPACING));
-					child.setXExt(newX);
-
-					currentNodeIdx++;
+				int remaining = inDegree.get(child) - 1;
+				inDegree.put(child, remaining);
+				if (remaining == 0) {
+					queue.add(child);
 				}
 			}
 		}
 
-		for (Map.Entry<Integer, List<ResearchNode>> layer : layerMap.int2ObjectEntrySet()) {
-			for (ResearchNode node : layer.getValue()) {
-				Researchd.debug("Layout", "Node@2.5: " + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY());
+		// Safety: assign any unvisited nodes to layer 0 (shouldn't happen in valid DAG)
+		for (ResearchNode node : nodes) {
+			layerOf.putIfAbsent(node, 0);
+		}
+
+		return layerOf;
+	}
+
+	/**
+	 * Builds ordered layer lists from the layer assignment map.
+	 */
+	private static List<List<ResearchNode>> buildLayerLists(Map<ResearchNode, Integer> nodeToLayer) {
+		int maxLayer = 0;
+		for (int layer : nodeToLayer.values()) {
+			maxLayer = Math.max(maxLayer, layer);
+		}
+
+		List<List<ResearchNode>> layers = new ArrayList<>(maxLayer + 1);
+		for (int i = 0; i <= maxLayer; i++) {
+			layers.add(new ArrayList<>());
+		}
+
+		for (var entry : nodeToLayer.entrySet()) {
+			layers.get(entry.getValue()).add(entry.getKey());
+		}
+
+		return layers;
+	}
+
+	// ================================
+	// Phase 2: Crossing Minimization
+	// ================================
+
+	/**
+	 * Barycenter heuristic: alternates top-down and bottom-up sweeps.
+	 * Each sweep reorders a layer by the average position of connected nodes in the adjacent layer.
+	 */
+	private static void minimizeCrossings(List<List<ResearchNode>> layers, int iterations) {
+		for (int iter = 0; iter < iterations; iter++) {
+			// Top-down: order each layer by average parent position in layer above
+			for (int i = 1; i < layers.size(); i++) {
+				List<ResearchNode> aboveLayer = layers.get(i - 1);
+				reorderByBarycenter(layers.get(i), aboveLayer, true);
+			}
+
+			// Bottom-up: order each layer by average child position in layer below
+			for (int i = layers.size() - 2; i >= 0; i--) {
+				List<ResearchNode> belowLayer = layers.get(i + 1);
+				reorderByBarycenter(layers.get(i), belowLayer, false);
 			}
 		}
 	}
 
 	/**
-	 * General node movement for better coherent layout following the 𝒫𝑜𝓈𝒾𝓉𝒾𝑜𝓃𝒾𝓃𝑔 𝓇𝓊𝓁𝑒𝓈 <br><br>
+	 * Reorders {@code layer} so that each node is positioned near the barycenter of its
+	 * connected nodes in {@code adjacentLayer}.
 	 *
-	 * Iteration #11: 25-May-2025 - Please God, may this be the last refactor of this method.<br>
+	 * @param useParents true = look at parents (top-down), false = look at children (bottom-up)
 	 */
-	private static void handleNodeShiftingFromAbove() {
-		Researchd.debug("Layout", "Step 3 - Node shifting from above");
-		List<Integer> layerNumbers = new ArrayList<>(layerMap.keySet());
-		layerNumbers.sort(Comparator.naturalOrder()); // Start from the top
+	private static void reorderByBarycenter(List<ResearchNode> layer, List<ResearchNode> adjacentLayer, boolean useParents) {
+		// Build position index for adjacent layer
+		Map<ResearchNode, Integer> positionOf = new HashMap<>();
+		for (int i = 0; i < adjacentLayer.size(); i++) {
+			positionOf.put(adjacentLayer.get(i), i);
+		}
 
-		for (Integer layer : layerNumbers) {
-			List<ResearchNode> nodes = layerMap.get(layer);
-
-			for (ResearchNode node : nodes) {
-				if (!node.shouldMove()) continue;
-
-				// Calculations
-				Researchd.debug("Layout", "Checking: " + node.getInstance().getResearch());
-
-				UniqueArray<ResearchNode> parents = node.getParents();
-				UniqueArray<ResearchNode> children = node.getChildren();
-
-				// One layer below, sorted by X position
-				UniqueArray<ResearchNode> subsequentChildren = children.stream()
-						.filter((child) -> child != null && child.getLayer() == node.getLayer() + 1)
-						.sorted(Comparator.comparingInt(ResearchNode::getX))
-						.collect(Collectors.toCollection(UniqueArray::new));
-
-                // One layer above, sorted by X position
-				UniqueArray<ResearchNode> parentsOnLayerAbove = parents.stream()
-						.filter(parent -> parent != null && parent.getLayer() == node.getLayer() + 1)
-						.sorted(Comparator.comparingInt(ResearchNode::getX))
-						.collect(Collectors.toCollection(UniqueArray::new));
-
-                // Apply
-
-				// If the node's subsequent children only have this one node as parent, we shift the node to their center
-				if (!subsequentChildren.isEmpty() && subsequentChildren.stream().filter(child -> child != null && child.getParents().size() != 1).toList().isEmpty()) {
-					node.setXExt(centerOf2Nodes(subsequentChildren).x - NODE_WIDTH / 2);
-
-					subsequentChildren.forEach(child -> {
-						if (child != null) {
-							child.lockNodeTo(node);
-						}
-					});
-
-					Researchd.debug("Layout", "Shifted node: " + node.getInstance().getResearch() + " to center of its children: " + subsequentChildren.stream().map(ResearchNode::getInstance).map(instance -> instance.getResearch().toString()).collect(Collectors.joining(", ")));
-					continue;
+		// Compute barycenter for each node
+		Map<ResearchNode, Double> barycenter = new HashMap<>();
+		for (ResearchNode node : layer) {
+			var connected = useParents ? node.getParents() : node.getChildren();
+			double sum = 0;
+			int count = 0;
+			for (ResearchNode adj : connected) {
+				Integer pos = positionOf.get(adj);
+				if (pos != null) {
+					sum += pos;
+					count++;
 				}
 			}
+			// Nodes with no connections keep their current index as barycenter
+			barycenter.put(node, count > 0 ? sum / count : (double) layer.indexOf(node));
 		}
 
-		for (Map.Entry<Integer, List<ResearchNode>> layer : layerMap.int2ObjectEntrySet()) {
-			for (ResearchNode node : layer.getValue()) {
-				Researchd.debug("Layout", "Node@3: " + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY() + " Pos locks: " + node.getPositionLocks().size());
+		layer.sort(Comparator.comparingDouble(barycenter::get));
+	}
+
+	// ==============================
+	// Phase 3: X Coordinate Assignment
+	// ==============================
+
+	/**
+	 * Assigns X positions based on layer ordering, then centers parents over children.
+	 */
+	private static void assignXCoordinates(List<List<ResearchNode>> layers, int offsetX) {
+		// Initial assignment: sequential by order index
+		for (List<ResearchNode> layer : layers) {
+			for (int i = 0; i < layer.size(); i++) {
+				layer.get(i).setXExt(offsetX + i * (NODE_WIDTH + HORIZONTAL_SPACING));
+			}
+		}
+
+		// Center parents over their children (top-down)
+		for (int layerIdx = 0; layerIdx < layers.size() - 1; layerIdx++) {
+			for (ResearchNode parent : layers.get(layerIdx)) {
+				List<ResearchNode> visibleChildren = new ArrayList<>();
+				for (ResearchNode child : parent.getChildren()) {
+					if (child.getLayer() >= 0) visibleChildren.add(child);
+				}
+				if (visibleChildren.isEmpty()) continue;
+
+				// Compute children midpoint
+				int minX = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE;
+				for (ResearchNode child : visibleChildren) {
+					minX = Math.min(minX, child.getX());
+					maxX = Math.max(maxX, child.getX() + NODE_WIDTH);
+				}
+				int childrenCenter = (minX + maxX) / 2;
+				int desiredX = childrenCenter - NODE_WIDTH / 2;
+				parent.setXExt(desiredX);
+			}
+
+			// Resolve overlaps in this layer after centering
+			resolveOverlapsInLayer(layers.get(layerIdx));
+		}
+
+		// Center the whole graph horizontally around offsetX
+		centerGraph(layers, offsetX);
+	}
+
+	/**
+	 * Scans left-to-right and pushes overlapping nodes to the right.
+	 */
+	private static void resolveOverlapsInLayer(List<ResearchNode> layer) {
+		// Current X first
+		layer.sort(Comparator.comparingInt(ResearchNode::getX));
+
+		for (int i = 1; i < layer.size(); i++) {
+			ResearchNode prev = layer.get(i - 1);
+			ResearchNode curr = layer.get(i);
+			int minX = prev.getX() + NODE_WIDTH + HORIZONTAL_SPACING;
+			if (curr.getX() < minX) {
+				curr.setXExt(minX);
 			}
 		}
 	}
 
 	/**
-	 * General node movement for better coherent layout following the 𝒫𝑜𝓈𝒾𝓉𝒾𝑜𝓃𝒾𝓃𝑔 𝓇𝓊𝓁𝑒𝓈 <br><br>
-	 *
-	 * Iteration #11: 25-May-2025 - Please God, may this be the last refactor of this method.<br>
+	 * Centers all layers so the graph midpoint aligns with offsetX.
 	 */
-	private static void handleNodeShiftingFromBelow() {
-		Researchd.debug("Layout", "Step 5 - Node shifting from below");
-		List<Integer> layerNumbers = new ArrayList<>(layerMap.keySet());
-		layerNumbers.sort((a, b) -> Integer.compare(b, a)); // Start from the bottom layer
+	private static void centerGraph(List<List<ResearchNode>> layers, int offsetX) {
+		int globalMinX = Integer.MAX_VALUE;
+		int globalMaxX = Integer.MIN_VALUE;
 
-		for (Integer layer : layerNumbers) {
-			List<ResearchNode> nodes = layerMap.get(layer);
+		for (List<ResearchNode> layer : layers) {
+			for (ResearchNode node : layer) {
+				globalMinX = Math.min(globalMinX, node.getX());
+				globalMaxX = Math.max(globalMaxX, node.getX() + NODE_WIDTH);
+			}
+		}
 
-			for (ResearchNode node : nodes) {
-				if (!node.shouldMove()) continue;
+		if (globalMinX == Integer.MAX_VALUE) return;
 
-				// Calculations
-				Researchd.debug("Layout", "Checking: " + node.getInstance().getResearch());
+		int graphCenter = (globalMinX + globalMaxX) / 2;
+		int dx = offsetX - graphCenter;
+		for (List<ResearchNode> layer : layers) {
+			for (ResearchNode node : layer) {
+				node.setXExt(node.getX() + dx);
+			}
+		}
+	}
 
-				UniqueArray<ResearchNode> parents = node.getParents();
-				UniqueArray<ResearchNode> children = node.getChildren();
+	// ======================================
+	// Phase 4: Channel Assignment per Zone
+	// ======================================
 
-				HashMap<Integer, UniqueArray<ResearchNode>> parentToSubsequentChildren = new HashMap<>();
-				UniqueArray<ResearchNode> parentsOnLayerAbove = parents.stream().filter(parent -> parent != null && parent.getLayer() == node.getLayer() - 1).collect(Collectors.toCollection(UniqueArray::new));
+	/**
+	 * For a routing zone between layer[zone] and layer[zone+1], determines which edges
+	 * pass through, assigns each non-straight edge a unique channel, and records the count.
+	 */
+	private static void assignChannelsForZone(
+			int zone,
+			List<List<ResearchNode>> layers,
+			int[] channelsPerZone,
+			Map<Long, Map<Integer, Integer>> edgeChannelAssignments
+	) {
+		// Collect all edges passing through this zone
+		// An edge (parent → child) passes through zone i if parent.layer <= i and child.layer > i
+		List<long[]> edgesInZone = new ArrayList<>(); // [edgeKey, horizontalSpan]
 
-				int _parentIndex = 0;
-				for (ResearchNode parent : parents) {
-					if (parent != null) {
-						UniqueArray<ResearchNode> _children = new UniqueArray<>(parent.getChildren());
-						UniqueArray<ResearchNode> _subsequentChildren = new UniqueArray<>(_children.stream().filter(child -> child != null && child.getLayer() == parent.getLayer() - 1).toList());
+		for (int layerIdx = 0; layerIdx <= zone; layerIdx++) {
+			for (ResearchNode parent : layers.get(layerIdx)) {
+				for (ResearchNode child : parent.getChildren()) {
+					if (child.getLayer() > zone) {
+						int parentCenterX = parent.getX() + NODE_WIDTH / 2;
+						int childCenterX = child.getX() + NODE_WIDTH / 2;
+						int span = Math.abs(parentCenterX - childCenterX);
 
-						parentToSubsequentChildren.put(_parentIndex, _subsequentChildren);
-						_parentIndex++;
+						// Straight edges (same X center) don't need a channel
+						if (span == 0) continue;
+
+						long key = edgeKey(parent, child);
+						edgesInZone.add(new long[]{key, span, parentCenterX, childCenterX});
 					}
 				}
-
-				if (children.isEmpty()) {
-					continue;
-				}
 			}
 		}
 
-		for (Map.Entry<Integer, List<ResearchNode>> layer : layerMap.int2ObjectEntrySet()) {
-			for (ResearchNode node : layer.getValue()) {
-				Researchd.debug("Layout", "Node@4: " + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY() + " Pos locks: " + node.getPositionLocks().size());
-			}
+		// Sort by horizontal span (shortest first — greedy assignment)
+		edgesInZone.sort(Comparator.comparingLong(e -> e[1]));
+
+		int channelCount = 0;
+		for (long[] edge : edgesInZone) {
+			long key = edge[0];
+			Map<Integer, Integer> zoneMap = edgeChannelAssignments.computeIfAbsent(key, k -> new HashMap<>());
+			zoneMap.put(zone, channelCount);
+			channelCount++;
 		}
+
+		channelsPerZone[zone] = channelCount;
 	}
 
 	/**
-	 * Resolve node overlaps by shifting
+	 * Unique key for a parent -> child edge
 	 */
-	private static void resolveOverlaps(int step) {
-		Researchd.debug("Layout", "Step %d - Resolving overlaps".formatted(step));
-
-		for (Map.Entry<Integer, List<ResearchNode>> layer : layerMap.int2ObjectEntrySet()) {
-			for (ResearchNode node : layer.getValue()) {
-				Researchd.debug("Layout", "Node@%d: ".formatted(step) + node.getInstance().getResearch() + " Layer: " + layer.getKey() + " X: " + node.getX() + " Y: " + node.getY() + " Pos locks: " + node.getPositionLocks().size());
-			}
-		}
-	}
-
-	private static void centerGraph(ResearchGraph graph, int step) {
-		Researchd.debug("Layout", "Step %d - Centering graph".formatted(step));
-
-		ResearchNode root = graph.rootNode();
-		ResearchScreen screen = Spaghetti.tryGetResearchScreen();
-
-		if (screen == null) {
-			Researchd.debug("Layout", "Cannot center graph, ResearchScreen is not open.");
-			return;
-		}
-
-		ResearchGraphWidget graphWidget = screen.getResearchGraphWidget();
-		int width = graphWidget.getWidth();
-		int height = graphWidget.getHeight();
-
-		int dx = ((width - NODE_WIDTH) / 2) - root.getX() + screen.getSelectedResearchWidget().getWidth();
-		int dy = ((height - NODE_HEIGHT) / 2) - root.getY();
-
-		for (ResearchNode node : graph.nodes().values()) {
-			node.translate(dx, dy);
-			Researchd.debug("Layout", "Node@%d: ".formatted(step) + node.getInstance().getResearch() + " Layer: " + node.getLayer() + " X: " + node.getX() + " Y: " + node.getY() + " Pos locks: " + node.getPositionLocks().size());
-		}
+	public static long edgeKey(ResearchNode parent, ResearchNode child) {
+		return ((long) System.identityHashCode(parent) << 32) | (System.identityHashCode(child) & 0xFFFFFFFFL);
 	}
 }
-

@@ -38,7 +38,7 @@ public class ConsumeItemMethodObject implements TypedEditorObject<ResearchMethod
         layout.getLayout().spacing(2);
         // TODO: The ability to select multiple && tag support
         layout.addWidget(null, new StringWidget(Component.literal("Item:"), PopupWidget.getFont()), LayoutSettings::alignHorizontallyCenter);
-        layout.addWidget("item_selector", new ItemSelectorWidget(context.parentPopupWidget(), 0, 0, 24, 24, true, true), LayoutSettings::alignHorizontallyCenter);
+        layout.addWidget("item_selector", new ItemSelectorWidget(context.parentPopupWidget(), 0, 0, 25, 24, true, true), LayoutSettings::alignHorizontallyCenter);
         layout.addWidget(null, new StringWidget(Component.literal("Count:"), PopupWidget.getFont()), LayoutSettings::alignHorizontallyCenter);
         EditBox editBox = layout.addWidget("count", new BackgroundEditBox(PopupWidget.getFont(), SPRITES, 24, 16, "1"), LayoutSettings::alignHorizontallyCenter);
         editBox.setValue("1");

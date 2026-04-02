@@ -60,6 +60,7 @@ public class ItemSelectorWidget extends AbstractWidget {
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         guiGraphics.blitSprite(EditorSharedSprites.EDITOR_BACKGROUND_INVERTED_SPRITE, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+
         if (this.selected != null && this.selected.getItems().length > 0) {
             guiGraphics.renderItem(this.selected.getItems()[0], this.getX() + (this.getWidth() - 16) / 2, this.getY() + (this.getWidth() - 16) / 2);
         }
@@ -92,14 +93,14 @@ public class ItemSelectorWidget extends AbstractWidget {
 
     public void setSelected(List<ItemStack> selected, boolean respond) {
         this.selected = Ingredient.of(selected.stream());
-        if (respond) {
+        if (respond && responder != null) {
             this.responder.accept(this.selected);
         }
     }
 
     public void setSelected(TagKey<Item> tag, boolean respond) {
         this.selected = Ingredient.of(tag);
-        if (respond) {
+        if (respond && responder != null) {
             this.responder.accept(this.selected);
         }
     }

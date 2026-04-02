@@ -24,8 +24,7 @@ public class ResearchNode extends AbstractWidget {
     private final UniqueArray<ResearchNode> parents;
     private final UniqueArray<ResearchNode> children;
 
-    private final UniqueArray<ResearchNode> positionLocks;
-    private boolean doMovementLogic;
+    private int layer = -1;
 
     private ResearchInstance instance; // TODO: Figure out why th there's a desync between Graph and TechList. (then remake this final)
     public void fetchInstanceFromTeam() {
@@ -48,13 +47,10 @@ public class ResearchNode extends AbstractWidget {
 
         this.children = new UniqueArray<>();
         this.parents = new UniqueArray<>();
-        this.positionLocks = new UniqueArray<>();
 
         this.inputs = new UniqueArray<>();
         this.outputs = new UniqueArray<>();
         this.rootNode = false;
-
-        this.doMovementLogic = true;
     }
 
     public void setHovered(GuiGraphics guiGraphics, int x, int y, int width, int height, int mouseX, int mouseY) {
@@ -69,30 +65,12 @@ public class ResearchNode extends AbstractWidget {
         this.parents.addLast(parent);
     }
 
-    public void addPositionLock(ResearchNode positionLock) {
-        this.positionLocks.add(positionLock);
+    public int getLayer() {
+        return layer;
     }
 
-    public boolean shouldMove() { return doMovementLogic; }
-
-    /**
-     * Add a position lock to the node. Disable doing movement logic for this node. <br>
-     * @param node
-     */
-    public void lockNodeTo(ResearchNode node) {
-        this.addPositionLock(node);
-        this.doMovementLogic = false;
-    }
-
-    public void lockNode() {
-        this.doMovementLogic = false;
-    }
-
-    public Integer getLayer() {
-        if (GraphLayoutManager.nodeLayerMap.get(this) == null) {
-            return -1;
-        }
-        return GraphLayoutManager.nodeLayerMap.get(this);
+    public void setLayer(int layer) {
+        this.layer = layer;
     }
 
     public UniqueArray<ResearchNode> getChildren() {
@@ -101,10 +79,6 @@ public class ResearchNode extends AbstractWidget {
 
     public UniqueArray<ResearchNode> getParents() {
         return parents;
-    }
-
-    public UniqueArray<ResearchNode> getPositionLocks() {
-        return positionLocks;
     }
 
     public ResearchInstance getInstance() {
@@ -193,23 +167,6 @@ public class ResearchNode extends AbstractWidget {
     }
 
 
-    // Used for shifting node logic
-    public void downStream(int dx, int dy) {
-        for (ResearchNode child : children) {
-            child.translate(dx, dy);
-            child.downStream(dx, dy);
-        }
-    }
-
-    public void downStreamSetX(int x) {
-        int dx = x - getX();
-        downStream(dx, 0);
-    }
-
-    public void downStreamSetY(int y) {
-        int dy = y - getY();
-        downStream(0, dy);
-    }
 
 	public GlobalResearch getResearch() {
 		return this.getInstance().getResearch();

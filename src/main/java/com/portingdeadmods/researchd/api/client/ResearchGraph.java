@@ -46,14 +46,18 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
 
             for (GlobalResearch parent : parents) {
                 ResearchNode parentNode = this.nodes.get(parent.getResearchKey());
-                node.addParent(parentNode);
+                if (parentNode != null) {
+                    node.addParent(parentNode);
+                }
             }
 
             Set<GlobalResearch> children = research.getChildren();
 
             for (GlobalResearch child : children) {
                 ResearchNode childNode = this.nodes.get(child.getResearchKey());
-                node.addChild(childNode);
+                if (childNode != null) {
+                    node.addChild(childNode);
+                }
             }
         }
     }

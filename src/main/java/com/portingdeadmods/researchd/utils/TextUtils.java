@@ -166,6 +166,18 @@ public final class TextUtils {
         return newString.toString();
     }
 
+    // Ignore special chars like spaces n' : (things that break datapack names etc.)
+    public static boolean isValidNamespace(String str) {
+        if (str == null) return false;
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            if (!((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_' || c == '.' || c == '-')) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static boolean isValidInt(String str) {
         if (str == null) {
             return false;

@@ -1,6 +1,5 @@
 package com.portingdeadmods.researchd.client.screens.research.widgets;
 
-import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchPage;
@@ -9,13 +8,12 @@ import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.screens.research.graph.GraphLayoutManager;
+import com.portingdeadmods.researchd.client.screens.research.graph.GraphLayoutManager.LayoutResult;
 import com.portingdeadmods.researchd.client.screens.research.graph.GraphStateManager;
 import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
-import com.portingdeadmods.researchd.client.screens.research.graph.lines.PotentialOverlap;
 import com.portingdeadmods.researchd.client.screens.research.graph.lines.ResearchHead;
-import com.portingdeadmods.researchd.utils.TextUtils;
 import com.portingdeadmods.researchd.client.screens.research.graph.lines.ResearchLine;
-import it.unimi.dsi.fastutil.Pair;
+import com.portingdeadmods.researchd.utils.TextUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
@@ -30,17 +28,17 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget.PANEL_HEIGHT;
 import static com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget.PANEL_WIDTH;
+import static com.portingdeadmods.researchd.client.screens.research.graph.GraphLayoutManager.*;
 
-// TODO: Fix null node children and parents
 public class ResearchGraphWidget extends AbstractWidget {
     public static final int LEFT_MARGIN_WIDTH = 174 + 13;
 
     private @Nullable ResearchGraph graph;
-    private final Map<ResearchNode, ArrayList<ResearchLine>> researchLines;
+    private final List<ResearchLine> researchLines;
+    private @Nullable LayoutResult layoutResult;
 
     private final ResearchScreen researchScreen;
     private final float ROOT_NODE_SCALING = 1.75f;
@@ -48,7 +46,7 @@ public class ResearchGraphWidget extends AbstractWidget {
     public ResearchGraphWidget(ResearchScreen researchScreen, int x, int y, int width, int height) {
         super(x, y, width, height, Component.empty());
         this.researchScreen = researchScreen;
-        this.researchLines = new HashMap<>();
+        this.researchLines = new ArrayList<>();
     }
 
     /**
@@ -57,488 +55,203 @@ public class ResearchGraphWidget extends AbstractWidget {
     public void setGraph(ResearchGraph graph) {
         if (this.graph != graph) {
             this.graph = graph;
-			this.researchScreen.getResearchPagesList().setSelectedPage(CommonResearchCache.pageOf(graph.rootNode().getResearch()));
+            this.researchScreen.getResearchPagesList().setSelectedPage(CommonResearchCache.pageOf(graph.rootNode().getResearch()));
             this.researchLines.clear();
+            this.layoutResult = null;
 
             if (graph == null || graph.nodes().isEmpty()) {
                 return;
             }
 
-            // Try to restore the complete layout for this exact graph view
             boolean layoutRestored = GraphStateManager.getInstance().tryRestoreLastSessionState(graph);
 
             if (!layoutRestored) {
-                // If we don't have a cached layout for this exact view,
-                // apply our layout manager to position all nodes
-                GraphLayoutManager.applyLayout(graph, getX() + 10, getY() + 10);
-            } else {
-                // Don't do anything if we restored the layout
+                this.layoutResult = GraphLayoutManager.applyLayout(graph, 0, 0);
             }
 
             for (ResearchNode node : graph.nodes().values()) {
                 node.refreshHeads();
             }
 
-            // Center the graph to the center of the widget
+            // Center the graph in the widget
             int baseX = this.graph.rootNode().getX();
             int baseY = this.graph.rootNode().getY();
-
-            int centerX = baseX + ResearchScreenWidget.PANEL_WIDTH / 2;
-            int centerY = baseY + ResearchScreenWidget.PANEL_HEIGHT / 2;
+            int centerX = baseX + PANEL_WIDTH / 2;
+            int centerY = baseY + PANEL_HEIGHT / 2;
             translate(this.getWidth() / 2 - centerX + LEFT_MARGIN_WIDTH, this.getHeight() / 2 - centerY);
 
             calculateLines();
         }
     }
 
+    // =============================
+    // Channel-based edge routing
+    // =============================
+
+    /**
+     * Builds ResearchLines for every parent - child node connection
+     */
     private void calculateLines() {
         this.researchLines.clear();
-        Researchd.debug("Research lines", "Calculating connection lines for graph with ", this.graph.nodes().size(), " nodes.");
+        if (this.graph == null || this.graph.nodes().isEmpty()) return;
 
-        // Proceed only if we have nodes to connect
-        if (this.graph == null) {
-            Researchd.debug("Research lines", "Graph is null, skipping line calculation.");
+        if (this.layoutResult == null) {
+            calculateLinesSimple();
             return;
         }
 
-        if (this.graph.nodes().isEmpty()) {
-            Researchd.debug("Research lines", "No nodes in graph, skipping line calculation.");
-            return;
-        }
-
-        // Process nodes layer by layer, bottom to top, then left to right
-        List<ResearchNode> sortedNodes = new ArrayList<>(graph.nodes().values());
-        sortedNodes.sort(Comparator
-                .comparingInt(ResearchNode::getY)  // First by Y (layer)
-                .reversed()                        // Reverse to start from bottom
-                .thenComparingInt(ResearchNode::getX)); // Then by X position
-
-        Researchd.debug("Research lines", "Sorted ", sortedNodes.size(), " nodes for processing");
-
-        // Track all generated lines
-        List<ResearchLine> allLines = new ArrayList<>();
-
-        // Keep track of established vertical paths (X coordinates where vertical line segments exist)
-        Set<Integer> verticalPathXCoords = new HashSet<>();
-
-        // Track which heads are already used to prevent duplicates
+        // Track used heads to prevent double-assignment
         Set<ResearchHead> usedOutputHeads = new HashSet<>();
         Set<ResearchHead> usedInputHeads = new HashSet<>();
 
-        // Process each node
-        for (ResearchNode parent : sortedNodes) {
-            Researchd.debug("Research lines", "Processing parent node: ", parent.getInstance().getKey().location());
-
-            ArrayList<ResearchLine> nodeLines = new ArrayList<>();
-
-            // Group children by layer for consistent rootPath styles
-            Map<Integer, List<ResearchNode>> childrenByLayer = new HashMap<>();
+        for (ResearchNode parent : graph.nodes().values()) {
             for (ResearchNode child : parent.getChildren()) {
-                if (!this.graph.nodes().containsValue(child)) continue;
+                if (!graph.nodes().containsValue(child)) continue;
 
-                childrenByLayer
-                        .computeIfAbsent(GraphLayoutManager.calculateDepth(child), k -> new ArrayList<>())
-                        .add(child);
-            }
+                ResearchHead outputHead = findClosestAvailableHead(parent.getOutputs(), child.getX() + PANEL_WIDTH / 2, usedOutputHeads);
+                ResearchHead inputHead = findClosestAvailableHead(child.getInputs(), parent.getX() + PANEL_WIDTH / 2, usedInputHeads);
 
-            Researchd.debug("Research lines", "Parent has ", childrenByLayer.size(), " child layers with total children: ", parent.getChildren().size());
+                if (outputHead == null || inputHead == null) continue;
 
-            // Process each layer of children
-            for (Map.Entry<Integer, List<ResearchNode>> entry : childrenByLayer.entrySet()) {
-                List<ResearchNode> layerChildren = entry.getValue();
-                Researchd.debug("Research lines", "Processing layer ", entry.getKey(), " with ", layerChildren.size(), " children");
+                usedOutputHeads.add(outputHead);
+                usedInputHeads.add(inputHead);
 
+                Point outPt = outputHead.getConnectionPoint();
+                Point inPt = inputHead.getConnectionPoint();
 
-                // Sort children left to right
-                layerChildren.sort(Comparator.comparingInt(ResearchNode::getX));
+                long key = GraphLayoutManager.edgeKey(parent, child);
+                Map<Integer, Integer> zoneAssignments = layoutResult.edgeChannelAssignments.get(key);
 
-                // Choose consistent rootPath style for this parent-layer combination
-                boolean preferVerticalFirst =
-                        (parent.getX() + PANEL_WIDTH / 2) <
-                                (layerChildren.stream()
-                                        .mapToInt(n -> n.getX() + PANEL_WIDTH / 2)
-                                        .average()
-                                        .orElse(0));
-
-                Researchd.debug("Research lines", "Path style for this layer: ", preferVerticalFirst ? "vertical-first" : "horizontal-first");
-
-                // Get all available output heads for this parent
-                List<ResearchHead> availableOutputHeads = parent.getOutputs().stream()
-                        .filter(head -> !usedOutputHeads.contains(head))
-                        .sorted(Comparator.comparingInt(ResearchHead::getX))
-                        .collect(Collectors.toList());
-
-                Researchd.debug("Research lines", "Available output heads: ", availableOutputHeads.size(), " out of ", parent.getOutputs().size());
-
-                // Process each child and assign heads in positional order
-                for (int i = 0; i < layerChildren.size(); i++) {
-                    ResearchNode child = layerChildren.get(i);
-
-                    Researchd.debug("Research lines", "Processing child ", (i + 1), "/", layerChildren.size(), ": ", child.getInstance().getKey().location());
-                    Researchd.debug("Research lines", "Total input heads: ", child.getInputs().size());
-
-                    // Get available input heads for this child
-                    List<ResearchHead> availableInputHeads = child.getInputs().stream()
-                            .filter(head -> !usedInputHeads.contains(head))
-                            .sorted(Comparator.comparingInt(ResearchHead::getX))
-                            .collect(Collectors.toList());
-
-                    Researchd.debug("Research lines", "Available input heads: ", availableInputHeads.size(), " out of ", child.getInputs().size());
-
-                    // Find the best head pair based on position
-                    Pair<ResearchHead, ResearchHead> bestHeads = findBestHeadPairByPosition(
-                            parent, child, availableOutputHeads, availableInputHeads,
-                            i, layerChildren.size(), usedOutputHeads, usedInputHeads
-                    );
-
-                    Researchd.debug("Research lines", "Selected head pair - Output: ", (bestHeads.left() != null ? "found" : "null"), ", Input: ", (bestHeads.right() != null ? "found" : "null"));
-
-                    // Mark these heads as used
-                    usedOutputHeads.add(bestHeads.left());
-                    usedInputHeads.add(bestHeads.right());
-
-                    // Remove the used heads from available lists to ensure they're not picked again
-                    availableOutputHeads.remove(bestHeads.left());
-
-                    // FIXME: Why could these two be null
-                    if (bestHeads.left() != null && bestHeads.right() != null) {
-                        Researchd.debug("Research lines", "Generating optimal rootPath between connection points");
-
-                        // Generate the best rootPath
-                        ResearchLine bestLine = generateOptimalPath(
-                                bestHeads.left().getConnectionPoint(),
-                                bestHeads.right().getConnectionPoint(),
-                                allLines,
-                                verticalPathXCoords,
-                                preferVerticalFirst
-                        );
-
-                        Researchd.debug("Research lines", "Generated rootPath with ", bestLine.getPoints().size(), " points");
-
-                        // Update vertical rootPath zones with any new vertical segments
-                        int verticalSegments = 0;
-                        for (int j = 0; j < bestLine.getPoints().size() - 1; j++) {
-                            Point p1 = bestLine.getPoints().get(j);
-                            Point p2 = bestLine.getPoints().get(j + 1);
-                            if (p1.x == p2.x) {
-                                verticalPathXCoords.add(p1.x);
-                                verticalSegments++;
-                            }
-                        }
-
-                        Researchd.debug("Research lines", "Added ", verticalSegments, " vertical segments to rootPath tracking");
-
-                        // Store the line
-                        nodeLines.add(bestLine);
-                        allLines.add(bestLine);
+                ResearchLine line;
+                if (zoneAssignments == null || zoneAssignments.isEmpty()) {
+                    // Straight edge -> just a vertical line (or near-vertical L)
+                    if (outPt.x == inPt.x) {
+                        line = ResearchLine.start(outPt).then(inPt);
                     } else {
-                        Researchd.debug("Research lines", "Skipping line generation due to null heads");
+                        line = ResearchLine.createLConnection(outPt, inPt, true);
                     }
+                } else {
+                    line = buildChannelRoute(outPt, inPt, parent.getLayer(), child.getLayer(), zoneAssignments);
                 }
-            }
 
-            // Add all lines for this parent
-            if (!nodeLines.isEmpty()) {
-                this.researchLines.put(parent, nodeLines);
-                Researchd.debug("Research lines", "Added ", nodeLines.size(), " lines for parent node");
-            } else {
-                Researchd.debug("Research lines", "No lines generated for parent node");
+                this.researchLines.add(line);
             }
         }
-        Researchd.debug("Research lines", "Line calculation complete. Generated ", researchLines.size(), " line groups with total lines: ", allLines.size());
     }
 
     /**
-     * Finds the optimal pair of connection heads between two nodes based on their positions
-     * in the hierarchy of connections
+     * Builds a route from parent output to child input through routing channels.
+     * For edges spanning a single zone: down → horizontal at channel → down.
+     * For edges spanning multiple zones: chains through intermediate channels.
      */
-    private Pair<ResearchHead, ResearchHead> findBestHeadPairByPosition(
-            ResearchNode parent,
-            ResearchNode child,
-            List<ResearchHead> availableOutputHeads,
-            List<ResearchHead> availableInputHeads,
-            int childIndex,
-            int totalChildren,
-            Set<ResearchHead> usedOutputHeads,
-            Set<ResearchHead> usedInputHeads
-    ) {
-        // Handle case with no available heads
-        if (availableOutputHeads.isEmpty() || availableInputHeads.isEmpty()) {
-            // Try to use any heads if we need to
-            if (availableOutputHeads.isEmpty() && !parent.getOutputs().isEmpty()) {
-                availableOutputHeads = new ArrayList<>(parent.getOutputs());
-                availableOutputHeads.removeIf(usedOutputHeads::contains);
+    private ResearchLine buildChannelRoute(Point outPt, Point inPt, int parentLayer, int childLayer, Map<Integer, Integer> zoneAssignments) {
+        ResearchLine line = ResearchLine.start(outPt);
 
-                if (availableOutputHeads.isEmpty()) {
-                    availableOutputHeads = new ArrayList<>(parent.getOutputs());
+        // Current X tracks where the vertical line is
+        int currentX = outPt.x;
+
+        for (int zone = parentLayer; zone < childLayer; zone++) {
+            Integer channelIndex = zoneAssignments.get(zone);
+
+            if (channelIndex != null) {
+                // This edge has a horizontal segment in this zone
+                int channelY = layoutResult.zoneBaseY[zone] + channelIndex * CHANNEL_SIZE;
+
+                // Vertical down to channel
+                line.then(currentX, channelY);
+
+                // Determine target X: for the last zone, go to input X; otherwise stay at current path
+                int targetX;
+                if (zone == childLayer - 1) {
+                    targetX = inPt.x;
+                } else {
+                    // For intermediate zones, route toward the child's X
+                    targetX = inPt.x;
+                }
+
+                // Horizontal along channel
+                if (targetX != currentX) {
+                    line.then(targetX, channelY);
+                    currentX = targetX;
                 }
             }
-
-            if (availableInputHeads.isEmpty() && !child.getInputs().isEmpty()) {
-                availableInputHeads = new ArrayList<>(child.getInputs());
-                availableInputHeads.removeIf(usedInputHeads::contains);
-
-                if (availableInputHeads.isEmpty()) {
-                    availableInputHeads = new ArrayList<>(child.getInputs());
-                }
-            }
+            // If no channel assignment for this zone, just pass through vertically
         }
 
-        if (availableOutputHeads.isEmpty() || availableInputHeads.isEmpty()) {
-            ResearchHead outputHead = !parent.getOutputs().isEmpty() ? parent.getOutputs().getFirst() : null;
-            ResearchHead inputHead = !child.getInputs().isEmpty() ? child.getInputs().getFirst() : null;
-            return Pair.of(outputHead, inputHead);
-        }
+        // Final vertical segment down to input
+        line.then(inPt);
 
-        // Sort both output and input heads by X position
-        availableOutputHeads.sort(Comparator.comparingInt(ResearchHead::getX));
-        availableInputHeads.sort(Comparator.comparingInt(ResearchHead::getX));
-
-        // Get the closest output head to the input head's X position
-        ResearchHead inputHead = availableInputHeads.getFirst();
-        ResearchHead outputHead = availableOutputHeads.stream()
-                .min(Comparator.comparingInt(head -> Math.abs(head.getX() - inputHead.getX())))
-                .orElse(availableOutputHeads.getFirst());
-
-        return Pair.of(outputHead, inputHead);
+        return line;
     }
 
     /**
-     * Generates the optimal rootPath between two points
+     * Simple fallback routing when layout result is not available (e.g., restored from cache).
+     * Uses basic L-shaped connections.
      */
-    private ResearchLine generateOptimalPath(
-            Point start,
-            Point end,
-            List<ResearchLine> existingLines,
-            Set<Integer> verticalPathXCoords,
-            boolean preferVerticalFirst
-    ) {
-        // Generate candidate paths
-        List<ResearchLine> candidates = new ArrayList<>();
+    private void calculateLinesSimple() {
+        Set<ResearchHead> usedOutputHeads = new HashSet<>();
+        Set<ResearchHead> usedInputHeads = new HashSet<>();
 
-        // Add direct connection if points are aligned
-        if (start.x == end.x) {
-            candidates.add(ResearchLine.start(start).then(end));
-        }
+        for (ResearchNode parent : graph.nodes().values()) {
+            for (ResearchNode child : parent.getChildren()) {
+                if (!graph.nodes().containsValue(child)) continue;
 
-        // Add L-shaped connections (both vertical-first and horizontal-first)
-        candidates.add(ResearchLine.createLConnection(start, end, true));
-        candidates.add(ResearchLine.createLConnection(start, end, false));
+                ResearchHead outputHead = findClosestAvailableHead(parent.getOutputs(), child.getX() + PANEL_WIDTH / 2, usedOutputHeads);
+                ResearchHead inputHead = findClosestAvailableHead(child.getInputs(), parent.getX() + PANEL_WIDTH / 2, usedInputHeads);
 
-        // Try S-shaped connections if there's enough vertical distance
-        int verticalDistance = Math.abs(end.y - start.y);
-        if (verticalDistance > PANEL_HEIGHT) {
-            try {
-                candidates.add(ResearchLine.createSConnection(start, end, verticalDistance / 3));
-            } catch (IllegalArgumentException e) {
-                // Invalid offset, skip this candidate
-            }
+                if (outputHead == null || inputHead == null) continue;
 
-            try {
-                candidates.add(ResearchLine.createSConnection(start, end, verticalDistance / 2));
-            } catch (IllegalArgumentException e) {
-                // Invalid offset, skip this candidate
-            }
-        }
+                usedOutputHeads.add(outputHead);
+                usedInputHeads.add(inputHead);
 
-        // Try paths that reuse existing vertical paths
-        for (int x : verticalPathXCoords) {
-            // Only consider vertical paths between start and end x positions
-            if ((x > Math.min(start.x, end.x) && x < Math.max(start.x, end.x))) {
-                try {
-                    ResearchLine path = ResearchLine.start(start)
-                            .then(start.x, start.y) // Extra point for better handling
-                            .then(x, start.y)
-                            .then(x, end.y)
-                            .then(end.x, end.y)
-                            .then(end);
-                    candidates.add(path);
-                } catch (Exception e) {
-                    // Skip invalid rootPath
+                Point outPt = outputHead.getConnectionPoint();
+                Point inPt = inputHead.getConnectionPoint();
+
+                ResearchLine line;
+                if (outPt.x == inPt.x) {
+                    line = ResearchLine.start(outPt).then(inPt);
+                } else {
+                    line = ResearchLine.createLConnection(outPt, inPt, true);
                 }
+
+                this.researchLines.add(line);
             }
         }
-
-        // Find the best rootPath
-        ResearchLine bestPath = null;
-        double bestScore = Double.MAX_VALUE;
-
-        for (ResearchLine candidate : candidates) {
-            double score = evaluatePath(candidate, existingLines, preferVerticalFirst);
-            if (score < bestScore) {
-                bestScore = score;
-                bestPath = candidate;
-            }
-        }
-
-        // If all paths have significant overlaps, try a custom rootPath
-        if (bestScore > 2.0 && !existingLines.isEmpty()) {
-            ResearchLine customPath = findCustomPath(start, end, existingLines, verticalPathXCoords);
-            if (customPath != null) {
-                double customScore = evaluatePath(customPath, existingLines, preferVerticalFirst);
-                if (customScore < bestScore) {
-                    return customPath;
-                }
-            }
-        }
-
-        return bestPath != null ? bestPath : candidates.getFirst();
     }
 
     /**
-     * Evaluates the quality of a rootPath
+     * Finds the closest available head to a target X position.
      */
-    private double evaluatePath(
-            ResearchLine path,
-            List<ResearchLine> existingLines,
-            boolean preferVerticalFirst
-    ) {
-        // Start with a base score = complexity (number of segments)
-        double score = path.getPoints().size() - 1;
+    private @Nullable ResearchHead findClosestAvailableHead(Iterable<ResearchHead> heads, int targetX, Set<ResearchHead> usedHeads) {
+        ResearchHead best = null;
+        int bestDist = Integer.MAX_VALUE;
 
-        // Check if rootPath follows preferred direction
-        List<Point> points = path.getPoints();
-        if (points.size() >= 3) {
-            Point p1 = points.get(0);
-            Point p2 = points.get(1);
-
-            boolean isFirstSegmentVertical = p1.x == p2.x;
-            if (isFirstSegmentVertical != preferVerticalFirst) {
-                score += 0.5; // Penalty for not following preferred direction
+        for (ResearchHead head : heads) {
+            if (usedHeads.contains(head)) continue;
+            int dist = Math.abs(head.getX() - targetX);
+            if (dist < bestDist) {
+                bestDist = dist;
+                best = head;
             }
         }
 
-        // Check for overlaps with existing lines
-        for (ResearchLine existingLine : existingLines) {
-            // Find exact overlaps
-            Set<PotentialOverlap> overlaps = path.getOverlaps(existingLine);
-            for (PotentialOverlap overlap : overlaps) {
-                // True overlaps (segments on top of each other) are worse than intersections
-                score += overlap.isOverlap() ? 2.0 : 1.0;
-            }
-
-            // Also check for near-misses and parallels
-            score += calculateProximityPenalty(path, existingLine);
-        }
-
-        return score;
-    }
-
-    /**
-     * Calculates penalty for paths that run close to each other
-     */
-    private double calculateProximityPenalty(ResearchLine path1, ResearchLine path2) {
-        double penalty = 0;
-        List<Point> points1 = path1.getPoints();
-        List<Point> points2 = path2.getPoints();
-
-        // Check for parallel segments
-        for (int i = 0; i < points1.size() - 1; i++) {
-            Point a1 = points1.get(i);
-            Point a2 = points1.get(i + 1);
-
-            for (int j = 0; j < points2.size() - 1; j++) {
-                Point b1 = points2.get(j);
-                Point b2 = points2.get(j + 1);
-
-                // Check parallel vertical lines
-                if (a1.x == a2.x && b1.x == b2.x) {
-                    if (Math.abs(a1.x - b1.x) < 5) { // Close parallel vertical lines
-                        // Check if they overlap in Y dimension
-                        int yOverlap = Math.min(Math.max(a1.y, a2.y), Math.max(b1.y, b2.y)) -
-                                Math.max(Math.min(a1.y, a2.y), Math.min(b1.y, b2.y));
-                        if (yOverlap > 0) {
-                            penalty += 0.5;
-                        }
-                    }
-                }
-
-                // Check parallel horizontal lines
-                if (a1.y == a2.y && b1.y == b2.y) {
-                    if (Math.abs(a1.y - b1.y) < 5) { // Close parallel horizontal lines
-                        // Check if they overlap in X dimension
-                        int xOverlap = Math.min(Math.max(a1.x, a2.x), Math.max(b1.x, b2.x)) -
-                                Math.max(Math.min(a1.x, a2.x), Math.min(b1.x, b2.x));
-                        if (xOverlap > 0) {
-                            penalty += 0.5;
-                        }
-                    }
+        // If all heads are used, fall back to closest regardless
+        if (best == null) {
+            for (ResearchHead head : heads) {
+                int dist = Math.abs(head.getX() - targetX);
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    best = head;
                 }
             }
         }
 
-        return penalty;
+        return best;
     }
 
-    /**
-     * Generates a custom rootPath for difficult cases
-     */
-    private ResearchLine findCustomPath(
-            Point start,
-            Point end,
-            List<ResearchLine> existingLines,
-            Set<Integer> verticalPathXCoords
-    ) {
-        // First try to find a rootPath using midpoints between start and end
-        int minX = Math.min(start.x, end.x);
-        int maxX = Math.max(start.x, end.x);
-        int width = maxX - minX;
-
-        // Try several potential midpoints
-        for (int i = 1; i <= 4; i++) {
-            int midX = minX + (width * i / 5);
-
-            // Skip if this vertical rootPath is already congested
-            if (verticalPathXCoords.contains(midX)) {
-                continue;
-            }
-
-            // Try a rootPath with this midpoint
-            ResearchLine path = ResearchLine.start(start)
-                    .then(midX, start.y)
-                    .then(midX, end.y)
-                    .then(end);
-
-            double score = evaluatePath(path, existingLines, true);
-            if (score < 2.0) {
-                return path;
-            }
-        }
-
-        // If that fails, try an offset between layers
-        int minY = Math.min(start.y, end.y);
-        int maxY = Math.max(start.y, end.y);
-        int midY = minY + (maxY - minY) / 2;
-
-        // Find a good X coordinate for the middle segment
-        for (int offset = -20; offset <= 20; offset += 10) {
-            int midX = (start.x + end.x) / 2 + offset;
-
-            // Try a custom stepped rootPath (ensuring orthogonal segments)
-            ResearchLine path = ResearchLine.start(start)
-                    .then(start.x, midY) // Vertical segment from start
-                    .then(midX, midY)    // Horizontal segment to middle
-                    .then(midX, end.y)   // Vertical segment to end's Y
-                    .then(end);          // Horizontal segment to end
-
-            double score = evaluatePath(path, existingLines, true);
-            if (score < 3.0) {
-                return path;
-            }
-        }
-
-        // Final fallback: Try a different stepped rootPath with more segments
-        int quarterY = start.y + (end.y - start.y) / 3;
-        int thirdX = start.x + (end.x - start.x) / 4;
-
-        return ResearchLine.start(start)
-                .then(start.x, quarterY)  // First move vertically
-                .then(thirdX, quarterY)   // Then horizontally
-                .then(thirdX, midY)       // Then vertically again
-                .then(end.x, midY)        // Then horizontally
-                .then(end.x, end.y)       // Finally vertically
-                .then(end);
-    }
+    // =============================
+    // Rendering
+    // =============================
 
     public ResearchGraph getCurrentGraph() {
         return this.graph;
@@ -592,12 +305,8 @@ public class ResearchGraphWidget extends AbstractWidget {
 
         guiGraphics.enableScissor(w, 8, guiGraphics.guiWidth() - 8, guiGraphics.guiHeight() - 8);
         {
-            if (this.researchLines != null) {
-                for (List<ResearchLine> lines : this.researchLines.values()) {
-                    for (ResearchLine line : lines) {
-                        line.render(guiGraphics);
-                    }
-                }
+            for (ResearchLine line : this.researchLines) {
+                line.render(guiGraphics);
             }
 
             for (ResearchNode node : this.graph.nodes().values()) {
@@ -633,15 +342,6 @@ public class ResearchGraphWidget extends AbstractWidget {
             }
         }
         guiGraphics.disableScissor();
-    }
-
-    private void renderNode(ResearchNode node, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        node.render(guiGraphics, mouseX, mouseY, partialTick);
-
-        for (ResearchNode childNode : node.getChildren()) {
-            //ResearchLineHelper.drawLineBetweenNodes(guiGraphics, node, childNode);
-            renderNode(childNode, guiGraphics, mouseX, mouseY, partialTick);
-        }
     }
 
     // TODO: Cache hovered node like the isHovered field
@@ -685,9 +385,17 @@ public class ResearchGraphWidget extends AbstractWidget {
             }
         }
 
-        for (List<ResearchLine> lines : this.researchLines.values()) {
-            for (ResearchLine line : lines) {
-                line.translate(dx, dy);
+        for (ResearchLine line : this.researchLines) {
+            line.translate(dx, dy);
+        }
+
+        // Update zone base Y positions if we have layout result
+        if (this.layoutResult != null) {
+            for (int i = 0; i < this.layoutResult.zoneBaseY.length; i++) {
+                this.layoutResult.zoneBaseY[i] += dy;
+            }
+            for (int i = 0; i < this.layoutResult.layerY.length; i++) {
+                this.layoutResult.layerY[i] += dy;
             }
         }
     }
@@ -697,7 +405,7 @@ public class ResearchGraphWidget extends AbstractWidget {
         if (this.graph == null || this.graph.nodes() == null) {
             return false;
         }
-        
+
         for (ResearchNode node : this.graph.nodes().values()) {
             if (node.isHovered()) {
                 this.setGraph(ResearchGraphCache.computeIfAbsent(node.getInstance().getKey()));
