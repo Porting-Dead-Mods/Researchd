@@ -10,27 +10,27 @@ import java.util.*;
  *
  * Sugiyama-style layered graph layout with 4 phases:
  *
- * <h3>Phase 1 — Layer Assignment</h3>
+ * <h1>Phase 1 — Layer Assignment</h1>
  * Topological sort (Kahn's algorithm). Each node's layer = max(parent layers) + 1.
  * Root is layer 0, children go deeper. Guarantees all parents are above their children.
  *
- * <h3>Phase 2 — Crossing Minimization</h3>
+ * <h1>Phase 2 — Crossing Minimization</h1>
  * Barycenter heuristic: for each layer, position each node at the average index of its
  * connected nodes in the adjacent layer, then sort. Alternates top-down and bottom-up
  * passes (3 iterations) to converge on a low-crossing ordering.
  *
- * <h3>Phase 3 — X Coordinate Assignment</h3>
+ * <h1>Phase 3 — X Coordinate Assignment</h1>
  * Assigns X positions from the ordering in Phase 2 with guaranteed minimum spacing.
  * Then centers parents over their children's midpoint and resolves any resulting overlaps
  * with a left-to-right scan. Finally centers the whole graph.
  *
- * <h3>Phase 4 — Y Coordinate Assignment (dynamic spacing)</h3>
+ * <h1>Phase 4 — Y Coordinate Assignment (dynamic spacing)</h1>
  * Computes the number of routing channels needed between each pair of adjacent layers
  * (one channel per non-straight edge). Y positions are set so the gap between layers
  * grows to accommodate channels. Channel Y positions are stored in {@link LayoutResult}
  * for the edge router in {@code ResearchGraphWidget}.
  *
- * <h3>Edge routing</h3>
+ * <h1>Edge routing</h1>
  * Done externally by {@code ResearchGraphWidget.calculateLines()}, which reads the
  * channel assignments from {@link LayoutResult}. Each non-straight edge gets its own
  * horizontal channel (1px line, 1px gap) — Factorio style.
