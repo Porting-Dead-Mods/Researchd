@@ -48,7 +48,7 @@ public class DevCommands {
     private static int enableEditMode(CommandContext<CommandSourceStack> ctx) {
         boolean enabled = ctx.getArgument("enabled", boolean.class);
         ctx.getSource().getPlayer().setData(ResearchdAttachments.RESEARCH_INTERACTION_TYPE, enabled ? ResearchInteractionType.EDIT : ResearchInteractionType.DEFAULT);
-        ctx.getSource().sendSuccess(() -> Component.literal("Set edit mode " + (enabled ? "Enabled" : "Disabled")), true);
+        ctx.getSource().sendSuccess(() -> Component.literal("Set edit mode " + (enabled ? "Enabled\n Open the Research Screen and configure edit mode settings in the bottom right hand corner to get started" : "Disabled")), true);
         return 1;
     }
 
