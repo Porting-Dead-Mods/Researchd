@@ -67,7 +67,7 @@ public class ResearchEffectTypeSelectionPopupWidget extends PopupWidget {
     private void onDoneClicked(PDLImageButton button) {
         ResearchScreen screen = Spaghetti.tryGetResearchScreen();
         int height = 128;
-        TypedEditorObject<ResearchEffect, ResearchEffectType> clientEffectType = ResearchdClient.getClientEffectType(this.selectedResearchEffect);
+        TypedEditorObject<? extends ResearchEffect, ResearchEffectType> clientEffectType = ResearchdClient.getClientEffectType(this.selectedResearchEffect);
         if (clientEffectType != null) {
             //height = clientEffectType.getHeight();
         }
@@ -188,7 +188,7 @@ public class ResearchEffectTypeSelectionPopupWidget extends PopupWidget {
                 ResearchEffectTypeSelectionPopupWidget.this.doneButton.active = true;
                 ResearchScreen screen = Spaghetti.tryGetResearchScreen();
                 int height = 128;
-                TypedEditorObject<ResearchEffect, ResearchEffectType> clientEffectType = ResearchdClient.getClientEffectType(ResearchEffectTypeSelectionPopupWidget.this.selectedResearchEffect);
+                TypedEditorObject<? extends ResearchEffect, ResearchEffectType> clientEffectType = ResearchdClient.getClientEffectType(ResearchEffectTypeSelectionPopupWidget.this.selectedResearchEffect);
                 if (clientEffectType != null) {
                     //height = clientEffectType.getHeight();
                 }

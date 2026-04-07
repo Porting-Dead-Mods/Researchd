@@ -91,18 +91,19 @@ public class ItemSelectorWidget extends AbstractWidget {
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
     }
 
-    public void setSelected(List<ItemStack> selected, boolean respond) {
-        this.selected = Ingredient.of(selected.stream());
+    public void setSelected(Ingredient selected, boolean respond) {
+        this.selected = selected;
         if (respond && responder != null) {
             this.responder.accept(this.selected);
         }
     }
 
+    public void setSelected(List<ItemStack> selected, boolean respond) {
+        this.setSelected(Ingredient.of(selected.stream()), respond);
+    }
+
     public void setSelected(TagKey<Item> tag, boolean respond) {
-        this.selected = Ingredient.of(tag);
-        if (respond && responder != null) {
-            this.responder.accept(this.selected);
-        }
+        this.setSelected(Ingredient.of(tag), respond);
     }
 
     public Ingredient getSelected() {

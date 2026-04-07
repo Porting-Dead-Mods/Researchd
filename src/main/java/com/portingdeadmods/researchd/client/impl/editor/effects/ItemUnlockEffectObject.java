@@ -16,10 +16,11 @@ import net.minecraft.client.gui.layouts.LayoutSettings;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Unit;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class ItemUnlockEffectObject implements TypedEditorObject<ResearchEffect, ResearchEffectType> {
+public class ItemUnlockEffectObject implements TypedEditorObject<ItemUnlockEffect, ResearchEffectType> {
     public static final ResourceLocation ID = Researchd.rl("item_unlock");
     public static final ItemUnlockEffectObject INSTANCE = new ItemUnlockEffectObject();
 
@@ -29,7 +30,7 @@ public class ItemUnlockEffectObject implements TypedEditorObject<ResearchEffect,
     }
 
     @Override
-    public void buildLayout(RememberingLinearLayout layout, EditorContext context) {
+    public void buildLayout(RememberingLinearLayout layout, @Nullable ItemUnlockEffect previous, EditorContext context) {
         layout.getLayout().spacing(2);
 
         ItemSelectorWidget itemSelector = new ItemSelectorWidget(context.parentPopupWidget(), 0, 0, 25, 20, false, false);
@@ -49,7 +50,7 @@ public class ItemUnlockEffectObject implements TypedEditorObject<ResearchEffect,
     }
 
     @Override
-    public ResearchEffect create(RememberingLinearLayout layout) {
+    public ItemUnlockEffect create(RememberingLinearLayout layout) {
         RegistryVerifyEditBox idEditBox = layout.getChild("id_edit_box", RegistryVerifyEditBox.class);
         return new ItemUnlockEffect(idEditBox.createId());
     }

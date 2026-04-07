@@ -19,7 +19,7 @@ public class ResearchPackCreationPopupWidget extends AbstractStandaloneCreationP
     public static final ResourceLocation DEFAULT_ID = Researchd.rl(ResearchPackImpl.ID);
 
     public ResearchPackCreationPopupWidget(int x, int y, int width, int height) {
-        super(DEFAULT_ID, ResearchdClient.CLIENT_RESEARCH_PACKS::get, x, y, width, height);
+        super(DEFAULT_ID, ResearchdClient.CLIENT_RESEARCH_PACKS::get, null, x, y, width, height);
     }
 
     @Override

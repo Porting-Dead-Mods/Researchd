@@ -21,46 +21,76 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Unit;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.sound.sampled.Line;
 import java.util.Optional;
 
-public class ResearchPackObject implements StandaloneEditorObject<ResearchPack> {
+public class ResearchPackObject implements StandaloneEditorObject<ResearchPackImpl> {
     public static final ResearchPackObject INSTANCE = new ResearchPackObject();
 
     @Override
-    public void buildLayout(RememberingLinearLayout layout, EditorContext context) {
+    public void buildLayout(RememberingLinearLayout layout, @Nullable ResearchPackImpl previous, EditorContext context) {
         layout.getLayout().spacing(2);
         layout.addWidget(null, new StringWidget(Component.literal("Display:"), PopupWidget.getFont()));
         BackgroundEditBox nameEditBox = layout.addWidget("name_edit_box", new BackgroundEditBox(PopupWidget.getFont(), context.innerWidth() - 4, 16));
+        if (previous != null) {
+            nameEditBox.setValue(previous.display().name().orElse(Component.empty()).getString());
+        }
         nameEditBox.setHint(Component.literal("<Name>"));
         nameEditBox.setFilter(TextUtils::isValidNamespace);
         nameEditBox.setResponder(newVal -> this.update(layout, context));
         BackgroundEditBox descEditBox = layout.addWidget("desc_edit_box", new BackgroundEditBox(PopupWidget.getFont(), context.innerWidth() - 4, 16));
+        if (previous != null) {
+            descEditBox.setValue(previous.display().desc().orElse(Component.empty()).getString());
+        }
         descEditBox.setHint(Component.literal("<Desc>"));
 
         layout.addWidget(null, new StringWidget(Component.literal("Color (r,g,b,a):"), PopupWidget.getFont()));
         LinearLayout colorLayout = layout.addChild(LinearLayout.horizontal());
-        BackgroundEditBox rEditBox = colorLayout.addChild(new BackgroundEditBox(GuiUtils.getFont(), 26, 16));
-        rEditBox.setValue("255");
-        rEditBox.setHint(Component.literal("<r>"));
-        rEditBox.setFilter(newVal -> TextUtils.isValidIntInRange(newVal, 0, 255));
-        layout.getWidgets().put("r_edit_box", rEditBox);
-        BackgroundEditBox gEditBox = colorLayout.addChild(new BackgroundEditBox(GuiUtils.getFont(), 26, 16));
-        gEditBox.setValue("255");
-        gEditBox.setHint(Component.literal("<g>"));
-        gEditBox.setFilter(newVal -> TextUtils.isValidIntInRange(newVal, 0, 255));
-        layout.getWidgets().put("g_edit_box", gEditBox);
-        BackgroundEditBox bEditBox = colorLayout.addChild(new BackgroundEditBox(GuiUtils.getFont(), 26, 16));
-        bEditBox.setValue("255");
-        bEditBox.setHint(Component.literal("<b>"));
-        bEditBox.setFilter(newVal -> TextUtils.isValidIntInRange(newVal, 0, 255));
-        layout.getWidgets().put("b_edit_box", bEditBox);
-        BackgroundEditBox aEditBox = colorLayout.addChild(new BackgroundEditBox(GuiUtils.getFont(), 26, 16));
-        aEditBox.setValue("255");
-        aEditBox.setHint(Component.literal("<a>"));
-        aEditBox.setFilter(newVal -> TextUtils.isValidIntInRange(newVal, 0, 255));
-        layout.getWidgets().put("a_edit_box", aEditBox);
+        {
+            RGBAColor rgbaColor = previous != null ? previous.colorAsRgba() : null;
+
+            BackgroundEditBox rEditBox = colorLayout.addChild(new BackgroundEditBox(GuiUtils.getFont(), 26, 16));
+            if (rgbaColor != null) {
+                rEditBox.setValue(String.valueOf(rgbaColor.r()));
+            } else {
+                rEditBox.setValue("255");
+            }
+            rEditBox.setHint(Component.literal("<r>"));
+            rEditBox.setFilter(newVal -> TextUtils.isValidIntInRange(newVal, 0, 255));
+            layout.getWidgets().put("r_edit_box", rEditBox);
+
+            BackgroundEditBox gEditBox = colorLayout.addChild(new BackgroundEditBox(GuiUtils.getFont(), 26, 16));
+            if (rgbaColor != null) {
+                gEditBox.setValue(String.valueOf(rgbaColor.g()));
+            } else {
+                gEditBox.setValue("255");
+            }
+            gEditBox.setHint(Component.literal("<g>"));
+            gEditBox.setFilter(newVal -> TextUtils.isValidIntInRange(newVal, 0, 255));
+            layout.getWidgets().put("g_edit_box", gEditBox);
+
+            BackgroundEditBox bEditBox = colorLayout.addChild(new BackgroundEditBox(GuiUtils.getFont(), 26, 16));
+            if (rgbaColor != null) {
+                bEditBox.setValue(String.valueOf(rgbaColor.b()));
+            } else {
+                bEditBox.setValue("255");
+            }
+            bEditBox.setHint(Component.literal("<b>"));
+            bEditBox.setFilter(newVal -> TextUtils.isValidIntInRange(newVal, 0, 255));
+            layout.getWidgets().put("b_edit_box", bEditBox);
+
+            BackgroundEditBox aEditBox = colorLayout.addChild(new BackgroundEditBox(GuiUtils.getFont(), 26, 16));
+            if (rgbaColor != null) {
+                aEditBox.setValue(String.valueOf(rgbaColor.a()));
+            } else {
+                aEditBox.setValue("255");
+            }
+            aEditBox.setHint(Component.literal("<a>"));
+            aEditBox.setFilter(newVal -> TextUtils.isValidIntInRange(newVal, 0, 255));
+            layout.getWidgets().put("a_edit_box", aEditBox);
+        }
 
         layout.addWidget(null, new ResearchPackPreviewWidget(() -> getRgbaColor(layout), 16, 16), LayoutSettings::alignHorizontallyCenter);
 
@@ -72,6 +102,9 @@ public class ResearchPackObject implements StandaloneEditorObject<ResearchPack> 
 
         layout.addWidget(null, GuiUtils.stringWidget("Custom Texture:"));
         BackgroundEditBox textureEditBox = layout.addWidget("custom_texture_edit_box", new BackgroundEditBox(GuiUtils.getFont(), context.innerWidth() - 8, 16));
+        if (previous != null && previous.customTexture().isPresent()) {
+            textureEditBox.setValue(previous.customTexture().get().toString());
+        }
         textureEditBox.setFilter(TextUtils::isValidResourceLocation);
         textureEditBox.setResponder(newVal -> this.update(layout, context));
         textureEditBox.setHint(Component.literal("<Optional>"));
@@ -87,7 +120,7 @@ public class ResearchPackObject implements StandaloneEditorObject<ResearchPack> 
     }
 
     @Override
-    public ResearchPack create(RememberingLinearLayout layout) {
+    public ResearchPackImpl create(RememberingLinearLayout layout) {
         RGBAColor color = getRgbaColor(layout);
         int sortingValue = Integer.parseInt(layout.getChild("sorting_value_edit_box", BackgroundEditBox.class).getValue());
         String customTextureLoc = layout.getChild("custom_texture_edit_box", BackgroundEditBox.class).getValue();

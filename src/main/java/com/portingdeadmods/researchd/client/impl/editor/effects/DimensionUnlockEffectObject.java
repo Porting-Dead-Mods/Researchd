@@ -19,10 +19,11 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Unit;
 import net.minecraft.world.level.dimension.DimensionType;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
-public class DimensionUnlockEffectObject implements TypedEditorObject<ResearchEffect, ResearchEffectType> {
+public class DimensionUnlockEffectObject implements TypedEditorObject<DimensionUnlockEffect, ResearchEffectType> {
     public static final ResourceLocation ID = Researchd.rl("dimension_unlock");
     public static final DimensionUnlockEffectObject INSTANCE = new DimensionUnlockEffectObject();
 
@@ -32,17 +33,20 @@ public class DimensionUnlockEffectObject implements TypedEditorObject<ResearchEf
     }
 
     @Override
-    public void buildLayout(RememberingLinearLayout layout, EditorContext context) {
+    public void buildLayout(RememberingLinearLayout layout, @Nullable DimensionUnlockEffect previous, EditorContext context) {
         layout.addWidget(null, GuiUtils.stringWidget("Unlocks Dimension:"));
         Optional<Registry<DimensionType>> registry = Minecraft.getInstance().level.registryAccess().registry(Registries.DIMENSION_TYPE);
         registry.ifPresent(dimensionTypes -> {
             RegistryVerifyEditBox idEditBox = layout.addWidget("id_edit_box", RegistryVerifyEditBox.forRegistry(dimensionTypes, context.innerWidth() - 8, 16));
             idEditBox.setResponder(newVal -> this.update(layout, context));
+            if (previous != null) {
+                idEditBox.setValue(previous.dimension().toString());
+            }
         });
     }
 
     @Override
-    public ResearchEffect create(RememberingLinearLayout layout) {
+    public DimensionUnlockEffect create(RememberingLinearLayout layout) {
         return new DimensionUnlockEffect(ResourceLocation.parse(layout.getChild("id_edit_box", BackgroundEditBox.class).getValue()), ResourceLocation.withDefaultNamespace(""));
     }
 

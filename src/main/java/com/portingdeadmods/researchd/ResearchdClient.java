@@ -68,11 +68,11 @@ public final class ResearchdClient {
     public static final Map<ResourceLocation, WidgetConstructor<? extends ResearchMethod>> RESEARCH_METHOD_WIDGETS = new HashMap<>();
     public static final Map<ResourceLocation, WidgetConstructor<? extends ResearchEffect>> RESEARCH_EFFECT_WIDGETS = new HashMap<>();
     public static final Map<ResourceLocation, Function<ResearchIcon, ClientResearchIcon<?>>> RESEARCH_ICONS = new HashMap<>();
-    public static final Map<ResourceLocation, StandaloneEditorObject<Research>> CLIENT_RESEARCHES = new HashMap<>();
-    public static final Map<ResourceLocation, StandaloneEditorObject<ResearchPack>> CLIENT_RESEARCH_PACKS = new HashMap<>();
-    public static final Map<ResourceLocation, TypedEditorObject<ResearchMethod, ResearchMethodType>> CLIENT_RESEARCH_METHOD_TYPES = new HashMap<>();
+    public static final Map<ResourceLocation, StandaloneEditorObject<? extends Research>> CLIENT_RESEARCHES = new HashMap<>();
+    public static final Map<ResourceLocation, StandaloneEditorObject<? extends ResearchPack>> CLIENT_RESEARCH_PACKS = new HashMap<>();
+    public static final Map<ResourceLocation, TypedEditorObject<? extends ResearchMethod, ResearchMethodType>> CLIENT_RESEARCH_METHOD_TYPES = new HashMap<>();
     public static final ModelResourceLocation RESEARCH_LAB_MODEL = ModelResourceLocation.standalone(Researchd.rl("block/research_lab"));
-    public static final Map<ResourceLocation, TypedEditorObject<ResearchEffect, ResearchEffectType>> CLIENT_RESEARCH_EFFECT_TYPES = new HashMap<>();
+    public static final Map<ResourceLocation, TypedEditorObject<? extends ResearchEffect, ResearchEffectType>> CLIENT_RESEARCH_EFFECT_TYPES = new HashMap<>();
 
     public static int previewRendererResearchPackColor = -1;
 
@@ -90,11 +90,11 @@ public final class ResearchdClient {
         modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
     }
 
-    public static TypedEditorObject<ResearchEffect, ResearchEffectType> getClientEffectType(ResearchEffectType effectType) {
+    public static TypedEditorObject<? extends ResearchEffect, ResearchEffectType> getClientEffectType(ResearchEffectType effectType) {
         return CLIENT_RESEARCH_EFFECT_TYPES.get(effectType.id());
     }
 
-    public static TypedEditorObject<ResearchMethod, ResearchMethodType> getClientMethodType(ResearchMethodType methodType) {
+    public static TypedEditorObject<? extends ResearchMethod, ResearchMethodType> getClientMethodType(ResearchMethodType methodType) {
         return CLIENT_RESEARCH_METHOD_TYPES.get(methodType.id());
     }
 

@@ -28,7 +28,7 @@ public class ResearchMethodCreationPopupWidget extends DraggablePopupWidget {
     public static final ResourceLocation BACKGROUND_SPRITE = Researchd.rl("widget/research_method_creation_widget");
 
     private final RememberingLinearLayout layout;
-    private final TypedEditorObject<ResearchMethod, ResearchMethodType> clientResearchMethod;
+    private final TypedEditorObject<? extends ResearchMethod, ResearchMethodType> clientResearchMethod;
     private final PDLButton createButton;
     private final ResearchMethodTypeSelectionPopupWidget parentPopupWidget;
     private final EmbeddedMethodCreationWidget originSelectionWidget;
@@ -76,7 +76,7 @@ public class ResearchMethodCreationPopupWidget extends DraggablePopupWidget {
 
     protected void buildLayout() {
         if (this.clientResearchMethod != null) {
-            this.clientResearchMethod.buildLayout(this.layout, new EditorContextImpl(this.createButton, Spaghetti.tryGetResearchScreen(), this, this.getWidth(), this.getHeight(), this.getWidth() - 14, this.getHeight() - 14, 7));
+            this.clientResearchMethod.buildLayout(this.layout, null, new EditorContextImpl(this.createButton, Spaghetti.tryGetResearchScreen(), this, this.getWidth(), this.getHeight(), this.getWidth() - 14, this.getHeight() - 14, 7));
             this.layout.getLayout().arrangeElements();
             FrameLayout.centerInRectangle(this.layout.getLayout(), this.getX(), this.getY(), this.getWidth(), this.getHeight());
             this.layout.getChildren().forEach(this::addRenderableWidget);

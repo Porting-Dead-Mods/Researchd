@@ -34,7 +34,7 @@ import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.List;
 
-public class ConsumePackMethodObject implements TypedEditorObject<ResearchMethod, ResearchMethodType> {
+public class ConsumePackMethodObject implements TypedEditorObject<ConsumePackResearchMethod, ResearchMethodType> {
     public static final ConsumePackMethodObject INSTANCE = new ConsumePackMethodObject();
     public static final WidgetSprites SPRITES = new WidgetSprites(EditorSharedSprites.EDITOR_BACKGROUND_INVERTED_SPRITE, EditorSharedSprites.EDITOR_BACKGROUND_INVERTED_SPRITE);
 
@@ -47,21 +47,32 @@ public class ConsumePackMethodObject implements TypedEditorObject<ResearchMethod
     }
 
     @Override
-    public void buildLayout(RememberingLinearLayout layout, @UnknownNullability EditorContext context) {
+    public void buildLayout(RememberingLinearLayout layout, @Nullable ConsumePackResearchMethod previous, @UnknownNullability EditorContext context) {
         layout.getLayout().spacing(2);
         // TODO: The ability to select multiple packs
         layout.addWidget(null, new StringWidget(Component.literal("Pack:"), PopupWidget.getFont()), LayoutSettings::alignHorizontallyCenter);
         ResourceKey<ResearchPack> defaultPack = ClientEditorHelper.getDefaultResearchPack();
         ItemStack defaultSelectedPack = defaultPack != null ? ResearchPackImpl.asStack(defaultPack) : ResearchdItems.GREEN_RESEARCH_PACK_ICON.toStack();
-        layout.addWidget("pack_selector", new ItemSelectorWidget(context.parentPopupWidget(), 0, 0, 25, 24, Ingredient.of(defaultSelectedPack), this::createItemSelectorPopup), LayoutSettings::alignHorizontallyCenter);
+        ItemSelectorWidget packSelector = layout.addWidget("pack_selector", new ItemSelectorWidget(context.parentPopupWidget(), 0, 0, 25, 24, Ingredient.of(defaultSelectedPack), this::createItemSelectorPopup), LayoutSettings::alignHorizontallyCenter);
+        if (previous != null) {
+            packSelector.setSelected(previous.asStacks(), false);
+        }
         layout.addWidget(null, new StringWidget(Component.literal("Time:"), PopupWidget.getFont()), LayoutSettings::alignHorizontallyCenter);
         EditBox timeEditBox = layout.addWidget("time", new BackgroundEditBox(PopupWidget.getFont(), SPRITES, 36, 16, "1"), LayoutSettings::alignHorizontallyCenter);
-        timeEditBox.setValue("200t");
+        if (previous != null) {
+            timeEditBox.setValue(previous.duration() + "t");
+        } else {
+            timeEditBox.setValue("200t");
+        }
         timeEditBox.setFilter(this::isTimeValid);
         timeEditBox.setResponder(val -> this.onTimeValueChanged(val, timeEditBox));
         layout.addWidget(null, new StringWidget(Component.literal("Count:"), PopupWidget.getFont()), LayoutSettings::alignHorizontallyCenter);
         EditBox countEditBox = layout.addWidget("count", new BackgroundEditBox(PopupWidget.getFont(), SPRITES, 24, 16, "1"), LayoutSettings::alignHorizontallyCenter);
-        countEditBox.setValue("1");
+        if (previous != null) {
+            countEditBox.setValue(String.valueOf(previous.count()));
+        } else {
+            countEditBox.setValue("1");
+        }
         countEditBox.setFilter(this::isCountValid);
     }
 
@@ -85,7 +96,7 @@ public class ConsumePackMethodObject implements TypedEditorObject<ResearchMethod
     }
 
     @Override
-    public ResearchMethod create(RememberingLinearLayout layout) {
+    public ConsumePackResearchMethod create(RememberingLinearLayout layout) {
         String time = layout.getChild("time", EditBox.class).getValue();
         return new ConsumePackResearchMethod(
                 List.of(layout.getChild("pack_selector", ItemSelectorWidget.class).getSelected().getItems()[0].get(ResearchdDataComponents.RESEARCH_PACK).researchPackKey().get()),

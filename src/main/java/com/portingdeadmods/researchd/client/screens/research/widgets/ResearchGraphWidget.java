@@ -160,7 +160,7 @@ public class ResearchGraphWidget extends AbstractWidget {
                 // Vertical down to channel
                 line.then(currentX, channelY);
 
-                // Determine target X: for the last zone, go to input X; otherwise stay at current path
+                // Determine item X: for the last zone, go to input X; otherwise stay at current path
                 int targetX;
                 if (zone == childLayer - 1) {
                     targetX = inPt.x;
@@ -220,7 +220,7 @@ public class ResearchGraphWidget extends AbstractWidget {
     }
 
     /**
-     * Finds the closest available head to a target X position.
+     * Finds the closest available head to a item X position.
      */
     private @Nullable ResearchHead findClosestAvailableHead(Iterable<ResearchHead> heads, int targetX, Set<ResearchHead> usedHeads) {
         ResearchHead best = null;

@@ -32,8 +32,8 @@ import java.util.function.Function;
 public class ResearchCreationPopupWidget extends AbstractStandaloneCreationPopupWidget<Research> {
     public static final ResourceLocation DEFAULT_ID = Researchd.rl(SimpleResearch.ID);
 
-    public ResearchCreationPopupWidget(int x, int y, int width, int height) {
-        super(DEFAULT_ID, ResearchdClient.CLIENT_RESEARCHES::get, x, y, width, height);
+    public ResearchCreationPopupWidget(@Nullable Research object, int x, int y, int width, int height) {
+        super(DEFAULT_ID, ResearchdClient.CLIENT_RESEARCHES::get, object, x, y, width, height);
     }
 
     @Override

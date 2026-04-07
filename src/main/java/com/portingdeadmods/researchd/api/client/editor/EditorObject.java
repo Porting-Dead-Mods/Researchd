@@ -6,8 +6,10 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Unit;
 
+import javax.annotation.Nullable;
+
 public interface EditorObject<O> {
-    void buildLayout(RememberingLinearLayout layout, EditorContext context);
+    void buildLayout(RememberingLinearLayout layout, @Nullable O previous, EditorContext context);
 
     O create(RememberingLinearLayout layout);
 

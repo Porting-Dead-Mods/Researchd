@@ -28,7 +28,7 @@ public class ResearchEffectCreationPopupWidget extends PopupWidget {
     public static final ResourceLocation BACKGROUND_SPRITE = Researchd.rl("widget/research_method_creation_widget");
 
     private final RememberingLinearLayout layout;
-    private final TypedEditorObject<ResearchEffect, ResearchEffectType> clientResearchEffect;
+    private final TypedEditorObject<? extends ResearchEffect, ResearchEffectType> clientResearchEffect;
     private final PDLButton createButton;
     private final ResearchEffectTypeSelectionPopupWidget parentPopupWidget;
     private final EmbeddedEffectCreationWidget originSelectionWidget;
@@ -74,7 +74,7 @@ public class ResearchEffectCreationPopupWidget extends PopupWidget {
     protected void buildLayout() {
         if (this.clientResearchEffect != null) {
             EditorContextImpl context = new EditorContextImpl(this.createButton, Spaghetti.tryGetResearchScreen(), this, this.getWidth(), this.getHeight(), this.getWidth() - 14, this.getHeight() - 14, 7);
-            this.clientResearchEffect.buildLayout(this.layout, context);
+            this.clientResearchEffect.buildLayout(this.layout, null, context);
             this.clientResearchEffect.update(this.layout, context);
             this.layout.getLayout().arrangeElements();
             FrameLayout.centerInRectangle(this.layout.getLayout(), this.getX(), this.getY(), this.getWidth(), this.getHeight());

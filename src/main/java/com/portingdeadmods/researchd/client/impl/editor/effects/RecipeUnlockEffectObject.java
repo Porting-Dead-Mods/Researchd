@@ -18,11 +18,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Unit;
 import net.minecraft.world.item.crafting.RecipeManager;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.Collection;
 
-public class RecipeUnlockEffectObject implements TypedEditorObject<ResearchEffect, ResearchEffectType> {
+public class RecipeUnlockEffectObject implements TypedEditorObject<RecipeUnlockEffect, ResearchEffectType> {
     public static final ResourceLocation ID = Researchd.rl("recipe_unlock");
     public static final RecipeUnlockEffectObject INSTANCE = new RecipeUnlockEffectObject();
 
@@ -32,7 +33,7 @@ public class RecipeUnlockEffectObject implements TypedEditorObject<ResearchEffec
     }
 
     @Override
-    public void buildLayout(RememberingLinearLayout layout, @UnknownNullability EditorContext context) {
+    public void buildLayout(RememberingLinearLayout layout, @Nullable RecipeUnlockEffect previous, @UnknownNullability EditorContext context) {
         layout.addWidget(null, new StringWidget(Component.literal("By id:"), PopupWidget.getFont()));
         //RegistryVerifyEditBox idEditBox = layout.addWidget("id_edit_box", RegistryVerifyEditBox.forIds(this.getIds(), context.innerWidth() - 8, 16));
         layout.addWidget("id_edit_boxes", new EditableIdListWidget(context.innerWidth() - 8, 60, this.getIds(), newVal -> this.update(layout, context)));
@@ -45,7 +46,7 @@ public class RecipeUnlockEffectObject implements TypedEditorObject<ResearchEffec
     }
 
     @Override
-    public ResearchEffect create(RememberingLinearLayout layout) {
+    public RecipeUnlockEffect create(RememberingLinearLayout layout) {
         EditableIdListWidget idEditBoxes = layout.getChild("id_edit_boxes", EditableIdListWidget.class);
         return new RecipeUnlockEffect(idEditBoxes.getIds().map(ResourceLocation::parse).toArray(ResourceLocation[]::new));
     }

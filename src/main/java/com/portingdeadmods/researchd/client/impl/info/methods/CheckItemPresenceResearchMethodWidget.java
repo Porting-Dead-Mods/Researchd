@@ -26,7 +26,7 @@ public class CheckItemPresenceResearchMethodWidget extends AbstractResearchInfoW
 
     public CheckItemPresenceResearchMethodWidget(int x, int y, CheckItemPresenceResearchMethod method) {
         super(x, y, method);
-        this.itemRenderer = new CycledItemRenderer(method.target(), method.count());
+        this.itemRenderer = new CycledItemRenderer(method.item(), method.count());
     }
 
     @Override
@@ -42,7 +42,7 @@ public class CheckItemPresenceResearchMethodWidget extends AbstractResearchInfoW
     public void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         Font font = Minecraft.getInstance().font;
         if (this.isHovered()) {
-            Ingredient target = value.target();
+            Ingredient target = value.item();
             ItemStack stack = new ItemStack(target.getItems()[0].getItem(), value.count());
             List<Component> tooltip = new ArrayList<>(Screen.getTooltipFromItem(Minecraft.getInstance(), stack));
             tooltip.addFirst(
@@ -59,7 +59,7 @@ public class CheckItemPresenceResearchMethodWidget extends AbstractResearchInfoW
     public void onClick(double mouseX, double mouseY, int button) {
         if (this.isHovered()) {
             if (ResearchdCompatHandler.isJeiLoaded()) {
-                Ingredient recipes1 = this.value.target();
+                Ingredient recipes1 = this.value.item();
                 JEICompat.openRecipes(Arrays.asList(recipes1.getItems()));
             }
         }

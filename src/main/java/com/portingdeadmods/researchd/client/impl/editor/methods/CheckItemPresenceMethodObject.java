@@ -6,9 +6,10 @@ import com.portingdeadmods.researchd.api.research.methods.ResearchMethodType;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.ItemSelectorWidget;
 import com.portingdeadmods.researchd.impl.research.method.CheckItemPresenceResearchMethod;
 import com.portingdeadmods.researchd.registries.ResearchMethodTypes;
+import com.portingdeadmods.researchd.translations.NumberUtils;
 import net.minecraft.client.gui.components.EditBox;
 
-public class CheckItemPresenceMethodObject extends ConsumeItemMethodObject {
+public class CheckItemPresenceMethodObject extends AbstractItemMethodObject<CheckItemPresenceResearchMethod> {
     public static final CheckItemPresenceMethodObject INSTANCE = new CheckItemPresenceMethodObject();
 
     @Override
@@ -17,10 +18,10 @@ public class CheckItemPresenceMethodObject extends ConsumeItemMethodObject {
     }
 
     @Override
-    public ResearchMethod create(RememberingLinearLayout layout) {
+    public CheckItemPresenceResearchMethod create(RememberingLinearLayout layout) {
         return new CheckItemPresenceResearchMethod(
                 layout.getChild("item_selector", ItemSelectorWidget.class).getSelected(),
-                Integer.parseInt(layout.getChild("count", EditBox.class).getValue())
+                NumberUtils.parseIntOr(layout.getChild("count", EditBox.class).getValue(), 1)
         );
     }
 

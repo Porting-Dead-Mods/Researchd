@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.api.client.editor;
 
 import com.portingdeadmods.researchd.api.client.RememberingLinearLayout;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * An editor object that will also create an

@@ -15,6 +15,7 @@ import com.portingdeadmods.researchd.client.screens.lib.widgets.DropDownWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.EditorSideBarWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.SelectPackPopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
+import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
 import com.portingdeadmods.researchd.client.screens.research.widgets.*;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
@@ -309,7 +310,17 @@ public class ResearchScreen extends Screen {
 
         if (this.editorModeActive()) {
             if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && this.researchGraphWidget.isHovered() && (this.openEditorButton == null || !this.openEditorButton.isHovered()) && this.isEditorConfigured()) {
-                this.setDropDown(new GraphDropDownWidget(this, (int) mouseX, (int) mouseY));
+                boolean clickedNode = false;
+                for (ResearchNode node : this.researchGraphWidget.getCurrentGraph().nodes().values()) {
+                    if (node.isHovered()) {
+                        this.setDropDown(new GraphDropDownWidget(node.getInstance().lookup(Minecraft.getInstance().level), this, (int) mouseX, (int) mouseY));
+                        clickedNode = true;
+                        break;
+                    }
+                }
+                if (!clickedNode) {
+                    this.setDropDown(new GraphDropDownWidget(this, (int) mouseX, (int) mouseY));
+                }
             } else if (this.dropDownWidget != null && this.dropDownWidget.isHovered() && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
                 this.dropDownWidget.mouseClicked(mouseX, mouseY, button);
             } else {

@@ -21,16 +21,19 @@ import java.util.function.Function;
 
 public abstract class AbstractStandaloneCreationPopupWidget<O> extends DraggablePopupWidget {
     private final RememberingLinearLayout layout;
-    private final StandaloneEditorObject<O> clientObject;
+    private final StandaloneEditorObject<? extends O> clientObject;
     private final ResearchScreen screen;
-    private final Function<ResourceLocation, StandaloneEditorObject<O>> editorObjectGetterFunction;
+    private final Function<ResourceLocation, StandaloneEditorObject<? extends O>> editorObjectGetterFunction;
+    @Nullable
+    private final O previous;
     private PDLButton createButton;
     private final ScrollableWidget<LinearLayout> scrollableWidget;
     private final ResourceLocation defaultId;
 
-    public AbstractStandaloneCreationPopupWidget(ResourceLocation defaultId, Function<ResourceLocation, StandaloneEditorObject<O>> editorObjectGetterFunction, int x, int y, int width, int height) {
+    public AbstractStandaloneCreationPopupWidget(ResourceLocation defaultId, Function<ResourceLocation, StandaloneEditorObject<? extends O>> editorObjectGetterFunction, @Nullable O previous, int x, int y, int width, int height) {
         super(x, y, width, height, CommonComponents.EMPTY);
         this.editorObjectGetterFunction = editorObjectGetterFunction;
+        this.previous = previous;
         this.screen = Spaghetti.tryGetResearchScreen();
         LinearLayout l = new LinearLayout(width - 14, height - 14, LinearLayout.Orientation.VERTICAL);
         this.layout = new RememberingLinearLayout(l);
@@ -62,10 +65,15 @@ public abstract class AbstractStandaloneCreationPopupWidget<O> extends Draggable
                 .build());
         if (this.clientObject != null) {
             EditorContextImpl context = new EditorContextImpl(this.createButton, this.screen, this, this.getWidth(), this.getHeight(), this.getWidth() - 16, this.getHeight() - 16, 7);
-            this.clientObject.buildLayout(this.layout, context);
+            this.buildLayoutFromPrevious(context);
             this.clientObject.update(this.layout, context);
             this.layout.getLayout().arrangeElements();
         }
+    }
+
+    private <P extends O> void buildLayoutFromPrevious(EditorContextImpl context) {
+        StandaloneEditorObject<P> obj = (StandaloneEditorObject<P>) this.clientObject;
+        obj.buildLayout(this.layout, (P) this.previous, context);
     }
 
     private void onCreatePressed(PDLButton pdlButton) {

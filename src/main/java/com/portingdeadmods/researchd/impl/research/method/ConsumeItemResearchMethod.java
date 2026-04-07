@@ -5,7 +5,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
+import com.portingdeadmods.researchd.api.research.methods.ItemResearchMethod;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethodType;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
 import com.portingdeadmods.researchd.api.team.TeamMember;
@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public record ConsumeItemResearchMethod(Ingredient toConsume, int count) implements ResearchMethod {
+public record ConsumeItemResearchMethod(Ingredient item, int count) implements ItemResearchMethod {
     public static final ConsumeItemResearchMethod EMPTY = new ConsumeItemResearchMethod(Ingredient.EMPTY, 0);
     public static final ResourceLocation ID = Researchd.rl("consume_item");
 
@@ -43,7 +43,7 @@ public record ConsumeItemResearchMethod(Ingredient toConsume, int count) impleme
 					int containerSize = player.getInventory().getContainerSize();
 					for (int i = 0; i < containerSize; i++) {
 						ItemStack stack = player.getInventory().getItem(i);
-						if (this.toConsume.test(stack)) {
+						if (this.item.test(stack)) {
 							matchingItems.add(stack);
 							found = Math.min(remaining, found + stack.getCount());
 							if (found == remaining) break findItems;
@@ -95,13 +95,13 @@ public record ConsumeItemResearchMethod(Ingredient toConsume, int count) impleme
     public static final class Serializer implements ResearchMethodSerializer<ConsumeItemResearchMethod> {
         public static final Serializer INSTANCE = new Serializer();
         public static final MapCodec<ConsumeItemResearchMethod> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                Ingredient.CODEC.fieldOf("items").forGetter(ConsumeItemResearchMethod::toConsume),
+                Ingredient.CODEC.fieldOf("items").forGetter(ConsumeItemResearchMethod::item),
                 Codec.INT.fieldOf("count").forGetter(ConsumeItemResearchMethod::count)
         ).apply(instance, ConsumeItemResearchMethod::new));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, ConsumeItemResearchMethod> STREAM_CODEC = StreamCodec.composite(
                 Ingredient.CONTENTS_STREAM_CODEC,
-                ConsumeItemResearchMethod::toConsume,
+                ConsumeItemResearchMethod::item,
                 ByteBufCodecs.INT,
                 ConsumeItemResearchMethod::count,
                 ConsumeItemResearchMethod::new

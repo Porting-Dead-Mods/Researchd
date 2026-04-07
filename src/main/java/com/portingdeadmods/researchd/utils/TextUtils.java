@@ -178,6 +178,10 @@ public final class TextUtils {
         return true;
     }
 
+    public static boolean isValidIntOrEmpty(String str) {
+        return isValidInt(str) || str.isBlank();
+    }
+
     public static boolean isValidInt(String str) {
         if (str == null) {
             return false;

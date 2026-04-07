@@ -11,10 +11,12 @@ import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.utils.Spaghetti;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.vehicle.Minecart;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -31,6 +33,12 @@ public class ResearchSelectorListWidget extends ContainerWidget<ResearchSelector
         this.parentPopupWidget = parentPopupWidget;
         this.items = new UniqueArray<>(items);
         this.getItems().add(Element.SelectorElement.INSTANCE);
+    }
+
+    public void setPrevious(List<ResourceKey<Research>> previous) {
+        for (ResourceKey<Research> research : previous) {
+            this.addItem(new Element.SimpleElement(research, ResearchHelperCommon.getResearch(research, Minecraft.getInstance().level)));
+        }
     }
 
     @Override

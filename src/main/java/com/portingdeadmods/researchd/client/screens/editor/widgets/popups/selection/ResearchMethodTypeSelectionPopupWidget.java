@@ -187,7 +187,7 @@ public class ResearchMethodTypeSelectionPopupWidget extends PopupWidget {
                 this.parentWidget.doneButton.active = true;
                 ResearchScreen screen = Spaghetti.tryGetResearchScreen();
                 int height = 128;
-                TypedEditorObject<ResearchMethod, ResearchMethodType> clientMethodType = ResearchdClient.getClientMethodType(this.parentWidget.selectedResearchMethod);
+                TypedEditorObject<? extends ResearchMethod, ResearchMethodType> clientMethodType = ResearchdClient.getClientMethodType(this.parentWidget.selectedResearchMethod);
                 if (clientMethodType != null) {
                     //height = clientMethodType.getHeight();
                 }
