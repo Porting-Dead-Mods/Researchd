@@ -8,6 +8,7 @@ import com.portingdeadmods.researchd.impl.research.icons.ItemResearchIcon;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
 import com.portingdeadmods.researchd.impl.research.effect.EmptyResearchEffect;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
+import com.portingdeadmods.researchd.resources.contents.ResearchdResearchPackProvider;
 import dev.latvian.mods.kubejs.script.SourceLine;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -50,6 +51,11 @@ public class ResearchBuilder {
 
     public ResearchBuilder iconStacks(ItemStack... stacks) {
         this.icon = new ItemResearchIcon(Arrays.asList(stacks));
+        return this;
+    }
+
+    public ResearchBuilder iconPack(ResourceLocation key) {
+        this.icon = new ItemResearchIcon(List.of(ResearchdResearchPackProvider.asStack(key)));
         return this;
     }
 
