@@ -1,6 +1,7 @@
 package com.portingdeadmods.researchd;
 
 import com.mojang.logging.LogUtils;
+import com.portingdeadmods.portingdeadlibs.api.config.PDLConfigHelper;
 import com.portingdeadmods.portingdeadlibs.api.resources.DynamicPack;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
@@ -15,7 +16,6 @@ import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.networking.registries.UpdateResearchPacksPayload;
 import com.portingdeadmods.researchd.networking.registries.UpdateResearchesPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchCacheReloadPayload;
-import com.portingdeadmods.researchd.pdl.config.PDLConfigHelper;
 import com.portingdeadmods.researchd.registries.*;
 import com.portingdeadmods.researchd.registries.serializers.*;
 import com.portingdeadmods.researchd.resources.ResearchdDynamicPackContents;
@@ -124,10 +124,8 @@ public final class Researchd {
 
         NeoForge.EVENT_BUS.addListener(this::onDatapacksSynced);
 
-        PDLConfigHelper.registerConfig(ResearchdConfig.Client.class, ModConfig.Type.CLIENT)
-                .register(modContainer);
-        PDLConfigHelper.registerConfig(ResearchdConfig.Common.class, ModConfig.Type.COMMON)
-                .register(modContainer);
+        PDLConfigHelper.registerConfig(ResearchdConfig.Client.class, ModConfig.Type.CLIENT, modContainer);
+        PDLConfigHelper.registerConfig(ResearchdConfig.Common.class, ModConfig.Type.COMMON, modContainer);
 
 		if (ResearchdCompatHandler.isFTBTeamsEnabled())
             FTBTeamsCompat.init();

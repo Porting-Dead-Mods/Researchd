@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.client.screens.editor.widgets.popups;
 
 import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.editor.PackLocation;
+import com.portingdeadmods.researchd.api.editmode.PackLocation;
 import com.portingdeadmods.researchd.client.screens.lib.layout.WidgetHeaderAndFooterLayout;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.DraggablePopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
@@ -10,7 +10,6 @@ import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.widgets.PDLButton;
 import com.portingdeadmods.researchd.networking.editor.CreateDatapackPayload;
 import com.portingdeadmods.researchd.networking.editor.SetPackPayload;
-import com.portingdeadmods.researchd.pdl.config.PDLConfigHelper;
 import com.portingdeadmods.researchd.utils.ClientEditorHelper;
 import com.portingdeadmods.researchd.utils.PrettyPath;
 import com.portingdeadmods.researchd.utils.TextUtils;
@@ -82,7 +81,7 @@ public class CreatePackPopupWidget extends DraggablePopupWidget {
         boolean generateExamples = this.checkbox.selected();
 
         if (this.packType == PackType.SERVER_DATA) {
-            PacketDistributor.sendToServer(new CreateDatapackPayload(name, description, PDLConfigHelper.camelToSnake(name), generateExamples));
+            PacketDistributor.sendToServer(new CreateDatapackPayload(name, description, TextUtils.camelToSnake(name), generateExamples));
         } else if (this.packType == PackType.CLIENT_RESOURCES) {
             String namespace = TextUtils.trimSpecialCharacterAndConvertToSnake(name);
             Result<PrettyPath, Exception> resourcePack = ClientEditorHelper.createResourcePack(name, description, namespace, generateExamples);

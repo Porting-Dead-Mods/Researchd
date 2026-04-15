@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.api.editor;
+package com.portingdeadmods.researchd.api.editmode;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

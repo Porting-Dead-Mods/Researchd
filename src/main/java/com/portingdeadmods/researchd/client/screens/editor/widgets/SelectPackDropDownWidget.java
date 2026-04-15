@@ -1,7 +1,7 @@
 package com.portingdeadmods.researchd.client.screens.editor.widgets;
 
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.editor.PackLocation;
+import com.portingdeadmods.researchd.api.editmode.PackLocation;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.DropDownWidget;
 import com.portingdeadmods.researchd.networking.editor.SetPackPayload;
 import net.minecraft.client.Minecraft;

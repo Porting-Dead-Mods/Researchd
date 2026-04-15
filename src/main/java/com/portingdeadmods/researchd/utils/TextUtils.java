@@ -94,6 +94,10 @@ public final class TextUtils {
         return lines.size() * (font.lineHeight + lineSpacing);
     }
 
+    public static String camelToSnake(String str) {
+        return TextUtils.camelToSnake(str, TextUtils::isLetterDigitOrUnderscore);
+    }
+
     public static String camelToSnake(String str, Predicate<Character> allowed) {
         StringBuilder result = new StringBuilder();
 
@@ -126,6 +130,10 @@ public final class TextUtils {
         }
 
         return result.toString();
+    }
+
+    public static boolean isLetterDigitOrUnderscore(char c) {
+        return Character.isLetterOrDigit(c) || c == '_';
     }
 
     public static boolean isValidResourceLocation(String s) {

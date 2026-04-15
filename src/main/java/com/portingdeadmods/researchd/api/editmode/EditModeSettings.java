@@ -1,6 +1,5 @@
-package com.portingdeadmods.researchd.api.editor;
+package com.portingdeadmods.researchd.api.editmode;
 
-import com.portingdeadmods.researchd.utils.PrettyPath;
 import org.jetbrains.annotations.Nullable;
 
 public interface EditModeSettings {

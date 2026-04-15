@@ -2,8 +2,8 @@ package com.portingdeadmods.researchd.impl.editor;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.portingdeadmods.researchd.api.editor.EditModeSettings;
-import com.portingdeadmods.researchd.api.editor.PackLocation;
+import com.portingdeadmods.researchd.api.editmode.EditModeSettings;
+import com.portingdeadmods.researchd.api.editmode.PackLocation;
 import com.portingdeadmods.researchd.resources.editor.EditorDatapackWriter;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;

@@ -5,7 +5,6 @@ import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.api.client.RememberingLinearLayout;
 import com.portingdeadmods.researchd.api.client.editor.EditorContext;
 import com.portingdeadmods.researchd.api.client.editor.StandaloneEditorObject;
-import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.ResearchPackPreviewWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.BackgroundEditBox;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
@@ -23,7 +22,6 @@ import net.minecraft.util.Unit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.sound.sampled.Line;
 import java.util.Optional;
 
 public class ResearchPackObject implements StandaloneEditorObject<ResearchPackImpl> {
@@ -139,7 +137,7 @@ public class ResearchPackObject implements StandaloneEditorObject<ResearchPackIm
 
     @Override
     public ResourceLocation createId(RememberingLinearLayout layout) {
-        String nameEditBox = TextUtils.camelToSnake(layout.getChild("name_edit_box", BackgroundEditBox.class).getValue(), c -> Character.isLetterOrDigit(c) || c == '_');
+        String nameEditBox = TextUtils.camelToSnake(layout.getChild("name_edit_box", BackgroundEditBox.class).getValue());
         return ResourceLocation.parse(nameEditBox);
     }
 

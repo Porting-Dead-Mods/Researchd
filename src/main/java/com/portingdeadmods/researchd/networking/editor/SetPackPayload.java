@@ -1,7 +1,7 @@
 package com.portingdeadmods.researchd.networking.editor;
 
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.editor.PackLocation;
+import com.portingdeadmods.researchd.api.editmode.PackLocation;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.impl.editor.EditModeSettingsImpl;
 import net.minecraft.network.RegistryFriendlyByteBuf;

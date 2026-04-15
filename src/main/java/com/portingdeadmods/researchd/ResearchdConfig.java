@@ -1,6 +1,6 @@
 package com.portingdeadmods.researchd;
 
-import com.portingdeadmods.researchd.pdl.config.ConfigValue;
+import com.portingdeadmods.portingdeadlibs.api.config.ConfigValue;
 
 public final class ResearchdConfig {
     public static class Common {

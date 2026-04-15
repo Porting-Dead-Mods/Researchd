@@ -76,7 +76,7 @@ public class SimpleResearchObject implements StandaloneEditorObject<SimpleResear
 
     @Override
     public ResourceLocation createId(RememberingLinearLayout layout) {
-        String nameEditBox = TextUtils.camelToSnake(layout.getChild("name_edit_box", BackgroundEditBox.class).getValue(), c -> Character.isLetterOrDigit(c) || c == '_');
+        String nameEditBox = TextUtils.camelToSnake(layout.getChild("name_edit_box", BackgroundEditBox.class).getValue());
         return ResourceLocation.parse(nameEditBox);
     }
 

@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.utils;
 
 import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.editor.EditModeSettings;
+import com.portingdeadmods.researchd.api.editmode.EditModeSettings;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.impl.utils.DisplayImpl;

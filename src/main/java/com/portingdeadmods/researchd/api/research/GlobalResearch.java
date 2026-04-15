@@ -75,7 +75,7 @@ public final class GlobalResearch {
     @Override
     public String toString() {
         return "GlobalResearch{" +
-                "researchPack=" + research +
+                "research=" + research +
                 '}';
     }
 }
