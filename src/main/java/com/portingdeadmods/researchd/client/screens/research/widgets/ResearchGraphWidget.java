@@ -13,6 +13,7 @@ import com.portingdeadmods.researchd.client.screens.research.graph.GraphStateMan
 import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
 import com.portingdeadmods.researchd.client.screens.research.graph.lines.ResearchHead;
 import com.portingdeadmods.researchd.client.screens.research.graph.lines.ResearchLine;
+import com.portingdeadmods.researchd.utils.Spaghetti;
 import com.portingdeadmods.researchd.utils.TextUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
@@ -55,7 +56,7 @@ public class ResearchGraphWidget extends AbstractWidget {
     public void setGraph(ResearchGraph graph) {
         if (this.graph != graph) {
             this.graph = graph;
-            this.researchScreen.getResearchPagesList().setSelectedPage(CommonResearchCache.pageOf(graph.rootNode().getResearch()));
+            this.researchScreen.getResearchPagesList().setSelectedPage(CommonResearchCache.pageOf(graph.rootNode().getInstance().getResearch()));
             this.researchLines.clear();
             this.layoutResult = null;
 
@@ -408,7 +409,7 @@ public class ResearchGraphWidget extends AbstractWidget {
 
         for (ResearchNode node : this.graph.nodes().values()) {
             if (node.isHovered()) {
-                this.setGraph(ResearchGraphCache.computeIfAbsent(node.getInstance().getKey()));
+                this.setGraph(ResearchGraphCache.computeIfAbsent(node.getInstance().getResearch()));
                 List<ResearchInstance> entries = this.researchScreen.getTechList().entries();
                 int index = entries.indexOf(node.getInstance());
                 if (index != -1) {
@@ -422,11 +423,15 @@ public class ResearchGraphWidget extends AbstractWidget {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        if (this.isHovered()) {
-            translate((int) dragX, (int) dragY);
+        if (/*Spaghetti.tryGetResearchScreen().popupWidgets.keySet().stream().noneMatch(AbstractWidget::isHovered) && */super.mouseDragged(mouseX, mouseY, button, dragX, dragY)) {
+            if (this.isHovered()) {
+                translate((int) dragX, (int) dragY);
+            }
+            return true;
         }
 
-        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+
+        return false;
     }
 
     public void onClose() {

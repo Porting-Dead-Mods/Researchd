@@ -20,14 +20,11 @@ import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
 import com.portingdeadmods.researchd.utils.Spaghetti;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.attachment.AttachmentType;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -66,7 +63,7 @@ public final class ResearchHelperClient {
         for (ResearchInstance res : team.getResearches().values()) {
             if (res.getResearchStatus() == ResearchStatus.RESEARCHED) {
                 ResearchEffect effect = res.lookup(level).researchEffect();
-                effect.onUnlock(level, player, res.getKey());
+                effect.onUnlock(level, player, res.getResearch());
             }
         }
 
@@ -81,7 +78,7 @@ public final class ResearchHelperClient {
 
     // Called at the end of the initialization phase of the researchPack cache
     public static void initIconRenderers(Level level) {
-        CommonResearchCache.globalResearches.forEach((k, v) -> {
+        CommonResearchCache.researchRelations.forEach((k, v) -> {
             ResearchIcon icon = v.getResearch(level).researchIcon();
             ResearchScreen.CLIENT_ICONS.put(k.location(), ResearchdClient.RESEARCH_ICONS.get(icon.id()).apply(icon));
         });

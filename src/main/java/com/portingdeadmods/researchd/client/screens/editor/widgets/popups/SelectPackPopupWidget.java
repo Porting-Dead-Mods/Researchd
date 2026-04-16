@@ -9,6 +9,7 @@ import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.widgets.PDLButton;
 import com.portingdeadmods.researchd.utils.ClientEditorHelper;
+import com.portingdeadmods.researchd.utils.GuiUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -45,7 +46,7 @@ public class SelectPackPopupWidget extends PopupWidget {
     }
 
     public SelectPackPopupWidget(int x, int y, ResearchScreen screen) {
-        super(x, y, 256, 192, CommonComponents.EMPTY);
+        super(x, y, 256, 192, false, CommonComponents.EMPTY);
         this.screen = screen;
 
         EditModeSettings settings = ClientEditorHelper.getEditModeSettings();
@@ -55,12 +56,12 @@ public class SelectPackPopupWidget extends PopupWidget {
         this.layout = new WidgetHeaderAndFooterLayout(this.width, 15, 155, 22);
         this.layout.withHeader(header -> {
             header.defaultCellSetting().paddingTop(1);
-            header.addChild(new StringWidget(Component.literal("Select or Create Pack"), PopupWidget.getFont()), LayoutSettings::alignHorizontallyCenter);
+            header.addChild(new StringWidget(Component.literal("Select or Create Pack"), GuiUtils.getFont()), LayoutSettings::alignHorizontallyCenter);
         });
 
         this.layout.withContents(contents -> {
             contents.spacing(2);
-            Font font = PopupWidget.getFont();
+            Font font = GuiUtils.getFont();
             MultiLineTextWidget introductionTextWidget = contents.addChild(new MultiLineTextWidget(Component.literal(INTRODUCTION_TEXT).withColor(FastColor.ARGB32.color(125, 110, 77)), font));
             introductionTextWidget.setMaxWidth(192);
             introductionTextWidget.setMaxRows(5);
@@ -154,7 +155,7 @@ public class SelectPackPopupWidget extends PopupWidget {
     }
 
     @Override
-    protected void updateWidgetNarration(@NotNull NarrationElementOutput narrationElementOutput) {
+    protected void updateWidgetNarration(@NotNull NarrationElementOutput output) {
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.portingdeadmods.researchd.client.screens.editor.EditorSharedSprites;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.selection.ResearchEffectTypeSelectionPopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.impl.research.effect.EmptyResearchEffect;
+import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.Spaghetti;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -37,7 +38,7 @@ public class EmbeddedEffectCreationWidget extends AbstractWidget {
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         guiGraphics.blitSprite(EditorSharedSprites.EDITOR_BACKGROUND_INVERTED_SPRITE, this.getX(), this.getY(), this.getWidth(), this.getHeight());
         if (this.createdEffect == null || this.createdEffect == EmptyResearchEffect.INSTANCE) {
-            guiGraphics.drawCenteredString(PopupWidget.getFont(), "Create Effect", this.getX() + this.getWidth() / 2, this.getY() + (this.getHeight() - PopupWidget.getFont().lineHeight) / 2, -1);
+            guiGraphics.drawCenteredString(GuiUtils.getFont(), "Create Effect", this.getX() + this.getWidth() / 2, this.getY() + (this.getHeight() - GuiUtils.getFont().lineHeight) / 2, -1);
         } else {
             this.createdEffectInfoWidget.render(guiGraphics, mouseX, mouseY, partialTick);
             this.createdEffectInfoWidget.renderTooltip(guiGraphics, mouseX, mouseY, partialTick);

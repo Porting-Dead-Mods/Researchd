@@ -154,7 +154,7 @@ public final class ResearchHelperCommon {
         for (ResearchInstance res : team.getResearches().values()) {
             if (res.getResearchStatus() == ResearchStatus.RESEARCHED) {
                 ResearchEffect effect = res.lookup(level).researchEffect();
-                effect.onUnlock(level, player, res.getKey());
+                effect.onUnlock(level, player, res.getResearch());
             }
         }
     }

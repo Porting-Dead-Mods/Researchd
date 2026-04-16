@@ -5,7 +5,7 @@ import com.portingdeadmods.portingdeadlibs.utils.PlayerUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;
 import com.portingdeadmods.researchd.api.client.TechList;
-import com.portingdeadmods.researchd.api.research.GlobalResearch;
+import com.portingdeadmods.researchd.impl.research.cache.CachedResearchRelations;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
@@ -145,10 +145,10 @@ public class ClientResearchTeamHelper {
     public static void resolveInstances(ResearchTeam team) {
         Map<ResourceKey<Research>, ResearchInstance> researches = team.getResearches();
 
-        for (Map.Entry<ResourceKey<Research>, ResearchInstance> research : researches.entrySet()) {
-            GlobalResearch globalResearch = CommonResearchCache.globalResearches.get(research.getKey());
-            if (globalResearch != null) {
-                research.setValue(research.getValue().withResearch(globalResearch));
+        for (Map.Entry<ResourceKey<Research>, ResearchInstance> entry : researches.entrySet()) {
+            CachedResearchRelations researchRelations = CommonResearchCache.researchRelations.get(entry.getKey());
+            if (researchRelations != null) {
+                entry.setValue(entry.getValue().withResearch(entry.getKey()));
             } else {
                 Researchd.LOGGER.debug("RESEARCH");
             }

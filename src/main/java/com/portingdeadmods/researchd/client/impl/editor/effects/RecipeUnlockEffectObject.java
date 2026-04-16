@@ -12,6 +12,7 @@ import com.portingdeadmods.researchd.client.screens.editor.widgets.RegistryVerif
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.impl.research.effect.RecipeUnlockEffect;
 import com.portingdeadmods.researchd.registries.ResearchEffectTypes;
+import com.portingdeadmods.researchd.utils.GuiUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.network.chat.Component;
@@ -34,7 +35,7 @@ public class RecipeUnlockEffectObject implements TypedEditorObject<RecipeUnlockE
 
     @Override
     public void buildLayout(RememberingLinearLayout layout, @Nullable RecipeUnlockEffect previous, @UnknownNullability EditorContext context) {
-        layout.addWidget(null, new StringWidget(Component.literal("By id:"), PopupWidget.getFont()));
+        layout.addWidget(null, new StringWidget(Component.literal("By id:"), GuiUtils.getFont()));
         //RegistryVerifyEditBox idEditBox = layout.addWidget("id_edit_box", RegistryVerifyEditBox.forIds(this.getIds(), context.innerWidth() - 8, 16));
         layout.addWidget("id_edit_boxes", new EditableIdListWidget(context.innerWidth() - 8, 60, this.getIds(), newVal -> this.update(layout, context)));
         //idEditBox.setResponder(newVal -> this.update(layout, context));

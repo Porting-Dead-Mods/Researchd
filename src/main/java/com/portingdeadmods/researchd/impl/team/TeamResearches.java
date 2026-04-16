@@ -6,8 +6,10 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
+import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
 import com.portingdeadmods.researchd.impl.research.SimpleResearchQueue;
+import com.portingdeadmods.researchd.impl.research.cache.CachedResearchRelations;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -63,12 +65,14 @@ public record TeamResearches(SimpleResearchQueue researchQueue,
         for (ResearchInstance instance : this.researches.values()) {
             if (instance.getResearchStatus() == ResearchStatus.RESEARCHED) continue;
 
-            if (instance.getParents().stream().allMatch(parent -> this.hasCompleted(parent.getResearchKey()))) {
+            CachedResearchRelations relations = CommonResearchCache.researchRelations.get(instance.getResearch());
+
+            if (relations.getParents().stream().allMatch(parent -> this.hasCompleted(parent.getResearchKey()))) {
                 instance.setResearchStatus(ResearchStatus.RESEARCHABLE);
                 continue;
             }
 
-            if (instance.getParents().stream().allMatch(parent -> {
+            if (relations.getParents().stream().allMatch(parent -> {
                 if (this.hasCompleted(parent.getResearchKey())) return true;
                 return this.researchQueue.entries().contains(parent.getResearchKey());
             })) {

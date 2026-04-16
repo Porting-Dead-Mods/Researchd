@@ -4,10 +4,11 @@ import com.portingdeadmods.researchd.api.client.RememberingLinearLayout;
 import com.portingdeadmods.researchd.api.client.editor.StandaloneEditorObject;
 import com.portingdeadmods.researchd.client.impl.editor.EditorContextImpl;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.SelectPackPopupWidget;
-import com.portingdeadmods.researchd.client.screens.lib.widgets.DraggablePopupWidget;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.ScrollableWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.widgets.PDLButton;
+import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.Spaghetti;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.layouts.Layout;
@@ -19,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
 
-public abstract class AbstractStandaloneCreationPopupWidget<O> extends DraggablePopupWidget {
+public abstract class AbstractStandaloneCreationPopupWidget<O> extends PopupWidget {
     private final RememberingLinearLayout layout;
     private final StandaloneEditorObject<? extends O> clientObject;
     private final ResearchScreen screen;
@@ -31,7 +32,7 @@ public abstract class AbstractStandaloneCreationPopupWidget<O> extends Draggable
     private final ResourceLocation defaultId;
 
     public AbstractStandaloneCreationPopupWidget(ResourceLocation defaultId, Function<ResourceLocation, StandaloneEditorObject<? extends O>> editorObjectGetterFunction, @Nullable O previous, int x, int y, int width, int height) {
-        super(x, y, width, height, CommonComponents.EMPTY);
+        super(x, y, width, height, true, CommonComponents.EMPTY);
         this.editorObjectGetterFunction = editorObjectGetterFunction;
         this.previous = previous;
         this.screen = Spaghetti.tryGetResearchScreen();
@@ -63,6 +64,7 @@ public abstract class AbstractStandaloneCreationPopupWidget<O> extends Draggable
                 .sprites(SelectPackPopupWidget.EDITOR_BUTTON_SPRITES)
                 .size(100, 16)
                 .build());
+
         if (this.clientObject != null) {
             EditorContextImpl context = new EditorContextImpl(this.createButton, this.screen, this, this.getWidth(), this.getHeight(), this.getWidth() - 16, this.getHeight() - 16, 7);
             this.buildLayoutFromPrevious(context);
@@ -109,13 +111,11 @@ public abstract class AbstractStandaloneCreationPopupWidget<O> extends Draggable
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
-
         guiGraphics.blitSprite(ResearchMethodCreationPopupWidget.BACKGROUND_SPRITE, this.getX(), this.getY(), this.getWidth(), this.getHeight());
 
-        guiGraphics.drawScrollingString(getFont(), this.getTitle(), this.getX() + 5, this.getX() + this.getWidth() - 5, this.getY() + 8, -1);
+        super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
 
-        super.renderElements(guiGraphics, mouseX, mouseY, partialTick);
+        guiGraphics.drawScrollingString(GuiUtils.getFont(), this.getTitle(), this.getX() + 5, this.getX() + this.getWidth() - 5, this.getY() + 8, -1);
 
     }
 

@@ -160,7 +160,7 @@ public class TechListWidget extends ResearchScreenWidget {
                 selectedInstance.setResearchedPlayer(player);
                 selectedInstance.setResearchedTime(gameTime);
 
-                ResourceKey<Research> researchKey = selectedInstance.getKey();
+                ResourceKey<Research> researchKey = selectedInstance.getResearch();
                 PacketDistributor.sendToServer(new ResearchQueueAddPayload(researchKey, player, gameTime));
 
                 // Instantaneous Effect
@@ -243,7 +243,7 @@ public class TechListWidget extends ResearchScreenWidget {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (this.hoveredResearch != null) {
-            this.screen.getResearchGraphWidget().setGraph(ResearchGraphCache.computeIfAbsent(this.hoveredResearch.getKey()));
+            this.screen.getResearchGraphWidget().setGraph(ResearchGraphCache.computeIfAbsent(this.hoveredResearch.getResearch()));
             this.screen.getSelectedResearchWidget().setSelectedResearch(this.hoveredResearch);
             return super.mouseClicked(mouseX, mouseY, button);
         } else if (

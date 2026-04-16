@@ -7,6 +7,7 @@ import com.portingdeadmods.researchd.client.screens.lib.widgets.ContainerWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.widgets.PDLImageButton;
+import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.Search;
 import com.portingdeadmods.researchd.utils.Spaghetti;
 import net.minecraft.client.Minecraft;
@@ -48,7 +49,7 @@ public class ItemSelectorPopupWidget extends PopupWidget {
     private final List<ItemSelectorCategory> categories;
 
     public ItemSelectorPopupWidget(ItemSelectorWidget parentSelectorWidget, @Nullable PopupWidget parentPopupWidget, List<ItemSelectorCategory> categories, ItemSelectorCategory defaultCategory, int x, int y) {
-        super(x, y, 180, 194, CommonComponents.EMPTY);
+        super(x, y, 180, 194, false, CommonComponents.EMPTY);
         this.categories = categories;
         this.parentSelectorWidget = parentSelectorWidget;
         this.parentPopupWidget = parentPopupWidget;
@@ -123,7 +124,7 @@ public class ItemSelectorPopupWidget extends PopupWidget {
                 int iconOffset = selected ? 2 : 1;
                 guiGraphics.renderItem(category.getIcon(), x + iconOffset, y + iconOffset);
                 if (mouseX > x && mouseX < x + (selected ? 20 : 18) && mouseY > y && mouseY < y + 16 + (selected ? 2 : 0)) {
-                    guiGraphics.renderTooltip(getFont(), category.getName(), mouseX, mouseY);
+                    guiGraphics.renderTooltip(GuiUtils.getFont(), category.getName(), mouseX, mouseY);
                 }
             }
         }
@@ -208,7 +209,7 @@ public class ItemSelectorPopupWidget extends PopupWidget {
             super.renderTooltips(guiGraphics, mouseX, mouseY, v);
 
             if (this.hoveredItem != null) {
-                guiGraphics.renderTooltip(PopupWidget.getFont(), this.hoveredItem.getHoverName(), mouseX, mouseY);
+                guiGraphics.renderTooltip(GuiUtils.getFont(), this.hoveredItem.getHoverName(), mouseX, mouseY);
             }
         }
 

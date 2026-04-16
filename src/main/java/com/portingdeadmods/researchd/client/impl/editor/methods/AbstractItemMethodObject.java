@@ -13,6 +13,7 @@ import com.portingdeadmods.researchd.client.screens.lib.widgets.BackgroundEditBo
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
 import com.portingdeadmods.researchd.registries.ResearchMethodTypes;
+import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.TextUtils;
 import dev.ftb.mods.ftbteams.data.TeamType;
 import net.minecraft.client.gui.components.EditBox;
@@ -39,13 +40,13 @@ public abstract class AbstractItemMethodObject<T extends ItemResearchMethod> imp
     public void buildLayout(RememberingLinearLayout layout, @Nullable T previous, @UnknownNullability EditorContext context) {
         layout.getLayout().spacing(2);
         // TODO: The ability to select multiple && tag support
-        layout.addWidget(null, new StringWidget(Component.literal("Item:"), PopupWidget.getFont()), LayoutSettings::alignHorizontallyCenter);
+        layout.addWidget(null, new StringWidget(Component.literal("Item:"), GuiUtils.getFont()), LayoutSettings::alignHorizontallyCenter);
         ItemSelectorWidget itemSelector = layout.addWidget("item_selector", new ItemSelectorWidget(context.parentPopupWidget(), 0, 0, 25, 24, true, true), LayoutSettings::alignHorizontallyCenter);
         if (previous != null) {
             itemSelector.setSelected(previous.item(), false);
         }
-        layout.addWidget(null, new StringWidget(Component.literal("Count:"), PopupWidget.getFont()), LayoutSettings::alignHorizontallyCenter);
-        EditBox editBox = layout.addWidget("count", new BackgroundEditBox(PopupWidget.getFont(), SPRITES, 24, 16, "1"), LayoutSettings::alignHorizontallyCenter);
+        layout.addWidget(null, new StringWidget(Component.literal("Count:"), GuiUtils.getFont()), LayoutSettings::alignHorizontallyCenter);
+        EditBox editBox = layout.addWidget("count", new BackgroundEditBox(GuiUtils.getFont(), SPRITES, 24, 16, "1"), LayoutSettings::alignHorizontallyCenter);
         if (previous != null) {
             editBox.setValue(String.valueOf(previous.count()));
         } else {

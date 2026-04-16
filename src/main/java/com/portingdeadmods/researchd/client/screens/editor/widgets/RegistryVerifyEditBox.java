@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.client.screens.editor.widgets;
 
 import com.portingdeadmods.researchd.client.screens.lib.widgets.BackgroundEditBox;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
+import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.TextUtils;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.WidgetSprites;
@@ -32,12 +33,12 @@ public class RegistryVerifyEditBox extends BackgroundEditBox {
 
     public static RegistryVerifyEditBox forRegistry(Registry<?> registry, int width, int height) {
         Objects.requireNonNull(registry);
-        return new RegistryVerifyEditBox(PopupWidget.getFont(), BackgroundEditBox.SPRITES, registry, null, width, height, CommonComponents.EMPTY);
+        return new RegistryVerifyEditBox(GuiUtils.getFont(), BackgroundEditBox.SPRITES, registry, null, width, height, CommonComponents.EMPTY);
     }
 
     public static RegistryVerifyEditBox forIds(Collection<ResourceLocation> ids, int width, int height) {
         Objects.requireNonNull(ids);
-        return new RegistryVerifyEditBox(PopupWidget.getFont(), BackgroundEditBox.SPRITES, null, ids, width, height, CommonComponents.EMPTY);
+        return new RegistryVerifyEditBox(GuiUtils.getFont(), BackgroundEditBox.SPRITES, null, ids, width, height, CommonComponents.EMPTY);
     }
 
     public @Nullable Registry<?> getRegistry() {

@@ -16,6 +16,7 @@ import com.portingdeadmods.researchd.client.screens.research.widgets.PDLImageBut
 import com.portingdeadmods.researchd.impl.research.effect.AndResearchEffect;
 import com.portingdeadmods.researchd.impl.research.effect.EmptyResearchEffect;
 import com.portingdeadmods.researchd.registries.ResearchEffectTypes;
+import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.Search;
 import com.portingdeadmods.researchd.utils.Spaghetti;
 import it.unimi.dsi.fastutil.Pair;
@@ -46,7 +47,7 @@ public class ResearchEffectTypeSelectionPopupWidget extends PopupWidget {
     private boolean doneClicked;
 
     public ResearchEffectTypeSelectionPopupWidget(@Nullable PopupWidget parentPopupWidget, EmbeddedEffectCreationWidget parentSelectionWidget) {
-        super(0, 0, 148, 160, CommonComponents.EMPTY);
+        super(0, 0, 148, 160, false, CommonComponents.EMPTY);
         this.parentPopupWidget = parentPopupWidget;
         this.originSelectionWidget = parentSelectionWidget;
         this.search = new Search();
@@ -225,7 +226,7 @@ public class ResearchEffectTypeSelectionPopupWidget extends PopupWidget {
             ClientResearchIcon<?> icon = pair.left();
             Component name = pair.right();
             icon.render(guiGraphics, left + 1, top + 1, mouseX, mouseY, 1, 14, 14, 1);
-            guiGraphics.drawScrollingString(PopupWidget.getFont(), name, left + 18 + 1, left + this.getItemWidth() - 1, top + 4, -1);
+            guiGraphics.drawScrollingString(GuiUtils.getFont(), name, left + 18 + 1, left + this.getItemWidth() - 1, top + 4, -1);
         }
 
     }

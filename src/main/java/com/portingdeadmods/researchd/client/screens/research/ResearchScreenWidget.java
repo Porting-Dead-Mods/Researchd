@@ -40,7 +40,7 @@ public abstract class ResearchScreenWidget extends AbstractWidget {
         ResearchStatus status = instance.getResearchStatus();
         guiGraphics.blit(status.getSpriteTexture(), x, y, (int) (width * scale), (int) (height * scale), 0, 0, width, height, width, height);
 
-        ClientResearchIcon<?> clientResearchIcon = ResearchScreen.CLIENT_ICONS.get(instance.getKey().location());
+        ClientResearchIcon<?> clientResearchIcon = ResearchScreen.CLIENT_ICONS.get(instance.getResearch().location());
         if (clientResearchIcon != null) {
             clientResearchIcon.render(guiGraphics, x, y, mouseX, mouseY, scale, 0);
         }
@@ -67,7 +67,7 @@ public abstract class ResearchScreenWidget extends AbstractWidget {
         ResearchStatus status = instance.getResearchStatus();
         GuiUtils.drawImg(guiGraphics, status.getSpriteTexture(spriteType), x, y, PANEL_WIDTH, spriteType.getHeight());
 
-        ClientResearchIcon<?> clientResearchIcon = ResearchScreen.CLIENT_ICONS.get(instance.getKey().location());
+        ClientResearchIcon<?> clientResearchIcon = ResearchScreen.CLIENT_ICONS.get(instance.getResearch().location());
 
         if (clientResearchIcon != null) {
             clientResearchIcon.render(guiGraphics, x + 2, y + 2, mouseX, mouseY, 1, 0);

@@ -22,7 +22,7 @@ public record TechList(UniqueArray<ResearchInstance> entries) {
     public void sortTechList() {
         List<ResearchInstance> sorted = this.entries.stream().sorted((a, b) -> {
             if (a.getResearchStatus() == b.getResearchStatus()) {
-                return a.getKey().location().toString().compareTo(b.getKey().location().toString());
+                return a.getResearch().location().toString().compareTo(b.getResearch().location().toString());
             }
             return a.getResearchStatus().getSortingValue() - b.getResearchStatus().getSortingValue();
         }).toList();
@@ -37,7 +37,7 @@ public record TechList(UniqueArray<ResearchInstance> entries) {
 
         for (ResearchInstance entry : this.entries()) {
             // Search by resource location
-            String resourceLocation = entry.getKey().location().toString().toLowerCase();
+            String resourceLocation = entry.getResearch().location().toString().toLowerCase();
 
             // Search by localized display name
             String displayName = entry.getDisplayName(level).getString().toLowerCase();

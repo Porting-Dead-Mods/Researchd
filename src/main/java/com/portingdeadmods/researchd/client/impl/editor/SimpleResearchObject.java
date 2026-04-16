@@ -15,6 +15,7 @@ import com.portingdeadmods.researchd.impl.research.SimpleResearch;
 import com.portingdeadmods.researchd.impl.research.icons.ItemResearchIcon;
 import com.portingdeadmods.researchd.impl.utils.DisplayImpl;
 import com.portingdeadmods.researchd.utils.ClientEditorHelper;
+import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.TextUtils;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.StringWidget;
@@ -38,26 +39,25 @@ public class SimpleResearchObject implements StandaloneEditorObject<SimpleResear
     @Override
     public void buildLayout(RememberingLinearLayout layout, @Nullable SimpleResearch previous, @UnknownNullability EditorContext context) {
         layout.getLayout().spacing(2);
-        layout.addWidget(null, new StringWidget(Component.literal("Display:"), PopupWidget.getFont()));
-        BackgroundEditBox nameEditBox = layout.addWidget("name_edit_box", new BackgroundEditBox(PopupWidget.getFont(), context.innerWidth() - 4, 16));
+        layout.addWidget(null, new StringWidget(Component.literal("Display:"), GuiUtils.getFont()));
+        BackgroundEditBox nameEditBox = layout.addWidget("name_edit_box", new BackgroundEditBox(GuiUtils.getFont(), context.innerWidth() - 4, 16));
         nameEditBox.setHint(Component.literal("<Name>"));
-        //nameEditBox.setFilter(TextUtils::isValidNamespace);
         nameEditBox.setResponder(newVal -> this.update(layout, context));
-        BackgroundEditBox descEditBox = layout.addWidget("desc_edit_box", new BackgroundEditBox(PopupWidget.getFont(), context.innerWidth() - 4, 16));
+        BackgroundEditBox descEditBox = layout.addWidget("desc_edit_box", new BackgroundEditBox(GuiUtils.getFont(), context.innerWidth() - 4, 16));
         descEditBox.setHint(Component.literal("<Desc>"));
-        layout.addWidget(null, new StringWidget(Component.literal("Icon:"), PopupWidget.getFont()));
+        layout.addWidget(null, new StringWidget(Component.literal("Icon:"), GuiUtils.getFont()));
         ItemSelectorWidget itemSelectorWidget = layout.addWidget("icon", new ItemSelectorWidget(context.parentPopupWidget(), 0, 0, 20, 20, false, true));
-        layout.addWidget(null, new StringWidget(Component.literal("Page:"), PopupWidget.getFont()));
-        BackgroundEditBox pageEditBox = layout.addWidget("page", new BackgroundEditBox(PopupWidget.getFont(), context.innerWidth() - 4, 16));
-        layout.addWidget(null, new StringWidget(Component.literal("Parents:"), PopupWidget.getFont()));
+        layout.addWidget(null, new StringWidget(Component.literal("Page:"), GuiUtils.getFont()));
+        BackgroundEditBox pageEditBox = layout.addWidget("page", new BackgroundEditBox(GuiUtils.getFont(), context.innerWidth() - 4, 16));
+        layout.addWidget(null, new StringWidget(Component.literal("Parents:"), GuiUtils.getFont()));
         ResearchSelectorListWidget parentsSelector = layout.addWidget("parents_selector", new ResearchSelectorListWidget(context.parentPopupWidget(), context.innerWidth() - 4, 24, Collections.emptyList(), true));
-        layout.addWidget("requires_parents", Checkbox.builder(Component.literal("Requires Parents"), PopupWidget.getFont())
+        layout.addWidget("requires_parents", Checkbox.builder(Component.literal("Requires Parents"), GuiUtils.getFont())
                 .selected(previous != null && previous.requiresParent())
                 .build());
-        layout.addWidget(null, new StringWidget(Component.literal("Method:"), PopupWidget.getFont()));
+        layout.addWidget(null, new StringWidget(Component.literal("Method:"), GuiUtils.getFont()));
         EmbeddedMethodCreationWidget methodWidget = layout.addWidget("method", new EmbeddedMethodCreationWidget(context.parentPopupWidget(), 0, 0, context.innerWidth() - 4, 32, CommonComponents.EMPTY));
         methodWidget.setResponder(() -> this.update(layout, context));
-        layout.addWidget(null, new StringWidget(Component.literal("Effect:"), PopupWidget.getFont()));
+        layout.addWidget(null, new StringWidget(Component.literal("Effect:"), GuiUtils.getFont()));
         EmbeddedEffectCreationWidget effectWidget = layout.addWidget("effect", new EmbeddedEffectCreationWidget(context.parentPopupWidget(), 0, 0, context.innerWidth() - 4, 32, CommonComponents.EMPTY));
 
         if (previous != null) {

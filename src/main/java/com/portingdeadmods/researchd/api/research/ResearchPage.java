@@ -2,8 +2,8 @@ package com.portingdeadmods.researchd.api.research;
 
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.impl.research.cache.CachedResearchRelations;
 import com.portingdeadmods.researchd.impl.research.icons.ItemResearchIcon;
-import com.portingdeadmods.researchd.impl.utils.DisplayImpl;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -21,11 +21,11 @@ public record ResearchPage(
         ResourceLocation id,
         ResearchIcon icon,
         ResourceKey<Research> iconResearchKey,
-        UniqueArray<GlobalResearch> researches
+        UniqueArray<ResourceKey<Research>> researches
 ) {
     public static final ResourceLocation DEFAULT_PAGE_ID = Researchd.rl("default");
 
-	public boolean containsResearch(GlobalResearch res) {
+	public boolean containsResearch(ResourceKey<Research> res) {
 		return researches.contains(res);
 	}
 
@@ -37,7 +37,7 @@ public record ResearchPage(
         private final ResourceLocation id;
         private ResearchIcon icon = ItemResearchIcon.EMPTY;
         private ResourceKey<Research> iconResearchKey;
-        private final UniqueArray<GlobalResearch> researches = new UniqueArray<>();
+        private final UniqueArray<ResourceKey<Research>> researches = new UniqueArray<>();
 
         private Builder(ResourceLocation id) {
             this.id = id;
@@ -63,7 +63,7 @@ public record ResearchPage(
             return this;
         }
 
-        public Builder addResearch(GlobalResearch research) {
+        public Builder addResearch(ResourceKey<Research> research) {
             this.researches.add(research);
             return this;
         }

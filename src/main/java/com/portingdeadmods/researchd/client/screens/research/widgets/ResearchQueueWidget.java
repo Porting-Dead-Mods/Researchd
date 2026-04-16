@@ -60,7 +60,7 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
         int selectedIndex = 0;
         for (int i = 0; i < this.queue.size(); i++) {
             ResourceKey<Research> key = this.queue.get(i);
-            if (this.selected == null || key != this.selected.getKey()) {
+            if (this.selected == null || key != this.selected.getResearch()) {
                 ResearchInstance instance = ClientResearchTeamHelper.getTeam().getResearches().get(key);
                 renderQueuePanel(guiGraphics, instance, paddingX + i * PANEL_WIDTH, paddingY, mouseX, mouseY, i);
             } else {
@@ -147,12 +147,12 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
         ResearchStatus status = instance.getResearchStatus();
         GuiUtils.drawImg(guiGraphics, status.getSpriteTexture(spriteType), x, y, PANEL_WIDTH, spriteType.getHeight());
 
-        ResearchProgress rmp = ClientResearchTeamHelper.getTeam().getResearchProgresses().get(instance.getKey());
+        ResearchProgress rmp = ClientResearchTeamHelper.getTeam().getResearchProgresses().get(instance.getResearch());
         float progress = rmp == null ? 0f : (rmp.getProgress() / rmp.getMaxProgress());
 
         guiGraphics.blit(ResearchStatus.RESEARCHED.getSpriteTexture(spriteType), x, y, 0, 0, (int) (progress * PANEL_WIDTH), spriteType.getHeight(), PANEL_WIDTH, spriteType.getHeight());
 
-        ResearchScreen.CLIENT_ICONS.get(instance.getKey().location()).render(guiGraphics, x + 2, y + 2, mouseX, mouseY, 1, 0);
+        ResearchScreen.CLIENT_ICONS.get(instance.getResearch().location()).render(guiGraphics, x + 2, y + 2, mouseX, mouseY, 1, 0);
 
         if (isHovering(guiGraphics, x, y, mouseX, mouseY) && hoverable) {
             int color = -2130706433;

@@ -3,12 +3,10 @@ package com.portingdeadmods.researchd.impl.research;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.ResearchdConfig;
-import com.portingdeadmods.researchd.api.research.GlobalResearch;
-import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.ResearchInstance;
-import com.portingdeadmods.researchd.api.research.ResearchStatus;
+import com.portingdeadmods.researchd.api.research.*;
 import com.portingdeadmods.researchd.api.team.ResearchQueue;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
+import com.portingdeadmods.researchd.impl.research.cache.CachedResearchRelations;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -47,11 +45,11 @@ public record SimpleResearchQueue(List<ResourceKey<Research>> entries) implement
         if (researchInstance.getResearchStatus() == ResearchStatus.RESEARCHED) return false;
 
         for (ResourceKey<Research> instance : this.entries) {
-            if (instance.equals(researchInstance.getKey())) return false;
+            if (instance.equals(researchInstance.getResearch())) return false;
         }
 
         if (this.entries.size() < QUEUE_LENGTH.getAsInt()) {
-            this.entries.add(researchInstance.getKey());
+            this.entries.add(researchInstance.getResearch());
             return true;
         }
         return false;
@@ -72,7 +70,7 @@ public record SimpleResearchQueue(List<ResourceKey<Research>> entries) implement
     public boolean remove(int index, boolean removeChildren) {
         if (this.entries.size() > index && index >= 0) {
             if (removeChildren)
-                for (ResourceKey<Research> child : CommonResearchCache.allChildrenOf(this.entries.get(index)).stream().map(GlobalResearch::getResearchKey).toList()) {
+                for (ResourceKey<Research> child : CommonResearchCache.allChildrenOf(this.entries.get(index)).stream().map(CachedResearchRelations::getResearchKey).toList()) {
                     this.remove(this.entries.indexOf(child), true);
                 }
 

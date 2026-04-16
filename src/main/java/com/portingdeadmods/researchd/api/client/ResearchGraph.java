@@ -1,15 +1,11 @@
 package com.portingdeadmods.researchd.api.client;
 
-import com.portingdeadmods.portingdeadlibs.utils.LazyFinal;
-import com.portingdeadmods.researchd.api.research.GlobalResearch;
-import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.ResearchInstance;
-import com.portingdeadmods.researchd.api.research.ResearchPage;
+import com.portingdeadmods.researchd.api.research.*;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
+import com.portingdeadmods.researchd.impl.research.cache.CachedResearchRelations;
 import net.minecraft.resources.ResourceKey;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -24,14 +20,14 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
     private static final int RESEARCH_GRAPH_LAYERS = 2;
 
     // TODO: Add researchPacks to the team's researchPack progress
-    private ResearchGraph(GlobalResearch researchRoot, Map<ResourceKey<Research>, ResearchInstance> researches) {
-        this(new ResearchNode(researches.get(researchRoot.getResearchKey())), new LinkedHashMap<>(), CommonResearchCache.pageOf(researchRoot));
+    private ResearchGraph(ResourceKey<Research> researchRoot, Map<ResourceKey<Research>, ResearchInstance> researches) {
+        this(new ResearchNode(researches.get(researchRoot)), new LinkedHashMap<>(), CommonResearchCache.pageOf(researchRoot));
 
-        createNodes(rootNode.getInstance(), 0, CommonResearchCache.rootResearch != null && CommonResearchCache.rootResearch.is(rootNode.getInstance().getKey())
+        createNodes(rootNode.getInstance(), 0, CommonResearchCache.rootResearch != null && CommonResearchCache.rootResearch.is(rootNode.getInstance().getResearch())
                 ? -1
                 : RESEARCH_GRAPH_LAYERS, researches);
         this.rootNode.setRootNode(true);
-        this.nodes.put(this.rootNode.getInstance().getKey(), this.rootNode);
+        this.nodes.put(this.rootNode.getInstance().getResearch(), this.rootNode);
         collectRelatedNodes();
 
         for (ResearchNode node : this.nodes.values()) {
@@ -41,19 +37,22 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
 
     private void collectRelatedNodes() {
         for (ResearchNode node : this.nodes.values()) {
-            GlobalResearch research = node.getInstance().getResearch();
-            Set<GlobalResearch> parents = research.getParents();
+            ResourceKey<Research> research = node.getInstance().getResearch();
 
-            for (GlobalResearch parent : parents) {
+            CachedResearchRelations relations = CommonResearchCache.researchRelations.get(research);
+
+            Set<CachedResearchRelations> parents = relations.getParents();
+
+            for (CachedResearchRelations parent : parents) {
                 ResearchNode parentNode = this.nodes.get(parent.getResearchKey());
                 if (parentNode != null) {
                     node.addParent(parentNode);
                 }
             }
 
-            Set<GlobalResearch> children = research.getChildren();
+            Set<CachedResearchRelations> children = relations.getChildren();
 
-            for (GlobalResearch child : children) {
+            for (CachedResearchRelations child : children) {
                 ResearchNode childNode = this.nodes.get(child.getResearchKey());
                 if (childNode != null) {
                     node.addChild(childNode);
@@ -69,9 +68,10 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
 
     private void createNodesUpward(ResearchInstance instance, int nesting, int layers, Map<ResourceKey<Research>, ResearchInstance> researches) {
         if (nesting > 0) {
-            this.nodes.put(instance.getKey(), new ResearchNode(instance));
+            this.nodes.put(instance.getResearch(), new ResearchNode(instance));
         }
-        for (GlobalResearch research : instance.getParents()) {
+        CachedResearchRelations relations = CommonResearchCache.researchRelations.get(instance.getResearch());
+        for (CachedResearchRelations research : relations.getParents()) {
             if (nesting < layers || layers == -1) {
                 createNodesUpward(researches.get(research.getResearchKey()), nesting + 1, layers, researches);
             } else {
@@ -82,9 +82,10 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
 
     private void createNodesDownward(ResearchInstance instance, int nesting, int layers, Map<ResourceKey<Research>, ResearchInstance> researches) {
         if (nesting > 0) {
-            this.nodes.put(instance.getKey(), new ResearchNode(instance));
+            this.nodes.put(instance.getResearch(), new ResearchNode(instance));
         }
-        for (GlobalResearch research : instance.getChildren()) {
+        CachedResearchRelations relations = CommonResearchCache.researchRelations.get(instance.getResearch());
+        for (CachedResearchRelations research : relations.getChildren()) {
             if (nesting < layers || layers == -1) {
                 createNodesDownward(researches.get(research.getResearchKey()), nesting + 1, layers, researches);
             } else {
@@ -94,7 +95,7 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
     }
 
     public static ResearchGraph fromRootResearch(ResourceKey<Research> root, Map<ResourceKey<Research>, ResearchInstance> researches) {
-        return new ResearchGraph(CommonResearchCache.globalResearches.get(root), researches);
+        return new ResearchGraph(root, researches);
     }
 
     /**
@@ -103,7 +104,7 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
      * @param researches Lookup
      * @return A new ResearchGraph for the page
      */
-    public static ResearchGraph fromResearchPage(ResearchPage page, GlobalResearch rootNode, Map<ResourceKey<Research>, ResearchInstance> researches) {
+    public static ResearchGraph fromResearchPage(ResearchPage page, ResourceKey<Research> rootNode, Map<ResourceKey<Research>, ResearchInstance> researches) {
         // TODO: FINISH
         return new ResearchGraph(rootNode, researches);
     }

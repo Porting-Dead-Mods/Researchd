@@ -19,6 +19,7 @@ import com.portingdeadmods.researchd.registries.ResearchMethodTypes;
 import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
 import com.portingdeadmods.researchd.registries.ResearchdItems;
 import com.portingdeadmods.researchd.utils.ClientEditorHelper;
+import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.TextUtils;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
@@ -50,15 +51,15 @@ public class ConsumePackMethodObject implements TypedEditorObject<ConsumePackRes
     public void buildLayout(RememberingLinearLayout layout, @Nullable ConsumePackResearchMethod previous, @UnknownNullability EditorContext context) {
         layout.getLayout().spacing(2);
         // TODO: The ability to select multiple packs
-        layout.addWidget(null, new StringWidget(Component.literal("Pack:"), PopupWidget.getFont()), LayoutSettings::alignHorizontallyCenter);
+        layout.addWidget(null, new StringWidget(Component.literal("Pack:"), GuiUtils.getFont()), LayoutSettings::alignHorizontallyCenter);
         ResourceKey<ResearchPack> defaultPack = ClientEditorHelper.getDefaultResearchPack();
         ItemStack defaultSelectedPack = defaultPack != null ? ResearchPackImpl.asStack(defaultPack) : ResearchdItems.GREEN_RESEARCH_PACK_ICON.toStack();
         ItemSelectorWidget packSelector = layout.addWidget("pack_selector", new ItemSelectorWidget(context.parentPopupWidget(), 0, 0, 25, 24, Ingredient.of(defaultSelectedPack), this::createItemSelectorPopup), LayoutSettings::alignHorizontallyCenter);
         if (previous != null) {
             packSelector.setSelected(previous.asStacks(), false);
         }
-        layout.addWidget(null, new StringWidget(Component.literal("Time:"), PopupWidget.getFont()), LayoutSettings::alignHorizontallyCenter);
-        EditBox timeEditBox = layout.addWidget("time", new BackgroundEditBox(PopupWidget.getFont(), SPRITES, 36, 16, "1"), LayoutSettings::alignHorizontallyCenter);
+        layout.addWidget(null, new StringWidget(Component.literal("Time:"), GuiUtils.getFont()), LayoutSettings::alignHorizontallyCenter);
+        EditBox timeEditBox = layout.addWidget("time", new BackgroundEditBox(GuiUtils.getFont(), SPRITES, 36, 16, "1"), LayoutSettings::alignHorizontallyCenter);
         if (previous != null) {
             timeEditBox.setValue(previous.duration() + "t");
         } else {
@@ -66,8 +67,8 @@ public class ConsumePackMethodObject implements TypedEditorObject<ConsumePackRes
         }
         timeEditBox.setFilter(this::isTimeValid);
         timeEditBox.setResponder(val -> this.onTimeValueChanged(val, timeEditBox));
-        layout.addWidget(null, new StringWidget(Component.literal("Count:"), PopupWidget.getFont()), LayoutSettings::alignHorizontallyCenter);
-        EditBox countEditBox = layout.addWidget("count", new BackgroundEditBox(PopupWidget.getFont(), SPRITES, 24, 16, "1"), LayoutSettings::alignHorizontallyCenter);
+        layout.addWidget(null, new StringWidget(Component.literal("Count:"), GuiUtils.getFont()), LayoutSettings::alignHorizontallyCenter);
+        EditBox countEditBox = layout.addWidget("count", new BackgroundEditBox(GuiUtils.getFont(), SPRITES, 24, 16, "1"), LayoutSettings::alignHorizontallyCenter);
         if (previous != null) {
             countEditBox.setValue(String.valueOf(previous.count()));
         } else {

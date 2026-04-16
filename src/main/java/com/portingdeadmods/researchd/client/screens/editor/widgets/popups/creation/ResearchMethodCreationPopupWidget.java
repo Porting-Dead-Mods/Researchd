@@ -11,9 +11,10 @@ import com.portingdeadmods.researchd.api.research.methods.ResearchMethodType;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.EmbeddedMethodCreationWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.SelectPackPopupWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.selection.ResearchMethodTypeSelectionPopupWidget;
-import com.portingdeadmods.researchd.client.screens.lib.widgets.DraggablePopupWidget;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.widgets.PDLButton;
+import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.Spaghetti;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.layouts.FrameLayout;
@@ -24,7 +25,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
-public class ResearchMethodCreationPopupWidget extends DraggablePopupWidget {
+public class ResearchMethodCreationPopupWidget extends PopupWidget {
     public static final ResourceLocation BACKGROUND_SPRITE = Researchd.rl("widget/research_method_creation_widget");
 
     private final RememberingLinearLayout layout;
@@ -34,7 +35,7 @@ public class ResearchMethodCreationPopupWidget extends DraggablePopupWidget {
     private final EmbeddedMethodCreationWidget originSelectionWidget;
 
     public ResearchMethodCreationPopupWidget(ResearchMethodTypeSelectionPopupWidget parentPopupWidget, ResearchMethodType type, EmbeddedMethodCreationWidget originSelectionWidget, int x, int y, int width, int height) {
-        super(x, y, width, height, CommonComponents.EMPTY);
+        super(x, y, width, height, false, CommonComponents.EMPTY);
         this.parentPopupWidget = parentPopupWidget;
         this.originSelectionWidget = originSelectionWidget;
         LinearLayout l = new LinearLayout(width, height, LinearLayout.Orientation.VERTICAL);
@@ -111,7 +112,7 @@ public class ResearchMethodCreationPopupWidget extends DraggablePopupWidget {
 
         ClientResearchIcon.getClientIcon(this.clientResearchMethod.type().icon()).render(guiGraphics, this.getX() + 3, this.getY() + 3, mouseX, mouseY, 1, partialTick);
         Component name = this.clientResearchMethod.type().getName();
-        guiGraphics.drawScrollingString(getFont(), name, this.getX() + 21, this.getX() + this.getWidth() - 6, this.getY() + 7, -1);
+        guiGraphics.drawScrollingString(GuiUtils.getFont(), name, this.getX() + 21, this.getX() + this.getWidth() - 6, this.getY() + 7, -1);
     }
 
     @Override

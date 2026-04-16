@@ -30,21 +30,20 @@ public class ResearchPackObject implements StandaloneEditorObject<ResearchPackIm
     @Override
     public void buildLayout(RememberingLinearLayout layout, @Nullable ResearchPackImpl previous, EditorContext context) {
         layout.getLayout().spacing(2);
-        layout.addWidget(null, new StringWidget(Component.literal("Display:"), PopupWidget.getFont()));
-        BackgroundEditBox nameEditBox = layout.addWidget("name_edit_box", new BackgroundEditBox(PopupWidget.getFont(), context.innerWidth() - 4, 16));
+        layout.addWidget(null, new StringWidget(Component.literal("Display:"), GuiUtils.getFont()));
+        BackgroundEditBox nameEditBox = layout.addWidget("name_edit_box", new BackgroundEditBox(GuiUtils.getFont(), context.innerWidth() - 4, 16));
         if (previous != null) {
             nameEditBox.setValue(previous.display().name().orElse(Component.empty()).getString());
         }
         nameEditBox.setHint(Component.literal("<Name>"));
-        nameEditBox.setFilter(TextUtils::isValidNamespace);
         nameEditBox.setResponder(newVal -> this.update(layout, context));
-        BackgroundEditBox descEditBox = layout.addWidget("desc_edit_box", new BackgroundEditBox(PopupWidget.getFont(), context.innerWidth() - 4, 16));
+        BackgroundEditBox descEditBox = layout.addWidget("desc_edit_box", new BackgroundEditBox(GuiUtils.getFont(), context.innerWidth() - 4, 16));
         if (previous != null) {
             descEditBox.setValue(previous.display().desc().orElse(Component.empty()).getString());
         }
         descEditBox.setHint(Component.literal("<Desc>"));
 
-        layout.addWidget(null, new StringWidget(Component.literal("Color (r,g,b,a):"), PopupWidget.getFont()));
+        layout.addWidget(null, new StringWidget(Component.literal("Color (r,g,b,a):"), GuiUtils.getFont()));
         LinearLayout colorLayout = layout.addChild(LinearLayout.horizontal());
         {
             RGBAColor rgbaColor = previous != null ? previous.colorAsRgba() : null;

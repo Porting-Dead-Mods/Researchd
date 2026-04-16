@@ -2,10 +2,7 @@ package com.portingdeadmods.researchd.utils.researches;
 
 import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
 import com.portingdeadmods.portingdeadlibs.utils.PlayerUtils;
-import com.portingdeadmods.researchd.api.research.GlobalResearch;
-import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.ResearchInstance;
-import com.portingdeadmods.researchd.api.research.ResearchStatus;
+import com.portingdeadmods.researchd.api.research.*;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.ResearchTeamRole;
 import com.portingdeadmods.researchd.api.team.TeamMember;
@@ -13,6 +10,7 @@ import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
+import com.portingdeadmods.researchd.impl.research.cache.CachedResearchRelations;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
 import com.portingdeadmods.researchd.networking.cache.ClearGraphCachePayload;
@@ -500,7 +498,7 @@ public final class ResearchTeamHelper {
             Map<ResourceKey<Research>, ResearchInstance> researches = team.getResearches();
             Map<ResourceKey<Research>, ResearchInstance> newResearches = new HashMap<>();
             for (Map.Entry<ResourceKey<Research>, ResearchInstance> entry : researches.entrySet()) {
-                if (ResearchHelperCommon.getResearch(entry.getKey(), level) != null && entry.getValue().getKey() != null) {
+                if (ResearchHelperCommon.getResearch(entry.getKey(), level) != null && entry.getValue().getResearch() != null) {
                     newResearches.put(entry.getKey(), entry.getValue());
                 }
 
@@ -551,22 +549,22 @@ public final class ResearchTeamHelper {
 
     public static void initializeTeamResearches(ResearchTeamMap teamMap, Level level) {
         for (SimpleResearchTeam team : teamMap.researchTeams().values()) {
-            Map<ResourceKey<Research>, ResearchInstance> researches = team.getResearches();
-            Map<ResourceKey<Research>, ResearchProgress> progress = team.getResearchProgresses();
-            Set<GlobalResearch> globalResearches = new HashSet<>(CommonResearchCache.globalResearches.values());
+            Map<ResourceKey<Research>, ResearchInstance> teamResearches = team.getResearches();
+            Map<ResourceKey<Research>, ResearchProgress> teamProgress = team.getResearchProgresses();
+            Set<ResourceKey<Research>> allResearches = new HashSet<>(CommonResearchCache.researchRelations.keySet());
 
-            for (GlobalResearch research : globalResearches) {
-                if (progress.containsKey(research.getResearchKey())) continue;
+            for (ResourceKey<Research> research : allResearches) {
+                if (teamProgress.containsKey(research)) continue;
 
-                progress.put(research.getResearchKey(), ResearchProgress.forResearch(research.getResearchKey(), level));
+                teamProgress.put(research, ResearchProgress.forResearch(research, level));
             }
 
-            researches.values().stream().map(ResearchInstance::getResearch).forEach(globalResearches::remove);
-            for (GlobalResearch globalResearch : globalResearches) {
-                ResearchStatus status = CommonResearchCache.rootResearch != null && CommonResearchCache.rootResearch.is(globalResearch.getResearchKey())
+            teamResearches.values().stream().map(ResearchInstance::getResearch).forEach(allResearches::remove);
+            for (ResourceKey<Research> research : allResearches) {
+                ResearchStatus status = CommonResearchCache.rootResearch != null && CommonResearchCache.rootResearch.is(research)
                         ? ResearchStatus.RESEARCHABLE
                         : ResearchStatus.LOCKED;
-                researches.put(globalResearch.getResearchKey(), new ResearchInstance(globalResearch, status));
+                teamResearches.put(research, new ResearchInstance(research, status));
             }
         }
     }
@@ -574,7 +572,7 @@ public final class ResearchTeamHelper {
     public static void resolveGlobalResearches(ResearchTeamMap researchTeamMap) {
         for (ResearchTeam team : researchTeamMap.researchTeams().values()) {
             for (Map.Entry<ResourceKey<Research>, ResearchInstance> entry : team.getResearches().entrySet()) {
-                entry.setValue(new ResearchInstance(CommonResearchCache.globalResearches.get(entry.getKey()), entry.getValue().getResearchStatus(), entry.getValue().getResearchedPlayer(), entry.getValue().getResearchedTime()));
+                entry.setValue(new ResearchInstance(entry.getKey(), entry.getValue().getResearchStatus(), entry.getValue().getResearchedPlayer(), entry.getValue().getResearchedTime()));
             }
         }
     }

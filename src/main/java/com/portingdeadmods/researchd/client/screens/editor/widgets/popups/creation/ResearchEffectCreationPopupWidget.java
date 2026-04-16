@@ -14,6 +14,7 @@ import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.select
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.widgets.PDLButton;
+import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.Spaghetti;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.layouts.FrameLayout;
@@ -35,7 +36,7 @@ public class ResearchEffectCreationPopupWidget extends PopupWidget {
     //private final BaseResearchEffectCreationWidget originSelectionWidget;
 
     public ResearchEffectCreationPopupWidget(@Nullable ResearchEffectTypeSelectionPopupWidget parentPopupWidget, ResearchEffectType type, EmbeddedEffectCreationWidget originSelectionWidget, int x, int y, int width, int height) {
-        super(x, y, width, height, CommonComponents.EMPTY);
+        super(x, y, width, height, false, CommonComponents.EMPTY);
         this.parentPopupWidget = parentPopupWidget;
         this.originSelectionWidget = originSelectionWidget;
         LinearLayout l = new LinearLayout(width, height, LinearLayout.Orientation.VERTICAL);
@@ -110,7 +111,7 @@ public class ResearchEffectCreationPopupWidget extends PopupWidget {
 
         ClientResearchIcon.getClientIcon(this.clientResearchEffect.type().icon()).render(guiGraphics, this.getX() + 3, this.getY() + 3, mouseX, mouseY, 1, 14, 14, partialTick);
         Component name = this.clientResearchEffect.type().getName();
-        guiGraphics.drawScrollingString(getFont(), name, this.getX() + 21, this.getX() + this.getWidth() - 6, this.getY() + 7, -1);
+        guiGraphics.drawScrollingString(GuiUtils.getFont(), name, this.getX() + 21, this.getX() + this.getWidth() - 6, this.getY() + 7, -1);
     }
 
     @Override

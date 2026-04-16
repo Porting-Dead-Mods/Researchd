@@ -46,7 +46,7 @@ public class RecentResearchesList extends ContainerWidget<ResearchInstance> {
         float scale = 1.75f;
         int padding = (int) ((34f - 16f * scale) / 2f); // 32 + 2 (smth smth border 2px)
 
-        ResearchScreen.CLIENT_ICONS.get(research.getKey().location()).render(guiGraphics, (int) (((float) left + padding) / scale), (int) (((float) top + padding) / scale), mouseX, mouseY, scale, 0);
+        ResearchScreen.CLIENT_ICONS.get(research.getResearch().location()).render(guiGraphics, (int) (((float) left + padding) / scale), (int) (((float) top + padding) / scale), mouseX, mouseY, scale, 0);
 
         Minecraft minecraft = Minecraft.getInstance();
         Level level = minecraft.level;

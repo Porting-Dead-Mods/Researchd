@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.api.research;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.portingdeadmods.researchd.impl.research.cache.CachedResearchRelations;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -19,13 +20,13 @@ import java.util.UUID;
 
 public final class ResearchInstance {
     public static final Codec<ResearchInstance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            GlobalResearch.CODEC.fieldOf("research").forGetter(ResearchInstance::getResearch),
+            Research.RESOURCE_KEY_CODEC.fieldOf("research").forGetter(ResearchInstance::getResearch),
             ResearchStatus.CODEC.fieldOf("research_status").forGetter(ResearchInstance::getResearchStatus),
             UUIDUtil.CODEC.optionalFieldOf("researched_player").forGetter(r -> Optional.ofNullable(r.getResearchedPlayer())),
             Codec.LONG.fieldOf("researched_time").forGetter(ResearchInstance::getResearchedTime)
     ).apply(instance, (r, s, p, t) -> new ResearchInstance(r, s, p.orElse(null), t)));
     public static final StreamCodec<RegistryFriendlyByteBuf, ResearchInstance> STREAM_CODEC = StreamCodec.composite(
-            GlobalResearch.STREAM_CODEC,
+            Research.RESOURCE_KEY_STREAM_CODEC,
             ResearchInstance::getResearch,
             ResearchStatus.STREAM_CODEC,
             ResearchInstance::getResearchStatus,
@@ -36,19 +37,19 @@ public final class ResearchInstance {
             (r, s, p, t) -> new ResearchInstance(r, s, p.orElse(null), t)
     );
 
-    private final GlobalResearch research;
+    private final ResourceKey<Research> research;
     private ResearchStatus researchStatus;
     private @Nullable UUID researchedPlayer;
     private long researchedTime;
 
-    public ResearchInstance(GlobalResearch research, ResearchStatus researchStatus, UUID researchedPlayer, long researchedTime) {
+    public ResearchInstance(ResourceKey<Research> research, ResearchStatus researchStatus, UUID researchedPlayer, long researchedTime) {
         this.research = research;
         this.researchStatus = researchStatus;
         this.researchedPlayer = researchedPlayer;
         this.researchedTime = researchedTime;
     }
 
-    public ResearchInstance(GlobalResearch research, ResearchStatus researchStatus) {
+    public ResearchInstance(ResourceKey<Research> research, ResearchStatus researchStatus) {
         this(research, researchStatus, null, -1);
     }
 
@@ -64,36 +65,30 @@ public final class ResearchInstance {
         return this.researchStatus == ResearchStatus.LOCKED;
     }
 
-    public ResearchInstance withResearch(GlobalResearch research) {
+    public ResearchInstance withResearch(ResourceKey<Research> research) {
         return new ResearchInstance(research, researchStatus, researchedPlayer, researchedTime);
     }
 
     public Component getDisplayName(Level level) {
-        Research r = this.research.getResearch(level);
+        Research r = this.lookup(level);
 
         if (r instanceof RegistryDisplay<?> display) {
-            ResourceKey<?> researchKey = this.research.getResearchKey();
-            return display.getDisplayNameUnsafe(researchKey);
+            return display.getDisplayNameUnsafe(this.research);
         }
-        return Research.getLangName(this.research.getResearchKey());
+        return Research.getLangName(this.research);
     }
 
     public Component getDescription(Level level) {
-        Research r = this.research.getResearch(level);
+        Research r = this.lookup(level);
 
         if (r instanceof RegistryDisplay<?> display) {
-            ResourceKey<?> researchKey = this.research.getResearchKey();
-            return display.getDisplayDescriptionUnsafe(researchKey);
+            return display.getDisplayDescriptionUnsafe(this.research);
         }
-        return Research.getLangDesc(this.research.getResearchKey());
+        return Research.getLangDesc(this.research);
     }
 
-    public GlobalResearch getResearch() {
+    public ResourceKey<Research> getResearch() {
         return research;
-    }
-
-    public ResourceKey<Research> getKey() {
-        return this.research.getResearchKey();
     }
 
     public ResearchStatus getResearchStatus() {
@@ -124,27 +119,19 @@ public final class ResearchInstance {
     }
 
     public Research lookup(Level level) {
-        return ResearchHelperCommon.getResearch(this.research.getResearchKey(), level);
-    }
-
-    public Set<GlobalResearch> getChildren() {
-        return this.research.getChildren();
-    }
-
-    public Set<GlobalResearch> getParents() {
-        return this.research.getParents();
+        return ResearchHelperCommon.getResearch(this.research, level);
     }
 
     public boolean is(ResearchInstance instance) {
         return this.is(instance.getResearch());
     }
 
-    public boolean is(GlobalResearch research) {
+    public boolean is(CachedResearchRelations research) {
         return this.is(research.getResearchKey());
     }
 
     public boolean is(ResourceKey<Research> key) {
-        return this.research.is(key);
+        return this.research == key;
     }
 
     public ResearchInstance copy() {

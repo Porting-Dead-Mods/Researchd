@@ -8,6 +8,7 @@ import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.OrResearchMethod;
+import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.Spaghetti;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.layouts.Layout;
@@ -26,7 +27,7 @@ public class ResearchMethodParentSelectionPopupWidget extends PopupWidget {
     private boolean typeClicked;
 
     public ResearchMethodParentSelectionPopupWidget(@Nullable PopupWidget parentPopupWidget, EmbeddedMethodCreationWidget parentSelectionWidget, Component message) {
-        super(0, 0, 160, 64, message);
+        super(0, 0, 160, 64, false, message);
         this.parentPopupWidget = parentPopupWidget;
         this.containerWidget = this.addRenderableWidget(new ResearchMethodTypeContainerWidget(parentPopupWidget, this, 160 - 16, 64 - 16));
         this.parentSelectionWidget = parentSelectionWidget;
@@ -87,7 +88,7 @@ public class ResearchMethodParentSelectionPopupWidget extends PopupWidget {
         protected void internalRenderItem(GuiGraphics guiGraphics, ResearchMethodListType item, int xIndex, int yIndex,
                                           int left, int top, int mouseX, int mouseY) {
             guiGraphics.blitSprite(EditorSharedSprites.EDITOR_BACKGROUND_SPRITES.get(true, this.isItemHovered(xIndex, yIndex, mouseX, mouseY)), left, top, this.getItemWidth(), this.getItemHeight());
-            guiGraphics.drawCenteredString(getFont(), item.getName(), left + this.getItemWidth() / 2, top + (this.getItemHeight() - getFont().lineHeight) / 2, -1);
+            guiGraphics.drawCenteredString(GuiUtils.getFont(), item.getName(), left + this.getItemWidth() / 2, top + (this.getItemHeight() - GuiUtils.getFont().lineHeight) / 2, -1);
         }
     }
 

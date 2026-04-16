@@ -9,6 +9,7 @@ import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.select
 import com.portingdeadmods.researchd.client.screens.lib.widgets.ContainerWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
+import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.Spaghetti;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.client.Minecraft;
@@ -112,7 +113,7 @@ public class ResearchSelectorListWidget extends ContainerWidget<ResearchSelector
         super.renderTooltips(guiGraphics, mouseX, mouseY, v);
 
         if (this.hoveredItem instanceof Element.SimpleElement(ResourceKey<Research> researchKey, Research research)) {
-            guiGraphics.renderTooltip(PopupWidget.getFont(), ResearchHelperCommon.getResearchName(researchKey, research), mouseX, mouseY);
+            guiGraphics.renderTooltip(GuiUtils.getFont(), ResearchHelperCommon.getResearchName(researchKey, research), mouseX, mouseY);
         }
 
     }

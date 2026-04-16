@@ -6,6 +6,7 @@ import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.client.screens.editor.EditorSharedSprites;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.selection.ResearchMethodParentSelectionPopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
+import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.Spaghetti;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -44,7 +45,7 @@ public class EmbeddedMethodCreationWidget extends AbstractWidget {
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         guiGraphics.blitSprite(EditorSharedSprites.EDITOR_BACKGROUND_INVERTED_SPRITE, this.getX(), this.getY(), this.getWidth(), this.getHeight());
         if (this.createdMethod == null) {
-            guiGraphics.drawCenteredString(PopupWidget.getFont(), "Create Method", this.getX() + this.getWidth() / 2, this.getY() + (this.getHeight() - PopupWidget.getFont().lineHeight) / 2, -1);
+            guiGraphics.drawCenteredString(GuiUtils.getFont(), "Create Method", this.getX() + this.getWidth() / 2, this.getY() + (this.getHeight() - GuiUtils.getFont().lineHeight) / 2, -1);
         } else {
             this.createdMethodInfoWidget.render(guiGraphics, mouseX, mouseY, partialTick);
             this.createdMethodInfoWidget.renderTooltip(guiGraphics, mouseX, mouseY, partialTick);

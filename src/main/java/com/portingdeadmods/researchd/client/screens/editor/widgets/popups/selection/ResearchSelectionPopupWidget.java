@@ -8,6 +8,7 @@ import com.portingdeadmods.researchd.client.screens.lib.widgets.ContainerWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.widgets.PDLImageButton;
+import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.Search;
 import com.portingdeadmods.researchd.utils.Spaghetti;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
@@ -40,7 +41,7 @@ public class ResearchSelectionPopupWidget extends PopupWidget {
     private final Set<ResourceKey<Research>> addedResearches;
 
     public ResearchSelectionPopupWidget(ResearchSelectorListWidget selectorListWidget, @Nullable PopupWidget parentPopupWidget, Set<ResourceKey<Research>> addedResearches) {
-        super(0, 0, 148, 160, CommonComponents.EMPTY);
+        super(0, 0, 148, 160, false, CommonComponents.EMPTY);
         this.selectorListWidget = selectorListWidget;
         this.parentPopupWidget = parentPopupWidget;
         this.addedResearches = addedResearches;
@@ -73,7 +74,7 @@ public class ResearchSelectionPopupWidget extends PopupWidget {
         super.onClose();
 
         ResearchScreen screen = Spaghetti.tryGetResearchScreen();
-        screen.openPopupCentered(this.parentPopupWidget);
+        screen.openPopup(this.parentPopupWidget);
     }
 
     @Override
@@ -184,7 +185,7 @@ public class ResearchSelectionPopupWidget extends PopupWidget {
             ClientResearchIcon<?> icon = pair.left();
             Component name = pair.right();
             icon.render(guiGraphics, left + 1, top + 1, mouseX, mouseY, 1, 1);
-            guiGraphics.drawScrollingString(PopupWidget.getFont(), name, left + 18 + 1, left + this.getItemWidth() - 1, top + 4, -1);
+            guiGraphics.drawScrollingString(GuiUtils.getFont(), name, left + 18 + 1, left + this.getItemWidth() - 1, top + 4, -1);
         }
 
     }

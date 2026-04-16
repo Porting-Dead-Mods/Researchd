@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.client.cache;
 
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;
-import com.portingdeadmods.researchd.api.research.GlobalResearch;
+import com.portingdeadmods.researchd.impl.research.cache.CachedResearchRelations;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchPage;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
@@ -48,10 +48,10 @@ public final class ResearchGraphCache {
      */
     public static ResearchGraph computeIfAbsentForPage(ResearchPage page) {
         return PAGE_GRAPH_CACHE.computeIfAbsent(page.id(), pageId -> {
-            List<GlobalResearch> roots = CommonResearchCache.pageRoots.get(pageId);
+            List<CachedResearchRelations> roots = CommonResearchCache.pageRoots.get(pageId);
             if (roots != null && !roots.isEmpty()) {
                 // TODO: Parse
-                return ResearchGraph.fromResearchPage(page, roots.getFirst(), ClientResearchTeamHelper.getTeam().getResearches());
+                return ResearchGraph.fromResearchPage(page, roots.getFirst().getResearchKey(), ClientResearchTeamHelper.getTeam().getResearches());
             }
             return null;
         });

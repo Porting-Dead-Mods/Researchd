@@ -5,6 +5,7 @@ import com.portingdeadmods.researchd.client.screens.editor.EditorSharedSprites;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.AbstractLayoutWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.BackgroundEditBox;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
+import com.portingdeadmods.researchd.utils.GuiUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -38,9 +39,9 @@ public class TagCreationWidget extends AbstractLayoutWidget<Layout> {
     public TagCreationWidget(ItemSelectorPopupWidget parentPopupWidget, int x, int y, int width, int height) {
         super(null, x, y, width, height, CommonComponents.EMPTY);
         this.parentPopupWidget = parentPopupWidget;
-        this.stringWidget = this.addRenderableWidget(new StringWidget(Component.literal("Hello"), PopupWidget.getFont()));
+        this.stringWidget = this.addRenderableWidget(new StringWidget(Component.literal("Hello"), GuiUtils.getFont()));
         this.itemRenderer = new CycledItemRenderer();
-        this.tagEditBox = this.addRenderableWidget(new BackgroundEditBox(PopupWidget.getFont(), SPRITES, 72, 16, ""));
+        this.tagEditBox = this.addRenderableWidget(new BackgroundEditBox(GuiUtils.getFont(), SPRITES, 72, 16, ""));
         this.tagEditBox.setResponder(this::onValueChanged);
         this.tagEditBox.setValue("#");
     }

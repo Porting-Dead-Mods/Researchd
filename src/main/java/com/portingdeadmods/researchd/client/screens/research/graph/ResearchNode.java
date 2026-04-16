@@ -2,21 +2,16 @@ package com.portingdeadmods.researchd.client.screens.research.graph;
 
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;
-import com.portingdeadmods.researchd.api.research.GlobalResearch;
+import com.portingdeadmods.researchd.impl.research.cache.CachedResearchRelations;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
-import com.portingdeadmods.researchd.client.screens.editor.widgets.dropdowns.GraphDropDownWidget;
-import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.screens.research.graph.lines.ResearchHead;
 import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
-import com.portingdeadmods.researchd.utils.Spaghetti;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.CommonComponents;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.Collection;
 
@@ -32,9 +27,10 @@ public class ResearchNode extends AbstractWidget {
     private int layer = -1;
 
     private ResearchInstance instance; // TODO: Figure out why th there's a desync between Graph and TechList. (then remake this final)
+
     public void fetchInstanceFromTeam() {
         ResearchTeam team = ClientResearchTeamHelper.getTeam();
-        ResearchInstance updatedInstance = team.getResearches().get(this.instance.getKey());
+        ResearchInstance updatedInstance = team.getResearches().get(this.instance.getResearch());
         if (updatedInstance != null) {
             this.instance = updatedInstance;
         }
@@ -171,7 +167,4 @@ public class ResearchNode extends AbstractWidget {
         refreshHeads();
     }
 
-	public GlobalResearch getResearch() {
-		return this.getInstance().getResearch();
-	}
 }

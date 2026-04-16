@@ -34,7 +34,7 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
 
-public class ResearchScreen extends Screen {
+public class ResearchScreen extends AbstractResearchScreen {
     public static final ResourceLocation TOP_RIGHT_EDGE = Researchd.rl("textures/gui/research_screen/edges/top_right.png");
     public static final ResourceLocation BOTTOM_RIGHT_EDGE = Researchd.rl("textures/gui/research_screen/edges/bottom_right.png");
     public static final ResourceLocation TOP_BAR = Researchd.rl("textures/gui/research_screen/bars/top.png");
@@ -45,12 +45,6 @@ public class ResearchScreen extends Screen {
     public static final WidgetSprites EDITOR_BUTTON_SPRITES = new WidgetSprites(Researchd.rl("editor_open_button"), Researchd.rl("editor_open_button_highlighted"));
 
     public static final ResourceLocation RESEARCH_PAGES_LIST_BACKGROUND = Researchd.rl("textures/gui/research_screen/research_pages_list.png");
-
-    private static List<Component> tooltip = null;
-
-    public static void setTooltip(List<Component> tooltipNew) {
-        tooltip = tooltipNew;
-    }
 
     // Singleton since whole client is a singleton
     public static final Map<ResourceLocation, ClientResearchIcon<?>> CLIENT_ICONS = new HashMap<>();
@@ -63,26 +57,11 @@ public class ResearchScreen extends Screen {
     private PDLImageButton openEditorButton;
     private ResearchPagesList researchPagesList;
 
-    private final LinkedHashMap<PopupWidget, List<AbstractWidget>> popupWidgets;
-    private PopupWidget focusedPopupWidget;
-
     private boolean editorOpen;
     public SelectPackPopupWidget selectPackPopupWidget;
 
-    private DropDownWidget<?> dropDownWidget;
-
     public ResearchScreen() {
         super(ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_TITLE));
-        this.popupWidgets = new LinkedHashMap<>();
-    }
-
-    @Override
-    public boolean shouldCloseOnEsc() {
-        if (!this.popupWidgets.isEmpty() && this.focusedPopupWidget != null) {
-            this.closePopup(this.focusedPopupWidget);
-            return false;
-        }
-        return true;
     }
 
     @Override
@@ -172,42 +151,10 @@ public class ResearchScreen extends Screen {
         this.editorOpen = editorOpen;
     }
 
-    public <W extends PopupWidget> W openPopupCentered(W widget) {
-        int x = (this.width - widget.getWidth()) / 2;
-        int y = (this.height - widget.getHeight()) / 2;
-        widget.setPosition(x, y);
-
-        return this.openPopup(widget);
-    }
-
-    public <W extends PopupWidget> W openPopup(W widget) {
-        if (!this.popupWidgets.containsKey(widget)) {
-            List<AbstractWidget> widgets = new ArrayList<>();
-            widget.visitWidgets(widgets::add);
-            this.popupWidgets.putLast(widget, widgets);
-            widget.open();
-        }
-        this.setFocused(widget);
-        return widget;
-    }
-
-    public <W extends PopupWidget> void closePopup(W widget) {
-        widget.close();
-        this.popupWidgets.remove(widget);
-    }
-
-    @Override
-    public boolean isPauseScreen() {
-        return false;
-    }
-
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
 
-        //GuiUtils.drawImg(guiGraphics, TOP_BAR_TEXTURE, 103, 0, TOP_BAR_WIDTH, TOP_BAR_HEIGHT);
-        //GuiUtils.drawImg(guiGraphics, TOP_BAR_TEXTURE, 103, height - TOP_BAR_HEIGHT, TOP_BAR_WIDTH, TOP_BAR_HEIGHT);
-        //GuiUtils.drawImg(guiGraphics, SIDE_BAR_RIGHT_TEXTURE, width - 8, 0, SIDE_BAR_WIDTH, SIDE_BAR_HEIGHT);
         GuiUtils.drawImg(guiGraphics, BOTTOM_RIGHT_EDGE, width - 8, height - 8, 8, 8);
         GuiUtils.drawImg(guiGraphics, TOP_RIGHT_EDGE, width - 8, 0, 8, 8);
         int w = 174;
@@ -220,94 +167,43 @@ public class ResearchScreen extends Screen {
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        setTooltip(null);
-
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-
-        int z = 300;
-
-        PoseStack poseStack = guiGraphics.pose();
-
-        poseStack.pushPose();
-        {
-            poseStack.translate(0, 0, z);
-            for (Map.Entry<PopupWidget, List<AbstractWidget>> entry : this.popupWidgets.sequencedEntrySet()) {
-                poseStack.translate(0, 0, 100);
-
-                for (AbstractWidget widget : entry.getValue()) {
-                    widget.render(guiGraphics, mouseX, mouseY, partialTick);
-                }
-
-                z += 100;
-
-            }
-        }
-        poseStack.popPose();
 
         int w = 174;
         this.researchGraphWidget.setSize(guiGraphics.guiWidth() - 8 - w, guiGraphics.guiHeight() - 8 * 2);
 
         boolean popupHovered = false;
-        for (PopupWidget widget : this.popupWidgets.keySet()) {
+        for (PopupWidget widget : this.popupWidgets) {
             popupHovered = widget.isHovered();
             if (popupHovered) break;
         }
-        if (!popupHovered) {
-            this.researchGraphWidget.renderNodeTooltips(guiGraphics, mouseX, mouseY, partialTick);
-        }
+
+        PoseStack poseStack = guiGraphics.pose();
 
         poseStack.pushPose();
         {
-            poseStack.translate(0, 0, z);
+            poseStack.translate(0, 0, 400);
             this.selectedResearchWidget.renderTooltip(guiGraphics, mouseX, mouseY, partialTick);
-            if (tooltip != null) {
-                guiGraphics.renderComponentTooltip(PopupWidget.getFont(), tooltip, mouseX, mouseY);
-            }
         }
         poseStack.popPose();
+
+        if (!popupHovered) {
+            this.researchGraphWidget.renderNodeTooltips(guiGraphics, mouseX, mouseY, partialTick);
+        }
 
         if (this.editorModeActive()) {
             guiGraphics.blit(EDIT_BUTTON_CORNER, width - 24 - 4, height - 24 - 4, 0, 0, 24, 24, 24, 24);
             this.openEditorButton.render(guiGraphics, mouseX, mouseY, partialTick);
         }
 
-        if (dropDownWidget instanceof GraphDropDownWidget dropDownWidget) {
-            dropDownWidget.render(guiGraphics, mouseX, mouseY, partialTick);
+        if (this.dropDownWidget instanceof GraphDropDownWidget graphDrowDown) {
+            graphDrowDown.render(guiGraphics, mouseX, mouseY, partialTick);
         }
 
-    }
-
-    private Optional<GuiEventListener> getPopupChildAt(double mouseX, double mouseY) {
-        if (this.focusedPopupWidget != null && this.focusedPopupWidget.isHovered())
-            return Optional.of(this.focusedPopupWidget);
-
-        for (List<AbstractWidget> widgets : this.popupWidgets.values()) {
-            for (AbstractWidget widget : widgets) {
-                if (widget.isMouseOver(mouseX, mouseY)) {
-                    return Optional.of(widget);
-                }
-            }
-        }
-
-        return Optional.empty();
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        SequencedCollection<List<AbstractWidget>> reversed = new ArrayList<>(this.popupWidgets.sequencedValues().reversed());
-        for (List<AbstractWidget> widgets : reversed) {
-            for (AbstractWidget widget : widgets) {
-                if (widget.mouseClicked(mouseX, mouseY, button)) {
-                    this.setFocused(widget);
-                    if (button == 0) {
-                        this.setDragging(true);
-                    }
-
-                    return true;
-                }
-            }
-        }
-
         if (this.editorModeActive()) {
             if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && this.researchGraphWidget.isHovered() && (this.openEditorButton == null || !this.openEditorButton.isHovered()) && this.isEditorConfigured()) {
                 boolean clickedNode = false;
@@ -331,37 +227,18 @@ public class ResearchScreen extends Screen {
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
+    @Override
+    public void onClose() {
+        super.onClose();
+
+        // Save graph state on close
+        if (this.researchGraphWidget != null) {
+            this.researchGraphWidget.onClose();
+        }
+    }
+
     private boolean isEditorConfigured() {
         return ClientEditorHelper.getEditModeSettings().isConfigured();
-    }
-
-    @Override
-    public void setFocused(@Nullable GuiEventListener listener) {
-        super.setFocused(listener);
-
-        if (listener instanceof PopupWidget popupWidget && this.popupWidgets.containsKey(popupWidget)) {
-            this.focusedPopupWidget = popupWidget;
-            this.popupWidgets.putLast(popupWidget, this.popupWidgets.get(popupWidget));
-        } else if (listener == null) {
-            this.focusedPopupWidget = null;
-        }
-
-    }
-
-    @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        if (this.getPopupChildAt(mouseX, mouseY).filter(widget -> widget.mouseScrolled(mouseX, mouseY, scrollX, scrollY)).isPresent()) {
-            return true;
-        }
-        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
-    }
-
-    @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        if (this.getPopupChildAt(mouseX, mouseY).filter(widget -> widget.mouseDragged(mouseX, mouseY, button, dragX, dragY)).isPresent()) {
-            return true;
-        }
-        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 
     public ResearchGraphWidget getResearchGraphWidget() {
@@ -390,23 +267,6 @@ public class ResearchScreen extends Screen {
 
     public ResearchGraph getResearchGraph() {
         return this.researchGraphWidget.getCurrentGraph();
-    }
-
-    public void setDropDown(@Nullable DropDownWidget<?> dropDownWidget) {
-        this.dropDownWidget = dropDownWidget;
-        if (this.dropDownWidget != null) {
-            this.dropDownWidget.rebuildOptions();
-        }
-    }
-
-    @Override
-    public void onClose() {
-        super.onClose();
-
-        // Save graph state on close
-        if (this.researchGraphWidget != null) {
-            this.researchGraphWidget.onClose();
-        }
     }
 
 }
