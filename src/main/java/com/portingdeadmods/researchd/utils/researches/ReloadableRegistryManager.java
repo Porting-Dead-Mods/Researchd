@@ -20,8 +20,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -34,7 +36,7 @@ public class ReloadableRegistryManager<T> extends SimpleJsonResourceReloadListen
     private final HolderLookup.Provider lookup;
     private final ResourceKey<Registry<T>> registry;
     private final Codec<T> codec;
-    private Map<ResourceKey<T>, T> byName;
+    private @Nullable Map<ResourceKey<T>, T> byName;
     private boolean failed;
 
     public ReloadableRegistryManager(HolderLookup.Provider lookup, ResourceKey<Registry<T>> registry, Codec<T> codec) {
@@ -94,12 +96,14 @@ public class ReloadableRegistryManager<T> extends SimpleJsonResourceReloadListen
 
     // TODO: Fire an event when this happens
     public void mergeContents(Map<ResourceLocation, T> contents) {
-        ImmutableMap.Builder<ResourceKey<T>, T> builder = ImmutableMap.builder();
-        builder.putAll(this.byName);
-        for (Map.Entry<ResourceLocation, T> entry : contents.entrySet()) {
-            builder.put(ResourceKey.create(this.registry, entry.getKey()), entry.getValue());
+        Map<ResourceKey<T>, T> newByName = new HashMap<>();
+        if (this.byName != null) {
+            newByName.putAll(this.byName);
         }
-        this.byName = builder.build();
+        for (Map.Entry<ResourceLocation, T> entry : contents.entrySet()) {
+            newByName.put(ResourceKey.create(this.registry, entry.getKey()), entry.getValue());
+        }
+        this.byName = ImmutableMap.copyOf(newByName);
     }
 
     public Map<ResourceKey<T>, T> getLookup() {
@@ -112,7 +116,7 @@ public class ReloadableRegistryManager<T> extends SimpleJsonResourceReloadListen
     }
 
     public Map<ResourceLocation, T> getByName() {
-        return this.byName.entrySet().stream()
+        return this.getLookup().entrySet().stream()
                 .map(e -> Pair.of(e.getKey().location(), e.getValue()))
                 .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
     }

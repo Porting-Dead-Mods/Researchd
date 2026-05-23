@@ -1,7 +1,6 @@
-package com.portingdeadmods.researchd.client.screens.research.widgets;
+package com.portingdeadmods.researchd.client.screens.lib.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.portingdeadmods.researchd.api.team.ResearchQueue;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;

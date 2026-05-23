@@ -7,7 +7,7 @@ import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.Select
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.ScrollableWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
-import com.portingdeadmods.researchd.client.screens.research.widgets.PDLButton;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLButton;
 import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.Spaghetti;
 import net.minecraft.client.gui.GuiGraphics;
@@ -18,6 +18,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.function.Function;
 
 public abstract class AbstractStandaloneCreationPopupWidget<O> extends PopupWidget {
@@ -26,15 +27,18 @@ public abstract class AbstractStandaloneCreationPopupWidget<O> extends PopupWidg
     private final ResearchScreen screen;
     private final Function<ResourceLocation, StandaloneEditorObject<? extends O>> editorObjectGetterFunction;
     @Nullable
-    private final O previous;
+    protected final O previous;
+    @Nullable
+    protected final ResourceLocation previousId;
     private PDLButton createButton;
     private final ScrollableWidget<LinearLayout> scrollableWidget;
     private final ResourceLocation defaultId;
 
-    public AbstractStandaloneCreationPopupWidget(ResourceLocation defaultId, Function<ResourceLocation, StandaloneEditorObject<? extends O>> editorObjectGetterFunction, @Nullable O previous, int x, int y, int width, int height) {
+    public AbstractStandaloneCreationPopupWidget(ResourceLocation defaultId, Function<ResourceLocation, StandaloneEditorObject<? extends O>> editorObjectGetterFunction, @Nullable O previous, @Nullable ResourceLocation previousId, int x, int y, int width, int height) {
         super(x, y, width, height, true, CommonComponents.EMPTY);
         this.editorObjectGetterFunction = editorObjectGetterFunction;
         this.previous = previous;
+        this.previousId = previousId;
         this.screen = Spaghetti.tryGetResearchScreen();
         LinearLayout l = new LinearLayout(width - 14, height - 14, LinearLayout.Orientation.VERTICAL);
         this.layout = new RememberingLinearLayout(l);
@@ -60,7 +64,7 @@ public abstract class AbstractStandaloneCreationPopupWidget<O> extends PopupWidg
 
     protected void buildLayout() {
         this.createButton = this.addRenderableWidget(PDLButton.builder(this::onCreatePressed)
-                .message(Component.literal("Create"))
+                .message(this.previous == null ? Component.literal("Create") : Component.literal("Save"))
                 .sprites(SelectPackPopupWidget.EDITOR_BUTTON_SPRITES)
                 .size(100, 16)
                 .build());
@@ -80,7 +84,12 @@ public abstract class AbstractStandaloneCreationPopupWidget<O> extends PopupWidg
 
     private void onCreatePressed(PDLButton pdlButton) {
         O object = this.clientObject.create(this.layout);
-        ResourceLocation id = this.clientObject.createId(this.layout);
+        ResourceLocation id;
+        if (this.previous == null) {
+            id = this.clientObject.createId(this.layout);
+        } else {
+            id = Objects.requireNonNull(this.previousId);
+        }
         this.insertObjectToData(id, object);
         this.screen.closePopup(this);
     }

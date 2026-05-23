@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.utils.researches;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdClient;
+import com.portingdeadmods.researchd.api.client.ResearchGraph;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchIcon;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
@@ -13,7 +14,7 @@ import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
-import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
+import com.portingdeadmods.researchd.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
@@ -42,8 +43,9 @@ public final class ResearchHelperClient {
         ResearchGraphCache.clearCache();
         ClientResearchTeamHelper.refreshResearchScreenData();
         ResearchScreen screen = Spaghetti.tryGetResearchScreen();
-        if (CommonResearchCache.rootResearch != null && screen != null) {
-            screen.getResearchGraphWidget().setGraph(ResearchGraphCache.computeIfAbsent(CommonResearchCache.rootResearch.getResearchKey()));
+
+        if (screen != null) {
+            screen.initDefaultState();
         }
     }
 

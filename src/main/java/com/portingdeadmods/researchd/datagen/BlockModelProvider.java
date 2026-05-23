@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.datagen;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.registries.ResearchdBlocks;
 import net.minecraft.data.PackOutput;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.model.generators.BlockModelBuilder;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
 import net.neoforged.neoforge.client.model.generators.loaders.ObjModelBuilder;
@@ -32,5 +33,6 @@ public class BlockModelProvider extends BlockStateProvider {
                 .texture("particle", mcLoc("block/glass"));
 
         simpleBlock(ResearchdBlocks.RESEARCH_LAB_CONTROLLER.get(), researchLabBuilder);
+        simpleBlock(ResearchdBlocks.RESEARCH_LAB_PART.get(), models().getExistingFile(ResourceLocation.withDefaultNamespace("block/air")));
     }
 }

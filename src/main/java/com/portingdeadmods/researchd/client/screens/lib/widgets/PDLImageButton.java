@@ -1,10 +1,8 @@
-package com.portingdeadmods.researchd.client.screens.research.widgets;
+package com.portingdeadmods.researchd.client.screens.lib.widgets;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
-import net.minecraft.client.gui.components.WidgetSprites;
-import net.minecraft.network.chat.Component;
 
 public class PDLImageButton extends ImageButton {
     public PDLImageButton(PDLButton.Builder<PDLImageButton> builder) {

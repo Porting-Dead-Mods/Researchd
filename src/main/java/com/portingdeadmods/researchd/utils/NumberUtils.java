@@ -1,6 +1,4 @@
-package com.portingdeadmods.researchd.translations;
-
-import com.portingdeadmods.researchd.utils.TextUtils;
+package com.portingdeadmods.researchd.utils;
 
 public final class NumberUtils {
     public static int parseIntOr(String str, int defaultValue) {

@@ -7,7 +7,7 @@ import com.portingdeadmods.researchd.client.screens.editor.widgets.SelectPackSea
 import com.portingdeadmods.researchd.client.screens.lib.layout.WidgetHeaderAndFooterLayout;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
-import com.portingdeadmods.researchd.client.screens.research.widgets.PDLButton;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLButton;
 import com.portingdeadmods.researchd.utils.ClientEditorHelper;
 import com.portingdeadmods.researchd.utils.GuiUtils;
 import net.minecraft.ChatFormatting;

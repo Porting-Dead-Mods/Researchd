@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.api.client;
 
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
-import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
+import com.portingdeadmods.researchd.utils.ClientResearchTeamHelper;
 import net.minecraft.world.level.Level;
 
 import java.util.HashSet;

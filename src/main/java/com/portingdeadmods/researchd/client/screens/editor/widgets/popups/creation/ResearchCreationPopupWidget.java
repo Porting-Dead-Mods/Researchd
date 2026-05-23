@@ -19,8 +19,8 @@ import java.util.Collections;
 public class ResearchCreationPopupWidget extends AbstractStandaloneCreationPopupWidget<Research> {
     public static final ResourceLocation DEFAULT_ID = Researchd.rl(SimpleResearch.ID);
 
-    public ResearchCreationPopupWidget(@Nullable Research object, int x, int y, int width, int height) {
-        super(DEFAULT_ID, ResearchdClient.CLIENT_RESEARCHES::get, object, x, y, width, height);
+    public ResearchCreationPopupWidget(@Nullable Research previous, @Nullable ResourceLocation previousId, int x, int y, int width, int height) {
+        super(DEFAULT_ID, ResearchdClient.CLIENT_RESEARCHES::get, previous, previousId, x, y, width, height);
     }
 
     @Override
@@ -31,6 +31,6 @@ public class ResearchCreationPopupWidget extends AbstractStandaloneCreationPopup
 
     @Override
     protected Component getTitle() {
-        return Component.literal("Create Research");
+        return this.previous == null ? Component.literal("Create Research") : Component.literal("Edit Research");
     }
 }

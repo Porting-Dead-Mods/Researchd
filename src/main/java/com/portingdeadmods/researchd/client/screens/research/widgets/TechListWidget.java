@@ -8,7 +8,7 @@ import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
-import com.portingdeadmods.researchd.client.utils.ClientResearchTeamHelper;
+import com.portingdeadmods.researchd.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.networking.research.ResearchQueueAddPayload;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.client.Minecraft;
@@ -240,19 +240,25 @@ public class TechListWidget extends ResearchScreenWidget {
         return false;
     }
 
+    private boolean canScroll(double mouseX, double mouseY) {
+        return mouseX >= this.scrollX &&
+                mouseX < this.scrollX + SCROLLER_WIDTH &&
+                mouseY >= getY() + PADDING_Y &&
+                mouseY < getY() + PADDING_Y + this.getTechListHeight() - 1 &&
+                this.getContentHeight() > this.getTechListHeight();
+    }
+
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    protected boolean clicked(double mouseX, double mouseY) {
+        return super.clicked(mouseX, mouseY) && (this.hoveredResearch != null || this.canScroll(mouseX, mouseY));
+    }
+
+    @Override
+    public void onClick(double mouseX, double mouseY, int button) {
         if (this.hoveredResearch != null) {
             this.screen.getResearchGraphWidget().setGraph(ResearchGraphCache.computeIfAbsent(this.hoveredResearch.getResearch()));
             this.screen.getSelectedResearchWidget().setSelectedResearch(this.hoveredResearch);
-            return super.mouseClicked(mouseX, mouseY, button);
-        } else if (
-                    mouseX >= this.scrollX &&
-                    mouseX < this.scrollX + SCROLLER_WIDTH &&
-                    mouseY >= getY() + PADDING_Y &&
-                    mouseY < getY() + PADDING_Y + this.getTechListHeight() - 1 &&
-                    this.getContentHeight() > this.getTechListHeight()
-        ) {
+        } else if (this.canScroll(mouseX, mouseY)) {
             int scrollableHeight = this.getContentHeight() - this.getTechListHeight();
             int minY = getY() + PADDING_Y + 7;
             int maxY = getY() + PADDING_Y + this.getTechListHeight() - 1 - 8;
@@ -260,22 +266,13 @@ public class TechListWidget extends ResearchScreenWidget {
             double scrolledPercentage = ((Math.clamp(mouseY, minY, maxY) - (minY))) / (double) (maxY - minY);
 
             this.scrollOffset = (int) (scrollableHeight * scrolledPercentage);
-            return super.mouseClicked(mouseX, mouseY, button);
         }
-
-        return false;
     }
 
     @Override
     public void onDrag(double mouseX, double mouseY, double dragX, double dragY) {
-        if (
-                mouseX >= this.scrollX &&
-                mouseX < this.scrollX + SCROLLER_WIDTH &&
-                mouseY >= getY() + PADDING_Y &&
-                mouseY < getY() + PADDING_Y + this.getTechListHeight() - 1 &&
-                this.getContentHeight() > this.getTechListHeight()
-        ) {
-            this.mouseClicked(mouseX, mouseY, 0);
+        if (this.canScroll(mouseX, mouseY)) {
+            this.onClick(mouseX, mouseY, 0);
         }
     }
 

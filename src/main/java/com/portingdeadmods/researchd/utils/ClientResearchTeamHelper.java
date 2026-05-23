@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.client.utils;
+package com.portingdeadmods.researchd.utils;
 
 import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
 import com.portingdeadmods.portingdeadlibs.utils.PlayerUtils;

@@ -5,6 +5,7 @@ import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchPage;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
+import com.portingdeadmods.researchd.client.screens.research.AbstractResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.screens.research.graph.GraphLayoutManager;
@@ -352,15 +353,14 @@ public class ResearchGraphWidget extends AbstractWidget {
         for (ResearchNode node : this.graph.nodes().values()) {
             if (node.isHovered()) {
                 Minecraft mc = Minecraft.getInstance();
-                // Debug tooltip
-                if (SharedConstants.IS_RUNNING_IN_IDE && !ResearchScreen.hasControlDown()) {
-                    guiGraphics.renderComponentTooltip(mc.font, List.of(
+                if (!ResearchScreen.hasControlDown()) {
+                    AbstractResearchScreen.setTooltip(List.of(
                             node.getInstance().getDisplayName(mc.level),
                             node.getInstance().getDescription(mc.level),
                             SharedConstants.IS_RUNNING_IN_IDE ? Component.literal("Press Ctrl for debug info") : Component.empty()
-                    ), mouseX, mouseY);
-                } else {
-                    guiGraphics.renderComponentTooltip(mc.font, List.of(
+                    ));
+                } else if (SharedConstants.IS_RUNNING_IN_IDE) {
+                    AbstractResearchScreen.setTooltip(List.of(
                             node.getInstance().getDisplayName(mc.level),
                             node.getInstance().getDescription(mc.level),
                             Component.literal("x: %d, y: %d".formatted(node.getX(), node.getY())),
@@ -368,7 +368,7 @@ public class ResearchGraphWidget extends AbstractWidget {
                             Component.literal("hovered: %s".formatted(node.isHovered())),
                             Component.literal("%d parents".formatted(node.getParents().size())),
                             Component.literal("%d children".formatted(node.getChildren().size()))
-                    ), mouseX, mouseY);
+                    ));
                 }
                 break;
             }

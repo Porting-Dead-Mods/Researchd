@@ -6,7 +6,7 @@ import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.catego
 import com.portingdeadmods.researchd.client.screens.lib.widgets.ContainerWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
-import com.portingdeadmods.researchd.client.screens.research.widgets.PDLImageButton;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLImageButton;
 import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.Search;
 import com.portingdeadmods.researchd.utils.Spaghetti;
@@ -260,9 +260,11 @@ public class ItemSelectorPopupWidget extends PopupWidget {
 
         @Override
         protected void internalRenderItem(GuiGraphics guiGraphics, ItemStack item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {
-            guiGraphics.renderItem(item, left, top);
-            if (this.selectedItem == item) {
-                guiGraphics.renderOutline(left, top, this.getItemWidth(), this.getItemHeight(), -1);
+            if (guiGraphics.containsPointInScissor(left, top) || guiGraphics.containsPointInScissor(left, top + this.getItemHeight())) {
+                guiGraphics.renderItem(item, left, top);
+                if (this.selectedItem == item) {
+                    guiGraphics.renderOutline(left, top, this.getItemWidth(), this.getItemHeight(), -1);
+                }
             }
         }
     }

@@ -1,12 +1,11 @@
 package com.portingdeadmods.researchd.client.impl.editor.methods;
 
 import com.portingdeadmods.researchd.api.client.RememberingLinearLayout;
-import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethodType;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.ItemSelectorWidget;
 import com.portingdeadmods.researchd.impl.research.method.CheckItemPresenceResearchMethod;
 import com.portingdeadmods.researchd.registries.ResearchMethodTypes;
-import com.portingdeadmods.researchd.translations.NumberUtils;
+import com.portingdeadmods.researchd.utils.NumberUtils;
 import net.minecraft.client.gui.components.EditBox;
 
 public class CheckItemPresenceMethodObject extends AbstractItemMethodObject<CheckItemPresenceResearchMethod> {

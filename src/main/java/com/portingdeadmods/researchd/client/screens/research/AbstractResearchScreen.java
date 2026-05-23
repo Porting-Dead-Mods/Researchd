@@ -144,11 +144,23 @@ public abstract class AbstractResearchScreen extends Screen {
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 
+    protected void renderTooltip(GuiGraphics guiGraphics, PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        poseStack.translate(0, 0, 10);
+
+        if (tooltip != null) {
+            guiGraphics.renderComponentTooltip(com.portingdeadmods.researchd.utils.GuiUtils.getFont(), tooltip, mouseX, mouseY);
+        }
+    }
+
+    protected abstract void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick);
+
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public final void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         setTooltip(null);
 
         super.render(guiGraphics, mouseX, mouseY, partialTick);
+
+        this.renderContents(guiGraphics, mouseX, mouseY, partialTick);
 
         PoseStack poseStack = guiGraphics.pose();
 
@@ -166,9 +178,7 @@ public abstract class AbstractResearchScreen extends Screen {
 
             }
 
-            if (tooltip != null) {
-                guiGraphics.renderComponentTooltip(com.portingdeadmods.researchd.utils.GuiUtils.getFont(), tooltip, mouseX, mouseY);
-            }
+            this.renderTooltip(guiGraphics, poseStack, mouseX, mouseY, partialTick);
         }
         poseStack.popPose();
 

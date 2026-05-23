@@ -177,7 +177,6 @@ public final class Researchd {
         MinecraftServer server = event.getPlayerList().getServer();
         List<ServerPlayer> relevantPlayers = event.getPlayer() == null ? event.getPlayerList().getPlayers() : List.of(event.getPlayer());
         ResearchHelperServer.reloadResearches(server, player, relevantPlayers);
-
     }
 
     public static ResourceLocation rl(String path) {

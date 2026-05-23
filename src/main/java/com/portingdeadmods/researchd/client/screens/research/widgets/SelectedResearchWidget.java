@@ -13,7 +13,10 @@ import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
+import com.portingdeadmods.researchd.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.utils.WidgetConstructor;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -22,10 +25,12 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.MultiLineTextWidget;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class SelectedResearchWidget extends ResearchScreenWidget {
@@ -211,6 +216,10 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
     @Override
     public void onDrag(double mouseX, double mouseY, double dragX, double dragY) {
         this.mouseClicked(mouseX, mouseY, 0);
+    }
+
+    public void setSelectedResearch(ResourceKey<Research> research) {
+        this.setSelectedResearch(Objects.requireNonNull(ClientResearchTeamHelper.getTeam().getResearches().get(research)));
     }
 
     public void setSelectedResearch(@NotNull ResearchInstance instance) {

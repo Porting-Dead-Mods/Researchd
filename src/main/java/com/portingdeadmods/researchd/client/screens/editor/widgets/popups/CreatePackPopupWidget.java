@@ -6,7 +6,7 @@ import com.portingdeadmods.researchd.api.editmode.PackLocation;
 import com.portingdeadmods.researchd.client.screens.lib.layout.WidgetHeaderAndFooterLayout;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
-import com.portingdeadmods.researchd.client.screens.research.widgets.PDLButton;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLButton;
 import com.portingdeadmods.researchd.networking.editor.CreateDatapackPayload;
 import com.portingdeadmods.researchd.networking.editor.SetPackPayload;
 import com.portingdeadmods.researchd.utils.ClientEditorHelper;
