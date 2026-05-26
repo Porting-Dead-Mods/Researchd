@@ -2,10 +2,9 @@ package com.portingdeadmods.researchd.client.impl.info.methods;
 
 import com.portingdeadmods.researchd.api.client.renderers.CycledItemRenderer;
 import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidget;
-import com.portingdeadmods.researchd.compat.JEICompat;
-import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import com.portingdeadmods.researchd.impl.research.method.CheckItemPresenceResearchMethod;
 import com.portingdeadmods.researchd.utils.GuiUtils;
+import com.portingdeadmods.researchd.utils.RecipeViewerHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -47,8 +46,8 @@ public class CheckItemPresenceResearchMethodWidget extends AbstractResearchInfoW
             List<Component> tooltip = new ArrayList<>(Screen.getTooltipFromItem(Minecraft.getInstance(), stack));
             tooltip.addFirst(
                     Component.literal("Obtain ").withStyle(ChatFormatting.WHITE).append(
-                    Component.literal("%d".formatted(value.count())).withStyle(ChatFormatting.GOLD)).append(
-                    Component.literal(":").withStyle(ChatFormatting.WHITE))
+                            Component.literal("%d".formatted(value.count())).withStyle(ChatFormatting.GOLD)).append(
+                            Component.literal(":").withStyle(ChatFormatting.WHITE))
             );
             GuiUtils.renderTooltip(tooltip);
             //guiGraphics.renderTooltip(font, tooltip, stack.getTooltipImage(), stack, mouseX, mouseY);
@@ -58,10 +57,7 @@ public class CheckItemPresenceResearchMethodWidget extends AbstractResearchInfoW
     @Override
     public void onClick(double mouseX, double mouseY, int button) {
         if (this.isHovered()) {
-            if (ResearchdCompatHandler.isJeiLoaded()) {
-                Ingredient recipes1 = this.value.item();
-                JEICompat.openRecipes(Arrays.asList(recipes1.getItems()));
-            }
+            RecipeViewerHelper.openRecipesByResult(this.itemRenderer.getItem());
         }
     }
 

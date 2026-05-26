@@ -1,10 +1,9 @@
 package com.portingdeadmods.researchd.client.impl.info.effects;
 
 import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidget;
-import com.portingdeadmods.researchd.compat.JEICompat;
-import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import com.portingdeadmods.researchd.impl.research.effect.ItemUnlockEffect;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
+import com.portingdeadmods.researchd.utils.RecipeViewerHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -51,11 +50,8 @@ public class UnlockItemEffectWidget extends AbstractResearchInfoWidget<ItemUnloc
 
     @Override
     public void onClick(double mouseX, double mouseY, int button) {
-        if (this.isHovered() && ResearchdCompatHandler.isJeiLoaded()) {
-            Set<RecipeHolder<?>> recipes = this.value.getRecipes(Minecraft.getInstance().level);
-            if (!recipes.isEmpty()) {
-                JEICompat.openRecipes(recipes);
-            }
+        if (this.isHovered()) {
+            RecipeViewerHelper.openRecipesByResult(this.value.getItem().getDefaultInstance());
         }
     }
 }

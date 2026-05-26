@@ -3,11 +3,10 @@ package com.portingdeadmods.researchd.client.impl.info.effects;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.client.renderers.CycledItemRenderer;
 import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidget;
-import com.portingdeadmods.researchd.compat.JEICompat;
-import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import com.portingdeadmods.researchd.impl.research.effect.RecipeUnlockEffect;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import com.portingdeadmods.researchd.utils.GuiUtils;
+import com.portingdeadmods.researchd.utils.RecipeViewerHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.MutableComponent;
@@ -20,7 +19,6 @@ import net.neoforged.neoforge.common.util.Size2i;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class RecipeUnlockEffectWidget extends AbstractResearchInfoWidget<RecipeUnlockEffect> {
     public static final ResourceLocation RECIPE_ICON_SPRITE = Researchd.rl("recipe_icon");
@@ -40,10 +38,11 @@ public class RecipeUnlockEffectWidget extends AbstractResearchInfoWidget<RecipeU
                 .toList();
         if (effect.icon().isPresent()) {
             this.icon = effect.icon().get();
-            this.itemRenderer = null; new CycledItemRenderer();
+            this.itemRenderer = null;
+            new CycledItemRenderer();
         } else {
             this.icon = null;
-            this.itemRenderer = new CycledItemRenderer(List.copyOf(List.copyOf(resultItems)), 1);
+            this.itemRenderer = new CycledItemRenderer(List.copyOf(resultItems), 1);
         }
     }
 
@@ -92,9 +91,10 @@ public class RecipeUnlockEffectWidget extends AbstractResearchInfoWidget<RecipeU
     @Override
     public void onClick(double mouseX, double mouseY, int button) {
         if (this.isHovered()) {
-            if (ResearchdCompatHandler.isJeiLoaded()) {
-                Set<RecipeHolder<?>> recipes1 = this.value.getRecipes(Minecraft.getInstance().level);
-                JEICompat.openRecipes(recipes1);
+            int index = this.itemRenderer.getIndex();
+            if (index < this.recipes.size()) {
+                RecipeHolder<?> recipe = this.recipes.get(index);
+                RecipeViewerHelper.openRecipe(recipe);
             }
         }
     }

@@ -12,9 +12,11 @@ import com.portingdeadmods.researchd.api.research.ResearchInteractionType;
 import com.portingdeadmods.researchd.api.research.ResearchPage;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
+import com.portingdeadmods.researchd.client.screens.editor.EditorSharedSprites;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.dropdowns.GraphDropDownWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.EditorSideBarWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.SelectPackPopupWidget;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLButton;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLImageButton;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
@@ -54,6 +56,7 @@ public class ResearchScreen extends AbstractResearchScreen {
     private SelectedResearchWidget selectedResearchWidget;
     private EditorSideBarWidget editorSideBarWidget;
     private PDLImageButton openEditorButton;
+    private PDLImageButton editResearchButton;
     private ResearchPagesList researchPagesList;
 
     private boolean editorOpen;
@@ -151,6 +154,10 @@ public class ResearchScreen extends AbstractResearchScreen {
                 this.researchGraphWidget.setGraph(graph);
             }
         }
+    }
+
+    private void editSelectedResearch(PDLImageButton button) {
+
     }
 
     private void openEditor(PDLImageButton button) {

@@ -57,7 +57,6 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
-import javax.lang.model.element.ModuleElement;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;

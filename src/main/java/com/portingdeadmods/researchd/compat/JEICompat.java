@@ -20,13 +20,13 @@ public final class JEICompat {
 
     public static void openRecipes(Collection<RecipeHolder<?>> recipes) {
         RegistryAccess access = Minecraft.getInstance().level.registryAccess();
-        openRecipes(recipes.stream()
+        openRecipesFor(recipes.stream()
                 .map(RecipeHolder::value)
                 .map(r -> r.getResultItem(access))
                 .toList());
     }
 
-    public static void openRecipes(List<ItemStack> results) {
+    public static void openRecipesFor(List<ItemStack> results) {
         if (RUNTIME != null) {
             IFocusFactory focusFactory = RUNTIME.getJeiHelpers().getFocusFactory();
             IIngredientManager ingredientManager = RUNTIME.getIngredientManager();

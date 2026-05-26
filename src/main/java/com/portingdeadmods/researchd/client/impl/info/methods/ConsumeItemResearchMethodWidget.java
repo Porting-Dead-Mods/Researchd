@@ -2,10 +2,9 @@ package com.portingdeadmods.researchd.client.impl.info.methods;
 
 import com.portingdeadmods.researchd.api.client.renderers.CycledItemRenderer;
 import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidget;
-import com.portingdeadmods.researchd.compat.JEICompat;
-import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
 import com.portingdeadmods.researchd.utils.GuiUtils;
+import com.portingdeadmods.researchd.utils.RecipeViewerHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -43,14 +42,16 @@ public class ConsumeItemResearchMethodWidget extends AbstractResearchInfoWidget<
         Font font = Minecraft.getInstance().font;
         if (this.isHovered()) {
             Ingredient consume = value.item();
-            ItemStack stack = new ItemStack(consume.getItems()[0].getItem(), value.count());
-            List<Component> tooltip = new ArrayList<>(Screen.getTooltipFromItem(Minecraft.getInstance(), stack));
-            tooltip.addFirst(
-                    Component.literal("Consume ").withStyle(ChatFormatting.WHITE).append(
-                    Component.literal("%d".formatted(value.count())).withStyle(ChatFormatting.GOLD)).append(
-                    Component.literal(":").withStyle(ChatFormatting.WHITE))
-            );
-            GuiUtils.renderTooltip(tooltip);
+            if (!consume.isEmpty()) {
+                ItemStack stack = new ItemStack(consume.getItems()[0].getItem(), value.count());
+                List<Component> tooltip = new ArrayList<>(Screen.getTooltipFromItem(Minecraft.getInstance(), stack));
+                tooltip.addFirst(
+                        Component.literal("Consume ").withStyle(ChatFormatting.WHITE).append(
+                                Component.literal("%d".formatted(value.count())).withStyle(ChatFormatting.GOLD)).append(
+                                Component.literal(":").withStyle(ChatFormatting.WHITE))
+                );
+                GuiUtils.renderTooltip(tooltip);
+            }
             //guiGraphics.renderTooltip(font, tooltip, stack.getTooltipImage(), stack, mouseX, mouseY);
         }
     }
@@ -58,10 +59,7 @@ public class ConsumeItemResearchMethodWidget extends AbstractResearchInfoWidget<
     @Override
     public void onClick(double mouseX, double mouseY, int button) {
         if (this.isHovered()) {
-            if (ResearchdCompatHandler.isJeiLoaded()) {
-                Ingredient recipes1 = this.value.item();
-                JEICompat.openRecipes(Arrays.asList(recipes1.getItems()));
-            }
+            RecipeViewerHelper.openRecipesByResult(this.itemRenderer.getItem());
         }
     }
 

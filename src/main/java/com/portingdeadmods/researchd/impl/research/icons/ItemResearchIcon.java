@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 public record ItemResearchIcon(List<ItemStack> items) implements ResearchIcon {
-    public static final ResearchIconSerializer<ItemResearchIcon> SERIALIZER = ResearchIconSerializer.simple(ItemStack.CODEC.listOf()
+    public static final ResearchIconSerializer<ItemResearchIcon> SERIALIZER = ResearchIconSerializer.simple(ItemStack.OPTIONAL_CODEC.listOf()
             .xmap(ItemResearchIcon::new, ItemResearchIcon::items).fieldOf("items"));
     public static final ResourceLocation ID = Researchd.rl("item_research_icon");
     public static final ItemResearchIcon EMPTY = new ItemResearchIcon(Collections.emptyList());

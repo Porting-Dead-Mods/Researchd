@@ -10,4 +10,5 @@ public class EditorSharedSprites {
     public static final WidgetSprites EDITOR_BACKGROUND_SPRITES = new WidgetSprites(EDITOR_BACKGROUND_SPRITE, EDITOR_BACKGROUND_HIGHLIGHTED_SPRITE);
     public static final ResourceLocation EDITOR_BACKGROUND_INVERTED_SPRITE = Researchd.rl("editor_background_inverted");
     public static final ResourceLocation EDITOR_WIDGET_BACKGROUND_SPRITE = Researchd.rl("widget/editor_widget_background");
+    public static final WidgetSprites EDIT_BUTTON_SPRITES = new WidgetSprites(Researchd.rl("edit_button"), Researchd.rl("edit_button_highlighted"));
 }

@@ -62,6 +62,10 @@ public class CycledItemRenderer {
         return ItemStack.EMPTY;
     }
 
+    public int getIndex() {
+        return index;
+    }
+
     public void tick(float partialTicks) {
         if (items.isEmpty()) return;
         tickAccumulator++;
