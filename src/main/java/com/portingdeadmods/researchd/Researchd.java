@@ -115,6 +115,7 @@ public final class Researchd {
         ResearchMethodTypes.TYPES.register(modEventBus);
         ResearchEffectTypes.TYPES.register(modEventBus);
         ResearchdValueEffects.VALUE_EFFECTS.register(modEventBus);
+        ResearchdCommandArguments.ARGUMENT_TYPE_INFOS.register(modEventBus);
 
         modEventBus.addListener(this::registerCapabilities);
         modEventBus.addListener(this::registerRegistries);

@@ -128,9 +128,9 @@ public class NetworkEvents {
         );
 
         registrar.playToClient(
-                ResearchFinishedPayload.TYPE,
-                ResearchFinishedPayload.STREAM_CODEC,
-                ResearchFinishedPayload::handle
+                ClientResearchCompletedPayload.TYPE,
+                ClientResearchCompletedPayload.STREAM_CODEC,
+                ClientResearchCompletedPayload::handle
         );
         registrar.playToClient(
                 RefreshResearchesPayload.TYPE,

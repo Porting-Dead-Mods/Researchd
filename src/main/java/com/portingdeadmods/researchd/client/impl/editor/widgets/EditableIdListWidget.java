@@ -1,10 +1,8 @@
 package com.portingdeadmods.researchd.client.impl.editor.widgets;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.client.screens.editor.widgets.RegistryVerifyEditBox;
-import com.portingdeadmods.researchd.client.screens.editor.widgets.ResearchSelectorListWidget;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.RegistryVerifyEditBox;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.BackgroundEditBox;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.ContainerWidget;
 import com.portingdeadmods.researchd.utils.GuiUtils;

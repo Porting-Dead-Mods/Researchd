@@ -50,11 +50,10 @@ public final class ResearchHelperClient {
     }
 
     public static void refreshResearches(Player player) {
-        Level level;
-        level = Minecraft.getInstance().level;
+        Level level = Minecraft.getInstance().level;
 
         ResearchTeamMap researchData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
-        ResearchTeam team = researchData.getTeamByMember(player.getUUID());
+        ResearchTeam team = researchData.getTeamByPlayerId(player.getUUID());
 
         for (Supplier<? extends AttachmentType<? extends ResearchEffectData<?>>> entry : Researchd.RESEARCH_EFFECT_DATA_TYPES) {
 			AttachmentType<ResearchEffectData<?>> attachment = (AttachmentType<ResearchEffectData<?>>) entry.get();

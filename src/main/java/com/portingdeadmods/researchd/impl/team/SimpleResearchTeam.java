@@ -13,8 +13,11 @@ import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.api.team.*;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
+import com.portingdeadmods.researchd.compat.KubeJSCompat;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
+import com.portingdeadmods.researchd.networking.research.ClientResearchCompletedPayload;
 import com.portingdeadmods.researchd.utils.ResearchdCodecUtils;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -22,10 +25,13 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
@@ -136,12 +142,7 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
 
     @Override
     public SequencedCollection<TeamMember> getMembers() {
-        return new LinkedList<>(this.members.sequencedValues());
-    }
-
-    @Override
-    public int getMembersAmount() {
-        return this.members.size();
+        return this.members.sequencedValues().stream().sorted().toList();
     }
 
     @Override
@@ -178,8 +179,36 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
     }
 
     @Override
-    public void completeResearch(ResourceKey<Research> research, long completionTime, Level level) {
-        this.researches.completeResearch(research, completionTime, level);
+    public void setResearchCompleted(ResourceKey<Research> research, long completionTime) {
+        this.researches.setResearchFinished(research, completionTime);
+    }
+
+    @Override
+    public void onCompleteResearch(ResourceKey<Research> researchKey, long completionTime, boolean forced, Function<UUID, Player> playerGetter) {
+        ResearchInstance instance = this.getResearches().get(researchKey);
+        if (instance.getResearchedTime() != completionTime) {
+            return;
+        }
+
+        Research research = null;
+        for (TeamMember member : this.getMembers()) {
+            Player player = playerGetter.apply(member.player());
+            if (player == null) continue;
+
+            Level level = player.level();
+            if (level.isClientSide()) return;
+
+            if (research == null)  {
+                research = ResearchHelperCommon.getResearch(researchKey, level);
+            }
+
+            PacketDistributor.sendToPlayer((ServerPlayer) player, new ClientResearchCompletedPayload(researchKey, (int) completionTime, forced));
+
+            KubeJSCompat.fireResearchCompletedEvent((ServerPlayer) player, researchKey);
+
+            Researchd.debug("Researching", "Applying researchPack effects for Research: " + researchKey.location() + " to player: " + player.getName().getString());
+            research.researchEffect().onUnlock(level, player, researchKey);
+        }
     }
 
     @Override

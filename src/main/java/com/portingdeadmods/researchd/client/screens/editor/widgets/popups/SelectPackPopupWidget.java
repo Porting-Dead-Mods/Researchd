@@ -95,7 +95,12 @@ public class SelectPackPopupWidget extends PopupWidget {
         });
 
         this.layout.arrangeElements();
+        this.layout.visitWidgets(this::addRenderableWidget);
+    }
 
+    @Override
+    public Iterable<? extends LayoutElement> getElements() {
+        return super.getElements();
     }
 
     @Override
@@ -122,6 +127,10 @@ public class SelectPackPopupWidget extends PopupWidget {
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        guiGraphics.blitSprite(SPRITE, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+
+        super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+
         this.selectDatapackWidget.updateSelectedPack(ClientEditorHelper.getEditModeSettings().currentDatapack());
         this.selectResourcePackWidget.updateSelectedPack(ClientEditorHelper.getEditModeSettings().currentResourcePack());
 
@@ -131,8 +140,6 @@ public class SelectPackPopupWidget extends PopupWidget {
         } else {
             this.startEditingButton.setTooltip(Tooltip.create(Component.literal("Both Paths need to be filled in")));
         }
-
-        guiGraphics.blitSprite(SPRITE, this.getX(), this.getY(), this.getWidth(), this.getHeight());
     }
 
     @Override

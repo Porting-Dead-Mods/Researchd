@@ -2,10 +2,7 @@ package com.portingdeadmods.researchd.registries;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import com.portingdeadmods.researchd.content.commands.DebugCommands;
-import com.portingdeadmods.researchd.content.commands.DevCommands;
-import com.portingdeadmods.researchd.content.commands.ExampleCommands;
-import com.portingdeadmods.researchd.content.commands.TeamCommands;
+import com.portingdeadmods.researchd.content.commands.*;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -17,10 +14,11 @@ public final class ResearchdCommands {
 
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context) {
 		List<LiteralCommandNode<CommandSourceStack>> rootCommands = ALIASES.stream().map(
-				alias -> Commands.literal(alias).build()
+				alias -> Commands.literal(alias).requires(source -> source.hasPermission(2)).build()
 		).toList();
 
 		List<LiteralCommandNode<CommandSourceStack>> subCommands = List.of(
+				ResearchCommands.build(context),
 				DebugCommands.build(),
 				DevCommands.build(context),
                 TeamCommands.build(),

@@ -196,7 +196,7 @@ public class TechListWidget extends ResearchScreenWidget {
                             y1 += 2;
                         }
                         int x = paddingX + getX() + col * PANEL_WIDTH;
-                        if (isHovering(guiGraphics, x, y1, mouseX, mouseY)) {
+                        if (isPanelHovered(guiGraphics, x, y1, mouseX, mouseY)) {
                             this.hoveredResearch = instance;
                         }
                         if (index >= this.displayTechList.entries().size() - this.cols) {

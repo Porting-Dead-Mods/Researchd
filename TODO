@@ -1,0 +1,8 @@
+- Research Lab does not work without pack items in the slots
+- Research Pack consume method widget in editor looks ugly lol
+- Team screen does not render icon
+- Cannot close item selector widgets without selecting something
+- ESC closing of popup widgets doesnt quite work for method creation widgets
+- Newly created root researches cannot be researched
+- Enqueued research serialization doesnt work?
+- Add research toasts

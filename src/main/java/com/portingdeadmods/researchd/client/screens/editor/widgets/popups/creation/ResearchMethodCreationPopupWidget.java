@@ -41,13 +41,15 @@ public class ResearchMethodCreationPopupWidget extends PopupWidget {
         LinearLayout l = new LinearLayout(width, height, LinearLayout.Orientation.VERTICAL);
         this.layout = new RememberingLinearLayout(l);
         this.clientResearchMethod = ResearchdClient.CLIENT_RESEARCH_METHOD_TYPES.get(type.id());
-        this.buildLayout();
         this.createButton = this.addRenderableWidget(PDLButton.builder(this::onCreateButtonPressed)
                 .message(Component.literal("Create"))
                 .sprites(SelectPackPopupWidget.EDITOR_BUTTON_SPRITES)
                 .pos(x, y)
                 .size(this.getWidth() - 18, 16)
                 .build());
+
+        this.buildLayout();
+
     }
 
     private void onCreateButtonPressed(PDLButton button) {
@@ -77,7 +79,9 @@ public class ResearchMethodCreationPopupWidget extends PopupWidget {
 
     protected void buildLayout() {
         if (this.clientResearchMethod != null) {
-            this.clientResearchMethod.buildLayout(this.layout, null, new EditorContextImpl(this.createButton, Spaghetti.tryGetResearchScreen(), this, this.getWidth(), this.getHeight(), this.getWidth() - 14, this.getHeight() - 14, 7));
+            EditorContextImpl context = new EditorContextImpl(this.createButton, Spaghetti.tryGetResearchScreen(), this, this.getWidth(), this.getHeight(), this.getWidth() - 14, this.getHeight() - 14, 7);
+            this.clientResearchMethod.buildLayout(this.layout, null, context);
+            this.clientResearchMethod.update(this.layout, context);
             this.layout.getLayout().arrangeElements();
             FrameLayout.centerInRectangle(this.layout.getLayout(), this.getX(), this.getY(), this.getWidth(), this.getHeight());
             this.layout.getChildren().forEach(this::addRenderableWidget);

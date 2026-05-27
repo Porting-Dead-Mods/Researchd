@@ -124,7 +124,7 @@ public final class ResearchHelperCommon {
 
         ResearchTeamMap researchData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
 
-        SimpleResearchTeam team = researchData.getTeamByMember(player.getUUID());
+        SimpleResearchTeam team = researchData.getTeamByPlayerId(player.getUUID());
 	    Researchd.LOGGER.info("Refreshing effect data for player {}", player.getName().getString());
 	    for (Supplier<? extends AttachmentType<? extends ResearchEffectData<?>>> entry : Researchd.RESEARCH_EFFECT_DATA_TYPES) {
 		    AttachmentType<ResearchEffectData<?>> attachment = (AttachmentType<ResearchEffectData<?>>) entry.get();

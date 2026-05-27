@@ -50,19 +50,23 @@ public class ResearchLabControllerBE extends GhostMultiblockControllerBE impleme
         this.addItemHandler(
                 HandlerUtils::newItemStackHandler,
                 builder -> builder
-                        .onChange(slot -> this.updateData())
+                        .onChange(slot -> {
+                            if (level != null) {
+                                this.updateData();
+                            }
+                        })
                         .validator(this::isItemValid)
         );
     }
 
     @Override
-    public void setLevel(Level level) {
-        super.setLevel(level);
+    public void onLoad() {
+        super.onLoad();
 
         this.researchPacks = ResearchHelperCommon.getResearchPackKeys(level);
-		this.researchPacks.forEach(key -> {
-			this.researchPackUsage.computeIfAbsent(key, $ -> 0f);
-		});
+        this.researchPacks.forEach(key -> {
+            this.researchPackUsage.computeIfAbsent(key, $ -> 0f);
+        });
 
         List<ItemStack> stacks = new ArrayList<>();
         for (int i = 0; i < this.getItemHandler().getSlots(); i++) {
@@ -146,7 +150,7 @@ public class ResearchLabControllerBE extends GhostMultiblockControllerBE impleme
             researchPackUsageTag.putFloat(entry.getKey().location().toString(), entry.getValue());
         }
         tag.put("research_pack_usage", researchPackUsageTag);
-		super.saveData(tag, registries);
+        super.saveData(tag, registries);
     }
 
     @Override
@@ -155,7 +159,7 @@ public class ResearchLabControllerBE extends GhostMultiblockControllerBE impleme
         for (String key : researchPackUsageTag.getAllKeys()) {
             this.researchPackUsage.put(ResourceKey.create(ResearchdRegistries.RESEARCH_PACK_KEY, ResourceLocation.parse(key)), researchPackUsageTag.getFloat(key));
         }
-		super.loadData(tag, registries);
+        super.loadData(tag, registries);
     }
 
     @Override
@@ -163,8 +167,8 @@ public class ResearchLabControllerBE extends GhostMultiblockControllerBE impleme
         return Component.literal("Research Lab");
     }
 
-	@Override
-	protected PDLAbstractContainerMenu<?> createControllerMenu(int containerId, Inventory inventory, Player player) {
-		return new ResearchLabMenu(containerId, inventory, this);
-	}
+    @Override
+    protected PDLAbstractContainerMenu<?> createControllerMenu(int containerId, Inventory inventory, Player player) {
+        return new ResearchLabMenu(containerId, inventory, this);
+    }
 }

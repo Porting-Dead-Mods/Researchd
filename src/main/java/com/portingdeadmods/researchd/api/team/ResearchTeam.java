@@ -4,13 +4,16 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.Map;
 import java.util.SequencedCollection;
 import java.util.UUID;
+import java.util.function.Function;
 
 public interface ResearchTeam {
+    /* Team Metadata */
+
     /**
      * @return The display name of this team
      */
@@ -42,11 +45,9 @@ public interface ResearchTeam {
      */
     void setCreationTime(long creationTime);
 
+    /* Team Members */
+
     TeamMember getOwner();
-
-    SequencedCollection<TeamMember> getMembers();
-
-    int getMembersAmount();
 
     TeamMember getMember(UUID member);
 
@@ -60,11 +61,17 @@ public interface ResearchTeam {
 
     void removeMember(UUID member);
 
+    SequencedCollection<TeamMember> getMembers();
+
     void setRole(UUID member, ResearchTeamRole role);
 
     boolean isModerator(UUID member);
 
     boolean isOwner(UUID member);
+
+    TeamSocialManager getSocialManager();
+
+    /* Team Researches */
 
     /**
      * Gets the researchPack that is currently researching
@@ -84,15 +91,19 @@ public interface ResearchTeam {
         return this.getResearchProgresses().get(this.getCurrentResearch());
     }
 
-    TeamSocialManager getSocialManager();
-
     ResearchQueue getQueue();
 
     Map<ResourceKey<Research>, ResearchInstance> getResearches();
 
     Map<ResourceKey<Research>, ResearchProgress> getResearchProgresses();
 
-    void completeResearch(ResourceKey<Research> research, long completionTime, Level level);
+    void setResearchCompleted(ResourceKey<Research> research, long completionTime);
+
+    void onCompleteResearch(ResourceKey<Research> research, long completionTime, boolean forced, Function<UUID, Player> playerGetter);
+
+    default void onCompleteResearch(ResourceKey<Research> research, long completionTime, Function<UUID, Player> playerGetter) {
+        this.onCompleteResearch(research, completionTime, false, playerGetter);
+    }
 
     void refreshResearchStatus();
 

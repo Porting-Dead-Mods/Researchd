@@ -86,8 +86,13 @@ public record TeamResearches(SimpleResearchQueue researchQueue,
         //ResearchdSavedData.TEAM_RESEARCH.get().setData(level, ResearchdSavedData.TEAM_RESEARCH.get().getData(level));
     }
 
-    public void completeResearch(ResourceKey<Research> research, long completionTime, Level level) {
-        this.researches.get(research).setResearchStatus(ResearchStatus.RESEARCHED).setResearchedTime(completionTime);
+    public void setResearchFinished(ResourceKey<Research> research, long completionTime) {
+        ResearchInstance instance = this.researches.get(research);
+
+        if (instance.isResearched()) return;
+
+        instance.setResearchStatus(ResearchStatus.RESEARCHED);
+        instance.setResearchedTime(completionTime);
 
         this.refreshResearchStatus();
     }

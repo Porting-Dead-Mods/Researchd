@@ -37,7 +37,7 @@ public record ResearchQueueRemovePayload(ResourceKey<Research> researchKey) impl
                 Level level = serverPlayer.level();
                 ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
 
-	            SimpleResearchTeam team = data.getTeamByPlayer(serverPlayer);
+	            SimpleResearchTeam team = (SimpleResearchTeam) data.getTeamByPlayer(serverPlayer);
 				if (team == null) return;
 
                 TeamResearches teamResearches = team.getTeamResearches();

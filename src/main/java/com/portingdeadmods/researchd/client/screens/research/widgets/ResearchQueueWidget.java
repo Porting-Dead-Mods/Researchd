@@ -154,7 +154,7 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
 
         ResearchScreen.CLIENT_ICONS.get(instance.getResearch().location()).render(guiGraphics, x + 2, y + 2, mouseX, mouseY, 1, 0);
 
-        if (isHovering(guiGraphics, x, y, mouseX, mouseY) && hoverable) {
+        if (isPanelHovered(guiGraphics, x, y, mouseX, mouseY) && hoverable) {
             int color = -2130706433;
             guiGraphics.fillGradient(RenderType.guiOverlay(), x, y, x + 20, y + 20, color, color, 0);
         }

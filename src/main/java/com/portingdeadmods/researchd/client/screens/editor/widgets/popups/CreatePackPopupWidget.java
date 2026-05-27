@@ -67,6 +67,7 @@ public class CreatePackPopupWidget extends PopupWidget {
         });
 
         this.layout.arrangeElements();
+        this.layout.visitWidgets(this::addRenderableWidget);
     }
 
     private void onNameChanged(AbstractWidget widget, String val) {

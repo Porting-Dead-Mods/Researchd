@@ -55,6 +55,8 @@ public class ConsumePackMethodObject implements TypedEditorObject<ConsumePackRes
         ResourceKey<ResearchPack> defaultPack = ClientEditorHelper.getDefaultResearchPack();
         ItemStack defaultSelectedPack = defaultPack != null ? ResearchPackImpl.asStack(defaultPack) : ResearchdItems.GREEN_RESEARCH_PACK_ICON.toStack();
         ItemSelectorWidget packSelector = layout.addWidget("pack_selector", new ItemSelectorWidget(context.parentPopupWidget(), 0, 0, 25, 24, Ingredient.of(defaultSelectedPack), this::createItemSelectorPopup), LayoutSettings::alignHorizontallyCenter);
+        packSelector.setResponder(i -> this.update(layout, context));
+
         if (previous != null) {
             packSelector.setSelected(previous.asStacks(), false);
         }
@@ -99,8 +101,9 @@ public class ConsumePackMethodObject implements TypedEditorObject<ConsumePackRes
     @Override
     public ConsumePackResearchMethod create(RememberingLinearLayout layout) {
         String time = layout.getChild("time", EditBox.class).getValue();
+        Ingredient selectedPack = layout.getChild("pack_selector", ItemSelectorWidget.class).getSelected();
         return new ConsumePackResearchMethod(
-                List.of(layout.getChild("pack_selector", ItemSelectorWidget.class).getSelected().getItems()[0].get(ResearchdDataComponents.RESEARCH_PACK).researchPackKey().get()),
+                List.of(selectedPack.getItems()[0].get(ResearchdDataComponents.RESEARCH_PACK).researchPackKey().get()),
                 Integer.parseInt(layout.getChild("count", EditBox.class).getValue()),
                 Integer.parseInt(time.substring(0, time.length() - 1))
         );
@@ -108,6 +111,10 @@ public class ConsumePackMethodObject implements TypedEditorObject<ConsumePackRes
 
     @Override
     public Result<Unit, Exception> valid(RememberingLinearLayout layout) {
+        Ingredient selectedPack = layout.getChild("pack_selector", ItemSelectorWidget.class).getSelected();
+        if (selectedPack.isEmpty() || !selectedPack.getItems()[0].has(ResearchdDataComponents.RESEARCH_PACK) || selectedPack.getItems()[0].get(ResearchdDataComponents.RESEARCH_PACK).researchPackKey().isEmpty()) {
+            return Result.err("Cannot create ConsumePackMethodObject, selected research pack is invalid");
+        }
         return Result.ok(Unit.INSTANCE);
     }
 }

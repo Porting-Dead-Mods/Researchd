@@ -1,7 +1,5 @@
-package com.portingdeadmods.researchd.client.screens.editor.widgets;
+package com.portingdeadmods.researchd.client.screens.lib.widgets;
 
-import com.portingdeadmods.researchd.client.screens.lib.widgets.BackgroundEditBox;
-import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.TextUtils;
 import net.minecraft.client.gui.Font;

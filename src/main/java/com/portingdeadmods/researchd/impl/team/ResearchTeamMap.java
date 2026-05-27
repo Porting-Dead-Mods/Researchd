@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
+import com.portingdeadmods.researchd.api.team.ResearchTeamManager;
 import com.portingdeadmods.researchd.api.team.TeamMember;
 import com.portingdeadmods.researchd.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
@@ -20,11 +21,9 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
-public record ResearchTeamMap(Map<UUID, SimpleResearchTeam> researchTeams) {
+public record ResearchTeamMap(Map<UUID, SimpleResearchTeam> researchTeams) implements ResearchTeamManager {
     public static final ResearchTeamMap EMPTY = new ResearchTeamMap();
     public static final Codec<ResearchTeamMap> CODEC = RecordCodecBuilder.create(builder -> builder.group(
             Codec.unboundedMap(Codec.STRING, SimpleResearchTeam.CODEC).fieldOf("research_teams").forGetter(t -> ResearchdCodecUtils.encodeMap(t.researchTeams))
@@ -43,24 +42,64 @@ public record ResearchTeamMap(Map<UUID, SimpleResearchTeam> researchTeams) {
         this(new HashMap<>());
     }
 
-    public @Nullable SimpleResearchTeam getTeamByMember(UUID memberUuid) {
-        return this.researchTeams.get(memberUuid);
+    @Override
+    public ResearchTeam getTeamById(UUID uuid) {
+        return this.researchTeams.get(uuid);
     }
 
-    public @NotNull ResearchTeam getTeamByMemberOrThrow(UUID memberUuid) {
-        SimpleResearchTeam team = getTeamByMember(memberUuid);
-		if (team != null) return team;
-        throw new IllegalStateException("Player %s not in a team".formatted(AllPlayersCache.getName(memberUuid).equals("!Unknown Player!") ? memberUuid : AllPlayersCache.getName(memberUuid)));
+    @Override
+    public ResearchTeam getTeamByName(String name) {
+        for (SimpleResearchTeam team : this.researchTeams.values()) {
+            if (team.getName().equals(name)) {
+                return team;
+            }
+        }
+        return null;
     }
 
-	@Nullable
-    public SimpleResearchTeam getTeamByPlayer(Player player) {
-        return this.researchTeams.get(player.getUUID());
+    @Override
+    @Nullable
+    public SimpleResearchTeam getTeamByPlayerId(UUID uuid) {
+        for (SimpleResearchTeam team : this.researchTeams.values()) {
+            if (team.hasMember(uuid)) {
+                return team;
+            }
+        }
+        return null;
     }
 
-	@Nullable
-    public SimpleResearchTeam getTeamByUUID(UUID teamUuid) {
-        return this.researchTeams.get(teamUuid);
+    @SuppressWarnings("unchecked")
+    @Override
+    public Collection<ResearchTeam> getTeams() {
+        Collection<? extends ResearchTeam> teams = this.researchTeams.values();
+        return (Collection<ResearchTeam>) teams;
+    }
+
+    public void setDefaultTeam(UUID uuid, Level level) {
+        this.researchTeams.put(uuid, SimpleResearchTeam.createDefaultTeam(uuid, level));
+    }
+
+    public void setDefaultTeam(ServerPlayer player) {
+        this.setDefaultTeam(player.getUUID(), player.level());
+    }
+
+    /**
+     * Creates a team for the player if it doesn't exist.
+     * Does nothing if the player is already in a team.
+     * <p>
+     * Returns true if a team was created, false if not.
+     */
+    public boolean initPlayer(ServerPlayer player) {
+        try {
+            if (getTeamByPlayer(player) != null) return false;
+
+            researchTeams.put(player.getUUID(), SimpleResearchTeam.createDefaultTeam(player));
+
+            return true;
+        } catch (Exception e) {
+            Researchd.LOGGER.error(e.getMessage());
+            return false;
+        }
     }
 
     public static void afterSync(Player player) {
@@ -101,33 +140,6 @@ public record ResearchTeamMap(Map<UUID, SimpleResearchTeam> researchTeams) {
 	    data.researchTeams().clear();
 	    data.researchTeams().putAll(temp);
 		ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
-    }
-
-	public void setDefaultTeam(UUID uuid, Level level) {
-		this.researchTeams.put(uuid, SimpleResearchTeam.createDefaultTeam(uuid, level));
-	}
-
-	public void setDefaultTeam(ServerPlayer player) {
-		this.setDefaultTeam(player.getUUID(), player.level());
-	}
-
-    /**
-     * Creates a team for the player if it doesn't exist.
-     * Does nothing if the player is already in a team.
-     * <p>
-     * Returns true if a team was created, false if not.
-     */
-    public boolean initPlayer(ServerPlayer player) {
-        try {
-            if (getTeamByPlayer(player) != null) return false;
-
-            researchTeams.put(player.getUUID(), SimpleResearchTeam.createDefaultTeam(player));
-
-            return true;
-        } catch (Exception e) {
-            Researchd.LOGGER.error(e.getMessage());
-            return false;
-        }
     }
 
     public static ResearchTeamMap teamMapFromString(Map<String, SimpleResearchTeam> stringedMap) {

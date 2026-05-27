@@ -6,16 +6,13 @@ import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.TeamMember;
 import com.portingdeadmods.researchd.cache.CommonResearchCache;
-import com.portingdeadmods.researchd.compat.KubeJSCompat;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.networking.research.ResearchCacheReloadPayload;
-import com.portingdeadmods.researchd.networking.research.ResearchFinishedPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchProgressSyncPayload;
 import com.portingdeadmods.researchd.registries.ResearchdCommands;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -71,7 +68,6 @@ public final class ResearchdCommonEvents {
 
                 if (research != null) {
                     ResourceKey<Research> currentResearchKey = team.getCurrentResearch();
-                    Research currentResearch = ResearchHelperCommon.getResearch(currentResearchKey, level);
                     ResearchProgress currentResearchProgress = team.getCurrentProgress();
 
                     if (currentResearchProgress != null) {
@@ -86,19 +82,9 @@ public final class ResearchdCommonEvents {
 
                         // Research Complete Logic
                         if (currentResearchProgress.isComplete()) {
-                            team.completeResearch(research, server.overworld().getDayTime() * 50L, level);
-
-                            for (TeamMember playerUUIDs : team.getMembers()) {
-                                ServerPlayer player = server.getPlayerList().getPlayer(playerUUIDs.player());
-                                if (player == null) continue;
-
-                                PacketDistributor.sendToPlayer(player, new ResearchFinishedPayload(research, (int) server.overworld().getDayTime() * 50));
-
-                                KubeJSCompat.fireResearchCompletedEvent(player, research);
-
-                                Researchd.debug("Researching", "Applying researchPack effects for Research: " + team.getCurrentResearch() + " to player: " + player.getName().getString());
-                                currentResearch.researchEffect().onUnlock(level, player, team.getCurrentResearch());
-                            }
+                            long completionTime = server.overworld().getDayTime() * 50L;
+                            team.setResearchCompleted(research, completionTime);
+                            team.onCompleteResearch(research, completionTime, server.getPlayerList()::getPlayer);
 
                             team.getQueue().remove(0, false);
                         }

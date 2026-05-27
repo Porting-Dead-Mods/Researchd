@@ -45,7 +45,7 @@ public abstract class ResearchScreenWidget extends AbstractWidget {
             clientResearchIcon.render(guiGraphics, x, y, mouseX, mouseY, scale, 0);
         }
 
-        if (isHovering(guiGraphics, x, y, mouseX, mouseY, scale) && hoverable) {
+        if (isPanelHovered(guiGraphics, x, y, mouseX, mouseY, scale) && hoverable) {
             int color = -2130706433;
             guiGraphics.fillGradient(RenderType.guiOverlay(), x, y, (int) (x + 20 * scale), (int) (y + 20 * scale), color, color, 0);
         }
@@ -73,22 +73,30 @@ public abstract class ResearchScreenWidget extends AbstractWidget {
             clientResearchIcon.render(guiGraphics, x + 2, y + 2, mouseX, mouseY, 1, 0);
         }
 
-        if (isHovering(guiGraphics, x, y, mouseX, mouseY) && hoverable) {
+        if (isPanelHovered(guiGraphics, x, y, mouseX, mouseY) && hoverable) {
             int color = -2130706433;
             guiGraphics.fillGradient(RenderType.guiOverlay(), x, y, x + 20, y + 20, color, color, 0);
         }
     }
 
-    public static boolean isHovering(@Nullable GuiGraphics guiGraphics, int x, int y, int mouseX, int mouseY) {
-        return isHovering(guiGraphics, x, y, mouseX, mouseY, 1);
+    public static boolean isPanelHovered(@Nullable GuiGraphics guiGraphics, int x, int y, int mouseX, int mouseY) {
+        return isPanelHovered(guiGraphics, x, y, mouseX, mouseY, 1);
     }
 
-    public static boolean isHovering(@Nullable GuiGraphics guiGraphics, int x, int y, int mouseX, int mouseY, float scale) {
+    public static boolean isPanelHovered(@Nullable GuiGraphics guiGraphics, int x, int y, int mouseX, int mouseY, float scale) {
         return (guiGraphics == null || guiGraphics.containsPointInScissor(mouseX, mouseY))
                 && mouseX >= x
                 && mouseY >= y
                 && mouseX < x + PANEL_WIDTH * scale
                 && mouseY < y + PANEL_HEIGHT * scale;
+    }
+
+    public static boolean isPanelHovered(int x, int y, int mouseX, int mouseY, float scale) {
+        return isPanelHovered(null, x, y, mouseX, mouseY, scale);
+    }
+
+    public static boolean isPanelHovered(int x, int y, int mouseX, int mouseY) {
+        return isPanelHovered(null, x, y, mouseX, mouseY);
     }
 
     public enum PanelSpriteType {

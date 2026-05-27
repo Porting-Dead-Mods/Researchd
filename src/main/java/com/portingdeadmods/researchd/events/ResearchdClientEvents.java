@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.events;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdConfig;
+import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
@@ -27,17 +28,21 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
 @EventBusSubscriber(modid = Researchd.MODID, value = Dist.CLIENT)
 public final class ResearchdClientEvents {
-	@SubscribeEvent
-	public static void preClientTick(ClientTickEvent.Pre event) {
-		if (ResearchdKeybinds.OPEN_RESEARCH_SCREEN.get().consumeClick()) {
-			Minecraft.getInstance().setScreen(new ResearchScreen());
-		}
+    @SubscribeEvent
+    public static void preClientTick(ClientTickEvent.Pre event) {
+        if (ResearchdKeybinds.OPEN_RESEARCH_SCREEN.get().consumeClick()) {
+            ResearchdApi.openScreen();
+        }
 
-		if (ResearchdKeybinds.OPEN_RESEARCH_TEAM_SCREEN.get().consumeClick()) {
-			if (ResearchdCompatHandler.isFTBTeamsEnabled()) Minecraft.getInstance().player.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
-			else Minecraft.getInstance().setScreen(new ResearchTeamScreen());
-		}
-	}
+        if (ResearchdKeybinds.OPEN_RESEARCH_TEAM_SCREEN.get().consumeClick()) {
+            if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
+                // TODO: Open ftb team screen?
+                Minecraft.getInstance().player.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
+            } else {
+                ResearchdApi.openTeamScreen();
+            }
+        }
+    }
 
 //	@SubscribeEvent
 //	public static void postClientTick(ClientTickEvent.Post event) {
@@ -55,24 +60,24 @@ public final class ResearchdClientEvents {
 //		ResearchQueue queue = researchProgress.researchQueue();
 //	}
 
-	@SubscribeEvent
-	public static void onToolTipEvent(ItemTooltipEvent event) {
-		if (event.getEntity() == null) return;
-		LocalPlayer player = (LocalPlayer) event.getEntity();
-		Item item = event.getItemStack().getItem();
+    @SubscribeEvent
+    public static void onToolTipEvent(ItemTooltipEvent event) {
+        if (event.getEntity() == null) return;
+        LocalPlayer player = (LocalPlayer) event.getEntity();
+        Item item = event.getItemStack().getItem();
 
-		UnlockItemEffectData itemData = player.getData(ResearchdAttachments.ITEM_PREDICATE.get());
-		if (itemData.isBlocked(item)) {
-			event.getToolTip().add(Component.literal("")); // Add a blank line for spacing
-			event.getToolTip().add(Component.literal("This item is blocked by a researchPack!").withStyle(ChatFormatting.RED, ChatFormatting.ITALIC));
-		}
-	}
+        UnlockItemEffectData itemData = player.getData(ResearchdAttachments.ITEM_PREDICATE.get());
+        if (itemData.isBlocked(item)) {
+            event.getToolTip().add(Component.literal("")); // Add a blank line for spacing
+            event.getToolTip().add(Component.literal("This item is blocked by a researchPack!").withStyle(ChatFormatting.RED, ChatFormatting.ITALIC));
+        }
+    }
 
-	@SubscribeEvent
-	public static void onClientPlayerLoggingIn(ClientPlayerNetworkEvent.LoggingIn event) {
-		LocalPlayer player = event.getPlayer();
+    @SubscribeEvent
+    public static void onClientPlayerLoggingIn(ClientPlayerNetworkEvent.LoggingIn event) {
+        LocalPlayer player = event.getPlayer();
 
-		if (ResearchdConfig.Client.showJoinMessage) {
+        if (ResearchdConfig.Client.showJoinMessage) {
             player.sendSystemMessage(
                     ResearchdTranslations.Game.JOIN_MESSAGE.component(Researchd.MODID)
                             .append(Component.literal("\n> ").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.BOLD))
@@ -93,10 +98,10 @@ public final class ResearchdClientEvents {
                             )
             );
         }
-	}
+    }
 
-	@SubscribeEvent
-	public static void onClientPlayerLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
-		ResearchGraphCache.clearCache();
-	}
+    @SubscribeEvent
+    public static void onClientPlayerLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
+        ResearchGraphCache.clearCache();
+    }
 }

@@ -1,10 +1,12 @@
 package com.portingdeadmods.researchd.client.screens.lab;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.api.client.screens.PDLAbstractContainerScreen;
 import com.portingdeadmods.portingdeadlibs.api.client.screens.widgets.AbstractScroller;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
@@ -27,6 +29,7 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.event.ContainerScreenEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.glfw.GLFW;
 
 public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMenu> {
     public static final ResourceLocation BACKGROUND_TEXTURE = Researchd.rl("textures/gui/research_lab.png");
@@ -216,6 +219,17 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
         ResearchInstance instance = team.getResearches().get(team.getCurrentResearch());
         if (instance != null) {
             ResearchScreenWidget.renderResearchPanel(guiGraphics, instance, this.leftPos + 123, this.topPos + 51, mouseX, mouseY, 2, false, false);
+
+            if (ResearchScreenWidget.isPanelHovered(this.leftPos + 123, this.topPos + 51, mouseX, mouseY, 2)) {
+                PoseStack pose = guiGraphics.pose();
+
+                pose.pushPose();
+                {
+                    pose.translate(0, 0, 100);
+                    guiGraphics.renderTooltip(Minecraft.getInstance().font, Component.literal("Open Research in Research Screen"), mouseX, mouseY);
+                }
+                pose.popPose();
+            }
         }
 
         int x = this.leftPos + 12;
@@ -237,6 +251,12 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (ResearchScreenWidget.isPanelHovered(this.leftPos + 123, this.topPos + 51, (int) mouseX, (int) mouseY, 2)) {
+            if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+                ResearchdApi.openScreenForResearch(ClientResearchTeamHelper.getTeam().getCurrentResearch());
+                return true;
+            }
+        }
         return super.mouseClicked(mouseX, mouseY, button);
     }
 

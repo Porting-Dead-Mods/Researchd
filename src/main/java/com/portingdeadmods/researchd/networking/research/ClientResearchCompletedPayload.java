@@ -23,14 +23,16 @@ import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
-public record ResearchFinishedPayload(ResourceKey<Research> key, int timeStamp) implements CustomPacketPayload {
-    public static final Type<ResearchFinishedPayload> TYPE = new Type<>(Researchd.rl("research_finished"));
-    public static final StreamCodec<? super RegistryFriendlyByteBuf, ResearchFinishedPayload> STREAM_CODEC = StreamCodec.composite(
+public record ClientResearchCompletedPayload(ResourceKey<Research> key, int timeStamp, boolean forced) implements CustomPacketPayload {
+    public static final Type<ClientResearchCompletedPayload> TYPE = new Type<>(Researchd.rl("research_finished"));
+    public static final StreamCodec<? super RegistryFriendlyByteBuf, ClientResearchCompletedPayload> STREAM_CODEC = StreamCodec.composite(
             ResourceKey.streamCodec(ResearchdRegistries.RESEARCH_KEY),
-            ResearchFinishedPayload::key,
+            ClientResearchCompletedPayload::key,
             ByteBufCodecs.INT,
-            ResearchFinishedPayload::timeStamp,
-            ResearchFinishedPayload::new
+            ClientResearchCompletedPayload::timeStamp,
+            ByteBufCodecs.BOOL,
+            ClientResearchCompletedPayload::forced,
+            ClientResearchCompletedPayload::new
     );
 
     @Override
@@ -42,28 +44,37 @@ public record ResearchFinishedPayload(ResourceKey<Research> key, int timeStamp) 
         context.enqueueWork(() -> {
             Player player = context.player();
             ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level());
-            ResearchTeam team = data.getTeamByMember(player.getUUID());
+            ResearchTeam team = data.getTeamByPlayerId(player.getUUID());
             if (team == null) {
                 context.disconnect(ResearchdTranslations.component(ResearchdTranslations.Errors.NO_RESEARCH_TEAM));
                 return;
             }
 
             ResearchQueue queue = team.getQueue();
-            if (queue.isEmpty()) context.disconnect(ResearchdTranslations.component(ResearchdTranslations.Errors.RESEARCH_QUEUE_DESYNC));
-            ResourceKey<Research> first = queue.getFirst();
-            if (first != this.key()) context.disconnect(ResearchdTranslations.component(ResearchdTranslations.Errors.RESEARCH_QUEUE_DESYNC));
+            ResourceKey<Research> first = null;
 
-            team.completeResearch(first, timeStamp, player.level());
-            queue.remove(0, false);
+            if (!queue.isEmpty()) {
+                first = queue.getFirst();
+            }
 
-            if (player instanceof ServerPlayer serverPlayer) {
-                KubeJSCompat.fireResearchCompletedEvent(serverPlayer, this.key());
+            if (!forced && queue.isEmpty()) {
+                context.disconnect(ResearchdTranslations.component(ResearchdTranslations.Errors.RESEARCH_QUEUE_DESYNC));
+            }
+
+            if (!forced && first != this.key()) {
+                context.disconnect(ResearchdTranslations.component(ResearchdTranslations.Errors.RESEARCH_QUEUE_DESYNC));
+            }
+
+            team.setResearchCompleted(key, timeStamp);
+
+            if (first != null) {
+                queue.remove(0, false);
             }
 
             player.sendSystemMessage(
                     ResearchdTranslations.Research.QUEUE_FINISHED.component(
                             Researchd.MODID,
-                            ChatFormatting.GREEN + Utils.registryTranslation(first).getString() + ChatFormatting.RESET,
+                            ChatFormatting.GREEN + Utils.registryTranslation(key).getString() + ChatFormatting.RESET,
                             ChatFormatting.GREEN + ResearchHelperCommon.getResearchCompletionTime(team.getCreationTime(), timeStamp()) + ChatFormatting.RESET
             ));
 

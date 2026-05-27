@@ -49,7 +49,7 @@ public record ResearchQueueAddPayload(ResourceKey<Research> researchKey, UUID pl
             if (context.player() instanceof ServerPlayer serverPlayer) {
                 Level level = serverPlayer.level();
                 ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
-                SimpleResearchTeam team = data.getTeamByPlayer(serverPlayer);
+                SimpleResearchTeam team = (SimpleResearchTeam) data.getTeamByPlayer(serverPlayer);
 
 				if (team == null) return;
 				if (team.getQueue().size() >= ResearchdConfig.Common.researchQueueLength) return;

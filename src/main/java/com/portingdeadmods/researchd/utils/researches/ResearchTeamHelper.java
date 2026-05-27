@@ -41,7 +41,7 @@ public final class ResearchTeamHelper {
      * @param player The player whose team you want to get
      * @return The team the player is a member of
      */
-    public static @NotNull ResearchTeam getTeamByMember(@NotNull Player player) {
+    public static @Nullable ResearchTeam getTeamByMember(@NotNull Player player) {
         UUID uuid = player.getUUID();
         return getTeamByMember(player.level(), uuid);
     }
@@ -52,9 +52,9 @@ public final class ResearchTeamHelper {
      * @param uuid The uuid of the player whose team you want to get
      * @return The team the player is a member of
      */
-    public static @NotNull ResearchTeam getTeamByMember(Level level, UUID uuid) {
+    public static @Nullable ResearchTeam getTeamByMember(Level level, UUID uuid) {
         ResearchTeamMap map = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
-        return map.getTeamByMemberOrThrow(uuid);
+        return map.getTeamByPlayerId(uuid);
     }
 
     /**
@@ -66,7 +66,7 @@ public final class ResearchTeamHelper {
     public static void removeMember(ServerPlayer player) {
         UUID uuid = player.getUUID();
         ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level());
-        SimpleResearchTeam team = savedData.getTeamByMember(uuid);
+        SimpleResearchTeam team = savedData.getTeamByPlayerId(uuid);
 
         if (team != null) {
             team.removeMember(uuid);
@@ -84,14 +84,14 @@ public final class ResearchTeamHelper {
      * @return integer value permission level ( {@link ResearchTeamRole#getPermissionLevel()} )
      */
     public static int getPermissionLevel(@NotNull Player player) {
-        SimpleResearchTeam team = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeamByMember(player.getUUID());
+        SimpleResearchTeam team = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level()).getTeamByPlayerId(player.getUUID());
 		if (team == null) return -1;
 
         return team.getMember(player.getUUID()).role().getPermissionLevel();
     }
 
 	public static int getPermissionLevel(UUID player, Level level) {
-		SimpleResearchTeam team = ResearchdSavedData.TEAM_RESEARCH.get().getData(level).getTeamByMember(player);
+		SimpleResearchTeam team = ResearchdSavedData.TEAM_RESEARCH.get().getData(level).getTeamByPlayerId(player);
 		if (team == null) return -1;
 
 		return team.getMember(player).role().getPermissionLevel();
@@ -113,8 +113,8 @@ public final class ResearchTeamHelper {
     public static boolean arePlayersSameTeam(@NotNull Level level, UUID uuid1, UUID uuid2) {
         ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
 
-        ResearchTeam team1 = savedData.getTeamByMemberOrThrow(uuid1);
-        ResearchTeam team2 = savedData.getTeamByMemberOrThrow(uuid2);
+        ResearchTeam team1 = savedData.getTeamByPlayerId(uuid1);
+        ResearchTeam team2 = savedData.getTeamByPlayerId(uuid2);
 
         return team1.getId().equals(team2.getId());
     }
@@ -124,10 +124,10 @@ public final class ResearchTeamHelper {
         UUID requesterId = requester.getUUID();
 
         ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
-        SimpleResearchTeam team = savedData.getTeamByMember(memberOfTeam);
+        SimpleResearchTeam team = savedData.getTeamByPlayerId(memberOfTeam);
 
 		// Already in Team (with multiple people) -> Return with error msg
-        if (getTeamByMember(requester).getMembersAmount() > 1) {
+        if (getTeamByMember(requester).getMembers().size() > 1) {
             if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                 requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.ALREADY_IN_TEAM));
             return;
@@ -163,7 +163,7 @@ public final class ResearchTeamHelper {
         Level level = requester.level();
 
         ResearchTeamMap savedData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
-        SimpleResearchTeam team = savedData.getTeamByMember(memberOfTeam);
+        SimpleResearchTeam team = savedData.getTeamByPlayerId(memberOfTeam);
 
         if (team != null) {
             team.getSocialManager().addIgnore(requester.getUUID());
@@ -185,7 +185,7 @@ public final class ResearchTeamHelper {
         if (team.isOwner(requesterId)) {
 
 			// Alone In Team -> Leaving creates default team for player
-            if (team.getMembersAmount() <= 1) {
+            if (team.getMembers().size() <= 1) {
                 savedData.researchTeams().remove(requesterId);
                 if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                     requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.LEFT_TEAM));
@@ -384,7 +384,7 @@ public final class ResearchTeamHelper {
 
     public static Component formatMembers(ResearchTeam team, Level level) {
         MutableComponent formattedTeam = Component.literal(team.getName()).withStyle(ChatFormatting.AQUA);
-        formattedTeam.append(Component.literal(" has %d member%s: ".formatted(team.getMembersAmount(), team.getMembersAmount() == 1 ? "" : "s")).withStyle(ChatFormatting.WHITE));
+        formattedTeam.append(Component.literal(" has %d member%s: ".formatted(team.getMembers().size(), team.getMembers().size() == 1 ? "" : "s")).withStyle(ChatFormatting.WHITE));
 
         for (TeamMember member : team.getMembers()) {
             Player player = level.getPlayerByUUID(member.player());
@@ -449,7 +449,7 @@ public final class ResearchTeamHelper {
         dump.add(Component.literal("---- Researchd Teams ----").withStyle(ChatFormatting.GOLD));
         for (Iterator<SimpleResearchTeam> iterator = uniqueTeams.iterator(); iterator.hasNext(); ) {
             ResearchTeam team = iterator.next();
-            dump.add(Component.literal(ChatFormatting.GREEN + team.getName() + ChatFormatting.RESET).append(" with %s member%s".formatted(ChatFormatting.GREEN.toString() + team.getMembersAmount() + ChatFormatting.RESET, team.getMembersAmount() == 1 ? "" : "s")));
+            dump.add(Component.literal(ChatFormatting.GREEN + team.getName() + ChatFormatting.RESET).append(" with %s member%s".formatted(ChatFormatting.GREEN.toString() + team.getMembers().size() + ChatFormatting.RESET, team.getMembers().size() == 1 ? "" : "s")));
             for (TeamMember member : team.getMembers()) {
                 dump.add(Component.literal("┣ ").append(member.getName()).withStyle(ChatFormatting.GRAY));
             }

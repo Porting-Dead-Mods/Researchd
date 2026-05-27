@@ -173,6 +173,11 @@ public class ResearchScreen extends AbstractResearchScreen {
         this.editorOpen = editorOpen;
     }
 
+    public void setSelectedResearch(ResourceKey<Research> research) {
+        this.selectedResearchWidget.setSelectedResearch(research);
+        this.researchGraphWidget.setGraph(ResearchGraphCache.computeIfAbsent(research));
+    }
+
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
@@ -235,11 +240,14 @@ public class ResearchScreen extends AbstractResearchScreen {
         if (this.editorModeActive()) {
             if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && this.researchGraphWidget.isHovered() && (this.openEditorButton == null || !this.openEditorButton.isHovered()) && this.isEditorConfigured()) {
                 boolean clickedNode = false;
-                for (ResearchNode node : this.researchGraphWidget.getCurrentGraph().nodes().values()) {
-                    if (node.isHovered()) {
-                        this.setDropDown(new GraphDropDownWidget(node.getInstance().lookup(Minecraft.getInstance().level), node.getInstance().getResearch().location(), this, (int) mouseX, (int) mouseY));
-                        clickedNode = true;
-                        break;
+                ResearchGraph currentGraph = this.researchGraphWidget.getCurrentGraph();
+                if (currentGraph != null) {
+                    for (ResearchNode node :currentGraph.nodes().values()){
+                        if (node.isHovered()) {
+                            this.setDropDown(new GraphDropDownWidget(node.getInstance().lookup(Minecraft.getInstance().level), node.getInstance().getResearch().location(), this, (int) mouseX, (int) mouseY));
+                            clickedNode = true;
+                            break;
+                        }
                     }
                 }
                 if (!clickedNode) {
@@ -296,5 +304,4 @@ public class ResearchScreen extends AbstractResearchScreen {
     public ResearchGraph getResearchGraph() {
         return this.researchGraphWidget.getCurrentGraph();
     }
-
 }
