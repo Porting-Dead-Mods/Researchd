@@ -9,5 +9,5 @@ import org.jetbrains.annotations.Nullable;
  * id, for saving as a standalone data file
  */
 public interface StandaloneEditorObject<O> extends EditorObject<O> {
-    ResourceLocation createId(RememberingLinearLayout layout);
+    ResourceLocation createId(RememberingLinearLayout layout, String namespace);
 }

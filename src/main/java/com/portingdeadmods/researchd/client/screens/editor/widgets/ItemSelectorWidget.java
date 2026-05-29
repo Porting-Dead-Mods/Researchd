@@ -10,7 +10,7 @@ import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.catego
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.impl.research.icons.ItemResearchIcon;
-import com.portingdeadmods.researchd.utils.Spaghetti;
+import com.portingdeadmods.researchd.utils.SpaghettiClient;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
@@ -78,7 +78,7 @@ public class ItemSelectorWidget extends AbstractWidget {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (this.isHovered()) {
-            ResearchScreen screen = Spaghetti.tryGetResearchScreen();
+            ResearchScreen screen = SpaghettiClient.tryGetResearchScreen();
             if (this.parentPopupWidget != null) {
                 screen.closePopup(this.parentPopupWidget);
             }

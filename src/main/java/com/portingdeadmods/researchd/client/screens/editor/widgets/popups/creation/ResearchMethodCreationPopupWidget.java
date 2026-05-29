@@ -15,7 +15,7 @@ import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLButton;
 import com.portingdeadmods.researchd.utils.GuiUtils;
-import com.portingdeadmods.researchd.utils.Spaghetti;
+import com.portingdeadmods.researchd.utils.SpaghettiClient;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.layouts.FrameLayout;
 import net.minecraft.client.gui.layouts.Layout;
@@ -54,7 +54,7 @@ public class ResearchMethodCreationPopupWidget extends PopupWidget {
 
     private void onCreateButtonPressed(PDLButton button) {
         this.parentPopupWidget.addMethod(this.clientResearchMethod.create(this.layout));
-        ResearchScreen screen = Spaghetti.tryGetResearchScreen();
+        ResearchScreen screen = SpaghettiClient.tryGetResearchScreen();
         screen.closePopup(this);
         screen.openPopupCentered(this.parentPopupWidget);
     }
@@ -62,7 +62,7 @@ public class ResearchMethodCreationPopupWidget extends PopupWidget {
     @Override
     protected void onClose() {
         super.onClose();
-        ResearchScreen screen = Spaghetti.tryGetResearchScreen();
+        ResearchScreen screen = SpaghettiClient.tryGetResearchScreen();
 
         if (this.parentPopupWidget != null) {
             screen.openPopupCentered(this.parentPopupWidget);
@@ -79,7 +79,7 @@ public class ResearchMethodCreationPopupWidget extends PopupWidget {
 
     protected void buildLayout() {
         if (this.clientResearchMethod != null) {
-            EditorContextImpl context = new EditorContextImpl(this.createButton, Spaghetti.tryGetResearchScreen(), this, this.getWidth(), this.getHeight(), this.getWidth() - 14, this.getHeight() - 14, 7);
+            EditorContextImpl context = new EditorContextImpl(this.createButton, SpaghettiClient.tryGetResearchScreen(), this, this.getWidth(), this.getHeight(), this.getWidth() - 14, this.getHeight() - 14, 7);
             this.clientResearchMethod.buildLayout(this.layout, null, context);
             this.clientResearchMethod.update(this.layout, context);
             this.layout.getLayout().arrangeElements();

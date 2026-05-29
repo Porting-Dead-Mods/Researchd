@@ -2,11 +2,11 @@ package com.portingdeadmods.researchd.impl.team;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
-import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
 import com.portingdeadmods.researchd.impl.research.SimpleResearchQueue;
 import com.portingdeadmods.researchd.impl.research.cache.CachedResearchRelations;
@@ -14,7 +14,6 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -53,7 +52,7 @@ public record TeamResearches(SimpleResearchQueue researchQueue,
     /**
      * Gets the root progress of a researchPack
      */
-    public <T extends ResearchMethod> ResearchProgress getProgress(ResourceKey<Research> research) {
+    public ResearchProgress getProgress(ResourceKey<Research> research) {
         return this.progress().get(research);
     }
 
@@ -65,7 +64,7 @@ public record TeamResearches(SimpleResearchQueue researchQueue,
         for (ResearchInstance instance : this.researches.values()) {
             if (instance.getResearchStatus() == ResearchStatus.RESEARCHED) continue;
 
-            CachedResearchRelations relations = CommonResearchCache.researchRelations.get(instance.getResearch());
+            CachedResearchRelations relations = ResearchdApi.getResearchManager().getRelationsForResearch(instance.getResearch());
 
             if (relations.getParents().stream().allMatch(parent -> this.hasCompleted(parent.getResearchKey()))) {
                 instance.setResearchStatus(ResearchStatus.RESEARCHABLE);

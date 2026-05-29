@@ -36,6 +36,7 @@ import java.util.function.Consumer;
 
 public class SelectedResearchWidget extends ResearchScreenWidget {
     private static final ResourceLocation BACKGROUND_TEXTURE = Researchd.rl("textures/gui/selected_research.png");
+    private static final ResourceLocation BACKGROUND_TEXTURE_HORIZONTAL_SCROLLBAR = Researchd.rl("textures/gui/selected_research_horizontal_scrollbar.png");
     private static final ResourceLocation SMALL_SCROLLER_SPRITE = Researchd.rl("scroller_small");
     // For calculating height
     public static final int LABEL_PADDING_TOP_1 = 2;
@@ -97,11 +98,11 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
-        GuiUtils.drawImg(guiGraphics, BACKGROUND_TEXTURE, getX(), getY(), width, height);
+        GuiUtils.drawImg(guiGraphics, this.sideScroller.visible ? BACKGROUND_TEXTURE_HORIZONTAL_SCROLLBAR : BACKGROUND_TEXTURE, getX(), getY(), width, height);
         float percentage = (float) this.scrollOffset / (this.getInfoHeight() - 47f);
         guiGraphics.blitSprite(SMALL_SCROLLER_SPRITE, getX() + getWidth() - 9, (int) (getY() + PADDING_Y + (41 * percentage)), VERTICAL_SCROLLER_WIDTH, VERTICAL_SCROLLER_HEIGHT);
 
-        int offsetY = -(this.scrollOffset);
+        int offsetY = -this.scrollOffset;
 
         if (this.selectedInstance != null) {
             Minecraft mc = Minecraft.getInstance();
@@ -219,8 +220,10 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
         this.mouseClicked(mouseX, mouseY, 0);
     }
 
-    public void setSelectedResearch(ResourceKey<Research> research) {
-        this.setSelectedResearch(Objects.requireNonNull(ClientResearchTeamHelper.getTeam().getResearches().get(research)));
+    public void setSelectedResearch(@Nullable ResourceKey<Research> research) {
+        if (research != null) {
+            this.setSelectedResearch(Objects.requireNonNull(ClientResearchTeamHelper.getTeam().getResearches().get(research)));
+        }
     }
 
     public void setSelectedResearch(@NotNull ResearchInstance instance) {

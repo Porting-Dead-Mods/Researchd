@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.utils;
 import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
 import com.portingdeadmods.portingdeadlibs.utils.PlayerUtils;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;
 import com.portingdeadmods.researchd.api.client.TechList;
 import com.portingdeadmods.researchd.impl.research.cache.CachedResearchRelations;
@@ -11,7 +12,6 @@ import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.ResearchTeamRole;
 import com.portingdeadmods.researchd.api.team.TeamMember;
-import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.team.ResearchTeamScreen;
@@ -146,7 +146,7 @@ public class ClientResearchTeamHelper {
         Map<ResourceKey<Research>, ResearchInstance> researches = team.getResearches();
 
         for (Map.Entry<ResourceKey<Research>, ResearchInstance> entry : researches.entrySet()) {
-            CachedResearchRelations researchRelations = CommonResearchCache.researchRelations.get(entry.getKey());
+            CachedResearchRelations researchRelations = ResearchdApi.getResearchManager().getRelationsForResearch(entry.getKey());
             if (researchRelations != null) {
                 entry.setValue(entry.getValue().withResearch(entry.getKey()));
             } else {

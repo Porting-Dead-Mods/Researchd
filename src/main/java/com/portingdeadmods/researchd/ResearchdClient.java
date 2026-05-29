@@ -1,9 +1,9 @@
 package com.portingdeadmods.researchd;
 
+import com.portingdeadmods.portingdeadlibs.api.config.PDLConfigHelper;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
 import com.portingdeadmods.researchd.api.client.editor.StandaloneEditorObject;
 import com.portingdeadmods.researchd.api.client.editor.TypedEditorObject;
-import com.portingdeadmods.researchd.api.research.RegistryDisplay;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchIcon;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
@@ -28,6 +28,7 @@ import com.portingdeadmods.researchd.client.impl.editor.methods.ConsumeItemMetho
 import com.portingdeadmods.researchd.client.impl.editor.methods.ConsumePackMethodObject;
 import com.portingdeadmods.researchd.client.renderers.ResearchLabBER;
 import com.portingdeadmods.researchd.client.screens.lab.ResearchLabScreen;
+import com.portingdeadmods.researchd.data.ResearchdDataComponents;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.impl.research.icons.ItemResearchIcon;
@@ -44,22 +45,19 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 
 @Mod(value = Researchd.MODID, dist = Dist.CLIENT)
@@ -83,8 +81,7 @@ public final class ResearchdClient {
         eventBus.addListener(this::registerAdditionalModels);
         eventBus.addListener(this::registerBER);
 
-        NeoForge.EVENT_BUS.addListener(this::renderOutline);
-        NeoForge.EVENT_BUS.addListener(this::addTooltip);
+        PDLConfigHelper.registerConfig(ResearchdConfig.Client.class, ModConfig.Type.CLIENT, modContainer);
 
         modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
     }
@@ -189,37 +186,6 @@ public final class ResearchdClient {
 
     private void registerBER(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(ResearchdBlockEntityTypes.RESEARCH_LAB_CONTROLLER.get(), ResearchLabBER::new);
-    }
-
-    private void renderOutline(RenderHighlightEvent.Block event) {
-//        if (event.getCamera().getEntity() instanceof LivingEntity living) {
-//            Level world = living.level();
-//            BlockHitResult rtr = event.getTarget();
-//            BlockPos pos = rtr.getBlockPos();
-//            Vec3 renderView = event.getCamera().getPosition();
-//            BlockState targetBlock = world.getBlockState(rtr.getBlockPos());
-//            if (targetBlock.getBlock() == ResearchdBlocks.RESEARCH_LAB_CONTROLLER.get() || targetBlock.getBlock() == ResearchdBlocks.RESEARCH_LAB_PART.get()) {
-//                ((LevelRendererMixin) event.getLevelRenderer()).callRenderHitOutline(
-//                        event.getPoseStack(), event.getMultiBufferSource().getBuffer(ResearchdRenderTypes.LINES_NONTRANSLUCENT),
-//                        living, renderView.x, renderView.y, renderView.z,
-//                        pos, targetBlock
-//                );
-//                event.setCanceled(true);
-//            }
-//        }
-    }
-
-    private void addTooltip(ItemTooltipEvent event) {
-        if (event.getItemStack().has(ResearchdDataComponents.RESEARCH_PACK)) {
-            Optional<ResourceKey<ResearchPack>> key = event.getItemStack().get(ResearchdDataComponents.RESEARCH_PACK).researchPackKey();
-            if (key.isPresent()) {
-                ResearchPack pack = ResearchHelperCommon.getResearchPack(key.get(), Minecraft.getInstance().level);
-                if (pack instanceof RegistryDisplay<?> display) {
-                    event.getToolTip().set(0, display.getDisplayNameUnsafe(key.get()));
-                    event.getToolTip().add(1, display.getDisplayDescriptionUnsafe(key.get()));
-                }
-            }
-        }
     }
 
 }

@@ -3,10 +3,11 @@ package com.portingdeadmods.researchd.impl.research;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.ResearchdConfig;
+import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.*;
 import com.portingdeadmods.researchd.api.team.ResearchQueue;
-import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.impl.research.cache.CachedResearchRelations;
+import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -70,7 +71,7 @@ public record SimpleResearchQueue(List<ResourceKey<Research>> entries) implement
     public boolean remove(int index, boolean removeChildren) {
         if (this.entries.size() > index && index >= 0) {
             if (removeChildren)
-                for (ResourceKey<Research> child : CommonResearchCache.allChildrenOf(this.entries.get(index)).stream().map(CachedResearchRelations::getResearchKey).toList()) {
+                for (ResourceKey<Research> child : ResearchHelperCommon.getAllChildrenForResearch(this.entries.get(index), ResearchdApi.getResearchManager())) {
                     this.remove(this.entries.indexOf(child), true);
                 }
 

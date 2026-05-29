@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 public final class ResearchdValueEffects {
     public static final DeferredRegister<ValueEffect> VALUE_EFFECTS = DeferredRegister.create(ResearchdRegistries.VALUE_EFFECT, Researchd.MODID);
 
+    // TODO: Implement this
     public static final Supplier<ValueEffect> RESEARCH_LAB_PRODUCTIVITY = register("research_lab_productivity");
 
     public static Supplier<ValueEffect> register(String name) {

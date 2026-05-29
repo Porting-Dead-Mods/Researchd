@@ -2,7 +2,6 @@ package com.portingdeadmods.researchd.resources.editor;
 
 import com.mojang.serialization.Codec;
 import com.portingdeadmods.researchd.ResearchdRegistries;
-import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.resources.contents.ResearchdResearchPackProvider;
 import net.minecraft.core.Registry;

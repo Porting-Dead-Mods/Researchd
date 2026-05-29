@@ -1,6 +1,7 @@
 package com.portingdeadmods.researchd.client.screens.research;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
@@ -10,13 +11,11 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchInteractionType;
 import com.portingdeadmods.researchd.api.research.ResearchPage;
-import com.portingdeadmods.researchd.cache.CommonResearchCache;
+import com.portingdeadmods.researchd.impl.research.ResearchManagerImpl;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
-import com.portingdeadmods.researchd.client.screens.editor.EditorSharedSprites;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.dropdowns.GraphDropDownWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.EditorSideBarWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.SelectPackPopupWidget;
-import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLButton;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLImageButton;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
@@ -109,14 +108,14 @@ public class ResearchScreen extends AbstractResearchScreen {
     }
 
     public void initDefaultState() {
-        if (CommonResearchCache.rootResearch == null) return;
-
         this.techListWidget.setTechList(TechList.getClientTechList());
         this.techListWidget.getTechList().sortTechList();
-        ResourceKey<Research> firstResearchKey;
-        ResearchInstance firstResearch = this.techListWidget.getTechList().entries().getFirst();
+        // TODO: Proper sorting of techlist
+        ResourceKey<Research> firstResearchKey = null;
+        UniqueArray<ResearchInstance> entries = this.techListWidget.getTechList().entries();
+        ResearchInstance firstResearch = !entries.isEmpty() ? entries.getFirst() : null;
         if (firstResearch == null) {
-            firstResearchKey = CommonResearchCache.rootResearch.getResearchKey();
+            //firstResearchKey = ResearchManagerImpl.rootResearch.getResearchKey();
         } else {
             firstResearchKey = firstResearch.getResearch();
         }

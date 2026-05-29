@@ -8,7 +8,7 @@ import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.select
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.impl.research.effect.EmptyResearchEffect;
 import com.portingdeadmods.researchd.utils.GuiUtils;
-import com.portingdeadmods.researchd.utils.Spaghetti;
+import com.portingdeadmods.researchd.utils.SpaghettiClient;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -49,9 +49,9 @@ public class EmbeddedEffectCreationWidget extends AbstractWidget {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (this.isHovered() && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             if (this.parentPopupWidget != null) {
-                Spaghetti.tryGetResearchScreen().closePopup(this.parentPopupWidget);
+                SpaghettiClient.tryGetResearchScreen().closePopup(this.parentPopupWidget);
             }
-            this.effectTypePopupWidget = Spaghetti.tryGetResearchScreen().openPopupCentered(new ResearchEffectTypeSelectionPopupWidget(this.parentPopupWidget, this));
+            this.effectTypePopupWidget = SpaghettiClient.tryGetResearchScreen().openPopupCentered(new ResearchEffectTypeSelectionPopupWidget(this.parentPopupWidget, this));
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }

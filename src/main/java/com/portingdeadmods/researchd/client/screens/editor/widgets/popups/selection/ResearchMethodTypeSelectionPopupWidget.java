@@ -15,7 +15,7 @@ import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLImageButton;
 import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.Search;
-import com.portingdeadmods.researchd.utils.Spaghetti;
+import com.portingdeadmods.researchd.utils.SpaghettiClient;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -69,7 +69,7 @@ public class ResearchMethodTypeSelectionPopupWidget extends PopupWidget {
 //        screen.openPopupCentered(this.parentPopupWidget);
 //        Research researchPack = ResearchHelperCommon.getResearch(this.selectionContainerWidget.selectedResearch, Minecraft.getInstance().level);
 //        this.selectorListWidget.addItem(new ResearchSelectorListWidget.Element.SimpleElement(this.selectionContainerWidget.selectedResearch, researchPack));
-        ResearchScreen screen = Spaghetti.tryGetResearchScreen();
+        ResearchScreen screen = SpaghettiClient.tryGetResearchScreen();
         this.doneClicked = true;
         screen.closePopup(this);
         List<ResearchMethod> methods = List.copyOf(this.selectionContainerWidget.selectedMethodTypes.values());
@@ -86,7 +86,7 @@ public class ResearchMethodTypeSelectionPopupWidget extends PopupWidget {
     @Override
     protected void onClose() {
         super.onClose();
-        ResearchScreen screen = Spaghetti.tryGetResearchScreen();
+        ResearchScreen screen = SpaghettiClient.tryGetResearchScreen();
 
         if (this.doneClicked) {
             screen.openPopup(parentPopupWidget);
@@ -186,7 +186,7 @@ public class ResearchMethodTypeSelectionPopupWidget extends PopupWidget {
             } else {
                 this.parentWidget.selectedResearchMethod = item;
                 this.parentWidget.doneButton.active = true;
-                ResearchScreen screen = Spaghetti.tryGetResearchScreen();
+                ResearchScreen screen = SpaghettiClient.tryGetResearchScreen();
                 int height = 128;
                 TypedEditorObject<? extends ResearchMethod, ResearchMethodType> clientMethodType = ResearchdClient.getClientMethodType(this.parentWidget.selectedResearchMethod);
                 if (clientMethodType != null) {

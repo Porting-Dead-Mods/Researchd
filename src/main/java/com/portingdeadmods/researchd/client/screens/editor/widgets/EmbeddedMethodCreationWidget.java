@@ -7,7 +7,7 @@ import com.portingdeadmods.researchd.client.screens.editor.EditorSharedSprites;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.selection.ResearchMethodParentSelectionPopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.utils.GuiUtils;
-import com.portingdeadmods.researchd.utils.Spaghetti;
+import com.portingdeadmods.researchd.utils.SpaghettiClient;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -56,9 +56,9 @@ public class EmbeddedMethodCreationWidget extends AbstractWidget {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (this.isHovered() && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             if (this.parentPopupWidget != null) {
-                Spaghetti.tryGetResearchScreen().closePopup(this.parentPopupWidget);
+                SpaghettiClient.tryGetResearchScreen().closePopup(this.parentPopupWidget);
             }
-            this.methodTypePopupWidget = Spaghetti.tryGetResearchScreen().openPopupCentered(new ResearchMethodParentSelectionPopupWidget(this.parentPopupWidget, this, CommonComponents.EMPTY));
+            this.methodTypePopupWidget = SpaghettiClient.tryGetResearchScreen().openPopupCentered(new ResearchMethodParentSelectionPopupWidget(this.parentPopupWidget, this, CommonComponents.EMPTY));
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }

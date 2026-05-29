@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.resources;
+package com.portingdeadmods.researchd.resources.example;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.PackLocationInfo;

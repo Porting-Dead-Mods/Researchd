@@ -1,39 +1,59 @@
-package com.portingdeadmods.researchd.cache;
+package com.portingdeadmods.researchd.impl.research;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
+import com.portingdeadmods.researchd.api.research.ResearchManager;
 import com.portingdeadmods.researchd.impl.research.cache.CachedResearchRelations;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchPage;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
+import com.portingdeadmods.researchd.utils.researches.ResearchdManagers;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
+import java.util.*;
 
-public final class CommonResearchCache {
-    public static Map<ResourceKey<Research>, CachedResearchRelations> researchRelations;
-    public static Map<ResourceLocation, ResearchPage> researchPages;
+@ApiStatus.Internal
+public final class ResearchManagerImpl implements ResearchManager {
+    private static ResearchManagerImpl instance;
+
+    private List<ResourceKey<Research>> researches;
+    private List<ResourceLocation> pageIds;
+    private Map<ResourceKey<Research>, CachedResearchRelations> researchRelations;
+    private Map<ResourceLocation, ResearchPage> researchPages;
 
     /**
      * Map of ResearchPage id to list of root nodes (GlobalResearches with no parents within that page)
      */
-    public static Map<ResourceLocation, List<CachedResearchRelations>> pageRoots;
+    private Map<ResourceLocation, List<ResourceKey<Research>>> pageRoots;
     @Deprecated
-    public static @Nullable CachedResearchRelations rootResearch;
+    private @Nullable CachedResearchRelations rootResearch;
 
-    public static void initialize(Level level) {
-        CommonResearchCache.reset();
+    private ResearchManagerImpl() {
+    }
 
-        Map<ResourceKey<Research>, Research> researchLookup = ResearchHelperCommon.getLevelResearches(level);
+    public static void setNewInstance(Level level) {
+        instance = new ResearchManagerImpl();
+        instance.initialize(level);
+    }
+
+    public static void reset() {
+        instance = null;
+    }
+
+    // TODO: Use Hashmaps?
+    private void initialize(Level level) {
+        Map<ResourceKey<Research>, Research> researchLookup = ResearchdManagers.getResearchesManager(level).getLookup();
         Map<ResourceKey<Research>, CachedResearchRelations> globalResearchMap = new LinkedHashMap<>(researchLookup.size());
+
+        this.researches = ImmutableList.copyOf(researchLookup.keySet());
+
         // Add the researchPacks to GLOBAL_RESEARCHES
-        for (ResourceKey<Research> key : researchLookup.keySet()) {
+        for (ResourceKey<Research> key : this.researches) {
             globalResearchMap.put(key, new CachedResearchRelations(key));
         }
 
@@ -69,7 +89,7 @@ public final class CommonResearchCache {
 
         researchRelations = ImmutableMap.copyOf(globalResearchMap);
 
-        // Build researchPack pages
+        // Build research pages
         Map<ResourceLocation, UniqueArray<CachedResearchRelations>> pageGroups = new LinkedHashMap<>();
         for (CachedResearchRelations research : globalResearchMap.values()) {
             ResourceLocation pageId = resolvePage(research, researchLookup);
@@ -78,28 +98,30 @@ public final class CommonResearchCache {
 
         // Build page roots map and convert page groups to ResearchPage objects
         Map<ResourceLocation, ResearchPage> pagesMap = new LinkedHashMap<>();
-        Map<ResourceLocation, List<CachedResearchRelations>> pageRootsMap = new LinkedHashMap<>();
+        Map<ResourceLocation, List<ResourceKey<Research>>> pageRootsMap = new LinkedHashMap<>();
 
         for (Map.Entry<ResourceLocation, UniqueArray<CachedResearchRelations>> entry : pageGroups.entrySet()) {
             ResourceLocation pageId = entry.getKey();
             UniqueArray<CachedResearchRelations> researches = entry.getValue();
 
             // Find all root nodes for this page (researches with no parents within this page)
-            List<CachedResearchRelations> roots = researches.stream()
+            List<ResourceKey<Research>> roots = researches.stream()
                     .filter(r -> r.getParents().isEmpty() || !researches.containsAll(r.getParents()))
+                    .map(CachedResearchRelations::getResearchKey)
                     .toList();
             pageRootsMap.put(pageId, roots);
 
             // Use the first root's icon as the page icon
-            CachedResearchRelations firstRoot = roots.isEmpty() ? researches.getFirst() : roots.getFirst();
-            Research firstResearchData = researchLookup.get(firstRoot.getResearchKey());
+            ResourceKey<Research> firstRoot = roots.isEmpty() ? researches.getFirst().getResearchKey() : roots.getFirst();
+            Research firstResearchData = researchLookup.get(firstRoot);
             UniqueArray<ResourceKey<Research>> researchKeys = new UniqueArray<>(researches.stream().map(CachedResearchRelations::getResearchKey).toList());
-            ResearchPage page = new ResearchPage(pageId, firstResearchData.researchIcon(), firstRoot.getResearchKey(), researchKeys);
+            ResearchPage page = new ResearchPage(pageId, firstResearchData.researchIcon(), firstRoot, researchKeys);
             pagesMap.put(pageId, page);
         }
 
-        researchPages = ImmutableMap.copyOf(pagesMap);
-        pageRoots = ImmutableMap.copyOf(pageRootsMap);
+        this.researchPages = ImmutableMap.copyOf(pagesMap);
+        this.pageIds = ImmutableList.copyOf(researchPages.keySet());
+        this.pageRoots = ImmutableMap.copyOf(pageRootsMap);
     }
 
     private static ResourceLocation resolvePage(CachedResearchRelations research, Map<ResourceKey<Research>, Research> lookup) {
@@ -120,62 +142,43 @@ public final class CommonResearchCache {
         return pageId;
     }
 
-	/**
-	 * @return ResourceLocation of the page that contains the researchPack, null if no page contains it
-	 */
-	public static @Nullable ResourceLocation rlPageOf(ResourceKey<Research> res) {
-		for (Map.Entry<ResourceLocation, ResearchPage> entry : researchPages.entrySet()) {
-			if (entry.getValue().containsResearch(res)) return entry.getKey();
-		}
+    /* Research General */
 
-		return null;
-	}
-
-	/**
-	 * @return ResearchPage that contains the researchPack, null if no page contains it
-	 */
-	public static @Nullable ResearchPage pageOf(ResourceKey<Research> res) {
-		return researchPages.get(rlPageOf(res));
-	}
-
-    private static void _collectChildren(CachedResearchRelations research, List<CachedResearchRelations> list) {
-        for (CachedResearchRelations child : research.getChildren()) {
-            list.add(child);
-            if (!child.getChildren().isEmpty()) {
-                _collectChildren(child, list);
-            }
-        }
+    @Override
+    public List<ResourceKey<Research>> getResearches() {
+        return researches;
     }
 
-    public static List<CachedResearchRelations> allChildrenOf(ResourceKey<Research> key) {
-        List<CachedResearchRelations> list = new UniqueArray<>();
-        _collectChildren(researchRelations.get(key), list);
-
-        return list;
+    @Override
+    public Research lookupResearch(ResourceKey<Research> key, Level level) {
+        return ResearchdManagers.getResearchesManager(level).getLookup().get(key);
     }
 
-    private static void _collectParents(CachedResearchRelations research, List<CachedResearchRelations> list) {
-        for (CachedResearchRelations parent : research.getParents()) {
-            list.add(parent);
-            if (!parent.getParents().isEmpty()) {
-                _collectChildren(parent, list);
-            }
-        }
+    /* Research Relations */
+
+    @Override
+    public CachedResearchRelations getRelationsForResearch(ResourceKey<Research> researchKey) {
+        return this.researchRelations.get(researchKey);
     }
 
-    public static List<CachedResearchRelations> allParentsOf(ResourceKey<Research> key) {
-        List<CachedResearchRelations> list = new UniqueArray<>();
-        _collectParents(researchRelations.get(key), list);
+    /* Research Pages */
 
-        return list;
+    @Override
+    public List<ResourceLocation> getPageIds() {
+        return pageIds;
     }
 
-    public static void reset() {
-        if (researchRelations != null) {
-            rootResearch = null;
-            researchRelations = null;
-            researchPages = null;
-            pageRoots = null;
-        }
+    @Override
+    public List<ResourceKey<Research>> getRootsForPage(ResourceLocation pageId) {
+        return this.pageRoots.get(pageId);
+    }
+
+    @Override
+    public ResearchPage getPageForId(ResourceLocation pageId) {
+        return this.researchPages.get(pageId);
+    }
+
+    public static ResearchManagerImpl getInstance() {
+        return instance;
     }
 }

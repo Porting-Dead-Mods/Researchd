@@ -4,10 +4,10 @@ import com.portingdeadmods.portingdeadlibs.api.utils.PDLDeferredRegisterItems;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.content.items.ResearchLabItem;
 import com.portingdeadmods.researchd.content.items.ResearchPackItem;
+import com.portingdeadmods.researchd.data.ResearchdDataComponents;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.registries.DeferredItem;
-import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class ResearchdItems {
     public static final PDLDeferredRegisterItems ITEMS = PDLDeferredRegisterItems.createItemsRegister(Researchd.MODID);

@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.resources;
+package com.portingdeadmods.researchd.resources.example;
 
 import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
@@ -8,10 +8,9 @@ import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
+import com.portingdeadmods.researchd.resources.PackWriter;
 import com.portingdeadmods.researchd.resources.contents.ResearchdResearchPacks;
 import com.portingdeadmods.researchd.resources.contents.ResearchdResearches;
-import com.portingdeadmods.researchd.resources.editor.DatapackWriter;
-import com.portingdeadmods.researchd.utils.ResourceUtils;
 import com.portingdeadmods.researchd.utils.researches.ReloadableRegistryManager;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -26,7 +25,7 @@ import java.util.Map;
 /*
  * Helpers to create the example datapack that can be created using a command
  */
-public class ExampleDatapackWriter implements DatapackWriter {
+public class ExampleDatapackWriter implements PackWriter {
     private boolean generateExamples;
 
     public ExampleDatapackWriter(boolean generateExamples) {
@@ -47,7 +46,7 @@ public class ExampleDatapackWriter implements DatapackWriter {
             if (Files.notExists(datapackDir)) {
                 Files.createDirectories(datapackDir);
                 Path packFile = datapackDir.resolve("pack.mcmeta");
-                Files.writeString(packFile, ResourceUtils.getPackFile(packDescription, PackType.SERVER_DATA));
+                Files.writeString(packFile, PackWriter.getPackFile(packDescription, PackType.SERVER_DATA));
 
                 Path dataDir = datapackDir.resolve("data");
                 Files.createDirectory(dataDir);

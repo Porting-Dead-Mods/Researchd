@@ -6,3 +6,4 @@
 - Newly created root researches cannot be researched
 - Enqueued research serialization doesnt work?
 - Add research toasts
+- Research stays orange if parent is added to the queue and then deleted from the pack

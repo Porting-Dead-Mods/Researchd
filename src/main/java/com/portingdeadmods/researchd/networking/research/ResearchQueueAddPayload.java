@@ -8,7 +8,7 @@ import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.team.TeamMember;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
-import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
+import com.portingdeadmods.researchd.impl.team.ResearchTeamImpl;
 import com.portingdeadmods.researchd.networking.client.RefreshResearchScreenData;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.ChatFormatting;
@@ -49,7 +49,7 @@ public record ResearchQueueAddPayload(ResourceKey<Research> researchKey, UUID pl
             if (context.player() instanceof ServerPlayer serverPlayer) {
                 Level level = serverPlayer.level();
                 ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
-                SimpleResearchTeam team = (SimpleResearchTeam) data.getTeamByPlayer(serverPlayer);
+                ResearchTeamImpl team = (ResearchTeamImpl) data.getTeamByPlayer(serverPlayer);
 
 				if (team == null) return;
 				if (team.getQueue().size() >= ResearchdConfig.Common.researchQueueLength) return;

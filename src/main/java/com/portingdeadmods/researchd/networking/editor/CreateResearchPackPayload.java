@@ -55,7 +55,7 @@ public record CreateResearchPackPayload(ResourceKey<ResearchPack> key, ResearchP
                 if (this.reloadData) {
                     ResearchdManagers.getResearchPacksManager(serverPlayer.level()).mergeContents(Collections.singletonMap(key.location(), researchPack));
                     // Reload researches on the server
-                    ResearchHelperServer.reloadResearches(serverPlayer.server, null, serverPlayer.server.getPlayerList().getPlayers());
+                    ResearchHelperServer.onReloadResearches(serverPlayer.server, null, serverPlayer.server.getPlayerList().getPlayers());
                     // Reload researches on the client
                     PacketDistributor.sendToPlayer(serverPlayer, new ResearchCacheReloadPayload());
                 }

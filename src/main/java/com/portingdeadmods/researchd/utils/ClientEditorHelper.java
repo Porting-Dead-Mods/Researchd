@@ -6,6 +6,7 @@ import com.portingdeadmods.researchd.api.editmode.EditModeSettings;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.impl.utils.DisplayImpl;
+import com.portingdeadmods.researchd.resources.PackWriter;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.EditBox;
@@ -27,43 +28,6 @@ public final class ClientEditorHelper {
 
     public static @Nullable ResourceKey<ResearchPack> getDefaultResearchPack() {
         return ResearchHelperClient.getResearchPacks().keySet().stream().findFirst().orElse(null);
-    }
-
-    public static Result<PrettyPath, Exception> createResourcePack(String name, String description, String namespace, boolean generateExamples) {
-        Path resourcePackDir = Minecraft.getInstance().getResourcePackDirectory();
-        Path exampleResourcePackDir = resourcePackDir.resolve(name);
-        try {
-            if (Files.notExists(exampleResourcePackDir)) {
-                Files.createDirectories(exampleResourcePackDir);
-                Path packFile = exampleResourcePackDir.resolve("pack.mcmeta");
-                Files.writeString(packFile, ResourceUtils.getPackFile(description, PackType.CLIENT_RESOURCES));
-
-                Path dataDir = exampleResourcePackDir.resolve("data");
-                Files.createDirectory(dataDir);
-
-                if (generateExamples) {
-                    Path packContentRootDir = dataDir.resolve(namespace);
-
-                    Path packResearchdRegistriesDir = packContentRootDir.resolve("researchd");
-                    Files.createDirectories(packResearchdRegistriesDir);
-
-                    Path packResearchesDir = packResearchdRegistriesDir.resolve("research");
-                    Files.createDirectory(packResearchesDir);
-
-                   // createResearches(packResearchesDir);
-
-                    Path packResearchPacksDir = packResearchdRegistriesDir.resolve("research_pack");
-                    Files.createDirectory(packResearchPacksDir);
-
-                    //createResearchPacks(packResearchPacksDir);
-                }
-                return Result.ok(new PrettyPath(exampleResourcePackDir, Path.of("..." + exampleResourcePackDir.toString().substring(resourcePackDir.toString().length() - "resourcepacks".length() - 1))));
-            }
-            return Result.err("Example Resource Pack already exists");
-        } catch (IOException e) {
-            Researchd.LOGGER.error("Encountered error while creating files and directories for example resourcepack", e);
-            return Result.err("File/Directory creation failed");
-        }
     }
 
     public static DisplayImpl createDisplay(EditBox nameEditBox, EditBox descEditBox) {

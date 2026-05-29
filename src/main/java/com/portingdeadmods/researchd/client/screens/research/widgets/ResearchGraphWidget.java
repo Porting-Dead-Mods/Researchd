@@ -1,9 +1,9 @@
 package com.portingdeadmods.researchd.client.screens.research.widgets;
 
+import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchPage;
-import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.research.AbstractResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
@@ -14,7 +14,6 @@ import com.portingdeadmods.researchd.client.screens.research.graph.GraphStateMan
 import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
 import com.portingdeadmods.researchd.client.screens.research.graph.lines.ResearchHead;
 import com.portingdeadmods.researchd.client.screens.research.graph.lines.ResearchLine;
-import com.portingdeadmods.researchd.utils.Spaghetti;
 import com.portingdeadmods.researchd.utils.TextUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
@@ -57,11 +56,11 @@ public class ResearchGraphWidget extends AbstractWidget {
     public void setGraph(ResearchGraph graph) {
         if (this.graph != graph) {
             this.graph = graph;
-            this.researchScreen.getResearchPagesList().setSelectedPage(CommonResearchCache.pageOf(graph.rootNode().getInstance().getResearch()));
+            this.researchScreen.getResearchPagesList().setSelectedPage(ResearchdApi.getResearchManager().getPageByResearch(graph.rootNode().getInstance().getResearch()));
             this.researchLines.clear();
             this.layoutResult = null;
 
-            if (graph == null || graph.nodes().isEmpty()) {
+            if (graph.nodes().isEmpty()) {
                 return;
             }
 

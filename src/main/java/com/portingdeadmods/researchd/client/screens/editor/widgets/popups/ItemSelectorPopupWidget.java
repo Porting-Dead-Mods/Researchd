@@ -9,7 +9,7 @@ import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLImageButton;
 import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.Search;
-import com.portingdeadmods.researchd.utils.Spaghetti;
+import com.portingdeadmods.researchd.utils.SpaghettiClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -81,7 +81,7 @@ public class ItemSelectorPopupWidget extends PopupWidget {
     }
 
     private void onDoneClicked(PDLImageButton button) {
-        ResearchScreen screen = Spaghetti.tryGetResearchScreen();
+        ResearchScreen screen = SpaghettiClient.tryGetResearchScreen();
 
         screen.closePopup(this);
     }
@@ -91,7 +91,7 @@ public class ItemSelectorPopupWidget extends PopupWidget {
         super.onClose();
 
         if (this.parentPopupWidget != null) {
-            Spaghetti.tryGetResearchScreen().openPopupCentered(this.parentPopupWidget);
+            SpaghettiClient.tryGetResearchScreen().openPopupCentered(this.parentPopupWidget);
             Ingredient selected = this.selectedCategory.getSelected(this.containerWidget);
             if (!selected.isEmpty()) {
                 this.parentSelectorWidget.setSelected(Arrays.stream(selected.getItems()).map(ItemStack::copy).toList(), true);

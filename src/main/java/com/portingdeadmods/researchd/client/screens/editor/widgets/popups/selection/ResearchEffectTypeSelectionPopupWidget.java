@@ -18,7 +18,7 @@ import com.portingdeadmods.researchd.impl.research.effect.EmptyResearchEffect;
 import com.portingdeadmods.researchd.registries.ResearchEffectTypes;
 import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.Search;
-import com.portingdeadmods.researchd.utils.Spaghetti;
+import com.portingdeadmods.researchd.utils.SpaghettiClient;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -66,7 +66,7 @@ public class ResearchEffectTypeSelectionPopupWidget extends PopupWidget {
     }
 
     private void onDoneClicked(PDLImageButton button) {
-        ResearchScreen screen = Spaghetti.tryGetResearchScreen();
+        ResearchScreen screen = SpaghettiClient.tryGetResearchScreen();
         int height = 128;
         TypedEditorObject<? extends ResearchEffect, ResearchEffectType> clientEffectType = ResearchdClient.getClientEffectType(this.selectedResearchEffect);
         if (clientEffectType != null) {
@@ -89,7 +89,7 @@ public class ResearchEffectTypeSelectionPopupWidget extends PopupWidget {
     @Override
     protected void onClose() {
         super.onClose();
-        ResearchScreen screen = Spaghetti.tryGetResearchScreen();
+        ResearchScreen screen = SpaghettiClient.tryGetResearchScreen();
 
         if (this.doneClicked) {
             screen.openPopup(parentPopupWidget);
@@ -187,7 +187,7 @@ public class ResearchEffectTypeSelectionPopupWidget extends PopupWidget {
             } else {
                 ResearchEffectTypeSelectionPopupWidget.this.selectedResearchEffect = item;
                 ResearchEffectTypeSelectionPopupWidget.this.doneButton.active = true;
-                ResearchScreen screen = Spaghetti.tryGetResearchScreen();
+                ResearchScreen screen = SpaghettiClient.tryGetResearchScreen();
                 int height = 128;
                 TypedEditorObject<? extends ResearchEffect, ResearchEffectType> clientEffectType = ResearchdClient.getClientEffectType(ResearchEffectTypeSelectionPopupWidget.this.selectedResearchEffect);
                 if (clientEffectType != null) {

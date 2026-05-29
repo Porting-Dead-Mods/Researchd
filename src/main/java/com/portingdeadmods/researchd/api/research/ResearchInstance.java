@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.api.research;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.impl.research.cache.CachedResearchRelations;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.core.UUIDUtil;
@@ -119,7 +120,7 @@ public final class ResearchInstance {
     }
 
     public Research lookup(Level level) {
-        return ResearchHelperCommon.getResearch(this.research, level);
+        return ResearchdApi.getResearchManager().lookupResearch(this.research, level);
     }
 
     public boolean is(ResearchInstance instance) {

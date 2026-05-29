@@ -8,7 +8,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.compat.KubeJSCompat;
 import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import com.portingdeadmods.researchd.compat.kubejs.example.KubeJSExample;
-import com.portingdeadmods.researchd.resources.ExampleDatapackWriter;
+import com.portingdeadmods.researchd.resources.example.ExampleDatapackWriter;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;

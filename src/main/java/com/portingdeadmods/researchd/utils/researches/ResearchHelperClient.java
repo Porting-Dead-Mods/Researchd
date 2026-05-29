@@ -2,23 +2,20 @@ package com.portingdeadmods.researchd.utils.researches;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdClient;
-import com.portingdeadmods.researchd.api.client.ResearchGraph;
-import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.ResearchIcon;
-import com.portingdeadmods.researchd.api.research.ResearchInstance;
-import com.portingdeadmods.researchd.api.research.ResearchStatus;
+import com.portingdeadmods.researchd.api.ResearchdApi;
+import com.portingdeadmods.researchd.api.research.*;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
-import com.portingdeadmods.researchd.cache.CommonResearchCache;
+import com.portingdeadmods.researchd.impl.research.ResearchManagerImpl;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
-import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
-import com.portingdeadmods.researchd.utils.Spaghetti;
+import com.portingdeadmods.researchd.impl.team.ResearchTeamImpl;
+import com.portingdeadmods.researchd.utils.SpaghettiClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
@@ -31,18 +28,18 @@ import java.util.function.Supplier;
 
 public final class ResearchHelperClient {
     public static void reloadResearches(Level level) {
-        CommonResearchCache.initialize(level);
+        ResearchManagerImpl.setNewInstance(level);
 
-        ResearchHelperClient.initIconRenderers(level);
+        ResearchHelperClient.initIconRenderers();
         ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
         if (data != null) {
-            for (SimpleResearchTeam team : data.researchTeams().values()) {
+            for (ResearchTeamImpl team : data.researchTeams().values()) {
                 ClientResearchTeamHelper.resolveInstances(team);
             }
         }
         ResearchGraphCache.clearCache();
         ClientResearchTeamHelper.refreshResearchScreenData();
-        ResearchScreen screen = Spaghetti.tryGetResearchScreen();
+        ResearchScreen screen = SpaghettiClient.tryGetResearchScreen();
 
         if (screen != null) {
             screen.initDefaultState();
@@ -78,15 +75,13 @@ public final class ResearchHelperClient {
     }
 
     // Called at the end of the initialization phase of the researchPack cache
-    public static void initIconRenderers(Level level) {
-        CommonResearchCache.researchRelations.forEach((k, v) -> {
-            ResearchIcon icon = v.getResearch(level).researchIcon();
+    public static void initIconRenderers() {
+        ResearchManager researchManager = ResearchdApi.getResearchManager();
+
+        researchManager.getResearches().forEach((k) -> {
+            ResearchIcon icon = researchManager.lookupResearch(k, Minecraft.getInstance().level).researchIcon();
             ResearchScreen.CLIENT_ICONS.put(k.location(), ResearchdClient.RESEARCH_ICONS.get(icon.id()).apply(icon));
         });
-    }
-
-    public static Research getResearch(ResourceKey<Research> researchKey) {
-        return ResearchHelperCommon.getResearch(researchKey, Minecraft.getInstance().level);
     }
 
 }

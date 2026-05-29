@@ -1,6 +1,6 @@
 package com.portingdeadmods.researchd.compat.jei;
 
-import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
+import com.portingdeadmods.researchd.data.ResearchdDataComponents;
 import mezz.jei.api.ingredients.subtypes.ISubtypeInterpreter;
 import mezz.jei.api.ingredients.subtypes.UidContext;
 import net.minecraft.world.item.ItemStack;

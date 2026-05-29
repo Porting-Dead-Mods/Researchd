@@ -3,7 +3,7 @@ package com.portingdeadmods.researchd.content.items;
 import com.portingdeadmods.researchd.api.research.RegistryDisplay;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
-import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
+import com.portingdeadmods.researchd.data.ResearchdDataComponents;
 import com.portingdeadmods.researchd.utils.SpaghettiCommon;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.network.chat.Component;

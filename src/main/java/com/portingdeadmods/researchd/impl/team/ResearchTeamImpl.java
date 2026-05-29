@@ -7,12 +7,13 @@ import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
 import com.portingdeadmods.portingdeadlibs.utils.LazyFinal;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
+import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.ValueEffect;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.api.team.*;
-import com.portingdeadmods.researchd.cache.CommonResearchCache;
+import com.portingdeadmods.researchd.api.research.ResearchManager;
 import com.portingdeadmods.researchd.compat.KubeJSCompat;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
 import com.portingdeadmods.researchd.networking.research.ClientResearchCompletedPayload;
@@ -34,48 +35,48 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
+public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
     public static final GameProfile DEBUG_MEMBER = new GameProfile(UUID.fromString("b7c3f3ac-09b3-4e3c-b788-6f30594b34c6"), "Test player");
 
     private String name;
     private final UUID id;
     private final LazyFinal<Long> creationTime;
     private final LinkedHashMap<UUID, TeamMember> members;
-    private final SimpleTeamSocialManager socialManager;
+    private final TeamSocialManagerImpl socialManager;
 
     private final TeamResearches researches;
     private final Map<ResourceLocation, Float> effects;
 
-    public static final Codec<SimpleResearchTeam> CODEC = RecordCodecBuilder.create(builder -> builder.group(
-            Codec.STRING.fieldOf("name").forGetter(SimpleResearchTeam::getName),
-            UUIDUtil.CODEC.fieldOf("id").forGetter(SimpleResearchTeam::getId),
+    public static final Codec<ResearchTeamImpl> CODEC = RecordCodecBuilder.create(builder -> builder.group(
+            Codec.STRING.fieldOf("name").forGetter(ResearchTeamImpl::getName),
+            UUIDUtil.CODEC.fieldOf("id").forGetter(ResearchTeamImpl::getId),
             Codec.unboundedMap(Codec.STRING, TeamMember.CODEC).fieldOf("members").forGetter(t -> ResearchdCodecUtils.encodeMap(t.members)),
-            SimpleTeamSocialManager.CODEC.fieldOf("sent_invites").forGetter(t -> t.socialManager),
+            TeamSocialManagerImpl.CODEC.fieldOf("sent_invites").forGetter(t -> t.socialManager),
             TeamResearches.CODEC.fieldOf("researchPacks").forGetter(t -> t.researches),
             Codec.unboundedMap(Codec.STRING, Codec.FLOAT).fieldOf("effects").forGetter(t -> ResearchdCodecUtils.encodeMap(t.effects))
-    ).apply(builder, SimpleResearchTeam::newTeamStringMaps));
+    ).apply(builder, ResearchTeamImpl::newTeamStringMaps));
 
-    private static @NotNull SimpleResearchTeam newTeamStringMaps(String n, UUID i, Map<String, TeamMember> m, SimpleTeamSocialManager socialManager, TeamResearches tr, Map<String, Float> e) {
-        return new SimpleResearchTeam(n, i, ResearchdCodecUtils.decodeMap(m, UUID::fromString), socialManager, tr, ResearchdCodecUtils.decodeMap(e, ResourceLocation::parse));
+    private static @NotNull ResearchTeamImpl newTeamStringMaps(String n, UUID i, Map<String, TeamMember> m, TeamSocialManagerImpl socialManager, TeamResearches tr, Map<String, Float> e) {
+        return new ResearchTeamImpl(n, i, ResearchdCodecUtils.decodeMap(m, UUID::fromString), socialManager, tr, ResearchdCodecUtils.decodeMap(e, ResourceLocation::parse));
     }
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, SimpleResearchTeam> STREAM_CODEC = StreamCodec.composite(
+    public static final StreamCodec<RegistryFriendlyByteBuf, ResearchTeamImpl> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8,
-            SimpleResearchTeam::getName,
+            ResearchTeamImpl::getName,
             UUIDUtil.STREAM_CODEC,
             t -> t.id,
             ByteBufCodecs.map(HashMap::new, UUIDUtil.STREAM_CODEC, TeamMember.STREAM_CODEC),
             t -> t.members,
-            SimpleTeamSocialManager.STREAM_CODEC,
+            TeamSocialManagerImpl.STREAM_CODEC,
             t -> t.socialManager,
             TeamResearches.STREAM_CODEC,
             t -> t.researches,
             ByteBufCodecs.map(HashMap::new, ResourceLocation.STREAM_CODEC, ByteBufCodecs.FLOAT),
             t -> t.effects,
-            SimpleResearchTeam::new
+            ResearchTeamImpl::new
     );
 
-    private SimpleResearchTeam(String name, UUID id, Map<UUID, TeamMember> members, SimpleTeamSocialManager socialManager, TeamResearches teamResearches, Map<ResourceLocation, Float> effects) {
+    private ResearchTeamImpl(String name, UUID id, Map<UUID, TeamMember> members, TeamSocialManagerImpl socialManager, TeamResearches teamResearches, Map<ResourceLocation, Float> effects) {
         this.name = name;
         this.id = id;
         this.creationTime = LazyFinal.create();
@@ -92,8 +93,8 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
      * @param uuid The Owner
      * @param name The Name of the Team
      */
-    private SimpleResearchTeam(UUID uuid, String name) {
-        this(name, UUID.randomUUID(), Map.of(uuid, new TeamMember(uuid, ResearchTeamRole.OWNER)), SimpleTeamSocialManager.EMPTY, TeamResearches.EMPTY, new HashMap<>());
+    private ResearchTeamImpl(UUID uuid, String name) {
+        this(name, UUID.randomUUID(), Map.of(uuid, new TeamMember(uuid, ResearchTeamRole.OWNER)), TeamSocialManagerImpl.EMPTY, TeamResearches.EMPTY, new HashMap<>());
     }
 
 	/**
@@ -101,10 +102,10 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
 	 *
 	 * @param player The Owner
 	 */
-	public static SimpleResearchTeam createDefaultTeam(UUID player, Level level) {
+	public static ResearchTeamImpl createDefaultTeam(UUID player, Level level) {
 		Researchd.debug("Research Team", "Creating default team for player: " + AllPlayersCache.getName(player));
 
-		SimpleResearchTeam team = new SimpleResearchTeam(player, AllPlayersCache.getName(player) + "'s Team");
+		ResearchTeamImpl team = new ResearchTeamImpl(player, AllPlayersCache.getName(player) + "'s Team");
 		team.setCreationTime(level.getGameTime() * 50);
 		team.init(level);
 
@@ -116,7 +117,7 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
      *
      * @param player The Owner
      */
-    public static SimpleResearchTeam createDefaultTeam(ServerPlayer player) {
+    public static ResearchTeamImpl createDefaultTeam(ServerPlayer player) {
         return createDefaultTeam(player.getUUID(), player.level());
     }
 
@@ -199,7 +200,7 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
             if (level.isClientSide()) return;
 
             if (research == null)  {
-                research = ResearchHelperCommon.getResearch(researchKey, level);
+                research = ResearchdApi.getResearchManager().lookupResearch(researchKey, level);
             }
 
             PacketDistributor.sendToPlayer((ServerPlayer) player, new ClientResearchCompletedPayload(researchKey, (int) completionTime, forced));
@@ -272,16 +273,18 @@ public class SimpleResearchTeam implements ResearchTeam, ValueEffectsHolder {
         this.effects.put(ResearchdRegistries.VALUE_EFFECT.getKey(effect), value);
     }
 
+    // TODO: Merge this with refreshResearches
     public void init(Level level) {
-        Map<ResourceKey<Research>, ResearchInstance> researchInstances = CommonResearchCache.researchRelations.entrySet().stream()
-                .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), new ResearchInstance(e.getValue().getResearchKey(), CommonResearchCache.rootResearch.is(e.getKey())
+        ResearchManager researchManager = ResearchdApi.getResearchManager();
+        Map<ResourceKey<Research>, ResearchInstance> researchInstances = researchManager.getResearches().stream()
+                .map(key -> new AbstractMap.SimpleEntry<>(key, new ResearchInstance(key, researchManager.getRootsForPage(researchManager.getPageByResearch(key).id()).contains(key)
                         ? ResearchStatus.RESEARCHABLE
                         : ResearchStatus.LOCKED)))
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
         this.getResearches().putAll(researchInstances);
 
         Map<ResourceKey<Research>, ResearchProgress> rps = new HashMap<>();
-        for (ResourceKey<Research> key : CommonResearchCache.researchRelations.keySet()) {
+        for (ResourceKey<Research> key : researchManager.getResearches()) {
             rps.put(key, ResearchProgress.forResearch(key, level));
         }
         this.getResearchProgresses().putAll(rps);

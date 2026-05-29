@@ -2,21 +2,20 @@ package com.portingdeadmods.researchd.utils.researches;
 
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.research.RegistryDisplay;
-import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.ResearchInstance;
-import com.portingdeadmods.researchd.api.research.ResearchStatus;
+import com.portingdeadmods.researchd.api.ResearchdApi;
+import com.portingdeadmods.researchd.api.research.*;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectList;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
+import com.portingdeadmods.researchd.impl.research.cache.CachedResearchRelations;
 import com.portingdeadmods.researchd.impl.research.effect.data.DimensionUnlockEffectData;
 import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
 import com.portingdeadmods.researchd.impl.research.effect.data.UnlockItemEffectData;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
-import com.portingdeadmods.researchd.impl.team.SimpleResearchTeam;
+import com.portingdeadmods.researchd.impl.team.ResearchTeamImpl;
 import com.portingdeadmods.researchd.utils.TimeDifference;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -35,30 +34,31 @@ import java.util.*;
 import java.util.function.Supplier;
 
 public final class ResearchHelperCommon {
-    public static Map<ResourceKey<Research>, Research> getLevelResearches(Level level) {
-        return ResearchdManagers.getResearchesManager(level).getLookup();
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T extends ResearchEffect> void _collectEffects(ResearchEffect effect, Collection<T> effects) {
-        if (effect instanceof ResearchEffectList list) {
-            for (ResearchEffect subEffect : list.effects()) {
-                _collectEffects(subEffect,  effects);
-            }
-        } else {
-            effects.add((T) effect);
-        }
-    }
-
     public static <T extends ResearchEffect> Collection<T> getResearchEffects(Class<T> clazz, Level level) {
+        ResearchManager researchManager = ResearchdApi.getResearchManager();
+
         Collection<T> effects = new UniqueArray<>();
 
-        for (Research research : getLevelResearches(level).values()) {
-            ResearchEffect effect = research.researchEffect();
-            _collectEffects(effect, effects);
+        for (ResourceKey<Research> research : researchManager.getResearches()) {
+            ResearchEffect effect = researchManager.lookupResearch(research, level).researchEffect();
+            _collectEffects(clazz, effect, effects);
         }
 
         return new ArrayList<>(effects.stream().filter(clazz::isInstance).toList());
+    }
+
+    public static List<ResourceKey<Research>> getAllChildrenForResearch(ResourceKey<Research> key, ResearchManager manager) {
+        List<ResourceKey<Research>> list = new UniqueArray<>();
+        _collectChildren(manager.getRelationsForResearch(key), list);
+
+        return list;
+    }
+
+    public static List<ResourceKey<Research>> getAllParentsForResearch(ResourceKey<Research> key, ResearchManager manager) {
+        List<ResourceKey<Research>> list = new UniqueArray<>();
+        _collectParents(manager.getRelationsForResearch(key), list);
+
+        return list;
     }
 
     public static List<ResearchInstance> getRecentResearches(ResearchTeam team) {
@@ -69,22 +69,8 @@ public final class ResearchHelperCommon {
                 .toList();
     }
 
-    public static Research getResearch(ResourceKey<Research> key, Level level) {
-        return getLevelResearches(level).get(key);
-    }
-
-    public static @Nullable ResearchInstance getInstanceByResearch(Set<ResearchInstance> researches, ResourceKey<Research> key) {
-        for (ResearchInstance instance : researches) {
-            if (instance.is(key)) {
-                return instance;
-            }
-        }
-        return null;
-    }
-
+    // FIXME: This is pretty inefficient cuz we iterate through all Attachment types
     public static List<ResearchEffectData<?>> getResearchEffectData(ServerPlayer serverPlayer) {
-        MinecraftServer server = serverPlayer.server;
-        ServerLevel level = server.overworld();
         List<ResearchEffectData<?>> effData = new UniqueArray<>();
 
         for (Map.Entry<ResourceKey<AttachmentType<?>>, AttachmentType<?>> entry : NeoForgeRegistries.ATTACHMENT_TYPES.entrySet()) {
@@ -97,10 +83,42 @@ public final class ResearchHelperCommon {
         return effData.stream().sorted(Comparator.comparing(a -> a.getClass().getName())).toList();
     }
 
+    private static <T extends ResearchEffect> void _collectEffects(Class<T> clazz, ResearchEffect effect, Collection<T> effects) {
+        if (effect instanceof ResearchEffectList list) {
+            for (ResearchEffect subEffect : list.effects()) {
+                _collectEffects(clazz, subEffect,  effects);
+            }
+        } else {
+            if (clazz.isInstance(effect)) {
+                effects.add(clazz.cast(effect));
+            }
+        }
+    }
+
+    private static void _collectChildren(CachedResearchRelations research, List<ResourceKey<Research>> list) {
+        for (CachedResearchRelations child : research.getChildren()) {
+            list.add(child.getResearchKey());
+            if (!child.getChildren().isEmpty()) {
+                _collectChildren(child, list);
+            }
+        }
+    }
+
+    private static void _collectParents(CachedResearchRelations research, List<ResourceKey<Research>> list) {
+        for (CachedResearchRelations parent : research.getParents()) {
+            list.add(parent.getResearchKey());
+            if (!parent.getParents().isEmpty()) {
+                _collectChildren(parent, list);
+            }
+        }
+    }
+
+    @Deprecated
     public static Map<ResourceKey<ResearchPack>, ResearchPack> getResearchPacks(Level level) {
         return ResearchdManagers.getResearchPacksManager(level).getLookup();
     }
 
+    @Deprecated
     public static List<ResourceKey<ResearchPack>> getResearchPackKeys(Level level) {
         Map<ResourceKey<ResearchPack>, ResearchPack> lookup = ResearchdManagers.getResearchPacksManager(level).getLookup();
         return lookup.entrySet().stream()
@@ -124,7 +142,7 @@ public final class ResearchHelperCommon {
 
         ResearchTeamMap researchData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
 
-        SimpleResearchTeam team = researchData.getTeamByPlayerId(player.getUUID());
+        ResearchTeamImpl team = researchData.getTeamByPlayerId(player.getUUID());
 	    Researchd.LOGGER.info("Refreshing effect data for player {}", player.getName().getString());
 	    for (Supplier<? extends AttachmentType<? extends ResearchEffectData<?>>> entry : Researchd.RESEARCH_EFFECT_DATA_TYPES) {
 		    AttachmentType<ResearchEffectData<?>> attachment = (AttachmentType<ResearchEffectData<?>>) entry.get();

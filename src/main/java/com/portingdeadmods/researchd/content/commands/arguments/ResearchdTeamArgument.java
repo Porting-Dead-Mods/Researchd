@@ -11,7 +11,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.ResearchTeamManager;
-import com.portingdeadmods.researchd.utils.Spaghetti;
+import com.portingdeadmods.researchd.utils.SpaghettiClient;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -88,7 +88,7 @@ public class ResearchdTeamArgument implements ArgumentType<ResearchdTeamArgument
         if (context.getSource() instanceof CommandSourceStack sourceStack) {
             return ResearchdApi.getTeamManager(sourceStack.getLevel()).getTeams();
         } else {
-            return ResearchdApi.getTeamManager(Spaghetti.getClientLevel()).getTeams();
+            return ResearchdApi.getTeamManager(SpaghettiClient.getClientLevel()).getTeams();
         }
     }
 

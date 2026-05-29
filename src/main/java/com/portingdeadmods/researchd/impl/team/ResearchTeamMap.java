@@ -2,7 +2,6 @@ package com.portingdeadmods.researchd.impl.team;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.ResearchTeamManager;
@@ -18,21 +17,20 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public record ResearchTeamMap(Map<UUID, SimpleResearchTeam> researchTeams) implements ResearchTeamManager {
+public record ResearchTeamMap(Map<UUID, ResearchTeamImpl> researchTeams) implements ResearchTeamManager {
     public static final ResearchTeamMap EMPTY = new ResearchTeamMap();
     public static final Codec<ResearchTeamMap> CODEC = RecordCodecBuilder.create(builder -> builder.group(
-            Codec.unboundedMap(Codec.STRING, SimpleResearchTeam.CODEC).fieldOf("research_teams").forGetter(t -> ResearchdCodecUtils.encodeMap(t.researchTeams))
+            Codec.unboundedMap(Codec.STRING, ResearchTeamImpl.CODEC).fieldOf("research_teams").forGetter(t -> ResearchdCodecUtils.encodeMap(t.researchTeams))
     ).apply(builder, ResearchTeamMap::teamMapFromString));
     public static final StreamCodec<RegistryFriendlyByteBuf, ResearchTeamMap> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.map(
                     HashMap::new,
                     ByteBufCodecs.STRING_UTF8,
-                    SimpleResearchTeam.STREAM_CODEC
+                    ResearchTeamImpl.STREAM_CODEC
             ),
             t -> ResearchdCodecUtils.encodeMap(t.researchTeams),
             ResearchTeamMap::teamMapFromString
@@ -49,7 +47,7 @@ public record ResearchTeamMap(Map<UUID, SimpleResearchTeam> researchTeams) imple
 
     @Override
     public ResearchTeam getTeamByName(String name) {
-        for (SimpleResearchTeam team : this.researchTeams.values()) {
+        for (ResearchTeamImpl team : this.researchTeams.values()) {
             if (team.getName().equals(name)) {
                 return team;
             }
@@ -59,8 +57,8 @@ public record ResearchTeamMap(Map<UUID, SimpleResearchTeam> researchTeams) imple
 
     @Override
     @Nullable
-    public SimpleResearchTeam getTeamByPlayerId(UUID uuid) {
-        for (SimpleResearchTeam team : this.researchTeams.values()) {
+    public ResearchTeamImpl getTeamByPlayerId(UUID uuid) {
+        for (ResearchTeamImpl team : this.researchTeams.values()) {
             if (team.hasMember(uuid)) {
                 return team;
             }
@@ -76,7 +74,7 @@ public record ResearchTeamMap(Map<UUID, SimpleResearchTeam> researchTeams) imple
     }
 
     public void setDefaultTeam(UUID uuid, Level level) {
-        this.researchTeams.put(uuid, SimpleResearchTeam.createDefaultTeam(uuid, level));
+        this.researchTeams.put(uuid, ResearchTeamImpl.createDefaultTeam(uuid, level));
     }
 
     public void setDefaultTeam(ServerPlayer player) {
@@ -93,7 +91,7 @@ public record ResearchTeamMap(Map<UUID, SimpleResearchTeam> researchTeams) imple
         try {
             if (getTeamByPlayer(player) != null) return false;
 
-            researchTeams.put(player.getUUID(), SimpleResearchTeam.createDefaultTeam(player));
+            researchTeams.put(player.getUUID(), ResearchTeamImpl.createDefaultTeam(player));
 
             return true;
         } catch (Exception e) {
@@ -113,15 +111,15 @@ public record ResearchTeamMap(Map<UUID, SimpleResearchTeam> researchTeams) imple
 
 		// Resolve Map pointers to single team objects for all members
 	    ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
-	    Map<UUID, SimpleResearchTeam> temp = new HashMap<>();
-	    Map<UUID, SimpleResearchTeam> memberToTeam = new HashMap<>();
+	    Map<UUID, ResearchTeamImpl> temp = new HashMap<>();
+	    Map<UUID, ResearchTeamImpl> memberToTeam = new HashMap<>();
 
-	    for (Map.Entry<UUID, SimpleResearchTeam> entry : data.researchTeams().entrySet()) {
+	    for (Map.Entry<UUID, ResearchTeamImpl> entry : data.researchTeams().entrySet()) {
 		    UUID uuid = entry.getKey();
-		    SimpleResearchTeam team = entry.getValue();
+		    ResearchTeamImpl team = entry.getValue();
 
 		    // Check if this UUID is already associated with a team
-		    SimpleResearchTeam existingTeam = memberToTeam.get(uuid);
+		    ResearchTeamImpl existingTeam = memberToTeam.get(uuid);
 		    if (existingTeam != null) {
 			    temp.put(uuid, existingTeam);
 			    continue;
@@ -142,7 +140,7 @@ public record ResearchTeamMap(Map<UUID, SimpleResearchTeam> researchTeams) imple
 		ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
     }
 
-    public static ResearchTeamMap teamMapFromString(Map<String, SimpleResearchTeam> stringedMap) {
+    public static ResearchTeamMap teamMapFromString(Map<String, ResearchTeamImpl> stringedMap) {
         return new ResearchTeamMap(ResearchdCodecUtils.decodeMap(stringedMap, UUID::fromString));
     }
 }

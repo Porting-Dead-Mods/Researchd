@@ -7,8 +7,8 @@ public final class ResearchdConfig {
         @ConfigValue(name = "Research Queue Length", comment = "The length of the researchPack queue", range = {1, 99})
         public static int researchQueueLength = 7;
 
-        @ConfigValue(name = "Load Examples Datapack", comment = "Whether to load the examples resourcepack that can be enabled in the world creation screen.")
-        public static boolean loadExamplesDatapack = true;
+        @ConfigValue(name = "Load Default Datapack", comment = "Whether to load the default resourcepack that can be enabled in the world creation screen.")
+        public static boolean loadDefaultDatapack = true;
 
         @ConfigValue(name = "Console Debug", comment = "Whether to enable console debug messages for Researchd", category = "debug")
         public static boolean consoleDebug = false;

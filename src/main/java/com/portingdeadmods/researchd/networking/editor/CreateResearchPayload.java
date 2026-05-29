@@ -7,7 +7,6 @@ import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.impl.editor.EditModeSettingsImpl;
 import com.portingdeadmods.researchd.networking.research.ResearchCacheReloadPayload;
 import com.portingdeadmods.researchd.resources.editor.EditorResearchProvider;
-import com.portingdeadmods.researchd.utils.PrettyPath;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperServer;
 import com.portingdeadmods.researchd.utils.researches.ResearchdManagers;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -56,7 +55,7 @@ public record CreateResearchPayload(ResourceKey<Research> key, Research research
                 if (this.reloadData) {
                     ResearchdManagers.getResearchesManager(serverPlayer.level()).mergeContents(Collections.singletonMap(key.location(), research));
                     // Reload researches on the server
-                    ResearchHelperServer.reloadResearches(serverPlayer.server, null, serverPlayer.server.getPlayerList().getPlayers());
+                    ResearchHelperServer.onReloadResearches(serverPlayer.server, null, serverPlayer.server.getPlayerList().getPlayers());
                     // Reload researches on the client
                     PacketDistributor.sendToPlayer(serverPlayer, new ResearchCacheReloadPayload());
                 }

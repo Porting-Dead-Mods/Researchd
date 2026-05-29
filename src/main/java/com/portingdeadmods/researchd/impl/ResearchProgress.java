@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.impl;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
+import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
@@ -18,10 +19,9 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
-// TODO: Remove researchPack progresses for removed researches
-public final class ResearchProgress {
+// TODO: Remove research progresses for removed researches
+public record ResearchProgress(List<Task> tasks, Type type) {
     public static final Codec<ResearchProgress> CODEC = RecordCodecBuilder.create(inst -> inst.group(
             Task.CODEC.listOf().fieldOf("tasks").forGetter(ResearchProgress::tasks),
             Type.CODEC.fieldOf("type").forGetter(ResearchProgress::type)
@@ -33,13 +33,6 @@ public final class ResearchProgress {
             ResearchProgress::type,
             ResearchProgress::new
     );
-    private final List<Task> tasks;
-    private final Type type;
-
-    public ResearchProgress(List<Task> tasks, Type type) {
-        this.tasks = tasks;
-        this.type = type;
-    }
 
     public boolean isComplete() {
         return this.type.isComplete(this.tasks);
@@ -67,7 +60,7 @@ public final class ResearchProgress {
     }
 
     public static ResearchProgress forResearch(ResourceKey<Research> key, Level level) {
-        Research research = ResearchHelperCommon.getResearch(key, level);
+        Research research = ResearchdApi.getResearchManager().lookupResearch(key, level);
         ResearchMethod method = research.researchMethod();
         return method.createProgress();
     }
@@ -83,36 +76,6 @@ public final class ResearchProgress {
     public static ResearchProgress or(List<ResearchMethod> methods) {
         return new ResearchProgress(methods.stream().map(Task::new).toList(), Type.OR);
     }
-
-    public List<Task> tasks() {
-        return tasks;
-    }
-
-    public Type type() {
-        return type;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
-        var that = (ResearchProgress) obj;
-        return Objects.equals(this.tasks, that.tasks) &&
-                Objects.equals(this.type, that.type);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(tasks, type);
-    }
-
-    @Override
-    public String toString() {
-        return "ResearchProgress[" +
-                "tasks=" + tasks + ", " +
-                "type=" + type + ']';
-    }
-
 
     public enum Type implements StringRepresentable {
         OR("or"),

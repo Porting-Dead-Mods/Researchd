@@ -1,7 +1,8 @@
 package com.portingdeadmods.researchd.api.client;
 
+import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.*;
-import com.portingdeadmods.researchd.cache.CommonResearchCache;
+import com.portingdeadmods.researchd.api.research.ResearchManager;
 import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
 import com.portingdeadmods.researchd.impl.research.cache.CachedResearchRelations;
 import net.minecraft.resources.ResourceKey;
@@ -19,11 +20,12 @@ import java.util.Set;
 public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, ResearchNode> nodes, ResearchPage page) {
     private static final int RESEARCH_GRAPH_LAYERS = 2;
 
-    // TODO: Add researchPacks to the team's researchPack progress
+    // TODO: Add researches to the team's research progress
     private ResearchGraph(ResourceKey<Research> researchRoot, Map<ResourceKey<Research>, ResearchInstance> researches) {
-        this(new ResearchNode(researches.get(researchRoot)), new LinkedHashMap<>(), CommonResearchCache.pageOf(researchRoot));
+        this(new ResearchNode(researches.get(researchRoot)), new LinkedHashMap<>(), ResearchdApi.getResearchManager().getPageByResearch(researchRoot));
 
-        createNodes(rootNode.getInstance(), 0, CommonResearchCache.rootResearch != null && CommonResearchCache.rootResearch.is(rootNode.getInstance().getResearch())
+        ResearchManager researchManager = ResearchdApi.getResearchManager();
+        createNodes(rootNode.getInstance(), 0, researchManager.getRootsForPage(this.page().id()).contains(researchRoot)
                 ? -1
                 : RESEARCH_GRAPH_LAYERS, researches);
         this.rootNode.setRootNode(true);
@@ -39,7 +41,7 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
         for (ResearchNode node : this.nodes.values()) {
             ResourceKey<Research> research = node.getInstance().getResearch();
 
-            CachedResearchRelations relations = CommonResearchCache.researchRelations.get(research);
+            CachedResearchRelations relations = ResearchdApi.getResearchManager().getRelationsForResearch(research);
 
             Set<CachedResearchRelations> parents = relations.getParents();
 
@@ -70,7 +72,7 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
         if (nesting > 0) {
             this.nodes.put(instance.getResearch(), new ResearchNode(instance));
         }
-        CachedResearchRelations relations = CommonResearchCache.researchRelations.get(instance.getResearch());
+        CachedResearchRelations relations = ResearchdApi.getResearchManager().getRelationsForResearch(instance.getResearch());
         for (CachedResearchRelations research : relations.getParents()) {
             if (nesting < layers || layers == -1) {
                 createNodesUpward(researches.get(research.getResearchKey()), nesting + 1, layers, researches);
@@ -84,7 +86,7 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
         if (nesting > 0) {
             this.nodes.put(instance.getResearch(), new ResearchNode(instance));
         }
-        CachedResearchRelations relations = CommonResearchCache.researchRelations.get(instance.getResearch());
+        CachedResearchRelations relations = ResearchdApi.getResearchManager().getRelationsForResearch(instance.getResearch());
         for (CachedResearchRelations research : relations.getChildren()) {
             if (nesting < layers || layers == -1) {
                 createNodesDownward(researches.get(research.getResearchKey()), nesting + 1, layers, researches);

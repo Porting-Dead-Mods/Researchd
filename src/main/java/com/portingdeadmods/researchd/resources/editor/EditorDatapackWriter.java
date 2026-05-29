@@ -1,9 +1,8 @@
 package com.portingdeadmods.researchd.resources.editor;
 
 import com.portingdeadmods.portingdeadlibs.utils.Result;
-import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.resources.PackWriter;
 import com.portingdeadmods.researchd.resources.ResearchdDatagenProvider;
-import com.portingdeadmods.researchd.utils.ResourceUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.util.Unit;
@@ -15,7 +14,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EditorDatapackWriter implements DatapackWriter {
+public class EditorDatapackWriter implements PackWriter {
     private final Map<ResourceLocation, ResearchdDatagenProvider<?>> providers;
 
     public EditorDatapackWriter() {
@@ -32,7 +31,7 @@ public class EditorDatapackWriter implements DatapackWriter {
 
         if (packDescription != null) {
             Path packFile = datapackDirectory.resolve("pack.mcmeta");
-            tryWriteFile(packFile, ResourceUtils.getPackFile(packDescription, PackType.SERVER_DATA));
+            tryWriteFile(packFile, PackWriter.getPackFile(packDescription, PackType.SERVER_DATA));
         }
 
         Path dataDir = datapackDirectory.resolve("data");

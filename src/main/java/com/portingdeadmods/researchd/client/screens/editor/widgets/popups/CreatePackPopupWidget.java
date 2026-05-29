@@ -9,10 +9,12 @@ import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLButton;
 import com.portingdeadmods.researchd.networking.editor.CreateDatapackPayload;
 import com.portingdeadmods.researchd.networking.editor.SetPackPayload;
+import com.portingdeadmods.researchd.resources.example.ExampleResourcePackWriter;
 import com.portingdeadmods.researchd.utils.ClientEditorHelper;
 import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.PrettyPath;
 import com.portingdeadmods.researchd.utils.TextUtils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.layouts.LayoutSettings;
@@ -23,6 +25,7 @@ import net.minecraft.server.packs.PackType;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.file.Path;
 import java.util.function.Consumer;
 
 public class CreatePackPopupWidget extends PopupWidget {
@@ -84,11 +87,15 @@ public class CreatePackPopupWidget extends PopupWidget {
             PacketDistributor.sendToServer(new CreateDatapackPayload(name, description, TextUtils.camelToSnake(name), generateExamples));
         } else if (this.packType == PackType.CLIENT_RESOURCES) {
             String namespace = TextUtils.trimSpecialCharacterAndConvertToSnake(name);
-            Result<PrettyPath, Exception> resourcePack = ClientEditorHelper.createResourcePack(name, description, namespace, generateExamples);
-            if (resourcePack instanceof Result.Ok(PrettyPath value)) {
-                PacketDistributor.sendToServer(new SetPackPayload(new PackLocation(value.fullPath(), namespace, PackType.CLIENT_RESOURCES)));
+            ExampleResourcePackWriter writer = new ExampleResourcePackWriter();
+            writer.setGenerateExamples(generateExamples);
+
+            Result<Path, Exception> resourcePack = writer.write(Minecraft.getInstance().getResourcePackDirectory(), name, description, namespace);
+            if (resourcePack instanceof Result.Ok(Path value)) {
+                PacketDistributor.sendToServer(new SetPackPayload(new PackLocation(value, namespace, PackType.CLIENT_RESOURCES)));
             }
         }
+
         this.screen.closePopup(this);
     }
 

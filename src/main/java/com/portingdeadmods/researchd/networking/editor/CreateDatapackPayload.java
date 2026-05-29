@@ -6,7 +6,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.editmode.PackLocation;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.impl.editor.EditModeSettingsImpl;
-import com.portingdeadmods.researchd.resources.ExampleDatapackWriter;
+import com.portingdeadmods.researchd.resources.example.ExampleDatapackWriter;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;

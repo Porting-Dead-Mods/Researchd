@@ -15,7 +15,7 @@ import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLButton;
 import com.portingdeadmods.researchd.utils.GuiUtils;
-import com.portingdeadmods.researchd.utils.Spaghetti;
+import com.portingdeadmods.researchd.utils.SpaghettiClient;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.layouts.FrameLayout;
 import net.minecraft.client.gui.layouts.Layout;
@@ -57,7 +57,7 @@ public class ResearchEffectCreationPopupWidget extends PopupWidget {
     private void onCreateButtonPressed(PDLButton button) {
         //this.originSelectionWidget.setCreatedEffect(this.clientResearchEffect.createResearchEffect(this.layout));
         this.parentPopupWidget.addEffect(this.clientResearchEffect.create(this.layout));
-        ResearchScreen screen = Spaghetti.tryGetResearchScreen();
+        ResearchScreen screen = SpaghettiClient.tryGetResearchScreen();
         screen.closePopup(this);
         if (this.parentPopupWidget != null) {
             screen.openPopupCentered(this.parentPopupWidget);
@@ -74,7 +74,7 @@ public class ResearchEffectCreationPopupWidget extends PopupWidget {
 
     protected void buildLayout() {
         if (this.clientResearchEffect != null) {
-            EditorContextImpl context = new EditorContextImpl(this.createButton, Spaghetti.tryGetResearchScreen(), this, this.getWidth(), this.getHeight(), this.getWidth() - 14, this.getHeight() - 14, 7);
+            EditorContextImpl context = new EditorContextImpl(this.createButton, SpaghettiClient.tryGetResearchScreen(), this, this.getWidth(), this.getHeight(), this.getWidth() - 14, this.getHeight() - 14, 7);
             this.clientResearchEffect.buildLayout(this.layout, null, context);
             this.clientResearchEffect.update(this.layout, context);
             this.layout.getLayout().arrangeElements();

@@ -2,9 +2,10 @@ package com.portingdeadmods.researchd.client.screens.research.widgets;
 
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
 import com.portingdeadmods.researchd.api.research.ResearchPage;
-import com.portingdeadmods.researchd.cache.CommonResearchCache;
+import com.portingdeadmods.researchd.api.research.ResearchManager;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -35,29 +36,24 @@ public class ResearchPagesList extends AbstractWidget {
         super(x, y, BUTTON_SIZE, HEIGHT, Component.empty());
         this.screen = screen;
         this.pages = new ArrayList<>();
-
-        if (CommonResearchCache.researchPages != null) {
-            this.pages.addAll(CommonResearchCache.researchPages.values());
-            if (!this.pages.isEmpty()) {
-                this.selectedPage = CommonResearchCache.researchPages.get(ResearchPage.DEFAULT_PAGE_ID);
-                if (this.selectedPage == null) {
-                    this.selectedPage = this.pages.getFirst();
-                }
-            }
-        }
+        this.refreshPages();
     }
 
     public void refreshPages() {
-        this.pages.clear();
-        if (CommonResearchCache.researchPages != null) {
-            this.pages.addAll(CommonResearchCache.researchPages.values());
-            if (!this.pages.isEmpty() && this.selectedPage == null) {
-                this.selectedPage = CommonResearchCache.researchPages.get(ResearchPage.DEFAULT_PAGE_ID);
-                if (this.selectedPage == null) {
-                    this.selectedPage = this.pages.getFirst();
-                }
+        if (!this.pages.isEmpty()) {
+            this.pages.clear();
+        }
+
+        ResearchManager researchManager = ResearchdApi.getResearchManager();
+
+        researchManager.getPageIds().stream().map(researchManager::getPageForId).forEach(this.pages::add);
+        if (!this.pages.isEmpty()) {
+            this.selectedPage = researchManager.getPageForId(ResearchPage.DEFAULT_PAGE_ID);
+            if (this.selectedPage == null) {
+                this.selectedPage = this.pages.getFirst();
             }
         }
+
     }
 
     @Override
@@ -140,5 +136,6 @@ public class ResearchPagesList extends AbstractWidget {
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
+    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
+    }
 }

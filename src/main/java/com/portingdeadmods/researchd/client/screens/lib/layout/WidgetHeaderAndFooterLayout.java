@@ -16,7 +16,6 @@ public class WidgetHeaderAndFooterLayout implements Layout {
     private final LinearLayout header;
     private final LinearLayout contents;
     private final LinearLayout footer;
-    private final int width;
     private final int headerHeight;
     private final int contentsHeight;
     private final int footerHeight;
@@ -25,7 +24,6 @@ public class WidgetHeaderAndFooterLayout implements Layout {
     public WidgetHeaderAndFooterLayout(int width, int headerHeight, int contentsHeight, int footerHeight) {
         this.children = new ArrayList<>();
 
-        this.width = width;
         this.headerHeight = headerHeight;
         this.contentsHeight = contentsHeight;
         this.footerHeight = footerHeight;

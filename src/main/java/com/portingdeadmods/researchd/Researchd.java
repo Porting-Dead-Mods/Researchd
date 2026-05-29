@@ -5,31 +5,20 @@ import com.portingdeadmods.portingdeadlibs.api.config.PDLConfigHelper;
 import com.portingdeadmods.portingdeadlibs.api.resources.DynamicPack;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
-import com.portingdeadmods.researchd.api.research.effects.ResearchEffectType;
-import com.portingdeadmods.researchd.cache.CommonResearchCache;
 import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import com.portingdeadmods.researchd.compat.ftbteams.FTBTeamsCompat;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
+import com.portingdeadmods.researchd.data.ResearchdDataComponents;
 import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
-import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
-import com.portingdeadmods.researchd.networking.registries.UpdateResearchPacksPayload;
-import com.portingdeadmods.researchd.networking.registries.UpdateResearchesPayload;
-import com.portingdeadmods.researchd.networking.research.ResearchCacheReloadPayload;
 import com.portingdeadmods.researchd.registries.*;
 import com.portingdeadmods.researchd.registries.serializers.*;
 import com.portingdeadmods.researchd.resources.ResearchdDynamicPackContents;
-import com.portingdeadmods.researchd.resources.ResearchdExamplesSource;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperServer;
-import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
-import com.portingdeadmods.researchd.utils.researches.ResearchdManagers;
+import com.portingdeadmods.researchd.resources.example.ResearchdExamplesSource;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
@@ -45,20 +34,14 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.AddPackFindersEvent;
-import net.neoforged.neoforge.event.OnDatapackSyncEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
 import org.slf4j.Logger;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 @Mod(Researchd.MODID)
 public final class Researchd {
@@ -123,9 +106,6 @@ public final class Researchd {
         modEventBus.addListener(this::addPackFinders);
 		modEventBus.addListener(this::onCommonSetup);
 
-        NeoForge.EVENT_BUS.addListener(this::onDatapacksSynced);
-
-        PDLConfigHelper.registerConfig(ResearchdConfig.Client.class, ModConfig.Type.CLIENT, modContainer);
         PDLConfigHelper.registerConfig(ResearchdConfig.Common.class, ModConfig.Type.COMMON, modContainer);
 
 		if (ResearchdCompatHandler.isFTBTeamsEnabled())
@@ -141,7 +121,7 @@ public final class Researchd {
 	}
 
     private void addPackFinders(AddPackFindersEvent event) {
-        if (ResearchdConfig.Common.loadExamplesDatapack) {
+        if (ResearchdConfig.Common.loadDefaultDatapack) {
             DynamicPack pack = new DynamicPack(Researchd.rl("example_researches"), event.getPackType(), PackSource.FEATURE);
             switch (event.getPackType()) {
                 case CLIENT_RESOURCES -> ResearchdDynamicPackContents.writeAssets(pack);
@@ -171,13 +151,6 @@ public final class Researchd {
     private void registerDatapackRegistries(DataPackRegistryEvent.NewRegistry event) {
         event.dataPackRegistry(ResearchdRegistries.RESEARCH_KEY, Research.CODEC, Research.CODEC);
         event.dataPackRegistry(ResearchdRegistries.RESEARCH_PACK_KEY, ResearchPackImpl.CODEC, ResearchPackImpl.CODEC);
-    }
-
-    private void onDatapacksSynced(OnDatapackSyncEvent event) {
-        ServerPlayer player = event.getPlayer();
-        MinecraftServer server = event.getPlayerList().getServer();
-        List<ServerPlayer> relevantPlayers = event.getPlayer() == null ? event.getPlayerList().getPlayers() : List.of(event.getPlayer());
-        ResearchHelperServer.reloadResearches(server, player, relevantPlayers);
     }
 
     public static ResourceLocation rl(String path) {

@@ -4,14 +4,13 @@ import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
-import com.portingdeadmods.researchd.registries.ResearchdDataComponents;
+import com.portingdeadmods.researchd.data.ResearchdDataComponents;
 import com.portingdeadmods.researchd.registries.ResearchdItems;
 import com.portingdeadmods.researchd.resources.ResearchdDatagenProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.UnaryOperator;
 

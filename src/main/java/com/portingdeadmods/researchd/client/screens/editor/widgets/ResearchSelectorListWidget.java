@@ -3,21 +3,22 @@ package com.portingdeadmods.researchd.client.screens.editor.widgets;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.ResearchManager;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.selection.ResearchSelectionPopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.ContainerWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.utils.GuiUtils;
-import com.portingdeadmods.researchd.utils.Spaghetti;
+import com.portingdeadmods.researchd.utils.SpaghettiClient;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.vehicle.Minecart;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -37,8 +38,9 @@ public class ResearchSelectorListWidget extends ContainerWidget<ResearchSelector
     }
 
     public void setPrevious(List<ResourceKey<Research>> previous) {
+        ResearchManager researchManager = ResearchdApi.getResearchManager();
         for (ResourceKey<Research> research : previous) {
-            this.addItem(new Element.SimpleElement(research, ResearchHelperCommon.getResearch(research, Minecraft.getInstance().level)));
+            this.addItem(new Element.SimpleElement(research, researchManager.lookupResearch(research, Minecraft.getInstance().level)));
         }
     }
 
@@ -50,11 +52,10 @@ public class ResearchSelectorListWidget extends ContainerWidget<ResearchSelector
     public void addItem(Element item) {
         if (!this.getItems().isEmpty()) {
             this.getItems().set(this.getItems().size() - 1, item);
-            this.getItems().addLast(Element.SelectorElement.INSTANCE);
         } else {
             this.getItems().add(item);
-            this.getItems().add(Element.SelectorElement.INSTANCE);
         }
+        this.getItems().add(Element.SelectorElement.INSTANCE);
     }
 
     public void removeItem(Element element) {
@@ -93,7 +94,7 @@ public class ResearchSelectorListWidget extends ContainerWidget<ResearchSelector
     @Override
     public void clickedItem(Element item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {
         if (item instanceof Element.SelectorElement) {
-            ResearchScreen screen = Spaghetti.tryGetResearchScreen();
+            ResearchScreen screen = SpaghettiClient.tryGetResearchScreen();
             if (this.parentPopupWidget != null) {
                 screen.closePopup(this.parentPopupWidget);
             }

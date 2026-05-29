@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.registries;
+package com.portingdeadmods.researchd.data;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;

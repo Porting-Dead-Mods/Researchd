@@ -1,7 +1,5 @@
 package com.portingdeadmods.researchd.utils;
 
-import it.unimi.dsi.fastutil.Pair;
-
 public record Search(boolean stripExcessWhitespaces, boolean caseSensitive) {
     public Search() {
         this(true, false);
@@ -10,33 +8,31 @@ public record Search(boolean stripExcessWhitespaces, boolean caseSensitive) {
     public boolean matches(String a, String b) {
         if (a == null || b == null) return false;
 
-        Pair<String, String> preprocessedString = preprocessStrings(a, b);
+        a = preprocessString(a);
+        b = preprocessString(b);
 
-        return preprocessedString.first().contains(preprocessedString.second());
+        return a.contains(b);
     }
 
     public boolean matchesExactly(String a, String b) {
         if (a == null || b == null) return false;
 
-        Pair<String, String> preprocessedString = preprocessStrings(a, b);
+        a = preprocessString(a);
+        b = preprocessString(b);
 
-        return preprocessedString.first().equals(preprocessedString.second());
+        return a.equals(b);
     }
 
-    private Pair<String, String> preprocessStrings(String a, String b) {
-        String finalA = a;
-        String finalB = b;
+    private String preprocessString(String string) {
         if (!this.caseSensitive()) {
-            finalA = finalA.toLowerCase();
-            finalB = finalB.toLowerCase();
+            string = string.toLowerCase();
         }
 
         if (this.stripExcessWhitespaces()) {
-            finalA = finalA.strip();
-            finalB = finalB.strip();
+            string = string.strip();
         }
 
-        return Pair.of(finalA, finalB);
+        return string;
     }
 
 }

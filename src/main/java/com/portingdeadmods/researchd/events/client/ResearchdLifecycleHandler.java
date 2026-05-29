@@ -1,78 +1,22 @@
-package com.portingdeadmods.researchd.events;
+package com.portingdeadmods.researchd.events.client;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdConfig;
-import com.portingdeadmods.researchd.api.ResearchdApi;
-import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
-import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
-import com.portingdeadmods.researchd.client.screens.team.ResearchTeamScreen;
-import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
-import com.portingdeadmods.researchd.data.ResearchdAttachments;
-import com.portingdeadmods.researchd.impl.research.effect.data.UnlockItemEffectData;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.world.item.Item;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
 @EventBusSubscriber(modid = Researchd.MODID, value = Dist.CLIENT)
-public final class ResearchdClientEvents {
-    @SubscribeEvent
-    public static void preClientTick(ClientTickEvent.Pre event) {
-        if (ResearchdKeybinds.OPEN_RESEARCH_SCREEN.get().consumeClick()) {
-            ResearchdApi.openScreen();
-        }
-
-        if (ResearchdKeybinds.OPEN_RESEARCH_TEAM_SCREEN.get().consumeClick()) {
-            if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
-                // TODO: Open ftb team screen?
-                Minecraft.getInstance().player.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
-            } else {
-                ResearchdApi.openTeamScreen();
-            }
-        }
-    }
-
-//	@SubscribeEvent
-//	public static void postClientTick(ClientTickEvent.Post event) {
-//		Level level = Minecraft.getInstance().level;
-//		LocalPlayer player = Minecraft.getInstance().player;
-//		if (player == null || level == null) return;
-//
-//		ResearchTeamMap map = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
-//		if (map == null) return;
-//
-//		ResearchTeam team = map.getTeamByPlayer(player);
-//		if (team == null) return;
-//
-//		TeamResearchProgress researchProgress = team.getResearchProgress();
-//		ResearchQueue queue = researchProgress.researchQueue();
-//	}
-
-    @SubscribeEvent
-    public static void onToolTipEvent(ItemTooltipEvent event) {
-        if (event.getEntity() == null) return;
-        LocalPlayer player = (LocalPlayer) event.getEntity();
-        Item item = event.getItemStack().getItem();
-
-        UnlockItemEffectData itemData = player.getData(ResearchdAttachments.ITEM_PREDICATE.get());
-        if (itemData.isBlocked(item)) {
-            event.getToolTip().add(Component.literal("")); // Add a blank line for spacing
-            event.getToolTip().add(Component.literal("This item is blocked by a researchPack!").withStyle(ChatFormatting.RED, ChatFormatting.ITALIC));
-        }
-    }
-
+public class ResearchdLifecycleHandler {
     @SubscribeEvent
     public static void onClientPlayerLoggingIn(ClientPlayerNetworkEvent.LoggingIn event) {
         LocalPlayer player = event.getPlayer();

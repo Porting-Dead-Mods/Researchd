@@ -2,14 +2,12 @@ package com.portingdeadmods.researchd.datagen;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.registries.ResearchdItems;
-import com.portingdeadmods.researchd.resources.contents.ResearchdResearchPacks;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
 

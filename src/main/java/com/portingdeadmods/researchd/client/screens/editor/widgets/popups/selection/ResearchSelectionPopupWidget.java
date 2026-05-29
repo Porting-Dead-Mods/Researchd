@@ -1,8 +1,10 @@
 package com.portingdeadmods.researchd.client.screens.editor.widgets.popups.selection;
 
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.ResearchManager;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.ResearchSelectorListWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.ContainerWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
@@ -10,7 +12,7 @@ import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLImageButton;
 import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.Search;
-import com.portingdeadmods.researchd.utils.Spaghetti;
+import com.portingdeadmods.researchd.utils.SpaghettiClient;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import it.unimi.dsi.fastutil.Pair;
@@ -62,9 +64,10 @@ public class ResearchSelectionPopupWidget extends PopupWidget {
     }
 
     private void onDoneClicked(PDLImageButton button) {
-        ResearchScreen screen = Spaghetti.tryGetResearchScreen();
+        ResearchScreen screen = SpaghettiClient.tryGetResearchScreen();
         screen.openPopupCentered(this.parentPopupWidget);
-        Research research = ResearchHelperCommon.getResearch(this.selectionContainerWidget.selectedResearch, Minecraft.getInstance().level);
+        ResearchManager researchManager = ResearchdApi.getResearchManager();
+        Research research = researchManager.lookupResearch(this.selectionContainerWidget.selectedResearch, Minecraft.getInstance().level);
         this.selectorListWidget.addItem(new ResearchSelectorListWidget.Element.SimpleElement(this.selectionContainerWidget.selectedResearch, research));
         screen.closePopup(this);
     }
@@ -73,7 +76,7 @@ public class ResearchSelectionPopupWidget extends PopupWidget {
     protected void onClose() {
         super.onClose();
 
-        ResearchScreen screen = Spaghetti.tryGetResearchScreen();
+        ResearchScreen screen = SpaghettiClient.tryGetResearchScreen();
         screen.openPopup(this.parentPopupWidget);
     }
 
@@ -101,9 +104,10 @@ public class ResearchSelectionPopupWidget extends PopupWidget {
     }
 
     private void onSearchBarValueChanged(String val) {
-        Set<ResourceKey<Research>> researchKeys = ResearchHelperCommon.getLevelResearches(Minecraft.getInstance().level).keySet();
+        ResearchManager researchManager = ResearchdApi.getResearchManager();
+        List<ResourceKey<Research>> researchKeys = researchManager.getResearches();
         Map<ResourceKey<Research>, Component> researchNames = researchKeys.stream()
-                .map(key -> Pair.of(key, ResearchHelperClient.getResearch(key)))
+                .map(key -> Pair.of(key, researchManager.lookupResearch(key, Minecraft.getInstance().level)))
                 .map(pair -> Map.entry(pair.left(), ResearchHelperCommon.getResearchName(pair.left(), pair.right())))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         List<ResourceKey<Research>> filteredResearches = new ArrayList<>();
@@ -132,17 +136,20 @@ public class ResearchSelectionPopupWidget extends PopupWidget {
             super(x, y, width, height, width - 2, 18, Orientation.VERTICAL, 1, 10, new ArrayList<>(), renderScroller);
             this.parentWidget = parentWidget;
             this.iconsAndNames = new HashMap<>();
-            this.setItems(ResearchHelperCommon.getLevelResearches(Minecraft.getInstance().level).keySet());
+            ResearchManager researchManager = ResearchdApi.getResearchManager();
+            this.setItems(researchManager.getResearches());
         }
 
         @Override
         public void setItems(Collection<ResourceKey<Research>> items) {
             super.setItems(new ArrayList<>(items));
 
+            ResearchManager researchManager = ResearchdApi.getResearchManager();
+
             this.iconsAndNames.clear();
 
             for (ResourceKey<Research> key : this.getItems()) {
-                Research research = ResearchHelperCommon.getResearch(key, Minecraft.getInstance().level);
+                Research research = researchManager.lookupResearch(key, Minecraft.getInstance().level);
                 this.iconsAndNames.put(key, Pair.of(ClientResearchIcon.getClientIcon(research.researchIcon()), ResearchHelperCommon.getResearchName(key, research)));
             }
         }

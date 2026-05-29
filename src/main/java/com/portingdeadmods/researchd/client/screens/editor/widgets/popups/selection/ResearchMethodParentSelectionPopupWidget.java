@@ -9,7 +9,7 @@ import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.OrResearchMethod;
 import com.portingdeadmods.researchd.utils.GuiUtils;
-import com.portingdeadmods.researchd.utils.Spaghetti;
+import com.portingdeadmods.researchd.utils.SpaghettiClient;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.layouts.Layout;
 import net.minecraft.network.chat.Component;
@@ -51,7 +51,7 @@ public class ResearchMethodParentSelectionPopupWidget extends PopupWidget {
     protected void onClose() {
         super.onClose();
 
-        ResearchScreen screen = Spaghetti.tryGetResearchScreen();
+        ResearchScreen screen = SpaghettiClient.tryGetResearchScreen();
         if (this.typeClicked) {
             screen.openPopupCentered(new ResearchMethodTypeSelectionPopupWidget(this.parentPopupWidget, this.parentSelectionWidget, this.selectedType));
         } else {
@@ -78,7 +78,7 @@ public class ResearchMethodParentSelectionPopupWidget extends PopupWidget {
         @Override
         public void clickedItem(ResearchMethodListType item, int xIndex, int yIndex, int left, int top, int mouseX,
                                 int mouseY) {
-            ResearchScreen screen = Spaghetti.tryGetResearchScreen();
+            ResearchScreen screen = SpaghettiClient.tryGetResearchScreen();
             this.popupWidget.selectedType = item;
             this.popupWidget.typeClicked = true;
             screen.closePopup(this.popupWidget);

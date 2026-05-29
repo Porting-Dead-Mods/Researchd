@@ -1,17 +1,15 @@
 package com.portingdeadmods.researchd.utils;
 
-import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Set;
 
-public final class Spaghetti {
+public final class SpaghettiClient {
 	/**
 	 * <span style="color:red">CLIENT SIDE ONLY</span>
 	 *
@@ -30,15 +28,6 @@ public final class Spaghetti {
 	 */
 	public @Nullable static ResearchScreen tryGetResearchScreen() {
 		return Minecraft.getInstance().screen instanceof ResearchScreen ? (ResearchScreen) Minecraft.getInstance().screen : null;
-	}
-
-	public static void printAABB(AABB aabb) {
-		Researchd.debug("AABB Debug", "minX: " + aabb.minX);
-		Researchd.debug("AABB Debug","minY: " + aabb.minY);
-		Researchd.debug("AABB Debug","minZ: " + aabb.minZ);
-		Researchd.debug("AABB Debug","maxX: " + aabb.maxX);
-		Researchd.debug("AABB Debug","maxY: " + aabb.maxY);
-		Researchd.debug("AABB Debug","maxZ: " + aabb.maxZ);
 	}
 
     public static Level getClientLevel() {

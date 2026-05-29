@@ -6,7 +6,6 @@ import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.impl.research.effect.DimensionUnlockEffect;
 import com.portingdeadmods.researchd.registries.ResearchdItems;
-import com.portingdeadmods.researchd.resources.ResearchdDatagenProvider;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
