@@ -9,11 +9,10 @@ import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectList;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
-import com.portingdeadmods.researchd.data.ResearchdSavedData;
-import com.portingdeadmods.researchd.impl.research.cache.CachedResearchRelations;
+import com.portingdeadmods.researchd.api.research.ResearchRelations;
 import com.portingdeadmods.researchd.impl.research.effect.data.DimensionUnlockEffectData;
 import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
-import com.portingdeadmods.researchd.impl.research.effect.data.UnlockItemEffectData;
+import com.portingdeadmods.researchd.impl.research.effect.data.ItemUnlockEffectData;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamImpl;
 import com.portingdeadmods.researchd.utils.TimeDifference;
@@ -23,12 +22,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -95,8 +94,8 @@ public final class ResearchHelperCommon {
         }
     }
 
-    private static void _collectChildren(CachedResearchRelations research, List<ResourceKey<Research>> list) {
-        for (CachedResearchRelations child : research.getChildren()) {
+    private static void _collectChildren(ResearchRelations research, List<ResourceKey<Research>> list) {
+        for (ResearchRelations child : research.getChildren()) {
             list.add(child.getResearchKey());
             if (!child.getChildren().isEmpty()) {
                 _collectChildren(child, list);
@@ -104,8 +103,8 @@ public final class ResearchHelperCommon {
         }
     }
 
-    private static void _collectParents(CachedResearchRelations research, List<ResourceKey<Research>> list) {
-        for (CachedResearchRelations parent : research.getParents()) {
+    private static void _collectParents(ResearchRelations research, List<ResourceKey<Research>> list) {
+        for (ResearchRelations parent : research.getParents()) {
             list.add(parent.getResearchKey());
             if (!parent.getParents().isEmpty()) {
                 _collectChildren(parent, list);
@@ -135,44 +134,16 @@ public final class ResearchHelperCommon {
         }
     }
 
-    public static void refreshResearches(ServerPlayer player) {
-        ServerLevel level;
-        MinecraftServer server = player.server;
-        level = server.overworld();
+    public static void refreshResearches(ResearchTeamMap teamMap, Player player) {
+        Level level = player.level();
 
-        ResearchTeamMap researchData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
+        ResearchTeamImpl team = teamMap.getTeamByPlayerId(player.getUUID());
 
-        ResearchTeamImpl team = researchData.getTeamByPlayerId(player.getUUID());
-	    Researchd.LOGGER.info("Refreshing effect data for player {}", player.getName().getString());
-	    for (Supplier<? extends AttachmentType<? extends ResearchEffectData<?>>> entry : Researchd.RESEARCH_EFFECT_DATA_TYPES) {
-		    AttachmentType<ResearchEffectData<?>> attachment = (AttachmentType<ResearchEffectData<?>>) entry.get();
-			ResearchEffectData<?> effectData = player.getData(attachment);
-            player.setData(attachment, effectData.getDefault(level));
-            Researchd.debug("Effect Data", "Refreshing " + effectData.getClass().getSimpleName() + ": ");
-            if (effectData.getDefault(level) instanceof DimensionUnlockEffectData(Set<ResourceKey<DimensionType>> blockedDimensions)) {
-                for (ResourceKey<DimensionType> dim : blockedDimensions) {
-                    Researchd.debug("Effect Data", " - " + dim);
-                }
-            }
-
-            if (effectData.getDefault(level) instanceof RecipeUnlockEffectData(Set<ResourceLocation> blockedRecipes)) {
-                for (ResourceLocation rec : blockedRecipes) {
-                    Researchd.debug("Effect Data", " - " + rec);
-
-                }
-            }
-
-            if (effectData.getDefault(level) instanceof UnlockItemEffectData(Set<ResourceKey<Item>> blockedItems)) {
-                for (ResourceKey<Item> item : blockedItems) {
-                    Researchd.debug("Effect Data", " - " + item.location());
-                }
-            }
-        }
-
+        // FIXME: WHY ARE CALLING UNLOCK HERE EVEN THOUGH IT IS ALREADY CALLED WHEN RESEARCH IS UNLOCKED
         for (ResearchInstance res : team.getResearches().values()) {
             if (res.getResearchStatus() == ResearchStatus.RESEARCHED) {
                 ResearchEffect effect = res.lookup(level).researchEffect();
-                effect.onUnlock(level, player, res.getResearch());
+                effect.onUnlock(level, team, res.getResearch());
             }
         }
     }

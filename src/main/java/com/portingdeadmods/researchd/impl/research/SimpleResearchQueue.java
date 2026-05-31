@@ -6,7 +6,6 @@ import com.portingdeadmods.researchd.ResearchdConfig;
 import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.*;
 import com.portingdeadmods.researchd.api.team.ResearchQueue;
-import com.portingdeadmods.researchd.impl.research.cache.CachedResearchRelations;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;

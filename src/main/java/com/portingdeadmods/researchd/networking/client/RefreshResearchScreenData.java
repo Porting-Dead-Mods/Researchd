@@ -9,7 +9,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record RefreshResearchScreenData(boolean graphData, boolean techListData, boolean researchQueueData) implements CustomPacketPayload {
-	public static RefreshResearchScreenData ALL = new RefreshResearchScreenData(true, true, true);
+	public static final RefreshResearchScreenData ALL = new RefreshResearchScreenData(true, true, true);
 
 	public static final StreamCodec<? super RegistryFriendlyByteBuf, RefreshResearchScreenData> STREAM_CODEC = StreamCodec.composite(
 			ByteBufCodecs.BOOL,

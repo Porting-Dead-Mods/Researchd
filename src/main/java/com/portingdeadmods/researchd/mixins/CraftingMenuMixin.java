@@ -3,7 +3,9 @@ package com.portingdeadmods.researchd.mixins;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
-import com.portingdeadmods.researchd.impl.research.effect.data.UnlockItemEffectData;
+import com.portingdeadmods.researchd.impl.research.effect.data.ItemUnlockEffectData;
+import com.portingdeadmods.researchd.registries.ResearchdEffectDataTypes;
+import com.portingdeadmods.researchd.utils.researches.ResearchEffectHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CraftingContainer;
@@ -33,8 +35,9 @@ public abstract class CraftingMenuMixin {
             ordinal = 0
     )
     private static ItemStack checkCraftingPredicate(ItemStack itemstack, AbstractContainerMenu menu, Level level, Player player, CraftingContainer craftSlots, ResultContainer resultSlots, RecipeHolder<CraftingRecipe> recipe) {
-        UnlockItemEffectData itemData = player.getData(ResearchdAttachments.ITEM_PREDICATE.get());
-        RecipeUnlockEffectData recipeData = player.getData(ResearchdAttachments.RECIPE_PREDICATE.get());
+
+        ItemUnlockEffectData itemData = ResearchEffectHelper.getEffectDataForPlayer(player, ResearchdEffectDataTypes.ITEM_UNLOCK);
+        RecipeUnlockEffectData recipeData = ResearchEffectHelper.getEffectDataForPlayer(player, ResearchdEffectDataTypes.RECIPE_UNLOCK);
 
         CraftingInput craftinginput = craftSlots.asCraftInput();
         Optional<RecipeHolder<CraftingRecipe>> recipeHolder = level.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftinginput, level, recipe);
@@ -64,7 +67,7 @@ public abstract class CraftingMenuMixin {
         return itemstack;
     }
 
-    private static boolean isItemBlocked(UnlockItemEffectData itemData, CraftingRecipe craftingRecipe, Level level) {
+    private static boolean isItemBlocked(ItemUnlockEffectData itemData, CraftingRecipe craftingRecipe, Level level) {
         if (itemData.blockedItems().isEmpty()) {
             return false;
         }

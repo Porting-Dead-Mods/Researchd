@@ -4,12 +4,12 @@ import com.mojang.serialization.Codec;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectSerializer;
+import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 /**
@@ -22,7 +22,7 @@ public interface ResearchEffect {
     StreamCodec<RegistryFriendlyByteBuf, ResearchEffect> STREAM_CODEC =
             ResearchEffectSerializer.STREAM_CODEC.dispatch(ResearchEffect::getSerializer, ResearchEffectSerializer::streamCodec);
 
-    void onUnlock(Level level, Player player, ResourceKey<Research> research);
+    void onUnlock(Level level, ResearchTeam team, ResourceKey<Research> research);
 
     ResourceLocation id();
 

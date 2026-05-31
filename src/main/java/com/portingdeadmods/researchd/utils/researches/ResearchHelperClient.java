@@ -12,7 +12,6 @@ import com.portingdeadmods.researchd.impl.research.ResearchManagerImpl;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.utils.ClientResearchTeamHelper;
-import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamImpl;
 import com.portingdeadmods.researchd.utils.SpaghettiClient;
@@ -30,41 +29,23 @@ public final class ResearchHelperClient {
     public static void reloadResearches(Level level) {
         ResearchManagerImpl.setNewInstance(level);
 
-        ResearchHelperClient.initIconRenderers();
-        ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
+        ResearchTeamMap data = (ResearchTeamMap) ResearchdApi.getTeamManager(level);
         if (data != null) {
-            for (ResearchTeamImpl team : data.researchTeams().values()) {
+            for (ResearchTeam team : data.getTeams()) {
                 ClientResearchTeamHelper.resolveInstances(team);
             }
         }
+
+        // Update screen-related data
+
+        ResearchHelperClient.initIconRenderers();
         ResearchGraphCache.clearCache();
         ClientResearchTeamHelper.refreshResearchScreenData();
-        ResearchScreen screen = SpaghettiClient.tryGetResearchScreen();
 
+        ResearchScreen screen = SpaghettiClient.tryGetResearchScreen();
         if (screen != null) {
             screen.initDefaultState();
         }
-    }
-
-    public static void refreshResearches(Player player) {
-        Level level = Minecraft.getInstance().level;
-
-        ResearchTeamMap researchData = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
-        ResearchTeam team = researchData.getTeamByPlayerId(player.getUUID());
-
-        for (Supplier<? extends AttachmentType<? extends ResearchEffectData<?>>> entry : Researchd.RESEARCH_EFFECT_DATA_TYPES) {
-			AttachmentType<ResearchEffectData<?>> attachment = (AttachmentType<ResearchEffectData<?>>) entry.get();
-	        ResearchEffectData<?> data = player.getData(attachment);
-			player.setData(attachment, data.getDefault(level));
-        }
-
-        for (ResearchInstance res : team.getResearches().values()) {
-            if (res.getResearchStatus() == ResearchStatus.RESEARCHED) {
-                ResearchEffect effect = res.lookup(level).researchEffect();
-                effect.onUnlock(level, player, res.getResearch());
-            }
-        }
-
     }
 
     public static Map<ResourceKey<ResearchPack>, ResearchPack> getResearchPacks() {
@@ -74,8 +55,8 @@ public final class ResearchHelperClient {
         return ResearchHelperCommon.getResearchPacks(Minecraft.getInstance().level);
     }
 
-    // Called at the end of the initialization phase of the researchPack cache
-    public static void initIconRenderers() {
+    // Called at the end of the initialization phase of the research cache
+    private static void initIconRenderers() {
         ResearchManager researchManager = ResearchdApi.getResearchManager();
 
         researchManager.getResearches().forEach((k) -> {

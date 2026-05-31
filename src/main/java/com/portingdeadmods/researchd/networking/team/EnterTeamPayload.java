@@ -28,8 +28,9 @@ public record EnterTeamPayload(UUID memberOfTeam) implements CustomPacketPayload
 
     public void handle(IPayloadContext context) {
         context.enqueueWork(() -> {
-            if (context.player() instanceof ServerPlayer sp)
-                ResearchTeamHelper.handleEnterTeam(sp, this.memberOfTeam());
+//            if (context.player() instanceof ServerPlayer sp)
+//                ResearchTeamHelper.handleEnterTeamSynced(sp, this.memberOfTeam());
+            context.disconnect(Component.literal("EnterTeamPayload not implemented"));
         }).exceptionally(e -> {
             Researchd.LOGGER.error("Failed to handle EnterTeamPayload", e);
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));

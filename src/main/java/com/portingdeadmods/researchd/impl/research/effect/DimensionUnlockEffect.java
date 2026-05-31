@@ -7,15 +7,18 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectType;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectSerializer;
-import com.portingdeadmods.researchd.data.ResearchdAttachments;
+import com.portingdeadmods.researchd.api.team.ResearchTeam;
+import com.portingdeadmods.researchd.data.saved.TeamResearchEffectSavedData;
+import com.portingdeadmods.researchd.impl.TeamResearchEffectDataMap;
 import com.portingdeadmods.researchd.impl.research.effect.data.DimensionUnlockEffectData;
 import com.portingdeadmods.researchd.registries.ResearchEffectTypes;
+import com.portingdeadmods.researchd.registries.ResearchdEffectDataTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
 
@@ -44,9 +47,12 @@ public record DimensionUnlockEffect(ResourceLocation dimension,
     public static final ResearchEffectSerializer<DimensionUnlockEffect> SERIALIZER = ResearchEffectSerializer.simple(CODEC, STREAM_CODEC);
 
     @Override
-    public void onUnlock(Level level, Player player, ResourceKey<Research> research) {
-        DimensionUnlockEffectData data = player.getData(ResearchdAttachments.DIMENSION_PREDICATE.get());
-        player.setData(ResearchdAttachments.DIMENSION_PREDICATE.get(), data.remove(this, level));
+    public void onUnlock(Level level, ResearchTeam team, ResourceKey<Research> research) {
+        if (!level.isClientSide()) {
+            TeamResearchEffectDataMap map = TeamResearchEffectSavedData.getData((ServerLevel) level);
+            DimensionUnlockEffectData data = map.computeIfAbsent(team.getId(), ResearchdEffectDataTypes.DIMENSION_UNLOCK, level);
+            data.remove(this, level);
+        }
     }
 
     @Override

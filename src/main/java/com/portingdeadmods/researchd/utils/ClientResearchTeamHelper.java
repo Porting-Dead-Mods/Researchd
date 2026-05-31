@@ -6,7 +6,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;
 import com.portingdeadmods.researchd.api.client.TechList;
-import com.portingdeadmods.researchd.impl.research.cache.CachedResearchRelations;
+import com.portingdeadmods.researchd.api.research.ResearchRelations;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
@@ -19,7 +19,7 @@ import com.portingdeadmods.researchd.client.screens.team.ResearchTeamSettingsScr
 import com.portingdeadmods.researchd.client.screens.team.widgets.PlayerManagementDraggableWidget;
 import com.portingdeadmods.researchd.client.screens.team.widgets.PlayerManagementList;
 import com.portingdeadmods.researchd.client.screens.team.widgets.TeamMembersList;
-import com.portingdeadmods.researchd.data.ResearchdSavedData;
+import com.portingdeadmods.researchd.impl.team.ResearchTeamImpl;
 import com.portingdeadmods.researchd.networking.team.*;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
 import net.minecraft.client.Minecraft;
@@ -38,7 +38,7 @@ public class ClientResearchTeamHelper {
     }
 
     public static ResearchTeam getTeam(UUID uuid) {
-        return ResearchTeamHelper.getTeamByMember(Minecraft.getInstance().level, uuid);
+        return ResearchdApi.getTeamManager(Minecraft.getInstance().level).getTeamByPlayerId(uuid);
     }
 
     public static void setTeamNameSynced(String name) {
@@ -106,14 +106,14 @@ public class ClientResearchTeamHelper {
         boolean remove = getTeam().getSocialManager().containsSentInvite(invited);
         LocalPlayer player = Minecraft.getInstance().player;
 
-        ResearchTeam team = getTeam();
+        ResearchTeamImpl team = (ResearchTeamImpl) getTeam();
         if (remove) {
             team.getSocialManager().removeSentInvite(invited);
         } else {
             team.getSocialManager().addSentInvite(invited);
         }
+        team.setChanged();
         Level level = player.level();
-        ResearchdSavedData.TEAM_RESEARCH.get().setData(level, ResearchdSavedData.TEAM_RESEARCH.get().getData(level));
 
         PacketDistributor.sendToServer(new InvitePlayerPayload(invited, remove));
     }
@@ -146,11 +146,9 @@ public class ClientResearchTeamHelper {
         Map<ResourceKey<Research>, ResearchInstance> researches = team.getResearches();
 
         for (Map.Entry<ResourceKey<Research>, ResearchInstance> entry : researches.entrySet()) {
-            CachedResearchRelations researchRelations = ResearchdApi.getResearchManager().getRelationsForResearch(entry.getKey());
+            ResearchRelations researchRelations = ResearchdApi.getResearchManager().getRelationsForResearch(entry.getKey());
             if (researchRelations != null) {
                 entry.setValue(entry.getValue().withResearch(entry.getKey()));
-            } else {
-                Researchd.LOGGER.debug("RESEARCH");
             }
         }
     }

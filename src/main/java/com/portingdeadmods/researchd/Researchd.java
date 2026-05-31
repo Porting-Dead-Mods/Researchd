@@ -9,7 +9,6 @@ import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import com.portingdeadmods.researchd.compat.ftbteams.FTBTeamsCompat;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdDataComponents;
-import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.registries.*;
 import com.portingdeadmods.researchd.registries.serializers.*;
@@ -48,18 +47,6 @@ public final class Researchd {
     public static final String MODID = "researchd";
     public static final String MODNAME = "Researchd";
 
-	/**
-	 * Mods will need to register all of their different ResearchEffectData entries here to be picked up by refreshResearches();
-	 * Anything registered should only be of form {@code Supplier<AttachmentType<ResearchEffectData<?>>>}
-	 * <br>
-	 * Also PS: I will always hate generics (heart)
-	 */
-	public static final Set<Supplier<? extends AttachmentType<? extends ResearchEffectData<?>>>> RESEARCH_EFFECT_DATA_TYPES = new HashSet<>();
-
-	public static void registerResearchEffectData(Supplier<? extends AttachmentType<? extends ResearchEffectData<?>>> data) {
-		RESEARCH_EFFECT_DATA_TYPES.add(data);
-	}
-
     public static final Logger LOGGER = LogUtils.getLogger();
 
     /**
@@ -86,12 +73,12 @@ public final class Researchd {
         ResearchMethodSerializers.SERIALIZERS.register(modEventBus);
         ResearchPackSerializers.SERIALIZERS.register(modEventBus);
         ResearchIconSerializers.SERIALIZERS.register(modEventBus);
+        ResearchdEffectDataTypes.TYPES.register(modEventBus);
 
         ResearchdAttachments.ATTACHMENTS.register(modEventBus);
         ResearchdItems.ITEMS.register(modEventBus);
         ResearchdDataComponents.COMPONENTS.register(modEventBus);
         ResearchdTab.TABS.register(modEventBus);
-        ResearchdSavedData.SAVED_DATA.register(modEventBus);
         ResearchdBlocks.BLOCKS.register(modEventBus);
         ResearchdBlockEntityTypes.BLOCK_ENTITY_TYPES.register(modEventBus);
         ResearchdMenuTypes.MENU_TYPES.register(modEventBus);
@@ -104,21 +91,12 @@ public final class Researchd {
         modEventBus.addListener(this::registerRegistries);
         modEventBus.addListener(this::registerDatapackRegistries);
         modEventBus.addListener(this::addPackFinders);
-		modEventBus.addListener(this::onCommonSetup);
 
         PDLConfigHelper.registerConfig(ResearchdConfig.Common.class, ModConfig.Type.COMMON, modContainer);
 
 		if (ResearchdCompatHandler.isFTBTeamsEnabled())
             FTBTeamsCompat.init();
     }
-
-	private void onCommonSetup(FMLCommonSetupEvent event) {
-		event.enqueueWork(() -> {
-			registerResearchEffectData(ResearchdAttachments.DIMENSION_PREDICATE);
-			registerResearchEffectData(ResearchdAttachments.ITEM_PREDICATE);
-			registerResearchEffectData(ResearchdAttachments.RECIPE_PREDICATE);
-		});
-	}
 
     private void addPackFinders(AddPackFindersEvent event) {
         if (ResearchdConfig.Common.loadDefaultDatapack) {
@@ -140,9 +118,11 @@ public final class Researchd {
     private void registerRegistries(NewRegistryEvent event) {
         event.register(ResearchdRegistries.RESEARCH_SERIALIZER);
         event.register(ResearchdRegistries.RESEARCH_PACK_SERIALIZER);
-        event.register(ResearchdRegistries.RESEARCH_EFFECT_SERIALIZER);
-        event.register(ResearchdRegistries.RESEARCH_ICON_SERIALIZER);
         event.register(ResearchdRegistries.RESEARCH_METHOD_SERIALIZER);
+        event.register(ResearchdRegistries.RESEARCH_EFFECT_SERIALIZER);
+        event.register(ResearchdRegistries.RESEARCH_EFFECT_DATA_TYPE);
+        event.register(ResearchdRegistries.RESEARCH_ICON_SERIALIZER);
+
         event.register(ResearchdRegistries.VALUE_EFFECT);
         event.register(ResearchdRegistries.RESEARCH_METHOD_TYPE);
         event.register(ResearchdRegistries.RESEARCH_EFFECT_TYPE);
@@ -158,27 +138,28 @@ public final class Researchd {
     }
 
     // Mod Helpers
-    public static boolean isRecipeBlocked(Player player, ResourceLocation recipeId) {
-        return player.getData(ResearchdAttachments.RECIPE_PREDICATE).blockedRecipes().contains(recipeId);
-    }
-
-    public static boolean isItemBlocked(Player player, ResourceLocation itemId) {
-        return player.getData(ResearchdAttachments.ITEM_PREDICATE).blockedItems().stream().anyMatch(key -> key.location().equals(itemId));
-    }
-
-    public static boolean isItemBlocked(Player player, ResourceKey<Item> item) {
-        return player.getData(ResearchdAttachments.ITEM_PREDICATE).blockedItems().contains(item);
-    }
-
-    public static boolean isItemBlocked(Player player, ItemLike item) {
-        return player.getData(ResearchdAttachments.ITEM_PREDICATE).blockedItems().stream().anyMatch(key -> key.location().equals(BuiltInRegistries.ITEM.getKey(item.asItem())));
-    }
-
-    public static boolean isDimensionBlocked(Player player, ResourceLocation dimensionId) {
-        return player.getData(ResearchdAttachments.DIMENSION_PREDICATE).blockedDimensions().stream().anyMatch(key -> key.location().equals(dimensionId));
-    }
-
-    public static boolean isDimensionBlocked(Player player, ResourceKey<DimensionType> dimension) {
-        return player.getData(ResearchdAttachments.DIMENSION_PREDICATE).blockedDimensions().contains(dimension);
-    }
+    // TODO: Bring these back in different class
+//    public static boolean isRecipeBlocked(Player player, ResourceLocation recipeId) {
+//        return player.getData(ResearchdAttachments.RECIPE_PREDICATE).blockedRecipes().contains(recipeId);
+//    }
+//
+//    public static boolean isItemBlocked(Player player, ResourceLocation itemId) {
+//        return player.getData(ResearchdAttachments.ITEM_PREDICATE).blockedItems().stream().anyMatch(key -> key.location().equals(itemId));
+//    }
+//
+//    public static boolean isItemBlocked(Player player, ResourceKey<Item> item) {
+//        return player.getData(ResearchdAttachments.ITEM_PREDICATE).blockedItems().contains(item);
+//    }
+//
+//    public static boolean isItemBlocked(Player player, ItemLike item) {
+//        return player.getData(ResearchdAttachments.ITEM_PREDICATE).blockedItems().stream().anyMatch(key -> key.location().equals(BuiltInRegistries.ITEM.getKey(item.asItem())));
+//    }
+//
+//    public static boolean isDimensionBlocked(Player player, ResourceLocation dimensionId) {
+//        return player.getData(ResearchdAttachments.DIMENSION_PREDICATE).blockedDimensions().stream().anyMatch(key -> key.location().equals(dimensionId));
+//    }
+//
+//    public static boolean isDimensionBlocked(Player player, ResourceKey<DimensionType> dimension) {
+//        return player.getData(ResearchdAttachments.DIMENSION_PREDICATE).blockedDimensions().contains(dimension);
+//    }
 }

@@ -9,9 +9,11 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.portingdeadmods.researchd.api.ResearchdApi;
+import com.portingdeadmods.researchd.api.research.ResearchManager;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.ResearchTeamManager;
 import com.portingdeadmods.researchd.utils.SpaghettiClient;
+import dev.ftb.mods.ftbteams.api.TeamManager;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -77,19 +79,22 @@ public class ResearchdTeamArgument implements ArgumentType<ResearchdTeamArgument
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
         if (context.getSource() instanceof SharedSuggestionProvider) {
-            Stream<String> list = this.getTeams(context).stream().map(ResearchTeam::getName).map(name -> "\"" + name + "\"").sorted();
+            Stream<String> list = this.getTeams(context).map(ResearchTeam::getName).map(name -> "\"" + name + "\"").sorted();
             return SharedSuggestionProvider.suggest(list, builder);
         } else {
             return Suggestions.empty();
         }
     }
 
-    private Collection<ResearchTeam> getTeams(CommandContext<?> context) {
+    private Stream<ResearchTeam> getTeams(CommandContext<?> context) {
+        ResearchTeamManager teamManager;
         if (context.getSource() instanceof CommandSourceStack sourceStack) {
-            return ResearchdApi.getTeamManager(sourceStack.getLevel()).getTeams();
+            teamManager = ResearchdApi.getTeamManager(sourceStack.getLevel());
         } else {
-            return ResearchdApi.getTeamManager(SpaghettiClient.getClientLevel()).getTeams();
+            teamManager = ResearchdApi.getTeamManager(SpaghettiClient.getClientLevel());
         }
+
+        return teamManager.getTeamIds().stream().map(teamManager::getTeamById);
     }
 
     private record SelectorProvider(EntitySelector selector) implements ResearchdTeamArgumentProvider {

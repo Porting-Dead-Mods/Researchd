@@ -6,7 +6,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.ValueEffect;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectType;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectSerializer;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
@@ -19,7 +18,6 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 public record IncreaseValueEffect(ValueEffect value, float amount) implements ValueEffectModifierEffect {
@@ -50,9 +48,8 @@ public record IncreaseValueEffect(ValueEffect value, float amount) implements Va
     }
 
     @Override
-    public void onUnlock(Level level, Player player, ResourceKey<Research> research) {
-        ResearchTeam researchTeam = ResearchTeamHelper.getTeamByMember(player);
-        if (researchTeam instanceof ValueEffectsHolder effectsHolder) {
+    public void onUnlock(Level level, ResearchTeam team, ResourceKey<Research> research) {
+        if (team instanceof ValueEffectsHolder effectsHolder) {
             float oldValue = effectsHolder.getEffectValue(value);
             effectsHolder.setEffectValue(value, oldValue + this.amount());
         }

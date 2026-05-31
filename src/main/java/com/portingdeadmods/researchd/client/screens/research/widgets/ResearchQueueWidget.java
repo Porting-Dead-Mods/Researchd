@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.client.screens.research.widgets;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
@@ -10,13 +11,14 @@ import com.portingdeadmods.researchd.api.team.ResearchQueue;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
+import com.portingdeadmods.researchd.data.saved.TeamResearchEffectSavedData;
 import com.portingdeadmods.researchd.utils.ClientResearchTeamHelper;
-import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
 import com.portingdeadmods.researchd.networking.research.ResearchQueueRemovePayload;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -45,7 +47,8 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
     public ResearchQueueWidget(ResearchScreen screen, int x, int y) {
         super(x, y, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
         this.screen = screen;
-        this.queue = ResearchdSavedData.TEAM_RESEARCH.get().getData(Minecraft.getInstance().level).getTeamByPlayer(Minecraft.getInstance().player).getQueue();
+        Minecraft mc = Minecraft.getInstance();
+        this.queue = ResearchdApi.getTeamManager(mc.level).getTeamByPlayer(mc.player).getQueue();
     }
 
     @Override

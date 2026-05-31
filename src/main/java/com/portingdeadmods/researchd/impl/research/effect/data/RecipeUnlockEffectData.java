@@ -1,8 +1,9 @@
 package com.portingdeadmods.researchd.impl.research.effect.data;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
+import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectDataType;
 import com.portingdeadmods.researchd.impl.research.effect.RecipeUnlockEffect;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -16,26 +17,29 @@ import java.util.Collection;
 public record RecipeUnlockEffectData(UniqueArray<ResourceLocation> blockedRecipes) implements ResearchEffectData<RecipeUnlockEffect> {
     public static final RecipeUnlockEffectData EMPTY = new RecipeUnlockEffectData(new UniqueArray<>());
 
-    public static final Codec<RecipeUnlockEffectData> CODEC = UniqueArray.CODEC(ResourceLocation.CODEC)
-            .xmap(RecipeUnlockEffectData::new, RecipeUnlockEffectData::blockedRecipes);
+    public static final MapCodec<RecipeUnlockEffectData> CODEC = UniqueArray.CODEC(ResourceLocation.CODEC)
+            .xmap(RecipeUnlockEffectData::new, RecipeUnlockEffectData::blockedRecipes).fieldOf("blocked_recipes");
     public static final StreamCodec<RegistryFriendlyByteBuf, RecipeUnlockEffectData> STREAM_CODEC = StreamCodec.composite(
             UniqueArray.STREAM_CODEC(ResourceLocation.STREAM_CODEC),
             RecipeUnlockEffectData::blockedRecipes,
             RecipeUnlockEffectData::new
     );
+    public static final ResearchEffectDataType<RecipeUnlockEffectData> TYPE = ResearchEffectDataType.simple(RecipeUnlockEffectData::new, CODEC, STREAM_CODEC);
 
-    @Override
-    public RecipeUnlockEffectData add(RecipeUnlockEffect recipe, Level level) {
-        UniqueArray<ResourceLocation> recipes = new UniqueArray<>(this.blockedRecipes());
-        recipe.getRecipes(level).forEach(holder -> recipes.add(holder.id()));
-        return new RecipeUnlockEffectData(recipes);
+    public RecipeUnlockEffectData() {
+        this(new UniqueArray<>());
     }
 
     @Override
-    public RecipeUnlockEffectData remove(RecipeUnlockEffect recipe, Level level) {
-        UniqueArray<ResourceLocation> recipes = new UniqueArray<>(this.blockedRecipes());
+    public void add(RecipeUnlockEffect recipe, Level level) {
+        UniqueArray<ResourceLocation> recipes = this.blockedRecipes();
+        recipe.getRecipes(level).forEach(holder -> recipes.add(holder.id()));
+    }
+
+    @Override
+    public void remove(RecipeUnlockEffect recipe, Level level) {
+        UniqueArray<ResourceLocation> recipes = this.blockedRecipes();
         recipe.getRecipes(level).forEach(holder -> recipes.remove(holder.id()));
-        return new RecipeUnlockEffectData(recipes);
     }
 
     public boolean contains(ResourceLocation recipeId) {
@@ -64,7 +68,12 @@ public record RecipeUnlockEffectData(UniqueArray<ResourceLocation> blockedRecipe
     }
 
     @Override
-    public RecipeUnlockEffectData getDefault(Level level) {
+    public ResearchEffectDataType<? extends ResearchEffectData<RecipeUnlockEffect>> type() {
+        return TYPE;
+    }
+
+    @Override
+    public void initDefault(Level level) {
         Collection<RecipeUnlockEffect> recipeEffects = ResearchHelperCommon.getResearchEffects(RecipeUnlockEffect.class, level);
         UniqueArray<ResourceLocation> blocked = new UniqueArray<>();
 
@@ -72,6 +81,5 @@ public record RecipeUnlockEffectData(UniqueArray<ResourceLocation> blockedRecipe
             unlock.getRecipes(level).forEach(holder -> blocked.add(holder.id()));
         }
 
-        return new RecipeUnlockEffectData(blocked);
     }
 }

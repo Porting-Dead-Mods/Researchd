@@ -5,6 +5,7 @@ import com.portingdeadmods.portingdeadlibs.api.gui.menus.PDLAbstractContainerMen
 import com.portingdeadmods.portingdeadlibs.utils.LazyFinal;
 import com.portingdeadmods.portingdeadlibs.utils.capabilities.HandlerUtils;
 import com.portingdeadmods.researchd.ResearchdRegistries;
+import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
@@ -131,7 +132,7 @@ public class ResearchLabControllerBE extends GhostMultiblockControllerBE impleme
     public void tick() {
         super.tick();
 
-        ResearchTeam team = ResearchTeamHelper.getTeamByMember(this.getLevel(), this.getData(ResearchdAttachments.PLACED_BY_UUID));
+        ResearchTeam team = ResearchdApi.getTeamManager(this.getLevel()).getTeamByPlayerId(this.getData(ResearchdAttachments.PLACED_BY_UUID));
 
         ResourceKey<Research> current = team.getCurrentResearch();
         if (current == null) return;

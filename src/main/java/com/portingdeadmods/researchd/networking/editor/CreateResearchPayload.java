@@ -5,7 +5,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.impl.editor.EditModeSettingsImpl;
-import com.portingdeadmods.researchd.networking.research.ResearchCacheReloadPayload;
+import com.portingdeadmods.researchd.networking.research.ResearchReloadPayload;
 import com.portingdeadmods.researchd.resources.editor.EditorResearchProvider;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperServer;
 import com.portingdeadmods.researchd.utils.researches.ResearchdManagers;
@@ -57,7 +57,7 @@ public record CreateResearchPayload(ResourceKey<Research> key, Research research
                     // Reload researches on the server
                     ResearchHelperServer.onReloadResearches(serverPlayer.server, null, serverPlayer.server.getPlayerList().getPlayers());
                     // Reload researches on the client
-                    PacketDistributor.sendToPlayer(serverPlayer, new ResearchCacheReloadPayload());
+                    PacketDistributor.sendToPlayer(serverPlayer, new ResearchReloadPayload());
                 }
             } else {
                 throw new IllegalStateException("Handling payload on client");

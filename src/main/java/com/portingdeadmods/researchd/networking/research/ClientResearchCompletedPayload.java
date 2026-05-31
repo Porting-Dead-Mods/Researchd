@@ -3,12 +3,12 @@ package com.portingdeadmods.researchd.networking.research;
 import com.portingdeadmods.portingdeadlibs.utils.Utils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
+import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.team.ResearchQueue;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
+import com.portingdeadmods.researchd.api.team.ResearchTeamManager;
 import com.portingdeadmods.researchd.utils.ClientResearchTeamHelper;
-import com.portingdeadmods.researchd.compat.KubeJSCompat;
-import com.portingdeadmods.researchd.data.ResearchdSavedData;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
@@ -18,10 +18,10 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public record ClientResearchCompletedPayload(ResourceKey<Research> key, int timeStamp, boolean forced) implements CustomPacketPayload {
     public static final Type<ClientResearchCompletedPayload> TYPE = new Type<>(Researchd.rl("research_finished"));
@@ -43,7 +43,7 @@ public record ClientResearchCompletedPayload(ResourceKey<Research> key, int time
     public void handle(IPayloadContext context) {
         context.enqueueWork(() -> {
             Player player = context.player();
-            ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(player.level());
+            @Nullable ResearchTeamManager data = ResearchdApi.getTeamManager(player.level());
             ResearchTeam team = data.getTeamByPlayerId(player.getUUID());
             if (team == null) {
                 context.disconnect(ResearchdTranslations.component(ResearchdTranslations.Errors.NO_RESEARCH_TEAM));
@@ -79,7 +79,6 @@ public record ClientResearchCompletedPayload(ResourceKey<Research> key, int time
             ));
 
             ClientResearchTeamHelper.refreshResearchScreenData();
-            ResearchdSavedData.TEAM_RESEARCH.get().setData(player.level(), data);
         }).exceptionally(err -> {
             Researchd.LOGGER.error("Failed to handle ResearchFinishPayload: ", err);
             return null;

@@ -6,10 +6,10 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectType;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectSerializer;
+import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.registries.ResearchEffectTypes;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 public class EmptyResearchEffect implements ResearchEffect {
@@ -21,7 +21,7 @@ public class EmptyResearchEffect implements ResearchEffect {
     }
 
     @Override
-    public void onUnlock(Level level, Player player, ResourceKey<Research> research) {
+    public void onUnlock(Level level, ResearchTeam team, ResourceKey<Research> research) {
     }
 
     @Override

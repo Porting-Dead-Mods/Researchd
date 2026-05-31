@@ -6,10 +6,9 @@ import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
-import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
+import com.portingdeadmods.researchd.api.research.ResearchRelations;
 import com.portingdeadmods.researchd.impl.research.SimpleResearchQueue;
-import com.portingdeadmods.researchd.impl.research.cache.CachedResearchRelations;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -64,7 +63,7 @@ public record TeamResearches(SimpleResearchQueue researchQueue,
         for (ResearchInstance instance : this.researches.values()) {
             if (instance.getResearchStatus() == ResearchStatus.RESEARCHED) continue;
 
-            CachedResearchRelations relations = ResearchdApi.getResearchManager().getRelationsForResearch(instance.getResearch());
+            ResearchRelations relations = ResearchdApi.getResearchManager().getRelationsForResearch(instance.getResearch());
 
             if (relations.getParents().stream().allMatch(parent -> this.hasCompleted(parent.getResearchKey()))) {
                 instance.setResearchStatus(ResearchStatus.RESEARCHABLE);

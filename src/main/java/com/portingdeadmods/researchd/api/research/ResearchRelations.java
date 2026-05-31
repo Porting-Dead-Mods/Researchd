@@ -1,10 +1,7 @@
-package com.portingdeadmods.researchd.impl.research.cache;
+package com.portingdeadmods.researchd.api.research;
 
 import com.google.common.collect.ImmutableSet;
-import com.portingdeadmods.researchd.api.ResearchdApi;
-import com.portingdeadmods.researchd.api.research.Research;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.Level;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -13,12 +10,12 @@ import java.util.Set;
 /**
  * Research Wrapper holding the parent-child relationship between itself and other researches
  */
-public final class CachedResearchRelations {
+public final class ResearchRelations {
     private final ResourceKey<Research> research;
-    private Set<CachedResearchRelations> children;
-    private Set<CachedResearchRelations> parents;
+    private Set<ResearchRelations> children;
+    private Set<ResearchRelations> parents;
 
-    public CachedResearchRelations(ResourceKey<Research> research) {
+    public ResearchRelations(ResourceKey<Research> research) {
         this.research = research;
         this.children = new HashSet<>();
         this.parents = new HashSet<>();
@@ -28,11 +25,11 @@ public final class CachedResearchRelations {
         return this.research;
     }
 
-    public Set<CachedResearchRelations> getChildren() {
+    public Set<ResearchRelations> getChildren() {
         return this.children;
     }
 
-    public Set<CachedResearchRelations> getParents() {
+    public Set<ResearchRelations> getParents() {
         return this.parents;
     }
 
@@ -43,7 +40,7 @@ public final class CachedResearchRelations {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof CachedResearchRelations that)) return false;
+        if (!(o instanceof ResearchRelations that)) return false;
         return Objects.equals(research, that.research);
     }
 

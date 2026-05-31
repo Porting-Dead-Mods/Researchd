@@ -2,7 +2,8 @@ package com.portingdeadmods.researchd.networking.team;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
-import com.portingdeadmods.researchd.data.ResearchdSavedData;
+import com.portingdeadmods.researchd.impl.team.ResearchTeamImpl;
+import com.portingdeadmods.researchd.networking.team.manager.SyncTeamPayload;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.UUIDUtil;
@@ -15,6 +16,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,14 +44,14 @@ public record RequestToJoinPayload(UUID toJoin, boolean remove) implements Custo
                 ServerLevel level = server.overworld();
                 Player teamMemberPlayer = level.getPlayerByUUID(this.toJoin());
                 if (teamMemberPlayer != null) {
-                    ResearchTeam team = ResearchTeamHelper.getTeamByMember(teamMemberPlayer);
+                    ResearchTeamImpl team = (ResearchTeamImpl) ResearchTeamHelper.getTeamByMember(teamMemberPlayer);
                     if (this.remove()) {
                         team.getSocialManager().removeReceivedInvite(sp.getUUID());
                     } else {
                         team.getSocialManager().addSentInvite(sp.getUUID());
                     }
-                    ResearchdSavedData.TEAM_RESEARCH.get().setData(level, ResearchdSavedData.TEAM_RESEARCH.get().getData(level));
-                    ResearchdSavedData.TEAM_RESEARCH.get().sync(level);
+                    team.setChanged();
+                    PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
                     ResearchTeamHelper.refreshPlayerManagement(team, level);
                 } else {
                     sp.sendSystemMessage(Component.literal("The player you're trying to join does not exist!").withStyle(ChatFormatting.RED));

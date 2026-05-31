@@ -11,6 +11,7 @@ import com.portingdeadmods.researchd.networking.registries.UpdateResearchPacksPa
 import com.portingdeadmods.researchd.networking.registries.UpdateResearchesPayload;
 import com.portingdeadmods.researchd.networking.research.*;
 import com.portingdeadmods.researchd.networking.team.*;
+import com.portingdeadmods.researchd.networking.team.manager.*;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -106,9 +107,9 @@ public class NetworkEvents {
         );
 
         registrar.playToClient(
-                ResearchCacheReloadPayload.TYPE,
-                ResearchCacheReloadPayload.STREAM_CODEC,
-                ResearchCacheReloadPayload::handle
+                ResearchReloadPayload.TYPE,
+                ResearchReloadPayload.STREAM_CODEC,
+                ResearchReloadPayload::handle
         );
 
 	    registrar.playToClient(
@@ -146,6 +147,32 @@ public class NetworkEvents {
                 ResearchProgressSyncPayload.TYPE,
                 ResearchProgressSyncPayload.STREAM_CODEC,
                 ResearchProgressSyncPayload::handle
+        );
+
+        registrar.playToClient(
+                SyncTeamDataPayload.TYPE,
+                SyncTeamDataPayload.STREAM_CODEC,
+                SyncTeamDataPayload::handle
+        );
+        registrar.playToClient(
+                SyncTeamEffectDataPayload.TYPE,
+                SyncTeamEffectDataPayload.STREAM_CODEC,
+                SyncTeamEffectDataPayload::handle
+        );
+        registrar.playToClient(
+                SyncTeamPayload.TYPE,
+                SyncTeamPayload.STREAM_CODEC,
+                SyncTeamPayload::handle
+        );
+        registrar.playToClient(
+                AddTeamPayload.TYPE,
+                AddTeamPayload.STREAM_CODEC,
+                AddTeamPayload::handle
+        );
+        registrar.playToClient(
+                RemoveTeamPayload.TYPE,
+                RemoveTeamPayload.STREAM_CODEC,
+                RemoveTeamPayload::handle
         );
     }
 }

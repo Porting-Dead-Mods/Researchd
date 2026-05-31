@@ -4,7 +4,7 @@ import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.*;
 import com.portingdeadmods.researchd.api.research.ResearchManager;
 import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
-import com.portingdeadmods.researchd.impl.research.cache.CachedResearchRelations;
+import com.portingdeadmods.researchd.api.research.ResearchRelations;
 import net.minecraft.resources.ResourceKey;
 
 import java.util.LinkedHashMap;
@@ -41,20 +41,20 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
         for (ResearchNode node : this.nodes.values()) {
             ResourceKey<Research> research = node.getInstance().getResearch();
 
-            CachedResearchRelations relations = ResearchdApi.getResearchManager().getRelationsForResearch(research);
+            ResearchRelations relations = ResearchdApi.getResearchManager().getRelationsForResearch(research);
 
-            Set<CachedResearchRelations> parents = relations.getParents();
+            Set<ResearchRelations> parents = relations.getParents();
 
-            for (CachedResearchRelations parent : parents) {
+            for (ResearchRelations parent : parents) {
                 ResearchNode parentNode = this.nodes.get(parent.getResearchKey());
                 if (parentNode != null) {
                     node.addParent(parentNode);
                 }
             }
 
-            Set<CachedResearchRelations> children = relations.getChildren();
+            Set<ResearchRelations> children = relations.getChildren();
 
-            for (CachedResearchRelations child : children) {
+            for (ResearchRelations child : children) {
                 ResearchNode childNode = this.nodes.get(child.getResearchKey());
                 if (childNode != null) {
                     node.addChild(childNode);
@@ -72,8 +72,8 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
         if (nesting > 0) {
             this.nodes.put(instance.getResearch(), new ResearchNode(instance));
         }
-        CachedResearchRelations relations = ResearchdApi.getResearchManager().getRelationsForResearch(instance.getResearch());
-        for (CachedResearchRelations research : relations.getParents()) {
+        ResearchRelations relations = ResearchdApi.getResearchManager().getRelationsForResearch(instance.getResearch());
+        for (ResearchRelations research : relations.getParents()) {
             if (nesting < layers || layers == -1) {
                 createNodesUpward(researches.get(research.getResearchKey()), nesting + 1, layers, researches);
             } else {
@@ -86,8 +86,8 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
         if (nesting > 0) {
             this.nodes.put(instance.getResearch(), new ResearchNode(instance));
         }
-        CachedResearchRelations relations = ResearchdApi.getResearchManager().getRelationsForResearch(instance.getResearch());
-        for (CachedResearchRelations research : relations.getChildren()) {
+        ResearchRelations relations = ResearchdApi.getResearchManager().getRelationsForResearch(instance.getResearch());
+        for (ResearchRelations research : relations.getChildren()) {
             if (nesting < layers || layers == -1) {
                 createNodesDownward(researches.get(research.getResearchKey()), nesting + 1, layers, researches);
             } else {

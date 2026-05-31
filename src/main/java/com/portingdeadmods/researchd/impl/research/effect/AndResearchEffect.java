@@ -8,13 +8,13 @@ import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectList;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectType;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectSerializer;
+import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.registries.ResearchEffectTypes;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
@@ -34,9 +34,9 @@ public record AndResearchEffect(List<ResearchEffect> effects) implements Researc
     public static final ResourceLocation ID = Researchd.rl("and");
 
     @Override
-    public void onUnlock(Level level, Player player, ResourceKey<Research> research) {
+    public void onUnlock(Level level, ResearchTeam team, ResourceKey<Research> research) {
         for (ResearchEffect effect : this.effects) {
-            effect.onUnlock(level, player, research);
+            effect.onUnlock(level, team, research);
         }
     }
 

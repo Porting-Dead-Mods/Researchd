@@ -21,7 +21,7 @@ public record RefreshResearchesPayload() implements CustomPacketPayload {
 
     public static void handle(RefreshResearchesPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
-            ResearchHelperClient.refreshResearches(context.player());
+            //ResearchHelperClient.refreshResearches(context.player());
         }).exceptionally(e -> {
             Researchd.LOGGER.error("Failed to handle RefreshResearchesPayload", e);
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));

@@ -1,6 +1,5 @@
 package com.portingdeadmods.researchd.api.research;
 
-import com.portingdeadmods.researchd.impl.research.cache.CachedResearchRelations;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
@@ -16,7 +15,7 @@ public interface ResearchManager {
 
     /* Research Relations */
 
-    CachedResearchRelations getRelationsForResearch(ResourceKey<Research> researchKey);
+    ResearchRelations getRelationsForResearch(ResourceKey<Research> researchKey);
 
     /* Research Pages */
 

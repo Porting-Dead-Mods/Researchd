@@ -9,15 +9,18 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectType;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectSerializer;
-import com.portingdeadmods.researchd.data.ResearchdAttachments;
+import com.portingdeadmods.researchd.api.team.ResearchTeam;
+import com.portingdeadmods.researchd.data.saved.TeamResearchEffectSavedData;
+import com.portingdeadmods.researchd.impl.TeamResearchEffectDataMap;
 import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
 import com.portingdeadmods.researchd.registries.ResearchEffectTypes;
+import com.portingdeadmods.researchd.registries.ResearchdEffectDataTypes;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
@@ -55,9 +58,12 @@ public record RecipeUnlockEffect(Optional<ItemStack> icon, Optional<String> name
     }
 
     @Override
-    public void onUnlock(Level level, Player player, ResourceKey<Research> research) {
-        RecipeUnlockEffectData data = player.getData(ResearchdAttachments.RECIPE_PREDICATE.get());
-        player.setData(ResearchdAttachments.RECIPE_PREDICATE.get(), data.remove(this, level));
+    public void onUnlock(Level level, ResearchTeam team, ResourceKey<Research> research) {
+        if (!level.isClientSide()) {
+            TeamResearchEffectDataMap map = TeamResearchEffectSavedData.getData((ServerLevel) level);
+            RecipeUnlockEffectData data = map.computeIfAbsent(team.getId(), ResearchdEffectDataTypes.RECIPE_UNLOCK, level);
+            data.remove(this, level);
+        }
     }
 
     @Override

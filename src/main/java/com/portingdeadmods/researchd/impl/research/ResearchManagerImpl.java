@@ -4,10 +4,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.research.ResearchManager;
-import com.portingdeadmods.researchd.impl.research.cache.CachedResearchRelations;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchPage;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
+import com.portingdeadmods.researchd.api.research.ResearchRelations;
 import com.portingdeadmods.researchd.utils.researches.ResearchdManagers;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -23,7 +22,7 @@ public final class ResearchManagerImpl implements ResearchManager {
 
     private List<ResourceKey<Research>> researches;
     private List<ResourceLocation> pageIds;
-    private Map<ResourceKey<Research>, CachedResearchRelations> researchRelations;
+    private Map<ResourceKey<Research>, ResearchRelations> researchRelations;
     private Map<ResourceLocation, ResearchPage> researchPages;
 
     /**
@@ -31,7 +30,7 @@ public final class ResearchManagerImpl implements ResearchManager {
      */
     private Map<ResourceLocation, List<ResourceKey<Research>>> pageRoots;
     @Deprecated
-    private @Nullable CachedResearchRelations rootResearch;
+    private @Nullable ResearchRelations rootResearch;
 
     private ResearchManagerImpl() {
     }
@@ -48,27 +47,27 @@ public final class ResearchManagerImpl implements ResearchManager {
     // TODO: Use Hashmaps?
     private void initialize(Level level) {
         Map<ResourceKey<Research>, Research> researchLookup = ResearchdManagers.getResearchesManager(level).getLookup();
-        Map<ResourceKey<Research>, CachedResearchRelations> globalResearchMap = new LinkedHashMap<>(researchLookup.size());
+        Map<ResourceKey<Research>, ResearchRelations> globalResearchMap = new LinkedHashMap<>(researchLookup.size());
 
         this.researches = ImmutableList.copyOf(researchLookup.keySet());
 
         // Add the researchPacks to GLOBAL_RESEARCHES
         for (ResourceKey<Research> key : this.researches) {
-            globalResearchMap.put(key, new CachedResearchRelations(key));
+            globalResearchMap.put(key, new ResearchRelations(key));
         }
 
         // CHILDREN
-        for (CachedResearchRelations research : globalResearchMap.values()) {
+        for (ResearchRelations research : globalResearchMap.values()) {
             Research research1 = researchLookup.get(research.getResearchKey());
             List<ResourceKey<Research>> parents = research1.parents();
             for (ResourceKey<Research> parent : parents) {
-                CachedResearchRelations parentResearchRelations = globalResearchMap.get(parent);
+                ResearchRelations parentResearchRelations = globalResearchMap.get(parent);
                 parentResearchRelations.getChildren().add(research);
             }
         }
 
         // PARENTS
-        for (CachedResearchRelations research : globalResearchMap.values()) {
+        for (ResearchRelations research : globalResearchMap.values()) {
             Research research1 = researchLookup.get(research.getResearchKey());
             List<ResourceKey<Research>> parents = research1.parents();
 
@@ -83,15 +82,15 @@ public final class ResearchManagerImpl implements ResearchManager {
         }
 
         // Lock global researchLookup
-        for (CachedResearchRelations research : globalResearchMap.values()) {
+        for (ResearchRelations research : globalResearchMap.values()) {
             research.lock();
         }
 
         researchRelations = ImmutableMap.copyOf(globalResearchMap);
 
         // Build research pages
-        Map<ResourceLocation, UniqueArray<CachedResearchRelations>> pageGroups = new LinkedHashMap<>();
-        for (CachedResearchRelations research : globalResearchMap.values()) {
+        Map<ResourceLocation, UniqueArray<ResearchRelations>> pageGroups = new LinkedHashMap<>();
+        for (ResearchRelations research : globalResearchMap.values()) {
             ResourceLocation pageId = resolvePage(research, researchLookup);
             pageGroups.computeIfAbsent(pageId, k -> new UniqueArray<>()).add(research);
         }
@@ -100,21 +99,21 @@ public final class ResearchManagerImpl implements ResearchManager {
         Map<ResourceLocation, ResearchPage> pagesMap = new LinkedHashMap<>();
         Map<ResourceLocation, List<ResourceKey<Research>>> pageRootsMap = new LinkedHashMap<>();
 
-        for (Map.Entry<ResourceLocation, UniqueArray<CachedResearchRelations>> entry : pageGroups.entrySet()) {
+        for (Map.Entry<ResourceLocation, UniqueArray<ResearchRelations>> entry : pageGroups.entrySet()) {
             ResourceLocation pageId = entry.getKey();
-            UniqueArray<CachedResearchRelations> researches = entry.getValue();
+            UniqueArray<ResearchRelations> researches = entry.getValue();
 
             // Find all root nodes for this page (researches with no parents within this page)
             List<ResourceKey<Research>> roots = researches.stream()
                     .filter(r -> r.getParents().isEmpty() || !researches.containsAll(r.getParents()))
-                    .map(CachedResearchRelations::getResearchKey)
+                    .map(ResearchRelations::getResearchKey)
                     .toList();
             pageRootsMap.put(pageId, roots);
 
             // Use the first root's icon as the page icon
             ResourceKey<Research> firstRoot = roots.isEmpty() ? researches.getFirst().getResearchKey() : roots.getFirst();
             Research firstResearchData = researchLookup.get(firstRoot);
-            UniqueArray<ResourceKey<Research>> researchKeys = new UniqueArray<>(researches.stream().map(CachedResearchRelations::getResearchKey).toList());
+            UniqueArray<ResourceKey<Research>> researchKeys = new UniqueArray<>(researches.stream().map(ResearchRelations::getResearchKey).toList());
             ResearchPage page = new ResearchPage(pageId, firstResearchData.researchIcon(), firstRoot, researchKeys);
             pagesMap.put(pageId, page);
         }
@@ -124,16 +123,16 @@ public final class ResearchManagerImpl implements ResearchManager {
         this.pageRoots = ImmutableMap.copyOf(pageRootsMap);
     }
 
-    private static ResourceLocation resolvePage(CachedResearchRelations research, Map<ResourceKey<Research>, Research> lookup) {
+    private static ResourceLocation resolvePage(ResearchRelations research, Map<ResourceKey<Research>, Research> lookup) {
         Research r = lookup.get(research.getResearchKey());
         ResourceLocation pageId = r.researchPage();
 
         // If this is not root and has default page, inherit from parent
         if (!research.getParents().isEmpty() && pageId.equals(ResearchPage.DEFAULT_PAGE_ID)) {
-	        CachedResearchRelations firstParent = research.getParents().stream().findFirst().get();
+	        ResearchRelations firstParent = research.getParents().stream().findFirst().get();
 			ResourceLocation page = resolvePage(firstParent, lookup);
 
-			for (CachedResearchRelations parent : research.getParents()) {
+			for (ResearchRelations parent : research.getParents()) {
 				if (resolvePage(parent, lookup) != page) throw new RuntimeException("Research Parent is on a different page than child");
 			}
 
@@ -157,7 +156,7 @@ public final class ResearchManagerImpl implements ResearchManager {
     /* Research Relations */
 
     @Override
-    public CachedResearchRelations getRelationsForResearch(ResourceKey<Research> researchKey) {
+    public ResearchRelations getRelationsForResearch(ResourceKey<Research> researchKey) {
         return this.researchRelations.get(researchKey);
     }
 

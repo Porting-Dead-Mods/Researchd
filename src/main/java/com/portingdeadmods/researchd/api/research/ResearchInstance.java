@@ -3,8 +3,6 @@ package com.portingdeadmods.researchd.api.research;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.api.ResearchdApi;
-import com.portingdeadmods.researchd.impl.research.cache.CachedResearchRelations;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -16,7 +14,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 public final class ResearchInstance {
@@ -127,7 +124,7 @@ public final class ResearchInstance {
         return this.is(instance.getResearch());
     }
 
-    public boolean is(CachedResearchRelations research) {
+    public boolean is(ResearchRelations research) {
         return this.is(research.getResearchKey());
     }
 

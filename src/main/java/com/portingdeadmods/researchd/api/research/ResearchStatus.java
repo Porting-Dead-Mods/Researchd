@@ -57,4 +57,8 @@ public enum ResearchStatus implements StringRepresentable {
     public @NotNull String getSerializedName() {
         return this.name;
     }
+
+    public boolean isResearchable() {
+        return this == RESEARCHABLE || this == RESEARCHABLE_AFTER_QUEUE;
+    }
 }

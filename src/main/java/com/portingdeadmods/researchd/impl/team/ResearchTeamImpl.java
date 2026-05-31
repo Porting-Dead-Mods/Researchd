@@ -15,6 +15,7 @@ import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.api.team.*;
 import com.portingdeadmods.researchd.api.research.ResearchManager;
 import com.portingdeadmods.researchd.compat.KubeJSCompat;
+import com.portingdeadmods.researchd.data.saved.TeamSavedData;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
 import com.portingdeadmods.researchd.networking.research.ClientResearchCompletedPayload;
 import com.portingdeadmods.researchd.utils.ResearchdCodecUtils;
@@ -25,6 +26,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -36,8 +38,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
-    public static final GameProfile DEBUG_MEMBER = new GameProfile(UUID.fromString("b7c3f3ac-09b3-4e3c-b788-6f30594b34c6"), "Test player");
-
     private String name;
     private final UUID id;
     private final LazyFinal<Long> creationTime;
@@ -46,6 +46,8 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
 
     private final TeamResearches researches;
     private final Map<ResourceLocation, Float> effects;
+
+    private Runnable onChangedFunction;
 
     public static final Codec<ResearchTeamImpl> CODEC = RecordCodecBuilder.create(builder -> builder.group(
             Codec.STRING.fieldOf("name").forGetter(ResearchTeamImpl::getName),
@@ -93,32 +95,22 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
      * @param uuid The Owner
      * @param name The Name of the Team
      */
-    private ResearchTeamImpl(UUID uuid, String name) {
-        this(name, UUID.randomUUID(), Map.of(uuid, new TeamMember(uuid, ResearchTeamRole.OWNER)), TeamSocialManagerImpl.EMPTY, TeamResearches.EMPTY, new HashMap<>());
+    //private ResearchTeamImpl(UUID uuid, String name) {
+    //    this(name, UUID.randomUUID(), Map.of(uuid, new TeamMember(uuid, ResearchTeamRole.OWNER)), TeamSocialManagerImpl.EMPTY, TeamResearches.EMPTY, new HashMap<>());
+    //}
+
+    public ResearchTeamImpl(UUID teamId, String teamName) {
+        this(teamName, teamId, new HashMap<>(), TeamSocialManagerImpl.EMPTY, TeamResearches.EMPTY, new HashMap<>());
     }
 
-	/**
-	 * Creates a default Research Team with the given owner
-	 *
-	 * @param player The Owner
-	 */
-	public static ResearchTeamImpl createDefaultTeam(UUID player, Level level) {
-		Researchd.debug("Research Team", "Creating default team for player: " + AllPlayersCache.getName(player));
+    public void setOnChangedFunction(Runnable onChangedFunction) {
+        this.onChangedFunction = onChangedFunction;
+    }
 
-		ResearchTeamImpl team = new ResearchTeamImpl(player, AllPlayersCache.getName(player) + "'s Team");
-		team.setCreationTime(level.getGameTime() * 50);
-		team.init(level);
-
-		return team;
-	}
-
-    /**
-     * Creates a default Research Team with the given owner
-     *
-     * @param player The Owner
-     */
-    public static ResearchTeamImpl createDefaultTeam(ServerPlayer player) {
-        return createDefaultTeam(player.getUUID(), player.level());
+    public void setChanged() {
+        if (this.onChangedFunction != null) {
+            this.onChangedFunction.run();
+        }
     }
 
     @Override
@@ -157,6 +149,8 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
     @Override
     public void setCreationTime(long creationTime) {
         this.creationTime.initialize(creationTime);
+
+        this.setChanged();
     }
 
     @Override
@@ -182,6 +176,8 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
     @Override
     public void setResearchCompleted(ResourceKey<Research> research, long completionTime) {
         this.researches.setResearchFinished(research, completionTime);
+
+        this.setChanged();
     }
 
     @Override
@@ -191,12 +187,13 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
             return;
         }
 
+        Level level = null;
         Research research = null;
         for (TeamMember member : this.getMembers()) {
             Player player = playerGetter.apply(member.player());
             if (player == null) continue;
 
-            Level level = player.level();
+            level = player.level();
             if (level.isClientSide()) return;
 
             if (research == null)  {
@@ -206,30 +203,36 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
             PacketDistributor.sendToPlayer((ServerPlayer) player, new ClientResearchCompletedPayload(researchKey, (int) completionTime, forced));
 
             KubeJSCompat.fireResearchCompletedEvent((ServerPlayer) player, researchKey);
-
-            Researchd.debug("Researching", "Applying researchPack effects for Research: " + researchKey.location() + " to player: " + player.getName().getString());
-            research.researchEffect().onUnlock(level, player, researchKey);
         }
+        research.researchEffect().onUnlock(level, this, researchKey);
     }
 
     @Override
     public void refreshResearchStatus() {
         this.researches.refreshResearchStatus();
+
+        this.setChanged();
     }
 
     @Override
     public void addMember(UUID uuid) {
         this.members.put(uuid, new TeamMember(uuid, ResearchTeamRole.MEMBER));
+
+        this.setChanged();
     }
 
     @Override
     public void removeMember(UUID uuid) {
         this.members.remove(uuid);
+
+        this.setChanged();
     }
 
     @Override
     public void setRole(UUID member, ResearchTeamRole role) {
         this.members.put(member, new TeamMember(member, role));
+
+        this.setChanged();
     }
 
     @Override
@@ -245,6 +248,8 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
     @Override
     public void addMember(UUID member, ResearchTeamRole role) {
         this.members.put(member, new TeamMember(member, role));
+
+        this.setChanged();
     }
 
     @Override
@@ -271,6 +276,8 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
     @Override
     public void setEffectValue(ValueEffect effect, float value) {
         this.effects.put(ResearchdRegistries.VALUE_EFFECT.getKey(effect), value);
+
+        this.setChanged();
     }
 
     // TODO: Merge this with refreshResearches
@@ -288,10 +295,15 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
             rps.put(key, ResearchProgress.forResearch(key, level));
         }
         this.getResearchProgresses().putAll(rps);
+
+        this.setChanged();
     }
 
     public TeamResearches getTeamResearches() {
         return this.researches;
     }
 
+    public boolean hasOnChangedFunction() {
+        return this.onChangedFunction != null;
+    }
 }

@@ -5,6 +5,7 @@ import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 
 import java.util.Map;
 import java.util.SequencedCollection;
@@ -90,6 +91,8 @@ public interface ResearchTeam {
     default ResearchProgress getCurrentProgress() {
         return this.getResearchProgresses().get(this.getCurrentResearch());
     }
+
+    void init(Level level);
 
     ResearchQueue getQueue();
 

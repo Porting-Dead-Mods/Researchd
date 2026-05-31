@@ -2,53 +2,106 @@ package com.portingdeadmods.researchd.impl.team;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.ResearchTeamManager;
-import com.portingdeadmods.researchd.api.team.TeamMember;
-import com.portingdeadmods.researchd.utils.ClientResearchTeamHelper;
-import com.portingdeadmods.researchd.data.ResearchdSavedData;
-import com.portingdeadmods.researchd.utils.ResearchdCodecUtils;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
+import com.portingdeadmods.researchd.api.team.ResearchTeamRole;
+import com.portingdeadmods.researchd.data.saved.SavedDataMap;
+import com.portingdeadmods.researchd.data.saved.TeamSavedData;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public record ResearchTeamMap(Map<UUID, ResearchTeamImpl> researchTeams) implements ResearchTeamManager {
+public final class ResearchTeamMap implements ResearchTeamManager, SavedDataMap {
     public static final ResearchTeamMap EMPTY = new ResearchTeamMap();
     public static final Codec<ResearchTeamMap> CODEC = RecordCodecBuilder.create(builder -> builder.group(
-            Codec.unboundedMap(Codec.STRING, ResearchTeamImpl.CODEC).fieldOf("research_teams").forGetter(t -> ResearchdCodecUtils.encodeMap(t.researchTeams))
-    ).apply(builder, ResearchTeamMap::teamMapFromString));
+            Codec.unboundedMap(UUIDUtil.STRING_CODEC, ResearchTeamImpl.CODEC).fieldOf("research_teams").forGetter(t -> t.researchTeams)
+    ).apply(builder, ResearchTeamMap::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, ResearchTeamMap> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.map(
                     HashMap::new,
-                    ByteBufCodecs.STRING_UTF8,
+                    UUIDUtil.STREAM_CODEC,
                     ResearchTeamImpl.STREAM_CODEC
             ),
-            t -> ResearchdCodecUtils.encodeMap(t.researchTeams),
-            ResearchTeamMap::teamMapFromString
+            t -> t.researchTeams,
+            ResearchTeamMap::new
     );
+    private final Map<UUID, ResearchTeamImpl> researchTeams;
+    private final List<UUID> teamIds;
+    private Runnable onChangedFunction;
+
+    public ResearchTeamMap(Map<UUID, ResearchTeamImpl> researchTeams) {
+        this.researchTeams = researchTeams;
+        this.teamIds = new ArrayList<>(researchTeams.keySet());
+    }
 
     public ResearchTeamMap() {
         this(new HashMap<>());
     }
 
     @Override
-    public ResearchTeam getTeamById(UUID uuid) {
-        return this.researchTeams.get(uuid);
+    public void setOnChangedFunction(Runnable onChangedFunction) {
+        this.onChangedFunction = onChangedFunction;
     }
 
     @Override
-    public ResearchTeam getTeamByName(String name) {
-        for (ResearchTeamImpl team : this.researchTeams.values()) {
+    public void setChanged() {
+        if (this.onChangedFunction != null) {
+            this.onChangedFunction.run();
+        }
+    }
+
+    @Override
+    public void addTeam(ResearchTeam team) {
+        if (team instanceof ResearchTeamImpl teamImpl) {
+            this.researchTeams.put(team.getId(), teamImpl);
+            this.teamIds.add(team.getId());
+
+            this.setChanged();
+        } else {
+            throw new UnsupportedOperationException("Cannot add team of type" + team.getClass().getName() + " to " + this.getClass().getName());
+        }
+    }
+
+    @Override
+    public void removeTeam(UUID teamId) {
+        this.researchTeams.remove(teamId);
+        this.teamIds.remove(teamId);
+
+        this.setChanged();
+    }
+
+    public void updateTeam(ResearchTeamImpl team) {
+        this.researchTeams.put(team.getId(), team);
+
+        this.setChanged();
+    }
+
+    @Override
+    public ResearchTeamImpl getTeamById(UUID uuid) {
+        ResearchTeamImpl team = this.researchTeams.get(uuid);
+        if (!team.hasOnChangedFunction()) {
+            team.setOnChangedFunction(this::setChanged);
+        }
+        return team;
+    }
+
+    @Override
+    public ResearchTeamImpl getTeamByName(String name) {
+        for (UUID teamId : this.teamIds) {
+            ResearchTeamImpl team = this.getTeamById(teamId);
             if (team.getName().equals(name)) {
+                if (!team.hasOnChangedFunction()) {
+                    team.setOnChangedFunction(this::setChanged);
+                }
                 return team;
             }
         }
@@ -56,91 +109,118 @@ public record ResearchTeamMap(Map<UUID, ResearchTeamImpl> researchTeams) impleme
     }
 
     @Override
-    @Nullable
-    public ResearchTeamImpl getTeamByPlayerId(UUID uuid) {
-        for (ResearchTeamImpl team : this.researchTeams.values()) {
+    public @NotNull ResearchTeamImpl getTeamByPlayerId(UUID uuid) {
+        for (UUID teamId : this.teamIds) {
+            ResearchTeamImpl team = this.getTeamById(teamId);
             if (team.hasMember(uuid)) {
+                if (!team.hasOnChangedFunction()) {
+                    team.setOnChangedFunction(this::setChanged);
+                }
                 return team;
             }
         }
         return null;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Collection<ResearchTeam> getTeams() {
-        Collection<? extends ResearchTeam> teams = this.researchTeams.values();
-        return (Collection<ResearchTeam>) teams;
+    public Collection<UUID> getTeamIds() {
+        return this.teamIds;
     }
 
-    public void setDefaultTeam(UUID uuid, Level level) {
-        this.researchTeams.put(uuid, ResearchTeamImpl.createDefaultTeam(uuid, level));
-    }
-
-    public void setDefaultTeam(ServerPlayer player) {
-        this.setDefaultTeam(player.getUUID(), player.level());
-    }
-
-    /**
-     * Creates a team for the player if it doesn't exist.
-     * Does nothing if the player is already in a team.
-     * <p>
-     * Returns true if a team was created, false if not.
-     */
-    public boolean initPlayer(ServerPlayer player) {
-        try {
-            if (getTeamByPlayer(player) != null) return false;
-
-            researchTeams.put(player.getUUID(), ResearchTeamImpl.createDefaultTeam(player));
-
-            return true;
-        } catch (Exception e) {
-            Researchd.LOGGER.error(e.getMessage());
-            return false;
+    private UUID createUniqueTeamId() {
+        UUID teamId = UUID.randomUUID();
+        while (this.researchTeams.containsKey(teamId)) {
+            teamId = UUID.randomUUID();
         }
+        return teamId;
+    }
+
+    @Override
+    public ResearchTeam createEmptyTeam(String name) {
+        UUID teamId = this.createUniqueTeamId();
+
+        ResearchTeamImpl team = new ResearchTeamImpl(teamId, name);
+        team.setOnChangedFunction(this::setChanged);
+        return team;
+    }
+
+    @Override
+    public ResearchTeam createDefaultTeam(UUID playerId, Level level) {
+        Researchd.debug("Research Team", "Creating default team for player: " + AllPlayersCache.getName(playerId));
+
+        ResearchTeam team = this.createEmptyTeam(AllPlayersCache.getName(playerId) + "'s Team");
+
+        team.addMember(playerId, ResearchTeamRole.OWNER);
+
+        team.setCreationTime(level.getGameTime() * 50);
+        team.init(level);
+
+        return team;
+    }
+
+    public static void initServer(ServerLevel level) {
+        ResearchTeamMap map = TeamSavedData.getData(level);
+        //ResearchHelperCommon.refreshResearches(map, ull);
     }
 
     public static void afterSync(Player player) {
-	    Level level = player.level();
-	    if (level.isClientSide) {
-            ResearchHelperClient.refreshResearches(player);
-            ClientResearchTeamHelper.resolveInstances(ClientResearchTeamHelper.getTeam());
-        } else {
-            ResearchHelperCommon.refreshResearches((ServerPlayer) player);
-        }
+//        Level level = player.level();
+//        if (level.isClientSide) {
+//            ResearchHelperClient.refreshResearches(player);
+//            ClientResearchTeamHelper.resolveInstances(ClientResearchTeamHelper.getTeam());
+//        } else {
+//            ResearchHelperCommon.refreshResearches((ServerPlayer) player);
+//        }
 
-		// Resolve Map pointers to single team objects for all members
-	    ResearchTeamMap data = ResearchdSavedData.TEAM_RESEARCH.get().getData(level);
-	    Map<UUID, ResearchTeamImpl> temp = new HashMap<>();
-	    Map<UUID, ResearchTeamImpl> memberToTeam = new HashMap<>();
+        // TODO: Can probably remove this in the future
+        // Resolve Map pointers to single team objects for all members
+//        ResearchTeamMap data = TeamSavedData.getData(level);
+//        Map<UUID, ResearchTeamImpl> temp = new HashMap<>();
+//        Map<UUID, ResearchTeamImpl> memberToTeam = new HashMap<>();
+//
+//        for (Map.Entry<UUID, ResearchTeamImpl> entry : data.researchTeams().entrySet()) {
+//            UUID uuid = entry.getKey();
+//            ResearchTeamImpl team = entry.getValue();
+//
+//            // Check if this UUID is already associated with a team
+//            ResearchTeamImpl existingTeam = memberToTeam.get(uuid);
+//            if (existingTeam != null) {
+//                temp.put(uuid, existingTeam);
+//                continue;
+//            }
+//
+//            // Otherwise, this is a new unique team
+//            temp.put(uuid, team);
+//            for (TeamMember member : team.getMembers()) {
+//                memberToTeam.put(member.player(), team);
+//            }
+//        }
+//
+//        if (temp.equals(data.researchTeams()))
+//            return;
 
-	    for (Map.Entry<UUID, ResearchTeamImpl> entry : data.researchTeams().entrySet()) {
-		    UUID uuid = entry.getKey();
-		    ResearchTeamImpl team = entry.getValue();
-
-		    // Check if this UUID is already associated with a team
-		    ResearchTeamImpl existingTeam = memberToTeam.get(uuid);
-		    if (existingTeam != null) {
-			    temp.put(uuid, existingTeam);
-			    continue;
-		    }
-
-		    // Otherwise, this is a new unique team
-		    temp.put(uuid, team);
-		    for (TeamMember member : team.getMembers()) {
-			    memberToTeam.put(member.player(), team);
-		    }
-	    }
-
-		if (temp.equals(data.researchTeams()))
-			return;
-
-	    data.researchTeams().clear();
-	    data.researchTeams().putAll(temp);
-		ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
+//        data.researchTeams().clear();
+//        data.researchTeams().putAll(temp);
+//        ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
     }
 
-    public static ResearchTeamMap teamMapFromString(Map<String, ResearchTeamImpl> stringedMap) {
-        return new ResearchTeamMap(ResearchdCodecUtils.decodeMap(stringedMap, UUID::fromString));
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj == null || obj.getClass() != this.getClass()) return false;
+        var that = (ResearchTeamMap) obj;
+        return Objects.equals(this.researchTeams, that.researchTeams);
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(researchTeams);
+    }
+
+    @Override
+    public String toString() {
+        return "ResearchTeamMap[" +
+                "researchTeams=" + researchTeams + ']';
+    }
+
 }

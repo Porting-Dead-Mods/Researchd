@@ -6,6 +6,8 @@ import com.portingdeadmods.portingdeadlibs.utils.PlayerUtils;
 import com.portingdeadmods.portingdeadlibs.utils.SuggestionUtils;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
+import com.portingdeadmods.researchd.content.commands.arguments.ResearchdTeamArgument;
+import com.portingdeadmods.researchd.impl.team.ResearchTeamImpl;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import com.portingdeadmods.researchd.utils.ResearchdSuggestionUtils;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
@@ -102,8 +104,7 @@ public class TeamCommands {
 							})
 						))
 				.then(Commands.literal("join")
-					.then(Commands.argument("memberOfTeam", StringArgumentType.string())
-						.suggests(SuggestionUtils::playerNames)
+					.then(Commands.argument("team", ResearchdTeamArgument.teamArgument())
 						.executes(context -> {
 							CommandSourceStack source = context.getSource();
 							if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
@@ -114,7 +115,7 @@ public class TeamCommands {
 							ServerPlayer player = source.getPlayer();
 
 							if (player != null) {
-								ResearchTeamHelper.handleEnterTeam(player, PlayerUtils.getPlayerUUIDFromName(context.getSource().getLevel(), StringArgumentType.getString(context, "memberOfTeam")));
+								ResearchTeamHelper.handleEnterTeamSynced(player, (ResearchTeamImpl) ResearchdTeamArgument.get(context, "team"));
 							}
 
 							return 1;
