@@ -8,7 +8,7 @@ import com.portingdeadmods.researchd.client.screens.lib.layout.WidgetHeaderAndFo
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLButton;
-import com.portingdeadmods.researchd.utils.ClientEditorHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchEditorHelperClient;
 import com.portingdeadmods.researchd.utils.GuiUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
@@ -49,7 +49,7 @@ public class SelectPackPopupWidget extends PopupWidget {
         super(x, y, 256, 192, false, CommonComponents.EMPTY);
         this.screen = screen;
 
-        EditModeSettings settings = ClientEditorHelper.getEditModeSettings();
+        EditModeSettings settings = ResearchEditorHelperClient.getEditModeSettings();
 
         boolean canStartEditing = settings.currentDatapack() != null && settings.currentResourcePack() != null;
 
@@ -73,12 +73,12 @@ public class SelectPackPopupWidget extends PopupWidget {
                     .build(), LayoutSettings::alignHorizontallyCenter);
             contents.addChild(new SpacerElement(0, 4));
             contents.addChild(new StringWidget(Component.literal("Datapack:").withStyle(ChatFormatting.WHITE), font), LayoutSettings::alignHorizontallyCenter);
-            @Nullable PackLocation datapack = ClientEditorHelper.getEditModeSettings().currentDatapack();
+            @Nullable PackLocation datapack = ResearchEditorHelperClient.getEditModeSettings().currentDatapack();
             this.selectDatapackWidget = contents.addChild(new SelectPackSearchBarWidget(datapack, PackType.SERVER_DATA, create_btn -> {
                 this.screen.openPopupCentered(new CreatePackPopupWidget(this.screen, PackType.SERVER_DATA));
             }), LayoutSettings::alignHorizontallyCenter);
             contents.addChild(new StringWidget(Component.literal("Resource Pack:").withStyle(ChatFormatting.WHITE), font), LayoutSettings::alignHorizontallyCenter);
-            this.selectResourcePackWidget = contents.addChild(new SelectPackSearchBarWidget(ClientEditorHelper.getEditModeSettings().currentResourcePack(), PackType.CLIENT_RESOURCES, create_btn -> {
+            this.selectResourcePackWidget = contents.addChild(new SelectPackSearchBarWidget(ResearchEditorHelperClient.getEditModeSettings().currentResourcePack(), PackType.CLIENT_RESOURCES, create_btn -> {
                 this.screen.openPopupCentered(new CreatePackPopupWidget(this.screen, PackType.CLIENT_RESOURCES));
             }), LayoutSettings::alignHorizontallyCenter);
         });
@@ -131,8 +131,8 @@ public class SelectPackPopupWidget extends PopupWidget {
 
         super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
 
-        this.selectDatapackWidget.updateSelectedPack(ClientEditorHelper.getEditModeSettings().currentDatapack());
-        this.selectResourcePackWidget.updateSelectedPack(ClientEditorHelper.getEditModeSettings().currentResourcePack());
+        this.selectDatapackWidget.updateSelectedPack(ResearchEditorHelperClient.getEditModeSettings().currentDatapack());
+        this.selectResourcePackWidget.updateSelectedPack(ResearchEditorHelperClient.getEditModeSettings().currentResourcePack());
 
         if (this.selectResourcePackWidget.hasPack() && this.selectDatapackWidget.hasPack()) {
             this.startEditingButton.active = true;

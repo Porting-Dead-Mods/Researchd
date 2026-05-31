@@ -5,10 +5,10 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.ResearchTeamRole;
 import com.portingdeadmods.researchd.client.screens.team.widgets.PlayerManagementDraggableWidget;
-import com.portingdeadmods.researchd.utils.ClientResearchTeamHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import com.portingdeadmods.researchd.networking.team.LeaveTeamPayload;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
-import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperServer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -59,7 +59,7 @@ public class ResearchTeamSettingsScreen extends BaseTeamScreen {
         // Variables
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
-        ResearchTeam researchTeam = ResearchTeamHelper.getTeamByMember(Objects.requireNonNull(player));
+        ResearchTeam researchTeam = ResearchTeamHelperServer.getTeamByMember(Objects.requireNonNull(player));
 
         // Layout Setup
         this.layout = LinearLayout.vertical().spacing(8);
@@ -89,7 +89,7 @@ public class ResearchTeamSettingsScreen extends BaseTeamScreen {
 	        PacketDistributor.sendToServer(new LeaveTeamPayload(PlayerUtils.EmptyUUID));
         }).size(112, 16).build();
 
-        if (ClientResearchTeamHelper.getPlayerRole(Minecraft.getInstance().player.getUUID()) == ResearchTeamRole.OWNER) {
+        if (ResearchTeamHelperClient.getPlayerRole(Minecraft.getInstance().player.getUUID()) == ResearchTeamRole.OWNER) {
             this.layout.addChild(manageMembersButton);
             this.layout.addChild(transferOwnershipButton);
         }
@@ -103,7 +103,7 @@ public class ResearchTeamSettingsScreen extends BaseTeamScreen {
         this.playerManagementWindow = new PlayerManagementDraggableWidget(
                 this.leftPos,
                 this.topPos,
-                ClientResearchTeamHelper.getTeamMembers(),
+                ResearchTeamHelperClient.getTeamMembers(),
                 new PlayerManagementDraggableWidget.PlayerManagementButtons(true, true, true, false, false),
                 Component.empty()
         );
@@ -114,7 +114,7 @@ public class ResearchTeamSettingsScreen extends BaseTeamScreen {
         this.transferOwnershipWindow = new PlayerManagementDraggableWidget(
                 this.leftPos + this.width / 2,
                 this.topPos + this.height / 2,
-                ClientResearchTeamHelper.getTeamMembers(),
+                ResearchTeamHelperClient.getTeamMembers(),
                 new PlayerManagementDraggableWidget.PlayerManagementButtons(false, false, false, true, false),
                 Component.empty()
         );
@@ -174,9 +174,9 @@ public class ResearchTeamSettingsScreen extends BaseTeamScreen {
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
 		super.render(guiGraphics, mouseX, mouseY, partialTick);
-		this.manageMembersButton.active = (ClientResearchTeamHelper.getRole().getPermissionLevel() > 0);
-		this.transferOwnershipButton.active = (ClientResearchTeamHelper.getRole() == ResearchTeamRole.OWNER);
-		this.teamNameEdit.setEditable(ClientResearchTeamHelper.getRole() == ResearchTeamRole.OWNER);
+		this.manageMembersButton.active = (ResearchTeamHelperClient.getRole().getPermissionLevel() > 0);
+		this.transferOwnershipButton.active = (ResearchTeamHelperClient.getRole() == ResearchTeamRole.OWNER);
+		this.teamNameEdit.setEditable(ResearchTeamHelperClient.getRole() == ResearchTeamRole.OWNER);
 	}
 
     @Override

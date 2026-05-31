@@ -8,7 +8,7 @@ import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
-import com.portingdeadmods.researchd.utils.ClientResearchTeamHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import com.portingdeadmods.researchd.networking.research.ResearchQueueAddPayload;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.client.Minecraft;
@@ -163,8 +163,8 @@ public class TechListWidget extends ResearchScreenWidget {
                 PacketDistributor.sendToServer(new ResearchQueueAddPayload(researchKey, player, gameTime));
 
                 // Instantaneous Effect
-                ClientResearchTeamHelper.getTeam().refreshResearchStatus();
-                ClientResearchTeamHelper.refreshResearchScreenData();
+                ResearchTeamHelperClient.getTeam().refreshResearchStatus();
+                ResearchTeamHelperClient.refreshResearchScreenData();
             }
 
             this.startResearchButton.active = false;

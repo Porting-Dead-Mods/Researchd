@@ -7,10 +7,9 @@ import com.portingdeadmods.researchd.api.client.editor.EditorContext;
 import com.portingdeadmods.researchd.api.client.editor.StandaloneEditorObject;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.ResearchPackPreviewWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.BackgroundEditBox;
-import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.impl.utils.DisplayImpl;
-import com.portingdeadmods.researchd.utils.ClientEditorHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchEditorHelperClient;
 import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.TextUtils;
 import net.minecraft.client.gui.components.StringWidget;
@@ -122,7 +121,7 @@ public class ResearchPackObject implements StandaloneEditorObject<ResearchPackIm
         int sortingValue = Integer.parseInt(layout.getChild("sorting_value_edit_box", BackgroundEditBox.class).getValue());
         String customTextureLoc = layout.getChild("custom_texture_edit_box", BackgroundEditBox.class).getValue();
         Optional<ResourceLocation> customTexture = customTextureLoc.isBlank() ? Optional.empty() : Optional.of(ResourceLocation.parse(customTextureLoc));
-        DisplayImpl display = ClientEditorHelper.createDisplay(
+        DisplayImpl display = ResearchEditorHelperClient.createDisplay(
                 layout.getChild("name_edit_box", BackgroundEditBox.class),
                 layout.getChild("desc_edit_box", BackgroundEditBox.class)
         );

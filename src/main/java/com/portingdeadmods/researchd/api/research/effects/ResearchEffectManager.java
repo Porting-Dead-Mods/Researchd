@@ -21,6 +21,14 @@ public interface ResearchEffectManager {
         return this.computeIfAbsent(teamId, type.get(), level);
     }
 
+    void setChanged();
+
+    <T extends ResearchEffectData<?>> void sync(UUID teamId, ResearchEffectDataType<T> type);
+
+    default <T extends ResearchEffectData<?>> void sync(UUID teamId, Supplier<ResearchEffectDataType<T>> type) {
+        sync(teamId, type.get());
+    }
+
     default Iterable<ResearchEffectDataType<?>> getDataTypes() {
         return ResearchdRegistries.RESEARCH_EFFECT_DATA_TYPE;
     }

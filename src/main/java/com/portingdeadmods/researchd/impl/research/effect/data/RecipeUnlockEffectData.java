@@ -75,10 +75,11 @@ public record RecipeUnlockEffectData(UniqueArray<ResourceLocation> blockedRecipe
     @Override
     public void initDefault(Level level) {
         Collection<RecipeUnlockEffect> recipeEffects = ResearchHelperCommon.getResearchEffects(RecipeUnlockEffect.class, level);
-        UniqueArray<ResourceLocation> blocked = new UniqueArray<>();
 
         for (RecipeUnlockEffect unlock : recipeEffects) {
-            unlock.getRecipes(level).forEach(holder -> blocked.add(holder.id()));
+            for (RecipeHolder<?> holder : unlock.getRecipes(level)) {
+                this.blockedRecipes.add(holder.id());
+            }
         }
 
     }

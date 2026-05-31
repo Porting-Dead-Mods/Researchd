@@ -1,10 +1,9 @@
 package com.portingdeadmods.researchd.networking.team;
 
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamImpl;
 import com.portingdeadmods.researchd.networking.team.manager.SyncTeamPayload;
-import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperServer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -44,7 +43,7 @@ public record RequestToJoinPayload(UUID toJoin, boolean remove) implements Custo
                 ServerLevel level = server.overworld();
                 Player teamMemberPlayer = level.getPlayerByUUID(this.toJoin());
                 if (teamMemberPlayer != null) {
-                    ResearchTeamImpl team = (ResearchTeamImpl) ResearchTeamHelper.getTeamByMember(teamMemberPlayer);
+                    ResearchTeamImpl team = (ResearchTeamImpl) ResearchTeamHelperServer.getTeamByMember(teamMemberPlayer);
                     if (this.remove()) {
                         team.getSocialManager().removeReceivedInvite(sp.getUUID());
                     } else {
@@ -52,7 +51,7 @@ public record RequestToJoinPayload(UUID toJoin, boolean remove) implements Custo
                     }
                     team.setChanged();
                     PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
-                    ResearchTeamHelper.refreshPlayerManagement(team, level);
+                    ResearchTeamHelperServer.refreshPlayerManagement(team, level);
                 } else {
                     sp.sendSystemMessage(Component.literal("The player you're trying to join does not exist!").withStyle(ChatFormatting.RED));
                 }

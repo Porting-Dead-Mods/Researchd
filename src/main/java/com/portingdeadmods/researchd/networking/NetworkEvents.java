@@ -1,6 +1,7 @@
 package com.portingdeadmods.researchd.networking;
 
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.impl.SyncEffectDataPayload;
 import com.portingdeadmods.researchd.networking.cache.ClearGraphCachePayload;
 import com.portingdeadmods.researchd.networking.client.RefreshResearchScreenData;
 import com.portingdeadmods.researchd.networking.editor.CreateDatapackPayload;
@@ -150,14 +151,19 @@ public class NetworkEvents {
         );
 
         registrar.playToClient(
-                SyncTeamDataPayload.TYPE,
-                SyncTeamDataPayload.STREAM_CODEC,
-                SyncTeamDataPayload::handle
+                SyncEffectDataPayload.TYPE,
+                SyncEffectDataPayload.STREAM_CODEC,
+                SyncEffectDataPayload::handle
         );
         registrar.playToClient(
                 SyncTeamEffectDataPayload.TYPE,
                 SyncTeamEffectDataPayload.STREAM_CODEC,
                 SyncTeamEffectDataPayload::handle
+        );
+        registrar.playToClient(
+                SyncTeamDataPayload.TYPE,
+                SyncTeamDataPayload.STREAM_CODEC,
+                SyncTeamDataPayload::handle
         );
         registrar.playToClient(
                 SyncTeamPayload.TYPE,

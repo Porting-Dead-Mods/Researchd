@@ -17,7 +17,7 @@ import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMet
 import com.portingdeadmods.researchd.registries.ResearchMethodTypes;
 import com.portingdeadmods.researchd.data.ResearchdDataComponents;
 import com.portingdeadmods.researchd.registries.ResearchdItems;
-import com.portingdeadmods.researchd.utils.ClientEditorHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchEditorHelperClient;
 import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.TextUtils;
 import net.minecraft.client.gui.components.EditBox;
@@ -51,7 +51,7 @@ public class ConsumePackMethodObject implements TypedEditorObject<ConsumePackRes
         layout.getLayout().spacing(2);
         // TODO: The ability to select multiple packs
         layout.addWidget(null, new StringWidget(Component.literal("Pack:"), GuiUtils.getFont()), LayoutSettings::alignHorizontallyCenter);
-        ResourceKey<ResearchPack> defaultPack = ClientEditorHelper.getDefaultResearchPack();
+        ResourceKey<ResearchPack> defaultPack = ResearchEditorHelperClient.getDefaultResearchPack();
         ItemStack defaultSelectedPack = defaultPack != null ? ResearchPackImpl.asStack(defaultPack) : ResearchdItems.GREEN_RESEARCH_PACK_ICON.toStack();
         ItemSelectorWidget packSelector = layout.addWidget("pack_selector", new ItemSelectorWidget(context.parentPopupWidget(), 0, 0, 25, 24, Ingredient.of(defaultSelectedPack), this::createItemSelectorPopup), LayoutSettings::alignHorizontallyCenter);
         packSelector.setResponder(i -> this.update(layout, context));

@@ -3,17 +3,13 @@ package com.portingdeadmods.researchd.client.impl.info.effects;
 import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidget;
 import com.portingdeadmods.researchd.impl.research.effect.ItemUnlockEffect;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
-import com.portingdeadmods.researchd.utils.RecipeViewerHelper;
-import net.minecraft.client.Minecraft;
+import com.portingdeadmods.researchd.compat.RecipeViewerHelper;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.neoforged.neoforge.common.util.Size2i;
-
-import java.util.Set;
 
 public class UnlockItemEffectWidget extends AbstractResearchInfoWidget<ItemUnlockEffect> {
     private final ItemStack icon;

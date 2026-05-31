@@ -1,7 +1,7 @@
 package com.portingdeadmods.researchd.networking.team;
 
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperServer;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -29,7 +29,7 @@ public record TransferOwnershipPayload(UUID nextToLead) implements CustomPacketP
     public static void handle(TransferOwnershipPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer sp)
-                ResearchTeamHelper.handleTransferOwnership(sp, payload.nextToLead());
+                ResearchTeamHelperServer.handleTransferOwnership(sp, payload.nextToLead());
         }).exceptionally(e -> {
             Researchd.LOGGER.error("Failed to handle TransferOwnershipPayload", e);
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));

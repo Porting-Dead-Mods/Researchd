@@ -10,11 +10,10 @@ import com.portingdeadmods.researchd.client.screens.editor.widgets.EmbeddedMetho
 import com.portingdeadmods.researchd.client.screens.editor.widgets.ItemSelectorWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.ResearchSelectorListWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.BackgroundEditBox;
-import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
 import com.portingdeadmods.researchd.impl.research.icons.ItemResearchIcon;
 import com.portingdeadmods.researchd.impl.utils.DisplayImpl;
-import com.portingdeadmods.researchd.utils.ClientEditorHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchEditorHelperClient;
 import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.TextUtils;
 import net.minecraft.client.gui.components.Checkbox;
@@ -98,7 +97,7 @@ public class SimpleResearchObject implements StandaloneEditorObject<SimpleResear
     @SuppressWarnings("DataFlowIssue")
     @Override
     public SimpleResearch create(RememberingLinearLayout layout) {
-        DisplayImpl display = ClientEditorHelper.createDisplay(
+        DisplayImpl display = ResearchEditorHelperClient.createDisplay(
                 layout.getChild("name_edit_box", BackgroundEditBox.class),
                 layout.getChild("desc_edit_box", BackgroundEditBox.class)
         );

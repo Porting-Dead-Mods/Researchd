@@ -5,9 +5,8 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import com.portingdeadmods.portingdeadlibs.utils.Result;
-import com.portingdeadmods.researchd.utils.researches.ReloadableRegistryManager;
+import com.portingdeadmods.researchd.utils.registries.ReloadableRegistryManager;
 import net.minecraft.core.Registry;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Unit;
 

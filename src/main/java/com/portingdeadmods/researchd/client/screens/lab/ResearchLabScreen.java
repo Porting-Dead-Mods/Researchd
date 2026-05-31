@@ -10,7 +10,7 @@ import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
-import com.portingdeadmods.researchd.utils.ClientResearchTeamHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import com.portingdeadmods.researchd.content.menus.ResearchLabMenu;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
@@ -215,7 +215,7 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
         }
         guiGraphics.disableScissor();
 
-        ResearchTeam team = ClientResearchTeamHelper.getTeam();
+        ResearchTeam team = ResearchTeamHelperClient.getTeam();
         ResearchInstance instance = team.getResearches().get(team.getCurrentResearch());
         if (instance != null) {
             ResearchScreenWidget.renderResearchPanel(guiGraphics, instance, this.leftPos + 123, this.topPos + 51, mouseX, mouseY, 2, false, false);
@@ -234,7 +234,7 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
 
         int x = this.leftPos + 12;
         int y = this.topPos + 72;
-        ResearchProgress rp = ClientResearchTeamHelper.getTeam().getResearchProgresses().get(team.getCurrentResearch());
+        ResearchProgress rp = ResearchTeamHelperClient.getTeam().getResearchProgresses().get(team.getCurrentResearch());
         float progress = rp == null ? 0f : (rp.getProgress() / rp.getMaxProgress());
         int width = (int) (progress * PROGRESS_BAR_WIDTH);
         guiGraphics.fill(x, y, x + width, y + 6, PROGRESS_COLOR);
@@ -253,7 +253,7 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (ResearchScreenWidget.isPanelHovered(this.leftPos + 123, this.topPos + 51, (int) mouseX, (int) mouseY, 2)) {
             if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-                ResearchdApi.openScreenForResearch(ClientResearchTeamHelper.getTeam().getCurrentResearch());
+                ResearchdApi.openScreenForResearch(ResearchTeamHelperClient.getTeam().getCurrentResearch());
                 return true;
             }
         }

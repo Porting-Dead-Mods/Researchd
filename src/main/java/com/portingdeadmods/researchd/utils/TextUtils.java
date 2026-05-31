@@ -107,7 +107,6 @@ public final class TextUtils {
         char lastChar = 0;
 
         for (int i = 1; i < str.length(); i++) {
-
             char ch = str.charAt(i);
 
             if (allowed.test(ch) || Character.isSpaceChar(ch)) {

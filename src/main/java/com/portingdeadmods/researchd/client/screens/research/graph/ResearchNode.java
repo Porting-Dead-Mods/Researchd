@@ -6,7 +6,7 @@ import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.screens.research.graph.lines.ResearchHead;
-import com.portingdeadmods.researchd.utils.ClientResearchTeamHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -28,7 +28,7 @@ public class ResearchNode extends AbstractWidget {
     private ResearchInstance instance; // TODO: Figure out why th there's a desync between Graph and TechList. (then remake this final)
 
     public void fetchInstanceFromTeam() {
-        ResearchTeam team = ClientResearchTeamHelper.getTeam();
+        ResearchTeam team = ResearchTeamHelperClient.getTeam();
         ResearchInstance updatedInstance = team.getResearches().get(this.instance.getResearch());
         if (updatedInstance != null) {
             this.instance = updatedInstance;

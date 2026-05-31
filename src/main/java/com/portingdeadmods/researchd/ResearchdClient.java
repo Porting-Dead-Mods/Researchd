@@ -38,7 +38,7 @@ import com.portingdeadmods.researchd.impl.research.icons.SpriteResearchIcon;
 import com.portingdeadmods.researchd.impl.research.icons.TextResearchIcon;
 import com.portingdeadmods.researchd.impl.research.method.*;
 import com.portingdeadmods.researchd.registries.*;
-import com.portingdeadmods.researchd.utils.WidgetConstructor;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.WidgetConstructor;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;

@@ -6,7 +6,7 @@ import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.networking.editor.CreateResearchPackPayload;
-import com.portingdeadmods.researchd.utils.researches.ResearchdManagers;
+import com.portingdeadmods.researchd.utils.registries.ResearchdManagers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;

@@ -10,14 +10,11 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
-import com.portingdeadmods.researchd.client.screens.editor.EditorSharedSprites;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
-import com.portingdeadmods.researchd.utils.ClientResearchTeamHelper;
-import com.portingdeadmods.researchd.utils.WidgetConstructor;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
-import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.WidgetConstructor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -222,7 +219,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
 
     public void setSelectedResearch(@Nullable ResourceKey<Research> research) {
         if (research != null) {
-            this.setSelectedResearch(Objects.requireNonNull(ClientResearchTeamHelper.getTeam().getResearches().get(research)));
+            this.setSelectedResearch(Objects.requireNonNull(ResearchTeamHelperClient.getTeam().getResearches().get(research)));
         }
     }
 

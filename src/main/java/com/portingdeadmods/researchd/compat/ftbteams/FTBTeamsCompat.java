@@ -6,7 +6,7 @@ import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.data.saved.TeamSavedData;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamImpl;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
-import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperServer;
 import dev.ftb.mods.ftbteams.api.event.PlayerChangedTeamEvent;
 import dev.ftb.mods.ftbteams.api.event.TeamEvent;
 import dev.ftb.mods.ftbteams.api.event.TeamPropertiesChangedEvent;
@@ -27,12 +27,12 @@ public class FTBTeamsCompat {
             return;
         }
 
-        ResearchTeamHelper.handleLeaveTeam(player);
-        ResearchTeamHelper.handleSetName(player, event.getTeam().getName().getString());
+        ResearchTeamHelperServer.handleLeaveTeam(player);
+        ResearchTeamHelperServer.handleSetName(player, event.getTeam().getName().getString());
 
         UUID newTeamOwner = event.getTeam().getOwner();
         if (!newTeamOwner.equals(player.getUUID())) /* If it's an actually different team, in rest it's just a leave team*/ {
-            ResearchTeamHelper.handleEnterTeamSynced(player, (ResearchTeamImpl) ResearchdApi.getTeamManager(player.level()).getTeamByPlayerId(newTeamOwner));
+            ResearchTeamHelperServer.handleEnterTeamSynced(player, (ResearchTeamImpl) ResearchdApi.getTeamManager(player.level()).getTeamByPlayerId(newTeamOwner));
         }
     }
 

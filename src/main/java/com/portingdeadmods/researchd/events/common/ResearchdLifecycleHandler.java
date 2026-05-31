@@ -1,12 +1,15 @@
 package com.portingdeadmods.researchd.events.common;
 
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.client.cache.ResearchTeamCache;
 import com.portingdeadmods.researchd.data.saved.TeamResearchEffectSavedData;
 import com.portingdeadmods.researchd.data.saved.TeamSavedData;
 import com.portingdeadmods.researchd.impl.research.ResearchManagerImpl;
+import com.portingdeadmods.researchd.impl.team.ResearchTeamImpl;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.networking.research.ResearchReloadPayload;
+import com.portingdeadmods.researchd.networking.team.manager.AddTeamPayload;
 import com.portingdeadmods.researchd.networking.team.manager.SyncTeamDataPayload;
 import com.portingdeadmods.researchd.networking.team.manager.SyncTeamEffectDataPayload;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperServer;
@@ -67,26 +70,25 @@ public final class ResearchdLifecycleHandler {
     // Player logs in -> Sync teams and team effect data
     @SubscribeEvent
     private static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
-            PacketDistributor.sendToPlayer(serverPlayer, new SyncTeamDataPayload(TeamSavedData.getData(serverPlayer.serverLevel())));
-            PacketDistributor.sendToPlayer(serverPlayer, new SyncTeamEffectDataPayload(TeamResearchEffectSavedData.getData(serverPlayer.serverLevel())));
+        if (event.getEntity() instanceof ServerPlayer player) {
+            ResearchTeamMap map = TeamSavedData.getData(player.serverLevel());
+            PacketDistributor.sendToPlayer(player, new SyncTeamDataPayload(map));
+            PacketDistributor.sendToPlayer(player, new SyncTeamEffectDataPayload(TeamResearchEffectSavedData.getData(player.serverLevel())));
+
+            // Create default team if player isn't in a team
+            if (map.getTeamByPlayer(player) == null) {
+                ResearchTeamImpl newTeam = (ResearchTeamImpl) map.createDefaultTeam(player);
+                map.addTeam(newTeam);
+
+                PacketDistributor.sendToAllPlayers(new AddTeamPayload(newTeam));
+            }
         }
     }
 
     // Player joins -> create default team for player if player is not in a team yet
     @SubscribeEvent
     private static void onJoinLevel(EntityJoinLevelEvent event) {
-        if (event.getEntity() instanceof Player player) {
-            ResearchTeamMap map;
-            if (player.level() instanceof ServerLevel serverLevel) {
-                map = TeamSavedData.getData(serverLevel);
-            } else {
-                map = ResearchTeamCache.researchTeamMap;
-            }
-            // Create default team if player isn't in a team
-            if (map.getTeamByPlayer(player) == null) {
-                map.addTeam(map.createDefaultTeam(player));
-            }
+        if (event.getEntity() instanceof ServerPlayer player) {
         }
     }
 }

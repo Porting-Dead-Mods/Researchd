@@ -1,6 +1,6 @@
 package com.portingdeadmods.researchd.api.team;
 
-import com.portingdeadmods.researchd.utils.TeamIterator;
+import com.portingdeadmods.researchd.impl.team.TeamIterator;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 

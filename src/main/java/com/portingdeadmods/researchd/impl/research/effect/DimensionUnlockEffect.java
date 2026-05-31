@@ -52,6 +52,8 @@ public record DimensionUnlockEffect(ResourceLocation dimension,
             TeamResearchEffectDataMap map = TeamResearchEffectSavedData.getData((ServerLevel) level);
             DimensionUnlockEffectData data = map.computeIfAbsent(team.getId(), ResearchdEffectDataTypes.DIMENSION_UNLOCK, level);
             data.remove(this, level);
+            map.setChanged();
+            map.sync(team.getId(), data.type());
         }
     }
 

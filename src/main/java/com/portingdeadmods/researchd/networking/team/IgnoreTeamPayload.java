@@ -1,7 +1,7 @@
 package com.portingdeadmods.researchd.networking.team;
 
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperServer;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -29,7 +29,7 @@ public record IgnoreTeamPayload(UUID memberOfTeam) implements CustomPacketPayloa
     public void handle(IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer sp)
-                ResearchTeamHelper.handleIgnoreTeam(sp, this.memberOfTeam());
+                ResearchTeamHelperServer.handleIgnoreTeam(sp, this.memberOfTeam());
         }).exceptionally(e -> {
             Researchd.LOGGER.error("Failed to handle IgnoreTeamPayload", e);
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));

@@ -1,7 +1,7 @@
 package com.portingdeadmods.researchd.networking.team;
 
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.utils.ClientResearchTeamHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
@@ -21,7 +21,7 @@ public record RefreshPlayerManagementPayload() implements CustomPacketPayload {
 
     public static void handle(RefreshPlayerManagementPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
-            ClientResearchTeamHelper.refreshResearchTeamScreenData();
+            ResearchTeamHelperClient.refreshResearchTeamScreenData();
         }).exceptionally(e -> {
             Researchd.LOGGER.error("Failed to handle RefreshPlayerManagementPayload", e);
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));

@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.utils;
+package com.portingdeadmods.researchd.client.screens.lib.widgets;
 
 import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidget;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
@@ -6,7 +6,7 @@ import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 
 @FunctionalInterface
 public interface WidgetConstructor<T> {
-    AbstractResearchInfoWidget<T> create(int x, int y, T method);
+    AbstractResearchInfoWidget<T> create(int x, int y, T value);
 
     default AbstractResearchInfoWidget<? extends ResearchMethod> createMethod(int x, int y, ResearchMethod researchMethod) {
          return (AbstractResearchInfoWidget<? extends ResearchMethod>) create(x, y, (T) researchMethod);

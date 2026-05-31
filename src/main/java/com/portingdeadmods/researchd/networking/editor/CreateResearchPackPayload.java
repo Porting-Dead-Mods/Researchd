@@ -8,7 +8,7 @@ import com.portingdeadmods.researchd.impl.editor.EditModeSettingsImpl;
 import com.portingdeadmods.researchd.networking.research.ResearchReloadPayload;
 import com.portingdeadmods.researchd.resources.editor.EditorResearchPackProvider;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperServer;
-import com.portingdeadmods.researchd.utils.researches.ResearchdManagers;
+import com.portingdeadmods.researchd.utils.registries.ResearchdManagers;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;

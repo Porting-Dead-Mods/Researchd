@@ -8,8 +8,7 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.team.ResearchQueue;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.ResearchTeamManager;
-import com.portingdeadmods.researchd.utils.ClientResearchTeamHelper;
-import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.ChatFormatting;
@@ -78,7 +77,7 @@ public record ClientResearchCompletedPayload(ResourceKey<Research> key, int time
                             ChatFormatting.GREEN + ResearchHelperCommon.getResearchCompletionTime(team.getCreationTime(), timeStamp()) + ChatFormatting.RESET
             ));
 
-            ClientResearchTeamHelper.refreshResearchScreenData();
+            ResearchTeamHelperClient.refreshResearchScreenData();
         }).exceptionally(err -> {
             Researchd.LOGGER.error("Failed to handle ResearchFinishPayload: ", err);
             return null;

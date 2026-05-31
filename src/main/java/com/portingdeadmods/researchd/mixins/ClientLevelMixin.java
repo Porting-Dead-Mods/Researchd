@@ -1,12 +1,10 @@
 package com.portingdeadmods.researchd.mixins;
 
-import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
-import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
-import com.portingdeadmods.researchd.resources.RegistryManagersGetter;
-import com.portingdeadmods.researchd.utils.researches.ReloadableRegistryManager;
+import com.portingdeadmods.researchd.utils.registries.RegistryManagersGetter;
+import com.portingdeadmods.researchd.utils.registries.ReloadableRegistryManager;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.renderer.LevelRenderer;

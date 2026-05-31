@@ -7,7 +7,7 @@ import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.team.ResearchTeamScreen;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
-import com.portingdeadmods.researchd.utils.TimeDifference;
+import com.portingdeadmods.researchd.utils.NumberUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -64,8 +64,8 @@ public class RecentResearchesList extends ContainerWidget<ResearchInstance> {
         }
 
         long researchedTime = research.getResearchedTime();
-        TimeDifference time = new TimeDifference(0, (int) researchedTime);
-        String researchedDate = time.getFormatted();
+
+        String researchedDate = NumberUtils.getTimeDifferenceFormatted(0, researchedTime);
 
         Component metadata = ResearchdTranslations.component(ResearchdTranslations.Gui.RESEARCHED_BY_ON, researchedBy, researchedDate);
         poseStack.pushPose();

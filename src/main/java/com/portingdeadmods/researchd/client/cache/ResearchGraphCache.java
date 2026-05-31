@@ -5,7 +5,7 @@ import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchPage;
-import com.portingdeadmods.researchd.utils.ClientResearchTeamHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +38,7 @@ public final class ResearchGraphCache {
     }
 
     public static ResearchGraph computeIfAbsent(ResourceKey<Research> key)  {
-        return GRAPH_CACHE.computeIfAbsent(key, k -> ResearchGraph.fromRootResearch(key, ClientResearchTeamHelper.getTeam().getResearches()));
+        return GRAPH_CACHE.computeIfAbsent(key, k -> ResearchGraph.fromRootResearch(key, ResearchTeamHelperClient.getTeam().getResearches()));
     }
 
     /**
@@ -50,7 +50,7 @@ public final class ResearchGraphCache {
             List<ResourceKey<Research>> roots = ResearchdApi.getResearchManager().getRootsForPage(pageId);
             if (roots != null && !roots.isEmpty()) {
                 // TODO: Parse
-                return ResearchGraph.fromResearchPage(page, roots.getFirst(), ClientResearchTeamHelper.getTeam().getResearches());
+                return ResearchGraph.fromResearchPage(page, roots.getFirst(), ResearchTeamHelperClient.getTeam().getResearches());
             }
             return null;
         });

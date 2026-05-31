@@ -6,10 +6,10 @@ import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.client.screens.team.widgets.PlayerManagementDraggableWidget;
 import com.portingdeadmods.researchd.client.screens.team.widgets.RecentResearchesList;
 import com.portingdeadmods.researchd.client.screens.team.widgets.TeamMembersList;
-import com.portingdeadmods.researchd.utils.ClientResearchTeamHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
-import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperServer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
@@ -61,7 +61,7 @@ public class ResearchTeamScreen extends BaseTeamScreen {
         this.player = mc.player;
 
         // Team information
-        ResearchTeam researchTeam = ResearchTeamHelper.getTeamByMember(Objects.requireNonNull(player));
+        ResearchTeam researchTeam = ResearchTeamHelperServer.getTeamByMember(Objects.requireNonNull(player));
         String name = researchTeam.getName();
         List<ResearchInstance> recentResearches = ResearchHelperCommon.getRecentResearches(researchTeam);
 
@@ -78,7 +78,7 @@ public class ResearchTeamScreen extends BaseTeamScreen {
                 super.setFocused(focused);
 
                 if (!focused) {
-                    ClientResearchTeamHelper.setTeamNameSynced(this.getValue());
+                    ResearchTeamHelperClient.setTeamNameSynced(this.getValue());
                 }
             }
         });
@@ -111,7 +111,7 @@ public class ResearchTeamScreen extends BaseTeamScreen {
         teamMembersLayout.addChild(new StringWidget(ResearchdTranslations.component(ResearchdTranslations.Team.TITLE_MEMBERS), this.font));
         teamMembersLayout.addChild(new SpacerElement(-1, 1));
         linearLayout.spacing(11);
-        teamMembersList = teamMembersLayout.addChild(new TeamMembersList(94, 142, 94, 22, ClientResearchTeamHelper.getTeamMembers(), false));
+        teamMembersList = teamMembersLayout.addChild(new TeamMembersList(94, 142, 94, 22, ResearchTeamHelperClient.getTeamMembers(), false));
 
         // Layout - Elements - Recent Researches
         linearLayout.spacing(11);
@@ -130,7 +130,7 @@ public class ResearchTeamScreen extends BaseTeamScreen {
         this.inviteWidget = new PlayerManagementDraggableWidget(
                 this.leftPos,
                 this.topPos,
-                ClientResearchTeamHelper.getPlayersNotInTeam(),
+                ResearchTeamHelperClient.getPlayersNotInTeam(),
                 new PlayerManagementDraggableWidget.PlayerManagementButtons(false, false, false, false, true),
                 Component.empty()
         );
@@ -139,15 +139,15 @@ public class ResearchTeamScreen extends BaseTeamScreen {
         inviteWidget.visitWidgets(this::addRenderableOnly);
 
 		// Call visible logic on init asw since it flickers for 1 frame on screen creation
-	    this.inviteButton.active = !ClientResearchTeamHelper.getPlayersNotInTeam().isEmpty();
-	    this.inviteButton.active = this.inviteButton.active && (ClientResearchTeamHelper.getPlayerPermissionLevel(this.player) >= 1);
+	    this.inviteButton.active = !ResearchTeamHelperClient.getPlayersNotInTeam().isEmpty();
+	    this.inviteButton.active = this.inviteButton.active && (ResearchTeamHelperClient.getPlayerPermissionLevel(this.player) >= 1);
     }
 
     @Override
     public void onClose() {
         super.onClose();
 
-        ClientResearchTeamHelper.setTeamNameSynced(this.teamNameEdit.getValue());
+        ResearchTeamHelperClient.setTeamNameSynced(this.teamNameEdit.getValue());
 
     }
 
@@ -180,8 +180,8 @@ public class ResearchTeamScreen extends BaseTeamScreen {
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-	    this.inviteButton.active = !ClientResearchTeamHelper.getPlayersNotInTeam().isEmpty();
-		this.inviteButton.active = this.inviteButton.active && (ClientResearchTeamHelper.getPlayerPermissionLevel(this.player) >= 1);
+	    this.inviteButton.active = !ResearchTeamHelperClient.getPlayersNotInTeam().isEmpty();
+		this.inviteButton.active = this.inviteButton.active && (ResearchTeamHelperClient.getPlayerPermissionLevel(this.player) >= 1);
 	}
 
     @Override

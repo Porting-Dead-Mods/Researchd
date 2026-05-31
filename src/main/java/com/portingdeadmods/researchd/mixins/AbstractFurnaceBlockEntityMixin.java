@@ -6,7 +6,7 @@ import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffec
 import com.portingdeadmods.researchd.impl.research.effect.data.ItemUnlockEffectData;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.registries.ResearchdEffectDataTypes;
-import com.portingdeadmods.researchd.utils.researches.ResearchEffectHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchEffectHelperCommon;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -38,8 +38,8 @@ public class AbstractFurnaceBlockEntityMixin {
             Player player = level.getPlayerByUUID(playerUUID);
 
             if (player != null) {
-                ItemUnlockEffectData itemData = ResearchEffectHelper.getEffectDataForPlayer(player, ResearchdEffectDataTypes.ITEM_UNLOCK);
-                RecipeUnlockEffectData recipeData = ResearchEffectHelper.getEffectDataForPlayer(player, ResearchdEffectDataTypes.RECIPE_UNLOCK);
+                ItemUnlockEffectData itemData = ResearchEffectHelperCommon.getEffectDataForPlayer(player, ResearchdEffectDataTypes.ITEM_UNLOCK);
+                RecipeUnlockEffectData recipeData = ResearchEffectHelperCommon.getEffectDataForPlayer(player, ResearchdEffectDataTypes.RECIPE_UNLOCK);
 
                 Recipe<?> recipe = recipeholder.value();
                 if (isItemBlocked(itemData, recipe, level)) {

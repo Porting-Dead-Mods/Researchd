@@ -1,7 +1,7 @@
 package com.portingdeadmods.researchd.networking.team;
 
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperServer;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -32,7 +32,7 @@ public record InvitePlayerPayload(UUID invited, boolean remove) implements Custo
     public void handle(IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer sp)
-                ResearchTeamHelper.handleSendInviteToPlayer(sp, this.invited(), this.remove());
+                ResearchTeamHelperServer.handleSendInviteToPlayer(sp, this.invited(), this.remove());
         }).exceptionally(e -> {
             Researchd.LOGGER.error("Failed to handle InvitePlayerPayload", e);
             context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));

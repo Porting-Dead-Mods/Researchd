@@ -22,6 +22,7 @@ public class TeamResearchEffectSavedData extends SavedData {
 
     public TeamResearchEffectSavedData(TeamResearchEffectDataMap map) {
         this.map = map;
+        this.map.setOnChangedFunction(this::setDirty);
     }
 
     public static TeamResearchEffectDataMap getData(ServerLevel level) {

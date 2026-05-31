@@ -3,7 +3,7 @@ package com.portingdeadmods.researchd.content.commands;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
-import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperServer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -18,7 +18,7 @@ public class DebugCommands {
                 .then(Commands.literal("teams-dump")
                         .executes(context -> {
                             CommandSourceStack source = context.getSource();
-                            source.sendSystemMessage(ResearchTeamHelper.getFormattedDump(source.getLevel()));
+                            source.sendSystemMessage(ResearchTeamHelperServer.getFormattedDump(source.getLevel()));
                             return 1;
                         }))
                 .then(Commands.literal("data-dump")

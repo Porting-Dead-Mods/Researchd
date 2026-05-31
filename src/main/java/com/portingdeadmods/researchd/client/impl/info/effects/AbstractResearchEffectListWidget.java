@@ -4,7 +4,7 @@ import com.portingdeadmods.researchd.ResearchdClient;
 import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidget;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectList;
-import com.portingdeadmods.researchd.utils.WidgetConstructor;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.WidgetConstructor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;

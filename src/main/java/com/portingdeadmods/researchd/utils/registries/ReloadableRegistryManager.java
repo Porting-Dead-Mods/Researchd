@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.utils.researches;
+package com.portingdeadmods.researchd.utils.registries;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;

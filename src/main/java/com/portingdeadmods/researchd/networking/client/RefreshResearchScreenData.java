@@ -1,7 +1,7 @@
 package com.portingdeadmods.researchd.networking.client;
 
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.utils.ClientResearchTeamHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -29,9 +29,9 @@ public record RefreshResearchScreenData(boolean graphData, boolean techListData,
 
 	public void handle(IPayloadContext context) {
 		context.enqueueWork(() -> {
-			if (graphData) ClientResearchTeamHelper.refreshGraphData();
-			if (techListData) ClientResearchTeamHelper.refreshTechListData();
-			if (researchQueueData) ClientResearchTeamHelper.refreshResearchQueueData();
+			if (graphData) ResearchTeamHelperClient.refreshGraphData();
+			if (techListData) ResearchTeamHelperClient.refreshTechListData();
+			if (researchQueueData) ResearchTeamHelperClient.refreshResearchQueueData();
 		}).exceptionally(err -> {
 			Researchd.LOGGER.error("Failed to handle RefreshResearchScreenData", err);
 			return null;

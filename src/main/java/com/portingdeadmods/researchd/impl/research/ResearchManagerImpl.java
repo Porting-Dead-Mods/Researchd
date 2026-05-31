@@ -7,7 +7,7 @@ import com.portingdeadmods.researchd.api.research.ResearchManager;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchPage;
 import com.portingdeadmods.researchd.api.research.ResearchRelations;
-import com.portingdeadmods.researchd.utils.researches.ResearchdManagers;
+import com.portingdeadmods.researchd.utils.registries.ResearchdManagers;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;

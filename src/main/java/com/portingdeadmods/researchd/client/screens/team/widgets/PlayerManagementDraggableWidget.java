@@ -6,7 +6,7 @@ import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.team.TeamMember;
 import com.portingdeadmods.researchd.client.screens.team.ResearchTeamScreen;
-import com.portingdeadmods.researchd.utils.ClientResearchTeamHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -153,7 +153,7 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
 
     private void onOkPress(Button btn) {
         this.popupWidget.visible = false;
-        ClientResearchTeamHelper.transferOwnershipSynced(this.popupWidget.nextOwner);
+        ResearchTeamHelperClient.transferOwnershipSynced(this.popupWidget.nextOwner);
         Minecraft.getInstance().setScreen(new ResearchTeamScreen());
     }
 

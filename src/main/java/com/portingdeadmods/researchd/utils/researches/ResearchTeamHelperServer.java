@@ -36,7 +36,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Consumer;
 
-public final class ResearchTeamHelper {
+public final class ResearchTeamHelperServer {
     /**
      * Get the team that a specified player is a member of
      *
@@ -45,7 +45,7 @@ public final class ResearchTeamHelper {
      */
     public static @NotNull ResearchTeam getTeamByMember(@NotNull Player player) {
         ResearchTeamManager teamManager = ResearchdApi.getTeamManager(player.level());
-        return teamManager.getTeamById(player.getUUID());
+        return teamManager.getTeamByPlayerId(player.getUUID());
     }
 
     /**
@@ -131,7 +131,7 @@ public final class ResearchTeamHelper {
 
         // Alone in team -> Enter the new team | TODO: Add Invite Syncs from FTB Teams for the sake of compat. Currently it should work without
         if (team != null && ((team.getSocialManager().containsSentInvite(requesterId)) || ResearchdCompatHandler.isFTBTeamsEnabled())) {
-            ResearchTeamHelper.handleLeaveTeam(requester);
+            ResearchTeamHelperServer.handleLeaveTeam(requester);
 
             teamManager.addTeam(team);
             if (!ResearchdCompatHandler.isFTBTeamsEnabled())
@@ -221,7 +221,7 @@ public final class ResearchTeamHelper {
     }
 
     public static void handleLeaveTeam(@NotNull ServerPlayer requester) {
-        ResearchTeamHelper.handleLeaveTeam(requester, PlayerUtils.EmptyUUID);
+        ResearchTeamHelperServer.handleLeaveTeam(requester, PlayerUtils.EmptyUUID);
     }
 
     public static void handleManageMember(@NotNull ServerPlayer requester, UUID member, boolean remove) {
@@ -281,7 +281,6 @@ public final class ResearchTeamHelper {
     public static void handleManageModerator(@NotNull ServerPlayer requester, UUID moderator, boolean remove) {
         MinecraftServer server = requester.getServer();
         ServerLevel level = server.overworld();
-        ResearchTeamMap teamManager = (ResearchTeamMap) ResearchdApi.getTeamManager(level);
 
         // Error Safety (handling yourself)
         if (requester.getUUID().equals(moderator)) {

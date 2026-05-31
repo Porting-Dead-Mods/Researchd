@@ -1,8 +1,7 @@
-package com.portingdeadmods.researchd.resources;
+package com.portingdeadmods.researchd.utils.registries;
 
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
-import com.portingdeadmods.researchd.utils.researches.ReloadableRegistryManager;
 
 public interface RegistryManagersGetter {
     ReloadableRegistryManager<Research> researchd$getResearchesManager();

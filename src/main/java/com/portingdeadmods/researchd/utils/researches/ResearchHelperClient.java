@@ -1,29 +1,21 @@
 package com.portingdeadmods.researchd.utils.researches;
 
-import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdClient;
 import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.*;
-import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
-import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.impl.research.ResearchManagerImpl;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
-import com.portingdeadmods.researchd.utils.ClientResearchTeamHelper;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
-import com.portingdeadmods.researchd.impl.team.ResearchTeamImpl;
 import com.portingdeadmods.researchd.utils.SpaghettiClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.attachment.AttachmentType;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
 
 public final class ResearchHelperClient {
     public static void reloadResearches(Level level) {
@@ -32,7 +24,7 @@ public final class ResearchHelperClient {
         ResearchTeamMap data = (ResearchTeamMap) ResearchdApi.getTeamManager(level);
         if (data != null) {
             for (ResearchTeam team : data.getTeams()) {
-                ClientResearchTeamHelper.resolveInstances(team);
+                ResearchTeamHelperClient.resolveInstances(team);
             }
         }
 
@@ -40,7 +32,7 @@ public final class ResearchHelperClient {
 
         ResearchHelperClient.initIconRenderers();
         ResearchGraphCache.clearCache();
-        ClientResearchTeamHelper.refreshResearchScreenData();
+        ResearchTeamHelperClient.refreshResearchScreenData();
 
         ResearchScreen screen = SpaghettiClient.tryGetResearchScreen();
         if (screen != null) {

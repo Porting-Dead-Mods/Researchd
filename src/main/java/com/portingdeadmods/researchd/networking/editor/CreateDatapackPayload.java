@@ -7,6 +7,7 @@ import com.portingdeadmods.researchd.api.editmode.PackLocation;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.impl.editor.EditModeSettingsImpl;
 import com.portingdeadmods.researchd.resources.example.ExampleDatapackWriter;
+import com.portingdeadmods.researchd.utils.TextUtils;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -42,7 +43,7 @@ public record CreateDatapackPayload(String name, String description, String name
             Path datapackDir = context.player().getServer().getWorldPath(LevelResource.DATAPACK_DIR);
 
             ExampleDatapackWriter writer = new ExampleDatapackWriter(this.generateExamples());
-            String namespace1 = PDLConfigHelper.camelToSnake(this.name());
+            String namespace1 = TextUtils.camelToSnake(this.name());
             Result<Path, Exception> result = writer.write(datapackDir, this.name(), this.description(), namespace1);
 
             if (result instanceof Result.Ok(Path value)) {

@@ -3,12 +3,11 @@ package com.portingdeadmods.researchd.client.screens.editor.widgets.popups.categ
 import com.google.common.base.Suppliers;
 import com.portingdeadmods.researchd.compat.JEICompat;
 import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
-import com.portingdeadmods.researchd.utils.ClientEditorHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchEditorHelperClient;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.Collection;
 import java.util.function.BooleanSupplier;
@@ -17,7 +16,7 @@ import java.util.function.Supplier;
 public enum DefaultItemSelectorCategory implements ItemSelectorCategory {
     JEI(ResearchdCompatHandler::isJeiLoaded, JEICompat::getItems, Items.APPLE::getDefaultInstance, () -> Component.literal("Jei")),
     ALL(() -> true, () -> BuiltInRegistries.ITEM.stream().map(ItemStack::new).toList(), Items.COMPASS::getDefaultInstance, () -> Component.literal("All Items")),
-    INV(() -> true, () -> ClientEditorHelper.getPlayerInventory().items, Items.CHEST::getDefaultInstance, () -> Component.literal("Inventory"));
+    INV(() -> true, () -> ResearchEditorHelperClient.getPlayerInventory().items, Items.CHEST::getDefaultInstance, () -> Component.literal("Inventory"));
 
     private final BooleanSupplier exists;
     private final Supplier<Collection<ItemStack>> itemsGetter;

@@ -1,11 +1,10 @@
 package com.portingdeadmods.researchd.mixins;
 
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
 import com.portingdeadmods.researchd.impl.research.effect.data.ItemUnlockEffectData;
 import com.portingdeadmods.researchd.registries.ResearchdEffectDataTypes;
-import com.portingdeadmods.researchd.utils.researches.ResearchEffectHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchEffectHelperCommon;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CraftingContainer;
@@ -36,8 +35,8 @@ public abstract class CraftingMenuMixin {
     )
     private static ItemStack checkCraftingPredicate(ItemStack itemstack, AbstractContainerMenu menu, Level level, Player player, CraftingContainer craftSlots, ResultContainer resultSlots, RecipeHolder<CraftingRecipe> recipe) {
 
-        ItemUnlockEffectData itemData = ResearchEffectHelper.getEffectDataForPlayer(player, ResearchdEffectDataTypes.ITEM_UNLOCK);
-        RecipeUnlockEffectData recipeData = ResearchEffectHelper.getEffectDataForPlayer(player, ResearchdEffectDataTypes.RECIPE_UNLOCK);
+        ItemUnlockEffectData itemData = ResearchEffectHelperCommon.getEffectDataForPlayer(player, ResearchdEffectDataTypes.ITEM_UNLOCK);
+        RecipeUnlockEffectData recipeData = ResearchEffectHelperCommon.getEffectDataForPlayer(player, ResearchdEffectDataTypes.RECIPE_UNLOCK);
 
         CraftingInput craftinginput = craftSlots.asCraftInput();
         Optional<RecipeHolder<CraftingRecipe>> recipeHolder = level.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftinginput, level, recipe);

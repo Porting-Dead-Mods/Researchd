@@ -72,6 +72,8 @@ public record ItemUnlockEffect(Optional<ItemStack> icon, Optional<String> name, 
             TeamResearchEffectDataMap map = TeamResearchEffectSavedData.getData((ServerLevel) level);
             ItemUnlockEffectData data = map.computeIfAbsent(team.getId(), ResearchdEffectDataTypes.ITEM_UNLOCK, level);
             data.remove(this, level);
+            map.setChanged();
+            map.sync(team.getId(), data.type());
         }
     }
 

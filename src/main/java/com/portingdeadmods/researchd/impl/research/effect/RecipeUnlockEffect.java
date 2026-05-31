@@ -63,6 +63,8 @@ public record RecipeUnlockEffect(Optional<ItemStack> icon, Optional<String> name
             TeamResearchEffectDataMap map = TeamResearchEffectSavedData.getData((ServerLevel) level);
             RecipeUnlockEffectData data = map.computeIfAbsent(team.getId(), ResearchdEffectDataTypes.RECIPE_UNLOCK, level);
             data.remove(this, level);
+            map.setChanged();
+            map.sync(team.getId(), data.type());
         }
     }
 

@@ -1,6 +1,6 @@
 - Research Lab does not work without pack items in the slots
 - Research Pack consume method widget in editor looks ugly lol
-- Team screen does not render icon
+- Team screen does not render research icons
 - Cannot close item selector widgets without selecting something
 - ESC closing of popup widgets doesnt quite work for method creation widgets
 - Newly created root researches cannot be researched
@@ -8,3 +8,5 @@
 - Add research toasts
 - Research stays orange if parent is added to the queue and then deleted from the pack
 - Make all serializers records?
+- View-only team research screen if ftb teams is loaded
+- Add newly blocked entries to existing research effect data

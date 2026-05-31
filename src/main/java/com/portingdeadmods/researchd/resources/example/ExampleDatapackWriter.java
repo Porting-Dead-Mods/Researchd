@@ -11,7 +11,7 @@ import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.resources.PackWriter;
 import com.portingdeadmods.researchd.resources.contents.ResearchdResearchPacks;
 import com.portingdeadmods.researchd.resources.contents.ResearchdResearches;
-import com.portingdeadmods.researchd.utils.researches.ReloadableRegistryManager;
+import com.portingdeadmods.researchd.utils.registries.ReloadableRegistryManager;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;

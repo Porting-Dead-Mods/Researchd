@@ -8,7 +8,7 @@ import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.ScrollableWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLButton;
-import com.portingdeadmods.researchd.utils.ClientEditorHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchEditorHelperClient;
 import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.SpaghettiClient;
 import net.minecraft.client.gui.GuiGraphics;
@@ -87,7 +87,7 @@ public abstract class AbstractStandaloneCreationPopupWidget<O> extends PopupWidg
         O object = this.clientObject.create(this.layout);
         ResourceLocation id;
         if (this.previous == null) {
-            id = this.clientObject.createId(this.layout, ClientEditorHelper.getEditModeSettings().currentDatapack().namespace());
+            id = this.clientObject.createId(this.layout, ResearchEditorHelperClient.getEditModeSettings().currentDatapack().namespace());
         } else {
             id = Objects.requireNonNull(this.previousId);
         }

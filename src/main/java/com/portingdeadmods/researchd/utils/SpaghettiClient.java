@@ -27,7 +27,7 @@ public final class SpaghettiClient {
 	 * Returns the current {@link ResearchScreen} if it is open, otherwise returns null.
 	 */
 	public @Nullable static ResearchScreen tryGetResearchScreen() {
-		return Minecraft.getInstance().screen instanceof ResearchScreen ? (ResearchScreen) Minecraft.getInstance().screen : null;
+		return Minecraft.getInstance().screen instanceof ResearchScreen researchScreen ? researchScreen : null;
 	}
 
     public static Level getClientLevel() {

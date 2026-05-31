@@ -1,8 +1,5 @@
-package com.portingdeadmods.researchd.utils;
+package com.portingdeadmods.researchd.compat;
 
-import com.portingdeadmods.researchd.compat.EMICompat;
-import com.portingdeadmods.researchd.compat.JEICompat;
-import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 

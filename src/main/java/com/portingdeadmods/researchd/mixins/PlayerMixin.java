@@ -1,10 +1,8 @@
 package com.portingdeadmods.researchd.mixins;
 
 import com.portingdeadmods.researchd.impl.research.effect.data.DimensionUnlockEffectData;
-import com.portingdeadmods.researchd.data.ResearchdAttachments;
-import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
 import com.portingdeadmods.researchd.registries.ResearchdEffectDataTypes;
-import com.portingdeadmods.researchd.utils.researches.ResearchEffectHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchEffectHelperCommon;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -21,7 +19,7 @@ public abstract class PlayerMixin extends LivingEntity {
 
     @Override
     public boolean canChangeDimensions(Level oldLevel, Level newLevel) {
-        DimensionUnlockEffectData data = ResearchEffectHelper.getEffectDataForPlayer((Player) (Object) this, ResearchdEffectDataTypes.DIMENSION_UNLOCK);
+        DimensionUnlockEffectData data = ResearchEffectHelperCommon.getEffectDataForPlayer((Player) (Object) this, ResearchdEffectDataTypes.DIMENSION_UNLOCK);
         return super.canChangeDimensions(oldLevel, newLevel)
                 && (!data.blockedDimensions().contains(newLevel.dimensionTypeRegistration().getKey()) || this.isCreative());
     }

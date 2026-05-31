@@ -1,7 +1,6 @@
 package com.portingdeadmods.researchd.utils.researches;
 
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
-import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.*;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
@@ -10,27 +9,19 @@ import com.portingdeadmods.researchd.api.research.effects.ResearchEffectList;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.research.ResearchRelations;
-import com.portingdeadmods.researchd.impl.research.effect.data.DimensionUnlockEffectData;
-import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
-import com.portingdeadmods.researchd.impl.research.effect.data.ItemUnlockEffectData;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamImpl;
-import com.portingdeadmods.researchd.utils.TimeDifference;
+import com.portingdeadmods.researchd.utils.NumberUtils;
+import com.portingdeadmods.researchd.utils.registries.ResearchdManagers;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.dimension.DimensionType;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 import java.util.*;
-import java.util.function.Supplier;
 
 public final class ResearchHelperCommon {
     public static <T extends ResearchEffect> Collection<T> getResearchEffects(Class<T> clazz, Level level) {
@@ -149,7 +140,7 @@ public final class ResearchHelperCommon {
     }
 
     public static String getResearchCompletionTime(long teamCreationTime, long time) {
-        return new TimeDifference(teamCreationTime, time).getFormatted();
+        return NumberUtils.getTimeDifferenceFormatted(teamCreationTime, time);
     }
 
     public static ResearchPack getResearchPack(ResourceKey<ResearchPack> key, Level level) {

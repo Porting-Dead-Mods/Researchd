@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.networking.registries;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.utils.researches.ResearchdManagers;
+import com.portingdeadmods.researchd.utils.registries.ResearchdManagers;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;

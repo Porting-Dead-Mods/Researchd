@@ -30,10 +30,4 @@ public interface ResearchEffectData<T extends ResearchEffect> {
 
     ResearchEffectDataType<? extends ResearchEffectData<T>> type();
 
-    static <T extends ResearchEffectData<?>> T create(Supplier<T> factory, Level level) {
-        T data = factory.get();
-        data.initDefault(level);
-        return data;
-    }
-
 }

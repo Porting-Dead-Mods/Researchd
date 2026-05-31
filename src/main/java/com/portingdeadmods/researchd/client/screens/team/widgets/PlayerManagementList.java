@@ -6,7 +6,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.ContainerWidget;
 import com.portingdeadmods.researchd.api.team.ResearchTeamRole;
 import com.portingdeadmods.researchd.api.team.TeamMember;
-import com.portingdeadmods.researchd.utils.ClientResearchTeamHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -24,7 +24,7 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
     private final AbstractWidget parent;
 
 	private boolean shouldAddButton(Entry item, PlayerManagementDraggableWidget.PlayerManagementButtonType type) {
-		ResearchTeamRole clientRole = ClientResearchTeamHelper.getRole();
+		ResearchTeamRole clientRole = ResearchTeamHelperClient.getRole();
 		ResearchTeamRole targetRole = item.teamMember.role();
 
 		return switch (type) {
@@ -50,10 +50,10 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
 
                     this.buttonWidgets.get(item).add(new DraggableWidgetImageButton(0, 0, 12, 12, entry.getValue(), btn -> {
                         switch (entry.getKey()) {
-                            case PROMOTE -> ClientResearchTeamHelper.promoteTeamMemberSynced(item.teamMember());
-                            case DEMOTE -> ClientResearchTeamHelper.demoteTeamMemberSynced(item.teamMember());
-                            case REMOVE -> ClientResearchTeamHelper.removeTeamMemberSynced(item.teamMember());
-                            case INVITE_PLAYER -> ClientResearchTeamHelper.sendTeamInviteSynced(item.teamMember());
+                            case PROMOTE -> ResearchTeamHelperClient.promoteTeamMemberSynced(item.teamMember());
+                            case DEMOTE -> ResearchTeamHelperClient.demoteTeamMemberSynced(item.teamMember());
+                            case REMOVE -> ResearchTeamHelperClient.removeTeamMemberSynced(item.teamMember());
+                            case INVITE_PLAYER -> ResearchTeamHelperClient.sendTeamInviteSynced(item.teamMember());
                             case TRANSFER_OWNERSHIP -> {
                                 if (this.parent instanceof PlayerManagementDraggableWidget widget) {
                                     widget.openPopupWidget(item.teamMember());
@@ -137,7 +137,7 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
     }
 
 	private void resort() {
-		this.sortEntriesBy(Comparator.comparing(entry -> ClientResearchTeamHelper.getPlayerRole(entry.teamMember().player()).getPermissionLevel(), Comparator.reverseOrder()));
+		this.sortEntriesBy(Comparator.comparing(entry -> ResearchTeamHelperClient.getPlayerRole(entry.teamMember().player()).getPermissionLevel(), Comparator.reverseOrder()));
 	}
 
     public void refreshEntries(Collection<PlayerManagementList.Entry> newEntries) {
@@ -152,10 +152,10 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
                     if (!this.shouldAddButton(item, entry.getKey())) continue;
                     this.buttonWidgets.get(item).add(new DraggableWidgetImageButton(0, 0, 12, 12, entry.getValue(), btn -> {
                         switch (entry.getKey()) {
-                            case PROMOTE -> ClientResearchTeamHelper.promoteTeamMemberSynced(item.teamMember());
-                            case DEMOTE -> ClientResearchTeamHelper.demoteTeamMemberSynced(item.teamMember());
-                            case REMOVE -> ClientResearchTeamHelper.removeTeamMemberSynced(item.teamMember());
-                            case INVITE_PLAYER -> ClientResearchTeamHelper.sendTeamInviteSynced(item.teamMember());
+                            case PROMOTE -> ResearchTeamHelperClient.promoteTeamMemberSynced(item.teamMember());
+                            case DEMOTE -> ResearchTeamHelperClient.demoteTeamMemberSynced(item.teamMember());
+                            case REMOVE -> ResearchTeamHelperClient.removeTeamMemberSynced(item.teamMember());
+                            case INVITE_PLAYER -> ResearchTeamHelperClient.sendTeamInviteSynced(item.teamMember());
                             case TRANSFER_OWNERSHIP -> {
                                 if (this.parent instanceof PlayerManagementDraggableWidget widget) {
                                     widget.openPopupWidget(item.teamMember());

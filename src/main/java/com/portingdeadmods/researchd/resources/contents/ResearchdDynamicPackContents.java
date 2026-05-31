@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.resources;
+package com.portingdeadmods.researchd.resources.contents;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -9,10 +9,7 @@ import com.portingdeadmods.portingdeadlibs.api.resources.DynamicPack;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
-import com.portingdeadmods.researchd.resources.contents.ResearchdLang;
-import com.portingdeadmods.researchd.resources.contents.ResearchdRecipes;
-import com.portingdeadmods.researchd.resources.contents.ResearchdResearchPacks;
-import com.portingdeadmods.researchd.resources.contents.ResearchdResearches;
+import com.portingdeadmods.researchd.resources.ResearchdDatagenProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Recipe;

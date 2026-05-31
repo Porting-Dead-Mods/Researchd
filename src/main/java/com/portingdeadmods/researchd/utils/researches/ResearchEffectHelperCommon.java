@@ -1,6 +1,5 @@
 package com.portingdeadmods.researchd.utils.researches;
 
-import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectManager;
@@ -10,10 +9,9 @@ import com.portingdeadmods.researchd.api.team.ResearchTeamManager;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.UUID;
 import java.util.function.Supplier;
 
-public class ResearchEffectHelper {
+public final class ResearchEffectHelperCommon {
     public static <T extends ResearchEffectData<?>> @Nullable T getEffectDataForPlayer(Player player, ResearchEffectDataType<T> type) {
         ResearchTeamManager teamManager = ResearchdApi.getTeamManager(player.level());
         ResearchEffectManager researchEffectManager = ResearchdApi.getResearchEffectManager(player.level());
@@ -23,6 +21,6 @@ public class ResearchEffectHelper {
     }
 
     public static <T extends ResearchEffectData<?>> @Nullable T getEffectDataForPlayer(Player player, Supplier<ResearchEffectDataType<T>> type) {
-        return ResearchEffectHelper.getEffectDataForPlayer(player, type.get());
+        return ResearchEffectHelperCommon.getEffectDataForPlayer(player, type.get());
     }
 }

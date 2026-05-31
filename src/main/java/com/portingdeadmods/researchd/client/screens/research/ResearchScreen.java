@@ -11,7 +11,6 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchInteractionType;
 import com.portingdeadmods.researchd.api.research.ResearchPage;
-import com.portingdeadmods.researchd.impl.research.ResearchManagerImpl;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.dropdowns.GraphDropDownWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.EditorSideBarWidget;
@@ -22,7 +21,7 @@ import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
 import com.portingdeadmods.researchd.client.screens.research.widgets.*;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
-import com.portingdeadmods.researchd.utils.ClientEditorHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchEditorHelperClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
@@ -273,7 +272,7 @@ public class ResearchScreen extends AbstractResearchScreen {
     }
 
     private boolean isEditorConfigured() {
-        return ClientEditorHelper.getEditModeSettings().isConfigured();
+        return ResearchEditorHelperClient.getEditModeSettings().isConfigured();
     }
 
     public ResearchGraphWidget getResearchGraphWidget() {

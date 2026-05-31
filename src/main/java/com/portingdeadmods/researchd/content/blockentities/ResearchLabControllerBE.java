@@ -18,7 +18,6 @@ import com.portingdeadmods.researchd.impl.ResearchProgress;
 import com.portingdeadmods.researchd.registries.ResearchdBlockEntityTypes;
 import com.portingdeadmods.researchd.data.ResearchdDataComponents;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
-import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;

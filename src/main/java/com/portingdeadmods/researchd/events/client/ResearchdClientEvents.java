@@ -3,17 +3,14 @@ package com.portingdeadmods.researchd.events.client;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.RegistryDisplay;
-import com.portingdeadmods.researchd.api.research.effects.ResearchEffectManager;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
-import com.portingdeadmods.researchd.api.team.ResearchTeamManager;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
-import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.impl.research.effect.data.ItemUnlockEffectData;
 import com.portingdeadmods.researchd.data.ResearchdDataComponents;
 import com.portingdeadmods.researchd.registries.ResearchdEffectDataTypes;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
-import com.portingdeadmods.researchd.utils.researches.ResearchEffectHelper;
+import com.portingdeadmods.researchd.utils.researches.ResearchEffectHelperCommon;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -28,7 +25,6 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @EventBusSubscriber(modid = Researchd.MODID, value = Dist.CLIENT)
 public final class ResearchdClientEvents {
@@ -54,7 +50,7 @@ public final class ResearchdClientEvents {
         LocalPlayer player = (LocalPlayer) event.getEntity();
         ItemStack itemStack = event.getItemStack();
 
-        ItemUnlockEffectData itemData = ResearchEffectHelper.getEffectDataForPlayer(player, ResearchdEffectDataTypes.ITEM_UNLOCK);
+        ItemUnlockEffectData itemData = ResearchEffectHelperCommon.getEffectDataForPlayer(player, ResearchdEffectDataTypes.ITEM_UNLOCK);
 
         if (itemData != null && itemData.isBlocked(itemStack.getItem())) {
             event.getToolTip().add(Component.empty()); // Add a blank line for spacing

@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.utils;
+package com.portingdeadmods.researchd.utils.researches;
 
 import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
 import com.portingdeadmods.portingdeadlibs.utils.PlayerUtils;
@@ -21,7 +21,6 @@ import com.portingdeadmods.researchd.client.screens.team.widgets.PlayerManagemen
 import com.portingdeadmods.researchd.client.screens.team.widgets.TeamMembersList;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamImpl;
 import com.portingdeadmods.researchd.networking.team.*;
-import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceKey;
@@ -31,10 +30,10 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.*;
 
-public class ClientResearchTeamHelper {
+public final class ResearchTeamHelperClient {
     public static ResearchTeam getTeam() {
         LocalPlayer player = Minecraft.getInstance().player;
-        return ResearchTeamHelper.getTeamByMember(player);
+        return ResearchTeamHelperServer.getTeamByMember(player);
     }
 
     public static ResearchTeam getTeam(UUID uuid) {
@@ -186,12 +185,12 @@ public class ClientResearchTeamHelper {
 			PlayerManagementDraggableWidget inviteWidget = screen.getInviteWidget();
 			if (inviteWidget != null && !inviteWidget.getManagementList().getItems().isEmpty()) {
 				List<PlayerManagementList.Entry> entries = new ArrayList<>();
-				ClientResearchTeamHelper.getPlayersNotInTeam().forEach(member -> entries.add(new PlayerManagementList.Entry(member, inviteWidget.getManagementList().getItems().stream().findFirst().get().buttonSettings())));
+				ResearchTeamHelperClient.getPlayersNotInTeam().forEach(member -> entries.add(new PlayerManagementList.Entry(member, inviteWidget.getManagementList().getItems().stream().findFirst().get().buttonSettings())));
 				inviteWidget.getManagementList().refreshEntries(entries);
 			}
 			TeamMembersList teamMembersList = screen.getTeamMembersList();
 			teamMembersList.getItems().clear();
-			teamMembersList.getItems().addAll(ClientResearchTeamHelper.getTeamMembers());
+			teamMembersList.getItems().addAll(ResearchTeamHelperClient.getTeamMembers());
 			teamMembersList.resort();
             System.out.println(teamMembersList.getItems().size());
 		}
@@ -202,13 +201,13 @@ public class ClientResearchTeamHelper {
 			PlayerManagementDraggableWidget playerManagementWindow = screen.getPlayerManagementWindow();
 			if (playerManagementWindow != null && !playerManagementWindow.getManagementList().getItems().isEmpty()) {
 				List<PlayerManagementList.Entry> entries = new ArrayList<>();
-				ClientResearchTeamHelper.getTeamMembers().forEach(member -> entries.add(new PlayerManagementList.Entry(member, playerManagementWindow.getManagementList().getItems().stream().findFirst().get().buttonSettings())));
+				ResearchTeamHelperClient.getTeamMembers().forEach(member -> entries.add(new PlayerManagementList.Entry(member, playerManagementWindow.getManagementList().getItems().stream().findFirst().get().buttonSettings())));
 				playerManagementWindow.getManagementList().refreshEntries(entries);
 			}
 			PlayerManagementDraggableWidget transferOwnershipWindow = screen.getTransferOwnershipWindow();
 			if (transferOwnershipWindow != null && !transferOwnershipWindow.getManagementList().getItems().isEmpty()) {
 				List<PlayerManagementList.Entry> entries = new ArrayList<>();
-				ClientResearchTeamHelper.getTeamMembers().forEach(member -> entries.add(new PlayerManagementList.Entry(member, transferOwnershipWindow.getManagementList().getItems().stream().findFirst().get().buttonSettings())));
+				ResearchTeamHelperClient.getTeamMembers().forEach(member -> entries.add(new PlayerManagementList.Entry(member, transferOwnershipWindow.getManagementList().getItems().stream().findFirst().get().buttonSettings())));
 				transferOwnershipWindow.getManagementList().refreshEntries(entries);
 			}
 		}

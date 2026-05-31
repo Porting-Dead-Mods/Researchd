@@ -1,4 +1,4 @@
-package com.portingdeadmods.researchd.utils;
+package com.portingdeadmods.researchd.impl.team;
 
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.ResearchTeamManager;

@@ -5,7 +5,7 @@ import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.data.ResearchdDataComponents;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
-import com.portingdeadmods.researchd.resources.RegistryManagersGetter;
+import com.portingdeadmods.researchd.utils.registries.RegistryManagersGetter;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
