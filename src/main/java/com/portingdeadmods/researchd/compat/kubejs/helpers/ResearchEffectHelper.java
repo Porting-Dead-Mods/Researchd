@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ResearchEffectHelper {
@@ -78,9 +79,7 @@ public class ResearchEffectHelper {
     
     public static ResearchEffect and(ResearchEffect... effects) {
         List<ResearchEffect> list = new ArrayList<>();
-        for (ResearchEffect effect : effects) {
-            list.add(effect);
-        }
+        Collections.addAll(list, effects);
         return new AndResearchEffect(list);
     }
     

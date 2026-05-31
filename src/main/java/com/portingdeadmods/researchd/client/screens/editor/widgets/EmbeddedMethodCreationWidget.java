@@ -19,7 +19,7 @@ import org.lwjgl.glfw.GLFW;
 // The base widget that can be embedded and used as a button
 public class EmbeddedMethodCreationWidget extends AbstractWidget {
     private ResearchMethodParentSelectionPopupWidget methodTypePopupWidget;
-    private @Nullable PopupWidget parentPopupWidget;
+    private final @Nullable PopupWidget parentPopupWidget;
     private @Nullable ResearchMethod createdMethod;
     private @Nullable AbstractResearchInfoWidget<? extends ResearchMethod> createdMethodInfoWidget;
     private Runnable responder;

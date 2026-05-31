@@ -88,7 +88,7 @@ public class ScrollableWidget<L extends Layout> extends AbstractLayoutWidget<L> 
             int  maxScrollOffset = this.getContentHeight() - this.getHeight() + 1;
             if (rawScrollOffset > maxScrollOffset) {
                 this.scrollOffset = maxScrollOffset;
-                this.layout.setY((int) (initialY - maxScrollOffset));
+                this.layout.setY(initialY - maxScrollOffset);
             } else {
                 this.scrollOffset = (int) rawScrollOffset;
                 this.layout.setY((int) (this.layout.getY() + scrollY * 7));

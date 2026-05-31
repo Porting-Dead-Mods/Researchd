@@ -49,12 +49,12 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
         @Override
         public int getContentLength() {
             return SLOT_WIDTH * ResearchHelperClient.getResearchPacks().size();
-        };
+        }
 
         @Override
         public int getVisibleContentLength() {
             return 164;
-        };
+        }
 
         @Override
         public void onScroll() {
@@ -151,7 +151,7 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
             int k2 = this.snapbackEnd.y - this.snapbackStartY;
             int j1 = this.snapbackStartX + (int)((float)j2 * f);
             int k1 = this.snapbackStartY + (int)((float)k2 * f);
-            this.renderFloatingItem(guiGraphics, this.snapbackItem, j1, k1, (String)null);
+            this.renderFloatingItem(guiGraphics, this.snapbackItem, j1, k1, null);
         }
 
         guiGraphics.pose().popPose();

@@ -121,7 +121,7 @@ public class ResearchGraphWidget extends AbstractWidget {
                 Point inPt = inputHead.getConnectionPoint();
 
                 long key = GraphLayoutManager.edgeKey(parent, child);
-                Map<Integer, Integer> zoneAssignments = layoutResult.edgeChannelAssignments.get(key);
+                Map<Integer, Integer> zoneAssignments = layoutResult.edgeChannelAssignments().get(key);
 
                 ResearchLine line;
                 if (zoneAssignments == null || zoneAssignments.isEmpty()) {
@@ -156,7 +156,7 @@ public class ResearchGraphWidget extends AbstractWidget {
 
             if (channelIndex != null) {
                 // This edge has a horizontal segment in this zone
-                int channelY = layoutResult.zoneBaseY[zone] + channelIndex * CHANNEL_SIZE;
+                int channelY = layoutResult.zoneBaseY()[zone] + channelIndex * CHANNEL_SIZE;
 
                 // Vertical down to channel
                 line.then(currentX, channelY);
@@ -391,11 +391,11 @@ public class ResearchGraphWidget extends AbstractWidget {
 
         // Update zone base Y positions if we have layout result
         if (this.layoutResult != null) {
-            for (int i = 0; i < this.layoutResult.zoneBaseY.length; i++) {
-                this.layoutResult.zoneBaseY[i] += dy;
+            for (int i = 0; i < this.layoutResult.zoneBaseY().length; i++) {
+                this.layoutResult.zoneBaseY()[i] += dy;
             }
-            for (int i = 0; i < this.layoutResult.layerY.length; i++) {
-                this.layoutResult.layerY[i] += dy;
+            for (int i = 0; i < this.layoutResult.layerY().length; i++) {
+                this.layoutResult.layerY()[i] += dy;
             }
         }
     }

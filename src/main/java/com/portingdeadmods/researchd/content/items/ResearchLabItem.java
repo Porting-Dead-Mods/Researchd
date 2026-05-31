@@ -55,9 +55,9 @@ public class ResearchLabItem extends GhostControllerItem {
 			if (player != null && !level.isClientSide())
 				player.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Errors.NO_RESEARCH_PACKS_PRESENT));
 			return false;
-		};
+		}
 
-		return super.canPlace(context, state);
+        return super.canPlace(context, state);
 	}
 
 	@Override

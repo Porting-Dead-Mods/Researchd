@@ -58,28 +58,16 @@ public class GraphLayoutManager {
 
 	/**
 	 * Result of layout computation. Consumed by the edge router.
+	 *
+	 * @param layers                 Ordered nodes per layer (index = layer number).
+	 * @param layerY                 Y position of each layer's nodes.
+	 * @param channelsPerZone        Number of routing channels between layer i and layer i+1. Index i corresponds to zone between layer i and i+1.
+	 * @param zoneBaseY              Y position of channel 0 in each routing zone. Channels go downward: channelY = zoneBaseY[i] + channelIndex * CHANNEL_PITCH.
+	 * @param edgeChannelAssignments For each edge (parent→child), which channel it's assigned in each routing zone it passes through.
+	 *                               Key = edgeKey(parent, child), Value = map from zone index to channel index.
 	 */
-	public static class LayoutResult {
-		/** Ordered nodes per layer (index = layer number). */
-		public final List<List<ResearchNode>> layers;
-		/** Y position of each layer's nodes. */
-		public final int[] layerY;
-		/** Number of routing channels between layer i and layer i+1. Index i corresponds to zone between layer i and i+1. */
-		public final int[] channelsPerZone;
-		/** Y position of channel 0 in each routing zone. Channels go downward: channelY = zoneBaseY[i] + channelIndex * CHANNEL_PITCH. */
-		public final int[] zoneBaseY;
-
-		/** For each edge (parent→child), which channel it's assigned in each routing zone it passes through.
-		 *  Key = edgeKey(parent, child), Value = map from zone index to channel index. */
-		public final Map<Long, Map<Integer, Integer>> edgeChannelAssignments;
-
-		public LayoutResult(List<List<ResearchNode>> layers, int[] layerY, int[] channelsPerZone, int[] zoneBaseY, Map<Long, Map<Integer, Integer>> edgeChannelAssignments) {
-			this.layers = layers;
-			this.layerY = layerY;
-			this.channelsPerZone = channelsPerZone;
-			this.zoneBaseY = zoneBaseY;
-			this.edgeChannelAssignments = edgeChannelAssignments;
-		}
+		public record LayoutResult(List<List<ResearchNode>> layers, int[] layerY, int[] channelsPerZone, int[] zoneBaseY,
+		                           Map<Long, Map<Integer, Integer>> edgeChannelAssignments) {
 	}
 
 	/**
