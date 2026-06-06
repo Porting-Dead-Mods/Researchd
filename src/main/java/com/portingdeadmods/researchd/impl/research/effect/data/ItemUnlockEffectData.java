@@ -54,16 +54,6 @@ public record ItemUnlockEffectData(UniqueArray<ResourceKey<Item>> blockedItems) 
     }
 
     @Override
-    public void initDefault(Level level) {
-        Collection<ItemUnlockEffect> unlockItemEffects = ResearchHelperCommon.getResearchEffects(ItemUnlockEffect.class, level);
-
-        for (ItemUnlockEffect effect : unlockItemEffects) {
-            this.blockedItems.add(effect.getItemKey());
-        }
-
-    }
-
-    @Override
     public UniqueArray<ResourceKey<Item>> getAll() {
         return this.blockedItems();
     }

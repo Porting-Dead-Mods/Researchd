@@ -15,7 +15,7 @@ public final class ResearchdCompatHandler {
 	public static boolean isFTBTeamsLoaded() { return ModList.get().isLoaded("ftbteams"); }
 
 	public static boolean isFTBTeamsEnabled() {
-		return isFTBTeamsLoaded() && ResearchdConfig.Common.useFTBTeams;
+		return isFTBTeamsLoaded() && ResearchdConfig.Server.useFTBTeams;
 	}
 
     public static boolean isEmiLoaded() {

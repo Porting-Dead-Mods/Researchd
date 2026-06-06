@@ -7,6 +7,8 @@ import com.portingdeadmods.researchd.networking.registries.UpdateResearchPacksPa
 import com.portingdeadmods.researchd.networking.registries.UpdateResearchesPayload;
 import com.portingdeadmods.researchd.networking.research.ResearchReloadPayload;
 import com.portingdeadmods.researchd.networking.team.manager.SyncTeamDataPayload;
+import com.portingdeadmods.researchd.networking.team.manager.SyncTeamEffectDataPayload;
+import com.portingdeadmods.researchd.data.saved.TeamResearchEffectSavedData;
 import com.portingdeadmods.researchd.utils.registries.ResearchdManagers;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -30,8 +32,10 @@ public final class ResearchHelperServer {
         // TODO: Remove old researches from teams in cases ones were removed
         ResearchTeamHelperServer.cleanupTeamResearches(teamMap, overworld);
         ResearchTeamHelperServer.initializeTeamResearches(teamMap, overworld);
+        ResearchTeamHelperServer.reinitializeAllTeamEffects(teamMap, overworld);
         teamMap.setChanged();
         PacketDistributor.sendToAllPlayers(new SyncTeamDataPayload(teamMap));
+        PacketDistributor.sendToAllPlayers(new SyncTeamEffectDataPayload(TeamResearchEffectSavedData.getData(overworld)));
 
         if (player != null) {
             syncReloadableRegistries(player);

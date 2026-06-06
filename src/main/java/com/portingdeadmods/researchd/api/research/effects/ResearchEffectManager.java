@@ -21,6 +21,9 @@ public interface ResearchEffectManager {
         return this.computeIfAbsent(teamId, type.get(), level);
     }
 
+    /** Removes all effect data entries for the given team. Used when reinitializing on reload. */
+    void clearTeam(UUID teamId);
+
     void setChanged();
 
     <T extends ResearchEffectData<?>> void sync(UUID teamId, ResearchEffectDataType<T> type);

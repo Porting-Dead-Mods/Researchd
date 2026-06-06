@@ -108,6 +108,13 @@ public interface ResearchTeam {
         this.onCompleteResearch(research, completionTime, false, playerGetter);
     }
 
+    /**
+     * Inverse of {@link #onCompleteResearch}: flips the research back to non-completed,
+     * fires {@link com.portingdeadmods.researchd.api.research.effects.ResearchEffect#onLock onLock}
+     * to reverse the effect, and syncs the team.
+     */
+    void onRemoveResearch(ResourceKey<Research> research, Function<UUID, Player> playerGetter);
+
     void refreshResearchStatus();
 
 }

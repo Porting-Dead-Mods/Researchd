@@ -5,12 +5,9 @@ import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.RegistryDisplay;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
-import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
-import com.portingdeadmods.researchd.impl.research.effect.data.ItemUnlockEffectData;
 import com.portingdeadmods.researchd.data.ResearchdDataComponents;
+import com.portingdeadmods.researchd.impl.research.effect.data.ItemUnlockEffectData;
 import com.portingdeadmods.researchd.registries.ResearchdEffectDataTypes;
-import com.portingdeadmods.researchd.translations.ResearchdTranslations;
-import com.portingdeadmods.researchd.utils.researches.ResearchEffectHelperCommon;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -35,12 +32,7 @@ public final class ResearchdClientEvents {
         }
 
         if (ResearchdKeybinds.OPEN_RESEARCH_TEAM_SCREEN.get().consumeClick()) {
-            if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
-                // TODO: Open ftb team screen?
-                Minecraft.getInstance().player.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
-            } else {
-                ResearchdApi.openTeamScreen();
-            }
+            ResearchdApi.openTeamScreen();
         }
     }
 
@@ -50,7 +42,7 @@ public final class ResearchdClientEvents {
         LocalPlayer player = (LocalPlayer) event.getEntity();
         ItemStack itemStack = event.getItemStack();
 
-        ItemUnlockEffectData itemData = ResearchEffectHelperCommon.getEffectDataForPlayer(player, ResearchdEffectDataTypes.ITEM_UNLOCK);
+        ItemUnlockEffectData itemData = ResearchdApi.getEffectDataForPlayer(player, ResearchdEffectDataTypes.ITEM_UNLOCK);
 
         if (itemData != null && itemData.isBlocked(itemStack.getItem())) {
             event.getToolTip().add(Component.empty()); // Add a blank line for spacing

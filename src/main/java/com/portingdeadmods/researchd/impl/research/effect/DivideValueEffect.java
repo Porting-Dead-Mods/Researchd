@@ -50,6 +50,14 @@ public record DivideValueEffect(ValueEffect value, float amount) implements Valu
     }
 
     @Override
+    public void onLock(Level level, ResearchTeam team, ResourceKey<Research> research) {
+        if (team instanceof ValueEffectsHolder effectsHolder) {
+            float oldValue = effectsHolder.getEffectValue(value);
+            effectsHolder.setEffectValue(value, oldValue * this.amount());
+        }
+    }
+
+    @Override
     public Component desc() {
         return makeDescription("Divide");
     }

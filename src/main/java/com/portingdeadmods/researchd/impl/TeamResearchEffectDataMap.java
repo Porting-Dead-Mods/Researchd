@@ -80,14 +80,15 @@ public class TeamResearchEffectDataMap implements ResearchEffectManager, SavedDa
     public <T extends ResearchEffectData<?>> @Nullable T computeIfAbsent(UUID teamId, ResearchEffectDataType<T> type, Level level) {
         return (T) this.map
                 .computeIfAbsent(teamId, k -> new HashMap<>())
-                .computeIfAbsent(type, k -> {
-                    ResearchEffectData<?> data = k.create();
-                    data.initDefault(level);
-                    return data;
-                });
+                .computeIfAbsent(type, k -> k.create());
     }
 
     public void setEffectData(UUID teamId, ResearchEffectData<?> effectData) {
         this.map.computeIfAbsent(teamId, k -> new HashMap<>()).put(effectData.type(), effectData);
+    }
+
+    @Override
+    public void clearTeam(UUID teamId) {
+        this.map.remove(teamId);
     }
 }

@@ -1,14 +1,16 @@
 package com.portingdeadmods.researchd.client.screens.team;
 
+import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.client.screens.team.widgets.PlayerManagementDraggableWidget;
 import com.portingdeadmods.researchd.client.screens.team.widgets.RecentResearchesList;
 import com.portingdeadmods.researchd.client.screens.team.widgets.TeamMembersList;
-import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
+import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperServer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -77,7 +79,7 @@ public class ResearchTeamScreen extends BaseTeamScreen {
             public void setFocused(boolean focused) {
                 super.setFocused(focused);
 
-                if (!focused) {
+                if (!focused && !ResearchdCompatHandler.isFTBTeamsEnabled()) {
                     ResearchTeamHelperClient.setTeamNameSynced(this.getValue());
                 }
             }
@@ -87,16 +89,21 @@ public class ResearchTeamScreen extends BaseTeamScreen {
         this.teamNameEdit.setMaxLength(32);
         this.teamNameEdit.setTextShadow(false);
         this.teamNameEdit.setBordered(false);
+        if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
+            this.teamNameEdit.setEditable(false);
+        }
 
         // Layout - Header - Buttons
         headerLayout.addChild(new SpacerElement(77, 0));
 
         this.inviteButton = new ImageButton(14, 14, INVITE_BUTTON_SPRITES, (btn) -> {
+            if (ResearchdCompatHandler.isFTBTeamsEnabled()) return;
             this.inviteWidget.setVisible(!this.inviteWidget.visible);
         }, ResearchdTranslations.component(ResearchdTranslations.Team.BUTTON_INVITE));
         headerLayout.addChild(this.inviteButton);
 
         this.settingsButton = new ImageButton(14, 14, SETTINGS_BUTTON_SPRITES, (btn) -> {
+            if (ResearchdCompatHandler.isFTBTeamsEnabled()) return;
             ResearchTeamSettingsScreen screen = new ResearchTeamSettingsScreen();
             screen.setTempTeamName(this.teamNameEdit.getValue());
             Minecraft.getInstance().setScreen(screen);
@@ -111,7 +118,7 @@ public class ResearchTeamScreen extends BaseTeamScreen {
         teamMembersLayout.addChild(new StringWidget(ResearchdTranslations.component(ResearchdTranslations.Team.TITLE_MEMBERS), this.font));
         teamMembersLayout.addChild(new SpacerElement(-1, 1));
         linearLayout.spacing(11);
-        teamMembersList = teamMembersLayout.addChild(new TeamMembersList(94, 142, 94, 22, ResearchTeamHelperClient.getTeamMembers(), false));
+        teamMembersList = teamMembersLayout.addChild(new TeamMembersList(94, 142, 94, 22, new UniqueArray<>(ResearchTeamHelperClient.getTeamMembers()), false));
 
         // Layout - Elements - Recent Researches
         linearLayout.spacing(11);
@@ -139,21 +146,32 @@ public class ResearchTeamScreen extends BaseTeamScreen {
         inviteWidget.visitWidgets(this::addRenderableOnly);
 
 		// Call visible logic on init asw since it flickers for 1 frame on screen creation
-	    this.inviteButton.active = !ResearchTeamHelperClient.getPlayersNotInTeam().isEmpty();
-	    this.inviteButton.active = this.inviteButton.active && (ResearchTeamHelperClient.getPlayerPermissionLevel(this.player) >= 1);
+	    updateHeaderButtonsActive();
+    }
+
+    private void updateHeaderButtonsActive() {
+        if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
+            this.inviteButton.active = false;
+            this.settingsButton.active = false;
+            return;
+        }
+        this.inviteButton.active = !ResearchTeamHelperClient.getPlayersNotInTeam().isEmpty()
+                && (ResearchTeamHelperClient.getPlayerPermissionLevel(this.player) >= 1);
+        this.settingsButton.active = true;
     }
 
     @Override
     public void onClose() {
         super.onClose();
 
-        ResearchTeamHelperClient.setTeamNameSynced(this.teamNameEdit.getValue());
-
+        if (!ResearchdCompatHandler.isFTBTeamsEnabled()) {
+            ResearchTeamHelperClient.setTeamNameSynced(this.teamNameEdit.getValue());
+        }
     }
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        if (this.inviteWidget.isLazyHovered()) {
+        if (!ResearchdCompatHandler.isFTBTeamsEnabled() && this.inviteWidget.isLazyHovered()) {
             return this.inviteWidget.mouseDragged(mouseX, mouseY, button, dragX, dragY);
         }
 
@@ -162,7 +180,7 @@ public class ResearchTeamScreen extends BaseTeamScreen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (this.inviteWidget.isHovered()) {
+        if (!ResearchdCompatHandler.isFTBTeamsEnabled() && this.inviteWidget.isHovered()) {
             return this.inviteWidget.mouseClicked(mouseX, mouseY, button);
         }
 
@@ -180,8 +198,7 @@ public class ResearchTeamScreen extends BaseTeamScreen {
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-	    this.inviteButton.active = !ResearchTeamHelperClient.getPlayersNotInTeam().isEmpty();
-		this.inviteButton.active = this.inviteButton.active && (ResearchTeamHelperClient.getPlayerPermissionLevel(this.player) >= 1);
+        updateHeaderButtonsActive();
 	}
 
     @Override

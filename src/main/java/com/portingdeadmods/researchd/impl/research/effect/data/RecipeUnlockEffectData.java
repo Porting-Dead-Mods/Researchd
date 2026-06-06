@@ -71,16 +71,4 @@ public record RecipeUnlockEffectData(UniqueArray<ResourceLocation> blockedRecipe
     public ResearchEffectDataType<? extends ResearchEffectData<RecipeUnlockEffect>> type() {
         return TYPE;
     }
-
-    @Override
-    public void initDefault(Level level) {
-        Collection<RecipeUnlockEffect> recipeEffects = ResearchHelperCommon.getResearchEffects(RecipeUnlockEffect.class, level);
-
-        for (RecipeUnlockEffect unlock : recipeEffects) {
-            for (RecipeHolder<?> holder : unlock.getRecipes(level)) {
-                this.blockedRecipes.add(holder.id());
-            }
-        }
-
-    }
 }

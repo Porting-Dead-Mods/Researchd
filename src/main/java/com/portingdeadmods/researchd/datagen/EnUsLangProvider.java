@@ -51,6 +51,7 @@ public final class EnUsLangProvider extends LanguageProvider {
 
         PDLConfigHelper.generateConfigNames(ResearchdConfig.Client.class, Researchd.MODID, this::add);
         PDLConfigHelper.generateConfigNames(ResearchdConfig.Common.class, Researchd.MODID, this::add);
+        PDLConfigHelper.generateConfigNames(ResearchdConfig.Server.class, Researchd.MODID, this::add);
     }
 
     private <T> void addRegistryObject(Registry<T> registry, T value, String name) {

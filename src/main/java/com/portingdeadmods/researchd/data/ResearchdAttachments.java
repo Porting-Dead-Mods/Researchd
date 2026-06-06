@@ -14,6 +14,9 @@ import java.util.function.Supplier;
 public final class ResearchdAttachments {
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENTS = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, Researchd.MODID);
 
+    // Stores the team UUID that owns the block entity (the placer's team at placement time).
+    // Legacy worlds may still hold a raw player UUID here; ResearchdApi.getOrMigratePlacedByTeam
+    // performs a silent in-place migration on first read.
     public static final Supplier<AttachmentType<UUID>> PLACED_BY_UUID = ATTACHMENTS.register("placed_by_uuid",
             () -> AttachmentType.builder(() -> UUID.fromString("00000000-0000-0000-0000-000000000000"))
                     .serialize(UUIDUtil.CODEC)

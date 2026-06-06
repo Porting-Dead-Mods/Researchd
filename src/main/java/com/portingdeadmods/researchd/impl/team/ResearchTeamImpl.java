@@ -1,32 +1,27 @@
 package com.portingdeadmods.researchd.impl.team;
 
-import com.mojang.authlib.GameProfile;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
 import com.portingdeadmods.portingdeadlibs.utils.LazyFinal;
-import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.ValueEffect;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.api.research.ResearchManager;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.api.team.*;
-import com.portingdeadmods.researchd.api.research.ResearchManager;
 import com.portingdeadmods.researchd.compat.KubeJSCompat;
-import com.portingdeadmods.researchd.data.saved.TeamSavedData;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
 import com.portingdeadmods.researchd.networking.research.ClientResearchCompletedPayload;
+import com.portingdeadmods.researchd.networking.team.manager.SyncTeamPayload;
 import com.portingdeadmods.researchd.utils.ResearchdCodecUtils;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -92,8 +87,8 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
     /**
      * Creates a Research Team with the given name and owner UUID.
      *
-     * @param uuid The Owner
-     * @param name The Name of the Team
+     * @param teamId The Owner
+     * @param teamName The Name of the Team
      */
     //private ResearchTeamImpl(UUID uuid, String name) {
     //    this(name, UUID.randomUUID(), Map.of(uuid, new TeamMember(uuid, ResearchTeamRole.OWNER)), TeamSocialManagerImpl.EMPTY, TeamResearches.EMPTY, new HashMap<>());
@@ -208,6 +203,33 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
     }
 
     @Override
+    public void onRemoveResearch(ResourceKey<Research> researchKey, Function<UUID, Player> playerGetter) {
+        ResearchInstance instance = this.getResearches().get(researchKey);
+        if (instance == null || !instance.isResearched()) return;
+
+        this.researches.setResearchUnfinished(researchKey);
+        this.setChanged();
+
+        Level level = null;
+        Research research = null;
+        for (TeamMember member : this.getMembers()) {
+            Player player = playerGetter.apply(member.player());
+            if (player == null) continue;
+
+            level = player.level();
+            if (level.isClientSide()) return;
+
+            if (research == null) {
+                research = ResearchdApi.getResearchManager().lookupResearch(researchKey, level);
+            }
+        }
+        if (level == null || research == null) return;
+
+        research.researchEffect().onLock(level, this, researchKey);
+        PacketDistributor.sendToAllPlayers(new SyncTeamPayload(this));
+    }
+
+    @Override
     public void refreshResearchStatus() {
         this.researches.refreshResearchStatus();
 
@@ -277,6 +299,12 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
     public void setEffectValue(ValueEffect effect, float value) {
         this.effects.put(ResearchdRegistries.VALUE_EFFECT.getKey(effect), value);
 
+        this.setChanged();
+    }
+
+    @Override
+    public void clearAllEffectValues() {
+        this.effects.clear();
         this.setChanged();
     }
 

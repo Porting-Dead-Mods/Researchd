@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.compat.ftbteams;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
+import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import com.portingdeadmods.researchd.data.saved.TeamSavedData;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamImpl;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
@@ -20,6 +21,7 @@ import java.util.UUID;
 public class FTBTeamsCompat {
     // Change Team also Handles Leave Team
     public static void changeTeamHandler(PlayerChangedTeamEvent event) {
+        if (!ResearchdCompatHandler.isFTBTeamsEnabled()) return;
         Researchd.debug("FTBTeamsCompat", "changeTeamHandler called");
         ServerPlayer player = event.getPlayer();
         if (player == null) {
@@ -37,6 +39,7 @@ public class FTBTeamsCompat {
     }
 
     public static void changeTeamNameHandler(TeamPropertiesChangedEvent event) {
+        if (!ResearchdCompatHandler.isFTBTeamsEnabled()) return;
         Researchd.debug("FTBTeamsCompat", "changeTeamNameHandler called");
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server == null) return;

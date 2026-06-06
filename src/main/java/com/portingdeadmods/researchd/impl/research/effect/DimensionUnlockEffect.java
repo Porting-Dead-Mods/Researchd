@@ -58,6 +58,17 @@ public record DimensionUnlockEffect(ResourceLocation dimension,
     }
 
     @Override
+    public void onLock(Level level, ResearchTeam team, ResourceKey<Research> research) {
+        if (!level.isClientSide()) {
+            TeamResearchEffectDataMap map = TeamResearchEffectSavedData.getData((ServerLevel) level);
+            DimensionUnlockEffectData data = map.computeIfAbsent(team.getId(), ResearchdEffectDataTypes.DIMENSION_UNLOCK, level);
+            data.add(this, level);
+            map.setChanged();
+            map.sync(team.getId(), data.type());
+        }
+    }
+
+    @Override
     public ResourceLocation id() {
         return ID;
     }

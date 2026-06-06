@@ -25,6 +25,10 @@ public class EmptyResearchEffect implements ResearchEffect {
     }
 
     @Override
+    public void onLock(Level level, ResearchTeam team, ResourceKey<Research> research) {
+    }
+
+    @Override
     public ResourceLocation id() {
         return ID;
     }

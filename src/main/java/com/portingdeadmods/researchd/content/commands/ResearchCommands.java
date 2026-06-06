@@ -69,11 +69,28 @@ public final class ResearchCommands {
         return 0;
     }
 
-    private static int removeAllResearches(CommandContext<CommandSourceStack> context) {
+    private static int removeAllResearches(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        CommandSourceStack source = context.getSource();
+        ResearchTeam team = ResearchdTeamArgument.get(context, "targets");
+
+        Stream<ResourceKey<Research>> researches = source.registryAccess().lookupOrThrow(ResearchdRegistries.RESEARCH_KEY).listElementIds();
+
+        researches.forEach(r -> team.onRemoveResearch(r, id -> id.equals(source.getPlayer().getUUID()) ? source.getPlayer() : null));
+
         return 0;
     }
 
-    public static int removeResearch(CommandContext<CommandSourceStack> context) {
+    public static int removeResearch(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        CommandSourceStack source = context.getSource();
+        ResearchTeam team = ResearchdTeamArgument.get(context, "targets");
+
+        ResourceOrTagArgument.Result<Research> result = ResourceOrTagArgument.getResourceOrTag(context, "research-id", ResearchdRegistries.RESEARCH_KEY);
+        List<? extends Holder<Research>> researches = result.unwrap().map(List::of, o -> o.stream().toList());
+
+        for (Holder<Research> research : researches) {
+            team.onRemoveResearch(research.getKey(), id -> id.equals(source.getPlayer().getUUID()) ? source.getPlayer() : null);
+        }
+
         return 0;
     }
 

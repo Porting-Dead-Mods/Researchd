@@ -95,4 +95,15 @@ public record TeamResearches(SimpleResearchQueue researchQueue,
         this.refreshResearchStatus();
     }
 
+    public void setResearchUnfinished(ResourceKey<Research> research) {
+        ResearchInstance instance = this.researches.get(research);
+        if (instance == null || !instance.isResearched()) return;
+
+        instance.setResearchStatus(ResearchStatus.LOCKED);
+        instance.setResearchedTime(0);
+        instance.setResearchedPlayer(null);
+
+        this.refreshResearchStatus();
+    }
+
 }

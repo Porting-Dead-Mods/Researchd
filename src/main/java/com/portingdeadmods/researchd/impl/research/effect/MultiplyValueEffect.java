@@ -45,6 +45,14 @@ public record MultiplyValueEffect(ValueEffect value, float amount) implements Va
     }
 
     @Override
+    public void onLock(Level level, ResearchTeam team, ResourceKey<Research> research) {
+        if (team instanceof ValueEffectsHolder effectsHolder) {
+            float oldValue = effectsHolder.getEffectValue(value);
+            effectsHolder.setEffectValue(value, oldValue / this.amount());
+        }
+    }
+
+    @Override
     public String operator() {
         return "*";
     }

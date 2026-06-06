@@ -41,6 +41,13 @@ public record AndResearchEffect(List<ResearchEffect> effects) implements Researc
     }
 
     @Override
+    public void onLock(Level level, ResearchTeam team, ResourceKey<Research> research) {
+        for (ResearchEffect effect : this.effects) {
+            effect.onLock(level, team, research);
+        }
+    }
+
+    @Override
     public ResourceLocation id() {
         return ID;
     }

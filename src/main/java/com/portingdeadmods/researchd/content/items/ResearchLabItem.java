@@ -3,6 +3,9 @@ package com.portingdeadmods.researchd.content.items;
 import com.portingdeadmods.portingdeadlibs.api.ghost.GhostControllerItem;
 import com.portingdeadmods.portingdeadlibs.api.ghost.GhostMultiblockShape;
 import com.portingdeadmods.portingdeadlibs.utils.PlayerUtils;
+import com.portingdeadmods.researchd.api.ResearchdApi;
+import com.portingdeadmods.researchd.api.team.ResearchTeam;
+import com.portingdeadmods.researchd.api.team.ResearchTeamManager;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.registries.ResearchdBlocks;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
@@ -19,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.UUID;
 
 public class ResearchLabItem extends GhostControllerItem {
 	public static final GhostMultiblockShape MULTIBLOCK_SHAPE = GhostMultiblockShape.builder()
@@ -72,10 +76,16 @@ public class ResearchLabItem extends GhostControllerItem {
 
 	@Override
 	protected void afterPlacement(@NotNull Level level, @NotNull BlockPos controllerPos, @NotNull List<BlockPos> allPos, @Nullable Player player) {
+		UUID teamId = PlayerUtils.EmptyUUID;
+		if (player != null) {
+			ResearchTeamManager mgr = ResearchdApi.getTeamManager(level);
+			ResearchTeam team = mgr != null ? mgr.getTeamByPlayer(player) : null;
+			if (team != null) teamId = team.getId();
+		}
 		for (BlockPos pos : allPos) {
 			BlockEntity be = level.getBlockEntity(pos);
 			if (be != null) {
-				be.setData(ResearchdAttachments.PLACED_BY_UUID, player == null ? PlayerUtils.EmptyUUID : player.getUUID());
+				be.setData(ResearchdAttachments.PLACED_BY_UUID, teamId);
 			}
 		}
 	}

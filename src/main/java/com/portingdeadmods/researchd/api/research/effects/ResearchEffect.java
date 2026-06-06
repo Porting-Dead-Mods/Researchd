@@ -24,6 +24,14 @@ public interface ResearchEffect {
 
     void onUnlock(Level level, ResearchTeam team, ResourceKey<Research> research);
 
+    /**
+     * Inverse of {@link #onUnlock}. Called when a previously-completed research is removed,
+     * and once per non-completed research at team-creation / datapack-reload time so the
+     * default "everything blocked" state is built up incrementally rather than from a
+     * separate {@code initDefault} pass.
+     */
+    void onLock(Level level, ResearchTeam team, ResourceKey<Research> research);
+
     ResourceLocation id();
 
     ResearchEffectType type();

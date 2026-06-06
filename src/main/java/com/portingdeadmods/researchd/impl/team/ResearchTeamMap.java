@@ -9,6 +9,7 @@ import com.portingdeadmods.researchd.api.team.ResearchTeamManager;
 import com.portingdeadmods.researchd.api.team.ResearchTeamRole;
 import com.portingdeadmods.researchd.data.saved.SavedDataMap;
 import com.portingdeadmods.researchd.data.saved.TeamSavedData;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperServer;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -17,6 +18,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -34,12 +36,22 @@ public final class ResearchTeamMap implements ResearchTeamManager, SavedDataMap 
             t -> t.researchTeams,
             ResearchTeamMap::new
     );
-    private final Map<UUID, ResearchTeamImpl> researchTeams;
-    private final List<UUID> teamIds;
+    private final @NotNull Map<UUID, ResearchTeamImpl> researchTeams;
+    private final @NotNull List<UUID> teamIds;
     private Runnable onChangedFunction;
 
-    public ResearchTeamMap(Map<UUID, ResearchTeamImpl> researchTeams) {
-        this.researchTeams = researchTeams;
+	/**
+	 * Declared as nullable just to declare null safety. This shouldn't be called with a null map (usually)
+	 * <br>
+	 * Constructor for codec. Shouldn't really be used outside of that
+	 */
+    public ResearchTeamMap(@Nullable Map<UUID, ResearchTeamImpl> researchTeams) {
+		if (researchTeams == null) {
+			Researchd.debug("Research Team Map", "Received null researchTeams map, initializing with empty map. Beware as this might not be intentional.");
+			researchTeams = new HashMap<>();
+		}
+
+        this.researchTeams = new HashMap<>(researchTeams); // Ensure Mutability
         this.teamIds = new ArrayList<>(researchTeams.keySet());
     }
 
@@ -123,7 +135,7 @@ public final class ResearchTeamMap implements ResearchTeamManager, SavedDataMap 
     }
 
     @Override
-    public Collection<UUID> getTeamIds() {
+    public @NotNull Collection<UUID> getTeamIds() {
         return this.teamIds;
     }
 
@@ -154,6 +166,8 @@ public final class ResearchTeamMap implements ResearchTeamManager, SavedDataMap 
 
         team.setCreationTime(level.getGameTime() * 50);
         team.init(level);
+
+        ResearchTeamHelperServer.initializeTeamEffects(team, level);
 
         return team;
     }

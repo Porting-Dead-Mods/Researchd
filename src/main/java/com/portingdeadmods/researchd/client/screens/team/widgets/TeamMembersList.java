@@ -16,8 +16,8 @@ import java.util.Collection;
 import java.util.Comparator;
 
 public class TeamMembersList extends ContainerWidget<TeamMember> {
-    public TeamMembersList(int width, int height, int itemWidth, int itemHeight, Collection<TeamMember> items, boolean renderScroller) {
-        super(width, height, itemWidth, itemHeight, Orientation.VERTICAL, 1, 10, items, renderScroller);
+    public TeamMembersList(int width, int height, int itemWidth, int itemHeight, Collection<TeamMember> members, boolean renderScroller) {
+        super(width, height, itemWidth, itemHeight, Orientation.VERTICAL, 1, 10, members, renderScroller);
         this.resort();
     }
 

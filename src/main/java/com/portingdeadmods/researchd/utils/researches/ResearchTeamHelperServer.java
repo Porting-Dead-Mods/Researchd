@@ -4,8 +4,11 @@ import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
 import com.portingdeadmods.portingdeadlibs.utils.PlayerUtils;
 import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.*;
+import com.portingdeadmods.researchd.api.research.effects.ResearchEffectManager;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.ResearchTeamManager;
+import com.portingdeadmods.researchd.api.team.ValueEffectsHolder;
+import com.portingdeadmods.researchd.data.saved.TeamResearchEffectSavedData;
 import com.portingdeadmods.researchd.api.team.ResearchTeamRole;
 import com.portingdeadmods.researchd.api.team.TeamMember;
 import com.portingdeadmods.researchd.api.research.ResearchManager;
@@ -437,6 +440,52 @@ public final class ResearchTeamHelperServer {
 
     }
 
+    private static void appendResearchProgress(List<Component> dump, ResearchTeam team) {
+        ResourceKey<Research> current = team.getCurrentResearch();
+        if (current != null) {
+            ResearchProgress progress = team.getCurrentProgress();
+            String progressStr = progress != null
+                    ? " [%.1f / %.1f]".formatted(progress.getProgress(), progress.getMaxProgress())
+                    : " [no progress]";
+            dump.add(Component.literal("┣ Current: ").withStyle(ChatFormatting.GRAY)
+                    .append(Component.literal(current.location().toString()).withStyle(ChatFormatting.AQUA))
+                    .append(Component.literal(progressStr).withStyle(ChatFormatting.YELLOW)));
+        } else {
+            dump.add(Component.literal("┣ Current: ").withStyle(ChatFormatting.GRAY)
+                    .append(Component.literal("(none)").withStyle(ChatFormatting.DARK_GRAY)));
+        }
+
+        int queueSize = team.getQueue().size();
+        if (queueSize > 1) {
+            MutableComponent queueLine = Component.literal("┣ Queue (%d): ".formatted(queueSize - 1)).withStyle(ChatFormatting.GRAY);
+            for (int i = 1; i < queueSize; i++) {
+                if (i > 1) queueLine.append(Component.literal(", ").withStyle(ChatFormatting.DARK_GRAY));
+                queueLine.append(Component.literal(team.getQueue().get(i).location().toString()).withStyle(ChatFormatting.AQUA));
+            }
+            dump.add(queueLine);
+        }
+
+        List<Map.Entry<ResourceKey<Research>, ResearchInstance>> sorted = new ArrayList<>(team.getResearches().entrySet());
+        sorted.sort(Comparator.comparing(e -> e.getKey().location().toString()));
+        dump.add(Component.literal("┣ Researches (%d):".formatted(sorted.size())).withStyle(ChatFormatting.GRAY));
+        for (Map.Entry<ResourceKey<Research>, ResearchInstance> entry : sorted) {
+            ResearchStatus status = entry.getValue().getResearchStatus();
+            dump.add(Component.literal("┣  ").withStyle(ChatFormatting.GRAY)
+                    .append(Component.literal(entry.getKey().location().toString()).withStyle(ChatFormatting.AQUA))
+                    .append(Component.literal(" — ").withStyle(ChatFormatting.DARK_GRAY))
+                    .append(Component.literal(status.getSerializedName()).withStyle(statusColor(status))));
+        }
+    }
+
+    private static ChatFormatting statusColor(ResearchStatus status) {
+        return switch (status) {
+            case RESEARCHED -> ChatFormatting.GREEN;
+            case RESEARCHABLE -> ChatFormatting.YELLOW;
+            case RESEARCHABLE_AFTER_QUEUE -> ChatFormatting.GOLD;
+            case LOCKED -> ChatFormatting.RED;
+        };
+    }
+
     public static Component getFormattedDump(Level level) {
         List<Component> dump = new ArrayList<>();
 
@@ -450,6 +499,7 @@ public final class ResearchTeamHelperServer {
             for (TeamMember member : team.getMembers()) {
                 dump.add(Component.literal("┣ ").append(member.getName()).withStyle(ChatFormatting.GRAY));
             }
+            appendResearchProgress(dump, team);
             if (iterator.hasNext()) {
                 dump.add(Component.literal("┣━━").withStyle(ChatFormatting.GRAY));
             } else {
@@ -542,6 +592,47 @@ public final class ResearchTeamHelperServer {
         msgs.add(illegalMessage("You're not getting anywhere with this."));
 
         return msgs.get((int) Math.floor(Math.random() * msgs.size()));
+    }
+
+    /**
+     * Wipes and rebuilds effect data for a single team: locks every research effect, then
+     * re-applies onUnlock for completed researches. Safe to call on team creation (no prior
+     * data) or after a datapack reload (existing data is discarded first).
+     *
+     * <p>Container effects (e.g. {@code AndResearchEffect}) recurse on their own children
+     * via their {@code onLock} impl, so this only calls the top-level effect.
+     */
+    public static void initializeTeamEffects(ResearchTeam team, Level level) {
+        if (level.isClientSide()) return;
+
+        ResearchManager researchManager = ResearchdApi.getResearchManager();
+        if (researchManager == null) return;
+
+        ResearchEffectManager effectManager = TeamResearchEffectSavedData.getData((ServerLevel) level);
+        effectManager.clearTeam(team.getId());
+        if (team instanceof ValueEffectsHolder holder) {
+            holder.clearAllEffectValues();
+        }
+
+        for (ResourceKey<Research> key : researchManager.getResearches()) {
+            Research research = researchManager.lookupResearch(key, level);
+            if (research == null) continue;
+            research.researchEffect().onLock(level, team, key);
+        }
+
+        for (ResearchInstance instance : team.getResearches().values()) {
+            if (instance.getResearchStatus() != ResearchStatus.RESEARCHED) continue;
+            Research research = researchManager.lookupResearch(instance.getResearch(), level);
+            if (research == null) continue;
+            research.researchEffect().onUnlock(level, team, instance.getResearch());
+        }
+    }
+
+    /** Re-runs {@link #initializeTeamEffects} for every team. Called after datapack reload. */
+    public static void reinitializeAllTeamEffects(ResearchTeamMap teamMap, Level level) {
+        for (ResearchTeam team : teamMap.getTeams()) {
+            initializeTeamEffects(team, level);
+        }
     }
 
     // TODO: Simplify?

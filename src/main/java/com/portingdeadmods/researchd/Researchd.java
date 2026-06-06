@@ -4,8 +4,6 @@ import com.mojang.logging.LogUtils;
 import com.portingdeadmods.portingdeadlibs.api.config.PDLConfigHelper;
 import com.portingdeadmods.portingdeadlibs.api.resources.DynamicPack;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
-import com.portingdeadmods.researchd.compat.ftbteams.FTBTeamsCompat;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdDataComponents;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
@@ -50,9 +48,20 @@ public final class Researchd {
             sb.append(msg.toString());
         }
         if (ResearchdConfig.Common.consoleDebug) {
-            LOGGER.debug(sb.toString());
+            LOGGER.info(sb.toString());
         }
     }
+
+	public static void log(String category, Object... message) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("[").append(category).append("] ");
+
+		for (Object msg : message) {
+			sb.append(msg.toString());
+		}
+
+		LOGGER.info(sb.toString());
+	}
 
     public Researchd(IEventBus modEventBus, ModContainer modContainer) {
         ResearchSerializers.SERIALIZERS.register(modEventBus);
@@ -80,9 +89,7 @@ public final class Researchd {
         modEventBus.addListener(this::addPackFinders);
 
         PDLConfigHelper.registerConfig(ResearchdConfig.Common.class, ModConfig.Type.COMMON, modContainer);
-
-		if (ResearchdCompatHandler.isFTBTeamsEnabled())
-            FTBTeamsCompat.init();
+        PDLConfigHelper.registerConfig(ResearchdConfig.Server.class, ModConfig.Type.SERVER, modContainer);
     }
 
     private void addPackFinders(AddPackFindersEvent event) {
@@ -123,30 +130,4 @@ public final class Researchd {
     public static ResourceLocation rl(String path) {
         return ResourceLocation.fromNamespaceAndPath(MODID, path);
     }
-
-    // Mod Helpers
-    // TODO: Bring these back in different class
-//    public static boolean isRecipeBlocked(Player player, ResourceLocation recipeId) {
-//        return player.getData(ResearchdAttachments.RECIPE_PREDICATE).blockedRecipes().contains(recipeId);
-//    }
-//
-//    public static boolean isItemBlocked(Player player, ResourceLocation itemId) {
-//        return player.getData(ResearchdAttachments.ITEM_PREDICATE).blockedItems().stream().anyMatch(key -> key.location().equals(itemId));
-//    }
-//
-//    public static boolean isItemBlocked(Player player, ResourceKey<Item> item) {
-//        return player.getData(ResearchdAttachments.ITEM_PREDICATE).blockedItems().contains(item);
-//    }
-//
-//    public static boolean isItemBlocked(Player player, ItemLike item) {
-//        return player.getData(ResearchdAttachments.ITEM_PREDICATE).blockedItems().stream().anyMatch(key -> key.location().equals(BuiltInRegistries.ITEM.getKey(item.asItem())));
-//    }
-//
-//    public static boolean isDimensionBlocked(Player player, ResourceLocation dimensionId) {
-//        return player.getData(ResearchdAttachments.DIMENSION_PREDICATE).blockedDimensions().stream().anyMatch(key -> key.location().equals(dimensionId));
-//    }
-//
-//    public static boolean isDimensionBlocked(Player player, ResourceKey<DimensionType> dimension) {
-//        return player.getData(ResearchdAttachments.DIMENSION_PREDICATE).blockedDimensions().contains(dimension);
-//    }
 }

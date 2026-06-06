@@ -52,14 +52,4 @@ public record DimensionUnlockEffectData(UniqueArray<ResourceKey<DimensionType>> 
     public ResearchEffectDataType<? extends ResearchEffectData<DimensionUnlockEffect>> type() {
         return TYPE;
     }
-
-    @Override
-    public void initDefault(Level level) {
-        Collection<DimensionUnlockEffect> effects = ResearchHelperCommon.getResearchEffects(DimensionUnlockEffect.class, level);
-
-        for (DimensionUnlockEffect effect : effects) {
-            this.blockedDimensions.add(effect.getDimensionType());
-        }
-
-    }
 }

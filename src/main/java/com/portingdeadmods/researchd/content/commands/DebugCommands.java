@@ -1,14 +1,20 @@
 package com.portingdeadmods.researchd.content.commands;
 
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import com.portingdeadmods.researchd.ResearchdRegistries;
+import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
+import com.portingdeadmods.researchd.api.research.effects.ResearchEffectManager;
+import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectDataType;
+import com.portingdeadmods.researchd.api.team.ResearchTeam;
+import com.portingdeadmods.researchd.data.saved.TeamResearchEffectSavedData;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperServer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
 public class DebugCommands {
@@ -43,14 +49,33 @@ public class DebugCommands {
                         .withStyle(ChatFormatting.YELLOW));
         player.sendSystemMessage(playerInfo);
 
-        for (ResearchEffectData<?> data : ResearchHelperCommon.getResearchEffectData(player)) {
-            MutableComponent effect = Component.literal(data.getClass().getSimpleName())
-                    .withStyle(ChatFormatting.GREEN);
+        ServerLevel level = player.serverLevel();
+        ResearchTeam team = ResearchdApi.getTeamManager(level) == null ? null
+                : ResearchdApi.getTeamManager(level).getTeamByPlayer(player);
+        if (team == null) {
+            player.sendSystemMessage(Component.literal("(no team)").withStyle(ChatFormatting.RED));
+            return;
+        }
 
+        MutableComponent teamInfo = Component.literal("Team: ").withStyle(ChatFormatting.WHITE)
+                .append(Component.literal(team.getName()).withStyle(ChatFormatting.YELLOW))
+                .append(Component.literal(" (" + team.getId() + ")").withStyle(ChatFormatting.DARK_GRAY));
+        player.sendSystemMessage(teamInfo);
+
+        ResearchEffectManager effectManager = TeamResearchEffectSavedData.getData(level);
+        for (ResearchEffectDataType<?> type : ResearchdRegistries.RESEARCH_EFFECT_DATA_TYPE) {
+            ResearchEffectData<?> data = effectManager.getEffectData(team.getId(), type);
+            String typeName = ResearchdRegistries.RESEARCH_EFFECT_DATA_TYPE.getKey(type).toString();
+            if (data == null) {
+                player.sendSystemMessage(Component.literal(typeName + ": (no entry)")
+                        .withStyle(ChatFormatting.DARK_GRAY));
+                continue;
+            }
+
+            MutableComponent effect = Component.literal(typeName).withStyle(ChatFormatting.GREEN);
             for (Object entry : data.getAll()) {
                 effect.append(Component.literal("\n  - " + entry.toString()).withStyle(ChatFormatting.WHITE));
             }
-
             player.sendSystemMessage(effect);
         }
 

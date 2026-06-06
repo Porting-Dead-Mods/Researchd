@@ -131,7 +131,9 @@ public class ResearchLabControllerBE extends GhostMultiblockControllerBE impleme
     public void tick() {
         super.tick();
 
-        ResearchTeam team = ResearchdApi.getTeamManager(this.getLevel()).getTeamByPlayerId(this.getData(ResearchdAttachments.PLACED_BY_UUID));
+        UUID teamId = ResearchdApi.getOrMigratePlacedByTeam(this, this.getLevel());
+        ResearchTeam team = ResearchdApi.getTeamManager(this.getLevel()).getTeamById(teamId);
+        if (team == null) return;
 
         ResourceKey<Research> current = team.getCurrentResearch();
         if (current == null) return;

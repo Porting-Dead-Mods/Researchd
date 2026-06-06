@@ -1,93 +1,49 @@
 package com.portingdeadmods.researchd.mixins;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
-import com.portingdeadmods.researchd.impl.research.effect.data.ItemUnlockEffectData;
-import com.portingdeadmods.researchd.registries.ResearchdEffectDataTypes;
-import com.portingdeadmods.researchd.utils.researches.ResearchEffectHelperCommon;
+import com.portingdeadmods.researchd.api.RecipeFilterContext;
+import com.portingdeadmods.researchd.api.ResearchdApi;
+import com.portingdeadmods.researchd.api.team.ResearchTeam;
+import com.portingdeadmods.researchd.api.team.ResearchTeamManager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.CraftingMenu;
 import net.minecraft.world.inventory.ResultContainer;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
-
-import java.util.Optional;
 
 @Mixin(CraftingMenu.class)
 public abstract class CraftingMenuMixin {
 
-    @ModifyVariable(
-            method = "slotChangedCraftingGrid",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/inventory/ResultContainer;setItem(ILnet/minecraft/world/item/ItemStack;)V",
-                    shift = At.Shift.BEFORE),
-            ordinal = 0
-    )
-    private static ItemStack checkCraftingPredicate(ItemStack itemstack, AbstractContainerMenu menu, Level level, Player player, CraftingContainer craftSlots, ResultContainer resultSlots, RecipeHolder<CraftingRecipe> recipe) {
+    @WrapMethod(method = "slotChangedCraftingGrid")
+    private static void researchd$pushOwnerContext(
+            AbstractContainerMenu menu, Level level, Player player,
+            CraftingContainer craftSlots, ResultContainer resultSlots,
+            RecipeHolder<CraftingRecipe> recipe, Operation<Void> original) {
 
-        ItemUnlockEffectData itemData = ResearchEffectHelperCommon.getEffectDataForPlayer(player, ResearchdEffectDataTypes.ITEM_UNLOCK);
-        RecipeUnlockEffectData recipeData = ResearchEffectHelperCommon.getEffectDataForPlayer(player, ResearchdEffectDataTypes.RECIPE_UNLOCK);
-
-        CraftingInput craftinginput = craftSlots.asCraftInput();
-        Optional<RecipeHolder<CraftingRecipe>> recipeHolder = level.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftinginput, level, recipe);
-
-        Researchd.debug("Crafting Mixin", "Blocked items: " + itemData.blockedItems());
-        Researchd.debug("Crafting Mixin", "RecipePredicateData: " + recipeData.blockedRecipes());
-
-        if (recipeHolder.isPresent()) {
-            RecipeHolder<CraftingRecipe> holder = recipeHolder.get();
-            CraftingRecipe craftingRecipe = holder.value();
-            Researchd.debug("Crafting Mixin","RecipeHolder id: " + holder.id());
-            Researchd.debug("Crafting Mixin","RecipeHolder result: " + craftingRecipe.getResultItem(level.registryAccess()));
-
-            if (isItemBlocked(itemData, craftingRecipe, level)) {
-                Researchd.debug("Crafting Mixin", "Recipe uses blocked item, denying craft.");
-                return ItemStack.EMPTY;
-            }
-
-            if (!recipeData.isEmpty() && recipeData.contains(holder)) {
-                Researchd.debug("Crafting Mixin","Recipe for " + craftingRecipe.getResultItem(level.registryAccess()) + " blocked!");
-                return ItemStack.EMPTY;
-            }
-        } else {
-            Researchd.debug("Crafting Mixin","Invalid recipes.");
+        if (level.isClientSide) {
+            original.call(menu, level, player, craftSlots, resultSlots, recipe);
+            return;
         }
 
-        return itemstack;
-    }
-
-    private static boolean isItemBlocked(ItemUnlockEffectData itemData, CraftingRecipe craftingRecipe, Level level) {
-        if (itemData.blockedItems().isEmpty()) {
-            return false;
+        ResearchTeamManager mgr = ResearchdApi.getTeamManager(level);
+        ResearchTeam team = mgr == null ? null : mgr.getTeamByPlayer(player);
+        if (team == null) {
+            original.call(menu, level, player, craftSlots, resultSlots, recipe);
+            return;
         }
 
-        ItemStack result = craftingRecipe.getResultItem(level.registryAccess());
-        if (!result.isEmpty() && itemData.isBlocked(result)) {
-            return true;
+        Researchd.debug("Recipe Filter", "Crafting push for ", player.getName().getString(), " team=", team.getId());
+        RecipeFilterContext.push(team.getId(), level);
+        try {
+            original.call(menu, level, player, craftSlots, resultSlots, recipe);
+        } finally {
+            RecipeFilterContext.pop();
         }
-
-        for (Ingredient ingredient : craftingRecipe.getIngredients()) {
-            if (ingredient.isEmpty()) {
-                continue;
-            }
-
-            for (ItemStack ingredientStack : ingredient.getItems()) {
-                if (!ingredientStack.isEmpty() && itemData.isBlocked(ingredientStack)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 }

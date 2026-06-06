@@ -3,6 +3,8 @@ package com.portingdeadmods.researchd.events.common;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.client.cache.ResearchTeamCache;
+import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
+import com.portingdeadmods.researchd.compat.ftbteams.FTBTeamsCompat;
 import com.portingdeadmods.researchd.data.saved.TeamResearchEffectSavedData;
 import com.portingdeadmods.researchd.data.saved.TeamSavedData;
 import com.portingdeadmods.researchd.impl.research.ResearchManagerImpl;
@@ -24,12 +26,21 @@ import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
+import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 
 @EventBusSubscriber(modid = Researchd.MODID)
 public final class ResearchdLifecycleHandler {
+    // Server starts -> server config is now loaded; wire up FTB Teams compat if enabled
+    @SubscribeEvent
+    private static void onServerStarting(ServerStartingEvent event) {
+        if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
+            FTBTeamsCompat.init();
+        }
+    }
+
     // World loads -> Get researches for static research manager
     @SubscribeEvent
     private static void onWorldLoad(LevelEvent.Load event) {

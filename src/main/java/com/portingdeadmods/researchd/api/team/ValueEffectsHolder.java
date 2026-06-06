@@ -16,4 +16,7 @@ public interface ValueEffectsHolder {
     default void setEffectValue(Supplier<ValueEffect> effect, float value) {
         this.setEffectValue(effect.get(), value);
     }
+
+    /** Clears all accumulated value-effect entries. Used when reinitializing on reload. */
+    void clearAllEffectValues();
 }

@@ -69,6 +69,17 @@ public record RecipeUnlockEffect(Optional<ItemStack> icon, Optional<String> name
     }
 
     @Override
+    public void onLock(Level level, ResearchTeam team, ResourceKey<Research> research) {
+        if (!level.isClientSide()) {
+            TeamResearchEffectDataMap map = TeamResearchEffectSavedData.getData((ServerLevel) level);
+            RecipeUnlockEffectData data = map.computeIfAbsent(team.getId(), ResearchdEffectDataTypes.RECIPE_UNLOCK, level);
+            data.add(this, level);
+            map.setChanged();
+            map.sync(team.getId(), data.type());
+        }
+    }
+
+    @Override
     public ResourceLocation id() {
         return ID;
     }
