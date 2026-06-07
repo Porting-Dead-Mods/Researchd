@@ -921,8 +921,16 @@
 <td>Shortcut for <code>.method(ResearchMethodHelper.consumeItem(itemId, count))</code>.</td>
 </tr>
 <tr>
+<td><code>consumeItem(itemId, count)</code></td>
+<td>Shortcut for <code>.method(ResearchMethodHelper.consumeItem(itemId, count))</code>.</td>
+</tr>
+<tr>
 <td><code>consumePack(packId, ...args)</code></td>
 <td>Shortcut for <code>.method(ResearchMethodHelper.consumePack(packId, ...args))</code>.</td>
+</tr>
+<tr>
+<td><code>consumePacks(packIds, ...args)</code></td>
+<td>Shortcut for <code>.method(ResearchMethodHelper.consumePacks(packIds, ...args))</code>. Accepts an array of pack IDs.</td>
 </tr>
 <tr>
 <td><code>requireAllMethods(...methods)</code></td>
@@ -995,6 +1003,14 @@
 <tr>
 <td><code>consumePack(packId, count, duration)</code></td>
 <td>Creates a method that requires consuming a certain amount of a research pack with a specific duration.</td>
+</tr>
+<tr>
+<td><code>consumePacks(packIds, count)</code></td>
+<td>Creates a method that requires consuming a certain amount from multiple research packs simultaneously. <code>packIds</code> is an array of pack ID strings.</td>
+</tr>
+<tr>
+<td><code>consumePacks(packIds, count, duration)</code></td>
+<td>Same as above but with a custom duration.</td>
 </tr>
 <tr>
 <td><code>and(...methods)</code></td>
