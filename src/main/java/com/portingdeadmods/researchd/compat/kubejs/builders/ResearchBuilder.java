@@ -4,6 +4,7 @@ import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
+import com.portingdeadmods.researchd.compat.kubejs.helpers.ResearchMethodHelper;
 import com.portingdeadmods.researchd.impl.research.icons.ItemResearchIcon;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
 import com.portingdeadmods.researchd.impl.research.effect.EmptyResearchEffect;
@@ -62,6 +63,26 @@ public class ResearchBuilder {
     public ResearchBuilder method(ResearchMethod method) {
         this.researchMethod = method;
         return this;
+    }
+
+    public ResearchBuilder consumeItem(String itemId, int count) {
+        return method(ResearchMethodHelper.consumeItem(itemId, count));
+    }
+
+    public ResearchBuilder consumePack(String packId, int count) {
+        return method(ResearchMethodHelper.consumePack(packId, count));
+    }
+
+    public ResearchBuilder consumePack(String packId, int count, int duration) {
+        return method(ResearchMethodHelper.consumePack(packId, count, duration));
+    }
+
+    public ResearchBuilder consumePacks(String[] packIds, int count) {
+        return method(ResearchMethodHelper.consumePacks(packIds, count));
+    }
+
+    public ResearchBuilder consumePacks(String[] packIds, int count, int duration) {
+        return method(ResearchMethodHelper.consumePacks(packIds, count, duration));
     }
 
     public ResearchBuilder effect(ResearchEffect effect) {

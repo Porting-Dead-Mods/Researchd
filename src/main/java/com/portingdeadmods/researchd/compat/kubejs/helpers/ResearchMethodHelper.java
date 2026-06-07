@@ -16,14 +16,15 @@ import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ResearchMethodHelper {
-    
+
     public static ResearchMethod consumeItem(String itemId, int count) {
         Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(itemId));
         return new ConsumeItemResearchMethod(Ingredient.of(item), count);
     }
-    
+
     public static ResearchMethod consumePack(String packId, int count) {
         ResourceKey<ResearchPack> key = ResourceKey.create(ResearchdRegistries.RESEARCH_PACK_KEY, ResourceLocation.parse(packId));
         return new ConsumePackResearchMethod(List.of(key), count, 10);
@@ -32,6 +33,20 @@ public class ResearchMethodHelper {
     public static ResearchMethod consumePack(String packId, int count, int duration) {
         ResourceKey<ResearchPack> key = ResourceKey.create(ResearchdRegistries.RESEARCH_PACK_KEY, ResourceLocation.parse(packId));
         return new ConsumePackResearchMethod(List.of(key), count, duration);
+    }
+
+    public static ResearchMethod consumePacks(String[] packIds, int count) {
+        List<ResourceKey<ResearchPack>> keys = Arrays.stream(packIds)
+                .map(id -> ResourceKey.create(ResearchdRegistries.RESEARCH_PACK_KEY, ResourceLocation.parse(id)))
+                .collect(Collectors.toList());
+        return new ConsumePackResearchMethod(keys, count, 10);
+    }
+
+    public static ResearchMethod consumePacks(String[] packIds, int count, int duration) {
+        List<ResourceKey<ResearchPack>> keys = Arrays.stream(packIds)
+                .map(id -> ResourceKey.create(ResearchdRegistries.RESEARCH_PACK_KEY, ResourceLocation.parse(id)))
+                .collect(Collectors.toList());
+        return new ConsumePackResearchMethod(keys, count, duration);
     }
 
     public static ResearchMethod checkItemPresence(String itemId, int count) {

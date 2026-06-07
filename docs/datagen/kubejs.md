@@ -60,7 +60,9 @@ ResearchdEvents.registerResearches(event => {
 | `icon(itemId)`              | Sets the icon for the research.                                              |
 | `method(researchMethod)`    | Sets the research method. Use `ResearchMethodHelper` to create methods.      |
 | `consumeItem(itemId, count)`| Shortcut for `.method(ResearchMethodHelper.consumeItem(itemId, count))`.     |
+| `consumeItem(itemId, count)`   | Shortcut for `.method(ResearchMethodHelper.consumeItem(itemId, count))`.     |
 | `consumePack(packId, ...args)` | Shortcut for `.method(ResearchMethodHelper.consumePack(packId, ...args))`. |
+| `consumePacks(packIds, ...args)` | Shortcut for `.method(ResearchMethodHelper.consumePacks(packIds, ...args))`. Accepts an array of pack IDs. |
 | `requireAllMethods(...methods)` | Shortcut for `.method(ResearchMethodHelper.and(...methods))`.            |
 | `requireAnyMethod(...methods)`  | Shortcut for `.method(ResearchMethodHelper.or(...methods))`.             |
 | `effect(researchEffect)`    | Sets the research effect. Use `ResearchEffectHelper` to create effects.      |
@@ -83,6 +85,8 @@ ResearchdEvents.registerResearches(event => {
 | `consumeItem(itemId, count)`         | Creates a method that requires consuming a certain amount of an item.     |
 | `consumePack(packId, count)`         | Creates a method that requires consuming a certain amount of a research pack. |
 | `consumePack(packId, count, duration)` | Creates a method that requires consuming a certain amount of a research pack with a specific duration. |
+| `consumePacks(packIds, count)`       | Creates a method that requires consuming a certain amount from multiple research packs simultaneously. `packIds` is an array of pack ID strings. |
+| `consumePacks(packIds, count, duration)` | Same as above but with a custom duration. |
 | `and(...methods)`                    | Creates a method that requires all of the specified methods to be completed. |
 | `or(...methods)`                     | Creates a method that requires any of the specified methods to be completed. |
 
