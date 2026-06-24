@@ -3,8 +3,9 @@ package com.portingdeadmods.researchd.impl.research;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
-import com.portingdeadmods.researchd.api.research.ResearchManager;
+import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.ResearchManager;
 import com.portingdeadmods.researchd.api.research.ResearchPage;
 import com.portingdeadmods.researchd.api.research.ResearchRelations;
 import com.portingdeadmods.researchd.utils.registries.ResearchdManagers;
@@ -14,16 +15,18 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @ApiStatus.Internal
 public final class ResearchManagerImpl implements ResearchManager {
     private static ResearchManagerImpl instance;
 
-    private List<ResourceKey<Research>> researches;
-    private List<ResourceLocation> pageIds;
-    private Map<ResourceKey<Research>, ResearchRelations> researchRelations;
-    private Map<ResourceLocation, ResearchPage> researchPages;
+    private List<ResourceKey<Research>> researches = ImmutableList.of();
+    private List<ResourceLocation> pageIds = ImmutableList.of();
+    private Map<ResourceKey<Research>, ResearchRelations> researchRelations = ImmutableMap.of();
+    private Map<ResourceLocation, ResearchPage> researchPages = ImmutableMap.of();
 
     /**
      * Map of ResearchPage id to list of root nodes (GlobalResearches with no parents within that page)
@@ -62,6 +65,12 @@ public final class ResearchManagerImpl implements ResearchManager {
             List<ResourceKey<Research>> parents = research1.parents();
             for (ResourceKey<Research> parent : parents) {
                 ResearchRelations parentResearchRelations = globalResearchMap.get(parent);
+
+				if (parentResearchRelations == null) {
+					Researchd.log("Research Manager", "Research %s has a parent %s that does not exist in the global research map. This may be due to a missing or misconfigured research definition.", research.getResearchKey().location(), parent.location());
+					continue;
+				}
+
                 parentResearchRelations.getChildren().add(research);
             }
         }

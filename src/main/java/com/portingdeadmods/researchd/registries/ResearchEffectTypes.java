@@ -35,6 +35,14 @@ public final class ResearchEffectTypes {
             SpriteResearchIcon.spriteIcon(Researchd.MODID, "item_unlock_icon", 16, 16)
     );
 
+    // COMPAT //
+
+	// Immersive Engineering
+    public static final Supplier<ResearchEffectType> IE_MULTIBLOCK_UNLOCK = registerEffectType(
+            "ie_multiblock_unlock",
+            new TextResearchIcon(Component.literal("MB"))
+    );
+
     private static @NotNull DeferredHolder<ResearchEffectType, ResearchEffectType> registerEffectType(String id, ResearchIcon icon) {
         return TYPES.register(id, () -> ResearchEffectType.single(Researchd.rl(id), icon));
     }

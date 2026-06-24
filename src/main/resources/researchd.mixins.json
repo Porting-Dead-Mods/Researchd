@@ -7,7 +7,11 @@
     "CraftingMenuMixin",
     "PlayerMixin",
     "RecipeManagerMixin",
-    "ReloadableServerResourcesMixin"
+    "ReloadableServerResourcesMixin",
+    "create.RecipeFinderMixin",
+    "create.RecipeTrieFinderMixin",
+    "immersiveengineering.CachedRecipeListMixin",
+    "immersiveengineering.HammerItemMixin"
   ],
   "client": [
     "ClientLevelMixin",

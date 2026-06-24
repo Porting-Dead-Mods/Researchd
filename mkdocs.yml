@@ -7,6 +7,7 @@ nav:
     - KubeJS: datagen/kubejs.md
   - Data: data.md
   - Gameplay: gameplay.md
+  - Compat: compat.md
   - Addons: addons.md
 theme:
   name: material

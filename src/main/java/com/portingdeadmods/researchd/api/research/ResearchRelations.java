@@ -1,6 +1,7 @@
 package com.portingdeadmods.researchd.api.research;
 
 import com.google.common.collect.ImmutableSet;
+import com.portingdeadmods.researchd.Researchd;
 import net.minecraft.resources.ResourceKey;
 
 import java.util.HashSet;
@@ -34,7 +35,16 @@ public final class ResearchRelations {
     }
 
     public void lock() {
+		if (this.children == null) {
+			Researchd.log("Research Relations", "Children set is null for research: " + this.research.location());
+			this.children = ImmutableSet.of();
+		}
         this.children = ImmutableSet.copyOf(this.children);
+
+	    if (this.parents == null) {
+		    Researchd.log("Research Relations", "Parents set is null for research: " + this.research.location());
+		    this.children = ImmutableSet.of();
+	    }
         this.parents = ImmutableSet.copyOf(this.parents);
     }
 

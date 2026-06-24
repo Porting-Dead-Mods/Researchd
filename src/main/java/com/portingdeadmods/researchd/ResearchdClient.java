@@ -13,32 +13,35 @@ import com.portingdeadmods.researchd.api.research.methods.ResearchMethodType;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.client.impl.editor.ResearchPackObject;
+import com.portingdeadmods.researchd.client.impl.editor.SimpleResearchObject;
 import com.portingdeadmods.researchd.client.impl.editor.effects.DimensionUnlockEffectObject;
 import com.portingdeadmods.researchd.client.impl.editor.effects.ItemUnlockEffectObject;
 import com.portingdeadmods.researchd.client.impl.editor.effects.RecipeUnlockEffectObject;
 import com.portingdeadmods.researchd.client.impl.editor.effects.ValueEffectModifierObject;
-import com.portingdeadmods.researchd.client.impl.icons.ClientItemResearchIcon;
-import com.portingdeadmods.researchd.client.impl.editor.SimpleResearchObject;
-import com.portingdeadmods.researchd.client.impl.info.effects.*;
-import com.portingdeadmods.researchd.client.impl.icons.ClientSpriteResearchIcon;
-import com.portingdeadmods.researchd.client.impl.icons.ClientTextResearchIcon;
-import com.portingdeadmods.researchd.client.impl.info.methods.*;
 import com.portingdeadmods.researchd.client.impl.editor.methods.CheckItemPresenceMethodObject;
 import com.portingdeadmods.researchd.client.impl.editor.methods.ConsumeItemMethodObject;
 import com.portingdeadmods.researchd.client.impl.editor.methods.ConsumePackMethodObject;
+import com.portingdeadmods.researchd.client.impl.icons.ClientItemResearchIcon;
+import com.portingdeadmods.researchd.client.impl.icons.ClientSpriteResearchIcon;
+import com.portingdeadmods.researchd.client.impl.icons.ClientTextResearchIcon;
+import com.portingdeadmods.researchd.client.impl.info.effects.*;
+import com.portingdeadmods.researchd.client.impl.info.methods.*;
 import com.portingdeadmods.researchd.client.renderers.ResearchLabBER;
 import com.portingdeadmods.researchd.client.screens.lab.ResearchLabScreen;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.WidgetConstructor;
+import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
+import com.portingdeadmods.researchd.compat.immersiveengineering.UnlockIEMultiblockEffect;
+import com.portingdeadmods.researchd.compat.immersiveengineering.client.UnlockIEMultiblockEffectWidget;
 import com.portingdeadmods.researchd.data.ResearchdDataComponents;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
-import com.portingdeadmods.researchd.impl.research.icons.ItemResearchIcon;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
 import com.portingdeadmods.researchd.impl.research.effect.*;
+import com.portingdeadmods.researchd.impl.research.icons.ItemResearchIcon;
 import com.portingdeadmods.researchd.impl.research.icons.SpriteResearchIcon;
 import com.portingdeadmods.researchd.impl.research.icons.TextResearchIcon;
 import com.portingdeadmods.researchd.impl.research.method.*;
 import com.portingdeadmods.researchd.registries.*;
-import com.portingdeadmods.researchd.client.screens.lib.widgets.WidgetConstructor;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -135,6 +138,12 @@ public final class ResearchdClient {
             CLIENT_RESEARCH_EFFECT_TYPES.put(MultiplyValueEffect.ID, new ValueEffectModifierObject(ResearchEffectTypes.MULTIPLE_VALUE.get(), MultiplyValueEffect::new));
 
             ItemBlockRenderTypes.setRenderLayer(ResearchdBlocks.RESEARCH_LAB_CONTROLLER.get(), RenderType.solid()); // Should fiddle with render types till it works ngl
+
+	        // COMPAT //
+
+	        // Immersive Engineering
+	        if (ResearchdCompatHandler.isIELoaded())
+		        addEffectWidget(UnlockIEMultiblockEffect.ID, UnlockIEMultiblockEffectWidget::new);
         });
     }
 

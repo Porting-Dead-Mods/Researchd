@@ -45,6 +45,15 @@ ResearchdEvents.registerResearchPacks(event => {
 });
 ```
 
+## Compat
+
+| Mod | Status | Notes |
+|-----|:------:|-------|
+| Immersive Engineering | 🟢 | All crafting is filtered. Multiblock formation can be gated - `RdImmersiveEngineering.unlockMultiblock("<multiblock>")` |
+| Create | 🟢 | All crafting is filtered. |
+
+Status legend: 🟢 full support · 🟡 partial / in progress · 🔴 known issues.
+
 ## Supported Versions
 
 | NeoForge | 1.21.1 |

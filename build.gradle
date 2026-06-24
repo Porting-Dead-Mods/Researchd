@@ -31,6 +31,10 @@ repositories {
         url = "https://maven.blamejared.com/"
     }
 
+    // COMPAT //
+    maven { url = "https://maven.createmod.net/" } // Create
+    maven { url = "https://maven.ithundxr.dev/snapshots" } // Registrate
+
     exclusiveContent {
         forRepository {
             maven {
@@ -140,6 +144,13 @@ dependencies {
     runtimeOnly "dev.emi:emi-neoforge:${emi_version}" // Don't load both JEI and EMI
 
     //runtimeOnly "curse.maven:ender-io-64578:7134432"
+
+    // COMPAT //
+    compileOnly "blusunrize.immersiveengineering:ImmersiveEngineering:${ie_version}"
+    localRuntime "blusunrize.immersiveengineering:ImmersiveEngineering:${ie_version}"
+
+    compileOnly "com.simibubi.create:create-1.21.1:${create_version}"
+    localRuntime "com.simibubi.create:create-1.21.1:${create_version}"
 }
 
 def parts = pdl_version.tokenize('.')

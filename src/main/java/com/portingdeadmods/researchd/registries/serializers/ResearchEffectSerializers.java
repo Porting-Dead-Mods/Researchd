@@ -3,6 +3,8 @@ package com.portingdeadmods.researchd.registries.serializers;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectSerializer;
+import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
+import com.portingdeadmods.researchd.compat.immersiveengineering.UnlockIEMultiblockEffect;
 import com.portingdeadmods.researchd.impl.research.effect.AndResearchEffect;
 import com.portingdeadmods.researchd.impl.research.effect.DimensionUnlockEffect;
 import com.portingdeadmods.researchd.impl.research.effect.DecreaseValueEffect;
@@ -27,5 +29,11 @@ public final class ResearchEffectSerializers {
 		SERIALIZERS.register("decrease_value", () -> DecreaseValueEffect.SERIALIZER);
 		SERIALIZERS.register("multiply_value", () -> MultiplyValueEffect.SERIALIZER);
 		SERIALIZERS.register("divide_value", () -> DivideValueEffect.SERIALIZER);
+
+		// COMPAT //
+
+		// Immersive Engineering
+		if (ResearchdCompatHandler.isIELoaded())
+			SERIALIZERS.register("unlock_ie_multiblock", () -> UnlockIEMultiblockEffect.SERIALIZER);
 	}
 }

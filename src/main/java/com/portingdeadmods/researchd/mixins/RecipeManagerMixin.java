@@ -2,16 +2,8 @@ package com.portingdeadmods.researchd.mixins;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.RecipeFilterContext;
-import com.portingdeadmods.researchd.api.ResearchdApi;
-import com.portingdeadmods.researchd.impl.research.effect.data.ItemUnlockEffectData;
-import com.portingdeadmods.researchd.registries.ResearchdEffectDataTypes;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -76,23 +68,6 @@ public abstract class RecipeManagerMixin {
 
     @Unique
     private static boolean researchd$isBlocked(RecipeHolder<?> holder, RecipeFilterContext.Frame frame) {
-        Level level = frame.level();
-        if (ResearchdApi.isRecipeBlocked(level, frame.teamId(), holder)) return true;
-
-        ItemUnlockEffectData itemData = ResearchdApi.getEffectDataForTeam(
-                level, frame.teamId(), ResearchdEffectDataTypes.ITEM_UNLOCK);
-        if (itemData == null || itemData.blockedItems().isEmpty()) return false;
-
-        Recipe<?> recipe = holder.value();
-        ItemStack result = recipe.getResultItem(level.registryAccess());
-        if (!result.isEmpty() && itemData.isBlocked(result)) return true;
-
-        for (Ingredient ingredient : recipe.getIngredients()) {
-            if (ingredient.isEmpty()) continue;
-            for (ItemStack stack : ingredient.getItems()) {
-                if (!stack.isEmpty() && itemData.isBlocked(stack)) return true;
-            }
-        }
-        return false;
+        return RecipeFilterContext.isBlocked(holder, frame);
     }
 }

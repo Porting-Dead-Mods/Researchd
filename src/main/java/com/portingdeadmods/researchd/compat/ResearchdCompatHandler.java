@@ -21,4 +21,12 @@ public final class ResearchdCompatHandler {
     public static boolean isEmiLoaded() {
         return ModList.get().isLoaded("emi");
     }
+
+    public static boolean isIELoaded() {
+        return ModList.get().isLoaded("immersiveengineering");
+    }
+
+    public static boolean isCreateLoaded() {
+        return ModList.get().isLoaded("create");
+    }
 }
