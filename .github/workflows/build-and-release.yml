@@ -221,49 +221,6 @@ jobs:
 
         run: ./gradlew modrinth
 
-      - name: Generate token for Researchd-XCompat
-        if: steps.check_version.outputs.SHOULD_RELEASE == 'true'
-        id: xcompat_token
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ secrets.PDM_APP_ID }}
-          private-key: ${{ secrets.PDM_APP_PRIVATE_KEY }}
-          owner: Porting-Dead-Mods
-          repositories: Researchd-XCompat
-
-      - name: Checkout Researchd-XCompat
-        if: steps.check_version.outputs.SHOULD_RELEASE == 'true'
-        uses: actions/checkout@v4
-        with:
-          repository: Porting-Dead-Mods/Researchd-XCompat
-          token: ${{ steps.xcompat_token.outputs.token }}
-          ref: main
-          path: researchd-xcompat
-
-      - name: Bump researchd_version in Researchd-XCompat
-        if: steps.check_version.outputs.SHOULD_RELEASE == 'true'
-        working-directory: researchd-xcompat
-        env:
-          NEW_VERSION: ${{ steps.check_version.outputs.VERSION }}
-          GITHUB_TOKEN: ${{ steps.xcompat_token.outputs.token }}
-        run: |
-          CURRENT=$(sed -n 's/^researchd_version=//p' gradle.properties | tr -d ' \r\n')
-          echo "Current researchd_version: $CURRENT"
-          echo "New researchd_version:     $NEW_VERSION"
-
-          if [ "$CURRENT" = "$NEW_VERSION" ]; then
-            echo "researchd_version already up to date, skipping."
-            exit 0
-          fi
-
-          sed -i -E "s/^researchd_version=.*/researchd_version=${NEW_VERSION}/" gradle.properties
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add gradle.properties
-          git commit -m "Researchd Workflow: bump rd to ${NEW_VERSION}"
-          git push origin main
-
       # Always upload artifacts for every build (even without release)
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
