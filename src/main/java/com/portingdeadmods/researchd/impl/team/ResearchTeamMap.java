@@ -98,8 +98,10 @@ public final class ResearchTeamMap implements ResearchTeamManager, SavedDataMap 
     }
 
     @Override
-    public ResearchTeamImpl getTeamById(UUID uuid) {
+    public @Nullable ResearchTeamImpl getTeamById(UUID uuid) {
         ResearchTeamImpl team = this.researchTeams.get(uuid);
+        if (team == null) return null;
+
         if (!team.hasOnChangedFunction()) {
             team.setOnChangedFunction(this::setChanged);
         }
@@ -107,13 +109,10 @@ public final class ResearchTeamMap implements ResearchTeamManager, SavedDataMap 
     }
 
     @Override
-    public ResearchTeamImpl getTeamByName(String name) {
+    public @Nullable ResearchTeamImpl getTeamByName(String name) {
         for (UUID teamId : this.teamIds) {
             ResearchTeamImpl team = this.getTeamById(teamId);
-            if (team.getName().equals(name)) {
-                if (!team.hasOnChangedFunction()) {
-                    team.setOnChangedFunction(this::setChanged);
-                }
+            if (team != null && team.getName().equals(name)) {
                 return team;
             }
         }
@@ -121,10 +120,10 @@ public final class ResearchTeamMap implements ResearchTeamManager, SavedDataMap 
     }
 
     @Override
-    public @NotNull ResearchTeamImpl getTeamByPlayerId(UUID uuid) {
+    public @Nullable ResearchTeamImpl getTeamByPlayerId(UUID uuid) {
         for (UUID teamId : this.teamIds) {
             ResearchTeamImpl team = this.getTeamById(teamId);
-            if (team.hasMember(uuid)) {
+            if (team != null && team.hasMember(uuid)) {
                 if (!team.hasOnChangedFunction()) {
                     team.setOnChangedFunction(this::setChanged);
                 }
@@ -148,7 +147,7 @@ public final class ResearchTeamMap implements ResearchTeamManager, SavedDataMap 
     }
 
     @Override
-    public ResearchTeam createEmptyTeam(String name) {
+    public @NotNull ResearchTeam createEmptyTeam(String name) {
         UUID teamId = this.createUniqueTeamId();
 
         ResearchTeamImpl team = new ResearchTeamImpl(teamId, name);
@@ -157,7 +156,7 @@ public final class ResearchTeamMap implements ResearchTeamManager, SavedDataMap 
     }
 
     @Override
-    public ResearchTeam createDefaultTeam(UUID playerId, Level level) {
+    public @NotNull ResearchTeam createDefaultTeam(UUID playerId, Level level) {
         Researchd.debug("Research Team", "Creating default team for player: " + AllPlayersCache.getName(playerId));
 
         ResearchTeam team = this.createEmptyTeam(AllPlayersCache.getName(playerId) + "'s Team");

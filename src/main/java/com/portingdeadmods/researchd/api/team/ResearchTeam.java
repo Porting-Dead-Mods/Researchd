@@ -6,6 +6,8 @@ import com.portingdeadmods.researchd.impl.ResearchProgress;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.SequencedCollection;
@@ -18,7 +20,7 @@ public interface ResearchTeam {
     /**
      * @return The display name of this team
      */
-    String getName();
+    @NotNull String getName();
 
     /**
      * Set the display name of this team
@@ -30,7 +32,7 @@ public interface ResearchTeam {
     /**
      * @return The unique uuid of this team
      */
-    UUID getId();
+    @NotNull UUID getId();
 
     /**
      * Gets the creation time of the team
@@ -48,9 +50,14 @@ public interface ResearchTeam {
 
     /* Team Members */
 
-    TeamMember getOwner();
+    @Nullable TeamMember getOwner();
 
-    TeamMember getMember(UUID member);
+    /**
+     * @return the team member for the given player uuid. Never null; players that are
+     * not part of this team are returned as members with the
+     * {@link ResearchTeamRole#NOT_MEMBER} role.
+     */
+    @NotNull TeamMember getMember(UUID member);
 
     boolean hasMember(UUID member);
 
@@ -62,7 +69,7 @@ public interface ResearchTeam {
 
     void removeMember(UUID member);
 
-    SequencedCollection<TeamMember> getMembers();
+    @NotNull SequencedCollection<TeamMember> getMembers();
 
     void setRole(UUID member, ResearchTeamRole role);
 
@@ -70,7 +77,7 @@ public interface ResearchTeam {
 
     boolean isOwner(UUID member);
 
-    TeamSocialManager getSocialManager();
+    @NotNull TeamSocialManager getSocialManager();
 
     /* Team Researches */
 
@@ -79,7 +86,7 @@ public interface ResearchTeam {
      *
      * @return {@link ResourceKey} of the researchPack or null if no researchPack is currently in progress
      */
-    default ResourceKey<Research> getCurrentResearch() {
+    default @Nullable ResourceKey<Research> getCurrentResearch() {
         return this.getQueue().getFirst();
     }
 
@@ -88,17 +95,18 @@ public interface ResearchTeam {
      *
      * @return {@link ResearchProgress} of the researchPack or null if no researchPack is currently in progress.
      */
-    default ResearchProgress getCurrentProgress() {
-        return this.getResearchProgresses().get(this.getCurrentResearch());
+    default @Nullable ResearchProgress getCurrentProgress() {
+        ResourceKey<Research> currentResearch = this.getCurrentResearch();
+        return currentResearch != null ? this.getResearchProgresses().get(currentResearch) : null;
     }
 
     void init(Level level);
 
-    ResearchQueue getQueue();
+    @NotNull ResearchQueue getQueue();
 
-    Map<ResourceKey<Research>, ResearchInstance> getResearches();
+    @NotNull Map<ResourceKey<Research>, ResearchInstance> getResearches();
 
-    Map<ResourceKey<Research>, ResearchProgress> getResearchProgresses();
+    @NotNull Map<ResourceKey<Research>, ResearchProgress> getResearchProgresses();
 
     void setResearchCompleted(ResourceKey<Research> research, long completionTime);
 

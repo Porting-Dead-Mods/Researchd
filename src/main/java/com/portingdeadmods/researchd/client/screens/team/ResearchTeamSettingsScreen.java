@@ -60,6 +60,10 @@ public class ResearchTeamSettingsScreen extends BaseTeamScreen {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         ResearchTeam researchTeam = ResearchTeamHelperServer.getTeamByMember(Objects.requireNonNull(player));
+        if (researchTeam == null) {
+            this.onClose();
+            return;
+        }
 
         // Layout Setup
         this.layout = LinearLayout.vertical().spacing(8);

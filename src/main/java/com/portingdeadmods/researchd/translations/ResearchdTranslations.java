@@ -80,6 +80,8 @@ public final class ResearchdTranslations {
         public static final TranslatableConstant RECIPE_UNLOCK_EFFECT_TOOLTIP = create("effects.tooltip.recipe_unlock", "Unlocks Recipe: %s");
         public static final TranslatableConstant ITEM_UNLOCK_EFFECT_TOOLTIP = create("effects.tooltip.item_unlock", "Unlocks Item: %s");
         public static final TranslatableConstant MULTIBLOCK_UNLOCK_EFFECT_TOOLTIP = create("effects.tooltip.multiblock_unlock", "Unlocks Multiblock: %s");
+        public static final TranslatableConstant COMMAND_EFFECT_TOOLTIP_UNLOCK = create("effects.tooltip.command_unlock", GOLD + "Unlock: " + RESET + "%s");
+        public static final TranslatableConstant COMMAND_EFFECT_TOOLTIP_LOCK = create("effects.tooltip.command_lock", GOLD + "Lock: " + RESET + "%s");
         public static final TranslatableConstant START_RESEARCH_BUTTON = create("screen.button.start_research", "Start");
         public static final TranslatableConstant ENQUEUE_RESEARCH_BUTTON = create("screen.button.enqueue_research", "Enqueue");
 

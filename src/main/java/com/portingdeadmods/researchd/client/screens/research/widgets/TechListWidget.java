@@ -5,6 +5,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.client.TechList;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
@@ -163,7 +164,10 @@ public class TechListWidget extends ResearchScreenWidget {
                 PacketDistributor.sendToServer(new ResearchQueueAddPayload(researchKey, player, gameTime));
 
                 // Instantaneous Effect
-                ResearchTeamHelperClient.getTeam().refreshResearchStatus();
+                ResearchTeam team = ResearchTeamHelperClient.getTeam();
+                if (team != null) {
+                    team.refreshResearchStatus();
+                }
                 ResearchTeamHelperClient.refreshResearchScreenData();
             }
 

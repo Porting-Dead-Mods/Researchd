@@ -41,7 +41,9 @@ public class TeamCommands {
 
 							if (player != null) {
                                 ResearchTeam team = ResearchTeamHelperServer.getTeamByMember(player);
-								player.sendSystemMessage(ResearchTeamHelperServer.formatMembers(team, player.level()));
+								if (team != null) {
+									player.sendSystemMessage(ResearchTeamHelperServer.formatMembers(team, player.level()));
+								}
 							}
 
 							return 1;

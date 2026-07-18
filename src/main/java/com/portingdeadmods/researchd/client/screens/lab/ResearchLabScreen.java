@@ -216,6 +216,8 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
         guiGraphics.disableScissor();
 
         ResearchTeam team = ResearchTeamHelperClient.getTeam();
+        if (team == null) return;
+
         ResearchInstance instance = team.getResearches().get(team.getCurrentResearch());
         if (instance != null) {
             ResearchScreenWidget.renderResearchPanel(guiGraphics, instance, this.leftPos + 123, this.topPos + 51, mouseX, mouseY, 2, false, false);
@@ -234,7 +236,7 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
 
         int x = this.leftPos + 12;
         int y = this.topPos + 72;
-        ResearchProgress rp = ResearchTeamHelperClient.getTeam().getResearchProgresses().get(team.getCurrentResearch());
+        ResearchProgress rp = team.getCurrentProgress();
         float progress = rp == null ? 0f : (rp.getProgress() / rp.getMaxProgress());
         int width = (int) (progress * PROGRESS_BAR_WIDTH);
         guiGraphics.fill(x, y, x + width, y + 6, PROGRESS_COLOR);
@@ -253,8 +255,11 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (ResearchScreenWidget.isPanelHovered(this.leftPos + 123, this.topPos + 51, (int) mouseX, (int) mouseY, 2)) {
             if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-                ResearchdApi.openScreenForResearch(ResearchTeamHelperClient.getTeam().getCurrentResearch());
-                return true;
+                ResearchTeam team = ResearchTeamHelperClient.getTeam();
+                if (team != null && team.getCurrentResearch() != null) {
+                    ResearchdApi.openScreenForResearch(team.getCurrentResearch());
+                    return true;
+                }
             }
         }
         return super.mouseClicked(mouseX, mouseY, button);

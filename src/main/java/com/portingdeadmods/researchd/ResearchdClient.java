@@ -14,6 +14,7 @@ import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.client.ResearchdKeybinds;
 import com.portingdeadmods.researchd.client.impl.editor.ResearchPackObject;
 import com.portingdeadmods.researchd.client.impl.editor.SimpleResearchObject;
+import com.portingdeadmods.researchd.client.impl.editor.effects.CommandEffectObject;
 import com.portingdeadmods.researchd.client.impl.editor.effects.DimensionUnlockEffectObject;
 import com.portingdeadmods.researchd.client.impl.editor.effects.ItemUnlockEffectObject;
 import com.portingdeadmods.researchd.client.impl.editor.effects.RecipeUnlockEffectObject;
@@ -110,6 +111,7 @@ public final class ResearchdClient {
             addEffectWidget(EmptyResearchEffect.ID, EmptyResearchEffectWidget::new);
             addEffectWidget(RecipeUnlockEffect.ID, RecipeUnlockEffectWidget::new);
             addEffectWidget(ItemUnlockEffect.ID, UnlockItemEffectWidget::new);
+            addEffectWidget(CommandResearchEffect.ID, CommandResearchEffectWidget::new);
 
             addEffectWidgetUnsafe(IncreaseValueEffect.ID, ValueEffectModifierEffectWidget::new);
             addEffectWidgetUnsafe(DecreaseValueEffect.ID, ValueEffectModifierEffectWidget::new);
@@ -131,6 +133,7 @@ public final class ResearchdClient {
             CLIENT_RESEARCH_EFFECT_TYPES.put(DimensionUnlockEffectObject.ID, DimensionUnlockEffectObject.INSTANCE);
             CLIENT_RESEARCH_EFFECT_TYPES.put(ItemUnlockEffectObject.ID, ItemUnlockEffectObject.INSTANCE);
             CLIENT_RESEARCH_EFFECT_TYPES.put(RecipeUnlockEffectObject.ID, RecipeUnlockEffectObject.INSTANCE);
+            CLIENT_RESEARCH_EFFECT_TYPES.put(CommandEffectObject.ID, CommandEffectObject.INSTANCE);
 
             CLIENT_RESEARCH_EFFECT_TYPES.put(IncreaseValueEffect.ID, new ValueEffectModifierObject(ResearchEffectTypes.INCREASE_VALUE.get(), IncreaseValueEffect::new));
             CLIENT_RESEARCH_EFFECT_TYPES.put(DecreaseValueEffect.ID, new ValueEffectModifierObject(ResearchEffectTypes.DECREASE_VALUE.get(), DecreaseValueEffect::new));

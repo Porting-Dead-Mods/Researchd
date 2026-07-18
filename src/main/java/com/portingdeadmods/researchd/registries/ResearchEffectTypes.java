@@ -34,6 +34,10 @@ public final class ResearchEffectTypes {
             "item_unlock",
             SpriteResearchIcon.spriteIcon(Researchd.MODID, "item_unlock_icon", 16, 16)
     );
+    public static final Supplier<ResearchEffectType> COMMAND = registerEffectType(
+            "command",
+            new TextResearchIcon(Component.literal("/"))
+    );
 
     // COMPAT //
 

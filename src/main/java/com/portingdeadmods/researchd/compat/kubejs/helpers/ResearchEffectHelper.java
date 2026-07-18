@@ -77,6 +77,22 @@ public class ResearchEffectHelper {
         return new DimensionUnlockEffect(Level.END.location(), DimensionUnlockEffect.END_SPRITE);
     }
     
+    /**
+     * Runs commands when the research is unlocked/locked. Pass an empty string to skip one of the two.
+     * Supports the {@code {{RESEARCH_PLAYER_NAME}}}, {@code {{RESEARCH_TEAM_NAME}}} and {@code {{RESEARCH_ID}}} placeholders.
+     */
+    public static ResearchEffect command(String onUnlock, String onLock) {
+        return new CommandResearchEffect(onUnlock, onLock);
+    }
+
+    public static ResearchEffect commandOnUnlock(String command) {
+        return new CommandResearchEffect(command, "");
+    }
+
+    public static ResearchEffect commandOnLock(String command) {
+        return new CommandResearchEffect("", command);
+    }
+
     public static ResearchEffect and(ResearchEffect... effects) {
         List<ResearchEffect> list = new ArrayList<>();
         Collections.addAll(list, effects);

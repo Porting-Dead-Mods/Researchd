@@ -10,6 +10,7 @@ import com.portingdeadmods.researchd.api.research.ResearchRelations;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
+import com.portingdeadmods.researchd.api.team.ResearchTeamManager;
 import com.portingdeadmods.researchd.api.team.ResearchTeamRole;
 import com.portingdeadmods.researchd.api.team.TeamMember;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
@@ -27,29 +28,36 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 public final class ResearchTeamHelperClient {
-    public static ResearchTeam getTeam() {
+    public static @Nullable ResearchTeam getTeam() {
         LocalPlayer player = Minecraft.getInstance().player;
+        if (player == null) return null;
+
         return ResearchTeamHelperServer.getTeamByMember(player);
     }
 
-    public static ResearchTeam getTeam(UUID uuid) {
-        return ResearchdApi.getTeamManager(Minecraft.getInstance().level).getTeamByPlayerId(uuid);
+    public static @Nullable ResearchTeam getTeam(UUID uuid) {
+        ResearchTeamManager teamManager = ResearchdApi.getTeamManager(Minecraft.getInstance().level);
+        return teamManager != null ? teamManager.getTeamByPlayerId(uuid) : null;
     }
 
     public static void setTeamNameSynced(String name) {
         ResearchTeam clientTeam = getTeam();
-        if (!clientTeam.getName().equals(name)) {
+        if (clientTeam != null && !clientTeam.getName().equals(name)) {
             clientTeam.setName(name);
             PacketDistributor.sendToServer(new TeamSetNamePayload(name));
         }
     }
 
-    public static ResearchTeamRole getPlayerRole(UUID uuid) {
+    public static @NotNull ResearchTeamRole getPlayerRole(UUID uuid) {
         ResearchTeam clientTeam = getTeam();
+        if (clientTeam == null) return ResearchTeamRole.NOT_MEMBER;
+
         if (clientTeam.isOwner(uuid)) {
             return ResearchTeamRole.OWNER;
         } else if (clientTeam.isModerator(uuid)) {
@@ -58,8 +66,10 @@ public final class ResearchTeamHelperClient {
         return ResearchTeamRole.MEMBER;
     }
 
-    public static ResearchTeamRole getRole() {
+    public static @NotNull ResearchTeamRole getRole() {
         LocalPlayer player = Minecraft.getInstance().player;
+        if (player == null) return ResearchTeamRole.NOT_MEMBER;
+
         return getPlayerRole(player.getUUID());
     }
 
@@ -83,18 +93,21 @@ public final class ResearchTeamHelperClient {
         return getPlayerRole(player.getUUID()).getPermissionLevel();
     }
 
-    public static Collection<TeamMember> getTeamMembers() {
-        return getTeam().getMembers();
+    public static @NotNull Collection<TeamMember> getTeamMembers() {
+        ResearchTeam team = getTeam();
+        return team != null ? team.getMembers() : List.of();
     }
 
-    public static List<TeamMember> getPlayersNotInTeam() {
+    public static @NotNull List<TeamMember> getPlayersNotInTeam() {
         ResearchTeam team = getTeam();
-		return AllPlayersCache.getUUIDs().stream().filter(uuid -> !team.hasMember(uuid)).map(uuid -> new TeamMember(uuid, ResearchTeamRole.NOT_MEMBER)).toList();
+		return AllPlayersCache.getUUIDs().stream().filter(uuid -> team == null || !team.hasMember(uuid)).map(uuid -> new TeamMember(uuid, ResearchTeamRole.NOT_MEMBER)).toList();
     }
 
     public static void removeTeamMemberSynced(TeamMember memberProfile) {
         UUID id = memberProfile.player();
         ResearchTeam team = getTeam(id);
+        if (team == null) return;
+
         team.removeMember(id);
         PacketDistributor.sendToServer(new ManageMemberPayload(id, true));
         Researchd.LOGGER.debug("Remove player {}", PlayerUtils.getPlayerNameFromUUID(Minecraft.getInstance().level, memberProfile.player()));
@@ -102,17 +115,16 @@ public final class ResearchTeamHelperClient {
 
     public static void sendTeamInviteSynced(TeamMember profileToInvite) {
         UUID invited = profileToInvite.player();
-        boolean remove = getTeam().getSocialManager().containsSentInvite(invited);
-        LocalPlayer player = Minecraft.getInstance().player;
-
         ResearchTeamImpl team = (ResearchTeamImpl) getTeam();
+        if (team == null) return;
+
+        boolean remove = team.getSocialManager().containsSentInvite(invited);
         if (remove) {
             team.getSocialManager().removeSentInvite(invited);
         } else {
             team.getSocialManager().addSentInvite(invited);
         }
         team.setChanged();
-        Level level = player.level();
 
         PacketDistributor.sendToServer(new InvitePlayerPayload(invited, remove));
     }
@@ -120,6 +132,8 @@ public final class ResearchTeamHelperClient {
     public static void promoteTeamMemberSynced(TeamMember member) {
         if (Objects.requireNonNull(member.role()) == ResearchTeamRole.MEMBER) {
             ResearchTeam team = getTeam(member.player());
+            if (team == null) return;
+
             team.setRole(member.player(), ResearchTeamRole.MODERATOR);
             PacketDistributor.sendToServer(new ManageModeratorPayload(member.player(), false));
         }
@@ -129,6 +143,8 @@ public final class ResearchTeamHelperClient {
     public static void demoteTeamMemberSynced(TeamMember memberProfile) {
         if (Objects.requireNonNull(memberProfile.role()) == ResearchTeamRole.MODERATOR) {
             ResearchTeam team = getTeam(memberProfile.player());
+            if (team == null) return;
+
             team.setRole(memberProfile.player(), ResearchTeamRole.MEMBER);
             PacketDistributor.sendToServer(new ManageModeratorPayload(memberProfile.player(), true));
         }
@@ -137,11 +153,15 @@ public final class ResearchTeamHelperClient {
 
     public static void transferOwnershipSynced(TeamMember nextOwner) {
         ResearchTeam team = getTeam();
+        if (team == null) return;
+
         team.setRole(nextOwner.player(), ResearchTeamRole.OWNER);
         PacketDistributor.sendToServer(new TransferOwnershipPayload(nextOwner.player()));
     }
 
-    public static void resolveInstances(ResearchTeam team) {
+    public static void resolveInstances(@Nullable ResearchTeam team) {
+        if (team == null || ResearchdApi.getResearchManager() == null) return;
+
         Map<ResourceKey<Research>, ResearchInstance> researches = team.getResearches();
 
         for (Map.Entry<ResourceKey<Research>, ResearchInstance> entry : researches.entrySet()) {
@@ -170,7 +190,10 @@ public final class ResearchTeamHelperClient {
 
 	public static void refreshResearchQueueData() {
 		if (Minecraft.getInstance().screen instanceof ResearchScreen screen) {
-			screen.getResearchQueueWidget().setQueue(getTeam().getQueue());
+			ResearchTeam team = getTeam();
+			if (team == null) return;
+
+			screen.getResearchQueueWidget().setQueue(team.getQueue());
 		}
 	}
 

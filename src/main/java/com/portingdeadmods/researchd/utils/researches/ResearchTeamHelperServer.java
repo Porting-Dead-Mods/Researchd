@@ -44,11 +44,11 @@ public final class ResearchTeamHelperServer {
      * Get the team that a specified player is a member of
      *
      * @param player The player whose team you want to get
-     * @return The team the player is a member of
+     * @return The team the player is a member of, or null if the player has no team
      */
-    public static @NotNull ResearchTeam getTeamByMember(@NotNull Player player) {
+    public static @Nullable ResearchTeam getTeamByMember(@NotNull Player player) {
         ResearchTeamManager teamManager = ResearchdApi.getTeamManager(player.level());
-        return teamManager.getTeamByPlayerId(player.getUUID());
+        return teamManager != null ? teamManager.getTeamByPlayerId(player.getUUID()) : null;
     }
 
     /**
@@ -57,10 +57,10 @@ public final class ResearchTeamHelperServer {
      *
      * @param player the player to be removed from their team
      */
-    public static void removeMember(ServerPlayer player) {
+    public static void removeMember(@NotNull ServerPlayer player) {
         UUID uuid = player.getUUID();
-        ResearchTeamManager teamManager = ResearchdApi.getTeamManager(player.level());
-        @NotNull ResearchTeam team = teamManager.getTeamByPlayerId(uuid);
+        ResearchTeam team = getTeamByMember(player);
+        if (team == null) return;
 
         team.removeMember(uuid);
     }
@@ -79,16 +79,19 @@ public final class ResearchTeamHelperServer {
 
     public static int getPermissionLevel(UUID player, Level level) {
         ResearchTeamManager teamManager = ResearchdApi.getTeamManager(level);
-        ResearchTeam team = teamManager.getTeamByPlayerId(player);
+        ResearchTeam team = teamManager != null ? teamManager.getTeamByPlayerId(player) : null;
+        if (team == null) return ResearchTeamRole.NOT_MEMBER.getPermissionLevel();
 
         return team.getMember(player).role().getPermissionLevel();
     }
 
     public static boolean arePlayersSameTeam(@NotNull Level level, UUID uuid1, UUID uuid2) {
         ResearchTeamManager teamManager = ResearchdApi.getTeamManager(level);
+        if (teamManager == null) return false;
 
         ResearchTeam team1 = teamManager.getTeamByPlayerId(uuid1);
         ResearchTeam team2 = teamManager.getTeamByPlayerId(uuid2);
+        if (team1 == null || team2 == null) return false;
 
         return team1.getId().equals(team2.getId());
     }
@@ -119,14 +122,16 @@ public final class ResearchTeamHelperServer {
      *   - Set member role of specified player to member
      */
 
-    public static void handleEnterTeamSynced(@NotNull ServerPlayer requester, ResearchTeamImpl team) {
+    public static void handleEnterTeamSynced(@NotNull ServerPlayer requester, @Nullable ResearchTeamImpl team) {
         Level level = requester.level();
         UUID requesterId = requester.getUUID();
 
         ResearchTeamManager teamManager = ResearchdApi.getTeamManager(level);
+        if (teamManager == null) return;
 
         // Already in Team (with multiple people) -> Return with error msg
-        if (getTeamByMember(requester).getMembers().size() > 1) {
+        ResearchTeam currentTeam = getTeamByMember(requester);
+        if (currentTeam != null && currentTeam.getMembers().size() > 1) {
             if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                 requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.ALREADY_IN_TEAM));
             return;
@@ -181,8 +186,10 @@ public final class ResearchTeamHelperServer {
         UUID requesterId = requester.getUUID();
 
         ResearchTeamManager teamManager = ResearchdApi.getTeamManager(level);
+        if (teamManager == null) return;
 
         ResearchTeam team = getTeamByMember(requester);
+        if (team == null) return;
 
         // Is Owner -> Handle cases of being alone / with multiple people
         if (team.isOwner(requesterId)) {
@@ -245,6 +252,8 @@ public final class ResearchTeamHelperServer {
         // Permission Check
         if (getPermissionLevel(requester) >= ResearchTeamRole.MODERATOR.getPermissionLevel() && (getPermissionLevel(requester) > getPermissionLevel(member, requester.level()))) {
             ResearchTeamImpl team = (ResearchTeamImpl) getTeamByMember(requester);
+            if (team == null) return;
+
             if (remove) {
                 // Remove member and put them into a default team with a status message
 
@@ -257,7 +266,7 @@ public final class ResearchTeamHelperServer {
                 ServerPlayer kickedPlayer = server.getPlayerList().getPlayer(member);
                 if (kickedPlayer != null) {
                     PacketDistributor.sendToPlayer(kickedPlayer, ClearGraphCachePayload.INSTANCE);
-                    kickedPlayer.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.KICKED, getTeamByMember(requester).getName()));
+                    kickedPlayer.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.KICKED, team.getName()));
                 }
 
                 createTeamForPlayerSynced(level, member, teamManager);
@@ -268,7 +277,7 @@ public final class ResearchTeamHelperServer {
                 PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
             }
 
-            refreshPlayerManagement(getTeamByMember(requester), level);
+            refreshPlayerManagement(team, level);
         } else {
             if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                 requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NO_PERMS));
@@ -308,7 +317,7 @@ public final class ResearchTeamHelperServer {
                 }
                 PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
 
-                refreshPlayerManagement(getTeamByMember(requester), level);
+                refreshPlayerManagement(team, level);
             } else {
                 if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                     requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.BAD_INPUT));
@@ -378,10 +387,12 @@ public final class ResearchTeamHelperServer {
 
     public static void handleListMembers(@NotNull ServerPlayer requester) {
         ResearchTeam team = getTeamByMember(requester);
+        if (team == null) return;
+
         requester.sendSystemMessage(formatMembers(team, requester.level()));
     }
 
-    public static Component formatMembers(ResearchTeam team, Level level) {
+    public static @NotNull Component formatMembers(@NotNull ResearchTeam team, @NotNull Level level) {
         MutableComponent formattedTeam = Component.literal(team.getName()).withStyle(ChatFormatting.AQUA);
         formattedTeam.append(Component.literal(" has %d member%s: ".formatted(team.getMembers().size(), team.getMembers().size() == 1 ? "" : "s")).withStyle(ChatFormatting.WHITE));
 
@@ -396,6 +407,8 @@ public final class ResearchTeamHelperServer {
 
     public static void handleSendInviteToPlayer(@NotNull ServerPlayer requester, UUID invited, boolean remove) {
         ResearchTeamImpl team = (ResearchTeamImpl) getTeamByMember(requester);
+        if (team == null) return;
+
         ServerLevel level = requester.serverLevel();
 
         // Error Safety (inviting yourself)
@@ -638,6 +651,7 @@ public final class ResearchTeamHelperServer {
     // TODO: Simplify?
     public static void initializeTeamResearches(ResearchTeamMap teamMap, Level level) {
         ResearchManager researchManager = ResearchdApi.getResearchManager();
+        if (researchManager == null) return;
 
         for (ResearchTeam team : teamMap.getTeams()) {
             Map<ResourceKey<Research>, ResearchInstance> teamResearches = team.getResearches();
@@ -655,6 +669,8 @@ public final class ResearchTeamHelperServer {
 
             for (ResearchInstance research : teamResearches.values()) {
                 Research r = researchManager.lookupResearch(research.getResearch(), level);
+                if (r == null) continue;
+
                 List<ResourceKey<Research>> pageRoots = researchManager.getRootsForPage(r.researchPage());
 
                 if (research.getResearchStatus() == ResearchStatus.RESEARCHABLE_AFTER_QUEUE && pageRoots.contains(research.getResearch())) {
@@ -664,6 +680,8 @@ public final class ResearchTeamHelperServer {
 
             for (ResourceKey<Research> research : allResearches) {
                 Research r = researchManager.lookupResearch(research, level);
+                if (r == null) continue;
+
                 List<ResourceKey<Research>> pageRoots = researchManager.getRootsForPage(r.researchPage());
                 ResearchStatus status;
                 if (pageRoots.contains(research)) {

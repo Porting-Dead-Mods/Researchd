@@ -5,6 +5,7 @@ import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchPage;
+import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -37,20 +38,26 @@ public final class ResearchGraphCache {
         PAGE_GRAPH_CACHE.clear();
     }
 
-    public static ResearchGraph computeIfAbsent(ResourceKey<Research> key)  {
-        return GRAPH_CACHE.computeIfAbsent(key, k -> ResearchGraph.fromRootResearch(key, ResearchTeamHelperClient.getTeam().getResearches()));
+    public static @Nullable ResearchGraph computeIfAbsent(ResourceKey<Research> key)  {
+        ResearchTeam team = ResearchTeamHelperClient.getTeam();
+        if (team == null) return GRAPH_CACHE.get(key);
+
+        return GRAPH_CACHE.computeIfAbsent(key, k -> ResearchGraph.fromRootResearch(key, team.getResearches()));
     }
 
     /**
      * Computes or retrieves a cached ResearchGraph for the given ResearchPage.
      * Currently uses the first root node of the page for graph generation.
      */
-    public static ResearchGraph computeIfAbsentForPage(ResearchPage page) {
+    public static @Nullable ResearchGraph computeIfAbsentForPage(ResearchPage page) {
+        ResearchTeam team = ResearchTeamHelperClient.getTeam();
+        if (team == null || ResearchdApi.getResearchManager() == null) return PAGE_GRAPH_CACHE.get(page.id());
+
         return PAGE_GRAPH_CACHE.computeIfAbsent(page.id(), pageId -> {
             List<ResourceKey<Research>> roots = ResearchdApi.getResearchManager().getRootsForPage(pageId);
             if (roots != null && !roots.isEmpty()) {
                 // TODO: Parse
-                return ResearchGraph.fromResearchPage(page, roots.getFirst(), ResearchTeamHelperClient.getTeam().getResearches());
+                return ResearchGraph.fromResearchPage(page, roots.getFirst(), team.getResearches());
             }
             return null;
         });

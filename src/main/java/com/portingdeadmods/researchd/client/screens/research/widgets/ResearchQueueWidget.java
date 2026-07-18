@@ -8,9 +8,11 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.api.team.ResearchQueue;
+import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
+import com.portingdeadmods.researchd.impl.research.SimpleResearchQueue;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
 import com.portingdeadmods.researchd.networking.research.ResearchQueueRemovePayload;
@@ -45,8 +47,8 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
     public ResearchQueueWidget(ResearchScreen screen, int x, int y) {
         super(x, y, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
         this.screen = screen;
-        Minecraft mc = Minecraft.getInstance();
-        this.queue = ResearchdApi.getTeamManager(mc.level).getTeamByPlayer(mc.player).getQueue();
+        ResearchTeam team = ResearchTeamHelperClient.getTeam();
+        this.queue = team != null ? team.getQueue() : new SimpleResearchQueue();
     }
 
     @Override
@@ -58,11 +60,13 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
 
         guiGraphics.drawString(Minecraft.getInstance().font, "Research Queue", paddingX - 1, 4, -1);
 
+        ResearchTeam team = ResearchTeamHelperClient.getTeam();
+
         int selectedIndex = 0;
         for (int i = 0; i < this.queue.size(); i++) {
             ResourceKey<Research> key = this.queue.get(i);
             if (this.selected == null || key != this.selected.getResearch()) {
-                ResearchInstance instance = ResearchTeamHelperClient.getTeam().getResearches().get(key);
+                ResearchInstance instance = team != null ? team.getResearches().get(key) : null;
                 renderQueuePanel(guiGraphics, instance, paddingX + i * PANEL_WIDTH, paddingY, mouseX, mouseY, i);
             } else {
                 selectedIndex = i;
@@ -92,7 +96,10 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
                 this.screen.getTechListWidget().startResearchButton.active = true;
                 return super.mouseClicked(mouseX, mouseY, button);
             } else if (isHovering(null, (int) mouseX, (int) mouseY, index, paddingY, getWidth(), getHeight())) {
-                ResearchInstance instance = ResearchTeamHelperClient.getTeam().getResearches().get(researchKey);
+                ResearchTeam team = ResearchTeamHelperClient.getTeam();
+                if (team == null) return false;
+
+                ResearchInstance instance = team.getResearches().get(researchKey);
                 this.screen.getSelectedResearchWidget().setSelectedResearch(instance);
                 this.screen.getResearchGraphWidget().setGraph(ResearchGraphCache.computeIfAbsent(researchKey));
                 return super.mouseClicked(mouseX, mouseY, button);
@@ -109,7 +116,10 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
             PacketDistributor.sendToServer(new ResearchQueueRemovePayload(researchKey));
 
             // Instantaneous Effect
-            ResearchTeamHelperClient.getTeam().refreshResearchStatus();
+            ResearchTeam team = ResearchTeamHelperClient.getTeam();
+            if (team != null) {
+                team.refreshResearchStatus();
+            }
             ResearchTeamHelperClient.refreshResearchScreenData();
         }
     }
@@ -148,7 +158,8 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
         ResearchStatus status = instance.getResearchStatus();
         GuiUtils.drawImg(guiGraphics, status.getSpriteTexture(spriteType), x, y, PANEL_WIDTH, spriteType.getHeight());
 
-        ResearchProgress rmp = ResearchTeamHelperClient.getTeam().getResearchProgresses().get(instance.getResearch());
+        ResearchTeam team = ResearchTeamHelperClient.getTeam();
+        ResearchProgress rmp = team != null ? team.getResearchProgresses().get(instance.getResearch()) : null;
         float progress = rmp == null ? 0f : (rmp.getProgress() / rmp.getMaxProgress());
 
         guiGraphics.blit(ResearchStatus.RESEARCHED.getSpriteTexture(spriteType), x, y, 0, 0, (int) (progress * PANEL_WIDTH), spriteType.getHeight(), PANEL_WIDTH, spriteType.getHeight());

@@ -27,6 +27,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
@@ -109,17 +110,17 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
     }
 
     @Override
-    public String getName() {
+    public @NotNull String getName() {
         return this.name;
     }
 
     @Override
-    public UUID getId() {
+    public @NotNull UUID getId() {
         return this.id;
     }
 
     @Override
-    public TeamMember getOwner() {
+    public @Nullable TeamMember getOwner() {
         for (TeamMember member : this.members.values()) {
             if (member.role() == ResearchTeamRole.OWNER) {
                 return member;
@@ -129,7 +130,7 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
     }
 
     @Override
-    public SequencedCollection<TeamMember> getMembers() {
+    public @NotNull SequencedCollection<TeamMember> getMembers() {
         return this.members.sequencedValues().stream().sorted().toList();
     }
 
@@ -154,17 +155,17 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
     }
 
     @Override
-    public ResearchQueue getQueue() {
+    public @NotNull ResearchQueue getQueue() {
         return this.researches.researchQueue();
     }
 
     @Override
-    public Map<ResourceKey<Research>, ResearchInstance> getResearches() {
+    public @NotNull Map<ResourceKey<Research>, ResearchInstance> getResearches() {
         return this.researches.researches();
     }
 
     @Override
-    public Map<ResourceKey<Research>, ResearchProgress> getResearchProgresses() {
+    public @NotNull Map<ResourceKey<Research>, ResearchProgress> getResearchProgresses() {
         return this.researches.progress();
     }
 
@@ -178,7 +179,7 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
     @Override
     public void onCompleteResearch(ResourceKey<Research> researchKey, long completionTime, boolean forced, Function<UUID, Player> playerGetter) {
         ResearchInstance instance = this.getResearches().get(researchKey);
-        if (instance.getResearchedTime() != completionTime) {
+        if (instance == null || instance.getResearchedTime() != completionTime) {
             return;
         }
 
@@ -199,6 +200,8 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
 
             KubeJSCompat.fireResearchCompletedEvent((ServerPlayer) player, researchKey);
         }
+        if (level == null || research == null) return;
+
         research.researchEffect().onUnlock(level, this, researchKey);
     }
 
@@ -280,7 +283,7 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
     }
 
     @Override
-    public TeamSocialManager getSocialManager() {
+    public @NotNull TeamSocialManager getSocialManager() {
         return this.socialManager;
     }
 

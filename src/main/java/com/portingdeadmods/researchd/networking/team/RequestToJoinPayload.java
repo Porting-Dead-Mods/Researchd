@@ -44,6 +44,8 @@ public record RequestToJoinPayload(UUID toJoin, boolean remove) implements Custo
                 Player teamMemberPlayer = level.getPlayerByUUID(this.toJoin());
                 if (teamMemberPlayer != null) {
                     ResearchTeamImpl team = (ResearchTeamImpl) ResearchTeamHelperServer.getTeamByMember(teamMemberPlayer);
+                    if (team == null) return;
+
                     if (this.remove()) {
                         team.getSocialManager().removeReceivedInvite(sp.getUUID());
                     } else {

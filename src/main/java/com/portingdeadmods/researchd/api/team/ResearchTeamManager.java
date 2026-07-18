@@ -3,32 +3,46 @@ package com.portingdeadmods.researchd.api.team;
 import com.portingdeadmods.researchd.impl.team.TeamIterator;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.UUID;
 
 public interface ResearchTeamManager {
-    ResearchTeam getTeamById(UUID uuid);
+    /**
+     * @return the team with the given team id, or null if no such team exists
+     */
+    @Nullable ResearchTeam getTeamById(UUID uuid);
 
-    ResearchTeam getTeamByName(String name);
+    /**
+     * @return the team with the given display name, or null if no such team exists
+     */
+    @Nullable ResearchTeam getTeamByName(String name);
 
-    ResearchTeam getTeamByPlayerId(UUID playerId);
+    /**
+     * @return the team the given player is a member of, or null if the player has no team
+     */
+    @Nullable ResearchTeam getTeamByPlayerId(UUID playerId);
 
-    default ResearchTeam getTeamByPlayer(Player player) {
+    /**
+     * @return the team the given player is a member of, or null if the player has no team
+     */
+    default @Nullable ResearchTeam getTeamByPlayer(@NotNull Player player) {
         return this.getTeamByPlayerId(player.getUUID());
     }
 
-    Collection<UUID> getTeamIds();
+    @NotNull Collection<UUID> getTeamIds();
 
-    default Iterable<ResearchTeam> getTeams() {
+    default @NotNull Iterable<ResearchTeam> getTeams() {
         return new TeamIterator.Iterable(this, this.getTeamIds().iterator());
     }
 
-    ResearchTeam createEmptyTeam(String name);
+    @NotNull ResearchTeam createEmptyTeam(String name);
 
-    ResearchTeam createDefaultTeam(UUID playerId, Level level);
+    @NotNull ResearchTeam createDefaultTeam(UUID playerId, Level level);
 
-    default ResearchTeam createDefaultTeam(Player player) {
+    default @NotNull ResearchTeam createDefaultTeam(@NotNull Player player) {
         return this.createDefaultTeam(player.getUUID(), player.level());
     }
 

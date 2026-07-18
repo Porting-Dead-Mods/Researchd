@@ -46,6 +46,8 @@ public class FTBTeamsCompat {
         if (!event.getPreviousProperties().get(TeamProperties.DISPLAY_NAME).equals(event.getTeam().getName().getString())) {
             ResearchTeamMap teams = TeamSavedData.getData(server.overworld());
             ResearchTeam team = teams.getTeamByPlayerId(event.getTeam().getOwner());
+            if (team == null) return;
+
             team.setName(event.getTeam().getName().getString());
             teams.setChanged();
         }

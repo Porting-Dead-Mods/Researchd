@@ -129,12 +129,15 @@ public final class ResearchHelperCommon {
         Level level = player.level();
 
         ResearchTeamImpl team = teamMap.getTeamByPlayerId(player.getUUID());
+        if (team == null) return;
 
         // FIXME: WHY ARE CALLING UNLOCK HERE EVEN THOUGH IT IS ALREADY CALLED WHEN RESEARCH IS UNLOCKED
         for (ResearchInstance res : team.getResearches().values()) {
             if (res.getResearchStatus() == ResearchStatus.RESEARCHED) {
-                ResearchEffect effect = res.lookup(level).researchEffect();
-                effect.onUnlock(level, team, res.getResearch());
+                Research research = res.lookup(level);
+                if (research == null) continue;
+
+                research.researchEffect().onUnlock(level, team, res.getResearch());
             }
         }
     }

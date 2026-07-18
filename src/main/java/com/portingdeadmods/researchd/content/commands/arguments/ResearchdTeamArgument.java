@@ -94,13 +94,19 @@ public class ResearchdTeamArgument implements ArgumentType<ResearchdTeamArgument
             teamManager = ResearchdApi.getTeamManager(SpaghettiClient.getClientLevel());
         }
 
-        return teamManager.getTeamIds().stream().map(teamManager::getTeamById);
+        if (teamManager == null) return Stream.empty();
+
+        return teamManager.getTeamIds().stream().map(teamManager::getTeamById).filter(Objects::nonNull);
     }
 
     private record SelectorProvider(EntitySelector selector) implements ResearchdTeamArgumentProvider {
         public ResearchTeam getTeam(CommandSourceStack source) throws CommandSyntaxException {
             ServerPlayer player = this.selector.findSinglePlayer(source);
-            return ResearchdApi.getTeamManager(source.getLevel()).getTeamByPlayer(player);
+            ResearchTeam team = ResearchdApi.getTeamManager(source.getLevel()).getTeamByPlayer(player);
+            if (team == null) {
+                throw TEAM_NOT_FOUND.create(player.getGameProfile().getName());
+            }
+            return team;
         }
     }
 
@@ -116,7 +122,11 @@ public class ResearchdTeamArgument implements ArgumentType<ResearchdTeamArgument
                 return team;
             } else {
                 Optional<UUID> playerUUID = source.getServer().getProfileCache().get(this.id).map(GameProfile::getId);
-                return playerUUID.map(teamManager::getTeamByPlayerId).orElseThrow(this::error);
+                ResearchTeam playerTeam = playerUUID.map(teamManager::getTeamByPlayerId).orElseThrow(this::error);
+                if (playerTeam == null) {
+                    throw this.error();
+                }
+                return playerTeam;
             }
         }
     }

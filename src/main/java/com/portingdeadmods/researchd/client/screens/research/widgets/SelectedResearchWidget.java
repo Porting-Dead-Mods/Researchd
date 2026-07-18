@@ -10,6 +10,7 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
+import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
@@ -219,7 +220,10 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
 
     public void setSelectedResearch(@Nullable ResourceKey<Research> research) {
         if (research != null) {
-            this.setSelectedResearch(Objects.requireNonNull(ResearchTeamHelperClient.getTeam().getResearches().get(research)));
+            ResearchTeam team = ResearchTeamHelperClient.getTeam();
+            if (team == null) return;
+
+            this.setSelectedResearch(Objects.requireNonNull(team.getResearches().get(research)));
         }
     }
 

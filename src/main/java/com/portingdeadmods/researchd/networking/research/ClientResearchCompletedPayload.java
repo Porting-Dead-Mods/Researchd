@@ -43,7 +43,7 @@ public record ClientResearchCompletedPayload(ResourceKey<Research> key, int time
         context.enqueueWork(() -> {
             Player player = context.player();
             @Nullable ResearchTeamManager data = ResearchdApi.getTeamManager(player.level());
-            ResearchTeam team = data.getTeamByPlayerId(player.getUUID());
+            ResearchTeam team = data != null ? data.getTeamByPlayerId(player.getUUID()) : null;
             if (team == null) {
                 context.disconnect(ResearchdTranslations.component(ResearchdTranslations.Errors.NO_RESEARCH_TEAM));
                 return;

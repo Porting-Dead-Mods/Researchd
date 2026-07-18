@@ -64,6 +64,11 @@ public class ResearchTeamScreen extends BaseTeamScreen {
 
         // Team information
         ResearchTeam researchTeam = ResearchTeamHelperServer.getTeamByMember(Objects.requireNonNull(player));
+        if (researchTeam == null) {
+            this.onClose();
+            return;
+        }
+
         String name = researchTeam.getName();
         List<ResearchInstance> recentResearches = ResearchHelperCommon.getRecentResearches(researchTeam);
 

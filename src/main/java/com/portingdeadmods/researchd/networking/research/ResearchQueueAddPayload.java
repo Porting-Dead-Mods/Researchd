@@ -53,10 +53,13 @@ public record ResearchQueueAddPayload(ResourceKey<Research> researchKey, UUID pl
                 ServerLevel level = serverPlayer.serverLevel();
                 ResearchTeamMap data = TeamSavedData.getData(level);
                 ResearchTeamImpl team = (ResearchTeamImpl) data.getTeamByPlayer(serverPlayer);
+                if (team == null) return;
 
 				if (team.getQueue().size() >= ResearchdConfig.Common.researchQueueLength) return;
 
                 ResearchInstance instance = team.getResearches().get(researchKey);
+                if (instance == null) return;
+
                 instance.setResearchedPlayer(this.player);
                 instance.setResearchedTime(this.time);
 

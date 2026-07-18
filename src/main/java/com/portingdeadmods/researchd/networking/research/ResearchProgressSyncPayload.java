@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.networking.research;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -28,7 +29,10 @@ public record ResearchProgressSyncPayload(ResourceKey<Research> key, ResearchPro
 
 	public void handle(IPayloadContext context) {
 		context.enqueueWork(() -> {
-			ResearchTeamHelperClient.getTeam().getResearchProgresses().put(this.key, this.progress);
+			ResearchTeam team = ResearchTeamHelperClient.getTeam();
+			if (team == null) return;
+
+			team.getResearchProgresses().put(this.key, this.progress);
 		}).exceptionally(err -> {
 			Researchd.LOGGER.error("Failed to handle ResearchMethodProgressSyncPayload", err);
 			return null;
