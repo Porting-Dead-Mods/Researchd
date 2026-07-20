@@ -88,10 +88,10 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run Data
-        run: ./gradlew runData
+        run: ./gradlew runData --no-configuration-cache
 
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew build --no-configuration-cache
 
       - name: Get mod info
         id: mod_info
