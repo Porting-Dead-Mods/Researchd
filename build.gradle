@@ -244,6 +244,7 @@ if (System.getenv('CURSEFORGE_TOKEN')) {
         mainFile.displayName = "${mod_id}-${mod_version}-${minecraft_version}"
         mainFile.addGameVersion minecraft_version
         mainFile.addModLoader 'NeoForge'
+        mainFile.addEnvironment 'Client', 'Server'
         mainFile.addRequirement "porting-dead-libs"
 
         // Add sources and javadoc as additional files
