@@ -40,6 +40,7 @@ public class ResearchLabControllerBE extends GhostMultiblockControllerBE impleme
     public Map<ResourceKey<ResearchPack>, Float> researchPackUsage; // Usage is between 0 and 1. It decreases with 1/DURATION per tick.
     public int currentResearchDuration; // Just initialized to -1
     public List<ResourceKey<ResearchPack>> researchPacks;
+    private int savedLabSlotCount;
 
     public ResearchLabControllerBE(BlockPos pos, BlockState blockState) {
         super(ResearchdBlockEntityTypes.RESEARCH_LAB_CONTROLLER.get(), pos, blockState);
@@ -72,10 +73,10 @@ public class ResearchLabControllerBE extends GhostMultiblockControllerBE impleme
             stacks.add(this.getItemHandler().getStackInSlot(i));
         }
         ItemStackHandler itemHandler = (ItemStackHandler) this.getItemHandler();
-        // Never shrink below the stored slot count: re-loading the lab (e.g. after respawn / crossing
-        // dimensions) can briefly observe an empty researchPack list, and resizing to 0 means the
-        // rewrite below hits out-of-bounds "Slot 0 not in valid range - [0,0)" and crashes.
-        int newSize = Math.max(this.researchPacks.size(), stacks.size());
+        // Never shrink below the stored lab slot count: it is persisted so the client (whose researchPack
+        // registry is empty) can build the same number of menu slots as the server, preventing
+        // container_set_content IndexOutOfBounds on both empty and loaded labs.
+        int newSize = Math.max(this.researchPacks.size(), Math.max(this.savedLabSlotCount, stacks.size()));
         itemHandler.setSize(newSize);
         for (int i = 0; i < stacks.size(); i++) {
             if (i < newSize) {
@@ -152,6 +153,7 @@ public class ResearchLabControllerBE extends GhostMultiblockControllerBE impleme
 
     @Override
     protected void saveData(CompoundTag tag, HolderLookup.Provider registries) {
+        tag.putInt("lab_slot_count", this.getItemHandler().getSlots());
         CompoundTag researchPackUsageTag = new CompoundTag();
         for (Map.Entry<ResourceKey<ResearchPack>, Float> entry : researchPackUsage.entrySet()) {
             researchPackUsageTag.putFloat(entry.getKey().location().toString(), entry.getValue());
@@ -162,6 +164,7 @@ public class ResearchLabControllerBE extends GhostMultiblockControllerBE impleme
 
     @Override
     protected void loadData(CompoundTag tag, HolderLookup.Provider registries) {
+        this.savedLabSlotCount = tag.getInt("lab_slot_count");
         CompoundTag researchPackUsageTag = tag.getCompound("research_pack_usage");
         for (String key : researchPackUsageTag.getAllKeys()) {
             this.researchPackUsage.put(ResourceKey.create(ResearchdRegistries.RESEARCH_PACK_KEY, ResourceLocation.parse(key)), researchPackUsageTag.getFloat(key));

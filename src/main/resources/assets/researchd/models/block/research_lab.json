@@ -1,9 +1,9 @@
 {
   "loader": "neoforge:obj",
   "model": "researchd:models/block/research_lab.obj",
-  "flipV": true,
-  "shadeQuads": true,
-  "emissiveAmbient": true,
+  "flip_v": true,
+  "shade_quads": true,
+  "emissive_ambient": true,
   "ambientocclusion": false,
   "textures": {
     "#texture0": "researchd:block/research_lab",

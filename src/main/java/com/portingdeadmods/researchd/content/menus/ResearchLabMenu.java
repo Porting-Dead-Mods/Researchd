@@ -13,6 +13,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,11 +31,21 @@ public class ResearchLabMenu extends PDLAbstractContainerMenu<ResearchLabControl
 	}
 
 	public ResearchLabMenu(int containerId, @NotNull Inventory inv, @NotNull ResearchLabControllerBE blockEntity) {
+		this(containerId, inv, blockEntity, blockEntity.getItemHandler().getSlots());
+	}
+
+	private ResearchLabMenu(int containerId, @NotNull Inventory inv, @NotNull ResearchLabControllerBE blockEntity, int packCount) {
 		super(ResearchdMenuTypes.RESEARCH_LAB_MENU.get(), containerId, inv, blockEntity);
-		Researchd.debug("Research Lab Menu", "Creating Research Lab Menu with ", ResearchHelperCommon.getResearchPacks(inv.player.level()).size(), " slots.");
+		Researchd.debug("Research Lab Menu", "Creating Research Lab Menu with ", packCount, " slots.");
 
         this.researchPacks = this.getBlockEntity().researchPacks;
         this.researchPackItems = researchPacks.stream().map(ResearchPackImpl::asStack).toList();
+
+		// The client's research-pack registry is empty, so always build exactly as many slots as the
+		// server sent. Keep the client item handler large enough for the display slots it binds to.
+		if (this.getBlockEntity().getItemHandler() instanceof ItemStackHandler itemHandler && itemHandler.getSlots() < packCount) {
+			itemHandler.setSize(packCount);
+		}
 
 		int slotsX = 8;
         int slotsY = 18;
@@ -42,7 +53,7 @@ public class ResearchLabMenu extends PDLAbstractContainerMenu<ResearchLabControl
 		var x = new ImmutableList.Builder<Integer>();
 		var s = new ImmutableList.Builder<Slot>();
 
-        for (int i = 0; i < this.researchPackItems.size(); i++) {
+        for (int i = 0; i < packCount; i++) {
 			int slotX = slotsX + i * 18;
 			Slot slot = new SlotItemHandler(this.getBlockEntity().getItemHandler(), i, slotX, slotsY);
 			x.add(slotX);

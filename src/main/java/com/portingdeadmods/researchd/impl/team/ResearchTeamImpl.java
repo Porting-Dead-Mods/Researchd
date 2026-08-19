@@ -190,8 +190,14 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
 
         // Re-sync the queue to every member before announcing completion, otherwise a member's
         // client may hold a stale queue head and get force-disconnected by
-        // ClientResearchCompletedPayload's desync check.
-        PacketDistributor.sendToAllPlayers(new SyncTeamPayload(this));
+        // ClientResearchCompletedPayload's desync check. Scope to online members only, not the
+        // whole server, so no team data leaks to unrelated clients.
+        for (TeamMember member : this.getMembers()) {
+            Player memberPlayer = playerGetter.apply(member.player());
+            if (memberPlayer instanceof ServerPlayer sp) {
+                PacketDistributor.sendToPlayer(sp, new SyncTeamPayload(this));
+            }
+        }
 
         Level level = null;
         Research research = null;

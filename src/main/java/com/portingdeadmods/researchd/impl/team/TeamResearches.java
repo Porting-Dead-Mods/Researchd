@@ -45,7 +45,8 @@ public record TeamResearches(SimpleResearchQueue researchQueue,
 
     // Helper methods
     public boolean hasCompleted(ResourceKey<Research> research) {
-        return this.researches.get(research).getResearchStatus() == ResearchStatus.RESEARCHED;
+        ResearchInstance instance = this.researches.get(research);
+        return instance != null && instance.getResearchStatus() == ResearchStatus.RESEARCHED;
     }
 
     /**
@@ -87,7 +88,7 @@ public record TeamResearches(SimpleResearchQueue researchQueue,
     public void setResearchFinished(ResourceKey<Research> research, long completionTime) {
         ResearchInstance instance = this.researches.get(research);
 
-        if (instance.isResearched()) return;
+        if (instance == null || instance.isResearched()) return;
 
         instance.setResearchStatus(ResearchStatus.RESEARCHED);
         instance.setResearchedTime(completionTime);
