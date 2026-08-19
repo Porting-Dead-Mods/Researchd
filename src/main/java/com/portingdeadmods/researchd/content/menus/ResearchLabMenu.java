@@ -4,10 +4,9 @@ import com.google.common.collect.ImmutableList;
 import com.portingdeadmods.portingdeadlibs.api.gui.menus.PDLAbstractContainerMenu;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
-import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.content.blockentities.ResearchLabControllerBE;
+import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.registries.ResearchdMenuTypes;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Inventory;
@@ -31,7 +30,7 @@ public class ResearchLabMenu extends PDLAbstractContainerMenu<ResearchLabControl
 
 	public ResearchLabMenu(int containerId, @NotNull Inventory inv, @NotNull ResearchLabControllerBE blockEntity) {
 		super(ResearchdMenuTypes.RESEARCH_LAB_MENU.get(), containerId, inv, blockEntity);
-		Researchd.debug("Research Lab Menu", "Creating Research Lab Menu with ", ResearchHelperCommon.getResearchPacks(inv.player.level()).size(), " slots.");
+		Researchd.debug("Research Lab Menu", "Creating Research Lab Menu with ", blockEntity.getItemHandler().getSlots(), " slots.");
 
         // The pack list is filled in on load, and the handler is resized to match it there. Both can lag
         // behind a datapack change, so the slot count is the smaller of the two rather than either one.

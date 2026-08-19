@@ -158,10 +158,8 @@ public class TeamCommands {
 
 									if (player != null) {
 										if (otherPlayer != null) {
-        ResearchTeamHelperServer.handleManageModerator(player, otherPlayer.getUUID(), false);
-    } else if (player != null) {
-        player.sendSystemMessage(ResearchTeamHelperServer.getIllegalMessage());
-    }
+											ResearchTeamHelperServer.handleManageModerator(player, otherPlayer.getUUID(), false);
+										}
 									}
 
 									return 1;

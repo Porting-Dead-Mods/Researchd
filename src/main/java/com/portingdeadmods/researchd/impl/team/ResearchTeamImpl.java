@@ -53,15 +53,7 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
             TeamResearches.CODEC.fieldOf("researchPacks").forGetter(t -> t.researches),
             Codec.unboundedMap(Codec.STRING, Codec.FLOAT).fieldOf("effects").forGetter(t -> ResearchdCodecUtils.encodeMap(t.effects)),
             Codec.LONG.optionalFieldOf("creation_time", 0L).forGetter(ResearchTeamImpl::getCreationTime)
-    ).apply(builder, ResearchTeamImpl::newTeamStringMaps));
-
-    private static @NotNull ResearchTeamImpl newTeamStringMaps(String n, UUID i, Map<String, TeamMember> m, TeamSocialManagerImpl socialManager, TeamResearches tr, Map<String, Float> e, long creationTime) {
-        ResearchTeamImpl team = new ResearchTeamImpl(n, i, ResearchdCodecUtils.decodeMap(m, UUID::fromString), socialManager, tr, ResearchdCodecUtils.decodeMap(e, ResourceLocation::parse));
-        if (creationTime > 0) {
-            team.setCreationTime(creationTime);
-        }
-        return team;
-    }
+    ).apply(builder, ResearchTeamImpl::ResearchTeamImplFromCodec));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ResearchTeamImpl> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8,
@@ -78,6 +70,25 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
             t -> t.effects,
             ResearchTeamImpl::new
     );
+
+	private static @NotNull ResearchTeamImpl ResearchTeamImplFromCodec(String n, UUID i, Map<String, TeamMember> m, TeamSocialManagerImpl socialManager, TeamResearches tr, Map<String, Float> e, Long creationTime) {
+		return new ResearchTeamImpl(n, i, ResearchdCodecUtils.decodeMap(m, UUID::fromString), socialManager, tr, ResearchdCodecUtils.decodeMap(e, ResourceLocation::parse), creationTime);
+	}
+
+
+	public ResearchTeamImpl(String name, UUID id, Map<UUID, TeamMember> members, TeamSocialManagerImpl socialManager, TeamResearches teamResearches, Map<ResourceLocation, Float> effects, Long creationTime) {
+		this.name = name;
+		this.id = id;
+		this.creationTime = LazyFinal.create();
+
+		if (creationTime != 0)
+			this.creationTime.initialize(creationTime);
+
+		this.members = new LinkedHashMap<>(members);
+		this.socialManager = socialManager;
+		this.researches = teamResearches;
+		this.effects = effects;
+	}
 
     private ResearchTeamImpl(String name, UUID id, Map<UUID, TeamMember> members, TeamSocialManagerImpl socialManager, TeamResearches teamResearches, Map<ResourceLocation, Float> effects) {
         this.name = name;
@@ -104,7 +115,7 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
         this(teamName, teamId, new HashMap<>(), TeamSocialManagerImpl.EMPTY, TeamResearches.EMPTY, new HashMap<>());
     }
 
-    public void setOnChangedFunction(Runnable onChangedFunction) {
+	public void setOnChangedFunction(Runnable onChangedFunction) {
         this.onChangedFunction = onChangedFunction;
     }
 
@@ -190,8 +201,7 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
 
         // Re-sync the queue to every member before announcing completion, otherwise a member's
         // client may hold a stale queue head and get force-disconnected by
-        // ClientResearchCompletedPayload's desync check. Scope to online members only, not the
-        // whole server, so no team data leaks to unrelated clients.
+        // ClientResearchCompletedPayload's desync check.
         for (TeamMember member : this.getMembers()) {
             Player memberPlayer = playerGetter.apply(member.player());
             if (memberPlayer instanceof ServerPlayer sp) {
