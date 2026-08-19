@@ -10,7 +10,7 @@ import net.minecraft.network.codec.StreamCodec;
 
 import java.util.UUID;
 
-public record TeamMember(UUID player, ResearchTeamRole role) {
+public record TeamMember(UUID player, ResearchTeamRole role) implements Comparable<TeamMember> {
     public static final Codec<TeamMember> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             UUIDUtil.CODEC.fieldOf("player").forGetter(TeamMember::player),
             CodecUtils.enumCodec(ResearchTeamRole.class).fieldOf("role").forGetter(TeamMember::role)
@@ -25,6 +25,13 @@ public record TeamMember(UUID player, ResearchTeamRole role) {
 
     public String getName() {
         return AllPlayersCache.getName(this.player);
+    }
+
+    @Override
+    public int compareTo(TeamMember o) {
+        // enum 顺序：OWNER > MODERATOR > MEMBER > NOT_MEMBER
+        int roleComparison = this.role.compareTo(o.role);
+        return roleComparison != 0 ? roleComparison : this.player.compareTo(o.player);
     }
 
 }

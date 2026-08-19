@@ -1,0 +1,12 @@
+{
+  "loader": "neoforge:obj",
+  "model": "researchd:models/block/research_lab.obj",
+  "flipV": true,
+  "shadeQuads": true,
+  "emissiveAmbient": true,
+  "ambientocclusion": false,
+  "textures": {
+    "#texture0": "researchd:block/research_lab",
+    "particle": "minecraft:block/glass"
+  }
+}

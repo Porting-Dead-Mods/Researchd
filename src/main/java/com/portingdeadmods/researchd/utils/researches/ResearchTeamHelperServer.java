@@ -574,8 +574,6 @@ public final class ResearchTeamHelperServer {
 
     public static void sendHelpMessage(Consumer<Component> sendMessageFunction) {
         sendMessageFunction.accept(Component.literal("> Researchd Teams").withStyle(ChatFormatting.WHITE, ChatFormatting.BOLD));
-        sendMessageFunction.accept(helpMessage("team", "create <name>", description("Create a new team with the specified name.")));
-        sendMessageFunction.accept(helpMessage("team", "list", description("List all teams.")));
         sendMessageFunction.accept(helpMessage("team", "members", description("List all members of your team.")));
         sendMessageFunction.accept(helpMessage("team", "invite <player>", description("Invite a player to your team.")));
         sendMessageFunction.accept(helpMessage("team", "join <player>", description("Join a team that you have been invited to.")));

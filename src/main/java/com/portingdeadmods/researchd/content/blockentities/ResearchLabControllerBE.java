@@ -72,9 +72,15 @@ public class ResearchLabControllerBE extends GhostMultiblockControllerBE impleme
             stacks.add(this.getItemHandler().getStackInSlot(i));
         }
         ItemStackHandler itemHandler = (ItemStackHandler) this.getItemHandler();
-        itemHandler.setSize(this.researchPacks.size());
+        // Never shrink below the stored slot count: re-loading the lab (e.g. after respawn / crossing
+        // dimensions) can briefly observe an empty researchPack list, and resizing to 0 means the
+        // rewrite below hits out-of-bounds "Slot 0 not in valid range - [0,0)" and crashes.
+        int newSize = Math.max(this.researchPacks.size(), stacks.size());
+        itemHandler.setSize(newSize);
         for (int i = 0; i < stacks.size(); i++) {
-            itemHandler.setStackInSlot(i, stacks.get(i));
+            if (i < newSize) {
+                itemHandler.setStackInSlot(i, stacks.get(i));
+            }
         }
     }
 
