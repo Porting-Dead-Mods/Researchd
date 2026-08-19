@@ -25,7 +25,8 @@ public class CommandEffectObject implements TypedEditorObject<CommandResearchEff
     }
 
     @Override
-    public void buildLayout(RememberingLinearLayout layout, @Nullable CommandResearchEffect previous, EditorContext context) {
+    public void buildLayout(
+            RememberingLinearLayout layout, @Nullable CommandResearchEffect previous, EditorContext context) {
         layout.addWidget(null, GuiUtils.stringWidget("Command on unlock:"));
         addCommandEditBox(layout, context, "on_unlock_edit_box", previous != null ? previous.onUnlockCommand() : "");
         layout.addWidget(null, GuiUtils.stringWidget("Command on lock:"));
@@ -33,7 +34,8 @@ public class CommandEffectObject implements TypedEditorObject<CommandResearchEff
     }
 
     private void addCommandEditBox(RememberingLinearLayout layout, EditorContext context, String name, String value) {
-        BackgroundEditBox editBox = layout.addWidget(name, new BackgroundEditBox(GuiUtils.getFont(), context.innerWidth() - 8, 16));
+        BackgroundEditBox editBox =
+                layout.addWidget(name, new BackgroundEditBox(GuiUtils.getFont(), context.innerWidth() - 8, 16));
         editBox.setMaxLength(MAX_COMMAND_LENGTH);
         editBox.setValue(value);
         editBox.setResponder(newVal -> this.update(layout, context));
@@ -43,14 +45,17 @@ public class CommandEffectObject implements TypedEditorObject<CommandResearchEff
     public CommandResearchEffect create(RememberingLinearLayout layout) {
         return new CommandResearchEffect(
                 layout.getChild("on_unlock_edit_box", BackgroundEditBox.class).getValue(),
-                layout.getChild("on_lock_edit_box", BackgroundEditBox.class).getValue()
-        );
+                layout.getChild("on_lock_edit_box", BackgroundEditBox.class).getValue());
     }
 
     @Override
     public Result<Unit, Exception> valid(RememberingLinearLayout layout) {
-        boolean unlockBlank = layout.getChild("on_unlock_edit_box", BackgroundEditBox.class).getValue().isBlank();
-        boolean lockBlank = layout.getChild("on_lock_edit_box", BackgroundEditBox.class).getValue().isBlank();
+        boolean unlockBlank = layout.getChild("on_unlock_edit_box", BackgroundEditBox.class)
+                .getValue()
+                .isBlank();
+        boolean lockBlank = layout.getChild("on_lock_edit_box", BackgroundEditBox.class)
+                .getValue()
+                .isBlank();
         if (unlockBlank && lockBlank) {
             return Result.err("At least one command needs to be provided");
         }

@@ -8,23 +8,22 @@ import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
 import com.portingdeadmods.researchd.impl.research.effect.AndResearchEffect;
 import com.portingdeadmods.researchd.impl.research.effect.DimensionUnlockEffect;
-import com.portingdeadmods.researchd.impl.research.effect.RecipeUnlockEffect;
 import com.portingdeadmods.researchd.impl.research.effect.ItemUnlockEffect;
+import com.portingdeadmods.researchd.impl.research.effect.RecipeUnlockEffect;
 import com.portingdeadmods.researchd.impl.research.method.AndResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.CheckItemPresenceResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
 import com.portingdeadmods.researchd.impl.research.method.OrResearchMethod;
 import com.portingdeadmods.researchd.resources.ResearchdDatagenProvider;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.UnaryOperator;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.UnaryOperator;
 
 public interface ResearchdResearchProvider extends ResearchdDatagenProvider<Research> {
     default @NotNull ResourceLocation mcLoc(String path) {
@@ -47,7 +46,8 @@ public interface ResearchdResearchProvider extends ResearchdDatagenProvider<Rese
         return new ItemUnlockEffect(item.asItem());
     }
 
-    default @NotNull ConsumePackResearchMethod consumePack(int count, int duration, ResourceKey<ResearchPack>... packs) {
+    default @NotNull ConsumePackResearchMethod consumePack(
+            int count, int duration, ResourceKey<ResearchPack>... packs) {
         return new ConsumePackResearchMethod(Arrays.asList(packs), count, duration);
     }
 

@@ -21,18 +21,19 @@ public class BlockModelProvider extends BlockStateProvider {
 
     private void registerResearchLabModel() {
         BlockModelBuilder researchLabBuilder = models().getBuilder("block/research_lab")
-                .customLoader((builder, existingFileHelper) ->
-                        ObjModelBuilder.begin(builder, existingFileHelper)
-                                .modelLocation(modLoc("models/block/research_lab.obj"))
-                                .automaticCulling(false)
-                                .shadeQuads(true)
-                                .flipV(true)
-                                .emissiveAmbient(true)
-                ).end()
+                .customLoader((builder, existingFileHelper) -> ObjModelBuilder.begin(builder, existingFileHelper)
+                        .modelLocation(modLoc("models/block/research_lab.obj"))
+                        .automaticCulling(false)
+                        .shadeQuads(true)
+                        .flipV(true)
+                        .emissiveAmbient(true))
+                .end()
                 .texture("texture0", modLoc("block/research_lab"))
                 .texture("particle", mcLoc("block/glass"));
 
         simpleBlock(ResearchdBlocks.RESEARCH_LAB_CONTROLLER.get(), researchLabBuilder);
-        simpleBlock(ResearchdBlocks.RESEARCH_LAB_PART.get(), models().getExistingFile(ResourceLocation.withDefaultNamespace("block/air")));
+        simpleBlock(
+                ResearchdBlocks.RESEARCH_LAB_PART.get(),
+                models().getExistingFile(ResourceLocation.withDefaultNamespace("block/air")));
     }
 }

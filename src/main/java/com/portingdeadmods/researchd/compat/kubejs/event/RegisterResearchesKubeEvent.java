@@ -4,12 +4,11 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.compat.kubejs.builders.ResearchBuilder;
 import dev.latvian.mods.kubejs.event.KubeEvent;
 import dev.latvian.mods.kubejs.script.SourceLine;
-import net.minecraft.resources.ResourceLocation;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.resources.ResourceLocation;
 
 public class RegisterResearchesKubeEvent implements KubeEvent {
     private final Map<ResourceLocation, Research> researches = new HashMap<>();

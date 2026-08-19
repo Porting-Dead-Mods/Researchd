@@ -13,8 +13,10 @@ public enum ResearchInteractionType implements StringRepresentable {
     /* Research Editing mode */
     EDIT("edit");
 
-    public static final Codec<ResearchInteractionType> CODEC = StringRepresentable.fromEnum(ResearchInteractionType::values);
-    public static final StreamCodec<? super RegistryFriendlyByteBuf, ResearchInteractionType> STREAM_CODEC = CodecUtils.enumStreamCodec(ResearchInteractionType.class);
+    public static final Codec<ResearchInteractionType> CODEC =
+            StringRepresentable.fromEnum(ResearchInteractionType::values);
+    public static final StreamCodec<? super RegistryFriendlyByteBuf, ResearchInteractionType> STREAM_CODEC =
+            CodecUtils.enumStreamCodec(ResearchInteractionType.class);
 
     private final String name;
 

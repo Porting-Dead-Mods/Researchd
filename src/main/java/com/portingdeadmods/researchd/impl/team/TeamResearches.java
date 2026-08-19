@@ -6,34 +6,35 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.api.research.ResearchRelations;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
-import com.portingdeadmods.researchd.api.research.ResearchRelations;
 import com.portingdeadmods.researchd.impl.research.SimpleResearchQueue;
+import java.util.HashMap;
+import java.util.function.Function;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.function.Function;
-
-public record TeamResearches(SimpleResearchQueue researchQueue,
-                             HashMap<ResourceKey<Research>, ResearchInstance> researches,
-                             HashMap<ResourceKey<Research>, ResearchProgress> progress) {
-    public static final TeamResearches EMPTY = new TeamResearches(
-            new SimpleResearchQueue(),
-            new HashMap<>(),
-            new HashMap<>()
-    );
+public record TeamResearches(
+        SimpleResearchQueue researchQueue,
+        HashMap<ResourceKey<Research>, ResearchInstance> researches,
+        HashMap<ResourceKey<Research>, ResearchProgress> progress) {
+    public static final TeamResearches EMPTY =
+            new TeamResearches(new SimpleResearchQueue(), new HashMap<>(), new HashMap<>());
     public static final Codec<TeamResearches> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            SimpleResearchQueue.CODEC.fieldOf("researchQueue").forGetter(TeamResearches::researchQueue),
-            Codec.unboundedMap(Research.RESOURCE_KEY_CODEC, ResearchInstance.CODEC).xmap(HashMap::new, Function.identity()).fieldOf("researchPacks")
-                    .forGetter(TeamResearches::researches),
-            Codec.unboundedMap(Research.RESOURCE_KEY_CODEC, ResearchProgress.CODEC).xmap(HashMap::new, Function.identity()).fieldOf("completionProgress")
-                    .forGetter(TeamResearches::progress)
-    ).apply(instance, TeamResearches::new));
+                    SimpleResearchQueue.CODEC.fieldOf("researchQueue").forGetter(TeamResearches::researchQueue),
+                    Codec.unboundedMap(Research.RESOURCE_KEY_CODEC, ResearchInstance.CODEC)
+                            .xmap(HashMap::new, Function.identity())
+                            .fieldOf("researchPacks")
+                            .forGetter(TeamResearches::researches),
+                    Codec.unboundedMap(Research.RESOURCE_KEY_CODEC, ResearchProgress.CODEC)
+                            .xmap(HashMap::new, Function.identity())
+                            .fieldOf("completionProgress")
+                            .forGetter(TeamResearches::progress))
+            .apply(instance, TeamResearches::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, TeamResearches> STREAM_CODEC = StreamCodec.composite(
             SimpleResearchQueue.STREAM_CODEC,
             TeamResearches::researchQueue,
@@ -41,13 +42,12 @@ public record TeamResearches(SimpleResearchQueue researchQueue,
             TeamResearches::researches,
             ByteBufCodecs.map(HashMap::new, Research.RESOURCE_KEY_STREAM_CODEC, ResearchProgress.STREAM_CODEC),
             TeamResearches::progress,
-            TeamResearches::new
-    );
+            TeamResearches::new);
 
     // Helper methods
     public boolean hasCompleted(ResourceKey<Research> research) {
         ResearchInstance instance = this.researches.get(research);
-		if (instance == null) return false;
+        if (instance == null) return false;
 
         return instance.getResearchStatus() == ResearchStatus.RESEARCHED;
     }
@@ -67,7 +67,8 @@ public record TeamResearches(SimpleResearchQueue researchQueue,
         for (ResearchInstance instance : this.researches.values()) {
             if (instance.getResearchStatus() == ResearchStatus.RESEARCHED) continue;
 
-            ResearchRelations relations = ResearchdApi.getResearchManager().getRelationsForResearch(instance.getResearch());
+            ResearchRelations relations =
+                    ResearchdApi.getResearchManager().getRelationsForResearch(instance.getResearch());
             if (relations == null) continue; // Research got removed, leave its instance alone until cleanup runs
 
             if (relations.getParents().stream().allMatch(parent -> this.hasCompleted(parent.getResearchKey()))) {
@@ -86,13 +87,14 @@ public record TeamResearches(SimpleResearchQueue researchQueue,
             instance.setResearchStatus(ResearchStatus.LOCKED);
         }
 
-        //ResearchdSavedData.TEAM_RESEARCH.get().setData(level, ResearchdSavedData.TEAM_RESEARCH.get().getData(level));
+        // ResearchdSavedData.TEAM_RESEARCH.get().setData(level, ResearchdSavedData.TEAM_RESEARCH.get().getData(level));
     }
 
     public void setResearchFinished(ResourceKey<Research> research, long completionTime) {
         ResearchInstance instance = this.researches.get(research);
         if (instance == null) {
-            Researchd.error("Team Researches", "Tried to complete %s, which this team has no entry for", research.location());
+            Researchd.error(
+                    "Team Researches", "Tried to complete %s, which this team has no entry for", research.location());
             return;
         }
 
@@ -114,5 +116,4 @@ public record TeamResearches(SimpleResearchQueue researchQueue,
 
         this.refreshResearchStatus();
     }
-
 }

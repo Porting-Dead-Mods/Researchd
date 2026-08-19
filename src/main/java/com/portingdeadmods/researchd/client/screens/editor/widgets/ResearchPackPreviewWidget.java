@@ -3,13 +3,12 @@ package com.portingdeadmods.researchd.client.screens.editor.widgets;
 import com.portingdeadmods.portingdeadlibs.api.utils.RGBAColor;
 import com.portingdeadmods.researchd.ResearchdClient;
 import com.portingdeadmods.researchd.registries.ResearchdItems;
+import java.util.function.Supplier;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.world.item.ItemStack;
-
-import java.util.function.Supplier;
 
 public class ResearchPackPreviewWidget extends AbstractWidget {
     private final Supplier<RGBAColor> colorSupplier;
@@ -37,7 +36,5 @@ public class ResearchPackPreviewWidget extends AbstractWidget {
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-
-    }
+    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 }

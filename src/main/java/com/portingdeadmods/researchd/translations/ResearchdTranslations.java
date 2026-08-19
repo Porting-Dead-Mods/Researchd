@@ -1,59 +1,86 @@
 package com.portingdeadmods.researchd.translations;
 
+import static net.minecraft.ChatFormatting.*;
+
 import com.portingdeadmods.portingdeadlibs.api.translations.TranslatableConstant;
 import com.portingdeadmods.researchd.Researchd;
-import net.minecraft.network.chat.MutableComponent;
-
 import java.util.HashMap;
 import java.util.Map;
-
-import static net.minecraft.ChatFormatting.*;
+import net.minecraft.network.chat.MutableComponent;
 
 public final class ResearchdTranslations {
     public static final Map<String, String> TRANSLATIONS = new HashMap<>();
 
-	public static final String AQUA_AT = AQUA + "@: " + RESET;
-	public static final String STR_PARAM = YELLOW + "%s" + RESET;
+    public static final String AQUA_AT = AQUA + "@: " + RESET;
+    public static final String STR_PARAM = YELLOW + "%s" + RESET;
 
     public static final class Team {
         public static final TranslatableConstant OWNER = create("role.owner", "Owner");
         public static final TranslatableConstant MEMBER = create("role.member", "Member");
-	    public static final TranslatableConstant NOT_MEMBER = create("role.not_player", "Not Member");
+        public static final TranslatableConstant NOT_MEMBER = create("role.not_player", "Not Member");
         public static final TranslatableConstant MODERATOR = create("role.moderator", "Moderator");
 
         public static final TranslatableConstant SCREEN_TITLE = create("screen.title", "Research Team");
-        public static final TranslatableConstant SETTINGS_SCREEN_TITLE = create("screen.settings.title", "Team Settings");
+        public static final TranslatableConstant SETTINGS_SCREEN_TITLE =
+                create("screen.settings.title", "Team Settings");
         public static final TranslatableConstant BUTTON_INVITE = create("buttons.invite", "Invite Player");
-        public static final TranslatableConstant BUTTON_TEAM_SETTINGS = create("buttons.team_settings", "Team Settings");
+        public static final TranslatableConstant BUTTON_TEAM_SETTINGS =
+                create("buttons.team_settings", "Team Settings");
 
-        public static final TranslatableConstant BUTTON_MANAGE_MEMBERS = create("buttons.manage_members", "Manage Members");
-        public static final TranslatableConstant BUTTON_TRANSFER_OWNERSHIP = create("buttons.transfer_ownership", "Transfer Ownership");
+        public static final TranslatableConstant BUTTON_MANAGE_MEMBERS =
+                create("buttons.manage_members", "Manage Members");
+        public static final TranslatableConstant BUTTON_TRANSFER_OWNERSHIP =
+                create("buttons.transfer_ownership", "Transfer Ownership");
         public static final TranslatableConstant BUTTON_LEAVE_TEAM = create("buttons.leave_team", "Leave Team");
 
         public static final TranslatableConstant TITLE_MEMBERS = create("titles.members", "Members");
-        public static final TranslatableConstant TITLE_RECENTLY_RESEARCHED = create("titles.recently_researched", "Recently Researched");
+        public static final TranslatableConstant TITLE_RECENTLY_RESEARCHED =
+                create("titles.recently_researched", "Recently Researched");
 
-		public static final TranslatableConstant SENT_INVITE = create("sent_invite", AQUA_AT + GREEN + "You invited " + RESET + STR_PARAM + GREEN + " to join " + RESET + STR_PARAM + GREEN + "!" + RESET);
-		public static final TranslatableConstant REMOVED_INVITE = create("removed_invite", AQUA_AT + GREEN + "Invite to " + RESET + STR_PARAM + GREEN + " has been removed!" + RESET);
-		public static final TranslatableConstant RECEIVED_INVITE = create("received_invite", AQUA_AT + GREEN + "You were invited to join: " + RESET + STR_PARAM);
-	    public static final TranslatableConstant YOU_JOINED_TEAM = create("joined_team",  AQUA_AT + GREEN + "You joined: " + RESET + STR_PARAM + GREEN + "!" + RESET);
-		public static final TranslatableConstant PLAYER_JOINED_TEAM = create("player_joined_team",  AQUA_AT + STR_PARAM + GREEN + " joined your team!" + RESET);
-		public static final TranslatableConstant LEFT_TEAM = create("left_team", GREEN.toString() + BOLD + "You successfully abandoned your team!" + RESET);
-		public static final TranslatableConstant ACCEPT = create("accept", GREEN.toString() + BOLD + UNDERLINE + "ACCEPT" + RESET);
-		public static final TranslatableConstant DECLINE = create("decline", RED.toString() + BOLD + UNDERLINE + "DECLINE" + RESET);
-		public static final TranslatableConstant PROMOTED = create("promoted", AQUA_AT + STR_PARAM + AQUA + " has been promoted to Moderator!" + RESET);
-		public static final TranslatableConstant DEMOTED = create("demoted", AQUA_AT + STR_PARAM + AQUA + " has been demoted to Member!" + RESET);
-		public static final TranslatableConstant REMOVED = create("removed", AQUA_AT + STR_PARAM + AQUA + " has been removed from the team!" + RESET);
-		public static final TranslatableConstant TRANSFERRED_OWNERSHIP = create("transferred_ownership", AQUA_AT + STR_PARAM + AQUA + " is the new team owner!" + RESET);
-	    public static final TranslatableConstant IGNORE = create("ignore", AQUA_AT + AQUA + "Ignoring invites from " + STR_PARAM + AQUA + " from now on!" + RESET);
-		public static final TranslatableConstant NEW_TEAM_NAME = create("new_team_name", AQUA_AT + STR_PARAM + AQUA + " changed to " + RESET + STR_PARAM + RESET);
-		public static final TranslatableConstant ALREADY_IN_TEAM = create("already_in_team", BOLD.toString() + RED + "You gotta abandon your team first..." + RESET);
-		public static final TranslatableConstant NO_NEXT_LEADER = create("no_next_leader", BOLD.toString() + RED + "You gotta specify the next leader..." + RESET);
-		public static final TranslatableConstant NO_PERMS = create("no_perms", BOLD.toString() + RED + "You don't have the permissions to do that..." + RESET);
-		public static final TranslatableConstant KICKED = create("kicked", AQUA_AT + AQUA + "You got kicked from " + STR_PARAM + RESET + AQUA + " :< " + RESET);
-	    public static final TranslatableConstant NAME_CANNOT_BE_EMPTY = create("name_cannot_be_empty", RED + "Team name cannot be empty" + RESET);
+        public static final TranslatableConstant SENT_INVITE = create(
+                "sent_invite",
+                AQUA_AT + GREEN + "You invited " + RESET + STR_PARAM + GREEN + " to join " + RESET + STR_PARAM + GREEN
+                        + "!" + RESET);
+        public static final TranslatableConstant REMOVED_INVITE = create(
+                "removed_invite",
+                AQUA_AT + GREEN + "Invite to " + RESET + STR_PARAM + GREEN + " has been removed!" + RESET);
+        public static final TranslatableConstant RECEIVED_INVITE =
+                create("received_invite", AQUA_AT + GREEN + "You were invited to join: " + RESET + STR_PARAM);
+        public static final TranslatableConstant YOU_JOINED_TEAM =
+                create("joined_team", AQUA_AT + GREEN + "You joined: " + RESET + STR_PARAM + GREEN + "!" + RESET);
+        public static final TranslatableConstant PLAYER_JOINED_TEAM =
+                create("player_joined_team", AQUA_AT + STR_PARAM + GREEN + " joined your team!" + RESET);
+        public static final TranslatableConstant LEFT_TEAM =
+                create("left_team", GREEN.toString() + BOLD + "You successfully abandoned your team!" + RESET);
+        public static final TranslatableConstant ACCEPT =
+                create("accept", GREEN.toString() + BOLD + UNDERLINE + "ACCEPT" + RESET);
+        public static final TranslatableConstant DECLINE =
+                create("decline", RED.toString() + BOLD + UNDERLINE + "DECLINE" + RESET);
+        public static final TranslatableConstant PROMOTED =
+                create("promoted", AQUA_AT + STR_PARAM + AQUA + " has been promoted to Moderator!" + RESET);
+        public static final TranslatableConstant DEMOTED =
+                create("demoted", AQUA_AT + STR_PARAM + AQUA + " has been demoted to Member!" + RESET);
+        public static final TranslatableConstant REMOVED =
+                create("removed", AQUA_AT + STR_PARAM + AQUA + " has been removed from the team!" + RESET);
+        public static final TranslatableConstant TRANSFERRED_OWNERSHIP =
+                create("transferred_ownership", AQUA_AT + STR_PARAM + AQUA + " is the new team owner!" + RESET);
+        public static final TranslatableConstant IGNORE = create(
+                "ignore", AQUA_AT + AQUA + "Ignoring invites from " + STR_PARAM + AQUA + " from now on!" + RESET);
+        public static final TranslatableConstant NEW_TEAM_NAME =
+                create("new_team_name", AQUA_AT + STR_PARAM + AQUA + " changed to " + RESET + STR_PARAM + RESET);
+        public static final TranslatableConstant ALREADY_IN_TEAM =
+                create("already_in_team", BOLD.toString() + RED + "You gotta abandon your team first..." + RESET);
+        public static final TranslatableConstant NO_NEXT_LEADER =
+                create("no_next_leader", BOLD.toString() + RED + "You gotta specify the next leader..." + RESET);
+        public static final TranslatableConstant NO_PERMS =
+                create("no_perms", BOLD.toString() + RED + "You don't have the permissions to do that..." + RESET);
+        public static final TranslatableConstant KICKED =
+                create("kicked", AQUA_AT + AQUA + "You got kicked from " + STR_PARAM + RESET + AQUA + " :< " + RESET);
+        public static final TranslatableConstant NAME_CANNOT_BE_EMPTY =
+                create("name_cannot_be_empty", RED + "Team name cannot be empty" + RESET);
 
-		public static final TranslatableConstant BAD_INPUT = create("bad_input", BOLD.toString() + RED + "Invalid input... how even..." + RESET);
+        public static final TranslatableConstant BAD_INPUT =
+                create("bad_input", BOLD.toString() + RED + "Invalid input... how even..." + RESET);
 
         private static TranslatableConstant create(String key, String defaultValue) {
             TranslatableConstant constant = new TranslatableConstant(key, "team");
@@ -61,29 +88,41 @@ public final class ResearchdTranslations {
             return constant;
         }
 
-        private static void init() {
-        }
+        private static void init() {}
     }
 
     public static final class Research {
         public static final TranslatableConstant SCREEN_TITLE = create("screen.title", "Researches");
 
-        public static final TranslatableConstant QUEUE_ADDED = create("queue.added", "%s added %s to the researchPack queue!");
-        public static final TranslatableConstant QUEUE_FINISHED = create("queue.finished", "%s finished researching (%s)!");
+        public static final TranslatableConstant QUEUE_ADDED =
+                create("queue.added", "%s added %s to the researchPack queue!");
+        public static final TranslatableConstant QUEUE_FINISHED =
+                create("queue.finished", "%s finished researching (%s)!");
 
-        public static final TranslatableConstant SCREEN_LABEL_RESEARCH_METHODS = create("screen.label.researched_by", "Methods");
-        public static final TranslatableConstant SCREEN_LABEL_RESEARCH_EFFECTS = create("screen.label.effects", "Effects");
+        public static final TranslatableConstant SCREEN_LABEL_RESEARCH_METHODS =
+                create("screen.label.researched_by", "Methods");
+        public static final TranslatableConstant SCREEN_LABEL_RESEARCH_EFFECTS =
+                create("screen.label.effects", "Effects");
 
-        public static final TranslatableConstant DIMENSION_UNLOCK_EFFECT_TOOLTIP = create("effects.tooltip.dimension_unlock", "Unlocks Dimension: %s");
+        public static final TranslatableConstant DIMENSION_UNLOCK_EFFECT_TOOLTIP =
+                create("effects.tooltip.dimension_unlock", "Unlocks Dimension: %s");
 
-        public static final TranslatableConstant RECIPE_UNLOCK_EFFECT_TOOLTIP_NO_ARG = create("effects.tooltip.recipe_unlock_no_arg", "Unlocks Recipe: ");
-        public static final TranslatableConstant RECIPE_UNLOCK_EFFECT_TOOLTIP = create("effects.tooltip.recipe_unlock", "Unlocks Recipe: %s");
-        public static final TranslatableConstant ITEM_UNLOCK_EFFECT_TOOLTIP = create("effects.tooltip.item_unlock", "Unlocks Item: %s");
-        public static final TranslatableConstant MULTIBLOCK_UNLOCK_EFFECT_TOOLTIP = create("effects.tooltip.multiblock_unlock", "Unlocks Multiblock: %s");
-        public static final TranslatableConstant COMMAND_EFFECT_TOOLTIP_UNLOCK = create("effects.tooltip.command_unlock", GOLD + "Unlock: " + RESET + "%s");
-        public static final TranslatableConstant COMMAND_EFFECT_TOOLTIP_LOCK = create("effects.tooltip.command_lock", GOLD + "Lock: " + RESET + "%s");
-        public static final TranslatableConstant START_RESEARCH_BUTTON = create("screen.button.start_research", "Start");
-        public static final TranslatableConstant ENQUEUE_RESEARCH_BUTTON = create("screen.button.enqueue_research", "Enqueue");
+        public static final TranslatableConstant RECIPE_UNLOCK_EFFECT_TOOLTIP_NO_ARG =
+                create("effects.tooltip.recipe_unlock_no_arg", "Unlocks Recipe: ");
+        public static final TranslatableConstant RECIPE_UNLOCK_EFFECT_TOOLTIP =
+                create("effects.tooltip.recipe_unlock", "Unlocks Recipe: %s");
+        public static final TranslatableConstant ITEM_UNLOCK_EFFECT_TOOLTIP =
+                create("effects.tooltip.item_unlock", "Unlocks Item: %s");
+        public static final TranslatableConstant MULTIBLOCK_UNLOCK_EFFECT_TOOLTIP =
+                create("effects.tooltip.multiblock_unlock", "Unlocks Multiblock: %s");
+        public static final TranslatableConstant COMMAND_EFFECT_TOOLTIP_UNLOCK =
+                create("effects.tooltip.command_unlock", GOLD + "Unlock: " + RESET + "%s");
+        public static final TranslatableConstant COMMAND_EFFECT_TOOLTIP_LOCK =
+                create("effects.tooltip.command_lock", GOLD + "Lock: " + RESET + "%s");
+        public static final TranslatableConstant START_RESEARCH_BUTTON =
+                create("screen.button.start_research", "Start");
+        public static final TranslatableConstant ENQUEUE_RESEARCH_BUTTON =
+                create("screen.button.enqueue_research", "Enqueue");
 
         private static TranslatableConstant create(String key, String defaultValue) {
             TranslatableConstant constant = new TranslatableConstant(key, "research");
@@ -91,15 +130,20 @@ public final class ResearchdTranslations {
             return constant;
         }
 
-        private static void init() {
-        }
+        private static void init() {}
     }
 
     public static final class Errors {
-        public static final TranslatableConstant RESEARCH_QUEUE_DESYNC = create("research_queue_desync", "A small desynchronization happened regarding the Research Queue, please relog.");
-        public static final TranslatableConstant NO_RESEARCH_TEAM = create("no_research_team", "Research related packet handled to player lacking a team");
-	    public static final TranslatableConstant NO_RESEARCH_PACKS_PRESENT = create("no_research_packs", AQUA_AT + WHITE + "There are no Research Packs present on this world. :< " + RESET);
-	    public static final TranslatableConstant DATA_INCONSISTENCY = create("data_inconsistency", RED + "[Researchd] " + RESET + GRAY + "%s" + RESET);
+        public static final TranslatableConstant RESEARCH_QUEUE_DESYNC = create(
+                "research_queue_desync",
+                "A small desynchronization happened regarding the Research Queue, please relog.");
+        public static final TranslatableConstant NO_RESEARCH_TEAM =
+                create("no_research_team", "Research related packet handled to player lacking a team");
+        public static final TranslatableConstant NO_RESEARCH_PACKS_PRESENT = create(
+                "no_research_packs",
+                AQUA_AT + WHITE + "There are no Research Packs present on this world. :< " + RESET);
+        public static final TranslatableConstant DATA_INCONSISTENCY =
+                create("data_inconsistency", RED + "[Researchd] " + RESET + GRAY + "%s" + RESET);
 
         private static TranslatableConstant create(String key, String defaultValue) {
             TranslatableConstant constant = new TranslatableConstant(key, "error");
@@ -107,8 +151,7 @@ public final class ResearchdTranslations {
             return constant;
         }
 
-        private static void init() {
-        }
+        private static void init() {}
     }
 
     public static MutableComponent component(TranslatableConstant constant, Object... args) {
@@ -116,7 +159,8 @@ public final class ResearchdTranslations {
     }
 
     public static final class Gui {
-        public static final TranslatableConstant RESEARCHED_BY_ON = create("researched_by_on", "Researched by %s on %s");
+        public static final TranslatableConstant RESEARCHED_BY_ON =
+                create("researched_by_on", "Researched by %s on %s");
 
         private static TranslatableConstant create(String key, String defaultValue) {
             TranslatableConstant constant = new TranslatableConstant(key, "gui");
@@ -124,15 +168,22 @@ public final class ResearchdTranslations {
             return constant;
         }
 
-        private static void init() {
-        }
+        private static void init() {}
     }
 
     public static final class Game {
-        public static final TranslatableConstant JOIN_MESSAGE = create("join_message", AQUA_AT + WHITE + "Welcome to " + RESET + GREEN + "Researchd Alpha" + RESET + WHITE + "! Please note that things may break completely between updates. Feel free to report any issues on the GitHub page!" + RESET);
+        public static final TranslatableConstant JOIN_MESSAGE = create(
+                "join_message",
+                AQUA_AT + WHITE + "Welcome to " + RESET + GREEN + "Researchd Alpha" + RESET + WHITE
+                        + "! Please note that things may break completely between updates. Feel free to report any issues on the GitHub page!"
+                        + RESET);
         public static final TranslatableConstant GITHUB = create("github", GREEN + "GitHub" + RESET);
         public static final TranslatableConstant WIKI = create("wiki", GREEN + "Wiki" + RESET);
-        public static final TranslatableConstant FTB_TEAMS_INSTALLED = create("ftbteams", AQUA_AT + GREEN + "FTB Teams" + RESET + WHITE + " is currently installed and 'use_ftb_teams' config option is enabled. Please use FTB Teams for team logic!" + RESET);
+        public static final TranslatableConstant FTB_TEAMS_INSTALLED = create(
+                "ftbteams",
+                AQUA_AT + GREEN + "FTB Teams" + RESET + WHITE
+                        + " is currently installed and 'use_ftb_teams' config option is enabled. Please use FTB Teams for team logic!"
+                        + RESET);
 
         private static TranslatableConstant create(String key, String defaultValue) {
             TranslatableConstant constant = new TranslatableConstant(key, "game");
@@ -140,8 +191,7 @@ public final class ResearchdTranslations {
             return constant;
         }
 
-        private static void init() {
-        }
+        private static void init() {}
     }
 
     public static void init() {

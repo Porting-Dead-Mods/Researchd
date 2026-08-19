@@ -3,11 +3,12 @@ package com.portingdeadmods.researchd.client.screens.team.widgets;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.client.screens.RdZIndex;
-import com.portingdeadmods.researchd.client.screens.lib.widgets.ContainerWidget;
 import com.portingdeadmods.researchd.api.team.ResearchTeamRole;
 import com.portingdeadmods.researchd.api.team.TeamMember;
+import com.portingdeadmods.researchd.client.screens.RdZIndex;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.ContainerWidget;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
+import java.util.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -17,59 +18,69 @@ import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.*;
-
 public class PlayerManagementList extends ContainerWidget<PlayerManagementList.Entry> {
     public static final ResourceLocation PLAYER_ENTRY_TEXTURE = Researchd.rl("player");
     private final Map<Entry, List<DraggableWidgetImageButton>> buttonWidgets;
     private final AbstractWidget parent;
 
-	private boolean shouldAddButton(Entry item, PlayerManagementDraggableWidget.PlayerManagementButtonType type) {
-		ResearchTeamRole clientRole = ResearchTeamHelperClient.getRole();
-		ResearchTeamRole targetRole = item.teamMember.role();
+    private boolean shouldAddButton(Entry item, PlayerManagementDraggableWidget.PlayerManagementButtonType type) {
+        ResearchTeamRole clientRole = ResearchTeamHelperClient.getRole();
+        ResearchTeamRole targetRole = item.teamMember.role();
 
-		return switch (type) {
-			case PROMOTE -> clientRole == ResearchTeamRole.OWNER && targetRole == ResearchTeamRole.MEMBER;
-			case DEMOTE -> clientRole == ResearchTeamRole.OWNER && targetRole == ResearchTeamRole.MODERATOR;
-			case REMOVE -> clientRole == ResearchTeamRole.OWNER && targetRole != ResearchTeamRole.OWNER
-					|| clientRole == ResearchTeamRole.MODERATOR && targetRole == ResearchTeamRole.MEMBER;
-			case INVITE_PLAYER -> clientRole == ResearchTeamRole.OWNER || clientRole == ResearchTeamRole.MODERATOR;
-			case TRANSFER_OWNERSHIP -> clientRole == ResearchTeamRole.OWNER && targetRole != ResearchTeamRole.OWNER;
-		};
-	}
+        return switch (type) {
+            case PROMOTE -> clientRole == ResearchTeamRole.OWNER && targetRole == ResearchTeamRole.MEMBER;
+            case DEMOTE -> clientRole == ResearchTeamRole.OWNER && targetRole == ResearchTeamRole.MODERATOR;
+            case REMOVE ->
+                clientRole == ResearchTeamRole.OWNER && targetRole != ResearchTeamRole.OWNER
+                        || clientRole == ResearchTeamRole.MODERATOR && targetRole == ResearchTeamRole.MEMBER;
+            case INVITE_PLAYER -> clientRole == ResearchTeamRole.OWNER || clientRole == ResearchTeamRole.MODERATOR;
+            case TRANSFER_OWNERSHIP -> clientRole == ResearchTeamRole.OWNER && targetRole != ResearchTeamRole.OWNER;
+        };
+    }
 
-    public PlayerManagementList(int width, int height, int itemWidth, int itemHeight, Collection<PlayerManagementList.Entry> items, boolean renderScroller, AbstractWidget parent) {
+    public PlayerManagementList(
+            int width,
+            int height,
+            int itemWidth,
+            int itemHeight,
+            Collection<PlayerManagementList.Entry> items,
+            boolean renderScroller,
+            AbstractWidget parent) {
         super(width, height, itemWidth, itemHeight, Orientation.VERTICAL, 1, 10, items, renderScroller);
         this.buttonWidgets = new HashMap<>();
         this.parent = parent;
         for (Entry item : items) {
-			buttonWidgets.put(item, new ArrayList<>());
+            buttonWidgets.put(item, new ArrayList<>());
 
             if (item.teamMember.role() != ResearchTeamRole.OWNER) {
-                for (Map.Entry<PlayerManagementDraggableWidget.PlayerManagementButtonType, WidgetSprites> entry : item.buttonSettings().getSprites().entrySet()) {
-					if (!this.shouldAddButton(item, entry.getKey())) continue;
+                for (Map.Entry<PlayerManagementDraggableWidget.PlayerManagementButtonType, WidgetSprites> entry :
+                        item.buttonSettings().getSprites().entrySet()) {
+                    if (!this.shouldAddButton(item, entry.getKey())) continue;
 
-                    this.buttonWidgets.get(item).add(new DraggableWidgetImageButton(0, 0, 12, 12, entry.getValue(), btn -> {
-                        switch (entry.getKey()) {
-                            case PROMOTE -> ResearchTeamHelperClient.promoteTeamMemberSynced(item.teamMember());
-                            case DEMOTE -> ResearchTeamHelperClient.demoteTeamMemberSynced(item.teamMember());
-                            case REMOVE -> ResearchTeamHelperClient.removeTeamMemberSynced(item.teamMember());
-                            case INVITE_PLAYER -> ResearchTeamHelperClient.sendTeamInviteSynced(item.teamMember());
-                            case TRANSFER_OWNERSHIP -> {
-                                if (this.parent instanceof PlayerManagementDraggableWidget widget) {
-                                    widget.openPopupWidget(item.teamMember());
+                    this.buttonWidgets
+                            .get(item)
+                            .add(new DraggableWidgetImageButton(0, 0, 12, 12, entry.getValue(), btn -> {
+                                switch (entry.getKey()) {
+                                    case PROMOTE -> ResearchTeamHelperClient.promoteTeamMemberSynced(item.teamMember());
+                                    case DEMOTE -> ResearchTeamHelperClient.demoteTeamMemberSynced(item.teamMember());
+                                    case REMOVE -> ResearchTeamHelperClient.removeTeamMemberSynced(item.teamMember());
+                                    case INVITE_PLAYER ->
+                                        ResearchTeamHelperClient.sendTeamInviteSynced(item.teamMember());
+                                    case TRANSFER_OWNERSHIP -> {
+                                        if (this.parent instanceof PlayerManagementDraggableWidget widget) {
+                                            widget.openPopupWidget(item.teamMember());
+                                        }
+                                    }
                                 }
-                            }
-                        }
-						if (this.parent instanceof PlayerManagementDraggableWidget widget)
-                            widget.refreshFunction.accept(item, entry.getKey());
-                    }));
+                                if (this.parent instanceof PlayerManagementDraggableWidget widget)
+                                    widget.refreshFunction.accept(item, entry.getKey());
+                            }));
                 }
             }
         }
 
-		this.resort();
-	}
+        this.resort();
+    }
 
     @Override
     protected int getScissorsHeight() {
@@ -77,8 +88,8 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
     }
 
     @Override
-    public void clickedItem(PlayerManagementList.Entry item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {
-    }
+    public void clickedItem(
+            PlayerManagementList.Entry item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {}
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
@@ -107,7 +118,15 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
     }
 
     @Override
-    public void internalRenderItem(GuiGraphics guiGraphics, PlayerManagementList.Entry item, int xIndex, int index, int left, int top, int mouseX, int mouseY) {
+    public void internalRenderItem(
+            GuiGraphics guiGraphics,
+            PlayerManagementList.Entry item,
+            int xIndex,
+            int index,
+            int left,
+            int top,
+            int mouseX,
+            int mouseY) {
         PoseStack poseStack = guiGraphics.pose();
         poseStack.pushPose();
         {
@@ -119,8 +138,16 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
         poseStack.pushPose();
         {
             poseStack.translate(0, 0, RdZIndex.DRAGGABLE_WINDOW_ROW_LABEL);
-            PlayerFaceRenderer.draw(guiGraphics, AllPlayersCache.getSkin(item.teamMember.player()), left + 3, top + 3, 10);
-            guiGraphics.drawScrollingString(Minecraft.getInstance().font, Component.literal(AllPlayersCache.getName(item.teamMember.player())).withStyle(ChatFormatting.WHITE), left + 3 + 12, left + 84 - this.buttonWidgets.get(item).size() * (12 + 2) - 2, top + 4, -1);
+            PlayerFaceRenderer.draw(
+                    guiGraphics, AllPlayersCache.getSkin(item.teamMember.player()), left + 3, top + 3, 10);
+            guiGraphics.drawScrollingString(
+                    Minecraft.getInstance().font,
+                    Component.literal(AllPlayersCache.getName(item.teamMember.player()))
+                            .withStyle(ChatFormatting.WHITE),
+                    left + 3 + 12,
+                    left + 84 - this.buttonWidgets.get(item).size() * (12 + 2) - 2,
+                    top + 4,
+                    -1);
         }
         poseStack.popPose();
 
@@ -137,9 +164,13 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
         poseStack.popPose();
     }
 
-	private void resort() {
-		this.sortEntriesBy(Comparator.comparing(entry -> ResearchTeamHelperClient.getPlayerRole(entry.teamMember().player()).getPermissionLevel(), Comparator.reverseOrder()));
-	}
+    private void resort() {
+        this.sortEntriesBy(Comparator.comparing(
+                entry -> ResearchTeamHelperClient.getPlayerRole(
+                                entry.teamMember().player())
+                        .getPermissionLevel(),
+                Comparator.reverseOrder()));
+    }
 
     public void refreshEntries(Collection<PlayerManagementList.Entry> newEntries) {
         this.getItems().clear();
@@ -149,23 +180,27 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
             buttonWidgets.put(item, new ArrayList<>());
 
             if (item.teamMember.role() != ResearchTeamRole.OWNER) {
-                for (Map.Entry<PlayerManagementDraggableWidget.PlayerManagementButtonType, WidgetSprites> entry : item.buttonSettings().getSprites().entrySet()) {
+                for (Map.Entry<PlayerManagementDraggableWidget.PlayerManagementButtonType, WidgetSprites> entry :
+                        item.buttonSettings().getSprites().entrySet()) {
                     if (!this.shouldAddButton(item, entry.getKey())) continue;
-                    this.buttonWidgets.get(item).add(new DraggableWidgetImageButton(0, 0, 12, 12, entry.getValue(), btn -> {
-                        switch (entry.getKey()) {
-                            case PROMOTE -> ResearchTeamHelperClient.promoteTeamMemberSynced(item.teamMember());
-                            case DEMOTE -> ResearchTeamHelperClient.demoteTeamMemberSynced(item.teamMember());
-                            case REMOVE -> ResearchTeamHelperClient.removeTeamMemberSynced(item.teamMember());
-                            case INVITE_PLAYER -> ResearchTeamHelperClient.sendTeamInviteSynced(item.teamMember());
-                            case TRANSFER_OWNERSHIP -> {
-                                if (this.parent instanceof PlayerManagementDraggableWidget widget) {
-                                    widget.openPopupWidget(item.teamMember());
+                    this.buttonWidgets
+                            .get(item)
+                            .add(new DraggableWidgetImageButton(0, 0, 12, 12, entry.getValue(), btn -> {
+                                switch (entry.getKey()) {
+                                    case PROMOTE -> ResearchTeamHelperClient.promoteTeamMemberSynced(item.teamMember());
+                                    case DEMOTE -> ResearchTeamHelperClient.demoteTeamMemberSynced(item.teamMember());
+                                    case REMOVE -> ResearchTeamHelperClient.removeTeamMemberSynced(item.teamMember());
+                                    case INVITE_PLAYER ->
+                                        ResearchTeamHelperClient.sendTeamInviteSynced(item.teamMember());
+                                    case TRANSFER_OWNERSHIP -> {
+                                        if (this.parent instanceof PlayerManagementDraggableWidget widget) {
+                                            widget.openPopupWidget(item.teamMember());
+                                        }
+                                    }
                                 }
-                            }
-                        }
-                        if (this.parent instanceof PlayerManagementDraggableWidget widget)
-                            widget.refreshFunction.accept(item, entry.getKey());
-                    }));
+                                if (this.parent instanceof PlayerManagementDraggableWidget widget)
+                                    widget.refreshFunction.accept(item, entry.getKey());
+                            }));
                 }
             }
         }
@@ -173,6 +208,6 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
         this.resort();
     }
 
-    public record Entry(TeamMember teamMember, PlayerManagementDraggableWidget.PlayerManagementButtons buttonSettings) {
-    }
+    public record Entry(
+            TeamMember teamMember, PlayerManagementDraggableWidget.PlayerManagementButtons buttonSettings) {}
 }

@@ -6,7 +6,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ItemResearchMethod;
-import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethodType;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
 import com.portingdeadmods.researchd.api.team.TeamMember;
@@ -27,11 +26,13 @@ import org.jetbrains.annotations.NotNull;
  * Research method that completes once the team collectively holds the required amount of the item ingredient.
  */
 public record CheckItemPresenceResearchMethod(Ingredient item, int count) implements ItemResearchMethod {
-    public static final CheckItemPresenceResearchMethod EMPTY = new CheckItemPresenceResearchMethod(Ingredient.EMPTY, 0);
+    public static final CheckItemPresenceResearchMethod EMPTY =
+            new CheckItemPresenceResearchMethod(Ingredient.EMPTY, 0);
     public static final ResourceLocation ID = Researchd.rl("check_item_presence");
 
     @Override
-    public void checkProgress(Level level, ResourceKey<Research> research, ResearchProgress.Task task, MethodContext context) {
+    public void checkProgress(
+            Level level, ResourceKey<Research> research, ResearchProgress.Task task, MethodContext context) {
         if (this.count <= 0 || this.item == Ingredient.EMPTY) {
             task.addProgress(this.getMaxProgress() - task.getProgress());
             return;
@@ -96,21 +97,21 @@ public record CheckItemPresenceResearchMethod(Ingredient item, int count) implem
 
     public static final class Serializer implements ResearchMethodSerializer<CheckItemPresenceResearchMethod> {
         public static final Serializer INSTANCE = new Serializer();
-        public static final MapCodec<CheckItemPresenceResearchMethod> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                Ingredient.CODEC.fieldOf("item").forGetter(CheckItemPresenceResearchMethod::item),
-                Codec.INT.fieldOf("count").forGetter(CheckItemPresenceResearchMethod::count)
-        ).apply(instance, CheckItemPresenceResearchMethod::new));
+        public static final MapCodec<CheckItemPresenceResearchMethod> CODEC =
+                RecordCodecBuilder.mapCodec(instance -> instance.group(
+                                Ingredient.CODEC.fieldOf("item").forGetter(CheckItemPresenceResearchMethod::item),
+                                Codec.INT.fieldOf("count").forGetter(CheckItemPresenceResearchMethod::count))
+                        .apply(instance, CheckItemPresenceResearchMethod::new));
 
-        public static final StreamCodec<RegistryFriendlyByteBuf, CheckItemPresenceResearchMethod> STREAM_CODEC = StreamCodec.composite(
-                Ingredient.CONTENTS_STREAM_CODEC,
-                CheckItemPresenceResearchMethod::item,
-                ByteBufCodecs.INT,
-                CheckItemPresenceResearchMethod::count,
-                CheckItemPresenceResearchMethod::new
-        );
+        public static final StreamCodec<RegistryFriendlyByteBuf, CheckItemPresenceResearchMethod> STREAM_CODEC =
+                StreamCodec.composite(
+                        Ingredient.CONTENTS_STREAM_CODEC,
+                        CheckItemPresenceResearchMethod::item,
+                        ByteBufCodecs.INT,
+                        CheckItemPresenceResearchMethod::count,
+                        CheckItemPresenceResearchMethod::new);
 
-        private Serializer() {
-        }
+        private Serializer() {}
 
         @Override
         public @NotNull MapCodec<CheckItemPresenceResearchMethod> codec() {

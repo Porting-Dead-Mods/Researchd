@@ -11,11 +11,13 @@ import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.WidgetConstructor;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
-import com.portingdeadmods.researchd.client.screens.lib.widgets.WidgetConstructor;
+import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -28,12 +30,10 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
-import java.util.function.Consumer;
-
 public class SelectedResearchWidget extends ResearchScreenWidget {
     private static final ResourceLocation BACKGROUND_TEXTURE = Researchd.rl("textures/gui/selected_research.png");
-    private static final ResourceLocation BACKGROUND_TEXTURE_HORIZONTAL_SCROLLBAR = Researchd.rl("textures/gui/selected_research_horizontal_scrollbar.png");
+    private static final ResourceLocation BACKGROUND_TEXTURE_HORIZONTAL_SCROLLBAR =
+            Researchd.rl("textures/gui/selected_research_horizontal_scrollbar.png");
     private static final ResourceLocation SMALL_SCROLLER_SPRITE = Researchd.rl("scroller_small");
     // For calculating height
     public static final int LABEL_PADDING_TOP_1 = 2;
@@ -72,32 +72,53 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
         super(x, y, width, height);
         this.font = Minecraft.getInstance().font;
         this.researchScreen = screen;
-        this.sideScroller = new AbstractScroller(this.researchScreen, HORIZONTAL_SCROLLER_X, HORIZONTAL_SCROLLER_Y, HORIZONTAL_SCROLLER_WIDTH, HORIZONTAL_SCROLLER_HEIGHT, HORIZONTAL_SCROLLER_TRACK_LENGTH, AbstractScroller.Mode.HORIZONTAL, Researchd.rl("scroller_small_horizontal")) {
-            @Override
-            public int getContentLength() {
-                if (methodWidget != null && effectWidget != null) {
-                    return METHOD_WIDGET_PADDING * 2 + Math.max(methodWidget.getWidth(), effectWidget.getWidth());
-                }
-                return 0;
-            }
+        this.sideScroller =
+                new AbstractScroller(
+                        this.researchScreen,
+                        HORIZONTAL_SCROLLER_X,
+                        HORIZONTAL_SCROLLER_Y,
+                        HORIZONTAL_SCROLLER_WIDTH,
+                        HORIZONTAL_SCROLLER_HEIGHT,
+                        HORIZONTAL_SCROLLER_TRACK_LENGTH,
+                        AbstractScroller.Mode.HORIZONTAL,
+                        Researchd.rl("scroller_small_horizontal")) {
+                    @Override
+                    public int getContentLength() {
+                        if (methodWidget != null && effectWidget != null) {
+                            return METHOD_WIDGET_PADDING * 2
+                                    + Math.max(methodWidget.getWidth(), effectWidget.getWidth());
+                        }
+                        return 0;
+                    }
 
-            @Override
-            public int getVisibleContentLength() {
-                return DESCRIPTION_WIDTH;
-            }
+                    @Override
+                    public int getVisibleContentLength() {
+                        return DESCRIPTION_WIDTH;
+                    }
 
-            @Override
-            public void onScroll() {
-                updateChildWidgetPositions();
-            }
-        };
+                    @Override
+                    public void onScroll() {
+                        updateChildWidgetPositions();
+                    }
+                };
     }
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
-        GuiUtils.drawImg(guiGraphics, this.sideScroller.visible ? BACKGROUND_TEXTURE_HORIZONTAL_SCROLLBAR : BACKGROUND_TEXTURE, getX(), getY(), width, height);
+        GuiUtils.drawImg(
+                guiGraphics,
+                this.sideScroller.visible ? BACKGROUND_TEXTURE_HORIZONTAL_SCROLLBAR : BACKGROUND_TEXTURE,
+                getX(),
+                getY(),
+                width,
+                height);
         float percentage = (float) this.scrollOffset / (this.getInfoHeight() - 47f);
-        guiGraphics.blitSprite(SMALL_SCROLLER_SPRITE, getX() + getWidth() - 9, (int) (getY() + PADDING_Y + (41 * percentage)), VERTICAL_SCROLLER_WIDTH, VERTICAL_SCROLLER_HEIGHT);
+        guiGraphics.blitSprite(
+                SMALL_SCROLLER_SPRITE,
+                getX() + getWidth() - 9,
+                (int) (getY() + PADDING_Y + (41 * percentage)),
+                VERTICAL_SCROLLER_WIDTH,
+                VERTICAL_SCROLLER_HEIGHT);
 
         int offsetY = -this.scrollOffset;
 
@@ -110,25 +131,47 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
             renderResearchPanel(guiGraphics, this.selectedInstance, 12, 60, mouseX, mouseY, 2, false);
 
             int horizontalScrollerArea = this.sideScroller.visible ? 5 : 0;
-            guiGraphics.enableScissor(53, startY, 53 + DESCRIPTION_WIDTH, startY + DESCRIPTION_HEIGHT - horizontalScrollerArea);
+            guiGraphics.enableScissor(
+                    53, startY, 53 + DESCRIPTION_WIDTH, startY + DESCRIPTION_HEIGHT - horizontalScrollerArea);
             {
                 int yPosMethodLabel = startY + LABEL_PADDING_TOP_1;
-                guiGraphics.drawString(font, ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_LABEL_RESEARCH_METHODS), 53 + METHOD_WIDGET_PADDING - this.sideScroller.getScrollOffset(), offsetY + yPosMethodLabel, -1);
+                guiGraphics.drawString(
+                        font,
+                        ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_LABEL_RESEARCH_METHODS),
+                        53 + METHOD_WIDGET_PADDING - this.sideScroller.getScrollOffset(),
+                        offsetY + yPosMethodLabel,
+                        -1);
 
                 this.methodWidget.render(guiGraphics, mouseX, mouseY, v);
 
-                int yPosLine = startY + LABEL_PADDING_TOP_1 + font.lineHeight + LABEL_PADDING_BOTTOM_1 + this.methodWidget.getHeight() + METHOD_WIDGET_PADDING_BOTTOM;
+                int yPosLine = startY
+                        + LABEL_PADDING_TOP_1
+                        + font.lineHeight
+                        + LABEL_PADDING_BOTTOM_1
+                        + this.methodWidget.getHeight()
+                        + METHOD_WIDGET_PADDING_BOTTOM;
                 guiGraphics.fill(53, offsetY + yPosLine, 53 + DESCRIPTION_WIDTH, offsetY + yPosLine + LINE_HEIGHT, -1);
 
                 int yPosEffectsLabel = yPosLine + LINE_HEIGHT + LABEL_PADDING_TOP_2;
-                guiGraphics.drawString(font, ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_LABEL_RESEARCH_EFFECTS), 53 + METHOD_WIDGET_PADDING - this.sideScroller.getScrollOffset(), offsetY + yPosEffectsLabel, -1);
+                guiGraphics.drawString(
+                        font,
+                        ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_LABEL_RESEARCH_EFFECTS),
+                        53 + METHOD_WIDGET_PADDING - this.sideScroller.getScrollOffset(),
+                        offsetY + yPosEffectsLabel,
+                        -1);
 
                 this.effectWidget.render(guiGraphics, mouseX, mouseY, v);
-                //guiGraphics.fill(53, startY + offsetY, 53 + DESCRIPTION_WIDTH, startY + offsetY + this.getInfoHeight(), FastColor.ARGB32.color(100, 0, 0, 155));
+                // guiGraphics.fill(53, startY + offsetY, 53 + DESCRIPTION_WIDTH, startY + offsetY +
+                // this.getInfoHeight(), FastColor.ARGB32.color(100, 0, 0, 155));
             }
             guiGraphics.disableScissor();
 
-            if (this.sideScroller.visible) guiGraphics.hLine(HORIZONTAL_SCROLLER_X, HORIZONTAL_SCROLLER_X + DESCRIPTION_WIDTH, HORIZONTAL_SCROLLER_Y - 1, -1);
+            if (this.sideScroller.visible)
+                guiGraphics.hLine(
+                        HORIZONTAL_SCROLLER_X,
+                        HORIZONTAL_SCROLLER_X + DESCRIPTION_WIDTH,
+                        HORIZONTAL_SCROLLER_Y - 1,
+                        -1);
 
             this.renderTooltip(guiGraphics, mouseX, mouseY, v);
         }
@@ -147,7 +190,11 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
     public int getInfoHeight() {
         int methodHeight = this.methodWidget != null ? this.methodWidget.getHeight() : 0;
         int effectHeight = this.effectWidget != null ? this.effectWidget.getHeight() : 0;
-        int methodSectionHeight = LABEL_PADDING_TOP_1 + font.lineHeight + LABEL_PADDING_BOTTOM_1 + methodHeight + METHOD_WIDGET_PADDING_BOTTOM;
+        int methodSectionHeight = LABEL_PADDING_TOP_1
+                + font.lineHeight
+                + LABEL_PADDING_BOTTOM_1
+                + methodHeight
+                + METHOD_WIDGET_PADDING_BOTTOM;
         int effectSectionHeight = LABEL_PADDING_TOP_2 + font.lineHeight + LABEL_PADDING_BOTTOM_2 + effectHeight;
         return methodSectionHeight + LINE_HEIGHT + effectSectionHeight + BOTTOM_PADDING;
     }
@@ -176,7 +223,17 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
         this.methodWidget.setY((int) (60 + LABEL_PADDING_TOP_1 + font.lineHeight + LABEL_PADDING_BOTTOM_1 - offsetY));
         this.methodWidget.setX(53 + METHOD_WIDGET_PADDING - this.sideScroller.getScrollOffset());
 
-        this.effectWidget.setY((int) (60 + LABEL_PADDING_TOP_1 + font.lineHeight + LABEL_PADDING_BOTTOM_1 + methodWidget.getHeight() + METHOD_WIDGET_PADDING_BOTTOM + LINE_HEIGHT + LABEL_PADDING_TOP_2 + font.lineHeight + LABEL_PADDING_BOTTOM_2 - offsetY));
+        this.effectWidget.setY((int) (60
+                + LABEL_PADDING_TOP_1
+                + font.lineHeight
+                + LABEL_PADDING_BOTTOM_1
+                + methodWidget.getHeight()
+                + METHOD_WIDGET_PADDING_BOTTOM
+                + LINE_HEIGHT
+                + LABEL_PADDING_TOP_2
+                + font.lineHeight
+                + LABEL_PADDING_BOTTOM_2
+                - offsetY));
         this.effectWidget.setX(53 + METHOD_WIDGET_PADDING - this.sideScroller.getScrollOffset());
     }
 
@@ -194,13 +251,11 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
         int trackTop = getY() + PADDING_Y;
         int trackRange = 41;
 
-        if (
-                mouseX >= scrollerX &&
-                mouseX < scrollerX + VERTICAL_SCROLLER_WIDTH &&
-                mouseY >= trackTop &&
-                mouseY <= trackTop + trackRange + VERTICAL_SCROLLER_HEIGHT &&
-                getInfoHeight() > VISIBLE_CONENT_HEIGHT
-        ) {
+        if (mouseX >= scrollerX
+                && mouseX < scrollerX + VERTICAL_SCROLLER_WIDTH
+                && mouseY >= trackTop
+                && mouseY <= trackTop + trackRange + VERTICAL_SCROLLER_HEIGHT
+                && getInfoHeight() > VISIBLE_CONENT_HEIGHT) {
             double clamped = Math.clamp(mouseY, trackTop, trackTop + trackRange) - trackTop;
             double percentage = clamped / (double) trackRange;
             int scrollableHeight = getInfoHeight() - VISIBLE_CONENT_HEIGHT;
@@ -224,7 +279,8 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
 
             ResearchInstance instance = team.getResearches().get(research);
             if (instance == null) {
-                Researchd.error("Research Screen", "Cannot select %s, this team has no entry for it", research.location());
+                Researchd.error(
+                        "Research Screen", "Cannot select %s, this team has no entry for it", research.location());
                 return;
             }
 
@@ -236,17 +292,27 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
         if (this.selectedInstance != instance) {
             Research selected = instance.lookup(Minecraft.getInstance().level);
             if (selected == null) {
-                Researchd.error("Research Screen", "Cannot select %s, it is not part of the loaded researches", instance.getResearch().location());
+                Researchd.error(
+                        "Research Screen",
+                        "Cannot select %s, it is not part of the loaded researches",
+                        instance.getResearch().location());
                 return;
             }
 
             this.selectedInstance = instance;
 
             this.researchScreen.getTechListWidget().startResearchButton.active = this.selectedInstance.isResearchable()
-                    && !this.researchScreen.getResearchQueueWidget().getQueue().contains(this.selectedInstance.getResearch())
-                    && !(this.researchScreen.getResearchQueueWidget().getQueue().size() >= ResearchdConfig.Common.researchQueueLength);
-            if (this.selectedInstance.isResearchable() && !this.researchScreen.getResearchQueueWidget().getQueue().isEmpty()) {
-                this.researchScreen.getTechListWidget().setResearchButtonMode(TechListWidget.ResearchButtonMode.ENQUEUE);
+                    && !this.researchScreen
+                            .getResearchQueueWidget()
+                            .getQueue()
+                            .contains(this.selectedInstance.getResearch())
+                    && !(this.researchScreen.getResearchQueueWidget().getQueue().size()
+                            >= ResearchdConfig.Common.researchQueueLength);
+            if (this.selectedInstance.isResearchable()
+                    && !this.researchScreen.getResearchQueueWidget().getQueue().isEmpty()) {
+                this.researchScreen
+                        .getTechListWidget()
+                        .setResearchButtonMode(TechListWidget.ResearchButtonMode.ENQUEUE);
             } else {
                 this.researchScreen.getTechListWidget().setResearchButtonMode(TechListWidget.ResearchButtonMode.START);
             }
@@ -258,24 +324,51 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
 
             this.scrollOffset = 0;
             ResearchMethod method = selected.researchMethod();
-            WidgetConstructor<? extends ResearchMethod> methodWidgetConstructor = ResearchdClient.RESEARCH_METHOD_WIDGETS.get(method.id());
+            WidgetConstructor<? extends ResearchMethod> methodWidgetConstructor =
+                    ResearchdClient.RESEARCH_METHOD_WIDGETS.get(method.id());
             if (methodWidgetConstructor != null) {
-                this.methodWidget = methodWidgetConstructor.createMethod(53 + METHOD_WIDGET_PADDING, 60 + LABEL_PADDING_TOP_1 + font.lineHeight + LABEL_PADDING_BOTTOM_1, method);
+                this.methodWidget = methodWidgetConstructor.createMethod(
+                        53 + METHOD_WIDGET_PADDING,
+                        60 + LABEL_PADDING_TOP_1 + font.lineHeight + LABEL_PADDING_BOTTOM_1,
+                        method);
             } else {
                 // in case the dev didn't implement a widget for the researchPack method, we scream at them
-                MutableComponent message = Component.literal("!!%s does not have info widget!!".formatted(method.id().toString())).withStyle(ChatFormatting.RED);
-                this.methodWidget = new MultiLineTextWidget(53 + METHOD_WIDGET_PADDING + 1, 60 + LABEL_PADDING_TOP_1 + font.lineHeight + LABEL_PADDING_BOTTOM_1, message, font);
+                MutableComponent message = Component.literal("!!%s does not have info widget!!"
+                                .formatted(method.id().toString()))
+                        .withStyle(ChatFormatting.RED);
+                this.methodWidget = new MultiLineTextWidget(
+                        53 + METHOD_WIDGET_PADDING + 1,
+                        60 + LABEL_PADDING_TOP_1 + font.lineHeight + LABEL_PADDING_BOTTOM_1,
+                        message,
+                        font);
                 ((MultiLineTextWidget) this.methodWidget).setMaxWidth(108);
             }
 
             ResearchEffect effect = selected.researchEffect();
-            WidgetConstructor<? extends ResearchEffect> effectWidgetConstructor = ResearchdClient.RESEARCH_EFFECT_WIDGETS.get(effect.id());
+            WidgetConstructor<? extends ResearchEffect> effectWidgetConstructor =
+                    ResearchdClient.RESEARCH_EFFECT_WIDGETS.get(effect.id());
             if (effectWidgetConstructor != null) {
-                this.effectWidget = effectWidgetConstructor.createEffect(53 + METHOD_WIDGET_PADDING, 60 + LABEL_PADDING_TOP_1 + font.lineHeight + LABEL_PADDING_BOTTOM_1 + methodWidget.getHeight() + METHOD_WIDGET_PADDING_BOTTOM + LINE_HEIGHT + LABEL_PADDING_TOP_2 + font.lineHeight + LABEL_PADDING_BOTTOM_2, effect);
+                this.effectWidget = effectWidgetConstructor.createEffect(
+                        53 + METHOD_WIDGET_PADDING,
+                        60
+                                + LABEL_PADDING_TOP_1
+                                + font.lineHeight
+                                + LABEL_PADDING_BOTTOM_1
+                                + methodWidget.getHeight()
+                                + METHOD_WIDGET_PADDING_BOTTOM
+                                + LINE_HEIGHT
+                                + LABEL_PADDING_TOP_2
+                                + font.lineHeight
+                                + LABEL_PADDING_BOTTOM_2,
+                        effect);
             } else {
-                // in case the dev didn't implement a widget for the researchPack method, we *aggressively* scream at them
-                MutableComponent message = Component.literal("!!%s does not have info widget!!".formatted(effect.id().toString())).withStyle(ChatFormatting.RED);
-                this.effectWidget = new MultiLineTextWidget(53 + METHOD_WIDGET_PADDING + 1, 64 + 36 + font.lineHeight + 4, message, font);
+                // in case the dev didn't implement a widget for the researchPack method, we *aggressively* scream at
+                // them
+                MutableComponent message = Component.literal("!!%s does not have info widget!!"
+                                .formatted(effect.id().toString()))
+                        .withStyle(ChatFormatting.RED);
+                this.effectWidget = new MultiLineTextWidget(
+                        53 + METHOD_WIDGET_PADDING + 1, 64 + 36 + font.lineHeight + 4, message, font);
                 ((MultiLineTextWidget) this.effectWidget).setMaxWidth(108);
             }
 
@@ -303,7 +396,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
         super.visitWidgets(consumer);
 
         consumer.accept(this.sideScroller);
-        //this.methodWidget.visitWidgets(consumer);
-        //this.effectWidget.visitWidgets(consumer);
+        // this.methodWidget.visitWidgets(consumer);
+        // this.effectWidget.visitWidgets(consumer);
     }
 }

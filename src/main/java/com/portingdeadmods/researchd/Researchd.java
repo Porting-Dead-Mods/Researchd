@@ -29,9 +29,6 @@ import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
 import org.slf4j.Logger;
 
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 @Mod(Researchd.MODID)
 public final class Researchd {
     public static final String MODID = "researchd";
@@ -57,16 +54,16 @@ public final class Researchd {
         }
     }
 
-	public static void log(String category, Object... message) {
-		StringBuilder sb = new StringBuilder();
-		sb.append("[").append(category).append("] ");
+    public static void log(String category, Object... message) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[").append(category).append("] ");
 
-		for (Object msg : message) {
-			sb.append(msg.toString());
-		}
+        for (Object msg : message) {
+            sb.append(msg.toString());
+        }
 
-		LOGGER.info(sb.toString());
-	}
+        LOGGER.info(sb.toString());
+    }
 
     public static void error(String category, String message, Object... args) {
         String formatted = "[" + category + "] " + (args.length > 0 ? message.formatted(args) : message);
@@ -109,19 +106,30 @@ public final class Researchd {
 
     private void addPackFinders(AddPackFindersEvent event) {
         if (ResearchdConfig.Common.loadDefaultDatapack) {
-            DynamicPack pack = new DynamicPack(Researchd.rl("example_researches"), event.getPackType(), PackSource.FEATURE);
+            DynamicPack pack =
+                    new DynamicPack(Researchd.rl("example_researches"), event.getPackType(), PackSource.FEATURE);
             switch (event.getPackType()) {
                 case CLIENT_RESOURCES -> ResearchdDynamicPackContents.writeAssets(pack);
                 case SERVER_DATA -> ResearchdDynamicPackContents.writeData(pack);
             }
-            event.addRepositorySource(new ResearchdExamplesSource(pack.packId(), event.getPackType(), Pack.Position.BOTTOM, pack));
+            event.addRepositorySource(
+                    new ResearchdExamplesSource(pack.packId(), event.getPackType(), Pack.Position.BOTTOM, pack));
         }
 
-		event.addPackFinders(rl("assets/researchd/darkmode"), PackType.CLIENT_RESOURCES, Component.literal("Researchd Dark Mode Assets"), PackSource.BUILT_IN, false, Pack.Position.TOP);
+        event.addPackFinders(
+                rl("assets/researchd/darkmode"),
+                PackType.CLIENT_RESOURCES,
+                Component.literal("Researchd Dark Mode Assets"),
+                PackSource.BUILT_IN,
+                false,
+                Pack.Position.TOP);
     }
 
     private void registerCapabilities(RegisterCapabilitiesEvent event) {
-        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ResearchdBlockEntityTypes.RESEARCH_LAB_PART.get(), (be, dir) -> be.getControllerItemHandler());
+        event.registerBlockEntity(
+                Capabilities.ItemHandler.BLOCK,
+                ResearchdBlockEntityTypes.RESEARCH_LAB_PART.get(),
+                (be, dir) -> be.getControllerItemHandler());
     }
 
     private void registerRegistries(NewRegistryEvent event) {

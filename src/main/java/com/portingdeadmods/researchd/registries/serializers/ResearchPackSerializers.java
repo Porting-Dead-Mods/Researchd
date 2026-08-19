@@ -7,7 +7,8 @@ import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class ResearchPackSerializers {
-    public static final DeferredRegister<ResearchPackSerializer<?>> SERIALIZERS = DeferredRegister.create(ResearchdRegistries.RESEARCH_PACK_SERIALIZER_KEY, Researchd.MODID);
+    public static final DeferredRegister<ResearchPackSerializer<?>> SERIALIZERS =
+            DeferredRegister.create(ResearchdRegistries.RESEARCH_PACK_SERIALIZER_KEY, Researchd.MODID);
 
     static {
         SERIALIZERS.register("simple", () -> ResearchPackImpl.Serializer.INSTANCE);

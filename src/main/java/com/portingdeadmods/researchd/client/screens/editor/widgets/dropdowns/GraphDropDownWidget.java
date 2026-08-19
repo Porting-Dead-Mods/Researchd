@@ -23,7 +23,12 @@ public class GraphDropDownWidget extends DropDownWidget<LayoutElement> {
         this(null, null, screen, x, y);
     }
 
-    public GraphDropDownWidget(@Nullable Research previousResearch, @Nullable ResourceLocation previousResearchdId, ResearchScreen screen, int x, int y) {
+    public GraphDropDownWidget(
+            @Nullable Research previousResearch,
+            @Nullable ResourceLocation previousResearchdId,
+            ResearchScreen screen,
+            int x,
+            int y) {
         this.previousResearch = previousResearch;
         this.previousResearchdId = previousResearchdId;
         this.screen = screen;
@@ -38,10 +43,13 @@ public class GraphDropDownWidget extends DropDownWidget<LayoutElement> {
     @Override
     protected void buildOptions() {
         if (this.previousResearch == null) {
-            this.addOption(new StringOption(Component.literal("New Research"), Minecraft.getInstance().font, this::createNewResearch));
-            this.addOption(new StringOption(Component.literal("New Research Pack"), Minecraft.getInstance().font, this::createNewResearchPack));
+            this.addOption(new StringOption(
+                    Component.literal("New Research"), Minecraft.getInstance().font, this::createNewResearch));
+            this.addOption(new StringOption(
+                    Component.literal("New Research Pack"), Minecraft.getInstance().font, this::createNewResearchPack));
         } else {
-            this.addOption(new StringOption(Component.literal("Edit Research"), Minecraft.getInstance().font, this::editResearch));
+            this.addOption(new StringOption(
+                    Component.literal("Edit Research"), Minecraft.getInstance().font, this::editResearch));
         }
     }
 
@@ -56,7 +64,8 @@ public class GraphDropDownWidget extends DropDownWidget<LayoutElement> {
     }
 
     private void editResearch(StringOption opt) {
-        this.screen.openPopupCentered(new ResearchCreationPopupWidget(this.previousResearch, this.previousResearchdId, 0, 0, 128, 182));
+        this.screen.openPopupCentered(
+                new ResearchCreationPopupWidget(this.previousResearch, this.previousResearchdId, 0, 0, 128, 182));
         this.screen.setDropDown(null);
     }
 }

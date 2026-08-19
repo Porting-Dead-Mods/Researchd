@@ -21,19 +21,19 @@ import net.minecraft.world.level.Level;
 
 public record IncreaseValueEffect(ValueEffect value, float amount) implements ValueEffectModifierEffect {
     private static final MapCodec<IncreaseValueEffect> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
-            ValueEffect.CODEC.fieldOf("value").forGetter(IncreaseValueEffect::value),
-            Codec.FLOAT.fieldOf("amount").forGetter(IncreaseValueEffect::amount)
-    ).apply(inst, IncreaseValueEffect::new));
+                    ValueEffect.CODEC.fieldOf("value").forGetter(IncreaseValueEffect::value),
+                    Codec.FLOAT.fieldOf("amount").forGetter(IncreaseValueEffect::amount))
+            .apply(inst, IncreaseValueEffect::new));
 
     private static final StreamCodec<RegistryFriendlyByteBuf, IncreaseValueEffect> STREAM_CODEC = StreamCodec.composite(
             ValueEffect.STREAM_CODEC,
             IncreaseValueEffect::value,
             ByteBufCodecs.FLOAT,
             IncreaseValueEffect::amount,
-            IncreaseValueEffect::new
-    );
+            IncreaseValueEffect::new);
 
-    public static final ResearchEffectSerializer<IncreaseValueEffect> SERIALIZER = ResearchEffectSerializer.simple(CODEC, STREAM_CODEC);
+    public static final ResearchEffectSerializer<IncreaseValueEffect> SERIALIZER =
+            ResearchEffectSerializer.simple(CODEC, STREAM_CODEC);
     public static final ResourceLocation ID = Researchd.rl("increase_value");
 
     @Override
@@ -77,4 +77,3 @@ public record IncreaseValueEffect(ValueEffect value, float amount) implements Va
         return SERIALIZER;
     }
 }
-

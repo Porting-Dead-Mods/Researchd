@@ -12,11 +12,13 @@ public final class ResearchdCompatHandler {
         return ModList.get().isLoaded("jei");
     }
 
-	public static boolean isFTBTeamsLoaded() { return ModList.get().isLoaded("ftbteams"); }
+    public static boolean isFTBTeamsLoaded() {
+        return ModList.get().isLoaded("ftbteams");
+    }
 
-	public static boolean isFTBTeamsEnabled() {
-		return isFTBTeamsLoaded() && ResearchdConfig.Server.useFTBTeams;
-	}
+    public static boolean isFTBTeamsEnabled() {
+        return isFTBTeamsLoaded() && ResearchdConfig.Server.useFTBTeams;
+    }
 
     public static boolean isEmiLoaded() {
         return ModList.get().isLoaded("emi");

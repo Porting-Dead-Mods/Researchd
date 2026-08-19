@@ -1,12 +1,7 @@
 package com.portingdeadmods.researchd.client.screens.team.widgets;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.StringWidget;
-import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 
@@ -26,8 +21,7 @@ public abstract class AbstractDraggableWidget extends AbstractWidget {
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-    }
+    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 
     @Override
     protected void onDrag(double mouseX, double mouseY, double dragX, double dragY) {
@@ -39,11 +33,9 @@ public abstract class AbstractDraggableWidget extends AbstractWidget {
             this.setPosition(getX() + (int) dragX, getY() + (int) dragY);
             this.onMoved();
         }
-
     }
 
-    protected void onMoved() {
-    }
+    protected void onMoved() {}
 
     @Override
     public void onRelease(double mouseX, double mouseY) {
@@ -64,5 +56,4 @@ public abstract class AbstractDraggableWidget extends AbstractWidget {
                 && mouseX < this.getX() + width
                 && mouseY < this.getY() + height;
     }
-
 }

@@ -3,6 +3,9 @@ package com.portingdeadmods.researchd.api.research;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.api.ResearchdApi;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -12,17 +15,15 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-
 public final class ResearchInstance {
     public static final Codec<ResearchInstance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Research.RESOURCE_KEY_CODEC.fieldOf("research").forGetter(ResearchInstance::getResearch),
-            ResearchStatus.CODEC.fieldOf("research_status").forGetter(ResearchInstance::getResearchStatus),
-            UUIDUtil.CODEC.optionalFieldOf("researched_player").forGetter(r -> Optional.ofNullable(r.getResearchedPlayer())),
-            Codec.LONG.fieldOf("researched_time").forGetter(ResearchInstance::getResearchedTime)
-    ).apply(instance, (r, s, p, t) -> new ResearchInstance(r, s, p.orElse(null), t)));
+                    Research.RESOURCE_KEY_CODEC.fieldOf("research").forGetter(ResearchInstance::getResearch),
+                    ResearchStatus.CODEC.fieldOf("research_status").forGetter(ResearchInstance::getResearchStatus),
+                    UUIDUtil.CODEC
+                            .optionalFieldOf("researched_player")
+                            .forGetter(r -> Optional.ofNullable(r.getResearchedPlayer())),
+                    Codec.LONG.fieldOf("researched_time").forGetter(ResearchInstance::getResearchedTime))
+            .apply(instance, (r, s, p, t) -> new ResearchInstance(r, s, p.orElse(null), t)));
     public static final StreamCodec<RegistryFriendlyByteBuf, ResearchInstance> STREAM_CODEC = StreamCodec.composite(
             Research.RESOURCE_KEY_STREAM_CODEC,
             ResearchInstance::getResearch,
@@ -32,15 +33,15 @@ public final class ResearchInstance {
             instance -> Optional.ofNullable(instance.getResearchedPlayer()),
             ByteBufCodecs.VAR_LONG,
             ResearchInstance::getResearchedTime,
-            (r, s, p, t) -> new ResearchInstance(r, s, p.orElse(null), t)
-    );
+            (r, s, p, t) -> new ResearchInstance(r, s, p.orElse(null), t));
 
     private final ResourceKey<Research> research;
     private ResearchStatus researchStatus;
     private @Nullable UUID researchedPlayer;
     private long researchedTime;
 
-    public ResearchInstance(ResourceKey<Research> research, ResearchStatus researchStatus, UUID researchedPlayer, long researchedTime) {
+    public ResearchInstance(
+            ResourceKey<Research> research, ResearchStatus researchStatus, UUID researchedPlayer, long researchedTime) {
         this.research = research;
         this.researchStatus = researchStatus;
         this.researchedPlayer = researchedPlayer;
@@ -56,7 +57,8 @@ public final class ResearchInstance {
     }
 
     public boolean isResearchable() {
-        return this.researchStatus == ResearchStatus.RESEARCHABLE || this.researchStatus == ResearchStatus.RESEARCHABLE_AFTER_QUEUE;
+        return this.researchStatus == ResearchStatus.RESEARCHABLE
+                || this.researchStatus == ResearchStatus.RESEARCHABLE_AFTER_QUEUE;
     }
 
     public boolean isLocked() {
@@ -133,13 +135,17 @@ public final class ResearchInstance {
     }
 
     public ResearchInstance copy() {
-        return new ResearchInstance(this.getResearch(), this.getResearchStatus(), this.getResearchedPlayer(), this.getResearchedTime());
+        return new ResearchInstance(
+                this.getResearch(), this.getResearchStatus(), this.getResearchedPlayer(), this.getResearchedTime());
     }
 
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof ResearchInstance instance)) return false;
-        return researchedTime == instance.researchedTime && Objects.equals(research, instance.research) && researchStatus == instance.researchStatus && Objects.equals(researchedPlayer, instance.researchedPlayer);
+        return researchedTime == instance.researchedTime
+                && Objects.equals(research, instance.research)
+                && researchStatus == instance.researchStatus
+                && Objects.equals(researchedPlayer, instance.researchedPlayer);
     }
 
     @Override
@@ -149,9 +155,6 @@ public final class ResearchInstance {
 
     @Override
     public String toString() {
-        return "ResearchInstance{" +
-                "researchPack=" + research +
-                ", researchStatus=" + researchStatus +
-                '}';
+        return "ResearchInstance{" + "researchPack=" + research + ", researchStatus=" + researchStatus + '}';
     }
 }

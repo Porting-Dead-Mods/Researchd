@@ -7,10 +7,11 @@ import com.portingdeadmods.portingdeadlibs.api.utils.RGBAColor;
 import com.portingdeadmods.researchd.api.research.RegistryDisplay;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchPackSerializer;
+import com.portingdeadmods.researchd.data.ResearchdDataComponents;
 import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
 import com.portingdeadmods.researchd.impl.utils.DisplayImpl;
-import com.portingdeadmods.researchd.data.ResearchdDataComponents;
 import com.portingdeadmods.researchd.registries.ResearchdItems;
+import java.util.Optional;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -20,10 +21,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.Optional;
-
-public record ResearchPackImpl(int color, int sortingValue, Optional<ResourceLocation> customTexture,
-                               DisplayImpl display) implements ResearchPack, RegistryDisplay<ResearchPack> {
+public record ResearchPackImpl(
+        int color, int sortingValue, Optional<ResourceLocation> customTexture, DisplayImpl display)
+        implements ResearchPack, RegistryDisplay<ResearchPack> {
 
     public static final ResearchPackImpl EMPTY = new ResearchPackImpl(-1, -1, Optional.empty(), DisplayImpl.EMPTY);
     public static final String ID = "simple";
@@ -32,7 +32,8 @@ public record ResearchPackImpl(int color, int sortingValue, Optional<ResourceLoc
         this(-1, -1, Optional.of(customTexture), DisplayImpl.EMPTY);
     }
 
-    public ResearchPackImpl(RGBAColor color, int sortingValue, Optional<ResourceLocation> customTexture, DisplayImpl display) {
+    public ResearchPackImpl(
+            RGBAColor color, int sortingValue, Optional<ResourceLocation> customTexture, DisplayImpl display) {
         this(color.toARGB(), sortingValue, customTexture, display);
     }
 
@@ -72,25 +73,28 @@ public record ResearchPackImpl(int color, int sortingValue, Optional<ResourceLoc
     public static final class Serializer implements ResearchPackSerializer<ResearchPackImpl> {
         public static final Serializer INSTANCE = new Serializer();
         public static final MapCodec<ResearchPackImpl> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                RGBAColor.CODEC.fieldOf("color").forGetter(ResearchPackImpl::colorAsRgba),
-                Codec.INT.fieldOf("sorting_value").forGetter(ResearchPackImpl::sortingValue),
-                ResourceLocation.CODEC.optionalFieldOf("custom_texture").forGetter(ResearchPackImpl::customTexture),
-                DisplayImpl.CODEC.optionalFieldOf("display", DisplayImpl.EMPTY).forGetter(ResearchPackImpl::display)
-        ).apply(instance, ResearchPackImpl::new));
-        public static final StreamCodec<? super RegistryFriendlyByteBuf, ResearchPackImpl> STREAM_CODEC = StreamCodec.composite(
-                ByteBufCodecs.INT,
-                ResearchPackImpl::color,
-                ByteBufCodecs.INT,
-                ResearchPackImpl::sortingValue,
-                ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
-                ResearchPackImpl::customTexture,
-                DisplayImpl.STREAM_CODEC,
-                ResearchPackImpl::display,
-                ResearchPackImpl::new
-        );
+                        RGBAColor.CODEC.fieldOf("color").forGetter(ResearchPackImpl::colorAsRgba),
+                        Codec.INT.fieldOf("sorting_value").forGetter(ResearchPackImpl::sortingValue),
+                        ResourceLocation.CODEC
+                                .optionalFieldOf("custom_texture")
+                                .forGetter(ResearchPackImpl::customTexture),
+                        DisplayImpl.CODEC
+                                .optionalFieldOf("display", DisplayImpl.EMPTY)
+                                .forGetter(ResearchPackImpl::display))
+                .apply(instance, ResearchPackImpl::new));
+        public static final StreamCodec<? super RegistryFriendlyByteBuf, ResearchPackImpl> STREAM_CODEC =
+                StreamCodec.composite(
+                        ByteBufCodecs.INT,
+                        ResearchPackImpl::color,
+                        ByteBufCodecs.INT,
+                        ResearchPackImpl::sortingValue,
+                        ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
+                        ResearchPackImpl::customTexture,
+                        DisplayImpl.STREAM_CODEC,
+                        ResearchPackImpl::display,
+                        ResearchPackImpl::new);
 
-        private Serializer() {
-        }
+        private Serializer() {}
 
         @Override
         public MapCodec<ResearchPackImpl> codec() {
@@ -101,7 +105,6 @@ public record ResearchPackImpl(int color, int sortingValue, Optional<ResourceLoc
         public StreamCodec<? super RegistryFriendlyByteBuf, ResearchPackImpl> streamCodec() {
             return STREAM_CODEC;
         }
-
     }
 
     public static final class Builder {
@@ -111,8 +114,7 @@ public record ResearchPackImpl(int color, int sortingValue, Optional<ResourceLoc
         private Component literalName;
         private Component literalDescription;
 
-        private Builder() {
-        }
+        private Builder() {}
 
         public Builder color(int r, int g, int b) {
             this.color = FastColor.ARGB32.color(r, g, b);
@@ -144,7 +146,12 @@ public record ResearchPackImpl(int color, int sortingValue, Optional<ResourceLoc
         }
 
         public ResearchPackImpl build() {
-            return new ResearchPackImpl(this.color, this.sorting_value, Optional.ofNullable(this.customTexture), new DisplayImpl(Optional.ofNullable(this.literalName), Optional.ofNullable(this.literalDescription)));
+            return new ResearchPackImpl(
+                    this.color,
+                    this.sorting_value,
+                    Optional.ofNullable(this.customTexture),
+                    new DisplayImpl(
+                            Optional.ofNullable(this.literalName), Optional.ofNullable(this.literalDescription)));
         }
     }
 }

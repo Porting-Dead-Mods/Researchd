@@ -4,13 +4,15 @@ import com.portingdeadmods.researchd.api.client.RememberingLinearLayout;
 import com.portingdeadmods.researchd.api.client.editor.StandaloneEditorObject;
 import com.portingdeadmods.researchd.client.impl.editor.EditorContextImpl;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.SelectPackPopupWidget;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLButton;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.ScrollableWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
-import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLButton;
-import com.portingdeadmods.researchd.utils.researches.ResearchEditorHelperClient;
 import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.SpaghettiClient;
+import com.portingdeadmods.researchd.utils.researches.ResearchEditorHelperClient;
+import java.util.Objects;
+import java.util.function.Function;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.layouts.Layout;
 import net.minecraft.client.gui.layouts.LinearLayout;
@@ -19,23 +21,29 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
-import java.util.function.Function;
-
 public abstract class AbstractStandaloneCreationPopupWidget<O> extends PopupWidget {
     private final RememberingLinearLayout layout;
     private final StandaloneEditorObject<? extends O> clientObject;
     private final ResearchScreen screen;
     private final Function<ResourceLocation, StandaloneEditorObject<? extends O>> editorObjectGetterFunction;
-    @Nullable
-    protected final O previous;
-    @Nullable
-    protected final ResourceLocation previousId;
+
+    @Nullable protected final O previous;
+
+    @Nullable protected final ResourceLocation previousId;
+
     private PDLButton createButton;
     private final ScrollableWidget<LinearLayout> scrollableWidget;
     private final ResourceLocation defaultId;
 
-    public AbstractStandaloneCreationPopupWidget(ResourceLocation defaultId, Function<ResourceLocation, StandaloneEditorObject<? extends O>> editorObjectGetterFunction, @Nullable O previous, @Nullable ResourceLocation previousId, int x, int y, int width, int height) {
+    public AbstractStandaloneCreationPopupWidget(
+            ResourceLocation defaultId,
+            Function<ResourceLocation, StandaloneEditorObject<? extends O>> editorObjectGetterFunction,
+            @Nullable O previous,
+            @Nullable ResourceLocation previousId,
+            int x,
+            int y,
+            int width,
+            int height) {
         super(x, y, width, height, true, CommonComponents.EMPTY);
         this.editorObjectGetterFunction = editorObjectGetterFunction;
         this.previous = previous;
@@ -46,13 +54,14 @@ public abstract class AbstractStandaloneCreationPopupWidget<O> extends PopupWidg
         this.defaultId = defaultId;
         this.clientObject = editorObjectGetterFunction.apply(defaultId);
         this.buildLayout();
-        this.scrollableWidget = new ScrollableWidget<>(this.layout.getLayout(), x + 7, y + 7, width - 14, height - 36 - 14, CommonComponents.EMPTY);
+        this.scrollableWidget = new ScrollableWidget<>(
+                this.layout.getLayout(), x + 7, y + 7, width - 14, height - 36 - 14, CommonComponents.EMPTY);
         this.addRenderableWidget(this.scrollableWidget);
     }
 
     @Override
     protected void onOpen() {
-        //this.scrollableWidget.resetScrollOffset();
+        // this.scrollableWidget.resetScrollOffset();
     }
 
     public int getHorizontalPadding() {
@@ -71,7 +80,15 @@ public abstract class AbstractStandaloneCreationPopupWidget<O> extends PopupWidg
                 .build());
 
         if (this.clientObject != null) {
-            EditorContextImpl context = new EditorContextImpl(this.createButton, this.screen, this, this.getWidth(), this.getHeight(), this.getWidth() - 16, this.getHeight() - 16, 7);
+            EditorContextImpl context = new EditorContextImpl(
+                    this.createButton,
+                    this.screen,
+                    this,
+                    this.getWidth(),
+                    this.getHeight(),
+                    this.getWidth() - 16,
+                    this.getHeight() - 16,
+                    7);
             this.buildLayoutFromPrevious(context);
             this.clientObject.update(this.layout, context);
             this.layout.getLayout().arrangeElements();
@@ -87,7 +104,11 @@ public abstract class AbstractStandaloneCreationPopupWidget<O> extends PopupWidg
         O object = this.clientObject.create(this.layout);
         ResourceLocation id;
         if (this.previous == null) {
-            id = this.clientObject.createId(this.layout, ResearchEditorHelperClient.getEditModeSettings().currentDatapack().namespace());
+            id = this.clientObject.createId(
+                    this.layout,
+                    ResearchEditorHelperClient.getEditModeSettings()
+                            .currentDatapack()
+                            .namespace());
         } else {
             id = Objects.requireNonNull(this.previousId);
         }
@@ -105,7 +126,8 @@ public abstract class AbstractStandaloneCreationPopupWidget<O> extends PopupWidg
 
         if (this.getLayout() != null) {
             this.scrollableWidget.setX(x + this.getHorizontalPadding());
-            this.createButton.setPosition(this.getX() + (width - this.createButton.getWidth()) / 2, this.createButton.getY());
+            this.createButton.setPosition(
+                    this.getX() + (width - this.createButton.getWidth()) / 2, this.createButton.getY());
         }
     }
 
@@ -115,18 +137,29 @@ public abstract class AbstractStandaloneCreationPopupWidget<O> extends PopupWidg
 
         if (this.getLayout() != null) {
             this.scrollableWidget.setY(y + this.getVerticalPadding());
-            this.createButton.setPosition(this.createButton.getX(), this.getY() + (height - this.createButton.getHeight()) / 2 + 78);
+            this.createButton.setPosition(
+                    this.createButton.getX(), this.getY() + (height - this.createButton.getHeight()) / 2 + 78);
         }
     }
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        guiGraphics.blitSprite(ResearchMethodCreationPopupWidget.BACKGROUND_SPRITE, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        guiGraphics.blitSprite(
+                ResearchMethodCreationPopupWidget.BACKGROUND_SPRITE,
+                this.getX(),
+                this.getY(),
+                this.getWidth(),
+                this.getHeight());
 
         super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
 
-        guiGraphics.drawScrollingString(GuiUtils.getFont(), this.getTitle(), this.getX() + 5, this.getX() + this.getWidth() - 5, this.getY() + 8, -1);
-
+        guiGraphics.drawScrollingString(
+                GuiUtils.getFont(),
+                this.getTitle(),
+                this.getX() + 5,
+                this.getX() + this.getWidth() - 5,
+                this.getY() + 8,
+                -1);
     }
 
     @Override

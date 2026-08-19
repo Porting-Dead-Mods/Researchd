@@ -14,6 +14,9 @@ import com.portingdeadmods.researchd.api.research.serializers.ResearchSerializer
 import com.portingdeadmods.researchd.impl.research.effect.EmptyResearchEffect;
 import com.portingdeadmods.researchd.impl.research.icons.ItemResearchIcon;
 import com.portingdeadmods.researchd.impl.utils.DisplayImpl;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -23,13 +26,15 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-
-public record SimpleResearch(ResearchIcon researchIcon, ResearchMethod researchMethod, ResearchEffect researchEffect,
-                             List<ResourceKey<Research>> parents, boolean requiresParent,
-                             ResourceLocation researchPage, DisplayImpl display) implements Research, RegistryDisplay<Research> {
+public record SimpleResearch(
+        ResearchIcon researchIcon,
+        ResearchMethod researchMethod,
+        ResearchEffect researchEffect,
+        List<ResourceKey<Research>> parents,
+        boolean requiresParent,
+        ResourceLocation researchPage,
+        DisplayImpl display)
+        implements Research, RegistryDisplay<Research> {
     public static final String ID = "simple";
 
     @Override
@@ -59,34 +64,42 @@ public record SimpleResearch(ResearchIcon researchIcon, ResearchMethod researchM
     public static class Serializer implements ResearchSerializer<SimpleResearch> {
         public static final Serializer INSTANCE = new Serializer();
         public static final MapCodec<SimpleResearch> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                ResearchIcon.CODEC.fieldOf("icon").forGetter(SimpleResearch::researchIcon),
-                ResearchMethod.CODEC.fieldOf("method").forGetter(SimpleResearch::researchMethod),
-                ResearchEffect.CODEC.optionalFieldOf("effect", EmptyResearchEffect.INSTANCE).forGetter(SimpleResearch::researchEffect),
-                Research.RESOURCE_KEY_CODEC.listOf().optionalFieldOf("parents", List.of()).forGetter(SimpleResearch::parents),
-                Codec.BOOL.orElse(true).fieldOf("requires_parent").forGetter(SimpleResearch::requiresParent),
-                ResourceLocation.CODEC.optionalFieldOf("research_page", ResearchPage.DEFAULT_PAGE_ID).forGetter(SimpleResearch::researchPage),
-                DisplayImpl.CODEC.optionalFieldOf("display", DisplayImpl.EMPTY).forGetter(SimpleResearch::display)
-        ).apply(instance, SimpleResearch::new));
-        public static final StreamCodec<? super RegistryFriendlyByteBuf, SimpleResearch> STREAM_CODEC = NeoForgeStreamCodecs.composite(
-                ResearchIcon.STREAM_CODEC,
-                SimpleResearch::researchIcon,
-                ResearchMethod.STREAM_CODEC,
-                SimpleResearch::researchMethod,
-                ResearchEffect.STREAM_CODEC,
-                SimpleResearch::researchEffect,
-                Research.RESOURCE_KEY_STREAM_CODEC.apply(ByteBufCodecs.list()),
-                SimpleResearch::parents,
-                ByteBufCodecs.BOOL,
-                SimpleResearch::requiresParent,
-                ResourceLocation.STREAM_CODEC,
-                SimpleResearch::researchPage,
-                DisplayImpl.STREAM_CODEC,
-                SimpleResearch::display,
-                SimpleResearch::new
-        );
+                        ResearchIcon.CODEC.fieldOf("icon").forGetter(SimpleResearch::researchIcon),
+                        ResearchMethod.CODEC.fieldOf("method").forGetter(SimpleResearch::researchMethod),
+                        ResearchEffect.CODEC
+                                .optionalFieldOf("effect", EmptyResearchEffect.INSTANCE)
+                                .forGetter(SimpleResearch::researchEffect),
+                        Research.RESOURCE_KEY_CODEC
+                                .listOf()
+                                .optionalFieldOf("parents", List.of())
+                                .forGetter(SimpleResearch::parents),
+                        Codec.BOOL.orElse(true).fieldOf("requires_parent").forGetter(SimpleResearch::requiresParent),
+                        ResourceLocation.CODEC
+                                .optionalFieldOf("research_page", ResearchPage.DEFAULT_PAGE_ID)
+                                .forGetter(SimpleResearch::researchPage),
+                        DisplayImpl.CODEC
+                                .optionalFieldOf("display", DisplayImpl.EMPTY)
+                                .forGetter(SimpleResearch::display))
+                .apply(instance, SimpleResearch::new));
+        public static final StreamCodec<? super RegistryFriendlyByteBuf, SimpleResearch> STREAM_CODEC =
+                NeoForgeStreamCodecs.composite(
+                        ResearchIcon.STREAM_CODEC,
+                        SimpleResearch::researchIcon,
+                        ResearchMethod.STREAM_CODEC,
+                        SimpleResearch::researchMethod,
+                        ResearchEffect.STREAM_CODEC,
+                        SimpleResearch::researchEffect,
+                        Research.RESOURCE_KEY_STREAM_CODEC.apply(ByteBufCodecs.list()),
+                        SimpleResearch::parents,
+                        ByteBufCodecs.BOOL,
+                        SimpleResearch::requiresParent,
+                        ResourceLocation.STREAM_CODEC,
+                        SimpleResearch::researchPage,
+                        DisplayImpl.STREAM_CODEC,
+                        SimpleResearch::display,
+                        SimpleResearch::new);
 
-        private Serializer() {
-        }
+        private Serializer() {}
 
         @Override
         public MapCodec<SimpleResearch> codec() {
@@ -109,8 +122,7 @@ public record SimpleResearch(ResearchIcon researchIcon, ResearchMethod researchM
         private Optional<Component> literalName = Optional.empty();
         private Optional<Component> literalDescription = Optional.empty();
 
-        private Builder() {
-        }
+        private Builder() {}
 
         public Builder icon(Item icon) {
             this.icon = ItemResearchIcon.single(icon);
@@ -174,7 +186,14 @@ public record SimpleResearch(ResearchIcon researchIcon, ResearchMethod researchM
         }
 
         public SimpleResearch build() {
-            return new SimpleResearch(this.icon, this.researchMethod, this.researchEffect, this.parents, this.requiresParent, this.researchPage, new DisplayImpl(this.literalName, this.literalDescription));
+            return new SimpleResearch(
+                    this.icon,
+                    this.researchMethod,
+                    this.researchEffect,
+                    this.parents,
+                    this.requiresParent,
+                    this.researchPage,
+                    new DisplayImpl(this.literalName, this.literalDescription));
         }
     }
 }

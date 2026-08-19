@@ -1,5 +1,9 @@
 package com.portingdeadmods.researchd.client.screens.lib.widgets;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractContainerWidget;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -9,11 +13,6 @@ import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public abstract class PopupWidget extends AbstractContainerWidget implements LayoutWidget<Layout> {
     private final Map<LayoutElement, DropDownWidget<?>> dropDownWidgets;
@@ -51,8 +50,7 @@ public abstract class PopupWidget extends AbstractContainerWidget implements Lay
         LayoutWidget.super.renderElements(guiGraphics, mouseX, mouseY, partialTick);
     }
 
-    public void renderTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-    }
+    public void renderTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {}
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
@@ -76,7 +74,6 @@ public abstract class PopupWidget extends AbstractContainerWidget implements Lay
                 this.onMoved();
             }
         }
-
     }
 
     @Override
@@ -87,8 +84,7 @@ public abstract class PopupWidget extends AbstractContainerWidget implements Lay
         this.hovered = false;
     }
 
-    protected void onPositionChanged(int x, int y) {
-    }
+    protected void onPositionChanged(int x, int y) {}
 
     @Override
     public void setX(int x) {
@@ -111,8 +107,7 @@ public abstract class PopupWidget extends AbstractContainerWidget implements Lay
     }
 
     @Override
-    protected void updateWidgetNarration(@NotNull NarrationElementOutput output) {
-    }
+    protected void updateWidgetNarration(@NotNull NarrationElementOutput output) {}
 
     @Override
     public @NotNull List<? extends GuiEventListener> children() {
@@ -131,16 +126,11 @@ public abstract class PopupWidget extends AbstractContainerWidget implements Lay
         this.onOpen();
     }
 
-    protected void onOpen() {
+    protected void onOpen() {}
 
-    }
+    protected void onClose() {}
 
-    protected void onClose() {
-
-    }
-
-    protected void onMoved() {
-    }
+    protected void onMoved() {}
 
     @Override
     public Iterable<? extends LayoutElement> getElements() {

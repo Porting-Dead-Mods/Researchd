@@ -5,12 +5,16 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.compat.kubejs.helpers.ResearchMethodHelper;
-import com.portingdeadmods.researchd.impl.research.icons.ItemResearchIcon;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
 import com.portingdeadmods.researchd.impl.research.effect.EmptyResearchEffect;
+import com.portingdeadmods.researchd.impl.research.icons.ItemResearchIcon;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
 import com.portingdeadmods.researchd.resources.contents.ResearchdResearchPackProvider;
 import dev.latvian.mods.kubejs.script.SourceLine;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -19,11 +23,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Stream;
 
 public class ResearchBuilder {
     public final ResourceLocation id;
@@ -130,9 +129,10 @@ public class ResearchBuilder {
 
     public Research createObject() {
         if (parents.isEmpty() && requiresParent) {
-            throw new IllegalStateException("Research '" + id + "' requires a parent but has no parents defined. Set requiresParent to false or add parents.");
+            throw new IllegalStateException("Research '" + id
+                    + "' requires a parent but has no parents defined. Set requiresParent to false or add parents.");
         }
-        
+
         SimpleResearch.Builder builder = SimpleResearch.builder()
                 .icon(this.icon)
                 .method(this.researchMethod)

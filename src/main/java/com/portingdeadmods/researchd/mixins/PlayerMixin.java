@@ -9,7 +9,8 @@ import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(Player.class)
 public abstract class PlayerMixin extends LivingEntity {
-    @Shadow public abstract boolean isCreative();
+    @Shadow
+    public abstract boolean isCreative();
 
     private PlayerMixin() {
         super(null, null);
@@ -19,6 +20,8 @@ public abstract class PlayerMixin extends LivingEntity {
     public boolean canChangeDimensions(Level oldLevel, Level newLevel) {
         Player self = (Player) (Object) this;
         return super.canChangeDimensions(oldLevel, newLevel)
-                && (this.isCreative() || !ResearchdApi.isDimensionBlocked(self, newLevel.dimensionTypeRegistration().getKey()));
+                && (this.isCreative()
+                        || !ResearchdApi.isDimensionBlocked(
+                                self, newLevel.dimensionTypeRegistration().getKey()));
     }
 }

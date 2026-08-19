@@ -5,6 +5,7 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.utils.registries.RegistryManagersGetter;
 import com.portingdeadmods.researchd.utils.registries.ReloadableRegistryManager;
+import java.util.function.Supplier;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -19,19 +20,29 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.function.Supplier;
-
 @Mixin(ClientLevel.class)
 public class ClientLevelMixin implements RegistryManagersGetter {
-    @Unique
-    private ReloadableRegistryManager<Research> researchd$researchesManager;
-    @Unique
-    private ReloadableRegistryManager<ResearchPack> researchd$researchPacks;
+    @Unique private ReloadableRegistryManager<Research> researchd$researchesManager;
+
+    @Unique private ReloadableRegistryManager<ResearchPack> researchd$researchPacks;
 
     @Inject(method = "<init>", at = @At("TAIL"))
-    private void researchd$init(ClientPacketListener connection, ClientLevel.ClientLevelData clientLevelData, ResourceKey<Level> dimension, Holder<DimensionType> dimensionType, int viewDistance, int serverSimulationDistance, Supplier<ProfilerFiller> profiler, LevelRenderer levelRenderer, boolean isDebug, long biomeZoomSeed, CallbackInfo ci) {
-        this.researchd$researchesManager = new ReloadableRegistryManager<>(connection.registryAccess(), ResearchdRegistries.RESEARCH_KEY, Research.CODEC);
-        this.researchd$researchPacks = new ReloadableRegistryManager<>(connection.registryAccess(), ResearchdRegistries.RESEARCH_PACK_KEY, ResearchPack.CODEC);
+    private void researchd$init(
+            ClientPacketListener connection,
+            ClientLevel.ClientLevelData clientLevelData,
+            ResourceKey<Level> dimension,
+            Holder<DimensionType> dimensionType,
+            int viewDistance,
+            int serverSimulationDistance,
+            Supplier<ProfilerFiller> profiler,
+            LevelRenderer levelRenderer,
+            boolean isDebug,
+            long biomeZoomSeed,
+            CallbackInfo ci) {
+        this.researchd$researchesManager = new ReloadableRegistryManager<>(
+                connection.registryAccess(), ResearchdRegistries.RESEARCH_KEY, Research.CODEC);
+        this.researchd$researchPacks = new ReloadableRegistryManager<>(
+                connection.registryAccess(), ResearchdRegistries.RESEARCH_PACK_KEY, ResearchPack.CODEC);
     }
 
     @Override

@@ -34,5 +34,4 @@ public abstract class BaseTeamScreen extends Screen {
         this.leftPos = (window.getGuiScaledWidth() - this.width) / 2;
         this.topPos = (window.getGuiScaledHeight() - this.height) / 2;
     }
-
 }

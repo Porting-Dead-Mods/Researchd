@@ -8,12 +8,13 @@ import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 public interface WidgetConstructor<T> {
     AbstractResearchInfoWidget<T> create(int x, int y, T value);
 
-    default AbstractResearchInfoWidget<? extends ResearchMethod> createMethod(int x, int y, ResearchMethod researchMethod) {
-         return (AbstractResearchInfoWidget<? extends ResearchMethod>) create(x, y, (T) researchMethod);
+    default AbstractResearchInfoWidget<? extends ResearchMethod> createMethod(
+            int x, int y, ResearchMethod researchMethod) {
+        return (AbstractResearchInfoWidget<? extends ResearchMethod>) create(x, y, (T) researchMethod);
     }
 
-    default AbstractResearchInfoWidget<? extends ResearchEffect> createEffect(int x, int y, ResearchEffect researchEffect) {
+    default AbstractResearchInfoWidget<? extends ResearchEffect> createEffect(
+            int x, int y, ResearchEffect researchEffect) {
         return (AbstractResearchInfoWidget<? extends ResearchEffect>) create(x, y, (T) researchEffect);
     }
-
 }

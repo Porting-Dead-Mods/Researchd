@@ -11,10 +11,10 @@ import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.client.screens.RdZIndex;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
-import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import com.portingdeadmods.researchd.content.menus.ResearchLabMenu;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
@@ -46,22 +46,31 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
     public static final int SCROLLER_HEIGHT = 4;
     public static final int SCROLLER_TRACK_LENGTH = 154;
 
-    private final AbstractScroller scroller = new AbstractScroller(this, SCROLLER_X, SCROLLER_Y, SCROLLER_WIDTH, SCROLLER_HEIGHT, SCROLLER_TRACK_LENGTH, AbstractScroller.Mode.HORIZONTAL, Researchd.rl("scroller_small_horizontal")) {
-        @Override
-        public int getContentLength() {
-            return SLOT_WIDTH * ResearchHelperClient.getResearchPacks().size();
-        }
+    private final AbstractScroller scroller =
+            new AbstractScroller(
+                    this,
+                    SCROLLER_X,
+                    SCROLLER_Y,
+                    SCROLLER_WIDTH,
+                    SCROLLER_HEIGHT,
+                    SCROLLER_TRACK_LENGTH,
+                    AbstractScroller.Mode.HORIZONTAL,
+                    Researchd.rl("scroller_small_horizontal")) {
+                @Override
+                public int getContentLength() {
+                    return SLOT_WIDTH * ResearchHelperClient.getResearchPacks().size();
+                }
 
-        @Override
-        public int getVisibleContentLength() {
-            return 164;
-        }
+                @Override
+                public int getVisibleContentLength() {
+                    return 164;
+                }
 
-        @Override
-        public void onScroll() {
-            updateSlotPositions();
-        }
-    };
+                @Override
+                public void onScroll() {
+                    updateSlotPositions();
+                }
+            };
 
     public ResearchLabScreen(ResearchLabMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -80,7 +89,7 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
         renderBackground(pGuiGraphics, pMouseX, pMouseX, pPartialTick);
         NeoForge.EVENT_BUS.post(new ContainerScreenEvent.Render.Background(this, pGuiGraphics, pMouseX, pMouseY));
 
-        for(Renderable renderable : this.renderables) {
+        for (Renderable renderable : this.renderables) {
             renderable.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
         }
 
@@ -88,7 +97,7 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
 
         this.scroller.renderWidget(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
         // Foreground
-//        this.drawBars(pGuiGraphics);
+        //        this.drawBars(pGuiGraphics);
 
         renderTooltip(pGuiGraphics, pMouseX, pMouseY);
     }
@@ -100,25 +109,24 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
     private void renderItemsAndSlots(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         RenderSystem.disableDepthTest();
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate((float)this.leftPos, (float)this.topPos, 0.0F);
+        guiGraphics.pose().translate((float) this.leftPos, (float) this.topPos, 0.0F);
         this.hoveredSlot = null;
-
 
         int startX = this.leftPos + 7;
         int startY = this.topPos + 17;
         guiGraphics.enableScissor(startX, startY, startX + SLOT_WIDTH * 9, startY + this.imageHeight);
         {
-        for(int k = 0; k < this.menu.slots.size(); ++k) {
-            Slot slot = this.menu.slots.get(k);
-            if (slot.isActive()) {
-                this.renderSlot(guiGraphics, slot);
-            }
+            for (int k = 0; k < this.menu.slots.size(); ++k) {
+                Slot slot = this.menu.slots.get(k);
+                if (slot.isActive()) {
+                    this.renderSlot(guiGraphics, slot);
+                }
 
-            if (this.isHovering(guiGraphics, slot, mouseX, mouseY) && slot.isActive()) {
-                this.hoveredSlot = slot;
-                this.renderSlotHighlight(guiGraphics, slot, mouseX, mouseY, partialTick);
+                if (this.isHovering(guiGraphics, slot, mouseX, mouseY) && slot.isActive()) {
+                    this.hoveredSlot = slot;
+                    this.renderSlotHighlight(guiGraphics, slot, mouseX, mouseY, partialTick);
+                }
             }
-        }
         }
         guiGraphics.disableScissor();
 
@@ -130,7 +138,7 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
             int i2 = this.draggingItem.isEmpty() ? 8 : 16;
             String s = null;
             if (!this.draggingItem.isEmpty() && this.isSplittingStack) {
-                itemstack = itemstack.copyWithCount(Mth.ceil((float)itemstack.getCount() / 2.0F));
+                itemstack = itemstack.copyWithCount(Mth.ceil((float) itemstack.getCount() / 2.0F));
             } else if (this.isQuickCrafting && this.quickCraftSlots.size() > 1) {
                 itemstack = itemstack.copyWithCount(this.quickCraftingRemainder);
                 if (itemstack.isEmpty()) {
@@ -142,7 +150,7 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
         }
 
         if (!this.snapbackItem.isEmpty()) {
-            float f = (float)(Util.getMillis() - this.snapbackTime) / 100.0F;
+            float f = (float) (Util.getMillis() - this.snapbackTime) / 100.0F;
             if (f >= 1.0F) {
                 f = 1.0F;
                 this.snapbackItem = ItemStack.EMPTY;
@@ -150,8 +158,8 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
 
             int j2 = this.snapbackEnd.x - this.snapbackStartX;
             int k2 = this.snapbackEnd.y - this.snapbackStartY;
-            int j1 = this.snapbackStartX + (int)((float)j2 * f);
-            int k1 = this.snapbackStartY + (int)((float)k2 * f);
+            int j1 = this.snapbackStartX + (int) ((float) j2 * f);
+            int k1 = this.snapbackStartY + (int) ((float) k2 * f);
             this.renderFloatingItem(guiGraphics, this.snapbackItem, j1, k1, null);
         }
 
@@ -172,42 +180,60 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         super.renderBg(guiGraphics, partialTick, mouseX, mouseY);
-//
-//        this.botPos = this.topPos + getYSize();
-//        this.rightPos = this.leftPos + getXSize();
-//
-//        guiGraphics.fill(this.leftPos, this.topPos, this.rightPos, this.botPos, BACKGROUND_COLOR);
-//        //Researchd.debug("Research Lab Screen", "Rendering background at: " + this.leftPos + ":" + this.topPos + " -> " + this.rightPos + ":" + this.botPos);
-//
-//        // Top border
-//        guiGraphics.fill(this.leftPos - BORDER_SIZE, this.topPos - BORDER_SIZE, this.rightPos + BORDER_SIZE, this.topPos, BORDER_COLOR);
-//
-//        // Bottom border
-//        guiGraphics.fill(this.leftPos - BORDER_SIZE, this.botPos, this.rightPos + BORDER_SIZE, this.botPos + BORDER_SIZE, BORDER_COLOR);
-//
-//        // Left border
-//        guiGraphics.fill(this.leftPos - BORDER_SIZE, this.topPos - BORDER_SIZE, this.leftPos, this.botPos + BORDER_SIZE, BORDER_COLOR);
-//
-//        guiGraphics.fill(this.rightPos, this.topPos - BORDER_SIZE, this.rightPos + BORDER_SIZE, this.botPos + BORDER_SIZE, BORDER_COLOR);
+        //
+        //        this.botPos = this.topPos + getYSize();
+        //        this.rightPos = this.leftPos + getXSize();
+        //
+        //        guiGraphics.fill(this.leftPos, this.topPos, this.rightPos, this.botPos, BACKGROUND_COLOR);
+        //        //Researchd.debug("Research Lab Screen", "Rendering background at: " + this.leftPos + ":" +
+        // this.topPos + " -> " + this.rightPos + ":" + this.botPos);
+        //
+        //        // Top border
+        //        guiGraphics.fill(this.leftPos - BORDER_SIZE, this.topPos - BORDER_SIZE, this.rightPos + BORDER_SIZE,
+        // this.topPos, BORDER_COLOR);
+        //
+        //        // Bottom border
+        //        guiGraphics.fill(this.leftPos - BORDER_SIZE, this.botPos, this.rightPos + BORDER_SIZE, this.botPos +
+        // BORDER_SIZE, BORDER_COLOR);
+        //
+        //        // Left border
+        //        guiGraphics.fill(this.leftPos - BORDER_SIZE, this.topPos - BORDER_SIZE, this.leftPos, this.botPos +
+        // BORDER_SIZE, BORDER_COLOR);
+        //
+        //        guiGraphics.fill(this.rightPos, this.topPos - BORDER_SIZE, this.rightPos + BORDER_SIZE, this.botPos +
+        // BORDER_SIZE, BORDER_COLOR);
         // Right border
 
-//        for (Point point : this.menu.getSlotPositions()) {
-//            drawPackSlot(guiGraphics, point.x + 1, point.y + 1);
-//        }
+        //        for (Point point : this.menu.getSlotPositions()) {
+        //            drawPackSlot(guiGraphics, point.x + 1, point.y + 1);
+        //        }
 
         int startX = this.leftPos + 7;
         int startY = this.topPos + 17;
         guiGraphics.enableScissor(startX, startY, startX + 162, startY + SLOT_HEIGHT);
         {
             for (int i = 0; i < this.menu.getResearchPackItems().size(); i++) {
-                guiGraphics.blitSprite(SLOT_SPRITE, startX + i * SLOT_WIDTH - this.scroller.getScrollOffset(), startY, SLOT_WIDTH, SLOT_HEIGHT);
+                guiGraphics.blitSprite(
+                        SLOT_SPRITE,
+                        startX + i * SLOT_WIDTH - this.scroller.getScrollOffset(),
+                        startY,
+                        SLOT_WIDTH,
+                        SLOT_HEIGHT);
 
-                int progress = (int) (this.menu.blockEntity.researchPackUsage.getOrDefault(this.menu.getResearchPacks().get(i), 0f) * 17);
-                guiGraphics.fill(startX + 1 + i * SLOT_WIDTH - this.scroller.getScrollOffset(), startY + SLOT_WIDTH, startX + 1 + i * SLOT_WIDTH + progress - this.scroller.getScrollOffset(), startY + SLOT_WIDTH + 1, PROGRESS_COLOR);
+                int progress = (int) (this.menu.blockEntity.researchPackUsage.getOrDefault(
+                                this.menu.getResearchPacks().get(i), 0f)
+                        * 17);
+                guiGraphics.fill(
+                        startX + 1 + i * SLOT_WIDTH - this.scroller.getScrollOffset(),
+                        startY + SLOT_WIDTH,
+                        startX + 1 + i * SLOT_WIDTH + progress - this.scroller.getScrollOffset(),
+                        startY + SLOT_WIDTH + 1,
+                        PROGRESS_COLOR);
                 RenderSystem.enableBlend();
                 RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 60f / 255f);
                 {
-                    guiGraphics.renderFakeItem(this.menu.getResearchPackItems().get(i),
+                    guiGraphics.renderFakeItem(
+                            this.menu.getResearchPackItems().get(i),
                             startX + i * SLOT_WIDTH + 1 - this.scroller.getScrollOffset(),
                             startY + 1);
                 }
@@ -222,7 +248,8 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
 
         ResearchInstance instance = team.getResearches().get(team.getCurrentResearch());
         if (instance != null) {
-            ResearchScreenWidget.renderResearchPanel(guiGraphics, instance, this.leftPos + 123, this.topPos + 51, mouseX, mouseY, 2, false, false);
+            ResearchScreenWidget.renderResearchPanel(
+                    guiGraphics, instance, this.leftPos + 123, this.topPos + 51, mouseX, mouseY, 2, false, false);
 
             if (ResearchScreenWidget.isPanelHovered(this.leftPos + 123, this.topPos + 51, mouseX, mouseY, 2)) {
                 PoseStack pose = guiGraphics.pose();
@@ -230,7 +257,11 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
                 pose.pushPose();
                 {
                     pose.translate(0, 0, RdZIndex.LAB_RESEARCH_TOOLTIP);
-                    guiGraphics.renderTooltip(Minecraft.getInstance().font, Component.literal("Open Research in Research Screen"), mouseX, mouseY);
+                    guiGraphics.renderTooltip(
+                            Minecraft.getInstance().font,
+                            Component.literal("Open Research in Research Screen"),
+                            mouseX,
+                            mouseY);
                 }
                 pose.popPose();
             }
@@ -243,15 +274,19 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
         int width = (int) (progress * PROGRESS_BAR_WIDTH);
         guiGraphics.fill(x, y, x + width, y + 6, PROGRESS_COLOR);
 
-        guiGraphics.drawCenteredString(Minecraft.getInstance().font, String.valueOf((int) (progress * 100)) + '%', x + 1 + PROGRESS_BAR_WIDTH / 2,  y + 9, 0xF8F8F8);
+        guiGraphics.drawCenteredString(
+                Minecraft.getInstance().font,
+                String.valueOf((int) (progress * 100)) + '%',
+                x + 1 + PROGRESS_BAR_WIDTH / 2,
+                y + 9,
+                0xF8F8F8);
     }
 
     private int getContentWidth() {
         return SLOT_WIDTH * ResearchHelperClient.getResearchPacks().size();
     }
 
-    private void drawSlot(GuiGraphics guiGraphics, int x, int y) {
-    }
+    private void drawSlot(GuiGraphics guiGraphics, int x, int y) {}
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
@@ -270,18 +305,25 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
-        //return this.mouseClicked(mouseX, mouseY, 0);
+        // return this.mouseClicked(mouseX, mouseY, 0);
     }
 
     private void updateSlotPositions() {
-         for (int i = 0; i < this.menu.labSlots.size(); i++) {
+        for (int i = 0; i < this.menu.labSlots.size(); i++) {
             this.menu.labSlots.get(i).x = this.menu.labSlotsX.get(i) - this.scroller.getScrollOffset();
-         }
+        }
     }
 
     private void drawPackSlot(GuiGraphics guiGraphics, int x, int y) {
         GuiUtils.ShaderChain.create()
                 .grayscale()
-                .drawTo(guiGraphics, RESEARCH_PACK_TEXTURE, this.getGuiLeft() + x, this.getGuiTop() + y, 16, 16, GuiUtils.BlendMode.DARKEN);
+                .drawTo(
+                        guiGraphics,
+                        RESEARCH_PACK_TEXTURE,
+                        this.getGuiLeft() + x,
+                        this.getGuiTop() + y,
+                        16,
+                        16,
+                        GuiUtils.BlendMode.DARKEN);
     }
 }

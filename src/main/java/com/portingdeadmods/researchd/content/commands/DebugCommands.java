@@ -21,20 +21,18 @@ public class DebugCommands {
     public static LiteralCommandNode<CommandSourceStack> build() {
         return Commands.literal("debug")
                 .requires(p -> p.hasPermission(2))
-                .then(Commands.literal("teams-dump")
-                        .executes(context -> {
-                            CommandSourceStack source = context.getSource();
-                            source.sendSystemMessage(ResearchTeamHelperServer.getFormattedDump(source.getLevel()));
-                            return 1;
-                        }))
-                .then(Commands.literal("data-dump")
-                        .executes(context -> {
-                            CommandSourceStack source = context.getSource();
-                            if (source.getPlayer() != null) {
-                                displayPlayerPredicates(source.getPlayer());
-                            }
-                            return 1;
-                        }))
+                .then(Commands.literal("teams-dump").executes(context -> {
+                    CommandSourceStack source = context.getSource();
+                    source.sendSystemMessage(ResearchTeamHelperServer.getFormattedDump(source.getLevel()));
+                    return 1;
+                }))
+                .then(Commands.literal("data-dump").executes(context -> {
+                    CommandSourceStack source = context.getSource();
+                    if (source.getPlayer() != null) {
+                        displayPlayerPredicates(source.getPlayer());
+                    }
+                    return 1;
+                }))
                 .build();
     }
 
@@ -45,19 +43,20 @@ public class DebugCommands {
 
         MutableComponent playerInfo = Component.literal("Player: ")
                 .withStyle(ChatFormatting.WHITE)
-                .append(Component.literal(player.getName().getString())
-                        .withStyle(ChatFormatting.YELLOW));
+                .append(Component.literal(player.getName().getString()).withStyle(ChatFormatting.YELLOW));
         player.sendSystemMessage(playerInfo);
 
         ServerLevel level = player.serverLevel();
-        ResearchTeam team = ResearchdApi.getTeamManager(level) == null ? null
+        ResearchTeam team = ResearchdApi.getTeamManager(level) == null
+                ? null
                 : ResearchdApi.getTeamManager(level).getTeamByPlayer(player);
         if (team == null) {
             player.sendSystemMessage(Component.literal("(no team)").withStyle(ChatFormatting.RED));
             return;
         }
 
-        MutableComponent teamInfo = Component.literal("Team: ").withStyle(ChatFormatting.WHITE)
+        MutableComponent teamInfo = Component.literal("Team: ")
+                .withStyle(ChatFormatting.WHITE)
                 .append(Component.literal(team.getName()).withStyle(ChatFormatting.YELLOW))
                 .append(Component.literal(" (" + team.getId() + ")").withStyle(ChatFormatting.DARK_GRAY));
         player.sendSystemMessage(teamInfo);
@@ -65,10 +64,11 @@ public class DebugCommands {
         ResearchEffectManager effectManager = TeamResearchEffectSavedData.getData(level);
         for (ResearchEffectDataType<?> type : ResearchdRegistries.RESEARCH_EFFECT_DATA_TYPE) {
             ResearchEffectData<?> data = effectManager.getEffectData(team.getId(), type);
-            String typeName = ResearchdRegistries.RESEARCH_EFFECT_DATA_TYPE.getKey(type).toString();
+            String typeName =
+                    ResearchdRegistries.RESEARCH_EFFECT_DATA_TYPE.getKey(type).toString();
             if (data == null) {
-                player.sendSystemMessage(Component.literal(typeName + ": (no entry)")
-                        .withStyle(ChatFormatting.DARK_GRAY));
+                player.sendSystemMessage(
+                        Component.literal(typeName + ": (no entry)").withStyle(ChatFormatting.DARK_GRAY));
                 continue;
             }
 

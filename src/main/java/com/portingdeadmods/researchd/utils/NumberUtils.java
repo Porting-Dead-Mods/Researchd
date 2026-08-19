@@ -16,7 +16,10 @@ public final class NumberUtils {
         int days = Math.toIntExact(diff / (1000 * 60 * 60 * 24));
 
         // Days < Hours < Minutes. Only gets displayed if they are greater than 0
-        return days > 0 ? String.format("%02d:%02d:%02d:%.3f", days, hours, minutes, seconds) : (hours > 0 ? String.format("%02d:%02d:%.3f", hours, minutes, seconds) : String.format("%02d:%.3f", minutes, seconds));
+        return days > 0
+                ? String.format("%02d:%02d:%02d:%.3f", days, hours, minutes, seconds)
+                : (hours > 0
+                        ? String.format("%02d:%02d:%.3f", hours, minutes, seconds)
+                        : String.format("%02d:%.3f", minutes, seconds));
     }
-
 }

@@ -1,8 +1,6 @@
 package com.portingdeadmods.researchd.events.common;
 
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.team.ResearchTeam;
-import com.portingdeadmods.researchd.client.cache.ResearchTeamCache;
 import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import com.portingdeadmods.researchd.compat.ftbteams.FTBTeamsCompat;
 import com.portingdeadmods.researchd.data.saved.TeamResearchEffectSavedData;
@@ -15,10 +13,9 @@ import com.portingdeadmods.researchd.networking.team.manager.AddTeamPayload;
 import com.portingdeadmods.researchd.networking.team.manager.SyncTeamDataPayload;
 import com.portingdeadmods.researchd.networking.team.manager.SyncTeamEffectDataPayload;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperServer;
+import java.util.List;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -28,8 +25,6 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
-
-import java.util.List;
 
 @EventBusSubscriber(modid = Researchd.MODID)
 public final class ResearchdLifecycleHandler {
@@ -74,7 +69,8 @@ public final class ResearchdLifecycleHandler {
     private static void onDatapacksSynced(OnDatapackSyncEvent event) {
         ServerPlayer player = event.getPlayer();
         MinecraftServer server = event.getPlayerList().getServer();
-        List<ServerPlayer> relevantPlayers = event.getPlayer() == null ? event.getPlayerList().getPlayers() : List.of(event.getPlayer());
+        List<ServerPlayer> relevantPlayers =
+                event.getPlayer() == null ? event.getPlayerList().getPlayers() : List.of(event.getPlayer());
         ResearchHelperServer.onReloadResearches(server, player, relevantPlayers);
     }
 
@@ -84,7 +80,8 @@ public final class ResearchdLifecycleHandler {
         if (event.getEntity() instanceof ServerPlayer player) {
             ResearchTeamMap map = TeamSavedData.getData(player.serverLevel());
             PacketDistributor.sendToPlayer(player, new SyncTeamDataPayload(map));
-            PacketDistributor.sendToPlayer(player, new SyncTeamEffectDataPayload(TeamResearchEffectSavedData.getData(player.serverLevel())));
+            PacketDistributor.sendToPlayer(
+                    player, new SyncTeamEffectDataPayload(TeamResearchEffectSavedData.getData(player.serverLevel())));
 
             // Create default team if player isn't in a team
             if (map.getTeamByPlayer(player) == null) {
@@ -99,7 +96,6 @@ public final class ResearchdLifecycleHandler {
     // Player joins -> create default team for player if player is not in a team yet
     @SubscribeEvent
     private static void onJoinLevel(EntityJoinLevelEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
-        }
+        if (event.getEntity() instanceof ServerPlayer player) {}
     }
 }

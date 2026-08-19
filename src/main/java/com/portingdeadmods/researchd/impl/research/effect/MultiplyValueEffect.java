@@ -21,19 +21,19 @@ import net.minecraft.world.level.Level;
 
 public record MultiplyValueEffect(ValueEffect value, float amount) implements ValueEffectModifierEffect {
     private static final MapCodec<MultiplyValueEffect> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
-            ValueEffect.CODEC.fieldOf("value").forGetter(MultiplyValueEffect::value),
-            Codec.FLOAT.fieldOf("amount").forGetter(MultiplyValueEffect::amount)
-    ).apply(inst, MultiplyValueEffect::new));
+                    ValueEffect.CODEC.fieldOf("value").forGetter(MultiplyValueEffect::value),
+                    Codec.FLOAT.fieldOf("amount").forGetter(MultiplyValueEffect::amount))
+            .apply(inst, MultiplyValueEffect::new));
 
     private static final StreamCodec<RegistryFriendlyByteBuf, MultiplyValueEffect> STREAM_CODEC = StreamCodec.composite(
             ValueEffect.STREAM_CODEC,
             MultiplyValueEffect::value,
             ByteBufCodecs.FLOAT,
             MultiplyValueEffect::amount,
-            MultiplyValueEffect::new
-    );
+            MultiplyValueEffect::new);
 
-    public static final ResearchEffectSerializer<MultiplyValueEffect> SERIALIZER = ResearchEffectSerializer.simple(CODEC, STREAM_CODEC);
+    public static final ResearchEffectSerializer<MultiplyValueEffect> SERIALIZER =
+            ResearchEffectSerializer.simple(CODEC, STREAM_CODEC);
     public static final ResourceLocation ID = Researchd.rl("multiply_value");
 
     @Override
@@ -77,5 +77,3 @@ public record MultiplyValueEffect(ValueEffect value, float amount) implements Va
         return SERIALIZER;
     }
 }
-
-

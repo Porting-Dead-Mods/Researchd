@@ -22,9 +22,13 @@ public abstract class CraftingMenuMixin {
 
     @WrapMethod(method = "slotChangedCraftingGrid")
     private static void researchd$pushOwnerContext(
-            AbstractContainerMenu menu, Level level, Player player,
-            CraftingContainer craftSlots, ResultContainer resultSlots,
-            RecipeHolder<CraftingRecipe> recipe, Operation<Void> original) {
+            AbstractContainerMenu menu,
+            Level level,
+            Player player,
+            CraftingContainer craftSlots,
+            ResultContainer resultSlots,
+            RecipeHolder<CraftingRecipe> recipe,
+            Operation<Void> original) {
 
         if (level.isClientSide) {
             original.call(menu, level, player, craftSlots, resultSlots, recipe);

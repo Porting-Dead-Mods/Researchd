@@ -9,9 +9,14 @@ import net.minecraft.core.registries.Registries;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class ResearchdCommandArguments {
-    public static final DeferredRegister<ArgumentTypeInfo<?, ?>>  ARGUMENT_TYPE_INFOS = DeferredRegister.create(Registries.COMMAND_ARGUMENT_TYPE, Researchd.MODID);
+    public static final DeferredRegister<ArgumentTypeInfo<?, ?>> ARGUMENT_TYPE_INFOS =
+            DeferredRegister.create(Registries.COMMAND_ARGUMENT_TYPE, Researchd.MODID);
 
     static {
-        ARGUMENT_TYPE_INFOS.register("team", () -> ArgumentTypeInfos.registerByClass(ResearchdTeamArgument.class, SingletonArgumentInfo.contextAware(context -> ResearchdTeamArgument.teamArgument())));
+        ARGUMENT_TYPE_INFOS.register(
+                "team",
+                () -> ArgumentTypeInfos.registerByClass(
+                        ResearchdTeamArgument.class,
+                        SingletonArgumentInfo.contextAware(context -> ResearchdTeamArgument.teamArgument())));
     }
 }

@@ -23,162 +23,81 @@ public class NetworkEvents {
     @SubscribeEvent
     public static void registerPayloads(final RegisterPayloadHandlersEvent event) {
         final PayloadRegistrar registrar = event.registrar(Researchd.MODID);
+        registrar.playToServer(EnterTeamPayload.TYPE, EnterTeamPayload.STREAM_CODEC, EnterTeamPayload::handle);
+        registrar.playToServer(LeaveTeamPayload.TYPE, LeaveTeamPayload.STREAM_CODEC, LeaveTeamPayload::handle);
+
+        registrar.playToServer(ManageMemberPayload.TYPE, ManageMemberPayload.STREAM_CODEC, ManageMemberPayload::handle);
         registrar.playToServer(
-                EnterTeamPayload.TYPE,
-                EnterTeamPayload.STREAM_CODEC,
-                EnterTeamPayload::handle
-        );
+                ManageModeratorPayload.TYPE, ManageModeratorPayload.STREAM_CODEC, ManageModeratorPayload::handle);
         registrar.playToServer(
-                LeaveTeamPayload.TYPE,
-                LeaveTeamPayload.STREAM_CODEC,
-                LeaveTeamPayload::handle
-        );
+                TransferOwnershipPayload.TYPE, TransferOwnershipPayload.STREAM_CODEC, TransferOwnershipPayload::handle);
+
+        registrar.playToServer(TeamSetNamePayload.TYPE, TeamSetNamePayload.STREAM_CODEC, TeamSetNamePayload::handle);
+
+        registrar.playToServer(InvitePlayerPayload.TYPE, InvitePlayerPayload.STREAM_CODEC, InvitePlayerPayload::handle);
+        registrar.playToServer(
+                RequestToJoinPayload.TYPE, RequestToJoinPayload.STREAM_CODEC, RequestToJoinPayload::handle);
 
         registrar.playToServer(
-                ManageMemberPayload.TYPE,
-                ManageMemberPayload.STREAM_CODEC,
-                ManageMemberPayload::handle
-        );
-        registrar.playToServer(
-                ManageModeratorPayload.TYPE,
-                ManageModeratorPayload.STREAM_CODEC,
-                ManageModeratorPayload::handle
-        );
-        registrar.playToServer(
-                TransferOwnershipPayload.TYPE,
-                TransferOwnershipPayload.STREAM_CODEC,
-                TransferOwnershipPayload::handle
-        );
+                CreateDatapackPayload.TYPE, CreateDatapackPayload.STREAM_CODEC, CreateDatapackPayload::handle);
+        registrar.playToServer(SetPackPayload.TYPE, SetPackPayload.STREAM_CODEC, SetPackPayload::handle);
 
         registrar.playToServer(
-                TeamSetNamePayload.TYPE,
-                TeamSetNamePayload.STREAM_CODEC,
-                TeamSetNamePayload::handle
-        );
-
-        registrar.playToServer(
-                InvitePlayerPayload.TYPE,
-                InvitePlayerPayload.STREAM_CODEC,
-                InvitePlayerPayload::handle
-        );
-        registrar.playToServer(
-                RequestToJoinPayload.TYPE,
-                RequestToJoinPayload.STREAM_CODEC,
-                RequestToJoinPayload::handle
-        );
-
-        registrar.playToServer(
-                CreateDatapackPayload.TYPE,
-                CreateDatapackPayload.STREAM_CODEC,
-                CreateDatapackPayload::handle
-        );
-        registrar.playToServer(
-                SetPackPayload.TYPE,
-                SetPackPayload.STREAM_CODEC,
-                SetPackPayload::handle
-        );
-
-        registrar.playToServer(
-                CreateResearchPayload.TYPE,
-                CreateResearchPayload.STREAM_CODEC,
-                CreateResearchPayload::handle
-        );
+                CreateResearchPayload.TYPE, CreateResearchPayload.STREAM_CODEC, CreateResearchPayload::handle);
 
         registrar.playToServer(
                 CreateResearchPackPayload.TYPE,
                 CreateResearchPackPayload.STREAM_CODEC,
-                CreateResearchPackPayload::handle
-        );
+                CreateResearchPackPayload::handle);
 
         registrar.playToServer(
-                ResearchQueueAddPayload.TYPE,
-                ResearchQueueAddPayload.STREAM_CODEC,
-                ResearchQueueAddPayload::handle
-        );
+                ResearchQueueAddPayload.TYPE, ResearchQueueAddPayload.STREAM_CODEC, ResearchQueueAddPayload::handle);
         registrar.playToServer(
                 ResearchQueueRemovePayload.TYPE,
                 ResearchQueueRemovePayload.STREAM_CODEC,
-                ResearchQueueRemovePayload::handle
-        );
+                ResearchQueueRemovePayload::handle);
 
         registrar.playToClient(
-                ClearGraphCachePayload.TYPE,
-                ClearGraphCachePayload.STREAM_CODEC,
-                ClearGraphCachePayload::handle
-        );
+                ClearGraphCachePayload.TYPE, ClearGraphCachePayload.STREAM_CODEC, ClearGraphCachePayload::handle);
 
         registrar.playToClient(
-                ResearchReloadPayload.TYPE,
-                ResearchReloadPayload.STREAM_CODEC,
-                ResearchReloadPayload::handle
-        );
+                ResearchReloadPayload.TYPE, ResearchReloadPayload.STREAM_CODEC, ResearchReloadPayload::handle);
 
-	    registrar.playToClient(
-			    RefreshResearchScreenData.TYPE,
-			    RefreshResearchScreenData.STREAM_CODEC,
-			    RefreshResearchScreenData::handle
-	    );
         registrar.playToClient(
-                UpdateResearchesPayload.TYPE,
-                UpdateResearchesPayload.STREAM_CODEC,
-                UpdateResearchesPayload::handle
-        );
+                RefreshResearchScreenData.TYPE,
+                RefreshResearchScreenData.STREAM_CODEC,
+                RefreshResearchScreenData::handle);
+        registrar.playToClient(
+                UpdateResearchesPayload.TYPE, UpdateResearchesPayload.STREAM_CODEC, UpdateResearchesPayload::handle);
         registrar.playToClient(
                 UpdateResearchPacksPayload.TYPE,
                 UpdateResearchPacksPayload.STREAM_CODEC,
-                UpdateResearchPacksPayload::handle
-        );
+                UpdateResearchPacksPayload::handle);
 
         registrar.playToClient(
                 ClientResearchCompletedPayload.TYPE,
                 ClientResearchCompletedPayload.STREAM_CODEC,
-                ClientResearchCompletedPayload::handle
-        );
+                ClientResearchCompletedPayload::handle);
         registrar.playToClient(
-                RefreshResearchesPayload.TYPE,
-                RefreshResearchesPayload.STREAM_CODEC,
-                RefreshResearchesPayload::handle
-        );
+                RefreshResearchesPayload.TYPE, RefreshResearchesPayload.STREAM_CODEC, RefreshResearchesPayload::handle);
         registrar.playToClient(
                 RefreshPlayerManagementPayload.TYPE,
                 RefreshPlayerManagementPayload.STREAM_CODEC,
-                RefreshPlayerManagementPayload::handle
-        );
+                RefreshPlayerManagementPayload::handle);
         registrar.playToClient(
                 ResearchProgressSyncPayload.TYPE,
                 ResearchProgressSyncPayload.STREAM_CODEC,
-                ResearchProgressSyncPayload::handle
-        );
+                ResearchProgressSyncPayload::handle);
 
         registrar.playToClient(
-                SyncEffectDataPayload.TYPE,
-                SyncEffectDataPayload.STREAM_CODEC,
-                SyncEffectDataPayload::handle
-        );
+                SyncEffectDataPayload.TYPE, SyncEffectDataPayload.STREAM_CODEC, SyncEffectDataPayload::handle);
         registrar.playToClient(
                 SyncTeamEffectDataPayload.TYPE,
                 SyncTeamEffectDataPayload.STREAM_CODEC,
-                SyncTeamEffectDataPayload::handle
-        );
-        registrar.playToClient(
-                SyncTeamDataPayload.TYPE,
-                SyncTeamDataPayload.STREAM_CODEC,
-                SyncTeamDataPayload::handle
-        );
-        registrar.playToClient(
-                SyncTeamPayload.TYPE,
-                SyncTeamPayload.STREAM_CODEC,
-                SyncTeamPayload::handle
-        );
-        registrar.playToClient(
-                AddTeamPayload.TYPE,
-                AddTeamPayload.STREAM_CODEC,
-                AddTeamPayload::handle
-        );
-        registrar.playToClient(
-                RemoveTeamPayload.TYPE,
-                RemoveTeamPayload.STREAM_CODEC,
-                RemoveTeamPayload::handle
-        );
+                SyncTeamEffectDataPayload::handle);
+        registrar.playToClient(SyncTeamDataPayload.TYPE, SyncTeamDataPayload.STREAM_CODEC, SyncTeamDataPayload::handle);
+        registrar.playToClient(SyncTeamPayload.TYPE, SyncTeamPayload.STREAM_CODEC, SyncTeamPayload::handle);
+        registrar.playToClient(AddTeamPayload.TYPE, AddTeamPayload.STREAM_CODEC, AddTeamPayload::handle);
+        registrar.playToClient(RemoveTeamPayload.TYPE, RemoveTeamPayload.STREAM_CODEC, RemoveTeamPayload::handle);
     }
 }

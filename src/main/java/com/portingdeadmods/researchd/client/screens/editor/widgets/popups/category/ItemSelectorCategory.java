@@ -1,15 +1,13 @@
 package com.portingdeadmods.researchd.client.screens.editor.widgets.popups.category;
 
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.ItemSelectorPopupWidget;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Consumer;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Consumer;
 
 public interface ItemSelectorCategory {
     boolean exists();
@@ -46,11 +44,11 @@ public interface ItemSelectorCategory {
         }
     }
 
-    default AbstractWidget createBodyWidget(ItemSelectorPopupWidget parentPopupWidget, int width, int height, Collection<ItemStack> filteredItems) {
-        return new ItemSelectorPopupWidget.SelectorContainerWidget(parentPopupWidget, width, height, 16, 16, filteredItems, true);
+    default AbstractWidget createBodyWidget(
+            ItemSelectorPopupWidget parentPopupWidget, int width, int height, Collection<ItemStack> filteredItems) {
+        return new ItemSelectorPopupWidget.SelectorContainerWidget(
+                parentPopupWidget, width, height, 16, 16, filteredItems, true);
     }
 
-    default void visitWidgets(Consumer<AbstractWidget> consumer) {
-    }
-
+    default void visitWidgets(Consumer<AbstractWidget> consumer) {}
 }

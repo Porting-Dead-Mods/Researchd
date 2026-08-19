@@ -6,6 +6,9 @@ import com.portingdeadmods.researchd.impl.research.effect.CommandResearchEffect;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -17,13 +20,10 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.util.Size2i;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-
 public class CommandResearchEffectWidget extends AbstractResearchInfoWidget<CommandResearchEffect> {
     public static final Size2i SPRITE_SIZE = new Size2i(14, 14);
-    private static final ResourceLocation COMMAND_BLOCK_FRONT = ResourceLocation.withDefaultNamespace("block/command_block_front");
+    private static final ResourceLocation COMMAND_BLOCK_FRONT =
+            ResourceLocation.withDefaultNamespace("block/command_block_front");
 
     public CommandResearchEffectWidget(int x, int y, CommandResearchEffect effect) {
         super(x, y, effect);
@@ -36,12 +36,18 @@ public class CommandResearchEffectWidget extends AbstractResearchInfoWidget<Comm
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
-        guiGraphics.fill(this.getX(), this.getY(), this.getX() + this.getSize().width, this.getY() + this.getSize().height, BACKGROUND_COLOR);
+        guiGraphics.fill(
+                this.getX(),
+                this.getY(),
+                this.getX() + this.getSize().width,
+                this.getY() + this.getSize().height,
+                BACKGROUND_COLOR);
         TextureAtlasSprite sprite = Minecraft.getInstance()
                 .getTextureAtlas(TextureAtlas.LOCATION_BLOCKS)
                 .apply(COMMAND_BLOCK_FRONT);
 
-        guiGraphics.blit((int) ((this.getX() + 1)), (int) ((this.getY() + 1)), 0, SPRITE_SIZE.width, SPRITE_SIZE.height, sprite);
+        guiGraphics.blit(
+                (int) ((this.getX() + 1)), (int) ((this.getY() + 1)), 0, SPRITE_SIZE.width, SPRITE_SIZE.height, sprite);
     }
 
     @Override
@@ -49,10 +55,14 @@ public class CommandResearchEffectWidget extends AbstractResearchInfoWidget<Comm
         if (this.isHovered()) {
             List<Component> tooltip = new ArrayList<>();
             if (!this.value.onUnlockCommand().isBlank()) {
-                tooltip.add(ResearchdTranslations.component(ResearchdTranslations.Research.COMMAND_EFFECT_TOOLTIP_UNLOCK, parseCommand(this.value.onUnlockCommand())));
+                tooltip.add(ResearchdTranslations.component(
+                        ResearchdTranslations.Research.COMMAND_EFFECT_TOOLTIP_UNLOCK,
+                        parseCommand(this.value.onUnlockCommand())));
             }
             if (!this.value.onLockCommand().isBlank()) {
-                tooltip.add(ResearchdTranslations.component(ResearchdTranslations.Research.COMMAND_EFFECT_TOOLTIP_LOCK, parseCommand(this.value.onLockCommand())));
+                tooltip.add(ResearchdTranslations.component(
+                        ResearchdTranslations.Research.COMMAND_EFFECT_TOOLTIP_LOCK,
+                        parseCommand(this.value.onLockCommand())));
             }
             if (!tooltip.isEmpty()) {
                 GuiUtils.renderTooltip(tooltip);

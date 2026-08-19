@@ -7,22 +7,22 @@ import com.portingdeadmods.researchd.api.client.RememberingLinearLayout;
 import com.portingdeadmods.researchd.api.client.editor.EditorContext;
 import com.portingdeadmods.researchd.api.client.editor.TypedEditorObject;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectType;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.BackgroundEditBox;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.RegistryVerifyEditBox;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.SuggestionRegistryVerifyEditBox;
-import com.portingdeadmods.researchd.client.screens.lib.widgets.BackgroundEditBox;
 import com.portingdeadmods.researchd.impl.research.effect.ValueEffectModifierEffect;
 import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.TextUtils;
+import java.util.function.BiFunction;
 import net.minecraft.util.Unit;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.function.BiFunction;
 
 public class ValueEffectModifierObject implements TypedEditorObject<ValueEffectModifierEffect, ResearchEffectType> {
     private final ResearchEffectType effectType;
     private final BiFunction<ValueEffect, Float, ValueEffectModifierEffect> effectFactory;
 
-    public ValueEffectModifierObject(ResearchEffectType effectType, BiFunction<ValueEffect, Float, ValueEffectModifierEffect> effectFactory) {
+    public ValueEffectModifierObject(
+            ResearchEffectType effectType, BiFunction<ValueEffect, Float, ValueEffectModifierEffect> effectFactory) {
         this.effectType = effectType;
         this.effectFactory = effectFactory;
     }
@@ -33,16 +33,21 @@ public class ValueEffectModifierObject implements TypedEditorObject<ValueEffectM
     }
 
     @Override
-    public void buildLayout(RememberingLinearLayout layout, @Nullable ValueEffectModifierEffect previous, EditorContext context) {
+    public void buildLayout(
+            RememberingLinearLayout layout, @Nullable ValueEffectModifierEffect previous, EditorContext context) {
         layout.getLayout().spacing(2);
         layout.addWidget(null, GuiUtils.stringWidget("Value Effect:"));
-        SuggestionRegistryVerifyEditBox effectEditBox = layout.addWidget("effect", new SuggestionRegistryVerifyEditBox(GuiUtils.getFont(), ResearchdRegistries.VALUE_EFFECT, context.innerWidth() - 8, 16));
+        SuggestionRegistryVerifyEditBox effectEditBox = layout.addWidget(
+                "effect",
+                new SuggestionRegistryVerifyEditBox(
+                        GuiUtils.getFont(), ResearchdRegistries.VALUE_EFFECT, context.innerWidth() - 8, 16));
         effectEditBox.setResponder(newVal -> {
             this.update(layout, context);
         });
         layout.addWidget(null, GuiUtils.stringWidget("Amount:"));
-        BackgroundEditBox valueEditBox = layout.addWidget("value", new BackgroundEditBox(GuiUtils.getFont(), context.innerWidth() - 8, 16, "1.0"));
-        //valueEditBox.setResponder(newVal -> this.update(layout, context));
+        BackgroundEditBox valueEditBox = layout.addWidget(
+                "value", new BackgroundEditBox(GuiUtils.getFont(), context.innerWidth() - 8, 16, "1.0"));
+        // valueEditBox.setResponder(newVal -> this.update(layout, context));
         valueEditBox.setFilter(TextUtils::isValidFloat);
     }
 

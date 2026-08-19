@@ -1,6 +1,7 @@
 package com.portingdeadmods.researchd.utils;
 
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.StringWidget;
@@ -9,9 +10,6 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-
-import java.nio.charset.MalformedInputException;
-import java.util.List;
 
 public final class GuiUtils {
     public static boolean spriteExists(TextureAtlas atlas, ResourceLocation spriteId) {
@@ -35,5 +33,4 @@ public final class GuiUtils {
     public static StringWidget stringWidget(String text) {
         return stringWidget(Component.literal(text));
     }
-
 }

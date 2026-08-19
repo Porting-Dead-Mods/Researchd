@@ -1,18 +1,17 @@
 package com.portingdeadmods.researchd.compat.kubejs.event;
 
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
-import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.compat.kubejs.builders.ResearchPackBuilder;
+import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import dev.latvian.mods.kubejs.event.KubeEvent;
 import dev.latvian.mods.kubejs.script.SourceLine;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 public class RegisterResearchPacksKubeEvent implements KubeEvent {
     private final Map<ResourceLocation, ResearchPackImpl> researchPacks = new HashMap<>();
@@ -28,7 +27,8 @@ public class RegisterResearchPacksKubeEvent implements KubeEvent {
 
     public ItemStack createItem(String packId) {
         ResourceLocation location = ResourceLocation.parse(packId);
-        ResourceKey<ResearchPack> key = ResourceKey.create(com.portingdeadmods.researchd.ResearchdRegistries.RESEARCH_PACK_KEY, location);
+        ResourceKey<ResearchPack> key =
+                ResourceKey.create(com.portingdeadmods.researchd.ResearchdRegistries.RESEARCH_PACK_KEY, location);
         return ResearchPackImpl.asStack(key);
     }
 

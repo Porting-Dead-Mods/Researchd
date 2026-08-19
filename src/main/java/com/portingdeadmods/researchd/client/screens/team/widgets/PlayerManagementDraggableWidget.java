@@ -8,6 +8,9 @@ import com.portingdeadmods.researchd.api.team.TeamMember;
 import com.portingdeadmods.researchd.client.screens.RdZIndex;
 import com.portingdeadmods.researchd.client.screens.team.ResearchTeamScreen;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -16,30 +19,29 @@ import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-
 public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
     public static final ResourceLocation WINDOW_TEXTURE = Researchd.rl("textures/gui/player_management_window.png");
     private final PlayerManagementButtons buttonSettings;
     private final List<DraggableWidgetImageButton> buttonWidgets;
     private final PlayerManagementList managementList;
+
     public PlayerManagementList getManagementList() {
         return managementList;
     }
 
     public final WarningPopupWidget popupWidget;
-	public final BiConsumer<PlayerManagementList.Entry, PlayerManagementButtonType> refreshFunction;
+    public final BiConsumer<PlayerManagementList.Entry, PlayerManagementButtonType> refreshFunction;
 
-    public PlayerManagementDraggableWidget(int x, int y, Collection<TeamMember> members, PlayerManagementButtons buttonSettings, Component message) {
+    public PlayerManagementDraggableWidget(
+            int x, int y, Collection<TeamMember> members, PlayerManagementButtons buttonSettings, Component message) {
         super(x, y, 102, 128, message);
         this.buttonSettings = buttonSettings;
         this.buttonWidgets = new ArrayList<>();
         int i = 0;
-        for (Map.Entry<PlayerManagementButtonType, WidgetSprites> entry : this.buttonSettings.getSprites().entrySet()) {
-            this.buttonWidgets.add(new DraggableWidgetImageButton(getX() + 6 + i * (12 + 2), getY() + 6, 12, 12, entry.getValue(), btn -> {
-            }));
+        for (Map.Entry<PlayerManagementButtonType, WidgetSprites> entry :
+                this.buttonSettings.getSprites().entrySet()) {
+            this.buttonWidgets.add(new DraggableWidgetImageButton(
+                    getX() + 6 + i * (12 + 2), getY() + 6, 12, 12, entry.getValue(), btn -> {}));
             i++;
         }
         List<PlayerManagementList.Entry> entries = new ArrayList<>();
@@ -47,29 +49,30 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
             entries.add(new PlayerManagementList.Entry(member, buttonSettings));
         }
         this.managementList = new PlayerManagementList(85, 118, 85, 16, entries, false, this);
-        this.managementList.active = this.visible; // Probably redundant... but idrk some freaky stuff is happening with visibility
+        this.managementList.active =
+                this.visible; // Probably redundant... but idrk some freaky stuff is happening with visibility
         this.managementList.setPosition(x + 5, y + 5);
         this.popupWidget = new WarningPopupWidget(0, 0, this::onOkPress, this::onCancelPress);
         this.popupWidget.visible = false;
 
-	    /*this.refreshFunction = (entry, type) -> {
-		    switch (type) {
-			    case REMOVE -> {
-				    this.managementList.getItems().remove(entry);
-			    }
-			    case DEMOTE -> {
-				    this.managementList.resort();
-			    }
-			    case PROMOTE -> {
-				    this.managementList.resort();
-			    }
-			    case TRANSFER_OWNERSHIP -> {
-				    this.managementList.resort();
-			    }
-			    case INVITE_PLAYER -> {
-			    }
-		    }
-	    };*/
+        /*this.refreshFunction = (entry, type) -> {
+         switch (type) {
+          case REMOVE -> {
+           this.managementList.getItems().remove(entry);
+          }
+          case DEMOTE -> {
+           this.managementList.resort();
+          }
+          case PROMOTE -> {
+           this.managementList.resort();
+          }
+          case TRANSFER_OWNERSHIP -> {
+           this.managementList.resort();
+          }
+          case INVITE_PLAYER -> {
+          }
+         }
+        };*/
         this.refreshFunction = (a, b) -> {};
     }
 
@@ -78,8 +81,9 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
         this.popupWidget.setBodyText(List.of(
                 Component.literal("Are you sure you"),
                 Component.literal("want to transfer ownership"),
-                Component.literal("to %s".formatted(PlayerUtils.getPlayerNameFromUUID(Minecraft.getInstance().level, profile.player())))
-        ));
+                Component.literal("to %s"
+                        .formatted(
+                                PlayerUtils.getPlayerNameFromUUID(Minecraft.getInstance().level, profile.player())))));
         this.popupWidget.visible = true;
         this.popupWidget.nextOwner = profile;
     }
@@ -91,7 +95,7 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
     public void setVisible(boolean visible) {
         this.visible = visible;
         this.managementList.active = visible;
-		this.managementList.visible = visible;
+        this.managementList.visible = visible;
     }
 
     @Override
@@ -128,7 +132,8 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
     }
 
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        //this.managementList.setScrollAmount(this.managementList.getScrollAmount() - scrollY * (double)16 / (double)2.0F);
+        // this.managementList.setScrollAmount(this.managementList.getScrollAmount() - scrollY * (double)16 /
+        // (double)2.0F);
         return true;
     }
 
@@ -136,7 +141,9 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
         super.renderWidget(guiGraphics, mouseX, mouseY, v);
 
-        this.popupWidget.setPosition((guiGraphics.guiWidth() - this.popupWidget.getWidth()) / 2, (guiGraphics.guiHeight() - this.popupWidget.getHeight()) / 2);
+        this.popupWidget.setPosition(
+                (guiGraphics.guiWidth() - this.popupWidget.getWidth()) / 2,
+                (guiGraphics.guiHeight() - this.popupWidget.getHeight()) / 2);
 
         PoseStack poseStack = guiGraphics.pose();
 
@@ -156,12 +163,22 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
         Minecraft.getInstance().setScreen(new ResearchTeamScreen());
     }
 
-    public record PlayerManagementButtons(boolean removeMembers, boolean promoteMembers, boolean demoteMembers, boolean transferOwnership, boolean invitePlayer) {
-        public static final WidgetSprites REMOVE_MEMBERS_SPRITES = new WidgetSprites(Researchd.rl("remove_member"), Researchd.rl("remove_member_focused"));
-        public static final WidgetSprites PROMOTE_MEMBERS_SPRITES = new WidgetSprites(Researchd.rl("promote_member"), Researchd.rl("promote_member_focused"));
-        public static final WidgetSprites DEMOTE_MEMBERS_SPRITES = new WidgetSprites(Researchd.rl("demote_member"), Researchd.rl("demote_member_focused"));
-        public static final WidgetSprites TRANSFER_OWNERSHIP_SPRITES = new WidgetSprites(Researchd.rl("transfer_ownership"), Researchd.rl("transfer_ownership_focused"));
-        public static final WidgetSprites INVITE_PLAYER_SPRITES = new WidgetSprites(Researchd.rl("invite_button"), Researchd.rl("invite_button_focused"));
+    public record PlayerManagementButtons(
+            boolean removeMembers,
+            boolean promoteMembers,
+            boolean demoteMembers,
+            boolean transferOwnership,
+            boolean invitePlayer) {
+        public static final WidgetSprites REMOVE_MEMBERS_SPRITES =
+                new WidgetSprites(Researchd.rl("remove_member"), Researchd.rl("remove_member_focused"));
+        public static final WidgetSprites PROMOTE_MEMBERS_SPRITES =
+                new WidgetSprites(Researchd.rl("promote_member"), Researchd.rl("promote_member_focused"));
+        public static final WidgetSprites DEMOTE_MEMBERS_SPRITES =
+                new WidgetSprites(Researchd.rl("demote_member"), Researchd.rl("demote_member_focused"));
+        public static final WidgetSprites TRANSFER_OWNERSHIP_SPRITES =
+                new WidgetSprites(Researchd.rl("transfer_ownership"), Researchd.rl("transfer_ownership_focused"));
+        public static final WidgetSprites INVITE_PLAYER_SPRITES =
+                new WidgetSprites(Researchd.rl("invite_button"), Researchd.rl("invite_button_focused"));
 
         public Map<PlayerManagementButtonType, WidgetSprites> getSprites() {
             Map<PlayerManagementButtonType, WidgetSprites> sprites = new LinkedHashMap<>(4);
@@ -182,7 +199,6 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
             }
             return sprites;
         }
-
     }
 
     public enum PlayerManagementButtonType {
@@ -192,5 +208,4 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
         TRANSFER_OWNERSHIP,
         INVITE_PLAYER,
     }
-
 }

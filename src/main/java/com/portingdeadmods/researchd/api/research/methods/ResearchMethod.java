@@ -16,11 +16,12 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 public interface ResearchMethod {
-    Codec<ResearchMethod> CODEC =
-            ResearchdRegistries.RESEARCH_METHOD_SERIALIZER.byNameCodec().dispatch(ResearchMethod::getSerializer, ResearchMethodSerializer::codec);
+    Codec<ResearchMethod> CODEC = ResearchdRegistries.RESEARCH_METHOD_SERIALIZER
+            .byNameCodec()
+            .dispatch(ResearchMethod::getSerializer, ResearchMethodSerializer::codec);
 
-    StreamCodec<RegistryFriendlyByteBuf, ResearchMethod> STREAM_CODEC =
-            ResearchMethodSerializer.STREAM_CODEC.dispatch(ResearchMethod::getSerializer, ResearchMethodSerializer::streamCodec);
+    StreamCodec<RegistryFriendlyByteBuf, ResearchMethod> STREAM_CODEC = ResearchMethodSerializer.STREAM_CODEC.dispatch(
+            ResearchMethod::getSerializer, ResearchMethodSerializer::streamCodec);
 
     ResourceLocation id();
 
@@ -47,6 +48,6 @@ public interface ResearchMethod {
         ResearchTeam team();
     }
 
-    record SimpleMethodContext(ResearchTeam team, @Nullable ResearchLabControllerBE blockEntity) implements MethodContext {
-    }
+    record SimpleMethodContext(ResearchTeam team, @Nullable ResearchLabControllerBE blockEntity)
+            implements MethodContext {}
 }

@@ -10,5 +10,4 @@ public interface EditModeSettings {
     default boolean isConfigured() {
         return this.currentDatapack() != null && this.currentResourcePack() != null;
     }
-
 }

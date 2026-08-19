@@ -3,12 +3,11 @@ package com.portingdeadmods.researchd.mixins.immersiveengineering;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.portingdeadmods.researchd.api.RecipeFilterContext;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
-
-import java.util.ArrayList;
-import java.util.List;
 
 // get recipes -> filter all -> return list
 @Mixin(targets = "blusunrize.immersiveengineering.api.crafting.cache.CachedRecipeList", remap = false)

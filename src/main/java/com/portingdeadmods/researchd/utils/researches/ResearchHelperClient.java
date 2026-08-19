@@ -7,18 +7,17 @@ import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
 import com.portingdeadmods.researchd.api.research.*;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
-import com.portingdeadmods.researchd.impl.research.ResearchManagerImpl;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
+import com.portingdeadmods.researchd.impl.research.ResearchManagerImpl;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.utils.SpaghettiClient;
-import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.Level;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 
 public final class ResearchHelperClient {
     public static void reloadResearches(Level level) {
@@ -63,12 +62,15 @@ public final class ResearchHelperClient {
             ResearchIcon icon = research.researchIcon();
             Function<ResearchIcon, ClientResearchIcon<?>> factory = ResearchdClient.RESEARCH_ICONS.get(icon.id());
             if (factory == null) {
-                Researchd.error("Research Icons", "Research %s uses icon type %s, which has no client renderer", k.location(), icon.id());
+                Researchd.error(
+                        "Research Icons",
+                        "Research %s uses icon type %s, which has no client renderer",
+                        k.location(),
+                        icon.id());
                 return;
             }
 
             ResearchScreen.CLIENT_ICONS.put(k.location(), factory.apply(icon));
         });
     }
-
 }

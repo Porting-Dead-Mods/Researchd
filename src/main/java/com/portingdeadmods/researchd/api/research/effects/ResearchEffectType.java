@@ -18,5 +18,4 @@ public record ResearchEffectType(ResourceLocation id, ResearchIcon icon, boolean
     public static ResearchEffectType multiple(ResourceLocation id, ResearchIcon icon) {
         return new ResearchEffectType(id, icon, true);
     }
-
 }

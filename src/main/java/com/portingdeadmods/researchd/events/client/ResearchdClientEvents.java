@@ -9,6 +9,7 @@ import com.portingdeadmods.researchd.data.ResearchdDataComponents;
 import com.portingdeadmods.researchd.impl.research.effect.data.ItemUnlockEffectData;
 import com.portingdeadmods.researchd.registries.ResearchdEffectDataTypes;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
+import java.util.Optional;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -20,8 +21,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
-
-import java.util.Optional;
 
 @EventBusSubscriber(modid = Researchd.MODID, value = Dist.CLIENT)
 public final class ResearchdClientEvents {
@@ -42,15 +41,19 @@ public final class ResearchdClientEvents {
         LocalPlayer player = (LocalPlayer) event.getEntity();
         ItemStack itemStack = event.getItemStack();
 
-        ItemUnlockEffectData itemData = ResearchdApi.getEffectDataForPlayer(player, ResearchdEffectDataTypes.ITEM_UNLOCK);
+        ItemUnlockEffectData itemData =
+                ResearchdApi.getEffectDataForPlayer(player, ResearchdEffectDataTypes.ITEM_UNLOCK);
 
         if (itemData != null && itemData.isBlocked(itemStack.getItem())) {
             event.getToolTip().add(Component.empty()); // Add a blank line for spacing
-            event.getToolTip().add(Component.literal("This item is blocked by a researchPack!").withStyle(ChatFormatting.RED, ChatFormatting.ITALIC));
+            event.getToolTip()
+                    .add(Component.literal("This item is blocked by a researchPack!")
+                            .withStyle(ChatFormatting.RED, ChatFormatting.ITALIC));
         }
 
         if (itemStack.has(ResearchdDataComponents.RESEARCH_PACK)) {
-            Optional<ResourceKey<ResearchPack>> key = itemStack.get(ResearchdDataComponents.RESEARCH_PACK).researchPackKey();
+            Optional<ResourceKey<ResearchPack>> key =
+                    itemStack.get(ResearchdDataComponents.RESEARCH_PACK).researchPackKey();
             if (key.isPresent()) {
                 ResearchPack pack = ResearchHelperCommon.getResearchPack(key.get(), Minecraft.getInstance().level);
                 if (pack instanceof RegistryDisplay<?> display) {
@@ -60,5 +63,4 @@ public final class ResearchdClientEvents {
             }
         }
     }
-
 }

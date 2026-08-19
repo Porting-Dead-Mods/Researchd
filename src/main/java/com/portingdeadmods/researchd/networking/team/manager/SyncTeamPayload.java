@@ -11,7 +11,8 @@ import org.jetbrains.annotations.NotNull;
 
 public record SyncTeamPayload(ResearchTeamImpl team) implements CustomPacketPayload {
     public static final Type<SyncTeamPayload> TYPE = new Type<>(Researchd.rl("sync_team"));
-    public static final StreamCodec<? super RegistryFriendlyByteBuf, SyncTeamPayload> STREAM_CODEC = ResearchTeamImpl.STREAM_CODEC.map(SyncTeamPayload::new, SyncTeamPayload::team);
+    public static final StreamCodec<? super RegistryFriendlyByteBuf, SyncTeamPayload> STREAM_CODEC =
+            ResearchTeamImpl.STREAM_CODEC.map(SyncTeamPayload::new, SyncTeamPayload::team);
 
     @Override
     public @NotNull Type<? extends CustomPacketPayload> type() {
@@ -20,11 +21,11 @@ public record SyncTeamPayload(ResearchTeamImpl team) implements CustomPacketPayl
 
     public void handle(IPayloadContext context) {
         context.enqueueWork(() -> {
-            ResearchTeamCache.researchTeamMap.updateTeam(team);
-        }).exceptionally(err -> {
-            Researchd.LOGGER.error("Failed to handle SyncTeamPayload", err);
-            return null;
-        });
+                    ResearchTeamCache.researchTeamMap.updateTeam(team);
+                })
+                .exceptionally(err -> {
+                    Researchd.LOGGER.error("Failed to handle SyncTeamPayload", err);
+                    return null;
+                });
     }
-
 }

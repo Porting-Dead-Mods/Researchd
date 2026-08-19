@@ -3,16 +3,17 @@ package com.portingdeadmods.researchd.utils.researches;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.*;
+import com.portingdeadmods.researchd.api.research.ResearchRelations;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectList;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
-import com.portingdeadmods.researchd.api.research.ResearchRelations;
-import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamImpl;
+import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
 import com.portingdeadmods.researchd.utils.NumberUtils;
 import com.portingdeadmods.researchd.utils.registries.ResearchdManagers;
+import java.util.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
@@ -20,8 +21,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
-
-import java.util.*;
 
 public final class ResearchHelperCommon {
     public static <T extends ResearchEffect> Collection<T> getResearchEffects(Class<T> clazz, Level level) {
@@ -39,7 +38,8 @@ public final class ResearchHelperCommon {
         return new ArrayList<>(effects.stream().filter(clazz::isInstance).toList());
     }
 
-    public static List<ResourceKey<Research>> getAllChildrenForResearch(ResourceKey<Research> key, ResearchManager manager) {
+    public static List<ResourceKey<Research>> getAllChildrenForResearch(
+            ResourceKey<Research> key, ResearchManager manager) {
         List<ResourceKey<Research>> list = new UniqueArray<>();
         ResearchRelations relations = manager.getRelationsForResearch(key);
         if (relations != null) _collectChildren(relations, list);
@@ -47,7 +47,8 @@ public final class ResearchHelperCommon {
         return list;
     }
 
-    public static List<ResourceKey<Research>> getAllParentsForResearch(ResourceKey<Research> key, ResearchManager manager) {
+    public static List<ResourceKey<Research>> getAllParentsForResearch(
+            ResourceKey<Research> key, ResearchManager manager) {
         List<ResourceKey<Research>> list = new UniqueArray<>();
         ResearchRelations relations = manager.getRelationsForResearch(key);
         if (relations != null) _collectParents(relations, list);
@@ -67,20 +68,24 @@ public final class ResearchHelperCommon {
     public static List<ResearchEffectData<?>> getResearchEffectData(ServerPlayer serverPlayer) {
         List<ResearchEffectData<?>> effData = new UniqueArray<>();
 
-        for (Map.Entry<ResourceKey<AttachmentType<?>>, AttachmentType<?>> entry : NeoForgeRegistries.ATTACHMENT_TYPES.entrySet()) {
+        for (Map.Entry<ResourceKey<AttachmentType<?>>, AttachmentType<?>> entry :
+                NeoForgeRegistries.ATTACHMENT_TYPES.entrySet()) {
             Object data = serverPlayer.getData(entry.getValue());
             if (data instanceof ResearchEffectData<?> effectData) {
                 effData.add(effectData);
             }
         }
 
-        return effData.stream().sorted(Comparator.comparing(a -> a.getClass().getName())).toList();
+        return effData.stream()
+                .sorted(Comparator.comparing(a -> a.getClass().getName()))
+                .toList();
     }
 
-    private static <T extends ResearchEffect> void _collectEffects(Class<T> clazz, ResearchEffect effect, Collection<T> effects) {
+    private static <T extends ResearchEffect> void _collectEffects(
+            Class<T> clazz, ResearchEffect effect, Collection<T> effects) {
         if (effect instanceof ResearchEffectList list) {
             for (ResearchEffect subEffect : list.effects()) {
-                _collectEffects(clazz, subEffect,  effects);
+                _collectEffects(clazz, subEffect, effects);
             }
         } else {
             if (clazz.isInstance(effect)) {
@@ -114,7 +119,8 @@ public final class ResearchHelperCommon {
 
     @Deprecated
     public static List<ResourceKey<ResearchPack>> getResearchPackKeys(Level level) {
-        Map<ResourceKey<ResearchPack>, ResearchPack> lookup = ResearchdManagers.getResearchPacksManager(level).getLookup();
+        Map<ResourceKey<ResearchPack>, ResearchPack> lookup =
+                ResearchdManagers.getResearchPacksManager(level).getLookup();
         return lookup.entrySet().stream()
                 .sorted(Comparator.comparingInt(entry -> entry.getValue().sortingValue()))
                 .map(Map.Entry::getKey)

@@ -8,11 +8,11 @@ import net.minecraft.client.gui.layouts.LayoutElement;
 
 public interface LayoutWidget<L extends Layout> {
     L getLayout();
-    
+
     Iterable<? extends LayoutElement> getElements();
 
     default void arrangeElements() {
-        if (this.getLayout() != null){
+        if (this.getLayout() != null) {
             this.getLayout().arrangeElements();
         }
     }

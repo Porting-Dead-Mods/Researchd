@@ -8,7 +8,8 @@ import net.minecraft.world.level.Level;
 public final class ResearchdManagers {
     public static ReloadableRegistryManager<Research> getResearchesManager(Level level) {
         if (!level.isClientSide()) {
-            ReloadableServerResources resources = level.getServer().getServerResources().managers();
+            ReloadableServerResources resources =
+                    level.getServer().getServerResources().managers();
             return ((RegistryManagersGetter) resources).researchd$getResearchesManager();
         } else {
             return ((RegistryManagersGetter) level).researchd$getResearchesManager();
@@ -17,11 +18,11 @@ public final class ResearchdManagers {
 
     public static ReloadableRegistryManager<ResearchPack> getResearchPacksManager(Level level) {
         if (!level.isClientSide()) {
-            ReloadableServerResources resources = level.getServer().getServerResources().managers();
+            ReloadableServerResources resources =
+                    level.getServer().getServerResources().managers();
             return ((RegistryManagersGetter) resources).researchd$getResearchPackManager();
         } else {
             return ((RegistryManagersGetter) level).researchd$getResearchPackManager();
         }
     }
-
 }

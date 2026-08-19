@@ -1,13 +1,11 @@
 package com.portingdeadmods.researchd.api.client;
 
+import java.util.*;
+import java.util.function.Consumer;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.layouts.FrameLayout;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.layouts.LayoutSettings;
 import net.minecraft.client.gui.layouts.LinearLayout;
-
-import java.util.*;
-import java.util.function.Consumer;
 
 public final class RememberingLinearLayout {
     private final LinearLayout layout;
@@ -71,8 +69,7 @@ public final class RememberingLinearLayout {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
         var that = (RememberingLinearLayout) obj;
-        return Objects.equals(this.layout, that.layout) &&
-                Objects.equals(this.widgets, that.widgets);
+        return Objects.equals(this.layout, that.layout) && Objects.equals(this.widgets, that.widgets);
     }
 
     @Override
@@ -82,9 +79,6 @@ public final class RememberingLinearLayout {
 
     @Override
     public String toString() {
-        return "RememberingLinearLayout[" +
-                "layout=" + layout + ", " +
-                "widgets=" + widgets + ']';
+        return "RememberingLinearLayout[" + "layout=" + layout + ", " + "widgets=" + widgets + ']';
     }
-
 }

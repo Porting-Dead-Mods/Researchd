@@ -12,8 +12,11 @@ import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.data.saved.TeamResearchEffectSavedData;
 import com.portingdeadmods.researchd.impl.TeamResearchEffectDataMap;
 import com.portingdeadmods.researchd.impl.research.effect.data.ItemUnlockEffectData;
-import com.portingdeadmods.researchd.registries.ResearchdEffectDataTypes;
 import com.portingdeadmods.researchd.registries.ResearchEffectTypes;
+import com.portingdeadmods.researchd.registries.ResearchdEffectDataTypes;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -30,16 +33,13 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-
-public record ItemUnlockEffect(Optional<ItemStack> icon, Optional<String> name, ResourceLocation item) implements ResearchEffect {
+public record ItemUnlockEffect(Optional<ItemStack> icon, Optional<String> name, ResourceLocation item)
+        implements ResearchEffect {
     private static final MapCodec<ItemUnlockEffect> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            ItemStack.CODEC.optionalFieldOf("icon").forGetter(ItemUnlockEffect::icon),
-            Codec.STRING.optionalFieldOf("name").forGetter(ItemUnlockEffect::name),
-            ResourceLocation.CODEC.fieldOf("item").forGetter(ItemUnlockEffect::item)
-    ).apply(instance, ItemUnlockEffect::new));
+                    ItemStack.CODEC.optionalFieldOf("icon").forGetter(ItemUnlockEffect::icon),
+                    Codec.STRING.optionalFieldOf("name").forGetter(ItemUnlockEffect::name),
+                    ResourceLocation.CODEC.fieldOf("item").forGetter(ItemUnlockEffect::item))
+            .apply(instance, ItemUnlockEffect::new));
 
     private static final StreamCodec<RegistryFriendlyByteBuf, ItemUnlockEffect> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.optional(ItemStack.STREAM_CODEC),
@@ -48,10 +48,10 @@ public record ItemUnlockEffect(Optional<ItemStack> icon, Optional<String> name, 
             ItemUnlockEffect::name,
             ResourceLocation.STREAM_CODEC,
             ItemUnlockEffect::item,
-            ItemUnlockEffect::new
-    );
+            ItemUnlockEffect::new);
 
-    public static final ResearchEffectSerializer<ItemUnlockEffect> SERIALIZER = ResearchEffectSerializer.simple(CODEC, STREAM_CODEC);
+    public static final ResearchEffectSerializer<ItemUnlockEffect> SERIALIZER =
+            ResearchEffectSerializer.simple(CODEC, STREAM_CODEC);
     public static final ResourceLocation ID = Researchd.rl("unlock_item");
 
     public ItemUnlockEffect(ItemStack icon, String name, ResourceLocation item) {
@@ -103,8 +103,7 @@ public record ItemUnlockEffect(Optional<ItemStack> icon, Optional<String> name, 
     }
 
     public ItemStack getDisplayStack() {
-        return this.icon().map(ItemStack::copy)
-                .orElseGet(() -> new ItemStack(this.getItem()));
+        return this.icon().map(ItemStack::copy).orElseGet(() -> new ItemStack(this.getItem()));
     }
 
     public Set<RecipeHolder<?>> getRecipes(Level level) {
@@ -118,7 +117,8 @@ public record ItemUnlockEffect(Optional<ItemStack> icon, Optional<String> name, 
             Recipe<?> recipe = holder.value();
             ItemStack resultStack = recipe.getResultItem(level.registryAccess());
             boolean matchesResult = resultStack.is(target);
-            boolean matchesIngredient = recipe.getIngredients().stream().anyMatch(ingredient -> ingredientMatches(ingredient, target));
+            boolean matchesIngredient =
+                    recipe.getIngredients().stream().anyMatch(ingredient -> ingredientMatches(ingredient, target));
             if (matchesResult || matchesIngredient) {
                 recipes.add(holder);
             }

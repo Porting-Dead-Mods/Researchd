@@ -4,12 +4,12 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.ValueEffect;
 import com.portingdeadmods.researchd.impl.SimpleValueEffect;
+import java.util.function.Supplier;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import java.util.function.Supplier;
-
 public final class ResearchdValueEffects {
-    public static final DeferredRegister<ValueEffect> VALUE_EFFECTS = DeferredRegister.create(ResearchdRegistries.VALUE_EFFECT, Researchd.MODID);
+    public static final DeferredRegister<ValueEffect> VALUE_EFFECTS =
+            DeferredRegister.create(ResearchdRegistries.VALUE_EFFECT, Researchd.MODID);
 
     // TODO: Implement this
     public static final Supplier<ValueEffect> RESEARCH_LAB_PRODUCTIVITY = register("research_lab_productivity");

@@ -5,26 +5,26 @@ import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectDataType;
 import com.portingdeadmods.researchd.impl.research.effect.RecipeUnlockEffect;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 
-import java.util.Collection;
-
-public record RecipeUnlockEffectData(UniqueArray<ResourceLocation> blockedRecipes) implements ResearchEffectData<RecipeUnlockEffect> {
+public record RecipeUnlockEffectData(UniqueArray<ResourceLocation> blockedRecipes)
+        implements ResearchEffectData<RecipeUnlockEffect> {
     public static final RecipeUnlockEffectData EMPTY = new RecipeUnlockEffectData(new UniqueArray<>());
 
     public static final MapCodec<RecipeUnlockEffectData> CODEC = UniqueArray.CODEC(ResourceLocation.CODEC)
-            .xmap(RecipeUnlockEffectData::new, RecipeUnlockEffectData::blockedRecipes).fieldOf("blocked_recipes");
-    public static final StreamCodec<RegistryFriendlyByteBuf, RecipeUnlockEffectData> STREAM_CODEC = StreamCodec.composite(
-            UniqueArray.STREAM_CODEC(ResourceLocation.STREAM_CODEC),
-            RecipeUnlockEffectData::blockedRecipes,
-            RecipeUnlockEffectData::new
-    );
-    public static final ResearchEffectDataType<RecipeUnlockEffectData> TYPE = ResearchEffectDataType.simple(RecipeUnlockEffectData::new, CODEC, STREAM_CODEC);
+            .xmap(RecipeUnlockEffectData::new, RecipeUnlockEffectData::blockedRecipes)
+            .fieldOf("blocked_recipes");
+    public static final StreamCodec<RegistryFriendlyByteBuf, RecipeUnlockEffectData> STREAM_CODEC =
+            StreamCodec.composite(
+                    UniqueArray.STREAM_CODEC(ResourceLocation.STREAM_CODEC),
+                    RecipeUnlockEffectData::blockedRecipes,
+                    RecipeUnlockEffectData::new);
+    public static final ResearchEffectDataType<RecipeUnlockEffectData> TYPE =
+            ResearchEffectDataType.simple(RecipeUnlockEffectData::new, CODEC, STREAM_CODEC);
 
     public RecipeUnlockEffectData() {
         this(new UniqueArray<>());

@@ -3,16 +3,15 @@ package com.portingdeadmods.researchd.api.team;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
+import java.util.Map;
+import java.util.SequencedCollection;
+import java.util.UUID;
+import java.util.function.Function;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Map;
-import java.util.SequencedCollection;
-import java.util.UUID;
-import java.util.function.Function;
 
 public interface ResearchTeam {
     /* Team Metadata */
@@ -110,9 +109,11 @@ public interface ResearchTeam {
 
     void setResearchCompleted(ResourceKey<Research> research, long completionTime);
 
-    void onCompleteResearch(ResourceKey<Research> research, long completionTime, boolean forced, Function<UUID, Player> playerGetter);
+    void onCompleteResearch(
+            ResourceKey<Research> research, long completionTime, boolean forced, Function<UUID, Player> playerGetter);
 
-    default void onCompleteResearch(ResourceKey<Research> research, long completionTime, Function<UUID, Player> playerGetter) {
+    default void onCompleteResearch(
+            ResourceKey<Research> research, long completionTime, Function<UUID, Player> playerGetter) {
         this.onCompleteResearch(research, completionTime, false, playerGetter);
     }
 
@@ -124,5 +125,4 @@ public interface ResearchTeam {
     void onRemoveResearch(ResourceKey<Research> research, Function<UUID, Player> playerGetter);
 
     void refreshResearchStatus();
-
 }

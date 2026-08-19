@@ -3,11 +3,10 @@ package com.portingdeadmods.researchd.resources.example;
 import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.resources.PackWriter;
-import net.minecraft.server.packs.PackType;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import net.minecraft.server.packs.PackType;
 
 public class ExampleResourcePackWriter implements PackWriter {
     private boolean generateExamples;
@@ -45,7 +44,8 @@ public class ExampleResourcePackWriter implements PackWriter {
             }
             return Result.err("Example Resource Pack already exists");
         } catch (IOException e) {
-            Researchd.LOGGER.error("Encountered error while creating files and directories for example resourcepack", e);
+            Researchd.LOGGER.error(
+                    "Encountered error while creating files and directories for example resourcepack", e);
             return Result.err("File/Directory creation failed");
         }
     }

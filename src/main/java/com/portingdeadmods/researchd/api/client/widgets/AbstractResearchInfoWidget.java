@@ -27,11 +27,8 @@ public abstract class AbstractResearchInfoWidget<T> extends AbstractWidget {
     @Override
     protected abstract void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v);
 
-    public void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-    }
+    public void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {}
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-    }
-
+    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 }

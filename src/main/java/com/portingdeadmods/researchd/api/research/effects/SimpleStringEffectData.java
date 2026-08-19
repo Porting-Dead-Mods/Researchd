@@ -3,12 +3,11 @@ package com.portingdeadmods.researchd.api.research.effects;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
+import java.util.function.Function;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.level.Level;
-
-import java.util.function.Function;
 
 /**
  * Subclasses only need to supply key(ResearchEffect), type() and build their codecs
@@ -53,17 +52,16 @@ public abstract class SimpleStringEffectData<E extends ResearchEffect> implement
         return this.values;
     }
 
-    public static <T extends SimpleStringEffectData<?>> MapCodec<T> codec(String fieldName, Function<UniqueArray<String>, T> factory) {
+    public static <T extends SimpleStringEffectData<?>> MapCodec<T> codec(
+            String fieldName, Function<UniqueArray<String>, T> factory) {
         return UniqueArray.CODEC(Codec.STRING)
                 .xmap(factory, SimpleStringEffectData::values)
                 .fieldOf(fieldName);
     }
 
-    public static <T extends SimpleStringEffectData<?>> StreamCodec<RegistryFriendlyByteBuf, T> streamCodec(Function<UniqueArray<String>, T> factory) {
+    public static <T extends SimpleStringEffectData<?>> StreamCodec<RegistryFriendlyByteBuf, T> streamCodec(
+            Function<UniqueArray<String>, T> factory) {
         return StreamCodec.composite(
-                UniqueArray.STREAM_CODEC(ByteBufCodecs.STRING_UTF8),
-                SimpleStringEffectData::values,
-                factory
-        );
+                UniqueArray.STREAM_CODEC(ByteBufCodecs.STRING_UTF8), SimpleStringEffectData::values, factory);
     }
 }

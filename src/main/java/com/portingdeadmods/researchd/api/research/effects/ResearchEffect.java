@@ -16,11 +16,12 @@ import net.minecraft.world.level.Level;
  * A Research Effect can be used to unlock content when researching
  */
 public interface ResearchEffect {
-    Codec<ResearchEffect> CODEC =
-            ResearchdRegistries.RESEARCH_EFFECT_SERIALIZER.byNameCodec().dispatch(ResearchEffect::getSerializer, ResearchEffectSerializer::codec);
+    Codec<ResearchEffect> CODEC = ResearchdRegistries.RESEARCH_EFFECT_SERIALIZER
+            .byNameCodec()
+            .dispatch(ResearchEffect::getSerializer, ResearchEffectSerializer::codec);
 
-    StreamCodec<RegistryFriendlyByteBuf, ResearchEffect> STREAM_CODEC =
-            ResearchEffectSerializer.STREAM_CODEC.dispatch(ResearchEffect::getSerializer, ResearchEffectSerializer::streamCodec);
+    StreamCodec<RegistryFriendlyByteBuf, ResearchEffect> STREAM_CODEC = ResearchEffectSerializer.STREAM_CODEC.dispatch(
+            ResearchEffect::getSerializer, ResearchEffectSerializer::streamCodec);
 
     void onUnlock(Level level, ResearchTeam team, ResourceKey<Research> research);
 

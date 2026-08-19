@@ -4,10 +4,11 @@ import com.portingdeadmods.researchd.api.client.renderers.CycledItemRenderer;
 import com.portingdeadmods.researchd.client.screens.editor.EditorSharedSprites;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.AbstractLayoutWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.BackgroundEditBox;
-import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.utils.GuiUtils;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
@@ -24,12 +25,10 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 public class TagCreationWidget extends AbstractLayoutWidget<Layout> {
-    public static final WidgetSprites SPRITES = new WidgetSprites(EditorSharedSprites.EDITOR_BACKGROUND_INVERTED_SPRITE, EditorSharedSprites.EDITOR_BACKGROUND_INVERTED_SPRITE);
+    public static final WidgetSprites SPRITES = new WidgetSprites(
+            EditorSharedSprites.EDITOR_BACKGROUND_INVERTED_SPRITE,
+            EditorSharedSprites.EDITOR_BACKGROUND_INVERTED_SPRITE);
     private final StringWidget stringWidget;
     private final EditBox tagEditBox;
     private final CycledItemRenderer itemRenderer;
@@ -61,7 +60,8 @@ public class TagCreationWidget extends AbstractLayoutWidget<Layout> {
         } else {
             this.tagEditBox.setValue("#" + newVal);
         }
-        Optional<HolderSet.Named<Item>> _tag = BuiltInRegistries.ITEM.getTag(TagKey.create(Registries.ITEM, ResourceLocation.parse(newVal)));
+        Optional<HolderSet.Named<Item>> _tag =
+                BuiltInRegistries.ITEM.getTag(TagKey.create(Registries.ITEM, ResourceLocation.parse(newVal)));
         if (_tag.isEmpty()) {
             this.tagEditBox.setTextColor(ChatFormatting.RED.getColor());
             this.itemRenderer.setItems(List.of());
@@ -96,9 +96,10 @@ public class TagCreationWidget extends AbstractLayoutWidget<Layout> {
 
     public TagKey<Item> createTag() {
         if (this.valid) {
-            return TagKey.create(Registries.ITEM, ResourceLocation.parse(this.tagEditBox.getValue().substring(1)));
+            return TagKey.create(
+                    Registries.ITEM,
+                    ResourceLocation.parse(this.tagEditBox.getValue().substring(1)));
         }
         return null;
     }
-
 }

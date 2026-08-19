@@ -15,7 +15,8 @@ public interface ResearchEffectSerializer<T extends ResearchEffect> {
 
     StreamCodec<RegistryFriendlyByteBuf, T> streamCodec();
 
-    static <T extends ResearchEffect> ResearchEffectSerializer<T> simple(MapCodec<T> codec, StreamCodec<RegistryFriendlyByteBuf, T> streamCodec) {
+    static <T extends ResearchEffect> ResearchEffectSerializer<T> simple(
+            MapCodec<T> codec, StreamCodec<RegistryFriendlyByteBuf, T> streamCodec) {
         return new ResearchEffectSerializer<>() {
             @Override
             public MapCodec<T> codec() {

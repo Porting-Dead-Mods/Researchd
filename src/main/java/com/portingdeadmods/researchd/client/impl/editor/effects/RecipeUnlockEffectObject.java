@@ -10,6 +10,7 @@ import com.portingdeadmods.researchd.client.impl.editor.widgets.EditableIdListWi
 import com.portingdeadmods.researchd.impl.research.effect.RecipeUnlockEffect;
 import com.portingdeadmods.researchd.registries.ResearchEffectTypes;
 import com.portingdeadmods.researchd.utils.GuiUtils;
+import java.util.Collection;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.network.chat.Component;
@@ -18,8 +19,6 @@ import net.minecraft.util.Unit;
 import net.minecraft.world.item.crafting.RecipeManager;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
-
-import java.util.Collection;
 
 public class RecipeUnlockEffectObject implements TypedEditorObject<RecipeUnlockEffect, ResearchEffectType> {
     public static final ResourceLocation ID = Researchd.rl("recipe_unlock");
@@ -31,11 +30,18 @@ public class RecipeUnlockEffectObject implements TypedEditorObject<RecipeUnlockE
     }
 
     @Override
-    public void buildLayout(RememberingLinearLayout layout, @Nullable RecipeUnlockEffect previous, @UnknownNullability EditorContext context) {
+    public void buildLayout(
+            RememberingLinearLayout layout,
+            @Nullable RecipeUnlockEffect previous,
+            @UnknownNullability EditorContext context) {
         layout.addWidget(null, new StringWidget(Component.literal("By id:"), GuiUtils.getFont()));
-        //RegistryVerifyEditBox idEditBox = layout.addWidget("id_edit_box", RegistryVerifyEditBox.forIds(this.getIds(), context.innerWidth() - 8, 16));
-        layout.addWidget("id_edit_boxes", new EditableIdListWidget(context.innerWidth() - 8, 60, this.getIds(), newVal -> this.update(layout, context)));
-        //idEditBox.setResponder(newVal -> this.update(layout, context));
+        // RegistryVerifyEditBox idEditBox = layout.addWidget("id_edit_box", RegistryVerifyEditBox.forIds(this.getIds(),
+        // context.innerWidth() - 8, 16));
+        layout.addWidget(
+                "id_edit_boxes",
+                new EditableIdListWidget(
+                        context.innerWidth() - 8, 60, this.getIds(), newVal -> this.update(layout, context)));
+        // idEditBox.setResponder(newVal -> this.update(layout, context));
     }
 
     private Collection<ResourceLocation> getIds() {
@@ -46,7 +52,8 @@ public class RecipeUnlockEffectObject implements TypedEditorObject<RecipeUnlockE
     @Override
     public RecipeUnlockEffect create(RememberingLinearLayout layout) {
         EditableIdListWidget idEditBoxes = layout.getChild("id_edit_boxes", EditableIdListWidget.class);
-        return new RecipeUnlockEffect(idEditBoxes.getIds().map(ResourceLocation::parse).toArray(ResourceLocation[]::new));
+        return new RecipeUnlockEffect(
+                idEditBoxes.getIds().map(ResourceLocation::parse).toArray(ResourceLocation[]::new));
     }
 
     @Override

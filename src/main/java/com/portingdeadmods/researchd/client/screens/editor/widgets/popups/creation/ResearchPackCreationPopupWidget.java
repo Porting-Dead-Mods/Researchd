@@ -7,13 +7,12 @@ import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.networking.editor.CreateResearchPackPayload;
 import com.portingdeadmods.researchd.utils.registries.ResearchdManagers;
+import java.util.Collections;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.PacketDistributor;
-
-import java.util.Collections;
 
 public class ResearchPackCreationPopupWidget extends AbstractStandaloneCreationPopupWidget<ResearchPack> {
     public static final ResourceLocation DEFAULT_ID = Researchd.rl(ResearchPackImpl.ID);
@@ -24,8 +23,10 @@ public class ResearchPackCreationPopupWidget extends AbstractStandaloneCreationP
 
     @Override
     protected void insertObjectToData(ResourceLocation id, ResearchPack object) {
-        ResearchdManagers.getResearchPacksManager(Minecraft.getInstance().level).mergeContents(Collections.singletonMap(id, object));
-        PacketDistributor.sendToServer(new CreateResearchPackPayload(ResourceKey.create(ResearchdRegistries.RESEARCH_PACK_KEY, id), object, true));
+        ResearchdManagers.getResearchPacksManager(Minecraft.getInstance().level)
+                .mergeContents(Collections.singletonMap(id, object));
+        PacketDistributor.sendToServer(new CreateResearchPackPayload(
+                ResourceKey.create(ResearchdRegistries.RESEARCH_PACK_KEY, id), object, true));
     }
 
     @Override

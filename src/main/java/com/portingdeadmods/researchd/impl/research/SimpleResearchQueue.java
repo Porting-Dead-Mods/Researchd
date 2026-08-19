@@ -7,26 +7,24 @@ import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.*;
 import com.portingdeadmods.researchd.api.team.ResearchQueue;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.IntSupplier;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.IntSupplier;
-
 public record SimpleResearchQueue(List<ResourceKey<Research>> entries) implements ResearchQueue {
     public static final SimpleResearchQueue EMPTY = new SimpleResearchQueue(new ArrayList<>());
     public static final Codec<SimpleResearchQueue> CODEC = RecordCodecBuilder.create(inst -> inst.group(
-            Research.RESOURCE_KEY_CODEC.listOf().fieldOf("entries").forGetter(SimpleResearchQueue::entries)
-    ).apply(inst, SimpleResearchQueue::new));
+                    Research.RESOURCE_KEY_CODEC.listOf().fieldOf("entries").forGetter(SimpleResearchQueue::entries))
+            .apply(inst, SimpleResearchQueue::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, SimpleResearchQueue> STREAM_CODEC = StreamCodec.composite(
             Research.RESOURCE_KEY_STREAM_CODEC.apply(ByteBufCodecs.list()),
             SimpleResearchQueue::entries,
-            SimpleResearchQueue::new
-    );
+            SimpleResearchQueue::new);
     public static final IntSupplier QUEUE_LENGTH = () -> ResearchdConfig.Common.researchQueueLength;
 
     public SimpleResearchQueue(List<ResourceKey<Research>> entries) {
@@ -70,7 +68,8 @@ public record SimpleResearchQueue(List<ResourceKey<Research>> entries) implement
     public boolean remove(int index, boolean removeChildren) {
         if (this.entries.size() > index && index >= 0) {
             if (removeChildren)
-                for (ResourceKey<Research> child : ResearchHelperCommon.getAllChildrenForResearch(this.entries.get(index), ResearchdApi.getResearchManager())) {
+                for (ResourceKey<Research> child : ResearchHelperCommon.getAllChildrenForResearch(
+                        this.entries.get(index), ResearchdApi.getResearchManager())) {
                     this.remove(this.entries.indexOf(child), true);
                 }
 

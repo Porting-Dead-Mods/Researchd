@@ -9,11 +9,12 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.portingdeadmods.researchd.api.ResearchdApi;
-import com.portingdeadmods.researchd.api.research.ResearchManager;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.ResearchTeamManager;
 import com.portingdeadmods.researchd.utils.SpaghettiClient;
-import dev.ftb.mods.ftbteams.api.TeamManager;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -22,18 +23,15 @@ import net.minecraft.commands.arguments.selector.EntitySelectorParser;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
-
 public class ResearchdTeamArgument implements ArgumentType<ResearchdTeamArgumentProvider> {
-    private static final DynamicCommandExceptionType TEAM_NOT_FOUND = new DynamicCommandExceptionType((object) -> Component.translatable("researchd.team_not_found", object));
+    private static final DynamicCommandExceptionType TEAM_NOT_FOUND =
+            new DynamicCommandExceptionType((object) -> Component.translatable("researchd.team_not_found", object));
     private static final ResearchdTeamArgument INSTANCE = new ResearchdTeamArgument();
 
-    private ResearchdTeamArgument() {
-    }
+    private ResearchdTeamArgument() {}
 
-    public static ResearchTeam get(CommandContext<CommandSourceStack> context, String name) throws CommandSyntaxException {
+    public static ResearchTeam get(CommandContext<CommandSourceStack> context, String name)
+            throws CommandSyntaxException {
         return context.getArgument(name, ResearchdTeamArgumentProvider.class).getTeam(context.getSource());
     }
 
@@ -79,7 +77,10 @@ public class ResearchdTeamArgument implements ArgumentType<ResearchdTeamArgument
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
         if (context.getSource() instanceof SharedSuggestionProvider) {
-            Stream<String> list = this.getTeams(context).map(ResearchTeam::getName).map(name -> "\"" + name + "\"").sorted();
+            Stream<String> list = this.getTeams(context)
+                    .map(ResearchTeam::getName)
+                    .map(name -> "\"" + name + "\"")
+                    .sorted();
             return SharedSuggestionProvider.suggest(list, builder);
         } else {
             return Suggestions.empty();
@@ -121,8 +122,10 @@ public class ResearchdTeamArgument implements ArgumentType<ResearchdTeamArgument
             if (team != null) {
                 return team;
             } else {
-                Optional<UUID> playerUUID = source.getServer().getProfileCache().get(this.id).map(GameProfile::getId);
-                ResearchTeam playerTeam = playerUUID.map(teamManager::getTeamByPlayerId).orElseThrow(this::error);
+                Optional<UUID> playerUUID =
+                        source.getServer().getProfileCache().get(this.id).map(GameProfile::getId);
+                ResearchTeam playerTeam =
+                        playerUUID.map(teamManager::getTeamByPlayerId).orElseThrow(this::error);
                 if (playerTeam == null) {
                     throw this.error();
                 }

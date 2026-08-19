@@ -13,13 +13,10 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
-
-import java.util.UUID;
 
 @EventBusSubscriber(modid = Researchd.MODID)
 public final class ResearchdServerTickHandler {
@@ -39,16 +36,17 @@ public final class ResearchdServerTickHandler {
                     // Check progress of first research in queue
                     if (currentProgress != null) {
                         float oldProgress = currentProgress.getProgress();
-                        currentProgress.checkProgress(currentResearch, level, new ResearchMethod.SimpleMethodContext(team, null));
+                        currentProgress.checkProgress(
+                                currentResearch, level, new ResearchMethod.SimpleMethodContext(team, null));
 
                         // If progress has changed, we sync
                         if (oldProgress != currentProgress.getProgress()) {
                             for (TeamMember member : team.getMembers()) {
                                 ServerPlayer player = server.getPlayerList().getPlayer(member.player());
                                 if (player == null) continue; // skip offline members
-                                PacketDistributor.sendToPlayer(player, new ResearchProgressSyncPayload(currentResearch, currentProgress));
+                                PacketDistributor.sendToPlayer(
+                                        player, new ResearchProgressSyncPayload(currentResearch, currentProgress));
                             }
-
                         }
 
                         if (currentProgress.isComplete()) {
@@ -60,11 +58,10 @@ public final class ResearchdServerTickHandler {
                             team.getQueue().remove(0, false);
                         }
                     } else {
-                        Researchd.LOGGER.error("Current research progress for research {} is null", currentResearch.location());
+                        Researchd.LOGGER.error(
+                                "Current research progress for research {} is null", currentResearch.location());
                     }
-
                 }
-
             }
         }
     }

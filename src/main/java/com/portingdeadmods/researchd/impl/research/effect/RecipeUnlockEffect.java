@@ -15,6 +15,9 @@ import com.portingdeadmods.researchd.impl.TeamResearchEffectDataMap;
 import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
 import com.portingdeadmods.researchd.registries.ResearchEffectTypes;
 import com.portingdeadmods.researchd.registries.ResearchdEffectDataTypes;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -25,16 +28,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-
-public record RecipeUnlockEffect(Optional<ItemStack> icon, Optional<String> name, Set<ResourceLocation> recipes) implements ResearchEffect {
+public record RecipeUnlockEffect(Optional<ItemStack> icon, Optional<String> name, Set<ResourceLocation> recipes)
+        implements ResearchEffect {
     private static final MapCodec<RecipeUnlockEffect> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            ItemStack.CODEC.optionalFieldOf("icon").forGetter(RecipeUnlockEffect::icon),
-            Codec.STRING.optionalFieldOf("name").forGetter(RecipeUnlockEffect::name),
-            CodecUtils.set(ResourceLocation.CODEC).fieldOf("recipes").forGetter(RecipeUnlockEffect::recipes)
-    ).apply(instance, RecipeUnlockEffect::new));
+                    ItemStack.CODEC.optionalFieldOf("icon").forGetter(RecipeUnlockEffect::icon),
+                    Codec.STRING.optionalFieldOf("name").forGetter(RecipeUnlockEffect::name),
+                    CodecUtils.set(ResourceLocation.CODEC).fieldOf("recipes").forGetter(RecipeUnlockEffect::recipes))
+            .apply(instance, RecipeUnlockEffect::new));
 
     private static final StreamCodec<RegistryFriendlyByteBuf, RecipeUnlockEffect> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.optional(ItemStack.STREAM_CODEC),
@@ -43,17 +43,17 @@ public record RecipeUnlockEffect(Optional<ItemStack> icon, Optional<String> name
             RecipeUnlockEffect::name,
             ResourceLocation.STREAM_CODEC.apply(ByteBufCodecs.collection(HashSet::new)),
             RecipeUnlockEffect::recipes,
-            RecipeUnlockEffect::new
-    );
+            RecipeUnlockEffect::new);
 
-    public static final ResearchEffectSerializer<RecipeUnlockEffect> SERIALIZER = ResearchEffectSerializer.simple(CODEC, STREAM_CODEC);
+    public static final ResearchEffectSerializer<RecipeUnlockEffect> SERIALIZER =
+            ResearchEffectSerializer.simple(CODEC, STREAM_CODEC);
     public static final ResourceLocation ID = Researchd.rl("unlock_recipe");
 
-    public RecipeUnlockEffect(ItemStack icon, String name, ResourceLocation ...recipes) {
+    public RecipeUnlockEffect(ItemStack icon, String name, ResourceLocation... recipes) {
         this(Optional.ofNullable(icon), Optional.ofNullable(name), Set.of(recipes));
     }
 
-    public RecipeUnlockEffect(ResourceLocation ...recipes) {
+    public RecipeUnlockEffect(ResourceLocation... recipes) {
         this(Optional.empty(), Optional.empty(), Set.of(recipes));
     }
 
@@ -61,7 +61,8 @@ public record RecipeUnlockEffect(Optional<ItemStack> icon, Optional<String> name
     public void onUnlock(Level level, ResearchTeam team, ResourceKey<Research> research) {
         if (!level.isClientSide()) {
             TeamResearchEffectDataMap map = TeamResearchEffectSavedData.getData((ServerLevel) level);
-            RecipeUnlockEffectData data = map.computeIfAbsent(team.getId(), ResearchdEffectDataTypes.RECIPE_UNLOCK, level);
+            RecipeUnlockEffectData data =
+                    map.computeIfAbsent(team.getId(), ResearchdEffectDataTypes.RECIPE_UNLOCK, level);
             data.remove(this, level);
             map.setChanged();
             map.sync(team.getId(), data.type());
@@ -72,7 +73,8 @@ public record RecipeUnlockEffect(Optional<ItemStack> icon, Optional<String> name
     public void onLock(Level level, ResearchTeam team, ResourceKey<Research> research) {
         if (!level.isClientSide()) {
             TeamResearchEffectDataMap map = TeamResearchEffectSavedData.getData((ServerLevel) level);
-            RecipeUnlockEffectData data = map.computeIfAbsent(team.getId(), ResearchdEffectDataTypes.RECIPE_UNLOCK, level);
+            RecipeUnlockEffectData data =
+                    map.computeIfAbsent(team.getId(), ResearchdEffectDataTypes.RECIPE_UNLOCK, level);
             data.add(this, level);
             map.setChanged();
             map.sync(team.getId(), data.type());
@@ -102,5 +104,4 @@ public record RecipeUnlockEffect(Optional<ItemStack> icon, Optional<String> name
     public ResearchEffectSerializer<RecipeUnlockEffect> getSerializer() {
         return RecipeUnlockEffect.SERIALIZER;
     }
-
 }

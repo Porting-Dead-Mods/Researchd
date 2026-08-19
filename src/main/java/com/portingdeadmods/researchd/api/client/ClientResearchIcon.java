@@ -1,7 +1,6 @@
 package com.portingdeadmods.researchd.api.client;
 
 import com.portingdeadmods.researchd.ResearchdClient;
-import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchIcon;
 import net.minecraft.client.gui.GuiGraphics;
 
@@ -24,14 +23,30 @@ public interface ClientResearchIcon<I extends ResearchIcon> {
      * @param panelLeft Left start position of the current panel the icon is rendered on
      * @param panelTop Top start position of the current panel the icon is rendered on
      */
-    void render(GuiGraphics guiGraphics, int panelLeft, int panelTop, int mouseX, int mouseY, float scale, float partialTicks);
+    void render(
+            GuiGraphics guiGraphics,
+            int panelLeft,
+            int panelTop,
+            int mouseX,
+            int mouseY,
+            float scale,
+            float partialTicks);
 
-    default void render(GuiGraphics guiGraphics, int panelLeft, int panelTop, int mouseX, int mouseY, float scale, int width, int height, float partialTicks) {
+    default void render(
+            GuiGraphics guiGraphics,
+            int panelLeft,
+            int panelTop,
+            int mouseX,
+            int mouseY,
+            float scale,
+            int width,
+            int height,
+            float partialTicks) {
         this.render(guiGraphics, panelLeft, panelTop, mouseX, mouseY, scale, partialTicks);
     }
 
     static <I extends ResearchIcon> ClientResearchIcon<I> getClientIcon(ResearchIcon icon) {
-        return (ClientResearchIcon<I>) ResearchdClient.RESEARCH_ICONS.get(icon.id()).apply(icon);
+        return (ClientResearchIcon<I>)
+                ResearchdClient.RESEARCH_ICONS.get(icon.id()).apply(icon);
     }
-
 }

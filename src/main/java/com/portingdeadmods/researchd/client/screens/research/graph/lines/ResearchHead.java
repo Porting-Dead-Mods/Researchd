@@ -3,283 +3,280 @@ package com.portingdeadmods.researchd.client.screens.research.graph.lines;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
+import java.awt.*;
+import java.util.Collection;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.FastColor;
 
-import java.awt.*;
-import java.util.Collection;
-
 public class ResearchHead {
-	private int x;
-	private int y;
-	private final boolean isInput;
-	private int color = FastColor.ARGB32.color(255, 255, 255, 255); // Default color is white
+    private int x;
+    private int y;
+    private final boolean isInput;
+    private int color = FastColor.ARGB32.color(255, 255, 255, 255); // Default color is white
 
-	/**
-	 *
-	 * @param x Should be based on the x position of the node, split evenly if there are multiple heads
-	 * @param y Should be the y position of the node <br>(+ Node height if it's output)
-	 * @param isInput Should be true if it's an input head, false if it's an output head
-	 */
-	public ResearchHead(int x, int y, boolean isInput) {
-		this.x = x;
-		this.y = y;
-		this.isInput = isInput;
-	}
+    /**
+     *
+     * @param x Should be based on the x position of the node, split evenly if there are multiple heads
+     * @param y Should be the y position of the node <br>(+ Node height if it's output)
+     * @param isInput Should be true if it's an input head, false if it's an output head
+     */
+    public ResearchHead(int x, int y, boolean isInput) {
+        this.x = x;
+        this.y = y;
+        this.isInput = isInput;
+    }
 
-	public int getX() { return this.x; }
-	public int getY() { return this.y; }
-	public void setX(int x) { this.x = x; }
-	public void setY(int y) { this.y = y; }
+    public int getX() {
+        return this.x;
+    }
 
+    public int getY() {
+        return this.y;
+    }
 
-	/**
-	 * @return The point where the last pixel is drawn for the head (going from the node outwards)
-	 */
-	public Point getConnectionPoint() {
-		return this.isInput ? new Point(this.x, this.y - 3) : new Point(this.x, this.y + 3);
-	}
+    public void setX(int x) {
+        this.x = x;
+    }
 
-	public boolean isInput() { return isInput; }
+    public void setY(int y) {
+        this.y = y;
+    }
 
-	public void translate(int dx, int dy) {
-		this.x += dx;
-		this.y += dy;
-	}
+    /**
+     * @return The point where the last pixel is drawn for the head (going from the node outwards)
+     */
+    public Point getConnectionPoint() {
+        return this.isInput ? new Point(this.x, this.y - 3) : new Point(this.x, this.y + 3);
+    }
 
-	public void render(GuiGraphics graphics) {
-		if (this.isInput)
-			graphics.vLine(this.x, this.y - 4, this.y, this.getColor());
-		else
-			graphics.vLine(this.x, this.y, this.y + 4, this.getColor());
-	}
+    public boolean isInput() {
+        return isInput;
+    }
 
-	/**
-	 * @param node {@link ResearchNode} to get input heads for
-	 * @return {@link UniqueArray} of input heads, order left -> right
-	 */
-	public static UniqueArray<ResearchHead> inputsOf(ResearchNode node) {
-		UniqueArray<ResearchHead> positions = new UniqueArray<>();
-		UniqueArray<ResearchNode> parents = node.getParents();
-		int parentCount = parents.size();
-		int width = ResearchScreenWidget.PANEL_WIDTH; // Node width
+    public void translate(int dx, int dy) {
+        this.x += dx;
+        this.y += dy;
+    }
 
-		if (parentCount == 0) return positions;
+    public void render(GuiGraphics graphics) {
+        if (this.isInput) graphics.vLine(this.x, this.y - 4, this.y, this.getColor());
+        else graphics.vLine(this.x, this.y, this.y + 4, this.getColor());
+    }
 
-		// If one, create a centered head
-		if (parentCount == 1) {
-			int x = node.getX() + width / 2;
-			int y = node.getY();
-			positions.add(new ResearchHead(x, y, true));
-			return positions;
-		}
+    /**
+     * @param node {@link ResearchNode} to get input heads for
+     * @return {@link UniqueArray} of input heads, order left -> right
+     */
+    public static UniqueArray<ResearchHead> inputsOf(ResearchNode node) {
+        UniqueArray<ResearchHead> positions = new UniqueArray<>();
+        UniqueArray<ResearchNode> parents = node.getParents();
+        int parentCount = parents.size();
+        int width = ResearchScreenWidget.PANEL_WIDTH; // Node width
 
-		int startingX = (parentCount % 2 == 0) ? (node.getX() + width / 2 - 2) : (node.getX() + width / 2);
+        if (parentCount == 0) return positions;
 
-		startingX -= ((parentCount - 1) / 2) * 3; // 3 px per pair of heads
+        // If one, create a centered head
+        if (parentCount == 1) {
+            int x = node.getX() + width / 2;
+            int y = node.getY();
+            positions.add(new ResearchHead(x, y, true));
+            return positions;
+        }
 
-		for (int i = 0; i < parentCount; i++) {
-			positions.addLast(new ResearchHead(startingX + i * 3,
-					node.getY(),
-					true
-			));
-		}
+        int startingX = (parentCount % 2 == 0) ? (node.getX() + width / 2 - 2) : (node.getX() + width / 2);
 
-		return positions;
-	}
+        startingX -= ((parentCount - 1) / 2) * 3; // 3 px per pair of heads
 
-	/**
-	 * @param node {@link ResearchNode} to get output heads for
-	 * @return {@link UniqueArray} of output heads, order left -> right
-	 */
-	public static UniqueArray<ResearchHead> outputsOf(ResearchNode node) {
-		UniqueArray<ResearchHead> positions = new UniqueArray<>();
-		UniqueArray<ResearchNode> children = node.getChildren();
-		int childCount = children.size();
-		int width = ResearchScreenWidget.PANEL_WIDTH; // Node width
+        for (int i = 0; i < parentCount; i++) {
+            positions.addLast(new ResearchHead(startingX + i * 3, node.getY(), true));
+        }
 
-		if (childCount == 0) return positions;
+        return positions;
+    }
 
-		// If one, create a centered head
-		if (childCount == 1) {
-			int x = node.getX() + width / 2;
-			int y = node.getY() + ResearchScreenWidget.PANEL_HEIGHT - 1;
-			positions.add(new ResearchHead(x, y, false));
-			return positions;
-		}
+    /**
+     * @param node {@link ResearchNode} to get output heads for
+     * @return {@link UniqueArray} of output heads, order left -> right
+     */
+    public static UniqueArray<ResearchHead> outputsOf(ResearchNode node) {
+        UniqueArray<ResearchHead> positions = new UniqueArray<>();
+        UniqueArray<ResearchNode> children = node.getChildren();
+        int childCount = children.size();
+        int width = ResearchScreenWidget.PANEL_WIDTH; // Node width
 
-		int startingX = (childCount % 2 == 0) ? (node.getX() + width / 2 - 2) : (node.getX() + width / 2);
+        if (childCount == 0) return positions;
 
-		startingX -= ((childCount - 1) / 2) * 3; // 2 px per pair of heads
+        // If one, create a centered head
+        if (childCount == 1) {
+            int x = node.getX() + width / 2;
+            int y = node.getY() + ResearchScreenWidget.PANEL_HEIGHT - 1;
+            positions.add(new ResearchHead(x, y, false));
+            return positions;
+        }
 
-		for (int i = 0; i < childCount; i++) {
-			positions.addLast(new ResearchHead(
-					startingX + i * 3,
-					node.getY() + ResearchScreenWidget.PANEL_HEIGHT - 1,
-					false
-			));
-		}
+        int startingX = (childCount % 2 == 0) ? (node.getX() + width / 2 - 2) : (node.getX() + width / 2);
 
-		return positions;
-	}
+        startingX -= ((childCount - 1) / 2) * 3; // 2 px per pair of heads
 
-	/**
-	 * @param node {@link ResearchNode} to get input heads for
-	 * @param visibleNodes {@link Collection} of visible nodes in the current graph
-	 * @return {@link UniqueArray} of input heads, order left -> right
-	 */
-	public static UniqueArray<ResearchHead> inputsOf(ResearchNode node, Collection<ResearchNode> visibleNodes) {
-		UniqueArray<ResearchHead> positions = new UniqueArray<>();
-		UniqueArray<ResearchNode> parents = new UniqueArray<>();
+        for (int i = 0; i < childCount; i++) {
+            positions.addLast(
+                    new ResearchHead(startingX + i * 3, node.getY() + ResearchScreenWidget.PANEL_HEIGHT - 1, false));
+        }
 
-		// Only consider parents that are actually visible in the current graph
-		for (ResearchNode parent : node.getParents()) {
-			if (visibleNodes.contains(parent)) {
-				parents.add(parent);
-			}
-		}
+        return positions;
+    }
 
-		int parentCount = parents.size();
-		int width = ResearchScreenWidget.PANEL_WIDTH;
+    /**
+     * @param node {@link ResearchNode} to get input heads for
+     * @param visibleNodes {@link Collection} of visible nodes in the current graph
+     * @return {@link UniqueArray} of input heads, order left -> right
+     */
+    public static UniqueArray<ResearchHead> inputsOf(ResearchNode node, Collection<ResearchNode> visibleNodes) {
+        UniqueArray<ResearchHead> positions = new UniqueArray<>();
+        UniqueArray<ResearchNode> parents = new UniqueArray<>();
 
-		if (parentCount == 0) return positions;
+        // Only consider parents that are actually visible in the current graph
+        for (ResearchNode parent : node.getParents()) {
+            if (visibleNodes.contains(parent)) {
+                parents.add(parent);
+            }
+        }
 
-		// If one, create a centered head
-		if (parentCount == 1) {
-			int x = node.getX() + width / 2;
-			int y = node.getY();
-			positions.add(new ResearchHead(x, y, true));
-			return positions;
-		}
+        int parentCount = parents.size();
+        int width = ResearchScreenWidget.PANEL_WIDTH;
 
-		int startingX = (parentCount % 2 == 0) ? (node.getX() + width / 2 - 2) : (node.getX() + width / 2);
+        if (parentCount == 0) return positions;
 
-		startingX -= ((parentCount - 1) / 2) * 3; // 3 px per pair of heads
+        // If one, create a centered head
+        if (parentCount == 1) {
+            int x = node.getX() + width / 2;
+            int y = node.getY();
+            positions.add(new ResearchHead(x, y, true));
+            return positions;
+        }
 
-		for (int i = 0; i < parentCount; i++) {
-			positions.addLast(new ResearchHead(startingX + i * 3,
-					node.getY(),
-					true
-					));
-		}
+        int startingX = (parentCount % 2 == 0) ? (node.getX() + width / 2 - 2) : (node.getX() + width / 2);
 
-		return positions;
-	}
+        startingX -= ((parentCount - 1) / 2) * 3; // 3 px per pair of heads
 
-	/**
-	 * @param node {@link ResearchNode} to get output heads for
-	 * @param visibleNodes {@link Collection} of visible nodes in the current graph
-	 * @return {@link UniqueArray} of output heads, order left -> right
-	 */
-	public static UniqueArray<ResearchHead> outputsOf(ResearchNode node, Collection<ResearchNode> visibleNodes) {
-		UniqueArray<ResearchHead> positions = new UniqueArray<>();
-		UniqueArray<ResearchNode> children = new UniqueArray<>();
+        for (int i = 0; i < parentCount; i++) {
+            positions.addLast(new ResearchHead(startingX + i * 3, node.getY(), true));
+        }
 
-		// Only consider children that are actually visible in the current graph
-		for (ResearchNode child : node.getChildren()) {
-			if (visibleNodes.contains(child)) {
-				children.add(child);
-			}
-		}
+        return positions;
+    }
 
-		int childCount = children.size();
-		int width = ResearchScreenWidget.PANEL_WIDTH; // Node width
+    /**
+     * @param node {@link ResearchNode} to get output heads for
+     * @param visibleNodes {@link Collection} of visible nodes in the current graph
+     * @return {@link UniqueArray} of output heads, order left -> right
+     */
+    public static UniqueArray<ResearchHead> outputsOf(ResearchNode node, Collection<ResearchNode> visibleNodes) {
+        UniqueArray<ResearchHead> positions = new UniqueArray<>();
+        UniqueArray<ResearchNode> children = new UniqueArray<>();
 
-		if (childCount == 0) return positions;
+        // Only consider children that are actually visible in the current graph
+        for (ResearchNode child : node.getChildren()) {
+            if (visibleNodes.contains(child)) {
+                children.add(child);
+            }
+        }
 
-		// If one, create a centered head
-		if (childCount == 1) {
-			int x = node.getX() + width / 2;
-			int y = node.getY() + ResearchScreenWidget.PANEL_HEIGHT - 1;
-			positions.add(new ResearchHead(x, y, false));
-			return positions;
-		}
+        int childCount = children.size();
+        int width = ResearchScreenWidget.PANEL_WIDTH; // Node width
 
-		int startingX = (childCount % 2 == 0) ? (node.getX() + width / 2 - 2) : (node.getX() + width / 2);
+        if (childCount == 0) return positions;
 
-		startingX -= ((childCount - 1) / 2) * 3; // 2 px per pair of heads
+        // If one, create a centered head
+        if (childCount == 1) {
+            int x = node.getX() + width / 2;
+            int y = node.getY() + ResearchScreenWidget.PANEL_HEIGHT - 1;
+            positions.add(new ResearchHead(x, y, false));
+            return positions;
+        }
 
-		for (int i = 0; i < childCount; i++) {
-			positions.addLast(new ResearchHead(
-					startingX + i * 3,
-					node.getY() + ResearchScreenWidget.PANEL_HEIGHT - 1,
-					false
-			));
-		}
+        int startingX = (childCount % 2 == 0) ? (node.getX() + width / 2 - 2) : (node.getX() + width / 2);
 
-		return positions;
-	}
+        startingX -= ((childCount - 1) / 2) * 3; // 2 px per pair of heads
 
-	/**
-	 * Creates a specific number of input heads for a node, evenly distributed along the top edge.
-	 *
-	 * @param node The researchPack node to create input heads for
-	 * @param count The number of input heads to create
-	 * @return A UniqueArray of evenly distributed input heads
-	 */
-	public static UniqueArray<ResearchHead> createInputHeads(ResearchNode node, int count) {
-		UniqueArray<ResearchHead> heads = new UniqueArray<>();
-		if (count <= 0) return heads;
+        for (int i = 0; i < childCount; i++) {
+            positions.addLast(
+                    new ResearchHead(startingX + i * 3, node.getY() + ResearchScreenWidget.PANEL_HEIGHT - 1, false));
+        }
 
-		int width = ResearchScreenWidget.PANEL_WIDTH;
-		int x = node.getX();
-		int y = node.getY();
+        return positions;
+    }
 
-		// If one, create a centered head
-		if (count == 1) {
-			heads.add(new ResearchHead(x + width / 2, y, true));
-			return heads;
-		}
+    /**
+     * Creates a specific number of input heads for a node, evenly distributed along the top edge.
+     *
+     * @param node The researchPack node to create input heads for
+     * @param count The number of input heads to create
+     * @return A UniqueArray of evenly distributed input heads
+     */
+    public static UniqueArray<ResearchHead> createInputHeads(ResearchNode node, int count) {
+        UniqueArray<ResearchHead> heads = new UniqueArray<>();
+        if (count <= 0) return heads;
 
-		// For multiple heads, evenly distribute them
-		int startingX = (count % 2 == 0) ? (x + width / 2 - 2) : (x + width / 2);
-		startingX -= ((count - 1) / 2) * 3; // 3 px spacing between heads
+        int width = ResearchScreenWidget.PANEL_WIDTH;
+        int x = node.getX();
+        int y = node.getY();
 
-		for (int i = 0; i < count; i++) {
-			heads.add(new ResearchHead(startingX + i * 3, y, true));
-		}
+        // If one, create a centered head
+        if (count == 1) {
+            heads.add(new ResearchHead(x + width / 2, y, true));
+            return heads;
+        }
 
-		return heads;
-	}
+        // For multiple heads, evenly distribute them
+        int startingX = (count % 2 == 0) ? (x + width / 2 - 2) : (x + width / 2);
+        startingX -= ((count - 1) / 2) * 3; // 3 px spacing between heads
 
-	/**
-	 * Creates a specific number of output heads for a node, evenly distributed along the bottom edge.
-	 *
-	 * @param node The researchPack node to create output heads for
-	 * @param count The number of output heads to create
-	 * @return A UniqueArray of evenly distributed output heads
-	 */
-	public static UniqueArray<ResearchHead> createOutputHeads(ResearchNode node, int count) {
-		UniqueArray<ResearchHead> heads = new UniqueArray<>();
-		if (count <= 0) return heads;
+        for (int i = 0; i < count; i++) {
+            heads.add(new ResearchHead(startingX + i * 3, y, true));
+        }
 
-		int width = ResearchScreenWidget.PANEL_WIDTH;
-		int height = ResearchScreenWidget.PANEL_HEIGHT;
-		int x = node.getX();
-		int y = node.getY() + height - 1; // Bottom of the node
+        return heads;
+    }
 
-		// If one, create a centered head
-		if (count == 1) {
-			heads.add(new ResearchHead(x + width / 2, y, false));
-			return heads;
-		}
+    /**
+     * Creates a specific number of output heads for a node, evenly distributed along the bottom edge.
+     *
+     * @param node The researchPack node to create output heads for
+     * @param count The number of output heads to create
+     * @return A UniqueArray of evenly distributed output heads
+     */
+    public static UniqueArray<ResearchHead> createOutputHeads(ResearchNode node, int count) {
+        UniqueArray<ResearchHead> heads = new UniqueArray<>();
+        if (count <= 0) return heads;
 
-		// For multiple heads, evenly distribute them
-		int startingX = (count % 2 == 0) ? (x + width / 2 - 2) : (x + width / 2);
-		startingX -= ((count - 1) / 2) * 3; // 3 px spacing between heads
+        int width = ResearchScreenWidget.PANEL_WIDTH;
+        int height = ResearchScreenWidget.PANEL_HEIGHT;
+        int x = node.getX();
+        int y = node.getY() + height - 1; // Bottom of the node
 
-		for (int i = 0; i < count; i++) {
-			heads.add(new ResearchHead(startingX + i * 3, y, false));
-		}
+        // If one, create a centered head
+        if (count == 1) {
+            heads.add(new ResearchHead(x + width / 2, y, false));
+            return heads;
+        }
 
-		return heads;
-	}
+        // For multiple heads, evenly distribute them
+        int startingX = (count % 2 == 0) ? (x + width / 2 - 2) : (x + width / 2);
+        startingX -= ((count - 1) / 2) * 3; // 3 px spacing between heads
 
-	public int getColor() {
-		return color;
-	}
+        for (int i = 0; i < count; i++) {
+            heads.add(new ResearchHead(startingX + i * 3, y, false));
+        }
 
-	public void setColor(int color) {
-		this.color = color;
-	}
+        return heads;
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
+    }
 }

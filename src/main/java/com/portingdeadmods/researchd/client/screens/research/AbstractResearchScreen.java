@@ -5,11 +5,11 @@
  */
 package com.portingdeadmods.researchd.client.screens.research;
 
-
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.client.screens.RdZIndex;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.DropDownWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
+import java.util.*;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -17,8 +17,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ArrayListDeque;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
 
 public abstract class AbstractResearchScreen extends Screen {
     private static List<Component> tooltip = null;
@@ -108,7 +106,6 @@ public abstract class AbstractResearchScreen extends Screen {
         } else if (listener == null) {
             this.focusedPopupWidget = null;
         }
-
     }
 
     @Override
@@ -131,7 +128,9 @@ public abstract class AbstractResearchScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        if (this.getPopupChildAt(mouseX, mouseY).filter(widget -> widget.mouseScrolled(mouseX, mouseY, scrollX, scrollY)).isPresent()) {
+        if (this.getPopupChildAt(mouseX, mouseY)
+                .filter(widget -> widget.mouseScrolled(mouseX, mouseY, scrollX, scrollY))
+                .isPresent()) {
             return true;
         }
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
@@ -139,17 +138,21 @@ public abstract class AbstractResearchScreen extends Screen {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        if (this.getPopupChildAt(mouseX, mouseY).filter(widget -> widget.mouseDragged(mouseX, mouseY, button, dragX, dragY)).isPresent()) {
+        if (this.getPopupChildAt(mouseX, mouseY)
+                .filter(widget -> widget.mouseDragged(mouseX, mouseY, button, dragX, dragY))
+                .isPresent()) {
             return true;
         }
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 
-    protected void renderTooltip(GuiGraphics guiGraphics, PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+    protected void renderTooltip(
+            GuiGraphics guiGraphics, PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         poseStack.translate(0, 0, RdZIndex.TOOLTIP);
 
         if (tooltip != null) {
-            guiGraphics.renderComponentTooltip(com.portingdeadmods.researchd.utils.GuiUtils.getFont(), tooltip, mouseX, mouseY);
+            guiGraphics.renderComponentTooltip(
+                    com.portingdeadmods.researchd.utils.GuiUtils.getFont(), tooltip, mouseX, mouseY);
         }
     }
 
@@ -176,12 +179,10 @@ public abstract class AbstractResearchScreen extends Screen {
                 for (AbstractWidget widget : popupWidget.getWidgets()) {
                     widget.render(guiGraphics, mouseX, mouseY, partialTick);
                 }
-
             }
 
             this.renderTooltip(guiGraphics, poseStack, mouseX, mouseY, partialTick);
         }
         poseStack.popPose();
-
     }
 }

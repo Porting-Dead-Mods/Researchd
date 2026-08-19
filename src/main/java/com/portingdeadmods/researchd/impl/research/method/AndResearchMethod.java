@@ -9,23 +9,22 @@ import com.portingdeadmods.researchd.api.research.methods.ResearchMethodType;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
 import com.portingdeadmods.researchd.registries.ResearchMethodTypes;
+import java.util.List;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.List;
-
 public record AndResearchMethod(List<ResearchMethod> methods) implements ResearchMethodList {
-    private static final MapCodec<AndResearchMethod> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
-            ResearchMethod.CODEC.listOf().fieldOf("methods").forGetter(AndResearchMethod::methods)
-    ).apply(inst, AndResearchMethod::new));
+    private static final MapCodec<AndResearchMethod> CODEC = RecordCodecBuilder.mapCodec(
+            inst -> inst.group(ResearchMethod.CODEC.listOf().fieldOf("methods").forGetter(AndResearchMethod::methods))
+                    .apply(inst, AndResearchMethod::new));
     private static final StreamCodec<RegistryFriendlyByteBuf, AndResearchMethod> STREAM_CODEC = StreamCodec.composite(
             ResearchMethod.STREAM_CODEC.apply(ByteBufCodecs.list()),
             AndResearchMethod::methods,
-            AndResearchMethod::new
-    );
-    public static final ResearchMethodSerializer<AndResearchMethod> SERIALIZER = ResearchMethodSerializer.simple(CODEC, STREAM_CODEC);
+            AndResearchMethod::new);
+    public static final ResearchMethodSerializer<AndResearchMethod> SERIALIZER =
+            ResearchMethodSerializer.simple(CODEC, STREAM_CODEC);
     public static final ResourceLocation ID = Researchd.rl("and");
 
     @Override
@@ -56,5 +55,4 @@ public record AndResearchMethod(List<ResearchMethod> methods) implements Researc
     public ResearchMethodSerializer<AndResearchMethod> getSerializer() {
         return SERIALIZER;
     }
-
 }

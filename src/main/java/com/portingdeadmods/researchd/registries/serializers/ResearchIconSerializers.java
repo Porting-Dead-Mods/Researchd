@@ -8,7 +8,8 @@ import com.portingdeadmods.researchd.impl.research.icons.SpriteResearchIcon;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class ResearchIconSerializers {
-    public static final DeferredRegister<ResearchIconSerializer<?>> SERIALIZERS = DeferredRegister.create(ResearchdRegistries.RESEARCH_ICON_SERIALIZER, Researchd.MODID);
+    public static final DeferredRegister<ResearchIconSerializer<?>> SERIALIZERS =
+            DeferredRegister.create(ResearchdRegistries.RESEARCH_ICON_SERIALIZER, Researchd.MODID);
 
     static {
         SERIALIZERS.register("item_research_icon", () -> ItemResearchIcon.SERIALIZER);

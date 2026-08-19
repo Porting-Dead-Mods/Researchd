@@ -20,5 +20,4 @@ public interface TeamSocialManager {
     void removeIgnore(UUID uuid);
 
     boolean containsIgnore(UUID uuid);
-
 }

@@ -10,12 +10,11 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.resources.ResearchdDatagenProvider;
+import java.util.Map;
+import java.util.function.Function;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Recipe;
-
-import java.util.Map;
-import java.util.function.Function;
 
 public class ResearchdDynamicPackContents {
     public static void writeData(DynamicPack pack) {
@@ -40,18 +39,21 @@ public class ResearchdDynamicPackContents {
         pack.put(Researchd.rl("lang/en_us"), object);
     }
 
-    private static void writeRecipeRegistry(DynamicPack pack, Function<String, ResearchdRecipes> providerFactory, Codec<Recipe<?>> codec, String path) {
+    private static void writeRecipeRegistry(
+            DynamicPack pack, Function<String, ResearchdRecipes> providerFactory, Codec<Recipe<?>> codec, String path) {
         ResearchdRecipes provider = providerFactory.apply(Researchd.MODID);
         provider.build();
 
-        for (Map.Entry<ResourceLocation, Recipe<?>> entry : provider.getContents().entrySet()) {
+        for (Map.Entry<ResourceLocation, Recipe<?>> entry :
+                provider.getContents().entrySet()) {
             Recipe<?> recipe = entry.getValue();
             DataResult<JsonElement> result = codec.encodeStart(JsonOps.INSTANCE, recipe);
             result.ifSuccess(json -> pack.put(entry.getKey().withPrefix(path + "/"), json));
         }
     }
 
-    private static <T, P extends ResearchdDatagenProvider<T>> void writeResearchdRegistry(DynamicPack pack, Function<String, P> providerFactory, Codec<T> codec, String path) {
+    private static <T, P extends ResearchdDatagenProvider<T>> void writeResearchdRegistry(
+            DynamicPack pack, Function<String, P> providerFactory, Codec<T> codec, String path) {
         P provider = providerFactory.apply(Researchd.MODID);
         provider.build();
 
@@ -61,5 +63,4 @@ public class ResearchdDynamicPackContents {
             result.ifSuccess(json -> pack.put(entry.getKey().location().withPrefix("researchd/" + path + "/"), json));
         }
     }
-
 }

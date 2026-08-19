@@ -21,9 +21,7 @@ public final class ResearchdKubeJSPlugin implements KubeJSPlugin {
 
         // COMPAT //
 
-	    // Immersive Engineering
-        if (ResearchdCompatHandler.isIELoaded())
-            bindings.add("RdImmersiveEngineering", RdImmersiveEngineering.class);
+        // Immersive Engineering
+        if (ResearchdCompatHandler.isIELoaded()) bindings.add("RdImmersiveEngineering", RdImmersiveEngineering.class);
     }
-
 }

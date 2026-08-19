@@ -6,14 +6,13 @@ import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchSerializer;
 import io.netty.buffer.ByteBuf;
+import java.util.List;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-
-import java.util.List;
 
 /**
  * Most basic researchPack, providing functionality and data for both displaying and researchPack logic
@@ -22,10 +21,14 @@ import java.util.List;
  * which implements the methods listed here and should be suitable for most use-cases.
  */
 public interface Research {
-    Codec<Research> CODEC = ResearchdRegistries.RESEARCH_SERIALIZER.byNameCodec().dispatch(Research::getSerializer, ResearchSerializer::codec);
-    StreamCodec<RegistryFriendlyByteBuf, Research> STREAM_CODEC = ByteBufCodecs.fromCodecTrusted(CODEC).cast();
+    Codec<Research> CODEC = ResearchdRegistries.RESEARCH_SERIALIZER
+            .byNameCodec()
+            .dispatch(Research::getSerializer, ResearchSerializer::codec);
+    StreamCodec<RegistryFriendlyByteBuf, Research> STREAM_CODEC =
+            ByteBufCodecs.fromCodecTrusted(CODEC).cast();
     Codec<ResourceKey<Research>> RESOURCE_KEY_CODEC = ResourceKey.codec(ResearchdRegistries.RESEARCH_KEY);
-    StreamCodec<ByteBuf, ResourceKey<Research>> RESOURCE_KEY_STREAM_CODEC = ResourceKey.streamCodec(ResearchdRegistries.RESEARCH_KEY);
+    StreamCodec<ByteBuf, ResourceKey<Research>> RESOURCE_KEY_STREAM_CODEC =
+            ResourceKey.streamCodec(ResearchdRegistries.RESEARCH_KEY);
 
     /**
      * @return The researchPack icon of this researchPack
@@ -83,5 +86,4 @@ public interface Research {
         String keyPath = key.location().getPath();
         return Component.translatable(String.format("%s.%s.%s_desc", registryPath, keyNamespace, keyPath));
     }
-
 }

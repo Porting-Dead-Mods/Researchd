@@ -1,5 +1,7 @@
 package com.portingdeadmods.researchd.resources;
 
+import java.util.HashMap;
+import java.util.Map;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.data.recipes.RecipeBuilder;
@@ -8,9 +10,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Recipe;
 import net.neoforged.neoforge.common.conditions.ICondition;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public record JsonRecipeOutput(Map<ResourceLocation, Recipe<?>> recipes) implements RecipeOutput {
     public JsonRecipeOutput() {
@@ -23,8 +22,8 @@ public record JsonRecipeOutput(Map<ResourceLocation, Recipe<?>> recipes) impleme
     }
 
     @Override
-    public void accept(ResourceLocation id, Recipe<?> recipe, @Nullable AdvancementHolder advancement, ICondition... conditions) {
+    public void accept(
+            ResourceLocation id, Recipe<?> recipe, @Nullable AdvancementHolder advancement, ICondition... conditions) {
         this.recipes.put(id, recipe);
     }
-
 }

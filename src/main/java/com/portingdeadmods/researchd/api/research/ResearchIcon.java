@@ -21,8 +21,11 @@ import net.minecraft.resources.ResourceLocation;
  * which is used in {@link com.portingdeadmods.researchd.impl.research.SimpleResearch}
  */
 public interface ResearchIcon {
-    Codec<ResearchIcon> CODEC = ResearchdRegistries.RESEARCH_ICON_SERIALIZER.byNameCodec().dispatch(ResearchIcon::getSerializer, ResearchIconSerializer::codec);
-    StreamCodec<RegistryFriendlyByteBuf, ResearchIcon> STREAM_CODEC = ByteBufCodecs.fromCodecTrusted(CODEC).cast();
+    Codec<ResearchIcon> CODEC = ResearchdRegistries.RESEARCH_ICON_SERIALIZER
+            .byNameCodec()
+            .dispatch(ResearchIcon::getSerializer, ResearchIconSerializer::codec);
+    StreamCodec<RegistryFriendlyByteBuf, ResearchIcon> STREAM_CODEC =
+            ByteBufCodecs.fromCodecTrusted(CODEC).cast();
 
     /**
      * @return The id of this type of Research Icon.

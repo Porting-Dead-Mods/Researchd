@@ -11,12 +11,12 @@ import net.minecraft.world.level.Level;
 
 public interface ValueEffect {
     Codec<ValueEffect> CODEC = CodecUtils.registryCodec(ResearchdRegistries.VALUE_EFFECT);
-    StreamCodec<? super RegistryFriendlyByteBuf, ValueEffect> STREAM_CODEC = CodecUtils.registryStreamCodec(ResearchdRegistries.VALUE_EFFECT);
+    StreamCodec<? super RegistryFriendlyByteBuf, ValueEffect> STREAM_CODEC =
+            CodecUtils.registryStreamCodec(ResearchdRegistries.VALUE_EFFECT);
 
     default ResourceLocation getKey() {
         return ResearchdRegistries.VALUE_EFFECT.getKey(this);
     }
 
-    default void onUnlock(ResearchTeam team, Level level) {
-    }
+    default void onUnlock(ResearchTeam team, Level level) {}
 }

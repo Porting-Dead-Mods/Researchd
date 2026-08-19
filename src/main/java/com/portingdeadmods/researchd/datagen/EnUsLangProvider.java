@@ -1,5 +1,8 @@
 package com.portingdeadmods.researchd.datagen;
 
+import static com.portingdeadmods.researchd.registries.ResearchdBlocks.RESEARCH_LAB_CONTROLLER;
+import static com.portingdeadmods.researchd.registries.ResearchdBlocks.RESEARCH_LAB_PART;
+
 import com.portingdeadmods.portingdeadlibs.api.config.PDLConfigHelper;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdConfig;
@@ -12,19 +15,13 @@ import com.portingdeadmods.researchd.registries.ResearchEffectTypes;
 import com.portingdeadmods.researchd.registries.ResearchMethodTypes;
 import com.portingdeadmods.researchd.registries.ResearchdValueEffects;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
+import java.util.Map;
+import java.util.function.Supplier;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.data.LanguageProvider;
-
-import java.util.Map;
-import java.util.function.Supplier;
-
-import static com.portingdeadmods.researchd.registries.ResearchdBlocks.RESEARCH_LAB_CONTROLLER;
-import static com.portingdeadmods.researchd.registries.ResearchdBlocks.RESEARCH_LAB_PART;
 
 public final class EnUsLangProvider extends LanguageProvider {
     public EnUsLangProvider(PackOutput output) {
@@ -50,7 +47,10 @@ public final class EnUsLangProvider extends LanguageProvider {
 
         addResearchEffectName(ResearchEffectTypes.COMMAND, "Execute Command");
 
-        addRegistryObject(ResearchdRegistries.VALUE_EFFECT, ResearchdValueEffects.RESEARCH_LAB_PRODUCTIVITY.get(), "Lab Productivity");
+        addRegistryObject(
+                ResearchdRegistries.VALUE_EFFECT,
+                ResearchdValueEffects.RESEARCH_LAB_PRODUCTIVITY.get(),
+                "Lab Productivity");
 
         PDLConfigHelper.generateConfigNames(ResearchdConfig.Client.class, Researchd.MODID, this::add);
         PDLConfigHelper.generateConfigNames(ResearchdConfig.Common.class, Researchd.MODID, this::add);
@@ -64,11 +64,17 @@ public final class EnUsLangProvider extends LanguageProvider {
     }
 
     private void addResearch(ResourceKey<Research> key, String name) {
-        add(key.registry().getPath() + "." + key.location().getNamespace() + "." + key.location().getPath(), name);
+        add(
+                key.registry().getPath() + "." + key.location().getNamespace() + "."
+                        + key.location().getPath(),
+                name);
     }
 
     private void addResearchDesc(ResourceKey<Research> key, String name) {
-        add("research_desc." + key.location().getNamespace() + "." + key.location().getPath(), name);
+        add(
+                "research_desc." + key.location().getNamespace() + "."
+                        + key.location().getPath(),
+                name);
     }
 
     private void addResearchMethod(ResourceLocation key, String name) {
@@ -92,5 +98,4 @@ public final class EnUsLangProvider extends LanguageProvider {
     private void addResearchPack(ResourceLocation key, String name) {
         add("item.researchd.research_pack_" + key.toString().replace(':', '_'), name);
     }
-
 }

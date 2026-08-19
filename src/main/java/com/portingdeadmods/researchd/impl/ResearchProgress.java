@@ -7,8 +7,10 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import it.unimi.dsi.fastutil.doubles.DoubleDoublePair;
+import java.util.Collections;
+import java.util.List;
+import javax.annotation.Nullable;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -17,23 +19,19 @@ import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
-
 // TODO: Remove research progresses for removed researches
 public record ResearchProgress(List<Task> tasks, Type type) {
     public static final Codec<ResearchProgress> CODEC = RecordCodecBuilder.create(inst -> inst.group(
-            Task.CODEC.listOf().fieldOf("tasks").forGetter(ResearchProgress::tasks),
-            Type.CODEC.fieldOf("type").forGetter(ResearchProgress::type)
-    ).apply(inst, ResearchProgress::new));
-    public static final StreamCodec<? super RegistryFriendlyByteBuf, ResearchProgress> STREAM_CODEC = StreamCodec.composite(
-            Task.STREAM_CODEC.apply(ByteBufCodecs.list()),
-            ResearchProgress::tasks,
-            Type.STREAM_CODEC,
-            ResearchProgress::type,
-            ResearchProgress::new
-    );
+                    Task.CODEC.listOf().fieldOf("tasks").forGetter(ResearchProgress::tasks),
+                    Type.CODEC.fieldOf("type").forGetter(ResearchProgress::type))
+            .apply(inst, ResearchProgress::new));
+    public static final StreamCodec<? super RegistryFriendlyByteBuf, ResearchProgress> STREAM_CODEC =
+            StreamCodec.composite(
+                    Task.STREAM_CODEC.apply(ByteBufCodecs.list()),
+                    ResearchProgress::tasks,
+                    Type.STREAM_CODEC,
+                    ResearchProgress::type,
+                    ResearchProgress::new);
 
     public boolean isComplete() {
         return this.type.isComplete(this.tasks);
@@ -63,7 +61,8 @@ public record ResearchProgress(List<Task> tasks, Type type) {
     public static @Nullable ResearchProgress forResearch(ResourceKey<Research> key, Level level) {
         Research research = ResearchdApi.getResearchManager().lookupResearch(key, level);
         if (research == null) {
-            Researchd.error("Research Progress", "No progress could be created for %s, it is not loaded", key.location());
+            Researchd.error(
+                    "Research Progress", "No progress could be created for %s, it is not loaded", key.location());
             return null;
         }
 
@@ -89,7 +88,8 @@ public record ResearchProgress(List<Task> tasks, Type type) {
         SINGLE("single");
 
         public static final Codec<Type> CODEC = StringRepresentable.fromEnum(Type::values);
-        public static final StreamCodec<? super RegistryFriendlyByteBuf, Type> STREAM_CODEC = CodecUtils.enumStreamCodec(Type.class);
+        public static final StreamCodec<? super RegistryFriendlyByteBuf, Type> STREAM_CODEC =
+                CodecUtils.enumStreamCodec(Type.class);
 
         private final String name;
 
@@ -97,7 +97,8 @@ public record ResearchProgress(List<Task> tasks, Type type) {
             this.name = name;
         }
 
-        public void checkProgress(ResourceKey<Research> research, Level level, List<Task> tasks, ResearchMethod.MethodContext context) {
+        public void checkProgress(
+                ResourceKey<Research> research, Level level, List<Task> tasks, ResearchMethod.MethodContext context) {
             switch (this) {
                 case AND, OR -> {
                     for (Task task : tasks) {
@@ -117,26 +118,31 @@ public record ResearchProgress(List<Task> tasks, Type type) {
         }
 
         public float getProgress(List<Task> tasks) {
-            return (float) switch (this) {
-                case OR -> this.getProgresses(tasks).firstDouble();
-                case AND -> tasks.stream().mapToDouble(Task::getProgress).sum();
-                case SINGLE -> tasks.getFirst().getProgress();
-            };
+            return (float)
+                    switch (this) {
+                        case OR -> this.getProgresses(tasks).firstDouble();
+                        case AND ->
+                            tasks.stream().mapToDouble(Task::getProgress).sum();
+                        case SINGLE -> tasks.getFirst().getProgress();
+                    };
         }
 
         public float getMaxProgress(List<Task> tasks) {
-            return (float) switch (this) {
-                case OR -> this.getProgresses(tasks).secondDouble();
-                case AND -> tasks.stream().mapToDouble(Task::getMaxProgress).sum();
-                case SINGLE -> tasks.getFirst().getMaxProgress();
-            };
+            return (float)
+                    switch (this) {
+                        case OR -> this.getProgresses(tasks).secondDouble();
+                        case AND ->
+                            tasks.stream().mapToDouble(Task::getMaxProgress).sum();
+                        case SINGLE -> tasks.getFirst().getMaxProgress();
+                    };
         }
 
         private DoubleDoublePair getProgresses(List<Task> tasks) {
             double curProgress = 0;
             double curMaxProgress = 0;
             for (Task task : tasks) {
-                if (curMaxProgress == 0 || (task.getProgress() / task.getMaxProgress() > curProgress / curMaxProgress)) {
+                if (curMaxProgress == 0
+                        || (task.getProgress() / task.getMaxProgress() > curProgress / curMaxProgress)) {
                     curProgress = task.getProgress();
                     curMaxProgress = task.getMaxProgress();
                 }
@@ -148,16 +154,15 @@ public record ResearchProgress(List<Task> tasks, Type type) {
         public @NotNull String getSerializedName() {
             return this.name;
         }
-
     }
 
     // TODO: Check if encoded method still exists
     public static class Task {
         public static final Codec<Task> CODEC = RecordCodecBuilder.create(inst -> inst.group(
-                ResearchMethod.CODEC.fieldOf("method").forGetter(Task::getMethod),
-                Codec.FLOAT.fieldOf("progress").forGetter(Task::getProgress),
-                Codec.FLOAT.fieldOf("max_progress").forGetter(Task::getMaxProgress)
-        ).apply(inst, Task::new));
+                        ResearchMethod.CODEC.fieldOf("method").forGetter(Task::getMethod),
+                        Codec.FLOAT.fieldOf("progress").forGetter(Task::getProgress),
+                        Codec.FLOAT.fieldOf("max_progress").forGetter(Task::getMaxProgress))
+                .apply(inst, Task::new));
         public static final StreamCodec<RegistryFriendlyByteBuf, Task> STREAM_CODEC = StreamCodec.composite(
                 ResearchMethod.STREAM_CODEC,
                 Task::getMethod,
@@ -165,8 +170,7 @@ public record ResearchProgress(List<Task> tasks, Type type) {
                 Task::getProgress,
                 ByteBufCodecs.FLOAT,
                 Task::getMaxProgress,
-                Task::new
-        );
+                Task::new);
         private final ResearchMethod method;
         private float progress;
         private final float maxProgress;
@@ -214,6 +218,5 @@ public record ResearchProgress(List<Task> tasks, Type type) {
                 this.method.checkProgress(level, research, this, context);
             }
         }
-
     }
 }

@@ -4,9 +4,12 @@ import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
-import com.portingdeadmods.researchd.api.research.ResearchPage;
 import com.portingdeadmods.researchd.api.research.ResearchManager;
+import com.portingdeadmods.researchd.api.research.ResearchPage;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -14,17 +17,16 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-
 /**
  *
  */
 public class ResearchPagesList extends AbstractWidget {
-    public static final ResourceLocation PAGE_BUTTON_ACTIVE = Researchd.rl("textures/gui/research_screen/research_page_button_active.png");
-    public static final ResourceLocation PAGE_BUTTON_INACTIVE = Researchd.rl("textures/gui/research_screen/research_page_button_inactive.png");
-    public static final ResourceLocation PAGE_BUTTON_INACTIVE_HOVER = Researchd.rl("textures/gui/research_screen/research_page_button_inactive_hover.png");
+    public static final ResourceLocation PAGE_BUTTON_ACTIVE =
+            Researchd.rl("textures/gui/research_screen/research_page_button_active.png");
+    public static final ResourceLocation PAGE_BUTTON_INACTIVE =
+            Researchd.rl("textures/gui/research_screen/research_page_button_inactive.png");
+    public static final ResourceLocation PAGE_BUTTON_INACTIVE_HOVER =
+            Researchd.rl("textures/gui/research_screen/research_page_button_inactive_hover.png");
 
     private static final int BUTTON_SIZE = 10;
     public static final int HEIGHT = 243;
@@ -84,14 +86,16 @@ public class ResearchPagesList extends AbstractWidget {
                 GuiUtils.drawImg(guiGraphics, PAGE_BUTTON_ACTIVE, getX(), buttonY, BUTTON_SIZE, BUTTON_SIZE);
             } else {
                 if (isButtonHovered(i, mouseX, mouseY)) {
-                    GuiUtils.drawImg(guiGraphics, PAGE_BUTTON_INACTIVE_HOVER, getX(), buttonY, BUTTON_SIZE, BUTTON_SIZE);
+                    GuiUtils.drawImg(
+                            guiGraphics, PAGE_BUTTON_INACTIVE_HOVER, getX(), buttonY, BUTTON_SIZE, BUTTON_SIZE);
                 } else {
                     GuiUtils.drawImg(guiGraphics, PAGE_BUTTON_INACTIVE, getX(), buttonY, BUTTON_SIZE, BUTTON_SIZE);
                 }
             }
 
             if (page.iconResearchKey() != null) {
-                ClientResearchIcon<?> clientIcon = ResearchScreen.CLIENT_ICONS.get(page.iconResearchKey().location());
+                ClientResearchIcon<?> clientIcon =
+                        ResearchScreen.CLIENT_ICONS.get(page.iconResearchKey().location());
                 if (clientIcon != null) {
                     clientIcon.render(guiGraphics, getX(), buttonY, mouseX, mouseY, 0.48f, partialTick);
                 }
@@ -103,8 +107,7 @@ public class ResearchPagesList extends AbstractWidget {
 
     private boolean isButtonHovered(int index, int mouseX, int mouseY) {
         int buttonY = getY() + index * BUTTON_SIZE;
-        return mouseX >= getX() && mouseX < getX() + BUTTON_SIZE
-                && mouseY >= buttonY && mouseY < buttonY + BUTTON_SIZE;
+        return mouseX >= getX() && mouseX < getX() + BUTTON_SIZE && mouseY >= buttonY && mouseY < buttonY + BUTTON_SIZE;
     }
 
     @Override
@@ -158,6 +161,5 @@ public class ResearchPagesList extends AbstractWidget {
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-    }
+    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 }

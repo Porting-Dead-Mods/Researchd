@@ -21,19 +21,19 @@ import net.minecraft.world.level.Level;
 
 public record DivideValueEffect(ValueEffect value, float amount) implements ValueEffectModifierEffect {
     private static final MapCodec<DivideValueEffect> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
-            ValueEffect.CODEC.fieldOf("value").forGetter(DivideValueEffect::value),
-            Codec.FLOAT.fieldOf("amount").forGetter(DivideValueEffect::amount)
-    ).apply(inst, DivideValueEffect::new));
+                    ValueEffect.CODEC.fieldOf("value").forGetter(DivideValueEffect::value),
+                    Codec.FLOAT.fieldOf("amount").forGetter(DivideValueEffect::amount))
+            .apply(inst, DivideValueEffect::new));
 
     private static final StreamCodec<RegistryFriendlyByteBuf, DivideValueEffect> STREAM_CODEC = StreamCodec.composite(
             ValueEffect.STREAM_CODEC,
             DivideValueEffect::value,
             ByteBufCodecs.FLOAT,
             DivideValueEffect::amount,
-            DivideValueEffect::new
-    );
-    
-    public static final ResearchEffectSerializer<DivideValueEffect> SERIALIZER = ResearchEffectSerializer.simple(CODEC, STREAM_CODEC);
+            DivideValueEffect::new);
+
+    public static final ResearchEffectSerializer<DivideValueEffect> SERIALIZER =
+            ResearchEffectSerializer.simple(CODEC, STREAM_CODEC);
     public static final ResourceLocation ID = Researchd.rl("divide_value");
 
     @Override
@@ -77,5 +77,3 @@ public record DivideValueEffect(ValueEffect value, float amount) implements Valu
         return SERIALIZER;
     }
 }
-
-

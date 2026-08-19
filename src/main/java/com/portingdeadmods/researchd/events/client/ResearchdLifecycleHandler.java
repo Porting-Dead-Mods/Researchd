@@ -23,25 +23,26 @@ public class ResearchdLifecycleHandler {
         LocalPlayer player = event.getPlayer();
 
         if (ResearchdConfig.Client.showJoinMessage) {
-            player.sendSystemMessage(
-                    ResearchdTranslations.Game.JOIN_MESSAGE.component(Researchd.MODID)
-                            .append(Component.literal("\n> ").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.BOLD))
-                            .append(
-                                    ResearchdTranslations.Game.GITHUB.component(Researchd.MODID)
-                                            .withStyle(Style.EMPTY
-                                                    .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/Porting-Dead-Mods/Researchd"))
-                                                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Go to the GitHub page")))
-                                            )
-                            )
-                            .append(Component.literal("\n> ").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.BOLD))
-                            .append(
-                                    ResearchdTranslations.Game.WIKI.component(Researchd.MODID)
-                                            .withStyle(Style.EMPTY
-                                                    .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://porting-dead-mods.github.io/Researchd/"))
-                                                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Go to the Wiki")))
-                                            )
-                            )
-            );
+            player.sendSystemMessage(ResearchdTranslations.Game.JOIN_MESSAGE
+                    .component(Researchd.MODID)
+                    .append(Component.literal("\n> ").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.BOLD))
+                    .append(ResearchdTranslations.Game.GITHUB
+                            .component(Researchd.MODID)
+                            .withStyle(Style.EMPTY
+                                    .withClickEvent(new ClickEvent(
+                                            ClickEvent.Action.OPEN_URL,
+                                            "https://github.com/Porting-Dead-Mods/Researchd"))
+                                    .withHoverEvent(new HoverEvent(
+                                            HoverEvent.Action.SHOW_TEXT, Component.literal("Go to the GitHub page")))))
+                    .append(Component.literal("\n> ").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.BOLD))
+                    .append(ResearchdTranslations.Game.WIKI
+                            .component(Researchd.MODID)
+                            .withStyle(Style.EMPTY
+                                    .withClickEvent(new ClickEvent(
+                                            ClickEvent.Action.OPEN_URL,
+                                            "https://porting-dead-mods.github.io/Researchd/"))
+                                    .withHoverEvent(new HoverEvent(
+                                            HoverEvent.Action.SHOW_TEXT, Component.literal("Go to the Wiki"))))));
         }
     }
 

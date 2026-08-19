@@ -2,11 +2,10 @@ package com.portingdeadmods.researchd.api.client.editor;
 
 import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.api.client.RememberingLinearLayout;
+import javax.annotation.Nullable;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Unit;
-
-import javax.annotation.Nullable;
 
 public interface EditorObject<O> {
     void buildLayout(RememberingLinearLayout layout, @Nullable O previous, EditorContext context);

@@ -3,18 +3,17 @@ package com.portingdeadmods.researchd.compat;
 import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.compat.kubejs.ResearchdKJSEvents;
+import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import dev.latvian.mods.kubejs.KubeJSPaths;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.fml.ModList;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.fml.ModList;
 
 /*
  * Directly called in mod code, do not import KubeJS classes
@@ -32,7 +31,8 @@ public final class KubeJSCompat {
         return kubeJSLoaded;
     }
 
-    public static final String EXAMPLE_CODE = """
+    public static final String EXAMPLE_CODE =
+            """
             ResearchdEvents.registerResearchPacks(event => {
                 event.create('kubejs:example_pack')
                     .colorRGB(255, 51, 51)
@@ -47,7 +47,7 @@ public final class KubeJSCompat {
                     .literalName('Getting Started')
                     .literalDescription('A simple starting researchPack.')
                     .noParentRequired();
-                
+
                 event.create('kubejs:automation_research')
                     .icon('minecraft:iron_ingot')
                     .parent('kubejs:start_research')
@@ -95,7 +95,10 @@ public final class KubeJSCompat {
         }
     }
 
-    public static void fireResearchProgressEvent(ServerPlayer player, ResourceKey<com.portingdeadmods.researchd.api.research.Research> research, double progress) {
+    public static void fireResearchProgressEvent(
+            ServerPlayer player,
+            ResourceKey<com.portingdeadmods.researchd.api.research.Research> research,
+            double progress) {
         if (isKubeJSLoaded()) {
             try {
                 ResearchdKJSEvents.fireResearchProgress(player, research, progress);
@@ -129,9 +132,5 @@ public final class KubeJSCompat {
         }
     }
 
-    private static class KubeJSEventHandler {
-    }
-
-
-
+    private static class KubeJSEventHandler {}
 }

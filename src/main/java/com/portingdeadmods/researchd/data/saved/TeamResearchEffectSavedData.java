@@ -13,7 +13,8 @@ import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.NotNull;
 
 public class TeamResearchEffectSavedData extends SavedData {
-    private static final Factory<TeamResearchEffectSavedData> FACTORY = new Factory<>(TeamResearchEffectSavedData::new, TeamResearchEffectSavedData::load);
+    private static final Factory<TeamResearchEffectSavedData> FACTORY =
+            new Factory<>(TeamResearchEffectSavedData::new, TeamResearchEffectSavedData::load);
     private final TeamResearchEffectDataMap map;
 
     public TeamResearchEffectSavedData() {
@@ -32,9 +33,11 @@ public class TeamResearchEffectSavedData extends SavedData {
 
     private static TeamResearchEffectSavedData load(CompoundTag compoundTag, HolderLookup.Provider provider) {
         if (compoundTag.contains("map")) {
-            DataResult<Pair<TeamResearchEffectDataMap, Tag>> result = TeamResearchEffectDataMap.CODEC.decode(NbtOps.INSTANCE, compoundTag.get("map"));
+            DataResult<Pair<TeamResearchEffectDataMap, Tag>> result =
+                    TeamResearchEffectDataMap.CODEC.decode(NbtOps.INSTANCE, compoundTag.get("map"));
             return switch (result) {
-                case DataResult.Success<Pair<TeamResearchEffectDataMap, Tag>> v -> new TeamResearchEffectSavedData(v.value().getFirst());
+                case DataResult.Success<Pair<TeamResearchEffectDataMap, Tag>> v ->
+                    new TeamResearchEffectSavedData(v.value().getFirst());
                 case DataResult.Error<Pair<TeamResearchEffectDataMap, Tag>> v -> {
                     Researchd.LOGGER.error(v.messageSupplier().get());
                     yield new TeamResearchEffectSavedData();
@@ -49,9 +52,9 @@ public class TeamResearchEffectSavedData extends SavedData {
         DataResult<Tag> result = TeamResearchEffectDataMap.CODEC.encodeStart(NbtOps.INSTANCE, this.map);
         switch (result) {
             case DataResult.Success<Tag> v -> compoundTag.put("map", v.value());
-            case DataResult.Error<Tag> v -> Researchd.LOGGER.error(v.messageSupplier().get());
+            case DataResult.Error<Tag> v ->
+                Researchd.LOGGER.error(v.messageSupplier().get());
         }
         return compoundTag;
     }
-
 }

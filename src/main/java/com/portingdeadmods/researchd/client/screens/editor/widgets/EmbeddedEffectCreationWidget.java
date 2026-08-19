@@ -22,7 +22,8 @@ public class EmbeddedEffectCreationWidget extends AbstractWidget {
     private ResearchEffect createdEffect;
     private AbstractResearchInfoWidget<? extends ResearchEffect> createdEffectInfoWidget;
 
-    public EmbeddedEffectCreationWidget(@Nullable PopupWidget parentPopupWidget, int x, int y, int width, int height, Component message) {
+    public EmbeddedEffectCreationWidget(
+            @Nullable PopupWidget parentPopupWidget, int x, int y, int width, int height, Component message) {
         super(x, y, width, height, message);
         this.createdEffect = EmptyResearchEffect.INSTANCE;
         this.parentPopupWidget = parentPopupWidget;
@@ -30,15 +31,29 @@ public class EmbeddedEffectCreationWidget extends AbstractWidget {
 
     public void setCreatedEffect(ResearchEffect effect) {
         this.createdEffect = effect;
-        this.createdEffectInfoWidget = ResearchdClient.RESEARCH_EFFECT_WIDGETS.get(effect.id()).createEffect(this.getX(), this.getY(), this.createdEffect);
-        this.createdEffectInfoWidget.setPosition(this.getX() + (this.width - this.createdEffectInfoWidget.getWidth()) / 2, this.getY() + (this.height - this.createdEffectInfoWidget.getHeight()) / 2);
+        this.createdEffectInfoWidget = ResearchdClient.RESEARCH_EFFECT_WIDGETS
+                .get(effect.id())
+                .createEffect(this.getX(), this.getY(), this.createdEffect);
+        this.createdEffectInfoWidget.setPosition(
+                this.getX() + (this.width - this.createdEffectInfoWidget.getWidth()) / 2,
+                this.getY() + (this.height - this.createdEffectInfoWidget.getHeight()) / 2);
     }
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        guiGraphics.blitSprite(EditorSharedSprites.EDITOR_BACKGROUND_INVERTED_SPRITE, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        guiGraphics.blitSprite(
+                EditorSharedSprites.EDITOR_BACKGROUND_INVERTED_SPRITE,
+                this.getX(),
+                this.getY(),
+                this.getWidth(),
+                this.getHeight());
         if (this.createdEffect == null || this.createdEffect == EmptyResearchEffect.INSTANCE) {
-            guiGraphics.drawCenteredString(GuiUtils.getFont(), "Create Effect", this.getX() + this.getWidth() / 2, this.getY() + (this.getHeight() - GuiUtils.getFont().lineHeight) / 2, -1);
+            guiGraphics.drawCenteredString(
+                    GuiUtils.getFont(),
+                    "Create Effect",
+                    this.getX() + this.getWidth() / 2,
+                    this.getY() + (this.getHeight() - GuiUtils.getFont().lineHeight) / 2,
+                    -1);
         } else {
             this.createdEffectInfoWidget.render(guiGraphics, mouseX, mouseY, partialTick);
             this.createdEffectInfoWidget.renderTooltip(guiGraphics, mouseX, mouseY, partialTick);
@@ -51,7 +66,8 @@ public class EmbeddedEffectCreationWidget extends AbstractWidget {
             if (this.parentPopupWidget != null) {
                 SpaghettiClient.tryGetResearchScreen().closePopup(this.parentPopupWidget);
             }
-            this.effectTypePopupWidget = SpaghettiClient.tryGetResearchScreen().openPopupCentered(new ResearchEffectTypeSelectionPopupWidget(this.parentPopupWidget, this));
+            this.effectTypePopupWidget = SpaghettiClient.tryGetResearchScreen()
+                    .openPopupCentered(new ResearchEffectTypeSelectionPopupWidget(this.parentPopupWidget, this));
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
@@ -75,11 +91,9 @@ public class EmbeddedEffectCreationWidget extends AbstractWidget {
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-    }
+    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 
     public ResearchEffect getEffect() {
         return this.createdEffect;
     }
-
 }

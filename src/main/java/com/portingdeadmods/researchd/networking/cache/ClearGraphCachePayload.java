@@ -12,7 +12,8 @@ import org.jetbrains.annotations.NotNull;
 public record ClearGraphCachePayload() implements CustomPacketPayload {
     public static final Type<ClearGraphCachePayload> TYPE = new Type<>(Researchd.rl("clear_graph_cache"));
     public static final ClearGraphCachePayload INSTANCE = new ClearGraphCachePayload();
-    public static final StreamCodec<RegistryFriendlyByteBuf, ClearGraphCachePayload> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+    public static final StreamCodec<RegistryFriendlyByteBuf, ClearGraphCachePayload> STREAM_CODEC =
+            StreamCodec.unit(INSTANCE);
 
     @Override
     public @NotNull Type<? extends CustomPacketPayload> type() {
@@ -21,11 +22,12 @@ public record ClearGraphCachePayload() implements CustomPacketPayload {
 
     public static void handle(ClearGraphCachePayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
-            ResearchGraphCache.clearCache();
-        }).exceptionally(e -> {
-            Researchd.LOGGER.error("Failed to handle ClearGraphCachePayload", e);
-            context.disconnect(Component.literal("Failed to clear graph cache: " + e.getMessage()));
-            return null;
-        });
+                    ResearchGraphCache.clearCache();
+                })
+                .exceptionally(e -> {
+                    Researchd.LOGGER.error("Failed to handle ClearGraphCachePayload", e);
+                    context.disconnect(Component.literal("Failed to clear graph cache: " + e.getMessage()));
+                    return null;
+                });
     }
 }

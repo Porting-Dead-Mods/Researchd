@@ -17,10 +17,10 @@ public interface ValueEffectModifierEffect extends ResearchEffect {
     Component desc();
 
     default Component makeDescription(String type) {
-        String valueEffect = Utils.registryTranslation(ResearchdRegistries.VALUE_EFFECT, this.value()).getString();
+        String valueEffect = Utils.registryTranslation(ResearchdRegistries.VALUE_EFFECT, this.value())
+                .getString();
         return Component.literal(type + " value ")
                 .append(Component.literal("'" + valueEffect + "'").withStyle(ChatFormatting.GOLD))
                 .append(Component.literal(" by %.1f".formatted(this.amount())));
     }
-
 }

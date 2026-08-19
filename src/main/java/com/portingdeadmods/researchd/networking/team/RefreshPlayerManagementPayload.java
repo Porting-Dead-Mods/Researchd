@@ -10,9 +10,11 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
 public record RefreshPlayerManagementPayload() implements CustomPacketPayload {
-    public static final Type<RefreshPlayerManagementPayload> TYPE = new Type<>(Researchd.rl("refresh_player_management_payload"));
+    public static final Type<RefreshPlayerManagementPayload> TYPE =
+            new Type<>(Researchd.rl("refresh_player_management_payload"));
     public static final RefreshPlayerManagementPayload INSTANCE = new RefreshPlayerManagementPayload();
-    public static final StreamCodec<RegistryFriendlyByteBuf, RefreshPlayerManagementPayload> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+    public static final StreamCodec<RegistryFriendlyByteBuf, RefreshPlayerManagementPayload> STREAM_CODEC =
+            StreamCodec.unit(INSTANCE);
 
     @Override
     public @NotNull Type<? extends CustomPacketPayload> type() {
@@ -21,11 +23,12 @@ public record RefreshPlayerManagementPayload() implements CustomPacketPayload {
 
     public static void handle(RefreshPlayerManagementPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
-            ResearchTeamHelperClient.refreshResearchTeamScreenData();
-        }).exceptionally(e -> {
-            Researchd.LOGGER.error("Failed to handle RefreshPlayerManagementPayload", e);
-            context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
-            return null;
-        });
+                    ResearchTeamHelperClient.refreshResearchTeamScreenData();
+                })
+                .exceptionally(e -> {
+                    Researchd.LOGGER.error("Failed to handle RefreshPlayerManagementPayload", e);
+                    context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
+                    return null;
+                });
     }
 }

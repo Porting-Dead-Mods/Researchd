@@ -12,15 +12,14 @@ import com.portingdeadmods.researchd.resources.PackWriter;
 import com.portingdeadmods.researchd.resources.contents.ResearchdResearchPacks;
 import com.portingdeadmods.researchd.resources.contents.ResearchdResearches;
 import com.portingdeadmods.researchd.utils.registries.ReloadableRegistryManager;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.PackType;
-
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 
 /*
  * Helpers to create the example datapack that can be created using a command
@@ -80,27 +79,34 @@ public class ExampleDatapackWriter implements PackWriter {
         ResearchdResearches researches = new ResearchdResearches("rd_examples");
         researches.buildExampleDatapack();
 
-        for (Map.Entry<ResourceKey<Research>, Research> entry : researches.contents().entrySet()) {
+        for (Map.Entry<ResourceKey<Research>, Research> entry :
+                researches.contents().entrySet()) {
             Codec<Research> codec = Research.CODEC;
-            writeToFile(researchDir, codec.encodeStart(JsonOps.INSTANCE, entry.getValue()), entry.getKey().location());
+            writeToFile(
+                    researchDir,
+                    codec.encodeStart(JsonOps.INSTANCE, entry.getValue()),
+                    entry.getKey().location());
         }
-
     }
 
     private static void createResearchPacks(Path researchDir) {
         ResearchdResearchPacks packs = new ResearchdResearchPacks("rd_examples");
         packs.buildExampleDatapack();
 
-        for (Map.Entry<ResourceKey<ResearchPack>, ResearchPack> entry : packs.contents().entrySet()) {
+        for (Map.Entry<ResourceKey<ResearchPack>, ResearchPack> entry :
+                packs.contents().entrySet()) {
             Codec<ResearchPack> codec = ResearchPack.CODEC;
-            writeToFile(researchDir, codec.encodeStart(JsonOps.INSTANCE, entry.getValue()), entry.getKey().location());
+            writeToFile(
+                    researchDir,
+                    codec.encodeStart(JsonOps.INSTANCE, entry.getValue()),
+                    entry.getKey().location());
         }
-
     }
 
     private static void writeToFile(Path researchDir, DataResult<JsonElement> result, ResourceLocation location) {
         result.ifSuccess(json -> {
-            try (FileWriter writer = new FileWriter(researchDir.resolve(location.getPath() + ".json").toFile())) {
+            try (FileWriter writer = new FileWriter(
+                    researchDir.resolve(location.getPath() + ".json").toFile())) {
                 ReloadableRegistryManager.GSON.toJson(json, writer);
             } catch (IOException e) {
                 Researchd.LOGGER.error("Failed to write json to file", e);

@@ -3,14 +3,13 @@ package com.portingdeadmods.researchd.api.client;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.*;
-import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
 import com.portingdeadmods.researchd.api.research.ResearchRelations;
-import net.minecraft.resources.ResourceKey;
-import org.jetbrains.annotations.Nullable;
-
+import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import net.minecraft.resources.ResourceKey;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Data of the researchPack graph
@@ -23,12 +22,17 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
 
     // TODO: Add researches to the team's research progress
     private ResearchGraph(ResourceKey<Research> researchRoot, Map<ResourceKey<Research>, ResearchInstance> researches) {
-        this(new ResearchNode(researches.get(researchRoot)), new LinkedHashMap<>(), ResearchdApi.getResearchManager().getPageByResearch(researchRoot));
+        this(
+                new ResearchNode(researches.get(researchRoot)),
+                new LinkedHashMap<>(),
+                ResearchdApi.getResearchManager().getPageByResearch(researchRoot));
 
         // A page root shows its whole page, anything else only shows its immediate surroundings
-        createNodes(rootNode.getInstance(), 0, ResearchdApi.getResearchManager().isPageRoot(researchRoot)
-                ? -1
-                : RESEARCH_GRAPH_LAYERS, researches);
+        createNodes(
+                rootNode.getInstance(),
+                0,
+                ResearchdApi.getResearchManager().isPageRoot(researchRoot) ? -1 : RESEARCH_GRAPH_LAYERS,
+                researches);
         this.rootNode.setRootNode(true);
         this.nodes.put(this.rootNode.getInstance().getResearch(), this.rootNode);
         collectRelatedNodes();
@@ -65,12 +69,20 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
         }
     }
 
-    private void createNodes(ResearchInstance instance, int nesting, int layers, Map<ResourceKey<Research>, ResearchInstance> researches) {
+    private void createNodes(
+            ResearchInstance instance,
+            int nesting,
+            int layers,
+            Map<ResourceKey<Research>, ResearchInstance> researches) {
         createNodesDownward(instance, nesting, layers, researches);
         createNodesUpward(instance, nesting, layers, researches);
     }
 
-    private void createNodesUpward(ResearchInstance instance, int nesting, int layers, Map<ResourceKey<Research>, ResearchInstance> researches) {
+    private void createNodesUpward(
+            ResearchInstance instance,
+            int nesting,
+            int layers,
+            Map<ResourceKey<Research>, ResearchInstance> researches) {
         if (nesting > 0) {
             this.nodes.put(instance.getResearch(), new ResearchNode(instance));
         }
@@ -87,7 +99,11 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
         }
     }
 
-    private void createNodesDownward(ResearchInstance instance, int nesting, int layers, Map<ResourceKey<Research>, ResearchInstance> researches) {
+    private void createNodesDownward(
+            ResearchInstance instance,
+            int nesting,
+            int layers,
+            Map<ResourceKey<Research>, ResearchInstance> researches) {
         if (nesting > 0) {
             this.nodes.put(instance.getResearch(), new ResearchNode(instance));
         }
@@ -104,9 +120,13 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
         }
     }
 
-    public static @Nullable ResearchGraph fromRootResearch(ResourceKey<Research> root, Map<ResourceKey<Research>, ResearchInstance> researches) {
+    public static @Nullable ResearchGraph fromRootResearch(
+            ResourceKey<Research> root, Map<ResourceKey<Research>, ResearchInstance> researches) {
         if (researches.get(root) == null || ResearchdApi.getResearchManager().getRelationsForResearch(root) == null) {
-            Researchd.error("Research Graph", "Cannot build a graph rooted at %s, it is not part of the loaded researches", root.location());
+            Researchd.error(
+                    "Research Graph",
+                    "Cannot build a graph rooted at %s, it is not part of the loaded researches",
+                    root.location());
             return null;
         }
 
@@ -119,7 +139,10 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
      * @param researches Lookup
      * @return A new ResearchGraph for the page
      */
-    public static @Nullable ResearchGraph fromResearchPage(ResearchPage page, ResourceKey<Research> rootNode, Map<ResourceKey<Research>, ResearchInstance> researches) {
+    public static @Nullable ResearchGraph fromResearchPage(
+            ResearchPage page,
+            ResourceKey<Research> rootNode,
+            Map<ResourceKey<Research>, ResearchInstance> researches) {
         // TODO: FINISH
         return fromRootResearch(rootNode, researches);
     }

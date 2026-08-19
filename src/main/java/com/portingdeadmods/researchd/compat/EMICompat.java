@@ -3,12 +3,9 @@ package com.portingdeadmods.researchd.compat;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiStack;
-import net.minecraft.client.Minecraft;
-import net.minecraft.core.RegistryAccess;
+import java.util.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
-
-import java.util.*;
 
 public final class EMICompat {
     public static void openRecipe(RecipeHolder<?> recipe) {

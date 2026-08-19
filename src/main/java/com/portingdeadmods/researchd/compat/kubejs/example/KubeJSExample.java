@@ -3,13 +3,13 @@ package com.portingdeadmods.researchd.compat.kubejs.example;
 import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.Researchd;
 import dev.latvian.mods.kubejs.KubeJSPaths;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class KubeJSExample {
-    public static final String CODE = """
+    public static final String CODE =
+            """
             ResearchdEvents.registerResearchPacks(event => {
                 event.create('rd_examples_js:test_pack')
                     .translatableName("research_pack.rd_example_js.test_pack")
@@ -17,7 +17,7 @@ public class KubeJSExample {
                     .color(120, 150, 90)
                     .sortingValue(0);
             });
-            
+
             ResearchdEvents.registerResearches(event => {
                 event.create('rd_example_js:wood')
                     .icon('minecraft:oak_log')
@@ -27,7 +27,7 @@ public class KubeJSExample {
                         ResearchMethodHelper.consumeItem('minecraft:dirt', 8)
                     ))
                     .effect(ResearchEffectHelper.unlockRecipe('minecraft:oak_planks'));
-            
+
                 event.create('rd_example_js:iron')
                     .icon('minecraft:iron_ingot')
                     .translatableDescription("research.rd_example_js.iron_desc")
@@ -37,7 +37,7 @@ public class KubeJSExample {
                         ResearchMethodHelper.consumeItem('minecraft:cobblestone', 8)
                     ))
                     .effect(ResearchEffectHelper.unlockRecipe('minecraft:iron_pickaxe'));
-            
+
                 event.create('rd_example_js:nether_dim')
                     .icon('minecraft:netherrack')
                     .parents('rd_example_js:iron')
@@ -47,7 +47,7 @@ public class KubeJSExample {
                         ResearchEffectHelper.unlockRecipe('minecraft:netherite_ingot')
                     ));
             });
-            
+
             """;
 
     /**
@@ -72,5 +72,4 @@ public class KubeJSExample {
             return Result.err(new Exception("File creation failed"));
         }
     }
-
 }

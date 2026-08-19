@@ -17,7 +17,6 @@ public class PDLImageButton extends ImageButton {
         if (this.isHovered() && !this.getMessage().getString().isEmpty()) {
             guiGraphics.renderTooltip(Minecraft.getInstance().font, this.getMessage(), mouseX, mouseY);
         }
-
     }
 
     public static PDLButton.Builder<PDLImageButton> builder(PDLButton.OnPress<PDLImageButton> onPress) {

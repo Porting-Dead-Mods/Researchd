@@ -21,19 +21,19 @@ import net.minecraft.world.level.Level;
 
 public record DecreaseValueEffect(ValueEffect value, float amount) implements ValueEffectModifierEffect {
     private static final MapCodec<DecreaseValueEffect> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
-            ValueEffect.CODEC.fieldOf("value").forGetter(DecreaseValueEffect::value),
-            Codec.FLOAT.fieldOf("amount").forGetter(DecreaseValueEffect::amount)
-    ).apply(inst, DecreaseValueEffect::new));
+                    ValueEffect.CODEC.fieldOf("value").forGetter(DecreaseValueEffect::value),
+                    Codec.FLOAT.fieldOf("amount").forGetter(DecreaseValueEffect::amount))
+            .apply(inst, DecreaseValueEffect::new));
 
     private static final StreamCodec<RegistryFriendlyByteBuf, DecreaseValueEffect> STREAM_CODEC = StreamCodec.composite(
             ValueEffect.STREAM_CODEC,
             DecreaseValueEffect::value,
             ByteBufCodecs.FLOAT,
             DecreaseValueEffect::amount,
-            DecreaseValueEffect::new
-    );
+            DecreaseValueEffect::new);
 
-    public static final ResearchEffectSerializer<DecreaseValueEffect> SERIALIZER = ResearchEffectSerializer.simple(CODEC, STREAM_CODEC);
+    public static final ResearchEffectSerializer<DecreaseValueEffect> SERIALIZER =
+            ResearchEffectSerializer.simple(CODEC, STREAM_CODEC);
     public static final ResourceLocation ID = Researchd.rl("decrease_value");
 
     @Override
@@ -77,4 +77,3 @@ public record DecreaseValueEffect(ValueEffect value, float amount) implements Va
         return SERIALIZER;
     }
 }
-

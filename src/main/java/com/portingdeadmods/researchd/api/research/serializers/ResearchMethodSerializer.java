@@ -16,7 +16,8 @@ public interface ResearchMethodSerializer<T extends ResearchMethod> {
 
     @NotNull StreamCodec<RegistryFriendlyByteBuf, T> streamCodec();
 
-    static <T extends ResearchMethod> ResearchMethodSerializer<T> simple(MapCodec<T> codec, StreamCodec<RegistryFriendlyByteBuf, T> streamCodec) {
+    static <T extends ResearchMethod> ResearchMethodSerializer<T> simple(
+            MapCodec<T> codec, StreamCodec<RegistryFriendlyByteBuf, T> streamCodec) {
         return new ResearchMethodSerializer<>() {
             @Override
             public @NotNull MapCodec<T> codec() {

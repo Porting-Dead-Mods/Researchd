@@ -20,23 +20,24 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ResearchLabPart extends SimpleGhostMultiblockPart {
-	public ResearchLabPart(Properties properties) {
-		super(properties);
-	}
-
-	@Override
-	public @NotNull MapCodec<? extends BaseEntityBlock> codec() {
-		return simpleCodec(ResearchLabPart::new);
-	}
-
-	@Override
-	public @Nullable BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
-		return new ResearchLabPartBE(blockPos, blockState);
-	}
+    public ResearchLabPart(Properties properties) {
+        super(properties);
+    }
 
     @Override
-    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
-		if (level.isClientSide) return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+    public @NotNull MapCodec<? extends BaseEntityBlock> codec() {
+        return simpleCodec(ResearchLabPart::new);
+    }
+
+    @Override
+    public @Nullable BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
+        return new ResearchLabPartBE(blockPos, blockState);
+    }
+
+    @Override
+    public boolean onDestroyedByPlayer(
+            BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
+        if (level.isClientSide) return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
 
         if (level.getBlockEntity(pos) instanceof SimpleGhostMultiblockPartBE partBE) {
             BlockPos controllerPos = partBE.getControllerPos();
@@ -48,8 +49,8 @@ public class ResearchLabPart extends SimpleGhostMultiblockPart {
     }
 
     @Override
-    public @NotNull ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
+    public @NotNull ItemStack getCloneItemStack(
+            BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
         return ResearchdItems.RESEARCH_LAB.toStack();
     }
-
 }

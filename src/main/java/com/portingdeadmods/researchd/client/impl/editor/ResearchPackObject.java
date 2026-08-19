@@ -9,9 +9,10 @@ import com.portingdeadmods.researchd.client.screens.editor.widgets.ResearchPackP
 import com.portingdeadmods.researchd.client.screens.lib.widgets.BackgroundEditBox;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.impl.utils.DisplayImpl;
-import com.portingdeadmods.researchd.utils.researches.ResearchEditorHelperClient;
 import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.TextUtils;
+import com.portingdeadmods.researchd.utils.researches.ResearchEditorHelperClient;
+import java.util.Optional;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.layouts.LayoutSettings;
 import net.minecraft.client.gui.layouts.LinearLayout;
@@ -21,24 +22,27 @@ import net.minecraft.util.Unit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
-
 public class ResearchPackObject implements StandaloneEditorObject<ResearchPackImpl> {
     public static final ResearchPackObject INSTANCE = new ResearchPackObject();
 
     @Override
-    public void buildLayout(RememberingLinearLayout layout, @Nullable ResearchPackImpl previous, EditorContext context) {
+    public void buildLayout(
+            RememberingLinearLayout layout, @Nullable ResearchPackImpl previous, EditorContext context) {
         layout.getLayout().spacing(2);
         layout.addWidget(null, new StringWidget(Component.literal("Display:"), GuiUtils.getFont()));
-        BackgroundEditBox nameEditBox = layout.addWidget("name_edit_box", new BackgroundEditBox(GuiUtils.getFont(), context.innerWidth() - 4, 16));
+        BackgroundEditBox nameEditBox = layout.addWidget(
+                "name_edit_box", new BackgroundEditBox(GuiUtils.getFont(), context.innerWidth() - 4, 16));
         if (previous != null) {
-            nameEditBox.setValue(previous.display().name().orElse(Component.empty()).getString());
+            nameEditBox.setValue(
+                    previous.display().name().orElse(Component.empty()).getString());
         }
         nameEditBox.setHint(Component.literal("<Name>"));
         nameEditBox.setResponder(newVal -> this.update(layout, context));
-        BackgroundEditBox descEditBox = layout.addWidget("desc_edit_box", new BackgroundEditBox(GuiUtils.getFont(), context.innerWidth() - 4, 16));
+        BackgroundEditBox descEditBox = layout.addWidget(
+                "desc_edit_box", new BackgroundEditBox(GuiUtils.getFont(), context.innerWidth() - 4, 16));
         if (previous != null) {
-            descEditBox.setValue(previous.display().desc().orElse(Component.empty()).getString());
+            descEditBox.setValue(
+                    previous.display().desc().orElse(Component.empty()).getString());
         }
         descEditBox.setHint(Component.literal("<Desc>"));
 
@@ -88,60 +92,68 @@ public class ResearchPackObject implements StandaloneEditorObject<ResearchPackIm
             layout.getWidgets().put("a_edit_box", aEditBox);
         }
 
-        layout.addWidget(null, new ResearchPackPreviewWidget(() -> getRgbaColor(layout), 16, 16), LayoutSettings::alignHorizontallyCenter);
+        layout.addWidget(
+                null,
+                new ResearchPackPreviewWidget(() -> getRgbaColor(layout), 16, 16),
+                LayoutSettings::alignHorizontallyCenter);
 
         layout.addWidget(null, GuiUtils.stringWidget("Sorting Value:"));
-        BackgroundEditBox valueEditBox = layout.addWidget("sorting_value_edit_box", new BackgroundEditBox(GuiUtils.getFont(), context.innerWidth() - 8, 16));
+        BackgroundEditBox valueEditBox = layout.addWidget(
+                "sorting_value_edit_box", new BackgroundEditBox(GuiUtils.getFont(), context.innerWidth() - 8, 16));
         valueEditBox.setFilter(TextUtils::isValidInt);
         valueEditBox.setResponder(newVal -> this.update(layout, context));
         valueEditBox.setValue("1");
 
         layout.addWidget(null, GuiUtils.stringWidget("Custom Texture:"));
-        BackgroundEditBox textureEditBox = layout.addWidget("custom_texture_edit_box", new BackgroundEditBox(GuiUtils.getFont(), context.innerWidth() - 8, 16));
+        BackgroundEditBox textureEditBox = layout.addWidget(
+                "custom_texture_edit_box", new BackgroundEditBox(GuiUtils.getFont(), context.innerWidth() - 8, 16));
         if (previous != null && previous.customTexture().isPresent()) {
             textureEditBox.setValue(previous.customTexture().get().toString());
         }
         textureEditBox.setFilter(TextUtils::isValidResourceLocation);
         textureEditBox.setResponder(newVal -> this.update(layout, context));
         textureEditBox.setHint(Component.literal("<Optional>"));
-
     }
 
     private @NotNull RGBAColor getRgbaColor(RememberingLinearLayout layout) {
-        int r = Integer.parseInt(layout.getChild("r_edit_box", BackgroundEditBox.class).getValue());
-        int g = Integer.parseInt(layout.getChild("g_edit_box", BackgroundEditBox.class).getValue());
-        int b = Integer.parseInt(layout.getChild("b_edit_box", BackgroundEditBox.class).getValue());
-        int a = Integer.parseInt(layout.getChild("a_edit_box", BackgroundEditBox.class).getValue());
+        int r = Integer.parseInt(
+                layout.getChild("r_edit_box", BackgroundEditBox.class).getValue());
+        int g = Integer.parseInt(
+                layout.getChild("g_edit_box", BackgroundEditBox.class).getValue());
+        int b = Integer.parseInt(
+                layout.getChild("b_edit_box", BackgroundEditBox.class).getValue());
+        int a = Integer.parseInt(
+                layout.getChild("a_edit_box", BackgroundEditBox.class).getValue());
         return new RGBAColor(r, g, b, a);
     }
 
     @Override
     public ResearchPackImpl create(RememberingLinearLayout layout) {
         RGBAColor color = getRgbaColor(layout);
-        int sortingValue = Integer.parseInt(layout.getChild("sorting_value_edit_box", BackgroundEditBox.class).getValue());
-        String customTextureLoc = layout.getChild("custom_texture_edit_box", BackgroundEditBox.class).getValue();
-        Optional<ResourceLocation> customTexture = customTextureLoc.isBlank() ? Optional.empty() : Optional.of(ResourceLocation.parse(customTextureLoc));
+        int sortingValue = Integer.parseInt(layout.getChild("sorting_value_edit_box", BackgroundEditBox.class)
+                .getValue());
+        String customTextureLoc = layout.getChild("custom_texture_edit_box", BackgroundEditBox.class)
+                .getValue();
+        Optional<ResourceLocation> customTexture =
+                customTextureLoc.isBlank() ? Optional.empty() : Optional.of(ResourceLocation.parse(customTextureLoc));
         DisplayImpl display = ResearchEditorHelperClient.createDisplay(
                 layout.getChild("name_edit_box", BackgroundEditBox.class),
-                layout.getChild("desc_edit_box", BackgroundEditBox.class)
-        );
-        return new ResearchPackImpl(
-                color,
-                sortingValue,
-                customTexture,
-                display
-        );
+                layout.getChild("desc_edit_box", BackgroundEditBox.class));
+        return new ResearchPackImpl(color, sortingValue, customTexture, display);
     }
 
     @Override
     public ResourceLocation createId(RememberingLinearLayout layout, String namespace) {
-        String nameEditBox = TextUtils.camelToSnake(layout.getChild("name_edit_box", BackgroundEditBox.class).getValue());
+        String nameEditBox = TextUtils.camelToSnake(
+                layout.getChild("name_edit_box", BackgroundEditBox.class).getValue());
         return ResourceLocation.fromNamespaceAndPath(namespace, nameEditBox);
     }
 
     @Override
     public Result<Unit, Exception> valid(RememberingLinearLayout layout) {
-        boolean nameEditBoxNotEmpty = !layout.getChild("name_edit_box", BackgroundEditBox.class).getValue().isEmpty();
+        boolean nameEditBoxNotEmpty = !layout.getChild("name_edit_box", BackgroundEditBox.class)
+                .getValue()
+                .isEmpty();
         if (!nameEditBoxNotEmpty) {
             return Result.err("Research Pack needs a name");
         }

@@ -1,15 +1,14 @@
 package com.portingdeadmods.researchd.client.screens.lib.layout;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.layouts.FrameLayout;
 import net.minecraft.client.gui.layouts.Layout;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
 
 public class WidgetHeaderAndFooterLayout implements Layout {
     private final LinearLayout wrapped;
@@ -70,10 +69,30 @@ public class WidgetHeaderAndFooterLayout implements Layout {
     public void arrangeElements() {
         Layout.super.arrangeElements();
 
-        FrameLayout.alignInRectangle(this.header, this.header.getX(), this.header.getY(), this.header.getWidth(), this.headerHeight, 0.5f, 0.25f);
-        FrameLayout.alignInRectangle(this.contents, this.contents.getX(), this.header.getY() + this.headerHeight, this.contents.getWidth(), this.contentsHeight, 0.5f, 0.25f);
-        FrameLayout.alignInRectangle(this.footer, this.footer.getX(), this.header.getY() + this.headerHeight + this.contentsHeight, this.footer.getWidth(), this.footerHeight, 0.5f, 0.25f);
-
+        FrameLayout.alignInRectangle(
+                this.header,
+                this.header.getX(),
+                this.header.getY(),
+                this.header.getWidth(),
+                this.headerHeight,
+                0.5f,
+                0.25f);
+        FrameLayout.alignInRectangle(
+                this.contents,
+                this.contents.getX(),
+                this.header.getY() + this.headerHeight,
+                this.contents.getWidth(),
+                this.contentsHeight,
+                0.5f,
+                0.25f);
+        FrameLayout.alignInRectangle(
+                this.footer,
+                this.footer.getX(),
+                this.header.getY() + this.headerHeight + this.contentsHeight,
+                this.footer.getWidth(),
+                this.footerHeight,
+                0.5f,
+                0.25f);
     }
 
     public List<AbstractWidget> getChildren() {
@@ -109,5 +128,4 @@ public class WidgetHeaderAndFooterLayout implements Layout {
     public int getHeight() {
         return this.wrapped.getHeight();
     }
-
 }

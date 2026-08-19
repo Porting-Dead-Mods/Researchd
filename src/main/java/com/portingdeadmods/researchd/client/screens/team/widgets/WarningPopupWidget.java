@@ -3,8 +3,9 @@ package com.portingdeadmods.researchd.client.screens.team.widgets;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.client.screens.RdZIndex;
 import com.portingdeadmods.researchd.api.team.TeamMember;
+import com.portingdeadmods.researchd.client.screens.RdZIndex;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -13,8 +14,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-
-import java.util.List;
 
 public class WarningPopupWidget extends AbstractWidget {
     public static final ResourceLocation TEXTURE = Researchd.rl("textures/gui/popup_window.png");
@@ -48,7 +47,12 @@ public class WarningPopupWidget extends AbstractWidget {
             Font font = Minecraft.getInstance().font;
             guiGraphics.drawCenteredString(font, this.title, getX() + width / 2, getY() + 4, -1);
             for (int i = 0; i < this.bodyText.size(); i++) {
-                guiGraphics.drawCenteredString(font, this.bodyText.get(i), getX() + width / 2, getY() + 8 + ((i + 1) * font.lineHeight + 2), -1);
+                guiGraphics.drawCenteredString(
+                        font,
+                        this.bodyText.get(i),
+                        getX() + width / 2,
+                        getY() + 8 + ((i + 1) * font.lineHeight + 2),
+                        -1);
             }
 
             this.acceptButton.render(guiGraphics, mouseX, mouseY, partialTicks);
@@ -73,7 +77,6 @@ public class WarningPopupWidget extends AbstractWidget {
 
         this.acceptButton.setPosition(x + 24, y + height - 40);
         this.cancelButton.setPosition(x + width - 24 - this.cancelButton.getWidth(), y + height - 40);
-
     }
 
     public void setTitle(Component title) {
@@ -85,7 +88,5 @@ public class WarningPopupWidget extends AbstractWidget {
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-    }
-
+    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 }

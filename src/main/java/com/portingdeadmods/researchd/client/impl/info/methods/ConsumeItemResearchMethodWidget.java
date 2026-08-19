@@ -2,9 +2,11 @@ package com.portingdeadmods.researchd.client.impl.info.methods;
 
 import com.portingdeadmods.researchd.api.client.renderers.CycledItemRenderer;
 import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidget;
+import com.portingdeadmods.researchd.compat.RecipeViewerHelper;
 import com.portingdeadmods.researchd.impl.research.method.ConsumeItemResearchMethod;
 import com.portingdeadmods.researchd.utils.GuiUtils;
-import com.portingdeadmods.researchd.compat.RecipeViewerHelper;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -15,9 +17,6 @@ import net.minecraft.util.FastColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.util.Size2i;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ConsumeItemResearchMethodWidget extends AbstractResearchInfoWidget<ConsumeItemResearchMethod> {
     private final CycledItemRenderer itemRenderer;
@@ -44,14 +43,13 @@ public class ConsumeItemResearchMethodWidget extends AbstractResearchInfoWidget<
             if (!consume.isEmpty()) {
                 ItemStack stack = new ItemStack(consume.getItems()[0].getItem(), value.count());
                 List<Component> tooltip = new ArrayList<>(Screen.getTooltipFromItem(Minecraft.getInstance(), stack));
-                tooltip.addFirst(
-                        Component.literal("Consume ").withStyle(ChatFormatting.WHITE).append(
-                                Component.literal("%d".formatted(value.count())).withStyle(ChatFormatting.GOLD)).append(
-                                Component.literal(":").withStyle(ChatFormatting.WHITE))
-                );
+                tooltip.addFirst(Component.literal("Consume ")
+                        .withStyle(ChatFormatting.WHITE)
+                        .append(Component.literal("%d".formatted(value.count())).withStyle(ChatFormatting.GOLD))
+                        .append(Component.literal(":").withStyle(ChatFormatting.WHITE)));
                 GuiUtils.renderTooltip(tooltip);
             }
-            //guiGraphics.renderTooltip(font, tooltip, stack.getTooltipImage(), stack, mouseX, mouseY);
+            // guiGraphics.renderTooltip(font, tooltip, stack.getTooltipImage(), stack, mouseX, mouseY);
         }
     }
 
@@ -66,5 +64,4 @@ public class ConsumeItemResearchMethodWidget extends AbstractResearchInfoWidget<
     public Size2i getSize() {
         return new Size2i(16, 16);
     }
-
 }

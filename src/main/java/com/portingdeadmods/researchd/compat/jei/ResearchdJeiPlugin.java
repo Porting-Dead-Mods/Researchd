@@ -31,6 +31,7 @@ public final class ResearchdJeiPlugin implements IModPlugin {
 
     @Override
     public void registerItemSubtypes(@NotNull ISubtypeRegistration registration) {
-        registration.registerSubtypeInterpreter(ResearchdItems.RESEARCH_PACK.get(), new SciencePackSubtypeInterpreter());
+        registration.registerSubtypeInterpreter(
+                ResearchdItems.RESEARCH_PACK.get(), new SciencePackSubtypeInterpreter());
     }
 }

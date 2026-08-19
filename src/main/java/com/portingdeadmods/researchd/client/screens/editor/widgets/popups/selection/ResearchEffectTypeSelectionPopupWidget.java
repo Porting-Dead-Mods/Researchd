@@ -10,9 +10,9 @@ import com.portingdeadmods.researchd.api.research.effects.ResearchEffectType;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.EmbeddedEffectCreationWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.creation.ResearchEffectCreationPopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.ContainerWidget;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLImageButton;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
-import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLImageButton;
 import com.portingdeadmods.researchd.impl.research.effect.AndResearchEffect;
 import com.portingdeadmods.researchd.impl.research.effect.EmptyResearchEffect;
 import com.portingdeadmods.researchd.registries.ResearchEffectTypes;
@@ -20,6 +20,8 @@ import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.Search;
 import com.portingdeadmods.researchd.utils.SpaghettiClient;
 import it.unimi.dsi.fastutil.Pair;
+import java.util.*;
+import java.util.stream.Collectors;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
@@ -30,9 +32,6 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class ResearchEffectTypeSelectionPopupWidget extends PopupWidget {
     public static final ResourceLocation BACKGROUND_SPRITE = Researchd.rl("widget/research_selector_widget");
@@ -46,20 +45,26 @@ public class ResearchEffectTypeSelectionPopupWidget extends PopupWidget {
     private ResearchEffectType selectedResearchEffect;
     private boolean doneClicked;
 
-    public ResearchEffectTypeSelectionPopupWidget(@Nullable PopupWidget parentPopupWidget, EmbeddedEffectCreationWidget parentSelectionWidget) {
+    public ResearchEffectTypeSelectionPopupWidget(
+            @Nullable PopupWidget parentPopupWidget, EmbeddedEffectCreationWidget parentSelectionWidget) {
         super(0, 0, 148, 160, false, CommonComponents.EMPTY);
         this.parentPopupWidget = parentPopupWidget;
         this.originSelectionWidget = parentSelectionWidget;
         this.search = new Search();
-        this.searchBar = this.addRenderableWidget(new EditBox(Minecraft.getInstance().font, 90, 12, CommonComponents.EMPTY));
+        this.searchBar =
+                this.addRenderableWidget(new EditBox(Minecraft.getInstance().font, 90, 12, CommonComponents.EMPTY));
         this.searchBar.setBordered(false);
         this.searchBar.setEditable(true);
         this.searchBar.setResponder(this::onSearchBarValueChanged);
-        this.selectionContainerWidget = this.addRenderableWidget(new ResearchEffectTypeSelectionPopupWidget.SelectionContainerWidget(0, 0, 112, 130, true));
+        this.selectionContainerWidget = this.addRenderableWidget(
+                new ResearchEffectTypeSelectionPopupWidget.SelectionContainerWidget(0, 0, 112, 130, true));
         this.doneButton = this.addRenderableWidget(PDLImageButton.builder(this::onDoneClicked)
                 .size(14, 14)
                 .tooltip(Tooltip.create(Component.literal("Select Research")))
-                .sprites(new WidgetSprites(Researchd.rl("editor_checkmark_button"), Researchd.rl("editor_checkmark_button_disabled"), Researchd.rl("editor_checkmark_button_highlighted")))
+                .sprites(new WidgetSprites(
+                        Researchd.rl("editor_checkmark_button"),
+                        Researchd.rl("editor_checkmark_button_disabled"),
+                        Researchd.rl("editor_checkmark_button_highlighted")))
                 .build());
         this.doneButton.active = false;
         this.setPosition(this.getX(), this.getY());
@@ -68,14 +73,20 @@ public class ResearchEffectTypeSelectionPopupWidget extends PopupWidget {
     private void onDoneClicked(PDLImageButton button) {
         ResearchScreen screen = SpaghettiClient.tryGetResearchScreen();
         int height = 128;
-        TypedEditorObject<? extends ResearchEffect, ResearchEffectType> clientEffectType = ResearchdClient.getClientEffectType(this.selectedResearchEffect);
+        TypedEditorObject<? extends ResearchEffect, ResearchEffectType> clientEffectType =
+                ResearchdClient.getClientEffectType(this.selectedResearchEffect);
         if (clientEffectType != null) {
-            //height = clientEffectType.getHeight();
+            // height = clientEffectType.getHeight();
         }
-        //screen.openPopupCentered(new ResearchEffectCreationPopupWidget(parentPopupWidget, this.selectedResearchEffect, 0, 0, 112, height));
-//        screen.openPopupCentered(this.parentPopupWidget);
-//        Research researchPack = ResearchHelperCommon.getResearch(this.selectionContainerWidget.selectedResearch, Minecraft.getInstance().level);
-//        this.selectorListWidget.addItem(new ResearchSelectorListWidget.Element.SimpleElement(this.selectionContainerWidget.selectedResearch, researchPack));
+        // screen.openPopupCentered(new ResearchEffectCreationPopupWidget(parentPopupWidget,
+        // this.selectedResearchEffect, 0, 0, 112, height));
+        //        screen.openPopupCentered(this.parentPopupWidget);
+        //        Research researchPack =
+        // ResearchHelperCommon.getResearch(this.selectionContainerWidget.selectedResearch,
+        // Minecraft.getInstance().level);
+        //        this.selectorListWidget.addItem(new
+        // ResearchSelectorListWidget.Element.SimpleElement(this.selectionContainerWidget.selectedResearch,
+        // researchPack));
         this.doneClicked = true;
         screen.closePopup(this);
         List<ResearchEffect> effects = List.copyOf(this.selectionContainerWidget.selectedEffectTypes.values());
@@ -124,7 +135,9 @@ public class ResearchEffectTypeSelectionPopupWidget extends PopupWidget {
     }
 
     private void onSearchBarValueChanged(String val) {
-        List<ResearchEffectType> researchKeys = ResearchdRegistries.RESEARCH_EFFECT_TYPE.stream().filter(type -> !type.parentType()).toList();
+        List<ResearchEffectType> researchKeys = ResearchdRegistries.RESEARCH_EFFECT_TYPE.stream()
+                .filter(type -> !type.parentType())
+                .toList();
         Map<ResearchEffectType, Component> researchNames = researchKeys.stream()
                 .map(type -> Pair.of(type, type.getName()))
                 .collect(Collectors.toMap(Pair::left, Pair::right));
@@ -143,7 +156,8 @@ public class ResearchEffectTypeSelectionPopupWidget extends PopupWidget {
     }
 
     private class SelectionContainerWidget extends ContainerWidget<ResearchEffectType> {
-        public static final WidgetSprites SPRITES = new WidgetSprites(Researchd.rl("editor_background"), Researchd.rl("editor_background_highlighted"));
+        public static final WidgetSprites SPRITES =
+                new WidgetSprites(Researchd.rl("editor_background"), Researchd.rl("editor_background_highlighted"));
 
         private final Map<ResearchEffectType, Pair<ClientResearchIcon<?>, Component>> iconsAndNames;
         private final Map<ResearchEffectType, ResearchEffect> selectedEffectTypes;
@@ -152,7 +166,9 @@ public class ResearchEffectTypeSelectionPopupWidget extends PopupWidget {
             super(x, y, width, height, width - 2, 18, Orientation.VERTICAL, 1, 10, new ArrayList<>(), renderScroller);
             this.iconsAndNames = new HashMap<>();
             this.selectedEffectTypes = new HashMap<>();
-            this.setItems(ResearchdRegistries.RESEARCH_EFFECT_TYPE.stream().filter(type -> !type.parentType()).toList());
+            this.setItems(ResearchdRegistries.RESEARCH_EFFECT_TYPE.stream()
+                    .filter(type -> !type.parentType())
+                    .toList());
         }
 
         @Override
@@ -177,7 +193,8 @@ public class ResearchEffectTypeSelectionPopupWidget extends PopupWidget {
         }
 
         @Override
-        public void clickedItem(ResearchEffectType item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {
+        public void clickedItem(
+                ResearchEffectType item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {
             if (this.selectedEffectTypes.containsKey(item)) {
                 ResearchEffectTypeSelectionPopupWidget.this.selectedResearchEffect = null;
                 this.selectedEffectTypes.remove(item);
@@ -189,14 +206,23 @@ public class ResearchEffectTypeSelectionPopupWidget extends PopupWidget {
                 ResearchEffectTypeSelectionPopupWidget.this.doneButton.active = true;
                 ResearchScreen screen = SpaghettiClient.tryGetResearchScreen();
                 int height = 128;
-                TypedEditorObject<? extends ResearchEffect, ResearchEffectType> clientEffectType = ResearchdClient.getClientEffectType(ResearchEffectTypeSelectionPopupWidget.this.selectedResearchEffect);
+                TypedEditorObject<? extends ResearchEffect, ResearchEffectType> clientEffectType =
+                        ResearchdClient.getClientEffectType(
+                                ResearchEffectTypeSelectionPopupWidget.this.selectedResearchEffect);
                 if (clientEffectType != null) {
-                    //height = clientEffectType.getHeight();
+                    // height = clientEffectType.getHeight();
                 }
                 if (item == ResearchEffectTypes.EMPTY.get()) {
                     ResearchEffectTypeSelectionPopupWidget.this.addEffect(EmptyResearchEffect.INSTANCE);
                 } else {
-                    screen.openPopupCentered(new ResearchEffectCreationPopupWidget(ResearchEffectTypeSelectionPopupWidget.this, ResearchEffectTypeSelectionPopupWidget.this.selectedResearchEffect, ResearchEffectTypeSelectionPopupWidget.this.originSelectionWidget, 0, 0, 112, height));
+                    screen.openPopupCentered(new ResearchEffectCreationPopupWidget(
+                            ResearchEffectTypeSelectionPopupWidget.this,
+                            ResearchEffectTypeSelectionPopupWidget.this.selectedResearchEffect,
+                            ResearchEffectTypeSelectionPopupWidget.this.originSelectionWidget,
+                            0,
+                            0,
+                            112,
+                            height));
                     screen.closePopup(ResearchEffectTypeSelectionPopupWidget.this);
                 }
             }
@@ -218,16 +244,31 @@ public class ResearchEffectTypeSelectionPopupWidget extends PopupWidget {
         }
 
         @Override
-        protected void internalRenderItem(GuiGraphics guiGraphics, ResearchEffectType item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {
-            guiGraphics.blitSprite(SPRITES.get(true, this.isItemHovered(xIndex, yIndex, mouseX, mouseY)
-                    || ResearchEffectTypeSelectionPopupWidget.this.selectedResearchEffect == item
-                    || this.selectedEffectTypes.containsKey(item)), left, top, this.getItemWidth(), this.getItemHeight());
+        protected void internalRenderItem(
+                GuiGraphics guiGraphics,
+                ResearchEffectType item,
+                int xIndex,
+                int yIndex,
+                int left,
+                int top,
+                int mouseX,
+                int mouseY) {
+            guiGraphics.blitSprite(
+                    SPRITES.get(
+                            true,
+                            this.isItemHovered(xIndex, yIndex, mouseX, mouseY)
+                                    || ResearchEffectTypeSelectionPopupWidget.this.selectedResearchEffect == item
+                                    || this.selectedEffectTypes.containsKey(item)),
+                    left,
+                    top,
+                    this.getItemWidth(),
+                    this.getItemHeight());
             Pair<ClientResearchIcon<?>, Component> pair = this.iconsAndNames.get(item);
             ClientResearchIcon<?> icon = pair.left();
             Component name = pair.right();
             icon.render(guiGraphics, left + 1, top + 1, mouseX, mouseY, 1, 14, 14, 1);
-            guiGraphics.drawScrollingString(GuiUtils.getFont(), name, left + 18 + 1, left + this.getItemWidth() - 1, top + 4, -1);
+            guiGraphics.drawScrollingString(
+                    GuiUtils.getFont(), name, left + 18 + 1, left + this.getItemWidth() - 1, top + 4, -1);
         }
-
     }
 }

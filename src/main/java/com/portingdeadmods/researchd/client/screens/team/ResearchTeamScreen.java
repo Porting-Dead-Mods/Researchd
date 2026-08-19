@@ -12,6 +12,8 @@ import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperServer;
+import java.util.List;
+import java.util.Objects;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
@@ -25,15 +27,20 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 
-import java.util.List;
-import java.util.Objects;
-
 public class ResearchTeamScreen extends BaseTeamScreen {
     public static final ResourceLocation SCREEN_TEXTURE = Researchd.rl("textures/gui/team_screen.png");
-    public static final WidgetSprites TEAM_MEMBER_BUTTON_SPRITES = new WidgetSprites(Researchd.rl("team_member"), Researchd.rl("team_member_focused"));
-    public static final WidgetSprites SETTINGS_BUTTON_SPRITES = new WidgetSprites(Researchd.rl("settings_button"), Researchd.rl("settings_button_disabled"), Researchd.rl("settings_button_focused"));
-    public static final WidgetSprites INVITE_BUTTON_SPRITES = new WidgetSprites(Researchd.rl("invite_button"), Researchd.rl("invite_button_disabled"), Researchd.rl("invite_button_focused"));
-    public static final WidgetSprites RECENT_RESEARCH_SPRITES = new WidgetSprites(Researchd.rl("recent_research"), Researchd.rl("recent_research_focused"));
+    public static final WidgetSprites TEAM_MEMBER_BUTTON_SPRITES =
+            new WidgetSprites(Researchd.rl("team_member"), Researchd.rl("team_member_focused"));
+    public static final WidgetSprites SETTINGS_BUTTON_SPRITES = new WidgetSprites(
+            Researchd.rl("settings_button"),
+            Researchd.rl("settings_button_disabled"),
+            Researchd.rl("settings_button_focused"));
+    public static final WidgetSprites INVITE_BUTTON_SPRITES = new WidgetSprites(
+            Researchd.rl("invite_button"),
+            Researchd.rl("invite_button_disabled"),
+            Researchd.rl("invite_button_focused"));
+    public static final WidgetSprites RECENT_RESEARCH_SPRITES =
+            new WidgetSprites(Researchd.rl("recent_research"), Researchd.rl("recent_research_focused"));
 
     private LocalPlayer player;
 
@@ -43,16 +50,24 @@ public class ResearchTeamScreen extends BaseTeamScreen {
     private ImageButton inviteButton;
     private ImageButton settingsButton;
     private PlayerManagementDraggableWidget inviteWidget;
+
     public PlayerManagementDraggableWidget getInviteWidget() {
         return inviteWidget;
     }
+
     private TeamMembersList teamMembersList;
+
     public TeamMembersList getTeamMembersList() {
         return teamMembersList;
     }
 
     public ResearchTeamScreen() {
-        super(ResearchdTranslations.component(ResearchdTranslations.Team.SCREEN_TITLE), 480, 264, 480 - 64 * 2, 264 - 32 * 2);
+        super(
+                ResearchdTranslations.component(ResearchdTranslations.Team.SCREEN_TITLE),
+                480,
+                264,
+                480 - 64 * 2,
+                264 - 32 * 2);
     }
 
     @Override
@@ -101,18 +116,28 @@ public class ResearchTeamScreen extends BaseTeamScreen {
         // Layout - Header - Buttons
         headerLayout.addChild(new SpacerElement(77, 0));
 
-        this.inviteButton = new ImageButton(14, 14, INVITE_BUTTON_SPRITES, (btn) -> {
-            if (ResearchdCompatHandler.isFTBTeamsEnabled()) return;
-            this.inviteWidget.setVisible(!this.inviteWidget.visible);
-        }, ResearchdTranslations.component(ResearchdTranslations.Team.BUTTON_INVITE));
+        this.inviteButton = new ImageButton(
+                14,
+                14,
+                INVITE_BUTTON_SPRITES,
+                (btn) -> {
+                    if (ResearchdCompatHandler.isFTBTeamsEnabled()) return;
+                    this.inviteWidget.setVisible(!this.inviteWidget.visible);
+                },
+                ResearchdTranslations.component(ResearchdTranslations.Team.BUTTON_INVITE));
         headerLayout.addChild(this.inviteButton);
 
-        this.settingsButton = new ImageButton(14, 14, SETTINGS_BUTTON_SPRITES, (btn) -> {
-            if (ResearchdCompatHandler.isFTBTeamsEnabled()) return;
-            ResearchTeamSettingsScreen screen = new ResearchTeamSettingsScreen();
-            screen.setTempTeamName(this.teamNameEdit.getValue());
-            Minecraft.getInstance().setScreen(screen);
-        }, ResearchdTranslations.component(ResearchdTranslations.Team.BUTTON_TEAM_SETTINGS));
+        this.settingsButton = new ImageButton(
+                14,
+                14,
+                SETTINGS_BUTTON_SPRITES,
+                (btn) -> {
+                    if (ResearchdCompatHandler.isFTBTeamsEnabled()) return;
+                    ResearchTeamSettingsScreen screen = new ResearchTeamSettingsScreen();
+                    screen.setTempTeamName(this.teamNameEdit.getValue());
+                    Minecraft.getInstance().setScreen(screen);
+                },
+                ResearchdTranslations.component(ResearchdTranslations.Team.BUTTON_TEAM_SETTINGS));
         headerLayout.addChild(this.settingsButton);
 
         // Layout - Elements
@@ -120,15 +145,18 @@ public class ResearchTeamScreen extends BaseTeamScreen {
 
         // Layout - Elements - Team Information
         LinearLayout teamMembersLayout = linearLayout.addChild(LinearLayout.vertical());
-        teamMembersLayout.addChild(new StringWidget(ResearchdTranslations.component(ResearchdTranslations.Team.TITLE_MEMBERS), this.font));
+        teamMembersLayout.addChild(
+                new StringWidget(ResearchdTranslations.component(ResearchdTranslations.Team.TITLE_MEMBERS), this.font));
         teamMembersLayout.addChild(new SpacerElement(-1, 1));
         linearLayout.spacing(11);
-        teamMembersList = teamMembersLayout.addChild(new TeamMembersList(94, 142, 94, 22, new UniqueArray<>(ResearchTeamHelperClient.getTeamMembers()), false));
+        teamMembersList = teamMembersLayout.addChild(new TeamMembersList(
+                94, 142, 94, 22, new UniqueArray<>(ResearchTeamHelperClient.getTeamMembers()), false));
 
         // Layout - Elements - Recent Researches
         linearLayout.spacing(11);
         LinearLayout recentResearchesLayout = linearLayout.addChild(LinearLayout.vertical());
-        recentResearchesLayout.addChild(new StringWidget(ResearchdTranslations.component(ResearchdTranslations.Team.TITLE_RECENTLY_RESEARCHED), this.font));
+        recentResearchesLayout.addChild(new StringWidget(
+                ResearchdTranslations.component(ResearchdTranslations.Team.TITLE_RECENTLY_RESEARCHED), this.font));
         recentResearchesLayout.spacing(1);
         recentResearchesLayout.addChild(new RecentResearchesList(230, 142, 221, 32, recentResearches, true));
 
@@ -144,14 +172,13 @@ public class ResearchTeamScreen extends BaseTeamScreen {
                 this.topPos,
                 ResearchTeamHelperClient.getPlayersNotInTeam(),
                 new PlayerManagementDraggableWidget.PlayerManagementButtons(false, false, false, false, true),
-                Component.empty()
-        );
+                Component.empty());
 
         inviteWidget.setVisible(false);
         inviteWidget.visitWidgets(this::addRenderableOnly);
 
-		// Call visible logic on init asw since it flickers for 1 frame on screen creation
-	    updateHeaderButtonsActive();
+        // Call visible logic on init asw since it flickers for 1 frame on screen creation
+        updateHeaderButtonsActive();
     }
 
     private void updateHeaderButtonsActive() {
@@ -160,7 +187,8 @@ public class ResearchTeamScreen extends BaseTeamScreen {
             this.settingsButton.active = false;
             return;
         }
-        this.inviteButton.active = !ResearchTeamHelperClient.getPlayersNotInTeam().isEmpty()
+        this.inviteButton.active = !ResearchTeamHelperClient.getPlayersNotInTeam()
+                        .isEmpty()
                 && (ResearchTeamHelperClient.getPlayerPermissionLevel(this.player) >= 1);
         this.settingsButton.active = true;
     }
@@ -196,18 +224,26 @@ public class ResearchTeamScreen extends BaseTeamScreen {
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
 
-        guiGraphics.blit(SCREEN_TEXTURE, leftPos, topPos, textureWidth, textureHeight, 0, 0, textureWidth, textureHeight, textureWidth, textureHeight);
-
+        guiGraphics.blit(
+                SCREEN_TEXTURE,
+                leftPos,
+                topPos,
+                textureWidth,
+                textureHeight,
+                0,
+                0,
+                textureWidth,
+                textureHeight,
+                textureWidth,
+                textureHeight);
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         updateHeaderButtonsActive();
-	}
-
-    @Override
-    protected void renderBlurredBackground(float partialTick) {
     }
 
+    @Override
+    protected void renderBlurredBackground(float partialTick) {}
 }

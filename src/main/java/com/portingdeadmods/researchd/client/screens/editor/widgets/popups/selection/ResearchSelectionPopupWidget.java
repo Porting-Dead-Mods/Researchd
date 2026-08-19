@@ -7,15 +7,16 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchManager;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.ResearchSelectorListWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.ContainerWidget;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLImageButton;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
-import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLImageButton;
 import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.Search;
 import com.portingdeadmods.researchd.utils.SpaghettiClient;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import it.unimi.dsi.fastutil.Pair;
+import java.util.*;
+import java.util.stream.Collectors;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
@@ -28,9 +29,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 public class ResearchSelectionPopupWidget extends PopupWidget {
     public static final ResourceLocation BACKGROUND_SPRITE = Researchd.rl("widget/research_selector_widget");
 
@@ -42,22 +40,30 @@ public class ResearchSelectionPopupWidget extends PopupWidget {
     private final PopupWidget parentPopupWidget;
     private final Set<ResourceKey<Research>> addedResearches;
 
-    public ResearchSelectionPopupWidget(ResearchSelectorListWidget selectorListWidget, @Nullable PopupWidget parentPopupWidget, Set<ResourceKey<Research>> addedResearches) {
+    public ResearchSelectionPopupWidget(
+            ResearchSelectorListWidget selectorListWidget,
+            @Nullable PopupWidget parentPopupWidget,
+            Set<ResourceKey<Research>> addedResearches) {
         super(0, 0, 148, 160, false, CommonComponents.EMPTY);
         this.selectorListWidget = selectorListWidget;
         this.parentPopupWidget = parentPopupWidget;
         this.addedResearches = addedResearches;
         this.search = new Search();
-        this.searchBar = this.addRenderableWidget(new EditBox(Minecraft.getInstance().font, 90, 12, CommonComponents.EMPTY));
+        this.searchBar =
+                this.addRenderableWidget(new EditBox(Minecraft.getInstance().font, 90, 12, CommonComponents.EMPTY));
         this.searchBar.setBordered(false);
         this.searchBar.setEditable(true);
         this.searchBar.setResponder(this::onSearchBarValueChanged);
-        this.selectionContainerWidget = this.addRenderableWidget(new SelectionContainerWidget(this, 0, 0, 112, 130, true));
+        this.selectionContainerWidget =
+                this.addRenderableWidget(new SelectionContainerWidget(this, 0, 0, 112, 130, true));
         this.selectionContainerWidget.getItems().removeAll(addedResearches);
         this.doneButton = this.addRenderableWidget(PDLImageButton.builder(this::onDoneClicked)
                 .size(14, 14)
                 .tooltip(Tooltip.create(Component.literal("Select Research")))
-                .sprites(new WidgetSprites(Researchd.rl("editor_checkmark_button"), Researchd.rl("editor_checkmark_button_disabled"), Researchd.rl("editor_checkmark_button_highlighted")))
+                .sprites(new WidgetSprites(
+                        Researchd.rl("editor_checkmark_button"),
+                        Researchd.rl("editor_checkmark_button_disabled"),
+                        Researchd.rl("editor_checkmark_button_highlighted")))
                 .build());
         this.doneButton.active = false;
         this.setPosition(this.getX(), this.getY());
@@ -67,8 +73,10 @@ public class ResearchSelectionPopupWidget extends PopupWidget {
         ResearchScreen screen = SpaghettiClient.tryGetResearchScreen();
         screen.openPopupCentered(this.parentPopupWidget);
         ResearchManager researchManager = ResearchdApi.getResearchManager();
-        Research research = researchManager.lookupResearch(this.selectionContainerWidget.selectedResearch, Minecraft.getInstance().level);
-        this.selectorListWidget.addItem(new ResearchSelectorListWidget.Element.SimpleElement(this.selectionContainerWidget.selectedResearch, research));
+        Research research = researchManager.lookupResearch(
+                this.selectionContainerWidget.selectedResearch, Minecraft.getInstance().level);
+        this.selectorListWidget.addItem(new ResearchSelectorListWidget.Element.SimpleElement(
+                this.selectionContainerWidget.selectedResearch, research));
         screen.closePopup(this);
     }
 
@@ -100,7 +108,7 @@ public class ResearchSelectionPopupWidget extends PopupWidget {
         super.setY(y);
         this.searchBar.setY(y + 8);
         this.selectionContainerWidget.setY(y + 23);
-        this.doneButton.setY(y + 139 );
+        this.doneButton.setY(y + 139);
     }
 
     private void onSearchBarValueChanged(String val) {
@@ -126,13 +134,20 @@ public class ResearchSelectionPopupWidget extends PopupWidget {
     }
 
     private static class SelectionContainerWidget extends ContainerWidget<ResourceKey<Research>> {
-        public static final WidgetSprites SPRITES = new WidgetSprites(Researchd.rl("editor_background"), Researchd.rl("editor_background_highlighted"));
+        public static final WidgetSprites SPRITES =
+                new WidgetSprites(Researchd.rl("editor_background"), Researchd.rl("editor_background_highlighted"));
 
         private final Map<ResourceKey<Research>, Pair<ClientResearchIcon<?>, Component>> iconsAndNames;
         private final ResearchSelectionPopupWidget parentWidget;
         private ResourceKey<Research> selectedResearch;
 
-        public SelectionContainerWidget(ResearchSelectionPopupWidget parentWidget, int x, int y, int width, int height, boolean renderScroller) {
+        public SelectionContainerWidget(
+                ResearchSelectionPopupWidget parentWidget,
+                int x,
+                int y,
+                int width,
+                int height,
+                boolean renderScroller) {
             super(x, y, width, height, width - 2, 18, Orientation.VERTICAL, 1, 10, new ArrayList<>(), renderScroller);
             this.parentWidget = parentWidget;
             this.iconsAndNames = new HashMap<>();
@@ -150,7 +165,11 @@ public class ResearchSelectionPopupWidget extends PopupWidget {
 
             for (ResourceKey<Research> key : this.getItems()) {
                 Research research = researchManager.lookupResearch(key, Minecraft.getInstance().level);
-                this.iconsAndNames.put(key, Pair.of(ClientResearchIcon.getClientIcon(research.researchIcon()), ResearchHelperCommon.getResearchName(key, research)));
+                this.iconsAndNames.put(
+                        key,
+                        Pair.of(
+                                ClientResearchIcon.getClientIcon(research.researchIcon()),
+                                ResearchHelperCommon.getResearchName(key, research)));
             }
         }
 
@@ -165,7 +184,8 @@ public class ResearchSelectionPopupWidget extends PopupWidget {
         }
 
         @Override
-        public void clickedItem(ResourceKey<Research> item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {
+        public void clickedItem(
+                ResourceKey<Research> item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {
             this.selectedResearch = item;
             this.parentWidget.doneButton.active = true;
         }
@@ -186,14 +206,28 @@ public class ResearchSelectionPopupWidget extends PopupWidget {
         }
 
         @Override
-        protected void internalRenderItem(GuiGraphics guiGraphics, ResourceKey<Research> item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {
-            guiGraphics.blitSprite(SPRITES.get(true, this.isItemHovered(xIndex, yIndex, mouseX, mouseY) || this.selectedResearch == item), left, top, this.getItemWidth(), this.getItemHeight());
+        protected void internalRenderItem(
+                GuiGraphics guiGraphics,
+                ResourceKey<Research> item,
+                int xIndex,
+                int yIndex,
+                int left,
+                int top,
+                int mouseX,
+                int mouseY) {
+            guiGraphics.blitSprite(
+                    SPRITES.get(
+                            true, this.isItemHovered(xIndex, yIndex, mouseX, mouseY) || this.selectedResearch == item),
+                    left,
+                    top,
+                    this.getItemWidth(),
+                    this.getItemHeight());
             Pair<ClientResearchIcon<?>, Component> pair = this.iconsAndNames.get(item);
             ClientResearchIcon<?> icon = pair.left();
             Component name = pair.right();
             icon.render(guiGraphics, left + 1, top + 1, mouseX, mouseY, 1, 1);
-            guiGraphics.drawScrollingString(GuiUtils.getFont(), name, left + 18 + 1, left + this.getItemWidth() - 1, top + 4, -1);
+            guiGraphics.drawScrollingString(
+                    GuiUtils.getFont(), name, left + 18 + 1, left + this.getItemWidth() - 1, top + 4, -1);
         }
-
     }
 }

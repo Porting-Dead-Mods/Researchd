@@ -52,6 +52,5 @@ public final class RdZIndex {
     /** Relative */
     public static final int WARNING_POPUP = 1;
 
-    private RdZIndex() {
-    }
+    private RdZIndex() {}
 }

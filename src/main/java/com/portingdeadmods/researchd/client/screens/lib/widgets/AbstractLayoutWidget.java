@@ -1,5 +1,9 @@
 package com.portingdeadmods.researchd.client.screens.lib.widgets;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractContainerWidget;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -9,12 +13,8 @@ import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-
-public abstract class AbstractLayoutWidget<L extends Layout> extends AbstractContainerWidget implements LayoutWidget<L> {
+public abstract class AbstractLayoutWidget<L extends Layout> extends AbstractContainerWidget
+        implements LayoutWidget<L> {
     protected final @Nullable L layout;
     private final List<AbstractWidget> widgets;
 
@@ -58,7 +58,5 @@ public abstract class AbstractLayoutWidget<L extends Layout> extends AbstractCon
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-    }
-
+    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 }

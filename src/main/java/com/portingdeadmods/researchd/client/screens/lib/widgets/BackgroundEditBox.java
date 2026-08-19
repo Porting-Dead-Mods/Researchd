@@ -5,10 +5,11 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.Component;
 
 public class BackgroundEditBox extends EditBox implements EditBoxExtension {
-    public static final WidgetSprites SPRITES = new WidgetSprites(EditorSharedSprites.EDITOR_BACKGROUND_INVERTED_SPRITE, EditorSharedSprites.EDITOR_BACKGROUND_INVERTED_SPRITE);
+    public static final WidgetSprites SPRITES = new WidgetSprites(
+            EditorSharedSprites.EDITOR_BACKGROUND_INVERTED_SPRITE,
+            EditorSharedSprites.EDITOR_BACKGROUND_INVERTED_SPRITE);
     private final WidgetSprites sprites;
 
     public BackgroundEditBox(Font font, WidgetSprites sprites, int width, int height, String message) {
@@ -23,7 +24,7 @@ public class BackgroundEditBox extends EditBox implements EditBoxExtension {
     }
 
     public BackgroundEditBox(Font font, int width, int height) {
-        this(font, SPRITES, width, height,"");
+        this(font, SPRITES, width, height, "");
     }
 
     @Override

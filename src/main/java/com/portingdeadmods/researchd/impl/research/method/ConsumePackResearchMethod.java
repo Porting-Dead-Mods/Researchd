@@ -9,13 +9,15 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethodType;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
-import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchMethodSerializer;
 import com.portingdeadmods.researchd.api.team.ValueEffectsHolder;
 import com.portingdeadmods.researchd.content.blockentities.ResearchLabControllerBE;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
+import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.registries.ResearchMethodTypes;
 import com.portingdeadmods.researchd.registries.ResearchdValueEffects;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -25,9 +27,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * A 1:1 to the Factorio researchPack. All the listed packs start getting consumed at once.
  * For researching to start, all the required packs must be present in the machine's inventory.'
@@ -36,7 +35,8 @@ import java.util.List;
  * @param count The amount of packs that will be used
  * @param duration The duration in ticks for a *base speed* machine to use 1 packs o' packs.
  */
-public record ConsumePackResearchMethod(List<ResourceKey<ResearchPack>> packs, int count, int duration) implements ResearchMethod {
+public record ConsumePackResearchMethod(List<ResourceKey<ResearchPack>> packs, int count, int duration)
+        implements ResearchMethod {
     public static final ResourceLocation ID = Researchd.rl("consume_pack");
 
     @Override
@@ -50,8 +50,10 @@ public record ConsumePackResearchMethod(List<ResourceKey<ResearchPack>> packs, i
     }
 
     @Override
-    public void checkProgress(Level level, ResourceKey<Research> research, ResearchProgress.Task task, MethodContext context) {
-        if (context instanceof SimpleMethodContext(ValueEffectsHolder team, ResearchLabControllerBE blockEntity) && blockEntity != null) {
+    public void checkProgress(
+            Level level, ResourceKey<Research> research, ResearchProgress.Task task, MethodContext context) {
+        if (context instanceof SimpleMethodContext(ValueEffectsHolder team, ResearchLabControllerBE blockEntity)
+                && blockEntity != null) {
             List<ResourceKey<ResearchPack>> packs = this.packs();
             blockEntity.currentResearchDuration = this.duration();
 
@@ -60,7 +62,13 @@ public record ConsumePackResearchMethod(List<ResourceKey<ResearchPack>> packs, i
 
             for (ResourceKey<ResearchPack> pack : packs) {
                 float usage = blockEntity.researchPackUsage.getOrDefault(pack, 0f);
-                blockEntity.researchPackUsage.put(pack, Math.max(usage - ((1f / blockEntity.currentResearchDuration) / team.getEffectValue(ResearchdValueEffects.RESEARCH_LAB_PRODUCTIVITY)), 0f));
+                blockEntity.researchPackUsage.put(
+                        pack,
+                        Math.max(
+                                usage
+                                        - ((1f / blockEntity.currentResearchDuration)
+                                                / team.getEffectValue(ResearchdValueEffects.RESEARCH_LAB_PRODUCTIVITY)),
+                                0f));
             }
             task.addProgress(1f / blockEntity.currentResearchDuration);
         }
@@ -97,24 +105,27 @@ public record ConsumePackResearchMethod(List<ResourceKey<ResearchPack>> packs, i
 
     public static final class Serializer implements ResearchMethodSerializer<ConsumePackResearchMethod> {
         public static final Serializer INSTANCE = new ConsumePackResearchMethod.Serializer();
-        public static final MapCodec<ConsumePackResearchMethod> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                Codec.list(ResearchPackImpl.RESOURCE_KEY_CODEC).fieldOf("packs").forGetter(ConsumePackResearchMethod::packs),
-                Codec.INT.fieldOf("count").forGetter(ConsumePackResearchMethod::count),
-                Codec.INT.fieldOf("duration").forGetter(ConsumePackResearchMethod::duration)
-        ).apply(instance, ConsumePackResearchMethod::new));
+        public static final MapCodec<ConsumePackResearchMethod> CODEC =
+                RecordCodecBuilder.mapCodec(instance -> instance.group(
+                                Codec.list(ResearchPackImpl.RESOURCE_KEY_CODEC)
+                                        .fieldOf("packs")
+                                        .forGetter(ConsumePackResearchMethod::packs),
+                                Codec.INT.fieldOf("count").forGetter(ConsumePackResearchMethod::count),
+                                Codec.INT.fieldOf("duration").forGetter(ConsumePackResearchMethod::duration))
+                        .apply(instance, ConsumePackResearchMethod::new));
 
-        public static final StreamCodec<RegistryFriendlyByteBuf, ConsumePackResearchMethod> STREAM_CODEC = StreamCodec.composite(
-                ResourceKey.streamCodec(ResearchdRegistries.RESEARCH_PACK_KEY).apply(ByteBufCodecs.list()),
-                ConsumePackResearchMethod::packs,
-                ByteBufCodecs.INT,
-                ConsumePackResearchMethod::count,
-                ByteBufCodecs.INT,
-                ConsumePackResearchMethod::duration,
-                ConsumePackResearchMethod::new
-        );
+        public static final StreamCodec<RegistryFriendlyByteBuf, ConsumePackResearchMethod> STREAM_CODEC =
+                StreamCodec.composite(
+                        ResourceKey.streamCodec(ResearchdRegistries.RESEARCH_PACK_KEY)
+                                .apply(ByteBufCodecs.list()),
+                        ConsumePackResearchMethod::packs,
+                        ByteBufCodecs.INT,
+                        ConsumePackResearchMethod::count,
+                        ByteBufCodecs.INT,
+                        ConsumePackResearchMethod::duration,
+                        ConsumePackResearchMethod::new);
 
-        private Serializer() {
-        }
+        private Serializer() {}
 
         @Override
         public @NotNull MapCodec<ConsumePackResearchMethod> codec() {

@@ -4,6 +4,9 @@ import com.portingdeadmods.researchd.ResearchdClient;
 import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidget;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethodList;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -12,11 +15,8 @@ import net.minecraft.util.FastColor;
 import net.neoforged.neoforge.common.util.Size2i;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-
-public abstract class AbstractResearchMethodListWidget<T extends ResearchMethodList> extends AbstractResearchInfoWidget<T> {
+public abstract class AbstractResearchMethodListWidget<T extends ResearchMethodList>
+        extends AbstractResearchInfoWidget<T> {
     private final List<AbstractResearchInfoWidget<? extends ResearchMethod>> methods;
 
     public AbstractResearchMethodListWidget(int x, int y, T method) {
@@ -26,7 +26,9 @@ public abstract class AbstractResearchMethodListWidget<T extends ResearchMethodL
         for (int i = 0; i < methods.size(); i++) {
             ResearchMethod researchMethod = methods.get(i);
             int xSize = i > 0 ? (int) (getSizeFor(i, false).width + i * getPadding()) : 0;
-            this.methods.add(ResearchdClient.RESEARCH_METHOD_WIDGETS.get(researchMethod.id()).createMethod(x + xSize + 1, y + 1, researchMethod));
+            this.methods.add(ResearchdClient.RESEARCH_METHOD_WIDGETS
+                    .get(researchMethod.id())
+                    .createMethod(x + xSize + 1, y + 1, researchMethod));
         }
         Size2i size = getSize(true);
         this.setWidth(size.width);
@@ -56,7 +58,12 @@ public abstract class AbstractResearchMethodListWidget<T extends ResearchMethodL
             if (i > 0 && i - 1 != methods.size()) {
                 int xSize1 = (int) (getSizeFor(i, false).width + (i - 1) * padding);
                 int ySize = (this.height - Minecraft.getInstance().font.lineHeight) / 2 + 1;
-                guiGraphics.drawCenteredString(Minecraft.getInstance().font, getSeparatorText(), (int) (x + xSize1 + getPadding() / 2), y + ySize, -1);
+                guiGraphics.drawCenteredString(
+                        Minecraft.getInstance().font,
+                        getSeparatorText(),
+                        (int) (x + xSize1 + getPadding() / 2),
+                        y + ySize,
+                        -1);
             }
         }
     }
@@ -89,7 +96,10 @@ public abstract class AbstractResearchMethodListWidget<T extends ResearchMethodL
         super.setX(x);
 
         for (AbstractResearchInfoWidget<? extends ResearchMethod> method : this.methods) {
-            method.setX(x + 1 + getSizeFor(this.methods.indexOf(method), false).width + this.methods.indexOf(method) * (int) getPadding());
+            method.setX(x
+                    + 1
+                    + getSizeFor(this.methods.indexOf(method), false).width
+                    + this.methods.indexOf(method) * (int) getPadding());
         }
     }
 
@@ -108,7 +118,9 @@ public abstract class AbstractResearchMethodListWidget<T extends ResearchMethodL
         if (methods == null) {
             methods = new ArrayList<>();
             for (ResearchMethod researchMethod : value.methods()) {
-                methods.add(ResearchdClient.RESEARCH_METHOD_WIDGETS.get(researchMethod.id()).createMethod(0, 0, researchMethod));
+                methods.add(ResearchdClient.RESEARCH_METHOD_WIDGETS
+                        .get(researchMethod.id())
+                        .createMethod(0, 0, researchMethod));
             }
         }
         if (!methods.isEmpty()) {
@@ -116,7 +128,10 @@ public abstract class AbstractResearchMethodListWidget<T extends ResearchMethodL
             Size2i size = new Size2i(0, firstMethodSize.height + 2);
             for (int i = 0; i < amount; i++) {
                 AbstractResearchInfoWidget<? extends ResearchMethod> researchMethod = methods.get(i);
-                size = new Size2i((int) (size.width + researchMethod.getWidth() + (includePadding && i > 0 ? getPadding() : 0)) + 2, size.height);
+                size = new Size2i(
+                        (int) (size.width + researchMethod.getWidth() + (includePadding && i > 0 ? getPadding() : 0))
+                                + 2,
+                        size.height);
             }
             return size;
         }

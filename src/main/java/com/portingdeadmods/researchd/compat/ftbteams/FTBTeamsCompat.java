@@ -13,11 +13,10 @@ import dev.ftb.mods.ftbteams.api.event.PlayerChangedTeamEvent;
 import dev.ftb.mods.ftbteams.api.event.TeamEvent;
 import dev.ftb.mods.ftbteams.api.event.TeamPropertiesChangedEvent;
 import dev.ftb.mods.ftbteams.api.property.TeamProperties;
+import java.util.UUID;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
-
-import java.util.UUID;
 
 public class FTBTeamsCompat {
     // Change Team also Handles Leave Team
@@ -26,7 +25,8 @@ public class FTBTeamsCompat {
         Researchd.debug("FTBTeamsCompat", "changeTeamHandler called");
         ServerPlayer player = event.getPlayer();
         if (player == null) {
-            Researchd.LOGGER.error("PlayerChangedTeamEvent posted with null ServerPlayer argument. Data Errors may occur.");
+            Researchd.LOGGER.error(
+                    "PlayerChangedTeamEvent posted with null ServerPlayer argument. Data Errors may occur.");
             return;
         }
 
@@ -71,7 +71,9 @@ public class FTBTeamsCompat {
         Researchd.debug("FTBTeamsCompat", "changeTeamNameHandler called");
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server == null) return;
-        if (!event.getPreviousProperties().get(TeamProperties.DISPLAY_NAME).equals(event.getTeam().getName().getString())) {
+        if (!event.getPreviousProperties()
+                .get(TeamProperties.DISPLAY_NAME)
+                .equals(event.getTeam().getName().getString())) {
             ResearchTeamMap teams = TeamSavedData.getData(server.overworld());
             ResearchTeam team = teams.getTeamByPlayerId(event.getTeam().getOwner());
             if (team == null) return;
@@ -80,26 +82,26 @@ public class FTBTeamsCompat {
             teams.setChanged();
         }
     }
-//
-//    public static void joinedTeamHandler(PlayerJoinedPartyTeamEvent event) {
-//        System.out.println("FTBTeamsCompat: joinedTeamHandler called");
-//        ServerPlayer player = event.getPlayer();
-//        if (player == null) {
-//            Researchd.LOGGER.error("PlayerJoinedPartyTeamEvent posted with null ServerPlayer argument. Data Errors may occur.");
-//            return;
-//        }
-//
-//        UUID newTeamOwner = event.getTeam().getOwner();
-//        ResearchTeamHelper.handleLeaveTeam(player);
-//        ResearchTeamHelper.handleEnterTeam(player, newTeamOwner);
-//    }
+    //
+    //    public static void joinedTeamHandler(PlayerJoinedPartyTeamEvent event) {
+    //        System.out.println("FTBTeamsCompat: joinedTeamHandler called");
+    //        ServerPlayer player = event.getPlayer();
+    //        if (player == null) {
+    //            Researchd.LOGGER.error("PlayerJoinedPartyTeamEvent posted with null ServerPlayer argument. Data Errors
+    // may occur.");
+    //            return;
+    //        }
+    //
+    //        UUID newTeamOwner = event.getTeam().getOwner();
+    //        ResearchTeamHelper.handleLeaveTeam(player);
+    //        ResearchTeamHelper.handleEnterTeam(player, newTeamOwner);
+    //    }
 
     static {
         TeamEvent.PLAYER_CHANGED.register(FTBTeamsCompat::changeTeamHandler);
-        //TeamEvent.PLAYER_JOINED_PARTY.register(FTBTeamsCompat::joinedTeamHandler);
+        // TeamEvent.PLAYER_JOINED_PARTY.register(FTBTeamsCompat::joinedTeamHandler);
         TeamEvent.PROPERTIES_CHANGED.register(FTBTeamsCompat::changeTeamNameHandler);
     }
 
-    public static void init() {
-    }
+    public static void init() {}
 }

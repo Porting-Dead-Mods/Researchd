@@ -6,6 +6,7 @@ import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.ResearchTeamManager;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
+import java.util.UUID;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -13,8 +14,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.level.BlockEvent;
-
-import java.util.UUID;
 
 @EventBusSubscriber(modid = Researchd.MODID)
 public final class ResearchdBEPlacementHandler {

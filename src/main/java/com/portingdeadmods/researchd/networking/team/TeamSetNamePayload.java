@@ -13,11 +13,8 @@ import org.jetbrains.annotations.NotNull;
 
 public record TeamSetNamePayload(String name) implements CustomPacketPayload {
     public static final Type<TeamSetNamePayload> TYPE = new Type<>(Researchd.rl("set_name_payload"));
-    public static final StreamCodec<RegistryFriendlyByteBuf, TeamSetNamePayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            TeamSetNamePayload::name,
-            TeamSetNamePayload::new
-    );
+    public static final StreamCodec<RegistryFriendlyByteBuf, TeamSetNamePayload> STREAM_CODEC =
+            StreamCodec.composite(ByteBufCodecs.STRING_UTF8, TeamSetNamePayload::name, TeamSetNamePayload::new);
 
     @Override
     public @NotNull Type<? extends CustomPacketPayload> type() {
@@ -26,13 +23,13 @@ public record TeamSetNamePayload(String name) implements CustomPacketPayload {
 
     public static void handle(TeamSetNamePayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
-            if (context.player() instanceof ServerPlayer sp)
-                ResearchTeamHelperServer.handleSetName(sp, payload.name);
-        }).exceptionally(e -> {
-            Researchd.LOGGER.error("Failed to handle TeamSetNamePayload", e);
-            context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
-            return null;
-        });
-
+                    if (context.player() instanceof ServerPlayer sp)
+                        ResearchTeamHelperServer.handleSetName(sp, payload.name);
+                })
+                .exceptionally(e -> {
+                    Researchd.LOGGER.error("Failed to handle TeamSetNamePayload", e);
+                    context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
+                    return null;
+                });
     }
 }

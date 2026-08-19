@@ -1,7 +1,6 @@
 package com.portingdeadmods.researchd.api.team;
 
 import com.portingdeadmods.researchd.api.ValueEffect;
-
 import java.util.function.Supplier;
 
 public interface ValueEffectsHolder {

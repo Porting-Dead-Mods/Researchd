@@ -3,11 +3,10 @@ package com.portingdeadmods.researchd.compat.kubejs.builders;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.impl.utils.DisplayImpl;
 import dev.latvian.mods.kubejs.script.SourceLine;
+import java.util.Optional;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
-
-import java.util.Optional;
 
 public class ResearchPackBuilder {
     public final ResourceLocation id;
@@ -63,6 +62,10 @@ public class ResearchPackBuilder {
     }
 
     public ResearchPackImpl createObject() {
-        return new ResearchPackImpl(color, sortingValue, Optional.ofNullable(customTexture), new DisplayImpl(Optional.ofNullable(this.literalName), Optional.ofNullable(this.literalDescription)));
+        return new ResearchPackImpl(
+                color,
+                sortingValue,
+                Optional.ofNullable(customTexture),
+                new DisplayImpl(Optional.ofNullable(this.literalName), Optional.ofNullable(this.literalDescription)));
     }
 }

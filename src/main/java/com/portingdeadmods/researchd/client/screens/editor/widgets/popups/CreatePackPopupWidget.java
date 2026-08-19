@@ -4,14 +4,16 @@ import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.editmode.PackLocation;
 import com.portingdeadmods.researchd.client.screens.lib.layout.WidgetHeaderAndFooterLayout;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLButton;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
-import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLButton;
 import com.portingdeadmods.researchd.networking.editor.CreateDatapackPayload;
 import com.portingdeadmods.researchd.networking.editor.SetPackPayload;
 import com.portingdeadmods.researchd.resources.example.ExampleResourcePackWriter;
 import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.TextUtils;
+import java.nio.file.Path;
+import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
@@ -22,9 +24,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
-
-import java.nio.file.Path;
-import java.util.function.Consumer;
 
 public class CreatePackPopupWidget extends PopupWidget {
     public static final ResourceLocation SPRITE = Researchd.rl("widget/pack_creation_popup");
@@ -52,18 +51,29 @@ public class CreatePackPopupWidget extends PopupWidget {
             this.nameEditBox = contents.addChild(new EditBox(GuiUtils.getFont(), 128, 16, Component.empty()));
             this.nameEditBox.setHint(Component.literal("<Pack Name>"));
             this.nameEditBox.setResponder(val -> this.onNameChanged(this.nameEditBox, val));
-            this.descEditBox = contents.addChild(new MultiLineEditBox(GuiUtils.getFont(), 0, 0, 128, 80, Component.literal("<Pack Description>"), Component.literal("msg")));
-            //this.descEditBox.setValueListener(val -> this.onValueChanged(this.descEditBox, val));
-            this.checkbox = contents.addChild(Checkbox.builder(Component.literal("Generate Examples"), GuiUtils.getFont()).build());
+            this.descEditBox = contents.addChild(new MultiLineEditBox(
+                    GuiUtils.getFont(),
+                    0,
+                    0,
+                    128,
+                    80,
+                    Component.literal("<Pack Description>"),
+                    Component.literal("msg")));
+            // this.descEditBox.setValueListener(val -> this.onValueChanged(this.descEditBox, val));
+            this.checkbox =
+                    contents.addChild(Checkbox.builder(Component.literal("Generate Examples"), GuiUtils.getFont())
+                            .build());
         });
         this.layout.withFooter(footer -> {
             footer.defaultCellSetting().paddingBottom(16);
-            this.createPackButton = footer.addChild(PDLButton.builder(this::createPackPressed)
-                    .message(Component.literal("Create Pack"))
-                    .tooltip(Tooltip.create(Component.literal("Pack name cannot be empty")))
-                    .sprites(SelectPackPopupWidget.EDITOR_BUTTON_SPRITES)
-                    .size(128, 17)
-                    .build(), LayoutSettings::alignHorizontallyCenter);
+            this.createPackButton = footer.addChild(
+                    PDLButton.builder(this::createPackPressed)
+                            .message(Component.literal("Create Pack"))
+                            .tooltip(Tooltip.create(Component.literal("Pack name cannot be empty")))
+                            .sprites(SelectPackPopupWidget.EDITOR_BUTTON_SPRITES)
+                            .size(128, 17)
+                            .build(),
+                    LayoutSettings::alignHorizontallyCenter);
             this.createPackButton.active = false;
         });
 
@@ -73,7 +83,8 @@ public class CreatePackPopupWidget extends PopupWidget {
 
     private void onNameChanged(AbstractWidget widget, String val) {
         this.createPackButton.active = !this.nameEditBox.getValue().isEmpty();
-        this.createPackButton.setTooltip(Tooltip.create(this.createPackButton.active ? Component.empty() : Component.literal("Pack name cannot be empty")));
+        this.createPackButton.setTooltip(Tooltip.create(
+                this.createPackButton.active ? Component.empty() : Component.literal("Pack name cannot be empty")));
     }
 
     private void createPackPressed(PDLButton button) {
@@ -82,15 +93,18 @@ public class CreatePackPopupWidget extends PopupWidget {
         boolean generateExamples = this.checkbox.selected();
 
         if (this.packType == PackType.SERVER_DATA) {
-            PacketDistributor.sendToServer(new CreateDatapackPayload(name, description, TextUtils.camelToSnake(name), generateExamples));
+            PacketDistributor.sendToServer(
+                    new CreateDatapackPayload(name, description, TextUtils.camelToSnake(name), generateExamples));
         } else if (this.packType == PackType.CLIENT_RESOURCES) {
             String namespace = TextUtils.trimSpecialCharacterAndConvertToSnake(name);
             ExampleResourcePackWriter writer = new ExampleResourcePackWriter();
             writer.setGenerateExamples(generateExamples);
 
-            Result<Path, Exception> resourcePack = writer.write(Minecraft.getInstance().getResourcePackDirectory(), name, description, namespace);
+            Result<Path, Exception> resourcePack =
+                    writer.write(Minecraft.getInstance().getResourcePackDirectory(), name, description, namespace);
             if (resourcePack instanceof Result.Ok(Path value)) {
-                PacketDistributor.sendToServer(new SetPackPayload(new PackLocation(value, namespace, PackType.CLIENT_RESOURCES)));
+                PacketDistributor.sendToServer(
+                        new SetPackPayload(new PackLocation(value, namespace, PackType.CLIENT_RESOURCES)));
             }
         }
 
@@ -115,5 +129,4 @@ public class CreatePackPopupWidget extends PopupWidget {
 
         this.layout.visitWidgets(consumer);
     }
-
 }

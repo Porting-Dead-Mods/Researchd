@@ -21,19 +21,23 @@ import net.minecraft.util.FastColor;
 
 public class SelectPackSearchBarWidget extends AbstractWidget {
     public static final ResourceLocation SEARCH_BAR_SPRITE = Researchd.rl("editor_search_bar");
-    public static final WidgetSprites CREATE_PACK_SPRITES = new WidgetSprites(Researchd.rl("editor_create_pack"), Researchd.rl("editor_create_pack_highlighted"));
-    public static final WidgetSprites SELECT_PACK_SPRITES = new WidgetSprites(Researchd.rl("editor_select_pack"), Researchd.rl("editor_select_pack_highlighted"));
+    public static final WidgetSprites CREATE_PACK_SPRITES =
+            new WidgetSprites(Researchd.rl("editor_create_pack"), Researchd.rl("editor_create_pack_highlighted"));
+    public static final WidgetSprites SELECT_PACK_SPRITES =
+            new WidgetSprites(Researchd.rl("editor_select_pack"), Researchd.rl("editor_select_pack_highlighted"));
     public static final MutableComponent SELECT_OR_CREATE_PACK_TEXT = Component.literal("<Select or Create Pack>");
     private final PDLImageButton selectPackDirectoryButton;
     private final PDLImageButton createPackButton;
     private final SelectPackDropDownWidget dropDownWidget;
     private PackLocation selectedPack;
 
-    public SelectPackSearchBarWidget(PackLocation pack, PackType type, PDLButton.OnPress<PDLImageButton> onCreatePressed) {
+    public SelectPackSearchBarWidget(
+            PackLocation pack, PackType type, PDLButton.OnPress<PDLImageButton> onCreatePressed) {
         this(0, 0, pack, type, onCreatePressed);
     }
 
-    public SelectPackSearchBarWidget(int x, int y, PackLocation pack, PackType type, PDLButton.OnPress<PDLImageButton> onCreatePressed) {
+    public SelectPackSearchBarWidget(
+            int x, int y, PackLocation pack, PackType type, PDLButton.OnPress<PDLImageButton> onCreatePressed) {
         super(x, y, 156, 16, CommonComponents.EMPTY);
 
         this.selectedPack = pack;
@@ -41,7 +45,8 @@ public class SelectPackSearchBarWidget extends AbstractWidget {
         this.dropDownWidget = new SelectPackDropDownWidget(this, type);
         this.dropDownWidget.setVisible(false);
         this.dropDownWidget.rebuildOptions();
-        this.selectPackDirectoryButton = PDLImageButton.builder(btn -> this.dropDownWidget.setVisible(!this.dropDownWidget.isVisible()))
+        this.selectPackDirectoryButton = PDLImageButton.builder(
+                        btn -> this.dropDownWidget.setVisible(!this.dropDownWidget.isVisible()))
                 .tooltip(Tooltip.create(Component.literal("Select Pack Directory")))
                 .sprites(SELECT_PACK_SPRITES)
                 .size(14, 14)
@@ -77,10 +82,22 @@ public class SelectPackSearchBarWidget extends AbstractWidget {
         this.createPackButton.render(guiGraphics, mouseX, mouseY, partialTick);
         this.selectPackDirectoryButton.render(guiGraphics, mouseX, mouseY, partialTick);
 
-        guiGraphics.drawScrollingString(Minecraft.getInstance().font, getText(this.selectedPack), this.getX() + 2, this.getX() + 156 - 32 - 1, this.getY() + 2 + (14 - Minecraft.getInstance().font.lineHeight) / 2, FastColor.ARGB32.color(255, 255, 255));
+        guiGraphics.drawScrollingString(
+                Minecraft.getInstance().font,
+                getText(this.selectedPack),
+                this.getX() + 2,
+                this.getX() + 156 - 32 - 1,
+                this.getY() + 2 + (14 - Minecraft.getInstance().font.lineHeight) / 2,
+                FastColor.ARGB32.color(255, 255, 255));
 
-        if (!(this.createPackButton.isHovered() || this.selectPackDirectoryButton.isHovered()) && this.selectedPack != null && this.isHovered()) {
-            guiGraphics.renderTooltip(Minecraft.getInstance().font, Component.literal(this.selectedPack.rootPath().toString()), mouseX, mouseY);
+        if (!(this.createPackButton.isHovered() || this.selectPackDirectoryButton.isHovered())
+                && this.selectedPack != null
+                && this.isHovered()) {
+            guiGraphics.renderTooltip(
+                    Minecraft.getInstance().font,
+                    Component.literal(this.selectedPack.rootPath().toString()),
+                    mouseX,
+                    mouseY);
         }
 
         PoseStack poseStack = guiGraphics.pose();
@@ -88,10 +105,10 @@ public class SelectPackSearchBarWidget extends AbstractWidget {
         {
             poseStack.translate(0, 0, RdZIndex.DROP_DOWN);
 
-            this.dropDownWidget.render(guiGraphics, this.getX(), this.getY() + this.getHeight(), mouseX, mouseY, partialTick);
+            this.dropDownWidget.render(
+                    guiGraphics, this.getX(), this.getY() + this.getHeight(), mouseX, mouseY, partialTick);
         }
         poseStack.popPose();
-
     }
 
     @Override
@@ -105,8 +122,7 @@ public class SelectPackSearchBarWidget extends AbstractWidget {
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-    }
+    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 
     @Override
     public void setX(int x) {

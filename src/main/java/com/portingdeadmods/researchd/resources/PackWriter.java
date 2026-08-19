@@ -1,10 +1,9 @@
 package com.portingdeadmods.researchd.resources;
 
 import com.portingdeadmods.portingdeadlibs.utils.Result;
+import java.nio.file.Path;
 import net.minecraft.SharedConstants;
 import net.minecraft.server.packs.PackType;
-
-import java.nio.file.Path;
 
 public interface PackWriter {
     Result<Path, Exception> write(Path path, String packDescription, String namespace);
@@ -23,6 +22,7 @@ public interface PackWriter {
                     "pack_format": %d
                   }
                 }
-                """.formatted(desc, SharedConstants.getCurrentVersion().getPackVersion(type));
+                """
+                .formatted(desc, SharedConstants.getCurrentVersion().getPackVersion(type));
     }
 }

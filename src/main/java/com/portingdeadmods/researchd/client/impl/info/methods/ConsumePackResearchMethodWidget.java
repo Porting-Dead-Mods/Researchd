@@ -2,6 +2,8 @@ package com.portingdeadmods.researchd.client.impl.info.methods;
 
 import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidget;
 import com.portingdeadmods.researchd.impl.research.method.ConsumePackResearchMethod;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -10,10 +12,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.util.Size2i;
-
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class ConsumePackResearchMethodWidget extends AbstractResearchInfoWidget<ConsumePackResearchMethod> {
     public static final int GAP_BETWEEN_PACKS = 4;
@@ -55,22 +53,21 @@ public class ConsumePackResearchMethodWidget extends AbstractResearchInfoWidget<
             int xPos = x + idx * GAP_BETWEEN_PACKS;
             guiGraphics.renderItem(stack, xPos, y);
 
-            if (idx == stacks.size() - 1)
-                guiGraphics.renderItemDecorations(this.font, stack, xPos, y);
+            if (idx == stacks.size() - 1) guiGraphics.renderItemDecorations(this.font, stack, xPos, y);
 
-//            guiGraphics.pose().pushPose();
-//            guiGraphics.pose().translate(0.0F, 0.0F, 200.0F);
-//            {
-//                if (idx == stacks.size() - 1) {
-//                    guiGraphics.drawString(Minecraft.getInstance().font,
-//                            String.valueOf(count),
-//                            xPos + 17 - Minecraft.getInstance().font.width(String.valueOf(count)),
-//                            y + 9,
-//                            16777215,
-//                            true);
-//                }
-//            }
-//            guiGraphics.pose().popPose();
+            //            guiGraphics.pose().pushPose();
+            //            guiGraphics.pose().translate(0.0F, 0.0F, 200.0F);
+            //            {
+            //                if (idx == stacks.size() - 1) {
+            //                    guiGraphics.drawString(Minecraft.getInstance().font,
+            //                            String.valueOf(count),
+            //                            xPos + 17 - Minecraft.getInstance().font.width(String.valueOf(count)),
+            //                            y + 9,
+            //                            16777215,
+            //                            true);
+            //                }
+            //            }
+            //            guiGraphics.pose().popPose();
         }
 
         guiGraphics.drawString(
@@ -79,22 +76,23 @@ public class ConsumePackResearchMethodWidget extends AbstractResearchInfoWidget<
                 x + 14 + GAP_BETWEEN_PACKS * stacks.size(),
                 y + (int) ((16f - font.lineHeight) / 2f) + 2,
                 16777215,
-                true
-        );
+                true);
     }
 
     @Override
     public void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         Font font = Minecraft.getInstance().font;
         if (this.isHovered()) {
-            guiGraphics.renderTooltip(font,
-                    Component.literal("Consume ").append(
-                    Component.literal("%d".formatted(count)).withStyle(ChatFormatting.GOLD)).append(
-                    Component.literal(count == 1 ? " pack for " : " packs for ")).append(
-                    Component.literal("%d".formatted(duration)).withStyle(ChatFormatting.GOLD)).append(
-                    Component.literal(duration == 1 ? " tick" : " ticks")).append(
-                    Component.literal(count == 1 ? "." : " each.")),
-                    mouseX, mouseY);
+            guiGraphics.renderTooltip(
+                    font,
+                    Component.literal("Consume ")
+                            .append(Component.literal("%d".formatted(count)).withStyle(ChatFormatting.GOLD))
+                            .append(Component.literal(count == 1 ? " pack for " : " packs for "))
+                            .append(Component.literal("%d".formatted(duration)).withStyle(ChatFormatting.GOLD))
+                            .append(Component.literal(duration == 1 ? " tick" : " ticks"))
+                            .append(Component.literal(count == 1 ? "." : " each.")),
+                    mouseX,
+                    mouseY);
         }
     }
 

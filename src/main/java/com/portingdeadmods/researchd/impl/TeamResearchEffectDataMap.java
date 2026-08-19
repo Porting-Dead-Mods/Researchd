@@ -8,6 +8,7 @@ import com.portingdeadmods.researchd.api.research.effects.ResearchEffectManager;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectDataType;
 import com.portingdeadmods.researchd.data.saved.SavedDataMap;
 import com.portingdeadmods.researchd.utils.CollectionUtils;
+import java.util.*;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -16,21 +17,21 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-import java.util.function.Supplier;
-
 public class TeamResearchEffectDataMap implements ResearchEffectManager, SavedDataMap {
-    public static final Codec<TeamResearchEffectDataMap> CODEC = Codec.unboundedMap(UUIDUtil.STRING_CODEC, Codec.unboundedMap(ResearchdRegistries.RESEARCH_EFFECT_DATA_TYPE.byNameCodec(), ResearchEffectData.CODEC))
+    public static final Codec<TeamResearchEffectDataMap> CODEC = Codec.unboundedMap(
+                    UUIDUtil.STRING_CODEC,
+                    Codec.unboundedMap(
+                            ResearchdRegistries.RESEARCH_EFFECT_DATA_TYPE.byNameCodec(), ResearchEffectData.CODEC))
             .xmap(TeamResearchEffectDataMap::new, m -> m.map);
-    public static final StreamCodec<? super RegistryFriendlyByteBuf, TeamResearchEffectDataMap> STREAM_CODEC = ByteBufCodecs.map(
-                    CollectionUtils::newMap,
-                    UUIDUtil.STREAM_CODEC,
-                    ByteBufCodecs.map(
+    public static final StreamCodec<? super RegistryFriendlyByteBuf, TeamResearchEffectDataMap> STREAM_CODEC =
+            ByteBufCodecs.map(
                             CollectionUtils::newMap,
-                            CodecUtils.registryStreamCodec(ResearchdRegistries.RESEARCH_EFFECT_DATA_TYPE),
-                            ResearchEffectData.STREAM_CODEC
-                    )
-            ).map(TeamResearchEffectDataMap::new, m -> m.map);
+                            UUIDUtil.STREAM_CODEC,
+                            ByteBufCodecs.map(
+                                    CollectionUtils::newMap,
+                                    CodecUtils.registryStreamCodec(ResearchdRegistries.RESEARCH_EFFECT_DATA_TYPE),
+                                    ResearchEffectData.STREAM_CODEC))
+                    .map(TeamResearchEffectDataMap::new, m -> m.map);
 
     private final Map<UUID, Map<ResearchEffectDataType<?>, ResearchEffectData<?>>> map;
     private Runnable onChangedFunction;
@@ -77,10 +78,9 @@ public class TeamResearchEffectDataMap implements ResearchEffectManager, SavedDa
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends ResearchEffectData<?>> @Nullable T computeIfAbsent(UUID teamId, ResearchEffectDataType<T> type, Level level) {
-        return (T) this.map
-                .computeIfAbsent(teamId, k -> new HashMap<>())
-                .computeIfAbsent(type, k -> k.create());
+    public <T extends ResearchEffectData<?>> @Nullable T computeIfAbsent(
+            UUID teamId, ResearchEffectDataType<T> type, Level level) {
+        return (T) this.map.computeIfAbsent(teamId, k -> new HashMap<>()).computeIfAbsent(type, k -> k.create());
     }
 
     public void setEffectData(UUID teamId, ResearchEffectData<?> effectData) {

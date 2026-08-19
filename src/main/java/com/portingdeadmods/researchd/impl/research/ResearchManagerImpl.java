@@ -9,15 +9,14 @@ import com.portingdeadmods.researchd.api.research.ResearchManager;
 import com.portingdeadmods.researchd.api.research.ResearchPage;
 import com.portingdeadmods.researchd.api.research.ResearchRelations;
 import com.portingdeadmods.researchd.utils.registries.ResearchdManagers;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Nullable;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.ApiStatus;
-
-import javax.annotation.Nullable;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 @ApiStatus.Internal
 public final class ResearchManagerImpl implements ResearchManager {
@@ -32,11 +31,11 @@ public final class ResearchManagerImpl implements ResearchManager {
      * Map of ResearchPage id to list of root nodes (GlobalResearches with no parents within that page)
      */
     private Map<ResourceLocation, List<ResourceKey<Research>>> pageRoots;
+
     @Deprecated
     private @Nullable ResearchRelations rootResearch;
 
-    private ResearchManagerImpl() {
-    }
+    private ResearchManagerImpl() {}
 
     public static void setNewInstance(Level level) {
         instance = new ResearchManagerImpl();
@@ -49,7 +48,8 @@ public final class ResearchManagerImpl implements ResearchManager {
 
     // TODO: Use Hashmaps?
     private void initialize(Level level) {
-        Map<ResourceKey<Research>, Research> researchLookup = ResearchdManagers.getResearchesManager(level).getLookup();
+        Map<ResourceKey<Research>, Research> researchLookup =
+                ResearchdManagers.getResearchesManager(level).getLookup();
         Map<ResourceKey<Research>, ResearchRelations> globalResearchMap = new LinkedHashMap<>(researchLookup.size());
 
         this.researches = ImmutableList.copyOf(researchLookup.keySet());
@@ -66,10 +66,14 @@ public final class ResearchManagerImpl implements ResearchManager {
             for (ResourceKey<Research> parent : parents) {
                 ResearchRelations parentResearchRelations = globalResearchMap.get(parent);
 
-				if (parentResearchRelations == null) {
-					Researchd.error("Research Manager", "Research %s has a parent %s that does not exist. It will be treated as if it had no such parent.", research.getResearchKey().location(), parent.location());
-					continue;
-				}
+                if (parentResearchRelations == null) {
+                    Researchd.error(
+                            "Research Manager",
+                            "Research %s has a parent %s that does not exist. It will be treated as if it had no such parent.",
+                            research.getResearchKey().location(),
+                            parent.location());
+                    continue;
+                }
 
                 parentResearchRelations.getChildren().add(research);
             }
@@ -123,9 +127,11 @@ public final class ResearchManagerImpl implements ResearchManager {
             pageRootsMap.put(pageId, roots);
 
             // Use the first root's icon as the page icon
-            ResourceKey<Research> firstRoot = roots.isEmpty() ? researches.getFirst().getResearchKey() : roots.getFirst();
+            ResourceKey<Research> firstRoot =
+                    roots.isEmpty() ? researches.getFirst().getResearchKey() : roots.getFirst();
             Research firstResearchData = researchLookup.get(firstRoot);
-            UniqueArray<ResourceKey<Research>> researchKeys = new UniqueArray<>(researches.stream().map(ResearchRelations::getResearchKey).toList());
+            UniqueArray<ResourceKey<Research>> researchKeys = new UniqueArray<>(
+                    researches.stream().map(ResearchRelations::getResearchKey).toList());
             ResearchPage page = new ResearchPage(pageId, firstResearchData.researchIcon(), firstRoot, researchKeys);
             pagesMap.put(pageId, page);
         }
@@ -135,7 +141,8 @@ public final class ResearchManagerImpl implements ResearchManager {
         this.pageRoots = ImmutableMap.copyOf(pageRootsMap);
     }
 
-    private static ResourceLocation resolvePage(ResearchRelations research, Map<ResourceKey<Research>, Research> lookup) {
+    private static ResourceLocation resolvePage(
+            ResearchRelations research, Map<ResourceKey<Research>, Research> lookup) {
         Research r = lookup.get(research.getResearchKey());
         if (r == null) return ResearchPage.DEFAULT_PAGE_ID;
 
@@ -143,16 +150,22 @@ public final class ResearchManagerImpl implements ResearchManager {
 
         // If this is not root and has default page, inherit from parent
         if (!research.getParents().isEmpty() && pageId.equals(ResearchPage.DEFAULT_PAGE_ID)) {
-	        ResearchRelations firstParent = research.getParents().stream().findFirst().get();
-			ResourceLocation page = resolvePage(firstParent, lookup);
+            ResearchRelations firstParent =
+                    research.getParents().stream().findFirst().get();
+            ResourceLocation page = resolvePage(firstParent, lookup);
 
-			for (ResearchRelations parent : research.getParents()) {
-				ResourceLocation parentPage = resolvePage(parent, lookup);
-				if (!parentPage.equals(page)) {
-					Researchd.error("Research Manager", "Research %s has parents on different pages (%s and %s), using %s.",
-							research.getResearchKey().location(), page, parentPage, page);
-				}
-			}
+            for (ResearchRelations parent : research.getParents()) {
+                ResourceLocation parentPage = resolvePage(parent, lookup);
+                if (!parentPage.equals(page)) {
+                    Researchd.error(
+                            "Research Manager",
+                            "Research %s has parents on different pages (%s and %s), using %s.",
+                            research.getResearchKey().location(),
+                            page,
+                            parentPage,
+                            page);
+                }
+            }
 
             return page;
         }

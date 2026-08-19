@@ -12,6 +12,12 @@ import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.impl.research.icons.ItemResearchIcon;
 import com.portingdeadmods.researchd.utils.SpaghettiClient;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
@@ -26,31 +32,42 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-
 public class ItemSelectorWidget extends AbstractWidget {
     public static final ResourceLocation EDIT_ELEMENT_HOVER_SPRITE = Researchd.rl("edit_element_hover");
-    @Nullable
-    private final PopupWidget parentPopupWidget;
+
+    @Nullable private final PopupWidget parentPopupWidget;
+
     private Ingredient selected;
-    private final BiFunction<ItemSelectorWidget, @Nullable PopupWidget, ? extends ItemSelectorPopupWidget> popupWidgetFactory;
+    private final BiFunction<ItemSelectorWidget, @Nullable PopupWidget, ? extends ItemSelectorPopupWidget>
+            popupWidgetFactory;
     private Consumer<Ingredient> responder;
 
-    public ItemSelectorWidget(@Nullable PopupWidget parentPopupWidget, int x, int y, int width, int height, boolean tagSelector, boolean selectMultiple) {
+    public ItemSelectorWidget(
+            @Nullable PopupWidget parentPopupWidget,
+            int x,
+            int y,
+            int width,
+            int height,
+            boolean tagSelector,
+            boolean selectMultiple) {
         this(parentPopupWidget, x, y, width, height, Ingredient.of(new ItemStack(Items.DIRT)), (self, parent) -> {
             List<ItemSelectorCategory> categories = new ArrayList<>();
             Collections.addAll(categories, DefaultItemSelectorCategory.values());
             if (tagSelector) categories.add(TagItemSelectorCategory.INSTANCE);
-            return new ItemSelectorPopupWidget(self, parent, categories, DefaultItemSelectorCategory.getDefault(), 0, 0);
+            return new ItemSelectorPopupWidget(
+                    self, parent, categories, DefaultItemSelectorCategory.getDefault(), 0, 0);
         });
     }
 
-    public ItemSelectorWidget(@Nullable PopupWidget parentPopupWidget, int x, int y, int width, int height, Ingredient defaultSelected, BiFunction<ItemSelectorWidget, @Nullable PopupWidget, ? extends ItemSelectorPopupWidget> popupWidgetFactory) {
+    public ItemSelectorWidget(
+            @Nullable PopupWidget parentPopupWidget,
+            int x,
+            int y,
+            int width,
+            int height,
+            Ingredient defaultSelected,
+            BiFunction<ItemSelectorWidget, @Nullable PopupWidget, ? extends ItemSelectorPopupWidget>
+                    popupWidgetFactory) {
         super(x, y, width, height, CommonComponents.EMPTY);
         this.popupWidgetFactory = popupWidgetFactory;
         this.parentPopupWidget = parentPopupWidget;
@@ -60,17 +77,30 @@ public class ItemSelectorWidget extends AbstractWidget {
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        guiGraphics.blitSprite(EditorSharedSprites.EDITOR_BACKGROUND_INVERTED_SPRITE, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        guiGraphics.blitSprite(
+                EditorSharedSprites.EDITOR_BACKGROUND_INVERTED_SPRITE,
+                this.getX(),
+                this.getY(),
+                this.getWidth(),
+                this.getHeight());
 
         if (this.selected != null && this.selected.getItems().length > 0) {
-            guiGraphics.renderItem(this.selected.getItems()[0], this.getX() + (this.getWidth() - 16) / 2, this.getY() + (this.getWidth() - 16) / 2);
+            guiGraphics.renderItem(
+                    this.selected.getItems()[0],
+                    this.getX() + (this.getWidth() - 16) / 2,
+                    this.getY() + (this.getWidth() - 16) / 2);
         }
         if (this.isHovered()) {
-            PoseStack poseStack  = guiGraphics.pose();
+            PoseStack poseStack = guiGraphics.pose();
             poseStack.pushPose();
             {
                 poseStack.translate(0, 0, RdZIndex.EDITOR_HOVER_OVERLAY);
-                guiGraphics.blitSprite(EDIT_ELEMENT_HOVER_SPRITE, this.getX() + (this.getWidth() - 14) / 2, this.getY() + (this.getHeight() - 14) / 2, 14, 14);
+                guiGraphics.blitSprite(
+                        EDIT_ELEMENT_HOVER_SPRITE,
+                        this.getX() + (this.getWidth() - 14) / 2,
+                        this.getY() + (this.getHeight() - 14) / 2,
+                        14,
+                        14);
             }
             poseStack.popPose();
         }
@@ -89,8 +119,7 @@ public class ItemSelectorWidget extends AbstractWidget {
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-    }
+    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 
     public void setSelected(Ingredient selected, boolean respond) {
         this.selected = selected;

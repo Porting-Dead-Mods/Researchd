@@ -4,11 +4,10 @@ import com.mojang.serialization.Codec;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.resources.contents.ResearchdResearchPackProvider;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
-
 import java.util.HashMap;
 import java.util.Map;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 
 public class EditorResearchPackProvider implements ResearchdResearchPackProvider {
     private final Map<ResourceKey<ResearchPack>, ResearchPack> researchPacks;
@@ -42,6 +41,5 @@ public class EditorResearchPackProvider implements ResearchdResearchPackProvider
     }
 
     @Override
-    public void build() {
-    }
+    public void build() {}
 }

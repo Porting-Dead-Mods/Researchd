@@ -4,6 +4,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamImpl;
 import com.portingdeadmods.researchd.networking.team.manager.SyncTeamPayload;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperServer;
+import java.util.UUID;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -19,8 +20,6 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.UUID;
-
 public record RequestToJoinPayload(UUID toJoin, boolean remove) implements CustomPacketPayload {
     public static final Type<RequestToJoinPayload> TYPE = new Type<>(Researchd.rl("request_to_join_payload"));
     public static final StreamCodec<RegistryFriendlyByteBuf, RequestToJoinPayload> STREAM_CODEC = StreamCodec.composite(
@@ -28,8 +27,7 @@ public record RequestToJoinPayload(UUID toJoin, boolean remove) implements Custo
             RequestToJoinPayload::toJoin,
             ByteBufCodecs.BOOL,
             RequestToJoinPayload::remove,
-            RequestToJoinPayload::new
-    );
+            RequestToJoinPayload::new);
 
     @Override
     public @NotNull Type<? extends CustomPacketPayload> type() {
@@ -38,31 +36,33 @@ public record RequestToJoinPayload(UUID toJoin, boolean remove) implements Custo
 
     public void handle(IPayloadContext context) {
         context.enqueueWork(() -> {
-            if (context.player() instanceof ServerPlayer sp) {
-                MinecraftServer server = sp.getServer();
-                ServerLevel level = server.overworld();
-                Player teamMemberPlayer = level.getPlayerByUUID(this.toJoin());
-                if (teamMemberPlayer != null) {
-                    ResearchTeamImpl team = (ResearchTeamImpl) ResearchTeamHelperServer.getTeamByMember(teamMemberPlayer);
-                    if (team == null) return;
+                    if (context.player() instanceof ServerPlayer sp) {
+                        MinecraftServer server = sp.getServer();
+                        ServerLevel level = server.overworld();
+                        Player teamMemberPlayer = level.getPlayerByUUID(this.toJoin());
+                        if (teamMemberPlayer != null) {
+                            ResearchTeamImpl team =
+                                    (ResearchTeamImpl) ResearchTeamHelperServer.getTeamByMember(teamMemberPlayer);
+                            if (team == null) return;
 
-                    if (this.remove()) {
-                        team.getSocialManager().removeReceivedInvite(sp.getUUID());
-                    } else {
-                        team.getSocialManager().addSentInvite(sp.getUUID());
+                            if (this.remove()) {
+                                team.getSocialManager().removeReceivedInvite(sp.getUUID());
+                            } else {
+                                team.getSocialManager().addSentInvite(sp.getUUID());
+                            }
+                            team.setChanged();
+                            PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
+                            ResearchTeamHelperServer.refreshPlayerManagement(team, level);
+                        } else {
+                            sp.sendSystemMessage(Component.literal("The player you're trying to join does not exist!")
+                                    .withStyle(ChatFormatting.RED));
+                        }
                     }
-                    team.setChanged();
-                    PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
-                    ResearchTeamHelperServer.refreshPlayerManagement(team, level);
-                } else {
-                    sp.sendSystemMessage(Component.literal("The player you're trying to join does not exist!").withStyle(ChatFormatting.RED));
-                }
-            }
-        }).exceptionally(e -> {
-            Researchd.LOGGER.error("Failed to handle RequestToJoinPayload", e);
-            context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
-            return null;
-        });
-
+                })
+                .exceptionally(e -> {
+                    Researchd.LOGGER.error("Failed to handle RequestToJoinPayload", e);
+                    context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
+                    return null;
+                });
     }
 }

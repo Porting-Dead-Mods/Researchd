@@ -18,244 +18,265 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
 public class TeamCommands {
-	public static LiteralCommandNode<CommandSourceStack> build() {
-		return Commands.literal("team")
-                .then(Commands.literal("help")
-                        .executes(ctx -> {
-                            CommandSourceStack source = ctx.getSource();
-							if (ResearchdCompatHandler.isFTBTeamsEnabled())
-								source.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
-                            else
-								ResearchTeamHelperServer.sendHelpMessage(source::sendSystemMessage);
+    public static LiteralCommandNode<CommandSourceStack> build() {
+        return Commands.literal("team")
+                .then(Commands.literal("help").executes(ctx -> {
+                    CommandSourceStack source = ctx.getSource();
+                    if (ResearchdCompatHandler.isFTBTeamsEnabled())
+                        source.sendSystemMessage(
+                                ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
+                    else ResearchTeamHelperServer.sendHelpMessage(source::sendSystemMessage);
+                    return 1;
+                }))
+                .then(Commands.literal("members").executes(context -> {
+                    CommandSourceStack source = context.getSource();
+                    if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
+                        source.sendSystemMessage(
+                                ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
+                        return 1;
+                    }
+
+                    ServerPlayer player = source.getPlayer();
+
+                    if (player != null) {
+                        ResearchTeam team = ResearchTeamHelperServer.getTeamByMember(player);
+                        if (team != null) {
+                            player.sendSystemMessage(ResearchTeamHelperServer.formatMembers(team, player.level()));
+                        }
+                    }
+
+                    return 1;
+                }))
+                .then(Commands.literal("invite")
+                        .then(Commands.argument("player", StringArgumentType.string())
+                                .suggests(SuggestionUtils::playerNames)
+                                .executes(context -> {
+                                    CommandSourceStack source = context.getSource();
+                                    if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
+                                        source.sendSystemMessage(ResearchdTranslations.component(
+                                                ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
+                                        return 1;
+                                    }
+
+                                    ServerPlayer player = source.getPlayer();
+
+                                    if (player != null) {
+                                        ResearchTeamHelperServer.handleSendInviteToPlayer(
+                                                player,
+                                                PlayerUtils.getPlayerUUIDFromName(
+                                                        context.getSource().getLevel(),
+                                                        StringArgumentType.getString(context, "player")),
+                                                false);
+                                    }
+
+                                    return 1;
+                                })))
+                .then(Commands.literal("leave")
+                        .executes(context -> {
+                            CommandSourceStack source = context.getSource();
+                            if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
+                                source.sendSystemMessage(ResearchdTranslations.component(
+                                        ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
+                                return 1;
+                            }
+
+                            ServerPlayer player = source.getPlayer();
+
+                            if (player != null) {
+                                ResearchTeamHelperServer.handleLeaveTeam(player);
+                            }
+
                             return 1;
-                        }))
-				.then(Commands.literal("members")
-						.executes(context -> {
-							CommandSourceStack source = context.getSource();
-							if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
-								source.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
-								return 1;
-							}
+                        })
+                        .then(Commands.argument("nextToLead", StringArgumentType.string())
+                                .suggests(ResearchdSuggestionUtils::teamMemberNames)
+                                .executes(context -> {
+                                    CommandSourceStack source = context.getSource();
+                                    if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
+                                        source.sendSystemMessage(ResearchdTranslations.component(
+                                                ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
+                                        return 1;
+                                    }
 
-							ServerPlayer player = source.getPlayer();
+                                    ServerPlayer player = source.getPlayer();
 
-							if (player != null) {
-                                ResearchTeam team = ResearchTeamHelperServer.getTeamByMember(player);
-								if (team != null) {
-									player.sendSystemMessage(ResearchTeamHelperServer.formatMembers(team, player.level()));
-								}
-							}
+                                    if (player != null) {
+                                        if (StringArgumentType.getString(context, "nextToLead")
+                                                .equals("none")) ResearchTeamHelperServer.handleLeaveTeam(player);
+                                        else {
+                                            ResearchTeamHelperServer.handleLeaveTeam(
+                                                    player,
+                                                    PlayerUtils.getPlayerUUIDFromName(
+                                                            context.getSource().getLevel(),
+                                                            StringArgumentType.getString(context, "nextToLead")));
+                                        }
+                                    }
 
-							return 1;
-						}))
-				.then(Commands.literal("invite")
-						.then(Commands.argument("player", StringArgumentType.string())
-								.suggests(SuggestionUtils::playerNames)
-								.executes(context -> {
-									CommandSourceStack source = context.getSource();
-									if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
-										source.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
-										return 1;
-									}
+                                    return 1;
+                                })))
+                .then(Commands.literal("join")
+                        .then(Commands.argument("team", ResearchdTeamArgument.teamArgument())
+                                .executes(context -> {
+                                    CommandSourceStack source = context.getSource();
+                                    if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
+                                        source.sendSystemMessage(ResearchdTranslations.component(
+                                                ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
+                                        return 1;
+                                    }
 
-									ServerPlayer player = source.getPlayer();
+                                    ServerPlayer player = source.getPlayer();
 
-									if (player != null) {
-										ResearchTeamHelperServer.handleSendInviteToPlayer(player, PlayerUtils.getPlayerUUIDFromName(context.getSource().getLevel(), StringArgumentType.getString(context, "player")), false);
-									}
+                                    if (player != null) {
+                                        ResearchTeamHelperServer.handleEnterTeamSynced(
+                                                player, (ResearchTeamImpl) ResearchdTeamArgument.get(context, "team"));
+                                    }
 
-									return 1;
-								})
-						))
-				.then(Commands.literal("leave")
-						.executes(context -> {
-							CommandSourceStack source = context.getSource();
-							if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
-								source.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
-								return 1;
-							}
+                                    return 1;
+                                })))
+                .then(Commands.literal("ignore")
+                        .then(Commands.argument("memberOfTeam", StringArgumentType.string())
+                                .suggests(SuggestionUtils::playerNames)
+                                .executes(context -> {
+                                    CommandSourceStack source = context.getSource();
+                                    if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
+                                        source.sendSystemMessage(ResearchdTranslations.component(
+                                                ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
+                                        return 1;
+                                    }
 
-							ServerPlayer player = source.getPlayer();
+                                    ServerPlayer player = source.getPlayer();
 
-							if (player != null) {
-								ResearchTeamHelperServer.handleLeaveTeam(player);
-							}
+                                    if (player != null) {
+                                        ResearchTeamHelperServer.handleIgnoreTeam(
+                                                player,
+                                                PlayerUtils.getPlayerUUIDFromName(
+                                                        context.getSource().getLevel(),
+                                                        StringArgumentType.getString(context, "memberOfTeam")));
+                                    }
 
-							return 1;
-						})
-						.then(Commands.argument("nextToLead", StringArgumentType.string())
-							.suggests(ResearchdSuggestionUtils::teamMemberNames)
-							.executes(context -> {
-								CommandSourceStack source = context.getSource();
-								if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
-									source.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
-									return 1;
-								}
+                                    return 1;
+                                })))
+                .then(Commands.literal("promote")
+                        .then(Commands.argument("player", StringArgumentType.string())
+                                .suggests(ResearchdSuggestionUtils::teamMemberNames)
+                                .executes(context -> {
+                                    CommandSourceStack source = context.getSource();
+                                    if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
+                                        source.sendSystemMessage(ResearchdTranslations.component(
+                                                ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
+                                        return 1;
+                                    }
 
-								ServerPlayer player = source.getPlayer();
+                                    ServerPlayer player = source.getPlayer();
+                                    Player otherPlayer = PlayerUtils.getPlayerFromName(
+                                            source.getLevel(), StringArgumentType.getString(context, "player"));
+                                    ServerLevel level = source.getLevel();
 
-								if (player != null) {
-									if (StringArgumentType.getString(context, "nextToLead").equals("none"))
-										ResearchTeamHelperServer.handleLeaveTeam(player);
-									else {
-										ResearchTeamHelperServer.handleLeaveTeam(player, PlayerUtils.getPlayerUUIDFromName(context.getSource().getLevel(), StringArgumentType.getString(context, "nextToLead")));
-									}
-								}
+                                    if (player != null) {
+                                        if (otherPlayer != null) {
+                                            ResearchTeamHelperServer.handleManageModerator(
+                                                    player, otherPlayer.getUUID(), false);
+                                        }
+                                    }
 
-								return 1;
-							})
-						))
-				.then(Commands.literal("join")
-					.then(Commands.argument("team", ResearchdTeamArgument.teamArgument())
-						.executes(context -> {
-							CommandSourceStack source = context.getSource();
-							if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
-								source.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
-								return 1;
-							}
+                                    return 1;
+                                })))
+                .then(Commands.literal("demote")
+                        .then(Commands.argument("player", StringArgumentType.string())
+                                .suggests(ResearchdSuggestionUtils::teamMemberNames)
+                                .executes(context -> {
+                                    CommandSourceStack source = context.getSource();
+                                    if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
+                                        source.sendSystemMessage(ResearchdTranslations.component(
+                                                ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
+                                        return 1;
+                                    }
 
-							ServerPlayer player = source.getPlayer();
+                                    ServerPlayer player = source.getPlayer();
+                                    Player otherPlayer = PlayerUtils.getPlayerFromName(
+                                            source.getLevel(), StringArgumentType.getString(context, "player"));
+                                    ServerLevel level = source.getLevel();
 
-							if (player != null) {
-								ResearchTeamHelperServer.handleEnterTeamSynced(player, (ResearchTeamImpl) ResearchdTeamArgument.get(context, "team"));
-							}
+                                    if (player != null) {
+                                        ResearchTeamHelperServer.handleManageModerator(
+                                                player, otherPlayer.getUUID(), true);
+                                    }
 
-							return 1;
-						})
-					))
-				.then(Commands.literal("ignore")
-						.then(Commands.argument("memberOfTeam", StringArgumentType.string())
-								.suggests(SuggestionUtils::playerNames)
-								.executes(context -> {
-									CommandSourceStack source = context.getSource();
-									if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
-										source.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
-										return 1;
-									}
+                                    return 1;
+                                })))
+                .then(Commands.literal("kick")
+                        .then(Commands.argument("player", StringArgumentType.string())
+                                .suggests(ResearchdSuggestionUtils::teamMemberNames)
+                                .executes(context -> {
+                                    CommandSourceStack source = context.getSource();
+                                    if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
+                                        source.sendSystemMessage(ResearchdTranslations.component(
+                                                ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
+                                        return 1;
+                                    }
 
-									ServerPlayer player = source.getPlayer();
+                                    ServerPlayer player = source.getPlayer();
+                                    Player otherPlayer = PlayerUtils.getPlayerFromName(
+                                            source.getLevel(), StringArgumentType.getString(context, "player"));
+                                    ServerLevel level = source.getLevel();
 
-									if (player != null) {
-										ResearchTeamHelperServer.handleIgnoreTeam(player, PlayerUtils.getPlayerUUIDFromName(context.getSource().getLevel(), StringArgumentType.getString(context, "memberOfTeam")));
-									}
+                                    if (player != null) {
+                                        if (otherPlayer != null) {
+                                            ResearchTeamHelperServer.handleManageMember(
+                                                    player, otherPlayer.getUUID(), true);
+                                        } else if (player != null) {
+                                            player.sendSystemMessage(ResearchTeamHelperServer.getIllegalMessage());
+                                        }
+                                    }
 
-									return 1;
-								})
-						))
-				.then(Commands.literal("promote")
-						.then(Commands.argument("player", StringArgumentType.string())
-								.suggests(ResearchdSuggestionUtils::teamMemberNames)
-								.executes(context -> {
-									CommandSourceStack source = context.getSource();
-									if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
-										source.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
-										return 1;
-									}
+                                    return 1;
+                                })))
+                .then(Commands.literal("transfer-ownership")
+                        .then(Commands.argument("nextToLead", StringArgumentType.string())
+                                .suggests(ResearchdSuggestionUtils::teamMemberNames)
+                                .executes(context -> {
+                                    CommandSourceStack source = context.getSource();
+                                    if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
+                                        source.sendSystemMessage(ResearchdTranslations.component(
+                                                ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
+                                        return 1;
+                                    }
 
-									ServerPlayer player = source.getPlayer();
-									Player otherPlayer = PlayerUtils.getPlayerFromName(source.getLevel(), StringArgumentType.getString(context, "player"));
-									ServerLevel level = source.getLevel();
+                                    ServerPlayer player = source.getPlayer();
 
-									if (player != null) {
-										if (otherPlayer != null) {
-											ResearchTeamHelperServer.handleManageModerator(player, otherPlayer.getUUID(), false);
-										}
-									}
+                                    if (player != null) {
+                                        if (StringArgumentType.getString(context, "nextToLead")
+                                                .equals("none"))
+                                            source.sendSystemMessage(ResearchTeamHelperServer.getIllegalMessage());
+                                        else
+                                            ResearchTeamHelperServer.handleTransferOwnership(
+                                                    player,
+                                                    PlayerUtils.getPlayerUUIDFromName(
+                                                            context.getSource().getLevel(),
+                                                            StringArgumentType.getString(context, "nextToLead")));
+                                    }
 
-									return 1;
-								})
-						))
-				.then(Commands.literal("demote")
-						.then(Commands.argument("player", StringArgumentType.string())
-								.suggests(ResearchdSuggestionUtils::teamMemberNames)
-								.executes(context -> {
-									CommandSourceStack source = context.getSource();
-									if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
-										source.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
-										return 1;
-									}
+                                    return 1;
+                                })))
+                .then(Commands.literal("set-name")
+                        .then(Commands.argument("name", StringArgumentType.string())
+                                .executes(context -> {
+                                    CommandSourceStack source = context.getSource();
+                                    if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
+                                        source.sendSystemMessage(ResearchdTranslations.component(
+                                                ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
+                                        return 1;
+                                    }
 
-									ServerPlayer player = source.getPlayer();
-									Player otherPlayer = PlayerUtils.getPlayerFromName(source.getLevel(), StringArgumentType.getString(context, "player"));
-									ServerLevel level = source.getLevel();
+                                    ServerPlayer player = source.getPlayer();
 
-									if (player != null) {
-										ResearchTeamHelperServer.handleManageModerator(player, otherPlayer.getUUID(), true);
-									}
+                                    if (player != null) {
+                                        ResearchTeamHelperServer.handleSetName(
+                                                player, StringArgumentType.getString(context, "name"));
+                                    }
 
-									return 1;
-								})
-						))
-				.then(Commands.literal("kick")
-						.then(Commands.argument("player", StringArgumentType.string())
-								.suggests(ResearchdSuggestionUtils::teamMemberNames)
-								.executes(context -> {
-									CommandSourceStack source = context.getSource();
-									if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
-										source.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
-										return 1;
-									}
-
-									ServerPlayer player = source.getPlayer();
-									Player otherPlayer = PlayerUtils.getPlayerFromName(source.getLevel(), StringArgumentType.getString(context, "player"));
-									ServerLevel level = source.getLevel();
-
-									if (player != null) {
-										if (otherPlayer != null) {
-        ResearchTeamHelperServer.handleManageMember(player, otherPlayer.getUUID(), true);
-    } else if (player != null) {
-        player.sendSystemMessage(ResearchTeamHelperServer.getIllegalMessage());
+                                    return 1;
+                                })))
+                .build();
     }
-									}
-
-									return 1;
-								})
-						)
-				)
-				.then(Commands.literal("transfer-ownership")
-						.then(Commands.argument("nextToLead", StringArgumentType.string())
-								.suggests(ResearchdSuggestionUtils::teamMemberNames)
-								.executes(context -> {
-									CommandSourceStack source = context.getSource();
-									if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
-										source.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
-										return 1;
-									}
-
-									ServerPlayer player = source.getPlayer();
-
-									if (player != null) {
-										if (StringArgumentType.getString(context, "nextToLead").equals("none"))
-											source.sendSystemMessage(ResearchTeamHelperServer.getIllegalMessage());
-										else
-											ResearchTeamHelperServer.handleTransferOwnership(player, PlayerUtils.getPlayerUUIDFromName(context.getSource().getLevel(), StringArgumentType.getString(context, "nextToLead")));
-									}
-
-									return 1;
-								})
-						)
-				)
-				.then(Commands.literal("set-name")
-						.then(Commands.argument("name", StringArgumentType.string())
-								.executes(context -> {
-									CommandSourceStack source = context.getSource();
-									if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
-										source.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Game.FTB_TEAMS_INSTALLED));
-										return 1;
-									}
-
-									ServerPlayer player = source.getPlayer();
-
-									if (player != null) {
-										ResearchTeamHelperServer.handleSetName(player, StringArgumentType.getString(context, "name"));
-									}
-
-									return 1;
-								})
-						)
-				)
-				.build();
-	}
-
-
 }

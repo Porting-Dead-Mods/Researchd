@@ -6,14 +6,13 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.utils.registries.ReloadableRegistryManager;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.Unit;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.Unit;
 
 public interface ResearchdDatagenProvider<T> {
     String modid();

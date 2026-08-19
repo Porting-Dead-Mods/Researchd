@@ -2,19 +2,18 @@ package com.portingdeadmods.researchd.compat.kubejs.helpers;
 
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffect;
 import com.portingdeadmods.researchd.impl.research.effect.*;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.Level;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 
 public class ResearchEffectHelper {
-    
+
     public static ResearchEffect empty() {
         return EmptyResearchEffect.INSTANCE;
     }
-    
+
     public static ResearchEffect unlockRecipe(String recipeId) {
         return new RecipeUnlockEffect(ResourceLocation.parse(recipeId));
     }
@@ -50,11 +49,11 @@ public class ResearchEffectHelper {
         }
         return new AndResearchEffect(list);
     }
-    
+
     public static ResearchEffect unlockDimension(String dimension) {
         return new DimensionUnlockEffect(ResourceLocation.parse(dimension), DimensionUnlockEffect.DEFAULT_SPRITE);
     }
-    
+
     public static ResearchEffect unlockDimensions(String... dimensions) {
         if (dimensions.length == 0) {
             return EmptyResearchEffect.INSTANCE;
@@ -68,15 +67,15 @@ public class ResearchEffectHelper {
         }
         return new AndResearchEffect(list);
     }
-    
+
     public static ResearchEffect unlockNether() {
         return new DimensionUnlockEffect(Level.NETHER.location(), DimensionUnlockEffect.NETHER_SPRITE);
     }
-    
+
     public static ResearchEffect unlockEnd() {
         return new DimensionUnlockEffect(Level.END.location(), DimensionUnlockEffect.END_SPRITE);
     }
-    
+
     /**
      * Runs commands when the research is unlocked/locked. Pass an empty string to skip one of the two.
      * Supports the {@code {{RESEARCH_PLAYER_NAME}}}, {@code {{RESEARCH_TEAM_NAME}}} and {@code {{RESEARCH_ID}}} placeholders.
@@ -98,7 +97,7 @@ public class ResearchEffectHelper {
         Collections.addAll(list, effects);
         return new AndResearchEffect(list);
     }
-    
+
     public static ResearchEffect combine(List<ResearchEffect> effects) {
         if (effects.isEmpty()) {
             return EmptyResearchEffect.INSTANCE;

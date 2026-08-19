@@ -1,6 +1,9 @@
 package com.portingdeadmods.researchd.client.screens.lib.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
@@ -15,24 +18,25 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 public class PDLButton extends AbstractButton {
     public static final WidgetSprites SPRITES = new WidgetSprites(
             ResourceLocation.withDefaultNamespace("widget/button"),
             ResourceLocation.withDefaultNamespace("widget/button_disabled"),
-            ResourceLocation.withDefaultNamespace("widget/button_highlighted")
-    );
+            ResourceLocation.withDefaultNamespace("widget/button_highlighted"));
     protected static final Button.CreateNarration DEFAULT_NARRATION = Supplier::get;
     private final PDLButton.OnPress<PDLButton> onPress;
     private final Button.CreateNarration createNarration;
     private final WidgetSprites sprites;
 
     protected PDLButton(
-            int x, int y, int width, int height, WidgetSprites sprites, Component message, PDLButton.OnPress<PDLButton> onPress, Button.CreateNarration createNarration
-    ) {
+            int x,
+            int y,
+            int width,
+            int height,
+            WidgetSprites sprites,
+            Component message,
+            PDLButton.OnPress<PDLButton> onPress,
+            Button.CreateNarration createNarration) {
         super(x, y, width, height, message);
         this.sprites = sprites;
         this.onPress = onPress;
@@ -40,7 +44,15 @@ public class PDLButton extends AbstractButton {
     }
 
     protected PDLButton(PDLButton.Builder<PDLButton> builder) {
-        this(builder.x, builder.y, builder.width, builder.height, builder.sprites, builder.message, builder.onPress, builder.createNarration);
+        this(
+                builder.x,
+                builder.y,
+                builder.width,
+                builder.height,
+                builder.sprites,
+                builder.message,
+                builder.onPress,
+                builder.createNarration);
         setTooltip(builder.tooltip);
     }
 
@@ -50,7 +62,12 @@ public class PDLButton extends AbstractButton {
         guiGraphics.setColor(1.0F, 1.0F, 1.0F, this.alpha);
         RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
-        guiGraphics.blitSprite(this.sprites.get(this.active, this.isHoveredOrFocused()), this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        guiGraphics.blitSprite(
+                this.sprites.get(this.active, this.isHoveredOrFocused()),
+                this.getX(),
+                this.getY(),
+                this.getWidth(),
+                this.getHeight());
         guiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
         int i = getFGColor();
         this.renderString(guiGraphics, minecraft.font, i | Mth.ceil(this.alpha * 255.0F) << 24);
@@ -71,7 +88,8 @@ public class PDLButton extends AbstractButton {
         this.defaultButtonNarrationText(narrationElementOutput);
     }
 
-    public static <B extends AbstractButton> Builder<B> builder(Function<PDLButton.Builder<B>, B> buttonFactory, OnPress<B> onPress) {
+    public static <B extends AbstractButton> Builder<B> builder(
+            Function<PDLButton.Builder<B>, B> buttonFactory, OnPress<B> onPress) {
         return new Builder<>(buttonFactory, onPress);
     }
 
@@ -83,8 +101,9 @@ public class PDLButton extends AbstractButton {
         public Component message = CommonComponents.EMPTY;
         public final Function<Builder<B>, B> buttonFactory;
         public final PDLButton.OnPress<B> onPress;
-        @Nullable
-        public Tooltip tooltip;
+
+        @Nullable public Tooltip tooltip;
+
         public int x;
         public int y;
         public int width = 150;

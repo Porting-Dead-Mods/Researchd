@@ -20,5 +20,4 @@ public interface ResearchQueue {
     int size();
 
     ResourceKey<Research> getFirst();
-
 }

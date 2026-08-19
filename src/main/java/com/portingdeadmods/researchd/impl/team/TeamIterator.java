@@ -2,10 +2,9 @@ package com.portingdeadmods.researchd.impl.team;
 
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.ResearchTeamManager;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Iterator;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 public class TeamIterator implements Iterator<ResearchTeam> {
     private final ResearchTeamManager manager;
@@ -40,5 +39,4 @@ public class TeamIterator implements Iterator<ResearchTeam> {
             return new TeamIterator(this.manager, this.teamIdIterator);
         }
     }
-
 }

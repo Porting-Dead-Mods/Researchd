@@ -1,16 +1,13 @@
 package com.portingdeadmods.researchd.client.screens.lib.widgets;
 
 import com.portingdeadmods.researchd.Researchd;
+import java.util.Collection;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Collection;
 
 // TODO: Move to pdl
 public abstract class ContainerWidget<E> extends AbstractWidget {
@@ -28,11 +25,31 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
     protected int hoveredXIndex;
     protected int hoveredYIndex;
 
-    public ContainerWidget(int width, int height, int itemWidth, int itemHeight, Orientation orientation, int cols, int rows, Collection<E> items, boolean renderScroller) {
+    public ContainerWidget(
+            int width,
+            int height,
+            int itemWidth,
+            int itemHeight,
+            Orientation orientation,
+            int cols,
+            int rows,
+            Collection<E> items,
+            boolean renderScroller) {
         this(0, 0, width, height, itemWidth, itemHeight, orientation, cols, rows, items, renderScroller);
     }
 
-    public ContainerWidget(int x, int y, int width, int height, int itemWidth, int itemHeight, Orientation orientation, int cols, int rows, Collection<E> items, boolean renderScroller) {
+    public ContainerWidget(
+            int x,
+            int y,
+            int width,
+            int height,
+            int itemWidth,
+            int itemHeight,
+            Orientation orientation,
+            int cols,
+            int rows,
+            Collection<E> items,
+            boolean renderScroller) {
         super(x, y, width, height, CommonComponents.EMPTY);
         this.itemWidth = itemWidth;
         this.itemHeight = itemHeight;
@@ -49,7 +66,11 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
         this.hoveredXIndex = -1;
         this.hoveredYIndex = -1;
 
-        guiGraphics.enableScissor(this.getLeft(), this.getTop(), this.getLeft() + getScissorsWidth(), this.getTop() + getScissorsHeight());
+        guiGraphics.enableScissor(
+                this.getLeft(),
+                this.getTop(),
+                this.getLeft() + getScissorsWidth(),
+                this.getTop() + getScissorsHeight());
         {
             this.renderContainer(guiGraphics, mouseX, mouseY);
         }
@@ -60,11 +81,9 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
         }
 
         renderTooltips(guiGraphics, mouseX, mouseY, v);
-
     }
 
-    protected void renderTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
-    }
+    protected void renderTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {}
 
     protected void renderScroller(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         float percentage = (float) this.scrollOffset / getMaxScrollDistance();
@@ -77,7 +96,9 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
     }
 
     private int getMaxScrollDistance() {
-        return this.orientation == Orientation.VERTICAL ? this.getContentHeight() - this.getHeight() : this.getContentWidth() - this.getWidth();
+        return this.orientation == Orientation.VERTICAL
+                ? this.getContentHeight() - this.getHeight()
+                : this.getContentWidth() - this.getWidth();
     }
 
     private int getScrollerY(float scrollPercentage) {
@@ -137,13 +158,18 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
             int left = this.getLeft() + (this.hoveredXIndex * this.getItemWidth());
             int top = this.getTop() + (this.hoveredYIndex * this.getItemHeight());
             if (this.hoveredItem != null) {
-                this.clickedItem(this.hoveredItem, this.hoveredXIndex, this.hoveredYIndex, left, top, (int) mouseX, (int) mouseY);
+                this.clickedItem(
+                        this.hoveredItem, this.hoveredXIndex, this.hoveredYIndex, left, top, (int) mouseX, (int)
+                                mouseY);
                 return super.mouseClicked(mouseX, mouseY, button);
             }
         } else if (this.isHovered() && this.isScrollbarHovered((int) mouseX, (int) mouseY) && this.renderScroller) {
             int scrollableDistance = this.getMaxScrollDistance();
             int minPos = (this.orientation == Orientation.HORIZONTAL ? this.getX() : this.getY()) + 7;
-            int maxPos = (this.orientation == Orientation.HORIZONTAL ? this.getX() + this.getWidth() : this.getY() + this.getHeight()) - 7;
+            int maxPos = (this.orientation == Orientation.HORIZONTAL
+                            ? this.getX() + this.getWidth()
+                            : this.getY() + this.getHeight())
+                    - 7;
 
             double scrolledPercentage = ((Math.clamp(mouseY, minPos, maxPos) - minPos)) / (double) (maxPos - minPos);
 
@@ -197,7 +223,8 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
         int yIndex = 0;
         boolean isAnyHovered = false;
         for (E item : this.getItems()) {
-            if (this.isItemHovered(xIndex, yIndex, mouseX, mouseY) && guiGraphics.containsPointInScissor(mouseX, mouseY)) {
+            if (this.isItemHovered(xIndex, yIndex, mouseX, mouseY)
+                    && guiGraphics.containsPointInScissor(mouseX, mouseY)) {
                 this.hoveredItem = item;
                 isAnyHovered = true;
             }
@@ -240,11 +267,11 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
                 && mouseY < this.getTop() + (this.getItemHeight() * (indexY + 1)) - scrollOffsetY;
     }
 
-	protected void sortEntriesBy(java.util.Comparator<? super E> comparator) {
-		if (this.items instanceof java.util.List<E> list) {
-			list.sort(comparator);
-		}
-	}
+    protected void sortEntriesBy(java.util.Comparator<? super E> comparator) {
+        if (this.items instanceof java.util.List<E> list) {
+            list.sort(comparator);
+        }
+    }
 
     public void clickedItem(E item, int index, int left, int top, int mouseX, int mouseY) {
         this.clickedItem(item, 0, index, left, top, mouseX, mouseY);
@@ -252,11 +279,13 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
 
     public abstract void clickedItem(E item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY);
 
-    public final void renderItem(GuiGraphics guiGraphics, E item, int index, int left, int top, int mouseX, int mouseY) {
+    public final void renderItem(
+            GuiGraphics guiGraphics, E item, int index, int left, int top, int mouseX, int mouseY) {
         this.renderItem(guiGraphics, item, 0, index, left, top, mouseX, mouseY);
     }
 
-    public final void renderItem(GuiGraphics guiGraphics, E item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {
+    public final void renderItem(
+            GuiGraphics guiGraphics, E item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {
         if (guiGraphics.containsPointInScissor(mouseX, mouseY) && this.isItemHovered(xIndex, yIndex, mouseX, mouseY)) {
             this.hoveredItem = item;
             this.hoveredXIndex = xIndex;
@@ -265,12 +294,11 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
         this.internalRenderItem(guiGraphics, item, xIndex, yIndex, left, top, mouseX, mouseY);
     }
 
-    protected abstract void internalRenderItem(GuiGraphics guiGraphics, E item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY);
+    protected abstract void internalRenderItem(
+            GuiGraphics guiGraphics, E item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY);
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-
-    }
+    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 
     public enum Orientation {
         HORIZONTAL(SCROLLER_SMALL_HORIZONTAL_SPRITE, 7, 4),

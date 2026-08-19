@@ -2,12 +2,13 @@ package com.portingdeadmods.researchd.api;
 
 import com.portingdeadmods.portingdeadlibs.utils.PlayerUtils;
 import com.portingdeadmods.researchd.api.research.Research;
+import com.portingdeadmods.researchd.api.research.ResearchManager;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectManager;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectDataType;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.ResearchTeamManager;
-import com.portingdeadmods.researchd.api.research.ResearchManager;
+import com.portingdeadmods.researchd.client.ClientResearchdApi;
 import com.portingdeadmods.researchd.client.cache.ResearchTeamCache;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.saved.TeamResearchEffectSavedData;
@@ -16,8 +17,9 @@ import com.portingdeadmods.researchd.impl.research.ResearchManagerImpl;
 import com.portingdeadmods.researchd.impl.research.effect.data.DimensionUnlockEffectData;
 import com.portingdeadmods.researchd.impl.research.effect.data.ItemUnlockEffectData;
 import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
-import com.portingdeadmods.researchd.client.ClientResearchdApi;
 import com.portingdeadmods.researchd.registries.ResearchdEffectDataTypes;
+import java.util.UUID;
+import java.util.function.Supplier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -31,9 +33,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.neoforged.fml.loading.FMLEnvironment;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.UUID;
-import java.util.function.Supplier;
 
 public final class ResearchdApi {
     /* Research Screen Api */
@@ -76,7 +75,8 @@ public final class ResearchdApi {
     }
 
     /* Research Effect Data Api */
-    public static <T extends ResearchEffectData<?>> @Nullable T getEffectDataForPlayer(Player player, ResearchEffectDataType<T> type) {
+    public static <T extends ResearchEffectData<?>> @Nullable T getEffectDataForPlayer(
+            Player player, ResearchEffectDataType<T> type) {
         ResearchTeamManager teamManager = getTeamManager(player.level());
         if (teamManager == null) return null;
         ResearchTeam team = teamManager.getTeamByPlayer(player);
@@ -84,18 +84,21 @@ public final class ResearchdApi {
         return getEffectDataForTeam(player.level(), team.getId(), type);
     }
 
-    public static <T extends ResearchEffectData<?>> @Nullable T getEffectDataForPlayer(Player player, Supplier<ResearchEffectDataType<T>> type) {
+    public static <T extends ResearchEffectData<?>> @Nullable T getEffectDataForPlayer(
+            Player player, Supplier<ResearchEffectDataType<T>> type) {
         return getEffectDataForPlayer(player, type.get());
     }
 
-    public static <T extends ResearchEffectData<?>> @Nullable T getEffectDataForTeam(Level level, UUID teamId, ResearchEffectDataType<T> type) {
+    public static <T extends ResearchEffectData<?>> @Nullable T getEffectDataForTeam(
+            Level level, UUID teamId, ResearchEffectDataType<T> type) {
         if (teamId == null) return null;
         ResearchEffectManager researchEffectManager = getResearchEffectManager(level);
         if (researchEffectManager == null) return null;
         return researchEffectManager.getEffectData(teamId, type);
     }
 
-    public static <T extends ResearchEffectData<?>> @Nullable T getEffectDataForTeam(Level level, UUID teamId, Supplier<ResearchEffectDataType<T>> type) {
+    public static <T extends ResearchEffectData<?>> @Nullable T getEffectDataForTeam(
+            Level level, UUID teamId, Supplier<ResearchEffectDataType<T>> type) {
         return getEffectDataForTeam(level, teamId, type.get());
     }
 
@@ -184,5 +187,4 @@ public final class ResearchdApi {
         }
         return stored;
     }
-
 }

@@ -14,12 +14,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class EditBoxMixin implements EditBoxExtension {
     @ModifyExpressionValue(
             method = "renderWidget",
-            at = @At(
-                    value = "FIELD",
-                    target = "net/minecraft/client/gui/components/EditBox.SPRITES : Lnet/minecraft/client/gui/components/WidgetSprites;",
-                    opcode = Opcodes.GETSTATIC
-            )
-    )
+            at =
+                    @At(
+                            value = "FIELD",
+                            target =
+                                    "net/minecraft/client/gui/components/EditBox.SPRITES : Lnet/minecraft/client/gui/components/WidgetSprites;",
+                            opcode = Opcodes.GETSTATIC))
     private WidgetSprites replaceSpritesField(WidgetSprites original) {
         return this.getSprites(original);
     }
@@ -33,5 +33,4 @@ public class EditBoxMixin implements EditBoxExtension {
     private void researchd$onValueChange(String newText, CallbackInfo ci) {
         this.onValueChangedExtra(newText);
     }
-
 }

@@ -36,12 +36,19 @@ public class ResearchLabBER implements BlockEntityRenderer<ResearchLabController
         BlockRenderDispatcher blockRenderer = mc.getBlockRenderer();
 
         this.context = context;
-        this.model = blockRenderer.getBlockModel(ResearchdBlocks.RESEARCH_LAB_CONTROLLER.get().defaultBlockState());
+        this.model = blockRenderer.getBlockModel(
+                ResearchdBlocks.RESEARCH_LAB_CONTROLLER.get().defaultBlockState());
         this.blockState = ResearchdBlocks.RESEARCH_LAB_CONTROLLER.get().defaultBlockState();
     }
 
     @Override
-    public void render(ResearchLabControllerBE researchLabControllerBE, float v, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight, int packedOverlay) {
+    public void render(
+            ResearchLabControllerBE researchLabControllerBE,
+            float v,
+            PoseStack poseStack,
+            MultiBufferSource multiBufferSource,
+            int packedLight,
+            int packedOverlay) {
         // Lab Model
         poseStack.pushPose();
         {
@@ -50,28 +57,35 @@ public class ResearchLabBER implements BlockEntityRenderer<ResearchLabController
             BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
             BlockState state = researchLabControllerBE.getBlockState();
             BlockPos pos = researchLabControllerBE.getBlockPos();
-            blockRenderer.getModelRenderer().tesselateBlock(
-                    researchLabControllerBE.getLevel(),
-                    this.model,
-                    state,
-                    pos,
-                    poseStack,
-                    multiBufferSource.getBuffer(RenderTypeHelper.getEntityRenderType(RenderType.TRANSLUCENT, false)),
-                    true,
-                    researchLabControllerBE.getLevel().random,
-                    state.getSeed(pos),
-                    OverlayTexture.NO_OVERLAY,
-                    ModelData.EMPTY,
-                    RenderTypeHelper.getEntityRenderType(RenderType.TRANSLUCENT, false)
-            );
+            blockRenderer
+                    .getModelRenderer()
+                    .tesselateBlock(
+                            researchLabControllerBE.getLevel(),
+                            this.model,
+                            state,
+                            pos,
+                            poseStack,
+                            multiBufferSource.getBuffer(
+                                    RenderTypeHelper.getEntityRenderType(RenderType.TRANSLUCENT, false)),
+                            true,
+                            researchLabControllerBE.getLevel().random,
+                            state.getSeed(pos),
+                            OverlayTexture.NO_OVERLAY,
+                            ModelData.EMPTY,
+                            RenderTypeHelper.getEntityRenderType(RenderType.TRANSLUCENT, false));
         }
 
         poseStack.popPose();
 
         // Research Packs
-        for (ItemStack pack : researchLabControllerBE.getItemHandlerStacksList(researchLabControllerBE.getItemHandler())) {
-            double len = researchLabControllerBE.getItemHandlerStacksList(researchLabControllerBE.getItemHandler()).size();
-            double idx = researchLabControllerBE.getItemHandlerStacksList(researchLabControllerBE.getItemHandler()).indexOf(pack);
+        for (ItemStack pack :
+                researchLabControllerBE.getItemHandlerStacksList(researchLabControllerBE.getItemHandler())) {
+            double len = researchLabControllerBE
+                    .getItemHandlerStacksList(researchLabControllerBE.getItemHandler())
+                    .size();
+            double idx = researchLabControllerBE
+                    .getItemHandlerStacksList(researchLabControllerBE.getItemHandler())
+                    .indexOf(pack);
 
             float duration = 50f * (float) len; // ticks per rotation
             double theta;
@@ -87,7 +101,8 @@ public class ResearchLabBER implements BlockEntityRenderer<ResearchLabController
 
             poseStack.pushPose();
             {
-                // System.out.println("Rendering pack at index " + idx + " of " + len + " at position (" + sin + ", " + PACK_RENDERING_HEIGHT + ", " + cos + ")");
+                // System.out.println("Rendering pack at index " + idx + " of " + len + " at position (" + sin + ", " +
+                // PACK_RENDERING_HEIGHT + ", " + cos + ")");
                 float bonus;
                 if (idx % 2 == 0) {
                     bonus = 0.25f;
@@ -95,13 +110,22 @@ public class ResearchLabBER implements BlockEntityRenderer<ResearchLabController
                     bonus = -0.25f;
                 }
 
-                poseStack.translate(sin + 0.5f, PACK_RENDERING_HEIGHT + Math.sin((bonus + theta) * Math.PI * 2) * 0.1, cos + 0.5f);
+                poseStack.translate(
+                        sin + 0.5f, PACK_RENDERING_HEIGHT + Math.sin((bonus + theta) * Math.PI * 2) * 0.1, cos + 0.5f);
                 poseStack.scale(0.5f, 0.5f, 0.5f);
                 double angle = -360.0 * ((idx / len) + theta);
                 poseStack.mulPose(com.mojang.math.Axis.YN.rotationDegrees((float) angle));
 
                 context.getItemRenderer()
-                        .renderStatic(pack, ItemDisplayContext.FIXED, packedLight, packedOverlay, poseStack, multiBufferSource, researchLabControllerBE.getLevel(), (int) blockState.getSeed(researchLabControllerBE.getBlockPos()));
+                        .renderStatic(
+                                pack,
+                                ItemDisplayContext.FIXED,
+                                packedLight,
+                                packedOverlay,
+                                poseStack,
+                                multiBufferSource,
+                                researchLabControllerBE.getLevel(),
+                                (int) blockState.getSeed(researchLabControllerBE.getBlockPos()));
             }
             poseStack.popPose();
         }
@@ -109,6 +133,7 @@ public class ResearchLabBER implements BlockEntityRenderer<ResearchLabController
 
     @Override
     public @NotNull AABB getRenderBoundingBox(ResearchLabControllerBE blockEntity) {
-        return AABBUtils.move(new AABB(blockEntity.getBlockPos()), Direction.UP, 1).inflate(1);
+        return AABBUtils.move(new AABB(blockEntity.getBlockPos()), Direction.UP, 1)
+                .inflate(1);
     }
 }

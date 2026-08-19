@@ -11,13 +11,12 @@ import com.portingdeadmods.researchd.client.screens.lib.widgets.RegistryVerifyEd
 import com.portingdeadmods.researchd.impl.research.effect.ItemUnlockEffect;
 import com.portingdeadmods.researchd.registries.ResearchEffectTypes;
 import com.portingdeadmods.researchd.utils.GuiUtils;
+import java.util.List;
 import net.minecraft.client.gui.layouts.LayoutSettings;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Unit;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public class ItemUnlockEffectObject implements TypedEditorObject<ItemUnlockEffect, ResearchEffectType> {
     public static final ResourceLocation ID = Researchd.rl("item_unlock");
@@ -29,11 +28,14 @@ public class ItemUnlockEffectObject implements TypedEditorObject<ItemUnlockEffec
     }
 
     @Override
-    public void buildLayout(RememberingLinearLayout layout, @Nullable ItemUnlockEffect previous, EditorContext context) {
+    public void buildLayout(
+            RememberingLinearLayout layout, @Nullable ItemUnlockEffect previous, EditorContext context) {
         layout.getLayout().spacing(2);
 
-        ItemSelectorWidget itemSelector = new ItemSelectorWidget(context.parentPopupWidget(), 0, 0, 25, 25, false, false);
-        RegistryVerifyEditBox idEditBox = RegistryVerifyEditBox.forRegistry(BuiltInRegistries.ITEM, context.innerWidth() - 8, 16);
+        ItemSelectorWidget itemSelector =
+                new ItemSelectorWidget(context.parentPopupWidget(), 0, 0, 25, 25, false, false);
+        RegistryVerifyEditBox idEditBox =
+                RegistryVerifyEditBox.forRegistry(BuiltInRegistries.ITEM, context.innerWidth() - 8, 16);
         idEditBox.setResponder(newVal -> {
             ResourceLocation id = ResourceLocation.parse(newVal);
             if (idEditBox.isValid(id)) {
@@ -41,7 +43,9 @@ public class ItemUnlockEffectObject implements TypedEditorObject<ItemUnlockEffec
             }
             this.update(layout, context);
         });
-        itemSelector.setResponder(ingredient -> idEditBox.setValue(BuiltInRegistries.ITEM.getKey(itemSelector.getSelected().getItems()[0].getItem()).toString()));
+        itemSelector.setResponder(ingredient -> idEditBox.setValue(BuiltInRegistries.ITEM
+                .getKey(itemSelector.getSelected().getItems()[0].getItem())
+                .toString()));
 
         layout.addWidget(null, GuiUtils.stringWidget("Unlocks Item:"));
         layout.addWidget("item_selector", itemSelector, LayoutSettings::alignHorizontallyCenter);
@@ -56,12 +60,12 @@ public class ItemUnlockEffectObject implements TypedEditorObject<ItemUnlockEffec
 
     @Override
     public Result<Unit, Exception> valid(RememberingLinearLayout layout) {
-        boolean idEditBoxValid = layout.getChild("id_edit_box", RegistryVerifyEditBox.class).isValid();
+        boolean idEditBoxValid =
+                layout.getChild("id_edit_box", RegistryVerifyEditBox.class).isValid();
         if (!idEditBoxValid) {
             return Result.err("Research Effect needs a valid item id");
         }
 
         return Result.ok(Unit.INSTANCE);
     }
-
 }

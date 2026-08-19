@@ -2,6 +2,9 @@ package com.portingdeadmods.researchd.client.screens.lib.widgets;
 
 import com.google.common.collect.ImmutableList;
 import com.portingdeadmods.researchd.Researchd;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -13,10 +16,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FastColor;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
 
 public abstract class DropDownWidget<P extends LayoutElement> implements GuiEventListener {
     private P parent;
@@ -137,14 +136,19 @@ public abstract class DropDownWidget<P extends LayoutElement> implements GuiEven
             return mouseX > x && mouseY > y - 1 && mouseX < x + context.maxWidth() && mouseY < y + this.height() + 1;
         }
 
-        default void clicked(int mouseX, int mouseY) {
-        }
+        default void clicked(int mouseX, int mouseY) {}
 
-        void render(GuiGraphics guiGraphics, int x, int y, int mouseX, int mouseY, float partialTicks, OptionContext context);
+        void render(
+                GuiGraphics guiGraphics,
+                int x,
+                int y,
+                int mouseX,
+                int mouseY,
+                float partialTicks,
+                OptionContext context);
     }
 
-    public record OptionContext(int maxWidth, int totalHeight) {
-    }
+    public record OptionContext(int maxWidth, int totalHeight) {}
 
     public record StringOption(Component value, Font font, Consumer<StringOption> onClicked) implements Option {
         public StringOption(Component value, Font font) {
@@ -167,14 +171,24 @@ public abstract class DropDownWidget<P extends LayoutElement> implements GuiEven
         }
 
         @Override
-        public void render(GuiGraphics guiGraphics, int x, int y, int mouseX, int mouseY, float partialTicks, OptionContext context) {
+        public void render(
+                GuiGraphics guiGraphics,
+                int x,
+                int y,
+                int mouseX,
+                int mouseY,
+                float partialTicks,
+                OptionContext context) {
             if (this.isHovered(x, y, mouseX, mouseY, context)) {
-                guiGraphics.fill(x - 1, y - 1, x + context.maxWidth() - 1, y + this.height() + 1, FastColor.ARGB32.color(120, 120, 120));
+                guiGraphics.fill(
+                        x - 1,
+                        y - 1,
+                        x + context.maxWidth() - 1,
+                        y + this.height() + 1,
+                        FastColor.ARGB32.color(120, 120, 120));
             }
 
             guiGraphics.drawString(this.font(), this.value(), x, y, -1);
         }
-
     }
-
 }

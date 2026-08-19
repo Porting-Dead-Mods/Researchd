@@ -18,5 +18,4 @@ public record ResearchMethodType(ResourceLocation id, ResearchIcon icon, boolean
     public static ResearchMethodType multiple(ResourceLocation id, ResearchIcon icon) {
         return new ResearchMethodType(id, icon, true);
     }
-
 }

@@ -24,7 +24,8 @@ public class EmbeddedMethodCreationWidget extends AbstractWidget {
     private @Nullable AbstractResearchInfoWidget<? extends ResearchMethod> createdMethodInfoWidget;
     private Runnable responder;
 
-    public EmbeddedMethodCreationWidget(@Nullable PopupWidget parentPopupWidget, int x, int y, int width, int height, Component message) {
+    public EmbeddedMethodCreationWidget(
+            @Nullable PopupWidget parentPopupWidget, int x, int y, int width, int height, Component message) {
         super(x, y, width, height, message);
         this.parentPopupWidget = parentPopupWidget;
         this.responder = () -> {};
@@ -36,16 +37,30 @@ public class EmbeddedMethodCreationWidget extends AbstractWidget {
 
     public void setCreatedMethod(ResearchMethod method) {
         this.createdMethod = method;
-        this.createdMethodInfoWidget = ResearchdClient.RESEARCH_METHOD_WIDGETS.get(method.id()).createMethod(this.getX(), this.getY(), this.createdMethod);
-        this.createdMethodInfoWidget.setPosition(this.getX() + (this.width - this.createdMethodInfoWidget.getWidth()) / 2, this.getY() + (this.height - this.createdMethodInfoWidget.getHeight()) / 2);
+        this.createdMethodInfoWidget = ResearchdClient.RESEARCH_METHOD_WIDGETS
+                .get(method.id())
+                .createMethod(this.getX(), this.getY(), this.createdMethod);
+        this.createdMethodInfoWidget.setPosition(
+                this.getX() + (this.width - this.createdMethodInfoWidget.getWidth()) / 2,
+                this.getY() + (this.height - this.createdMethodInfoWidget.getHeight()) / 2);
         this.responder.run();
     }
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        guiGraphics.blitSprite(EditorSharedSprites.EDITOR_BACKGROUND_INVERTED_SPRITE, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        guiGraphics.blitSprite(
+                EditorSharedSprites.EDITOR_BACKGROUND_INVERTED_SPRITE,
+                this.getX(),
+                this.getY(),
+                this.getWidth(),
+                this.getHeight());
         if (this.createdMethod == null) {
-            guiGraphics.drawCenteredString(GuiUtils.getFont(), "Create Method", this.getX() + this.getWidth() / 2, this.getY() + (this.getHeight() - GuiUtils.getFont().lineHeight) / 2, -1);
+            guiGraphics.drawCenteredString(
+                    GuiUtils.getFont(),
+                    "Create Method",
+                    this.getX() + this.getWidth() / 2,
+                    this.getY() + (this.getHeight() - GuiUtils.getFont().lineHeight) / 2,
+                    -1);
         } else {
             this.createdMethodInfoWidget.render(guiGraphics, mouseX, mouseY, partialTick);
             this.createdMethodInfoWidget.renderTooltip(guiGraphics, mouseX, mouseY, partialTick);
@@ -58,7 +73,9 @@ public class EmbeddedMethodCreationWidget extends AbstractWidget {
             if (this.parentPopupWidget != null) {
                 SpaghettiClient.tryGetResearchScreen().closePopup(this.parentPopupWidget);
             }
-            this.methodTypePopupWidget = SpaghettiClient.tryGetResearchScreen().openPopupCentered(new ResearchMethodParentSelectionPopupWidget(this.parentPopupWidget, this, CommonComponents.EMPTY));
+            this.methodTypePopupWidget = SpaghettiClient.tryGetResearchScreen()
+                    .openPopupCentered(new ResearchMethodParentSelectionPopupWidget(
+                            this.parentPopupWidget, this, CommonComponents.EMPTY));
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
@@ -82,11 +99,9 @@ public class EmbeddedMethodCreationWidget extends AbstractWidget {
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-    }
+    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 
     public ResearchMethod getMethod() {
         return this.createdMethod;
     }
-
 }

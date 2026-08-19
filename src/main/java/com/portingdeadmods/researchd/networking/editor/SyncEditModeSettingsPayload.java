@@ -16,11 +16,11 @@ public record SyncEditModeSettingsPayload(EditModeSettingsImpl editModeSettings)
 
     public void handle(IPayloadContext context) {
         context.enqueueWork(() -> {
-            context.player().setData(ResearchdAttachments.EDIT_MODE_SETTINGS, this.editModeSettings());
-        }).exceptionally(err -> {
-            Researchd.LOGGER.error("Failed to handle SyncEditModeSettingsPayload", err);
-            return null;
-        });
+                    context.player().setData(ResearchdAttachments.EDIT_MODE_SETTINGS, this.editModeSettings());
+                })
+                .exceptionally(err -> {
+                    Researchd.LOGGER.error("Failed to handle SyncEditModeSettingsPayload", err);
+                    return null;
+                });
     }
-
 }

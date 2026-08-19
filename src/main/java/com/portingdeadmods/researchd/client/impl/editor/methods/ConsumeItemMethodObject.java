@@ -11,8 +11,7 @@ import net.minecraft.client.gui.components.EditBox;
 public class ConsumeItemMethodObject extends AbstractItemMethodObject<ConsumeItemResearchMethod> {
     public static final ConsumeItemMethodObject INSTANCE = new ConsumeItemMethodObject();
 
-    protected ConsumeItemMethodObject() {
-    }
+    protected ConsumeItemMethodObject() {}
 
     @Override
     public ResearchMethodType type() {
@@ -23,7 +22,6 @@ public class ConsumeItemMethodObject extends AbstractItemMethodObject<ConsumeIte
     public ConsumeItemResearchMethod create(RememberingLinearLayout layout) {
         return new ConsumeItemResearchMethod(
                 layout.getChild("item_selector", ItemSelectorWidget.class).getSelected(),
-                NumberUtils.parseIntOr(layout.getChild("count", EditBox.class).getValue(), 1)
-        );
+                NumberUtils.parseIntOr(layout.getChild("count", EditBox.class).getValue(), 1));
     }
 }

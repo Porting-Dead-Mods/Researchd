@@ -1,15 +1,17 @@
 package com.portingdeadmods.researchd.resources.contents;
 
 import com.portingdeadmods.researchd.ResearchdRegistries;
-import net.minecraft.resources.ResourceLocation;
-
 import java.util.Map;
+import net.minecraft.resources.ResourceLocation;
 
 public interface ResearchdLangProvider {
     Map<String, String> getTranslations();
 
     default void addResearch(ResourceLocation key, String name) {
-        add(ResearchdRegistries.RESEARCH_KEY.location().getPath() + "." + key.getNamespace() + "." + key.getPath() + "_name", name);
+        add(
+                ResearchdRegistries.RESEARCH_KEY.location().getPath() + "." + key.getNamespace() + "." + key.getPath()
+                        + "_name",
+                name);
     }
 
     default void addResearchMethod(ResourceLocation key, String name) {

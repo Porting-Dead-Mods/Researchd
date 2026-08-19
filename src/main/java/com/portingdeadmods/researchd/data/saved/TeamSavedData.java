@@ -34,9 +34,11 @@ public class TeamSavedData extends SavedData {
 
     private static TeamSavedData load(CompoundTag compoundTag, HolderLookup.Provider provider) {
         if (compoundTag.contains("map")) {
-            DataResult<Pair<ResearchTeamMap, Tag>> result = ResearchTeamMap.CODEC.decode(NbtOps.INSTANCE, compoundTag.get("map"));
+            DataResult<Pair<ResearchTeamMap, Tag>> result =
+                    ResearchTeamMap.CODEC.decode(NbtOps.INSTANCE, compoundTag.get("map"));
             return switch (result) {
-                case DataResult.Success<Pair<ResearchTeamMap, Tag>> v -> new TeamSavedData(v.value().getFirst());
+                case DataResult.Success<Pair<ResearchTeamMap, Tag>> v ->
+                    new TeamSavedData(v.value().getFirst());
                 case DataResult.Error<Pair<ResearchTeamMap, Tag>> v -> {
                     Researchd.LOGGER.error(v.messageSupplier().get());
                     yield new TeamSavedData();
@@ -51,7 +53,8 @@ public class TeamSavedData extends SavedData {
         DataResult<Tag> result = ResearchTeamMap.CODEC.encodeStart(NbtOps.INSTANCE, this.map);
         switch (result) {
             case DataResult.Success<Tag> v -> compoundTag.put("map", v.value());
-            case DataResult.Error<Tag> v -> Researchd.LOGGER.error(v.messageSupplier().get());
+            case DataResult.Error<Tag> v ->
+                Researchd.LOGGER.error(v.messageSupplier().get());
         }
         return compoundTag;
     }

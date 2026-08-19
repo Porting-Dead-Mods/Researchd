@@ -18,6 +18,7 @@ import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
 import com.portingdeadmods.researchd.registries.ResearchdBlockEntityTypes;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
+import java.util.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -36,11 +37,10 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-
 public class ResearchLabControllerBE extends GhostMultiblockControllerBE implements MenuProvider {
     public LazyFinal<List<BlockPos>> partPos;
-    public Map<ResourceKey<ResearchPack>, Float> researchPackUsage; // Usage is between 0 and 1. It decreases with 1/DURATION per tick.
+    public Map<ResourceKey<ResearchPack>, Float>
+            researchPackUsage; // Usage is between 0 and 1. It decreases with 1/DURATION per tick.
     public int currentResearchDuration; // Just initialized to -1
     public List<ResourceKey<ResearchPack>> researchPacks;
     /** Stacks whose pack is gone, waiting to be popped out. See {@link #remapSlotsToPacks()}. */
@@ -51,16 +51,12 @@ public class ResearchLabControllerBE extends GhostMultiblockControllerBE impleme
         this.currentResearchDuration = -1;
         this.researchPackUsage = new HashMap<>();
 
-        this.addItemHandler(
-                HandlerUtils::newItemStackHandler,
-                builder -> builder
-                        .onChange(slot -> {
-                            if (level != null) {
-                                this.updateData();
-                            }
-                        })
-                        .validator(this::isItemValid)
-        );
+        this.addItemHandler(HandlerUtils::newItemStackHandler, builder -> builder.onChange(slot -> {
+                    if (level != null) {
+                        this.updateData();
+                    }
+                })
+                .validator(this::isItemValid));
     }
 
     @Override
@@ -97,8 +93,11 @@ public class ResearchLabControllerBE extends GhostMultiblockControllerBE impleme
                 continue;
             }
 
-            Researchd.error("Research Lab", "Research pack %s stored at %s no longer has a slot, dropping it",
-                    packKey != null ? packKey.location() : "<unknown>", this.getBlockPos().toShortString());
+            Researchd.error(
+                    "Research Lab",
+                    "Research pack %s stored at %s no longer has a slot, dropping it",
+                    packKey != null ? packKey.location() : "<unknown>",
+                    this.getBlockPos().toShortString());
             this.orphanedStacks.add(stack); // Dropped on the next tick, the chunk is still loading here
         }
     }
@@ -144,7 +143,9 @@ public class ResearchLabControllerBE extends GhostMultiblockControllerBE impleme
             ResourceKey<ResearchPack> key = getPackKey(stack);
             if (key == null) continue;
 
-            if (packs.contains(key) && (researchPackUsage.getOrDefault(key, 0f) == 0)) { // Only decrease if the pack is necessary and not already used
+            if (packs.contains(key)
+                    && (researchPackUsage.getOrDefault(key, 0f)
+                            == 0)) { // Only decrease if the pack is necessary and not already used
                 stack.shrink(1);
                 researchPackUsage.put(key, researchPackUsage.getOrDefault(key, 0f) + 1f);
             }
@@ -189,7 +190,9 @@ public class ResearchLabControllerBE extends GhostMultiblockControllerBE impleme
     protected void loadData(CompoundTag tag, HolderLookup.Provider registries) {
         CompoundTag researchPackUsageTag = tag.getCompound("research_pack_usage");
         for (String key : researchPackUsageTag.getAllKeys()) {
-            this.researchPackUsage.put(ResourceKey.create(ResearchdRegistries.RESEARCH_PACK_KEY, ResourceLocation.parse(key)), researchPackUsageTag.getFloat(key));
+            this.researchPackUsage.put(
+                    ResourceKey.create(ResearchdRegistries.RESEARCH_PACK_KEY, ResourceLocation.parse(key)),
+                    researchPackUsageTag.getFloat(key));
         }
         super.loadData(tag, registries);
     }

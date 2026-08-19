@@ -20,13 +20,12 @@ public record ResearchPage(
         ResourceLocation id,
         ResearchIcon icon,
         ResourceKey<Research> iconResearchKey,
-        UniqueArray<ResourceKey<Research>> researches
-) {
+        UniqueArray<ResourceKey<Research>> researches) {
     public static final ResourceLocation DEFAULT_PAGE_ID = Researchd.rl("default");
 
-	public boolean containsResearch(ResourceKey<Research> res) {
-		return researches.contains(res);
-	}
+    public boolean containsResearch(ResourceKey<Research> res) {
+        return researches.contains(res);
+    }
 
     public static Builder builder(ResourceLocation id) {
         return new Builder(id);

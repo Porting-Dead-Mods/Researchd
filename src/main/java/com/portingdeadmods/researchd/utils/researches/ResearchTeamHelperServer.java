@@ -4,16 +4,16 @@ import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
 import com.portingdeadmods.portingdeadlibs.utils.PlayerUtils;
 import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.*;
+import com.portingdeadmods.researchd.api.research.ResearchManager;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectManager;
 import com.portingdeadmods.researchd.api.team.ResearchQueue;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.ResearchTeamManager;
-import com.portingdeadmods.researchd.api.team.ValueEffectsHolder;
-import com.portingdeadmods.researchd.data.saved.TeamResearchEffectSavedData;
 import com.portingdeadmods.researchd.api.team.ResearchTeamRole;
 import com.portingdeadmods.researchd.api.team.TeamMember;
-import com.portingdeadmods.researchd.api.research.ResearchManager;
+import com.portingdeadmods.researchd.api.team.ValueEffectsHolder;
 import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
+import com.portingdeadmods.researchd.data.saved.TeamResearchEffectSavedData;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamImpl;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamMap;
@@ -23,6 +23,9 @@ import com.portingdeadmods.researchd.networking.team.manager.AddTeamPayload;
 import com.portingdeadmods.researchd.networking.team.manager.RemoveTeamPayload;
 import com.portingdeadmods.researchd.networking.team.manager.SyncTeamPayload;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
+import java.util.*;
+import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
@@ -35,10 +38,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
-
-import javax.annotation.Nullable;
-import java.util.*;
-import java.util.function.Consumer;
 
 public final class ResearchTeamHelperServer {
     /**
@@ -134,22 +133,29 @@ public final class ResearchTeamHelperServer {
         ResearchTeam currentTeam = getTeamByMember(requester);
         if (currentTeam != null && currentTeam.getMembers().size() > 1) {
             if (!ResearchdCompatHandler.isFTBTeamsEnabled())
-                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.ALREADY_IN_TEAM));
+                requester.sendSystemMessage(
+                        ResearchdTranslations.component(ResearchdTranslations.Team.ALREADY_IN_TEAM));
             return;
         }
 
-        // Alone in team -> Enter the new team | TODO: Add Invite Syncs from FTB Teams for the sake of compat. Currently it should work without
-        if (team != null && ((team.getSocialManager().containsSentInvite(requesterId)) || ResearchdCompatHandler.isFTBTeamsEnabled())) {
+        // Alone in team -> Enter the new team | TODO: Add Invite Syncs from FTB Teams for the sake of compat. Currently
+        // it should work without
+        if (team != null
+                && ((team.getSocialManager().containsSentInvite(requesterId))
+                        || ResearchdCompatHandler.isFTBTeamsEnabled())) {
             ResearchTeamHelperServer.handleLeaveTeam(requester);
 
             teamManager.addTeam(team);
             if (!ResearchdCompatHandler.isFTBTeamsEnabled())
-                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.YOU_JOINED_TEAM, team.getName()));
+                requester.sendSystemMessage(
+                        ResearchdTranslations.component(ResearchdTranslations.Team.YOU_JOINED_TEAM, team.getName()));
 
             for (TeamMember member : team.getMembers()) {
                 Player memberPlayer = level.getPlayerByUUID(member.player());
                 if (memberPlayer != null) {
-                    memberPlayer.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.PLAYER_JOINED_TEAM, PlayerUtils.getPlayerNameFromUUID(level, requesterId)));
+                    memberPlayer.sendSystemMessage(ResearchdTranslations.component(
+                            ResearchdTranslations.Team.PLAYER_JOINED_TEAM,
+                            PlayerUtils.getPlayerNameFromUUID(level, requesterId)));
                 }
             }
 
@@ -160,10 +166,9 @@ public final class ResearchTeamHelperServer {
             PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
 
             refreshPlayerManagement(team, level);
-            //PacketDistributor.sendToPlayer(requester, new RefreshResearchesPayload());
+            // PacketDistributor.sendToPlayer(requester, new RefreshResearchesPayload());
         }
     }
-
 
     public static void handleIgnoreTeam(@NotNull ServerPlayer requester, UUID memberOfTeam) {
         Level level = requester.level();
@@ -175,7 +180,8 @@ public final class ResearchTeamHelperServer {
             team.getSocialManager().addIgnore(requester.getUUID());
             team.setChanged();
             if (!ResearchdCompatHandler.isFTBTeamsEnabled())
-                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.IGNORE, team.getName()));
+                requester.sendSystemMessage(
+                        ResearchdTranslations.component(ResearchdTranslations.Team.IGNORE, team.getName()));
 
             PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
         }
@@ -211,7 +217,8 @@ public final class ResearchTeamHelperServer {
                 // Team Leader Not Specified
                 if (nextToLead == null || nextToLead.equals(PlayerUtils.EmptyUUID)) {
                     if (!ResearchdCompatHandler.isFTBTeamsEnabled())
-                        requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NO_NEXT_LEADER));
+                        requester.sendSystemMessage(
+                                ResearchdTranslations.component(ResearchdTranslations.Team.NO_NEXT_LEADER));
                     return;
                 }
 
@@ -228,7 +235,6 @@ public final class ResearchTeamHelperServer {
 
             refreshPlayerManagement(team, level);
         }
-
     }
 
     public static void handleLeaveTeam(@NotNull ServerPlayer requester) {
@@ -242,8 +248,7 @@ public final class ResearchTeamHelperServer {
 
         // Error safety (handling yourself)
         if (requester.getUUID().equals(member)) {
-            if (!ResearchdCompatHandler.isFTBTeamsEnabled())
-                requester.sendSystemMessage(getIllegalMessage());
+            if (!ResearchdCompatHandler.isFTBTeamsEnabled()) requester.sendSystemMessage(getIllegalMessage());
             return;
         }
 
@@ -251,7 +256,8 @@ public final class ResearchTeamHelperServer {
         if (!arePlayersSameTeam(requester.level(), requester.getUUID(), member)) return;
 
         // Permission Check
-        if (getPermissionLevel(requester) >= ResearchTeamRole.MODERATOR.getPermissionLevel() && (getPermissionLevel(requester) > getPermissionLevel(member, requester.level()))) {
+        if (getPermissionLevel(requester) >= ResearchTeamRole.MODERATOR.getPermissionLevel()
+                && (getPermissionLevel(requester) > getPermissionLevel(member, requester.level()))) {
             ResearchTeamImpl team = (ResearchTeamImpl) getTeamByMember(requester);
             if (team == null) return;
 
@@ -262,12 +268,14 @@ public final class ResearchTeamHelperServer {
                 PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
 
                 if (!ResearchdCompatHandler.isFTBTeamsEnabled())
-                    requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.REMOVED, PlayerUtils.getPlayerNameFromUUID(level, member)));
+                    requester.sendSystemMessage(ResearchdTranslations.component(
+                            ResearchdTranslations.Team.REMOVED, PlayerUtils.getPlayerNameFromUUID(level, member)));
 
                 ServerPlayer kickedPlayer = server.getPlayerList().getPlayer(member);
                 if (kickedPlayer != null) {
                     PacketDistributor.sendToPlayer(kickedPlayer, ClearGraphCachePayload.INSTANCE);
-                    kickedPlayer.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.KICKED, team.getName()));
+                    kickedPlayer.sendSystemMessage(
+                            ResearchdTranslations.component(ResearchdTranslations.Team.KICKED, team.getName()));
                 }
 
                 createTeamForPlayerSynced(level, member, teamManager);
@@ -297,8 +305,7 @@ public final class ResearchTeamHelperServer {
 
         // Error Safety (handling yourself)
         if (requester.getUUID().equals(moderator)) {
-            if (!ResearchdCompatHandler.isFTBTeamsEnabled())
-                requester.sendSystemMessage(getIllegalMessage());
+            if (!ResearchdCompatHandler.isFTBTeamsEnabled()) requester.sendSystemMessage(getIllegalMessage());
             return;
         }
 
@@ -310,11 +317,15 @@ public final class ResearchTeamHelperServer {
                 if (remove) {
                     team.setRole(moderator, ResearchTeamRole.MEMBER);
                     if (!ResearchdCompatHandler.isFTBTeamsEnabled())
-                        requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.DEMOTED, PlayerUtils.getPlayerNameFromUUID(level, moderator)));
+                        requester.sendSystemMessage(ResearchdTranslations.component(
+                                ResearchdTranslations.Team.DEMOTED,
+                                PlayerUtils.getPlayerNameFromUUID(level, moderator)));
                 } else {
                     team.setRole(moderator, ResearchTeamRole.MODERATOR);
                     if (!ResearchdCompatHandler.isFTBTeamsEnabled())
-                        requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.PROMOTED, PlayerUtils.getPlayerNameFromUUID(level, moderator)));
+                        requester.sendSystemMessage(ResearchdTranslations.component(
+                                ResearchdTranslations.Team.PROMOTED,
+                                PlayerUtils.getPlayerNameFromUUID(level, moderator)));
                 }
                 PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
 
@@ -339,15 +350,17 @@ public final class ResearchTeamHelperServer {
         if (getPermissionLevel(requester) == ResearchTeamRole.OWNER.getPermissionLevel()) {
             if (name.isEmpty()) {
                 if (!ResearchdCompatHandler.isFTBTeamsEnabled())
-                    requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NAME_CANNOT_BE_EMPTY));
+                    requester.sendSystemMessage(
+                            ResearchdTranslations.component(ResearchdTranslations.Team.NAME_CANNOT_BE_EMPTY));
                 return;
             }
 
-            ResearchTeamImpl team = (ResearchTeamImpl)getTeamByMember(requester);
+            ResearchTeamImpl team = (ResearchTeamImpl) getTeamByMember(requester);
             String oldname = team.getName();
             team.setName(name);
             if (!ResearchdCompatHandler.isFTBTeamsEnabled())
-                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.NEW_TEAM_NAME, oldname, name));
+                requester.sendSystemMessage(
+                        ResearchdTranslations.component(ResearchdTranslations.Team.NEW_TEAM_NAME, oldname, name));
 
             PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
             refreshPlayerManagement(team, level);
@@ -377,7 +390,9 @@ public final class ResearchTeamHelperServer {
                 PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
 
                 if (!ResearchdCompatHandler.isFTBTeamsEnabled())
-                    requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.TRANSFERRED_OWNERSHIP, PlayerUtils.getPlayerNameFromUUID(level, nextToLead)));
+                    requester.sendSystemMessage(ResearchdTranslations.component(
+                            ResearchdTranslations.Team.TRANSFERRED_OWNERSHIP,
+                            PlayerUtils.getPlayerNameFromUUID(level, nextToLead)));
                 refreshPlayerManagement(team, level);
             } else {
                 if (!ResearchdCompatHandler.isFTBTeamsEnabled())
@@ -395,12 +410,15 @@ public final class ResearchTeamHelperServer {
 
     public static @NotNull Component formatMembers(@NotNull ResearchTeam team, @NotNull Level level) {
         MutableComponent formattedTeam = Component.literal(team.getName()).withStyle(ChatFormatting.AQUA);
-        formattedTeam.append(Component.literal(" has %d member%s: ".formatted(team.getMembers().size(), team.getMembers().size() == 1 ? "" : "s")).withStyle(ChatFormatting.WHITE));
+        formattedTeam.append(Component.literal(" has %d member%s: "
+                        .formatted(team.getMembers().size(), team.getMembers().size() == 1 ? "" : "s"))
+                .withStyle(ChatFormatting.WHITE));
 
         for (TeamMember member : team.getMembers()) {
             Player player = level.getPlayerByUUID(member.player());
             if (player != null)
-                formattedTeam.append(Component.literal(player.getName().getString() + " ").withStyle(ChatFormatting.AQUA));
+                formattedTeam.append(
+                        Component.literal(player.getName().getString() + " ").withStyle(ChatFormatting.AQUA));
         }
 
         return formattedTeam;
@@ -421,7 +439,8 @@ public final class ResearchTeamHelperServer {
         if (remove) {
             team.getSocialManager().removeSentInvite(invited);
             if (!ResearchdCompatHandler.isFTBTeamsEnabled())
-                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.REMOVED_INVITE, AllPlayersCache.getName(invited)));
+                requester.sendSystemMessage(ResearchdTranslations.component(
+                        ResearchdTranslations.Team.REMOVED_INVITE, AllPlayersCache.getName(invited)));
             team.setChanged();
             PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
         } else {
@@ -431,27 +450,28 @@ public final class ResearchTeamHelperServer {
             if (invitedPlayer != null) {
 
                 // Accept / Decline prompt
-                invitedPlayer.sendSystemMessage(
-                        ResearchdTranslations.component(ResearchdTranslations.Team.RECEIVED_INVITE, team.getName())
-                                .append(Component.literal("\n"))
-                                .append("     ")
-                                .append(ResearchdTranslations.component(ResearchdTranslations.Team.ACCEPT).withStyle(style -> style.withClickEvent(
-                                        new net.minecraft.network.chat.ClickEvent(ClickEvent.Action.RUN_COMMAND, "/researchd team join " + AllPlayersCache.getName(requester.getUUID()))
-                                )))
-                                .append("     ")
-                                .append(ResearchdTranslations.component(ResearchdTranslations.Team.DECLINE).withStyle(style -> style.withClickEvent(
-                                        new net.minecraft.network.chat.ClickEvent(ClickEvent.Action.RUN_COMMAND, "/researchd team ignore " + AllPlayersCache.getName(requester.getUUID()))
-                                )))
-                );
+                invitedPlayer.sendSystemMessage(ResearchdTranslations.component(
+                                ResearchdTranslations.Team.RECEIVED_INVITE, team.getName())
+                        .append(Component.literal("\n"))
+                        .append("     ")
+                        .append(ResearchdTranslations.component(ResearchdTranslations.Team.ACCEPT)
+                                .withStyle(style -> style.withClickEvent(new net.minecraft.network.chat.ClickEvent(
+                                        ClickEvent.Action.RUN_COMMAND,
+                                        "/researchd team join " + AllPlayersCache.getName(requester.getUUID())))))
+                        .append("     ")
+                        .append(ResearchdTranslations.component(ResearchdTranslations.Team.DECLINE)
+                                .withStyle(style -> style.withClickEvent(new net.minecraft.network.chat.ClickEvent(
+                                        ClickEvent.Action.RUN_COMMAND,
+                                        "/researchd team ignore " + AllPlayersCache.getName(requester.getUUID()))))));
             }
             if (!ResearchdCompatHandler.isFTBTeamsEnabled())
-                requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.SENT_INVITE, AllPlayersCache.getName(invited), team.getName()));
+                requester.sendSystemMessage(ResearchdTranslations.component(
+                        ResearchdTranslations.Team.SENT_INVITE, AllPlayersCache.getName(invited), team.getName()));
 
             PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
         }
 
         refreshPlayerManagement(team, level);
-
     }
 
     private static void appendResearchProgress(List<Component> dump, ResearchTeam team) {
@@ -461,31 +481,40 @@ public final class ResearchTeamHelperServer {
             String progressStr = progress != null
                     ? " [%.1f / %.1f]".formatted(progress.getProgress(), progress.getMaxProgress())
                     : " [no progress]";
-            dump.add(Component.literal("┣ Current: ").withStyle(ChatFormatting.GRAY)
+            dump.add(Component.literal("┣ Current: ")
+                    .withStyle(ChatFormatting.GRAY)
                     .append(Component.literal(current.location().toString()).withStyle(ChatFormatting.AQUA))
                     .append(Component.literal(progressStr).withStyle(ChatFormatting.YELLOW)));
         } else {
-            dump.add(Component.literal("┣ Current: ").withStyle(ChatFormatting.GRAY)
+            dump.add(Component.literal("┣ Current: ")
+                    .withStyle(ChatFormatting.GRAY)
                     .append(Component.literal("(none)").withStyle(ChatFormatting.DARK_GRAY)));
         }
 
         int queueSize = team.getQueue().size();
         if (queueSize > 1) {
-            MutableComponent queueLine = Component.literal("┣ Queue (%d): ".formatted(queueSize - 1)).withStyle(ChatFormatting.GRAY);
+            MutableComponent queueLine =
+                    Component.literal("┣ Queue (%d): ".formatted(queueSize - 1)).withStyle(ChatFormatting.GRAY);
             for (int i = 1; i < queueSize; i++) {
                 if (i > 1) queueLine.append(Component.literal(", ").withStyle(ChatFormatting.DARK_GRAY));
-                queueLine.append(Component.literal(team.getQueue().get(i).location().toString()).withStyle(ChatFormatting.AQUA));
+                queueLine.append(
+                        Component.literal(team.getQueue().get(i).location().toString())
+                                .withStyle(ChatFormatting.AQUA));
             }
             dump.add(queueLine);
         }
 
-        List<Map.Entry<ResourceKey<Research>, ResearchInstance>> sorted = new ArrayList<>(team.getResearches().entrySet());
+        List<Map.Entry<ResourceKey<Research>, ResearchInstance>> sorted =
+                new ArrayList<>(team.getResearches().entrySet());
         sorted.sort(Comparator.comparing(e -> e.getKey().location().toString()));
-        dump.add(Component.literal("┣ Researches (%d):".formatted(sorted.size())).withStyle(ChatFormatting.GRAY));
+        dump.add(
+                Component.literal("┣ Researches (%d):".formatted(sorted.size())).withStyle(ChatFormatting.GRAY));
         for (Map.Entry<ResourceKey<Research>, ResearchInstance> entry : sorted) {
             ResearchStatus status = entry.getValue().getResearchStatus();
-            dump.add(Component.literal("┣  ").withStyle(ChatFormatting.GRAY)
-                    .append(Component.literal(entry.getKey().location().toString()).withStyle(ChatFormatting.AQUA))
+            dump.add(Component.literal("┣  ")
+                    .withStyle(ChatFormatting.GRAY)
+                    .append(Component.literal(entry.getKey().location().toString())
+                            .withStyle(ChatFormatting.AQUA))
                     .append(Component.literal(" — ").withStyle(ChatFormatting.DARK_GRAY))
                     .append(Component.literal(status.getSerializedName()).withStyle(statusColor(status))));
         }
@@ -505,11 +534,16 @@ public final class ResearchTeamHelperServer {
 
         ResearchTeamManager teamManager = ResearchdApi.getTeamManager(level);
 
-
         dump.add(Component.literal("---- Researchd Teams ----").withStyle(ChatFormatting.GOLD));
         for (Iterator<ResearchTeam> iterator = teamManager.getTeams().iterator(); iterator.hasNext(); ) {
             ResearchTeam team = iterator.next();
-            dump.add(Component.literal(ChatFormatting.GREEN + team.getName() + ChatFormatting.RESET).append(" with %s member%s".formatted(ChatFormatting.GREEN.toString() + team.getMembers().size() + ChatFormatting.RESET, team.getMembers().size() == 1 ? "" : "s")));
+            dump.add(Component.literal(ChatFormatting.GREEN + team.getName() + ChatFormatting.RESET)
+                    .append(" with %s member%s"
+                            .formatted(
+                                    ChatFormatting.GREEN.toString()
+                                            + team.getMembers().size()
+                                            + ChatFormatting.RESET,
+                                    team.getMembers().size() == 1 ? "" : "s")));
             for (TeamMember member : team.getMembers()) {
                 dump.add(Component.literal("┣ ").append(member.getName()).withStyle(ChatFormatting.GRAY));
             }
@@ -534,8 +568,10 @@ public final class ResearchTeamHelperServer {
     }
 
     public static MutableComponent paramDescription(String param, String description) {
-        MutableComponent paramComp = Component.literal("<" + param + ">").withStyle(ChatFormatting.WHITE, ChatFormatting.ITALIC);
-        return paramComp.append(Component.literal(" - " + description).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+        MutableComponent paramComp =
+                Component.literal("<" + param + ">").withStyle(ChatFormatting.WHITE, ChatFormatting.ITALIC);
+        return paramComp.append(
+                Component.literal(" - " + description).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
     }
 
     public static MutableComponent description(String description) {
@@ -559,10 +595,10 @@ public final class ResearchTeamHelperServer {
             Map<ResourceKey<Research>, ResearchInstance> researches = team.getResearches();
             Map<ResourceKey<Research>, ResearchInstance> newResearches = new HashMap<>();
             for (Map.Entry<ResourceKey<Research>, ResearchInstance> entry : researches.entrySet()) {
-                if (ResearchdApi.getResearchManager().lookupResearch(entry.getKey(), level) != null && entry.getValue().getResearch() != null) {
+                if (ResearchdApi.getResearchManager().lookupResearch(entry.getKey(), level) != null
+                        && entry.getValue().getResearch() != null) {
                     newResearches.put(entry.getKey(), entry.getValue());
                 }
-
             }
             researches.clear();
             researches.putAll(newResearches);
@@ -581,16 +617,36 @@ public final class ResearchTeamHelperServer {
     }
 
     public static void sendHelpMessage(Consumer<Component> sendMessageFunction) {
-        sendMessageFunction.accept(Component.literal("> Researchd Teams").withStyle(ChatFormatting.WHITE, ChatFormatting.BOLD));
+        sendMessageFunction.accept(
+                Component.literal("> Researchd Teams").withStyle(ChatFormatting.WHITE, ChatFormatting.BOLD));
         sendMessageFunction.accept(helpMessage("team", "members", description("List all members of your team.")));
-        sendMessageFunction.accept(helpMessage("team", "invite <player>", description("Invite a player to your team.")));
-        sendMessageFunction.accept(helpMessage("team", "join <player>", description("Join a team that you have been invited to.")));
-        sendMessageFunction.accept(helpMessage("team", "leave <next_to_lead>", paramDescription("next_to_lead", "Put 'none' if there's no-one to lead or you're not the leader."), description("Leave your current team.")));
-        sendMessageFunction.accept(helpMessage("team", "promote <player>", description("Promote a player to moderator. You got to be the leader to do this.")));
-        sendMessageFunction.accept(helpMessage("team", "demote <player>", description("Demote a player from moderator. You got to be the leader to do this.")));
-        sendMessageFunction.accept(helpMessage("team", "kick <player>", description("Kick a player from your team. You got to be a moderator or the leader to do this.")));
-        sendMessageFunction.accept(helpMessage("team", "transfer-ownership <player>", description("Transfer ownership of the team to another player.")));
-        sendMessageFunction.accept(helpMessage("team", "set-name <name>", description("Set a new name for your team.")));
+        sendMessageFunction.accept(
+                helpMessage("team", "invite <player>", description("Invite a player to your team.")));
+        sendMessageFunction.accept(
+                helpMessage("team", "join <player>", description("Join a team that you have been invited to.")));
+        sendMessageFunction.accept(helpMessage(
+                "team",
+                "leave <next_to_lead>",
+                paramDescription("next_to_lead", "Put 'none' if there's no-one to lead or you're not the leader."),
+                description("Leave your current team.")));
+        sendMessageFunction.accept(helpMessage(
+                "team",
+                "promote <player>",
+                description("Promote a player to moderator. You got to be the leader to do this.")));
+        sendMessageFunction.accept(helpMessage(
+                "team",
+                "demote <player>",
+                description("Demote a player from moderator. You got to be the leader to do this.")));
+        sendMessageFunction.accept(helpMessage(
+                "team",
+                "kick <player>",
+                description("Kick a player from your team. You got to be a moderator or the leader to do this.")));
+        sendMessageFunction.accept(helpMessage(
+                "team",
+                "transfer-ownership <player>",
+                description("Transfer ownership of the team to another player.")));
+        sendMessageFunction.accept(
+                helpMessage("team", "set-name <name>", description("Set a new name for your team.")));
     }
 
     public static MutableComponent illegalMessage(String message) {
@@ -662,7 +718,8 @@ public final class ResearchTeamHelperServer {
         for (ResearchTeam team : teamMap.getTeams()) {
             Map<ResourceKey<Research>, ResearchInstance> teamResearches = team.getResearches();
             Map<ResourceKey<Research>, ResearchProgress> teamProgress = team.getResearchProgresses();
-            Set<ResourceKey<Research>> allResearches = new HashSet<>(ResearchdApi.getResearchManager().getResearches());
+            Set<ResourceKey<Research>> allResearches =
+                    new HashSet<>(ResearchdApi.getResearchManager().getResearches());
 
             for (ResourceKey<Research> research : allResearches) {
                 if (teamProgress.containsKey(research)) continue;
@@ -675,13 +732,15 @@ public final class ResearchTeamHelperServer {
             teamResearches.values().stream().map(ResearchInstance::getResearch).forEach(allResearches::remove);
 
             for (ResearchInstance research : teamResearches.values()) {
-                if (research.getResearchStatus() == ResearchStatus.RESEARCHABLE_AFTER_QUEUE && researchManager.isPageRoot(research.getResearch())) {
+                if (research.getResearchStatus() == ResearchStatus.RESEARCHABLE_AFTER_QUEUE
+                        && researchManager.isPageRoot(research.getResearch())) {
                     research.setResearchStatus(ResearchStatus.RESEARCHABLE);
                 }
             }
 
             for (ResourceKey<Research> research : allResearches) {
-                ResearchStatus status = researchManager.isPageRoot(research) ? ResearchStatus.RESEARCHABLE : ResearchStatus.LOCKED;
+                ResearchStatus status =
+                        researchManager.isPageRoot(research) ? ResearchStatus.RESEARCHABLE : ResearchStatus.LOCKED;
                 teamResearches.put(research, new ResearchInstance(research, status));
             }
         }
@@ -696,5 +755,4 @@ public final class ResearchTeamHelperServer {
             }
         }
     }
-
 }

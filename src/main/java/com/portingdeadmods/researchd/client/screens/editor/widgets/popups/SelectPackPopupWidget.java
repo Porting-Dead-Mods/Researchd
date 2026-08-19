@@ -5,11 +5,12 @@ import com.portingdeadmods.researchd.api.editmode.EditModeSettings;
 import com.portingdeadmods.researchd.api.editmode.PackLocation;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.SelectPackSearchBarWidget;
 import com.portingdeadmods.researchd.client.screens.lib.layout.WidgetHeaderAndFooterLayout;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLButton;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
-import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLButton;
-import com.portingdeadmods.researchd.utils.researches.ResearchEditorHelperClient;
 import com.portingdeadmods.researchd.utils.GuiUtils;
+import com.portingdeadmods.researchd.utils.researches.ResearchEditorHelperClient;
+import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -24,16 +25,14 @@ import net.minecraft.util.FastColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Consumer;
-
 public class SelectPackPopupWidget extends PopupWidget {
     public static final ResourceLocation SPRITE = Researchd.rl("widget/editor_popup");
     public static final WidgetSprites EDITOR_BUTTON_SPRITES = new WidgetSprites(
             Researchd.rl("editor_button"),
             Researchd.rl("editor_button_disabled"),
-            Researchd.rl("editor_button_highlighted")
-    );
-    public static final String INTRODUCTION_TEXT = "To start creating Researches and Research Packs, you need to first select or create a data- and resource pack where everything will be stored to";
+            Researchd.rl("editor_button_highlighted"));
+    public static final String INTRODUCTION_TEXT =
+            "To start creating Researches and Research Packs, you need to first select or create a data- and resource pack where everything will be stored to";
 
     private final WidgetHeaderAndFooterLayout layout;
     private final ResearchScreen screen;
@@ -56,41 +55,64 @@ public class SelectPackPopupWidget extends PopupWidget {
         this.layout = new WidgetHeaderAndFooterLayout(this.width, 15, 155, 22);
         this.layout.withHeader(header -> {
             header.defaultCellSetting().paddingTop(1);
-            header.addChild(new StringWidget(Component.literal("Select or Create Pack"), GuiUtils.getFont()), LayoutSettings::alignHorizontallyCenter);
+            header.addChild(
+                    new StringWidget(Component.literal("Select or Create Pack"), GuiUtils.getFont()),
+                    LayoutSettings::alignHorizontallyCenter);
         });
 
         this.layout.withContents(contents -> {
             contents.spacing(2);
             Font font = GuiUtils.getFont();
-            MultiLineTextWidget introductionTextWidget = contents.addChild(new MultiLineTextWidget(Component.literal(INTRODUCTION_TEXT).withColor(FastColor.ARGB32.color(125, 110, 77)), font));
+            MultiLineTextWidget introductionTextWidget = contents.addChild(new MultiLineTextWidget(
+                    Component.literal(INTRODUCTION_TEXT).withColor(FastColor.ARGB32.color(125, 110, 77)), font));
             introductionTextWidget.setMaxWidth(192);
             introductionTextWidget.setMaxRows(5);
             contents.addChild(new SpacerElement(0, 4));
-            contents.addChild(PDLButton.builder(this::onCreateNewProjectPressed)
-                    .message(Component.literal("Create new project"))
-                    .sprites(EDITOR_BUTTON_SPRITES)
-                    .size(128, 16)
-                    .build(), LayoutSettings::alignHorizontallyCenter);
+            contents.addChild(
+                    PDLButton.builder(this::onCreateNewProjectPressed)
+                            .message(Component.literal("Create new project"))
+                            .sprites(EDITOR_BUTTON_SPRITES)
+                            .size(128, 16)
+                            .build(),
+                    LayoutSettings::alignHorizontallyCenter);
             contents.addChild(new SpacerElement(0, 4));
-            contents.addChild(new StringWidget(Component.literal("Datapack:").withStyle(ChatFormatting.WHITE), font), LayoutSettings::alignHorizontallyCenter);
-            @Nullable PackLocation datapack = ResearchEditorHelperClient.getEditModeSettings().currentDatapack();
-            this.selectDatapackWidget = contents.addChild(new SelectPackSearchBarWidget(datapack, PackType.SERVER_DATA, create_btn -> {
-                this.screen.openPopupCentered(new CreatePackPopupWidget(this.screen, PackType.SERVER_DATA));
-            }), LayoutSettings::alignHorizontallyCenter);
-            contents.addChild(new StringWidget(Component.literal("Resource Pack:").withStyle(ChatFormatting.WHITE), font), LayoutSettings::alignHorizontallyCenter);
-            this.selectResourcePackWidget = contents.addChild(new SelectPackSearchBarWidget(ResearchEditorHelperClient.getEditModeSettings().currentResourcePack(), PackType.CLIENT_RESOURCES, create_btn -> {
-                this.screen.openPopupCentered(new CreatePackPopupWidget(this.screen, PackType.CLIENT_RESOURCES));
-            }), LayoutSettings::alignHorizontallyCenter);
+            contents.addChild(
+                    new StringWidget(Component.literal("Datapack:").withStyle(ChatFormatting.WHITE), font),
+                    LayoutSettings::alignHorizontallyCenter);
+            @Nullable PackLocation datapack =
+                    ResearchEditorHelperClient.getEditModeSettings().currentDatapack();
+            this.selectDatapackWidget = contents.addChild(
+                    new SelectPackSearchBarWidget(datapack, PackType.SERVER_DATA, create_btn -> {
+                        this.screen.openPopupCentered(new CreatePackPopupWidget(this.screen, PackType.SERVER_DATA));
+                    }),
+                    LayoutSettings::alignHorizontallyCenter);
+            contents.addChild(
+                    new StringWidget(Component.literal("Resource Pack:").withStyle(ChatFormatting.WHITE), font),
+                    LayoutSettings::alignHorizontallyCenter);
+            this.selectResourcePackWidget = contents.addChild(
+                    new SelectPackSearchBarWidget(
+                            ResearchEditorHelperClient.getEditModeSettings().currentResourcePack(),
+                            PackType.CLIENT_RESOURCES,
+                            create_btn -> {
+                                this.screen.openPopupCentered(
+                                        new CreatePackPopupWidget(this.screen, PackType.CLIENT_RESOURCES));
+                            }),
+                    LayoutSettings::alignHorizontallyCenter);
         });
 
         this.layout.withFooter(footer -> {
             footer.defaultCellSetting().paddingBottom(20);
-            this.startEditingButton = footer.addChild(PDLButton.builder(this::onStartEditingPressed)
-                    .message(Component.literal("Start Editing"))
-                    .tooltip(Tooltip.create(canStartEditing ? CommonComponents.EMPTY : Component.literal("Both Paths need to be filled in")))
-                    .sprites(EDITOR_BUTTON_SPRITES)
-                    .size(128, 17)
-                    .build(), s -> s.alignHorizontallyCenter().alignVerticallyBottom());
+            this.startEditingButton = footer.addChild(
+                    PDLButton.builder(this::onStartEditingPressed)
+                            .message(Component.literal("Start Editing"))
+                            .tooltip(Tooltip.create(
+                                    canStartEditing
+                                            ? CommonComponents.EMPTY
+                                            : Component.literal("Both Paths need to be filled in")))
+                            .sprites(EDITOR_BUTTON_SPRITES)
+                            .size(128, 17)
+                            .build(),
+                    s -> s.alignHorizontallyCenter().alignVerticallyBottom());
             this.startEditingButton.active = canStartEditing;
         });
 
@@ -131,8 +153,10 @@ public class SelectPackPopupWidget extends PopupWidget {
 
         super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
 
-        this.selectDatapackWidget.updateSelectedPack(ResearchEditorHelperClient.getEditModeSettings().currentDatapack());
-        this.selectResourcePackWidget.updateSelectedPack(ResearchEditorHelperClient.getEditModeSettings().currentResourcePack());
+        this.selectDatapackWidget.updateSelectedPack(
+                ResearchEditorHelperClient.getEditModeSettings().currentDatapack());
+        this.selectResourcePackWidget.updateSelectedPack(
+                ResearchEditorHelperClient.getEditModeSettings().currentResourcePack());
 
         if (this.selectResourcePackWidget.hasPack() && this.selectDatapackWidget.hasPack()) {
             this.startEditingButton.active = true;
@@ -162,8 +186,7 @@ public class SelectPackPopupWidget extends PopupWidget {
     }
 
     @Override
-    protected void updateWidgetNarration(@NotNull NarrationElementOutput output) {
-    }
+    protected void updateWidgetNarration(@NotNull NarrationElementOutput output) {}
 
     @Override
     public void visitWidgets(@NotNull Consumer<AbstractWidget> consumer) {

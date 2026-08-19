@@ -2,8 +2,8 @@ package com.portingdeadmods.researchd.content.items;
 
 import com.portingdeadmods.researchd.api.research.RegistryDisplay;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
-import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
 import com.portingdeadmods.researchd.data.ResearchdDataComponents;
+import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
 import com.portingdeadmods.researchd.utils.SpaghettiCommon;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.network.chat.Component;
@@ -20,7 +20,8 @@ public class ResearchPackItem extends Item {
     public @NotNull Component getName(ItemStack stack) {
         ResearchPackComponent comp = stack.get(ResearchdDataComponents.RESEARCH_PACK);
         if (comp != null && comp.researchPackKey().isPresent()) {
-            ResearchPack researchPack = ResearchHelperCommon.getResearchPack(comp.researchPackKey().get(), SpaghettiCommon.tryGetLevel());
+            ResearchPack researchPack =
+                    ResearchHelperCommon.getResearchPack(comp.researchPackKey().get(), SpaghettiCommon.tryGetLevel());
             if (researchPack instanceof RegistryDisplay<?> display) {
                 return display.getDisplayNameUnsafe(comp.researchPackKey().get());
             }

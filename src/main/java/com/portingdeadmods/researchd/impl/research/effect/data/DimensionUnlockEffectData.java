@@ -5,7 +5,6 @@ import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectData;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectDataType;
 import com.portingdeadmods.researchd.impl.research.effect.DimensionUnlockEffect;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -13,19 +12,21 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
 
-import java.util.Collection;
-
-public record DimensionUnlockEffectData(UniqueArray<ResourceKey<DimensionType>> blockedDimensions) implements ResearchEffectData<DimensionUnlockEffect> {
+public record DimensionUnlockEffectData(UniqueArray<ResourceKey<DimensionType>> blockedDimensions)
+        implements ResearchEffectData<DimensionUnlockEffect> {
     public static final DimensionUnlockEffectData EMPTY = new DimensionUnlockEffectData(new UniqueArray<>());
 
-    public static final MapCodec<DimensionUnlockEffectData> CODEC = UniqueArray.CODEC(ResourceKey.codec(Registries.DIMENSION_TYPE))
-            .xmap(DimensionUnlockEffectData::new, DimensionUnlockEffectData::blockedDimensions).fieldOf("blocked_dimensions");
-    public static final StreamCodec<RegistryFriendlyByteBuf, DimensionUnlockEffectData> STREAM_CODEC = StreamCodec.composite(
-            UniqueArray.STREAM_CODEC(ResourceKey.streamCodec(Registries.DIMENSION_TYPE)),
-            DimensionUnlockEffectData::blockedDimensions,
-            DimensionUnlockEffectData::new
-    );
-    public static final ResearchEffectDataType<DimensionUnlockEffectData> TYPE = ResearchEffectDataType.simple(DimensionUnlockEffectData::new, CODEC, STREAM_CODEC);
+    public static final MapCodec<DimensionUnlockEffectData> CODEC = UniqueArray.CODEC(
+                    ResourceKey.codec(Registries.DIMENSION_TYPE))
+            .xmap(DimensionUnlockEffectData::new, DimensionUnlockEffectData::blockedDimensions)
+            .fieldOf("blocked_dimensions");
+    public static final StreamCodec<RegistryFriendlyByteBuf, DimensionUnlockEffectData> STREAM_CODEC =
+            StreamCodec.composite(
+                    UniqueArray.STREAM_CODEC(ResourceKey.streamCodec(Registries.DIMENSION_TYPE)),
+                    DimensionUnlockEffectData::blockedDimensions,
+                    DimensionUnlockEffectData::new);
+    public static final ResearchEffectDataType<DimensionUnlockEffectData> TYPE =
+            ResearchEffectDataType.simple(DimensionUnlockEffectData::new, CODEC, STREAM_CODEC);
 
     public DimensionUnlockEffectData() {
         this(new UniqueArray<>());

@@ -7,13 +7,12 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchPage;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 
 public final class ResearchGraphCache {
     private static final Map<ResourceKey<Research>, ResearchGraph> GRAPH_CACHE = new LinkedHashMap<>();
@@ -31,14 +30,16 @@ public final class ResearchGraphCache {
         return PAGE_GRAPH_CACHE.get(pageId);
     }
 
-	public static List<ResearchGraph> getAll() { return new UniqueArray<>(GRAPH_CACHE.values()); }
+    public static List<ResearchGraph> getAll() {
+        return new UniqueArray<>(GRAPH_CACHE.values());
+    }
 
     public static void clearCache() {
         GRAPH_CACHE.clear();
         PAGE_GRAPH_CACHE.clear();
     }
 
-    public static @Nullable ResearchGraph computeIfAbsent(ResourceKey<Research> key)  {
+    public static @Nullable ResearchGraph computeIfAbsent(ResourceKey<Research> key) {
         ResearchTeam team = ResearchTeamHelperClient.getTeam();
         if (team == null) return GRAPH_CACHE.get(key);
 
@@ -56,7 +57,8 @@ public final class ResearchGraphCache {
         if (team == null || ResearchdApi.getResearchManager() == null) return PAGE_GRAPH_CACHE.get(page.id());
 
         return PAGE_GRAPH_CACHE.computeIfAbsent(page.id(), pageId -> {
-            List<ResourceKey<Research>> roots = ResearchdApi.getResearchManager().getRootsForPage(pageId);
+            List<ResourceKey<Research>> roots =
+                    ResearchdApi.getResearchManager().getRootsForPage(pageId);
             if (roots != null && !roots.isEmpty()) {
                 // TODO: Parse
                 return ResearchGraph.fromResearchPage(page, roots.getFirst(), team.getResearches());
@@ -64,5 +66,4 @@ public final class ResearchGraphCache {
             return null;
         });
     }
-
 }

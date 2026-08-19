@@ -5,9 +5,9 @@ import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
-import com.portingdeadmods.researchd.client.screens.RdZIndex;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchManager;
+import com.portingdeadmods.researchd.client.screens.RdZIndex;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.selection.ResearchSelectionPopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.ContainerWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
@@ -15,14 +15,13 @@ import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.SpaghettiClient;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
+import java.util.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
 
 // Widget for selecting a list of elements horizontally, scrollable with a popup for selecting the element
 public class ResearchSelectorListWidget extends ContainerWidget<ResearchSelectorListWidget.Element> {
@@ -31,7 +30,12 @@ public class ResearchSelectorListWidget extends ContainerWidget<ResearchSelector
     private final PopupWidget parentPopupWidget;
     private UniqueArray<Element> items;
 
-    public ResearchSelectorListWidget(@Nullable PopupWidget parentPopupWidget, int width, int height, Collection<Element> items, boolean renderScroller) {
+    public ResearchSelectorListWidget(
+            @Nullable PopupWidget parentPopupWidget,
+            int width,
+            int height,
+            Collection<Element> items,
+            boolean renderScroller) {
         super(width, height, 18, 18, Orientation.HORIZONTAL, width, 1, items, renderScroller);
         this.parentPopupWidget = parentPopupWidget;
         this.items = new UniqueArray<>(items);
@@ -41,7 +45,8 @@ public class ResearchSelectorListWidget extends ContainerWidget<ResearchSelector
     public void setPrevious(List<ResourceKey<Research>> previous) {
         ResearchManager researchManager = ResearchdApi.getResearchManager();
         for (ResourceKey<Research> research : previous) {
-            this.addItem(new Element.SimpleElement(research, researchManager.lookupResearch(research, Minecraft.getInstance().level)));
+            this.addItem(new Element.SimpleElement(
+                    research, researchManager.lookupResearch(research, Minecraft.getInstance().level)));
         }
     }
 
@@ -99,15 +104,26 @@ public class ResearchSelectorListWidget extends ContainerWidget<ResearchSelector
             if (this.parentPopupWidget != null) {
                 screen.closePopup(this.parentPopupWidget);
             }
-            screen.openPopupCentered(new ResearchSelectionPopupWidget(this, this.parentPopupWidget, Set.copyOf(this.getResearches())));
+            screen.openPopupCentered(
+                    new ResearchSelectionPopupWidget(this, this.parentPopupWidget, Set.copyOf(this.getResearches())));
         } else {
             this.removeItem(item);
         }
     }
 
     @Override
-    protected void internalRenderItem(GuiGraphics guiGraphics, Element item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {
-        item.render(guiGraphics, left, top, this.getItemWidth(), this.getItemHeight(), this.isItemHovered(xIndex, yIndex, mouseX, mouseY), mouseX, mouseY, 1);
+    protected void internalRenderItem(
+            GuiGraphics guiGraphics, Element item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {
+        item.render(
+                guiGraphics,
+                left,
+                top,
+                this.getItemWidth(),
+                this.getItemHeight(),
+                this.isItemHovered(xIndex, yIndex, mouseX, mouseY),
+                mouseX,
+                mouseY,
+                1);
     }
 
     @Override
@@ -115,25 +131,45 @@ public class ResearchSelectorListWidget extends ContainerWidget<ResearchSelector
         super.renderTooltips(guiGraphics, mouseX, mouseY, v);
 
         if (this.hoveredItem instanceof Element.SimpleElement(ResourceKey<Research> researchKey, Research research)) {
-            guiGraphics.renderTooltip(GuiUtils.getFont(), ResearchHelperCommon.getResearchName(researchKey, research), mouseX, mouseY);
+            guiGraphics.renderTooltip(
+                    GuiUtils.getFont(), ResearchHelperCommon.getResearchName(researchKey, research), mouseX, mouseY);
         }
-
     }
 
     public sealed interface Element permits Element.SimpleElement, Element.SelectorElement {
-        WidgetSprites SPRITES = new WidgetSprites(Researchd.rl("editor_background"), Researchd.rl("editor_background_highlighted"));
+        WidgetSprites SPRITES =
+                new WidgetSprites(Researchd.rl("editor_background"), Researchd.rl("editor_background_highlighted"));
 
-        void render(GuiGraphics guiGraphics, int x, int y, int width, int height, boolean hovered, int mouseX, int mouseY, float partialTick);
+        void render(
+                GuiGraphics guiGraphics,
+                int x,
+                int y,
+                int width,
+                int height,
+                boolean hovered,
+                int mouseX,
+                int mouseY,
+                float partialTick);
 
         record SimpleElement(ResourceKey<Research> researchKey, Research research) implements Element {
             public static final ResourceLocation REMOVE_ELEMENT_HOVER_SPRITE = Researchd.rl("remove_element_hover");
 
             @Override
-            public void render(GuiGraphics guiGraphics, int x, int y, int width, int height, boolean hovered, int mouseX, int mouseY, float partialTick) {
+            public void render(
+                    GuiGraphics guiGraphics,
+                    int x,
+                    int y,
+                    int width,
+                    int height,
+                    boolean hovered,
+                    int mouseX,
+                    int mouseY,
+                    float partialTick) {
                 guiGraphics.blitSprite(SPRITES.get(true, hovered), x, y, width, height);
-                ClientResearchIcon.getClientIcon(research.researchIcon()).render(guiGraphics, x + 1, y + 1, mouseX, mouseY, 1, partialTick);
+                ClientResearchIcon.getClientIcon(research.researchIcon())
+                        .render(guiGraphics, x + 1, y + 1, mouseX, mouseY, 1, partialTick);
                 if (hovered) {
-                    PoseStack poseStack  = guiGraphics.pose();
+                    PoseStack poseStack = guiGraphics.pose();
                     poseStack.pushPose();
                     {
                         poseStack.translate(0, 0, RdZIndex.EDITOR_HOVER_OVERLAY);
@@ -145,14 +181,23 @@ public class ResearchSelectorListWidget extends ContainerWidget<ResearchSelector
         }
 
         final class SelectorElement implements Element {
-            public static final WidgetSprites SPRITES = new WidgetSprites(Researchd.rl("editor_select_research"), Researchd.rl("editor_select_research_highlighted"));
+            public static final WidgetSprites SPRITES = new WidgetSprites(
+                    Researchd.rl("editor_select_research"), Researchd.rl("editor_select_research_highlighted"));
             public static final SelectorElement INSTANCE = new SelectorElement();
 
-            private SelectorElement() {
-            }
+            private SelectorElement() {}
 
             @Override
-            public void render(GuiGraphics guiGraphics, int x, int y, int width, int height, boolean hovered, int mouseX, int mouseY, float partialTick) {
+            public void render(
+                    GuiGraphics guiGraphics,
+                    int x,
+                    int y,
+                    int width,
+                    int height,
+                    boolean hovered,
+                    int mouseX,
+                    int mouseY,
+                    float partialTick) {
                 guiGraphics.blitSprite(SPRITES.get(true, hovered), x, y, width, height);
             }
         }

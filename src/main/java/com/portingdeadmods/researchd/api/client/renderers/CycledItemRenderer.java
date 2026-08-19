@@ -1,12 +1,11 @@
 package com.portingdeadmods.researchd.api.client.renderers;
 
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class CycledItemRenderer {
     public static final float CYCLE_INTERVAL = 50.0f;
@@ -75,5 +74,4 @@ public class CycledItemRenderer {
             index = (index + 1) % items.size();
         }
     }
-
 }

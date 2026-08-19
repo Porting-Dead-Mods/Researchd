@@ -1,15 +1,14 @@
 package com.portingdeadmods.researchd.utils;
 
 import it.unimi.dsi.fastutil.chars.CharPredicate;
+import java.util.List;
+import java.util.function.Predicate;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
-
-import java.util.List;
-import java.util.function.Predicate;
 
 public final class TextUtils {
     /**
@@ -24,7 +23,8 @@ public final class TextUtils {
      * @param dropShadow  Whether to draw with drop shadow
      * @return The total height of the rendered text
      */
-    public static int drawWrappedText(GuiGraphics guiGraphics, Component component, int x, int y, int maxWidth, int color, boolean dropShadow) {
+    public static int drawWrappedText(
+            GuiGraphics guiGraphics, Component component, int x, int y, int maxWidth, int color, boolean dropShadow) {
         Font font = Minecraft.getInstance().font;
         List<FormattedCharSequence> lines = font.split(component, maxWidth);
 
@@ -52,7 +52,15 @@ public final class TextUtils {
      * @param dropShadow  Whether to draw with drop shadow
      * @return The total height of the rendered text
      */
-    public static int drawWrappedText(GuiGraphics guiGraphics, Component component, int x, int y, int maxWidth, int lineSpacing, int color, boolean dropShadow) {
+    public static int drawWrappedText(
+            GuiGraphics guiGraphics,
+            Component component,
+            int x,
+            int y,
+            int maxWidth,
+            int lineSpacing,
+            int color,
+            boolean dropShadow) {
         Font font = Minecraft.getInstance().font;
         List<FormattedCharSequence> lines = font.split(component, maxWidth);
 
@@ -167,7 +175,6 @@ public final class TextUtils {
                 newString.append(c);
             }
             index++;
-
         }
 
         return newString.toString();
@@ -220,5 +227,4 @@ public final class TextUtils {
         }
         return false;
     }
-
 }

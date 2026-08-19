@@ -12,10 +12,10 @@ import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.client.screens.RdZIndex;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
-import com.portingdeadmods.researchd.impl.research.SimpleResearchQueue;
-import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
+import com.portingdeadmods.researchd.impl.research.SimpleResearchQueue;
 import com.portingdeadmods.researchd.networking.research.ResearchQueueRemovePayload;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -32,13 +32,15 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
 
     private final ResearchScreen screen;
 
-	// TODO: Not final atm so it can be refreshed
-	// For some reason it doesn't update properly when another player adds/removes something from the queue
-	// Also it's weird since it's passed by reference from the ClientTeam so it *should* be updated... It's the same issue as the TechList and Graph...
-	private ResearchQueue queue;
-	public void setQueue(ResearchQueue newQueue) {
-		this.queue = newQueue;
-	}
+    // TODO: Not final atm so it can be refreshed
+    // For some reason it doesn't update properly when another player adds/removes something from the queue
+    // Also it's weird since it's passed by reference from the ClientTeam so it *should* be updated... It's the same
+    // issue as the TechList and Graph...
+    private ResearchQueue queue;
+
+    public void setQueue(ResearchQueue newQueue) {
+        this.queue = newQueue;
+    }
 
     private ResearchInstance selected;
     private float selectedX;
@@ -74,7 +76,8 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
         }
 
         if (this.selected != null) {
-            renderQueuePanel(guiGraphics, this.selected, (int) selectedX, (int) selectedY, mouseX, mouseY, selectedIndex);
+            renderQueuePanel(
+                    guiGraphics, this.selected, (int) selectedX, (int) selectedY, mouseX, mouseY, selectedIndex);
         }
     }
 
@@ -123,7 +126,8 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
         }
     }
 
-    private void renderQueuePanel(GuiGraphics guiGraphics, ResearchInstance instance, int x, int y, int mouseX, int mouseY, int index) {
+    private void renderQueuePanel(
+            GuiGraphics guiGraphics, ResearchInstance instance, int x, int y, int mouseX, int mouseY, int index) {
         if (instance == null) return;
 
         if (index == 0) {
@@ -152,7 +156,14 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
         }
     }
 
-    private void renderResearchingResearchPanel(GuiGraphics guiGraphics, ResearchInstance instance, int x, int y, int mouseX, int mouseY, boolean hoverable) {
+    private void renderResearchingResearchPanel(
+            GuiGraphics guiGraphics,
+            ResearchInstance instance,
+            int x,
+            int y,
+            int mouseX,
+            int mouseY,
+            boolean hoverable) {
         PanelSpriteType spriteType = PanelSpriteType.NORMAL;
         ResearchStatus status = instance.getResearchStatus();
         GuiUtils.drawImg(guiGraphics, status.getSpriteTexture(spriteType), x, y, PANEL_WIDTH, spriteType.getHeight());
@@ -161,9 +172,19 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
         ResearchProgress rmp = team != null ? team.getResearchProgresses().get(instance.getResearch()) : null;
         float progress = rmp == null ? 0f : (rmp.getProgress() / rmp.getMaxProgress());
 
-        guiGraphics.blit(ResearchStatus.RESEARCHED.getSpriteTexture(spriteType), x, y, 0, 0, (int) (progress * PANEL_WIDTH), spriteType.getHeight(), PANEL_WIDTH, spriteType.getHeight());
+        guiGraphics.blit(
+                ResearchStatus.RESEARCHED.getSpriteTexture(spriteType),
+                x,
+                y,
+                0,
+                0,
+                (int) (progress * PANEL_WIDTH),
+                spriteType.getHeight(),
+                PANEL_WIDTH,
+                spriteType.getHeight());
 
-        ClientResearchIcon<?> icon = ResearchScreen.CLIENT_ICONS.get(instance.getResearch().location());
+        ClientResearchIcon<?> icon =
+                ResearchScreen.CLIENT_ICONS.get(instance.getResearch().location());
         if (icon != null) {
             icon.render(guiGraphics, x + 2, y + 2, mouseX, mouseY, 1, 0);
         }
@@ -175,9 +196,11 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
     }
 
     private boolean isHovering(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
-        return (guiGraphics == null ||
-                guiGraphics.containsPointInScissor(mouseX, mouseY))
-                && mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
+        return (guiGraphics == null || guiGraphics.containsPointInScissor(mouseX, mouseY))
+                && mouseX >= x
+                && mouseY >= y
+                && mouseX < x + width
+                && mouseY < y + height;
     }
 
     public ResearchQueue getQueue() {

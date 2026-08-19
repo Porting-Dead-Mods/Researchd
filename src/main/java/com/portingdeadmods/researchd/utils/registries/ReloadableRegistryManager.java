@@ -10,8 +10,12 @@ import com.mojang.serialization.DataResult;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
-import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.compat.KubeJSCompat;
+import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -22,16 +26,9 @@ import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 public class ReloadableRegistryManager<T> extends SimpleJsonResourceReloadListener {
-    public static final Gson GSON = new GsonBuilder()
-            .setPrettyPrinting()
-            .disableHtmlEscaping()
-            .create();
+    public static final Gson GSON =
+            new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     private final HolderLookup.Provider lookup;
     private final ResourceKey<Registry<T>> registry;
@@ -48,14 +45,18 @@ public class ReloadableRegistryManager<T> extends SimpleJsonResourceReloadListen
 
     // TODO: Replace with linked hashmap and sort it
     @Override
-    protected void apply(Map<ResourceLocation, JsonElement> registryEntries, ResourceManager resourceManager, ProfilerFiller profilerFiller) {
+    protected void apply(
+            Map<ResourceLocation, JsonElement> registryEntries,
+            ResourceManager resourceManager,
+            ProfilerFiller profilerFiller) {
         ImmutableMap.Builder<ResourceKey<T>, T> builder = ImmutableMap.builder();
 
         for (Map.Entry<ResourceLocation, JsonElement> entry : registryEntries.entrySet()) {
             ResourceLocation location = entry.getKey();
             if (!location.getPath().startsWith("_")) {
                 try {
-                    DataResult<Pair<T, JsonElement>> result = this.codec.decode(this.makeConditionalOps(), entry.getValue());
+                    DataResult<Pair<T, JsonElement>> result =
+                            this.codec.decode(this.makeConditionalOps(), entry.getValue());
                     ResourceKey<T> key = ResourceKey.create(this.registry, location);
                     result.ifSuccess(pair -> {
                         builder.put(key, pair.getFirst());
@@ -129,5 +130,4 @@ public class ReloadableRegistryManager<T> extends SimpleJsonResourceReloadListen
         this.byName = Collections.emptyMap();
         this.failed = true;
     }
-
 }

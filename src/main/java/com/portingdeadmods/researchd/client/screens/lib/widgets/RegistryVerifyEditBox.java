@@ -2,6 +2,8 @@ package com.portingdeadmods.researchd.client.screens.lib.widgets;
 
 import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.TextUtils;
+import java.util.Collection;
+import java.util.Objects;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.core.Registry;
@@ -11,14 +13,18 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.Objects;
-
 public class RegistryVerifyEditBox extends BackgroundEditBox {
     private final @Nullable Registry<?> registry;
     private final @Nullable Collection<ResourceLocation> ids;
 
-    public RegistryVerifyEditBox(Font font, WidgetSprites sprites, @Nullable Registry<?> registry, @Nullable Collection<ResourceLocation> ids, int width, int height, Component message) {
+    public RegistryVerifyEditBox(
+            Font font,
+            WidgetSprites sprites,
+            @Nullable Registry<?> registry,
+            @Nullable Collection<ResourceLocation> ids,
+            int width,
+            int height,
+            Component message) {
         super(font, sprites, width, height, "");
         this.registry = registry;
         this.ids = ids;
@@ -31,12 +37,14 @@ public class RegistryVerifyEditBox extends BackgroundEditBox {
 
     public static RegistryVerifyEditBox forRegistry(Registry<?> registry, int width, int height) {
         Objects.requireNonNull(registry);
-        return new RegistryVerifyEditBox(GuiUtils.getFont(), BackgroundEditBox.SPRITES, registry, null, width, height, CommonComponents.EMPTY);
+        return new RegistryVerifyEditBox(
+                GuiUtils.getFont(), BackgroundEditBox.SPRITES, registry, null, width, height, CommonComponents.EMPTY);
     }
 
     public static RegistryVerifyEditBox forIds(Collection<ResourceLocation> ids, int width, int height) {
         Objects.requireNonNull(ids);
-        return new RegistryVerifyEditBox(GuiUtils.getFont(), BackgroundEditBox.SPRITES, null, ids, width, height, CommonComponents.EMPTY);
+        return new RegistryVerifyEditBox(
+                GuiUtils.getFont(), BackgroundEditBox.SPRITES, null, ids, width, height, CommonComponents.EMPTY);
     }
 
     public @Nullable Registry<?> getRegistry() {
@@ -73,11 +81,8 @@ public class RegistryVerifyEditBox extends BackgroundEditBox {
     }
 
     public boolean isValid(ResourceLocation id) {
-        if (this.registry != null)
-            return this.registry.containsKey(id);
-        else if (this.ids != null)
-            return this.ids.contains(id);
+        if (this.registry != null) return this.registry.containsKey(id);
+        else if (this.ids != null) return this.ids.contains(id);
         return false;
     }
-
 }

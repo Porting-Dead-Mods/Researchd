@@ -4,16 +4,16 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdClient;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
 import com.portingdeadmods.researchd.api.client.RememberingLinearLayout;
-import com.portingdeadmods.researchd.client.impl.editor.EditorContextImpl;
 import com.portingdeadmods.researchd.api.client.editor.TypedEditorObject;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethodType;
+import com.portingdeadmods.researchd.client.impl.editor.EditorContextImpl;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.EmbeddedMethodCreationWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.SelectPackPopupWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.selection.ResearchMethodTypeSelectionPopupWidget;
+import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLButton;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
-import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLButton;
 import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.SpaghettiClient;
 import net.minecraft.client.gui.GuiGraphics;
@@ -34,7 +34,14 @@ public class ResearchMethodCreationPopupWidget extends PopupWidget {
     private final ResearchMethodTypeSelectionPopupWidget parentPopupWidget;
     private final EmbeddedMethodCreationWidget originSelectionWidget;
 
-    public ResearchMethodCreationPopupWidget(ResearchMethodTypeSelectionPopupWidget parentPopupWidget, ResearchMethodType type, EmbeddedMethodCreationWidget originSelectionWidget, int x, int y, int width, int height) {
+    public ResearchMethodCreationPopupWidget(
+            ResearchMethodTypeSelectionPopupWidget parentPopupWidget,
+            ResearchMethodType type,
+            EmbeddedMethodCreationWidget originSelectionWidget,
+            int x,
+            int y,
+            int width,
+            int height) {
         super(x, y, width, height, false, CommonComponents.EMPTY);
         this.parentPopupWidget = parentPopupWidget;
         this.originSelectionWidget = originSelectionWidget;
@@ -49,7 +56,6 @@ public class ResearchMethodCreationPopupWidget extends PopupWidget {
                 .build());
 
         this.buildLayout();
-
     }
 
     private void onCreateButtonPressed(PDLButton button) {
@@ -79,11 +85,20 @@ public class ResearchMethodCreationPopupWidget extends PopupWidget {
 
     protected void buildLayout() {
         if (this.clientResearchMethod != null) {
-            EditorContextImpl context = new EditorContextImpl(this.createButton, SpaghettiClient.tryGetResearchScreen(), this, this.getWidth(), this.getHeight(), this.getWidth() - 14, this.getHeight() - 14, 7);
+            EditorContextImpl context = new EditorContextImpl(
+                    this.createButton,
+                    SpaghettiClient.tryGetResearchScreen(),
+                    this,
+                    this.getWidth(),
+                    this.getHeight(),
+                    this.getWidth() - 14,
+                    this.getHeight() - 14,
+                    7);
             this.clientResearchMethod.buildLayout(this.layout, null, context);
             this.clientResearchMethod.update(this.layout, context);
             this.layout.getLayout().arrangeElements();
-            FrameLayout.centerInRectangle(this.layout.getLayout(), this.getX(), this.getY(), this.getWidth(), this.getHeight());
+            FrameLayout.centerInRectangle(
+                    this.layout.getLayout(), this.getX(), this.getY(), this.getWidth(), this.getHeight());
             this.layout.getChildren().forEach(this::addRenderableWidget);
         }
     }
@@ -114,9 +129,11 @@ public class ResearchMethodCreationPopupWidget extends PopupWidget {
 
         super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
 
-        ClientResearchIcon.getClientIcon(this.clientResearchMethod.type().icon()).render(guiGraphics, this.getX() + 3, this.getY() + 3, mouseX, mouseY, 1, partialTick);
+        ClientResearchIcon.getClientIcon(this.clientResearchMethod.type().icon())
+                .render(guiGraphics, this.getX() + 3, this.getY() + 3, mouseX, mouseY, 1, partialTick);
         Component name = this.clientResearchMethod.type().getName();
-        guiGraphics.drawScrollingString(GuiUtils.getFont(), name, this.getX() + 21, this.getX() + this.getWidth() - 6, this.getY() + 7, -1);
+        guiGraphics.drawScrollingString(
+                GuiUtils.getFont(), name, this.getX() + 21, this.getX() + this.getWidth() - 6, this.getY() + 7, -1);
     }
 
     @Override

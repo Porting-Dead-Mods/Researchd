@@ -1,13 +1,12 @@
 package com.portingdeadmods.researchd.api.team;
 
 import com.portingdeadmods.researchd.impl.team.TeamIterator;
+import java.util.Collection;
+import java.util.UUID;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Collection;
-import java.util.UUID;
 
 public interface ResearchTeamManager {
     /**
@@ -49,5 +48,4 @@ public interface ResearchTeamManager {
     void addTeam(ResearchTeam team);
 
     void removeTeam(UUID teamId);
-
 }

@@ -5,10 +5,11 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.ResearchTeamRole;
 import com.portingdeadmods.researchd.client.screens.team.widgets.PlayerManagementDraggableWidget;
-import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import com.portingdeadmods.researchd.networking.team.LeaveTeamPayload;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperServer;
+import java.util.Objects;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -20,8 +21,6 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.PacketDistributor;
-
-import java.util.Objects;
 
 public class ResearchTeamSettingsScreen extends BaseTeamScreen {
     public static final ResourceLocation SCREEN_TEXTURE = Researchd.rl("textures/gui/team_settings_screen.png");
@@ -38,11 +37,13 @@ public class ResearchTeamSettingsScreen extends BaseTeamScreen {
     private Button leaveButton;
 
     private PlayerManagementDraggableWidget playerManagementWindow;
+
     public PlayerManagementDraggableWidget getPlayerManagementWindow() {
         return playerManagementWindow;
     }
 
     private PlayerManagementDraggableWidget transferOwnershipWindow;
+
     public PlayerManagementDraggableWidget getTransferOwnershipWindow() {
         return transferOwnershipWindow;
     }
@@ -83,17 +84,28 @@ public class ResearchTeamSettingsScreen extends BaseTeamScreen {
         }
 
         // Layout Widgets - Buttons
-        this.manageMembersButton = Button.builder(ResearchdTranslations.component(ResearchdTranslations.Team.BUTTON_MANAGE_MEMBERS), btn -> {
-            this.playerManagementWindow.setVisible(!this.playerManagementWindow.visible);
-        }).size(112, 16).build();
-        this.transferOwnershipButton = Button.builder(ResearchdTranslations.component(ResearchdTranslations.Team.BUTTON_TRANSFER_OWNERSHIP), btn -> {
-            this.transferOwnershipWindow.setVisible(!this.transferOwnershipWindow.visible);
-        }).size(112, 16).build();
-        this.leaveButton = Button.builder(ResearchdTranslations.component(ResearchdTranslations.Team.BUTTON_LEAVE_TEAM), btn -> {
-	        PacketDistributor.sendToServer(new LeaveTeamPayload(PlayerUtils.EmptyUUID));
-        }).size(112, 16).build();
+        this.manageMembersButton = Button.builder(
+                        ResearchdTranslations.component(ResearchdTranslations.Team.BUTTON_MANAGE_MEMBERS), btn -> {
+                            this.playerManagementWindow.setVisible(!this.playerManagementWindow.visible);
+                        })
+                .size(112, 16)
+                .build();
+        this.transferOwnershipButton = Button.builder(
+                        ResearchdTranslations.component(ResearchdTranslations.Team.BUTTON_TRANSFER_OWNERSHIP), btn -> {
+                            this.transferOwnershipWindow.setVisible(!this.transferOwnershipWindow.visible);
+                        })
+                .size(112, 16)
+                .build();
+        this.leaveButton = Button.builder(
+                        ResearchdTranslations.component(ResearchdTranslations.Team.BUTTON_LEAVE_TEAM), btn -> {
+                            PacketDistributor.sendToServer(new LeaveTeamPayload(PlayerUtils.EmptyUUID));
+                        })
+                .size(112, 16)
+                .build();
 
-        if (ResearchTeamHelperClient.getPlayerRole(Minecraft.getInstance().player.getUUID()) == ResearchTeamRole.OWNER) {
+        if (ResearchTeamHelperClient.getPlayerRole(
+                        Minecraft.getInstance().player.getUUID())
+                == ResearchTeamRole.OWNER) {
             this.layout.addChild(manageMembersButton);
             this.layout.addChild(transferOwnershipButton);
         }
@@ -109,8 +121,7 @@ public class ResearchTeamSettingsScreen extends BaseTeamScreen {
                 this.topPos,
                 ResearchTeamHelperClient.getTeamMembers(),
                 new PlayerManagementDraggableWidget.PlayerManagementButtons(true, true, true, false, false),
-                Component.empty()
-        );
+                Component.empty());
         this.playerManagementWindow.setVisible(false);
         this.playerManagementWindow.visitWidgets(this::addRenderableOnly);
 
@@ -120,8 +131,7 @@ public class ResearchTeamSettingsScreen extends BaseTeamScreen {
                 this.topPos + this.height / 2,
                 ResearchTeamHelperClient.getTeamMembers(),
                 new PlayerManagementDraggableWidget.PlayerManagementButtons(false, false, false, true, false),
-                Component.empty()
-        );
+                Component.empty());
         this.transferOwnershipWindow.setVisible(false);
         this.transferOwnershipWindow.visitWidgets(this::addRenderableOnly);
     }
@@ -137,14 +147,13 @@ public class ResearchTeamSettingsScreen extends BaseTeamScreen {
         if (this.prevScreen != null) {
             Minecraft.getInstance().setScreen(this.prevScreen);
         }
-
     }
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
         if (this.playerManagementWindow.isLazyHovered()) {
             return this.playerManagementWindow.mouseDragged(mouseX, mouseY, button, dragX, dragY);
-        } else if (this.transferOwnershipWindow.isLazyHovered()){
+        } else if (this.transferOwnershipWindow.isLazyHovered()) {
             return this.transferOwnershipWindow.mouseDragged(mouseX, mouseY, button, dragX, dragY);
         }
 
@@ -175,23 +184,30 @@ public class ResearchTeamSettingsScreen extends BaseTeamScreen {
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
-	@Override
-	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-		super.render(guiGraphics, mouseX, mouseY, partialTick);
-		this.manageMembersButton.active = (ResearchTeamHelperClient.getRole().getPermissionLevel() > 0);
-		this.transferOwnershipButton.active = (ResearchTeamHelperClient.getRole() == ResearchTeamRole.OWNER);
-		this.teamNameEdit.setEditable(ResearchTeamHelperClient.getRole() == ResearchTeamRole.OWNER);
-	}
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        this.manageMembersButton.active = (ResearchTeamHelperClient.getRole().getPermissionLevel() > 0);
+        this.transferOwnershipButton.active = (ResearchTeamHelperClient.getRole() == ResearchTeamRole.OWNER);
+        this.teamNameEdit.setEditable(ResearchTeamHelperClient.getRole() == ResearchTeamRole.OWNER);
+    }
 
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
 
-        guiGraphics.blit(SCREEN_TEXTURE, this.leftPos, this.topPos, 0, 0, this.width, this.height, this.textureWidth, this.textureHeight);
+        guiGraphics.blit(
+                SCREEN_TEXTURE,
+                this.leftPos,
+                this.topPos,
+                0,
+                0,
+                this.width,
+                this.height,
+                this.textureWidth,
+                this.textureHeight);
     }
 
     @Override
-    protected void renderBlurredBackground(float partialTick) {
-    }
-
+    protected void renderBlurredBackground(float partialTick) {}
 }

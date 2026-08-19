@@ -3,20 +3,20 @@ package com.portingdeadmods.researchd.client.screens.lib.widgets;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.client.screens.RdZIndex;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.dropdowns.RegistrySuggestionDropDownWidget;
+import java.util.List;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.CommonComponents;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
 public class SuggestionRegistryVerifyEditBox extends RegistryVerifyEditBox {
     private final RegistrySuggestionDropDownWidget dropDown;
 
     public SuggestionRegistryVerifyEditBox(Font font, @Nullable Registry<?> registry, int width, int height) {
         super(font, BackgroundEditBox.SPRITES, registry, List.of(), width, height, CommonComponents.EMPTY);
-        this.dropDown = new RegistrySuggestionDropDownWidget(registry, 0, 0, opt -> this.setValue(opt.value().getString()), this::getValue);
+        this.dropDown = new RegistrySuggestionDropDownWidget(
+                registry, 0, 0, opt -> this.setValue(opt.value().getString()), this::getValue);
         this.dropDown.rebuildOptions();
     }
 
@@ -44,7 +44,9 @@ public class SuggestionRegistryVerifyEditBox extends RegistryVerifyEditBox {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (this.dropDown.isHovered() && this.dropDown.isVisible() && this.dropDown.mouseClicked(mouseX, mouseY, button)) {
+        if (this.dropDown.isHovered()
+                && this.dropDown.isVisible()
+                && this.dropDown.mouseClicked(mouseX, mouseY, button)) {
             return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);

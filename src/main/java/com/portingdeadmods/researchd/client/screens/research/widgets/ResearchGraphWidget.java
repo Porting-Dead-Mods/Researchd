@@ -1,5 +1,9 @@
 package com.portingdeadmods.researchd.client.screens.research.widgets;
 
+import static com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget.PANEL_HEIGHT;
+import static com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget.PANEL_WIDTH;
+import static com.portingdeadmods.researchd.client.screens.research.graph.GraphLayoutManager.*;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;
 import com.portingdeadmods.researchd.api.research.Research;
@@ -18,6 +22,9 @@ import com.portingdeadmods.researchd.client.screens.research.graph.lines.Researc
 import com.portingdeadmods.researchd.client.screens.research.graph.lines.ResearchLine;
 import com.portingdeadmods.researchd.utils.TextUtils;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
+import java.awt.*;
+import java.util.*;
+import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
@@ -29,14 +36,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
-
-import java.awt.*;
-import java.util.*;
-import java.util.List;
-
-import static com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget.PANEL_HEIGHT;
-import static com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget.PANEL_WIDTH;
-import static com.portingdeadmods.researchd.client.screens.research.graph.GraphLayoutManager.*;
 
 public class ResearchGraphWidget extends AbstractWidget {
     public static final int LEFT_MARGIN_WIDTH = 174 + 13;
@@ -114,8 +113,10 @@ public class ResearchGraphWidget extends AbstractWidget {
             for (ResearchNode child : parent.getChildren()) {
                 if (!graph.nodes().containsValue(child)) continue;
 
-                ResearchHead outputHead = findClosestAvailableHead(parent.getOutputs(), child.getX() + PANEL_WIDTH / 2, usedOutputHeads);
-                ResearchHead inputHead = findClosestAvailableHead(child.getInputs(), parent.getX() + PANEL_WIDTH / 2, usedInputHeads);
+                ResearchHead outputHead =
+                        findClosestAvailableHead(parent.getOutputs(), child.getX() + PANEL_WIDTH / 2, usedOutputHeads);
+                ResearchHead inputHead =
+                        findClosestAvailableHead(child.getInputs(), parent.getX() + PANEL_WIDTH / 2, usedInputHeads);
 
                 if (outputHead == null || inputHead == null) continue;
 
@@ -126,7 +127,8 @@ public class ResearchGraphWidget extends AbstractWidget {
                 Point inPt = inputHead.getConnectionPoint();
 
                 long key = GraphLayoutManager.edgeKey(parent, child);
-                Map<Integer, Integer> zoneAssignments = layoutResult.edgeChannelAssignments().get(key);
+                Map<Integer, Integer> zoneAssignments =
+                        layoutResult.edgeChannelAssignments().get(key);
 
                 ResearchLine line;
                 if (zoneAssignments == null || zoneAssignments.isEmpty()) {
@@ -150,7 +152,8 @@ public class ResearchGraphWidget extends AbstractWidget {
      * For edges spanning a single zone: down → horizontal at channel → down.
      * For edges spanning multiple zones: chains through intermediate channels.
      */
-    private ResearchLine buildChannelRoute(Point outPt, Point inPt, int parentLayer, int childLayer, Map<Integer, Integer> zoneAssignments) {
+    private ResearchLine buildChannelRoute(
+            Point outPt, Point inPt, int parentLayer, int childLayer, Map<Integer, Integer> zoneAssignments) {
         ResearchLine line = ResearchLine.start(outPt);
 
         // Current X tracks where the vertical line is
@@ -202,8 +205,10 @@ public class ResearchGraphWidget extends AbstractWidget {
             for (ResearchNode child : parent.getChildren()) {
                 if (!graph.nodes().containsValue(child)) continue;
 
-                ResearchHead outputHead = findClosestAvailableHead(parent.getOutputs(), child.getX() + PANEL_WIDTH / 2, usedOutputHeads);
-                ResearchHead inputHead = findClosestAvailableHead(child.getInputs(), parent.getX() + PANEL_WIDTH / 2, usedInputHeads);
+                ResearchHead outputHead =
+                        findClosestAvailableHead(parent.getOutputs(), child.getX() + PANEL_WIDTH / 2, usedOutputHeads);
+                ResearchHead inputHead =
+                        findClosestAvailableHead(child.getInputs(), parent.getX() + PANEL_WIDTH / 2, usedInputHeads);
 
                 if (outputHead == null || inputHead == null) continue;
 
@@ -228,7 +233,8 @@ public class ResearchGraphWidget extends AbstractWidget {
     /**
      * Finds the closest available head to a item X position.
      */
-    private @Nullable ResearchHead findClosestAvailableHead(Iterable<ResearchHead> heads, int targetX, Set<ResearchHead> usedHeads) {
+    private @Nullable ResearchHead findClosestAvailableHead(
+            Iterable<ResearchHead> heads, int targetX, Set<ResearchHead> usedHeads) {
         ResearchHead best = null;
         int bestDist = Integer.MAX_VALUE;
 
@@ -291,15 +297,24 @@ public class ResearchGraphWidget extends AbstractWidget {
         int completionTextX = guiGraphics.guiWidth() - 8 - completionTextWidth - 5;
 
         // Title
-        Component title = Component.translatable("researchpage." + pageId.getNamespace() + "." + pageId.getPath() + ".title");
+        Component title =
+                Component.translatable("researchpage." + pageId.getNamespace() + "." + pageId.getPath() + ".title");
         int titleMaxWidth = completionTextX - x - 4;
         TextUtils.drawWrappedText(guiGraphics, title, x, y, titleMaxWidth, 0xFFFFFF, true);
 
         // Description
-        Component description = Component.translatable("researchpage." + pageId.getNamespace() + "." + pageId.getPath() + ".description");
+        Component description = Component.translatable(
+                "researchpage." + pageId.getNamespace() + "." + pageId.getPath() + ".description");
         int rightPadding = Math.max(8, guiGraphics.guiWidth() - x - 250);
         int descMaxWidth = Math.min(guiGraphics.guiWidth() - x - rightPadding, 250);
-        TextUtils.drawWrappedText(guiGraphics, description.copy().withStyle(ChatFormatting.GRAY), x, y + 12, descMaxWidth, 0xAAAAAA, false);
+        TextUtils.drawWrappedText(
+                guiGraphics,
+                description.copy().withStyle(ChatFormatting.GRAY),
+                x,
+                y + 12,
+                descMaxWidth,
+                0xAAAAAA,
+                false);
 
         // Completion count (right-aligned)
         guiGraphics.drawString(font, completionText, completionTextX, y, 0xFFFFFF, true);
@@ -336,16 +351,16 @@ public class ResearchGraphWidget extends AbstractWidget {
                     int scaledX = (int) (centerX - (width * ROOT_NODE_SCALING) / 2f);
                     int scaledY = (int) (centerY - (height * ROOT_NODE_SCALING) / 2f);
 
-                    node.setHovered(guiGraphics, scaledX, scaledY, (int) (20 * ROOT_NODE_SCALING), (int) (24 * ROOT_NODE_SCALING), mouseX, mouseY);
-                    ResearchScreenWidget.renderResearchPanel(
+                    node.setHovered(
                             guiGraphics,
-                            node.getInstance(),
-                            scaledX + 1,
+                            scaledX,
                             scaledY,
+                            (int) (20 * ROOT_NODE_SCALING),
+                            (int) (24 * ROOT_NODE_SCALING),
                             mouseX,
-                            mouseY,
-                            ROOT_NODE_SCALING
-                    );
+                            mouseY);
+                    ResearchScreenWidget.renderResearchPanel(
+                            guiGraphics, node.getInstance(), scaledX + 1, scaledY, mouseX, mouseY, ROOT_NODE_SCALING);
                 } else {
                     node.render(guiGraphics, mouseX, mouseY, v);
                 }
@@ -373,8 +388,9 @@ public class ResearchGraphWidget extends AbstractWidget {
                     AbstractResearchScreen.setTooltip(List.of(
                             node.getInstance().getDisplayName(mc.level),
                             node.getInstance().getDescription(mc.level),
-                            SharedConstants.IS_RUNNING_IN_IDE ? Component.literal("Press Ctrl for debug info") : Component.empty()
-                    ));
+                            SharedConstants.IS_RUNNING_IN_IDE
+                                    ? Component.literal("Press Ctrl for debug info")
+                                    : Component.empty()));
                 } else if (SharedConstants.IS_RUNNING_IN_IDE) {
                     AbstractResearchScreen.setTooltip(List.of(
                             node.getInstance().getDisplayName(mc.level),
@@ -382,9 +398,10 @@ public class ResearchGraphWidget extends AbstractWidget {
                             Component.literal("x: %d, y: %d".formatted(node.getX(), node.getY())),
                             Component.literal("w: %d, h: %d".formatted(node.getWidth(), node.getHeight())),
                             Component.literal("hovered: %s".formatted(node.isHovered())),
-                            Component.literal("%d parents".formatted(node.getParents().size())),
-                            Component.literal("%d children".formatted(node.getChildren().size()))
-                    ));
+                            Component.literal(
+                                    "%d parents".formatted(node.getParents().size())),
+                            Component.literal(
+                                    "%d children".formatted(node.getChildren().size()))));
                 }
                 break;
             }
@@ -392,8 +409,7 @@ public class ResearchGraphWidget extends AbstractWidget {
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-    }
+    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 
     public void translate(int dx, int dy) {
         if (this.graph != null && this.graph.nodes() != null) {
@@ -426,7 +442,8 @@ public class ResearchGraphWidget extends AbstractWidget {
         for (ResearchNode node : this.graph.nodes().values()) {
             if (node.isHovered()) {
                 this.researchScreen.showGraphForResearch(node.getInstance().getResearch());
-                List<ResearchInstance> entries = this.researchScreen.getTechList().entries();
+                List<ResearchInstance> entries =
+                        this.researchScreen.getTechList().entries();
                 int index = entries.indexOf(node.getInstance());
                 if (index != -1) {
                     this.researchScreen.getSelectedResearchWidget().setSelectedResearch(entries.get(index));
@@ -439,13 +456,14 @@ public class ResearchGraphWidget extends AbstractWidget {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        if (/*Spaghetti.tryGetResearchScreen().popupWidgets.keySet().stream().noneMatch(AbstractWidget::isHovered) && */super.mouseDragged(mouseX, mouseY, button, dragX, dragY)) {
+        if (
+        /*Spaghetti.tryGetResearchScreen().popupWidgets.keySet().stream().noneMatch(AbstractWidget::isHovered) && */ super
+                .mouseDragged(mouseX, mouseY, button, dragX, dragY)) {
             if (this.isHovered()) {
                 translate((int) dragX, (int) dragY);
             }
             return true;
         }
-
 
         return false;
     }
@@ -456,7 +474,7 @@ public class ResearchGraphWidget extends AbstractWidget {
             GraphStateManager.getInstance().saveLastSessionState(graph);
 
             // TODO: Reimpl this
-            //ClientResearchCache.ROOT_NODE = graph.rootNode();
+            // ClientResearchCache.ROOT_NODE = graph.rootNode();
         }
     }
 }

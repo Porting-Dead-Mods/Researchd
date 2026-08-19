@@ -6,9 +6,9 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;
 import com.portingdeadmods.researchd.api.client.TechList;
-import com.portingdeadmods.researchd.api.research.ResearchRelations;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.api.research.ResearchRelations;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.ResearchTeamManager;
 import com.portingdeadmods.researchd.api.team.ResearchTeamRole;
@@ -22,16 +22,14 @@ import com.portingdeadmods.researchd.client.screens.team.widgets.PlayerManagemen
 import com.portingdeadmods.researchd.client.screens.team.widgets.TeamMembersList;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamImpl;
 import com.portingdeadmods.researchd.networking.team.*;
+import java.util.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
 
 public final class ResearchTeamHelperClient {
     public static @Nullable ResearchTeam getTeam() {
@@ -100,7 +98,10 @@ public final class ResearchTeamHelperClient {
 
     public static @NotNull List<TeamMember> getPlayersNotInTeam() {
         ResearchTeam team = getTeam();
-		return AllPlayersCache.getUUIDs().stream().filter(uuid -> team == null || !team.hasMember(uuid)).map(uuid -> new TeamMember(uuid, ResearchTeamRole.NOT_MEMBER)).toList();
+        return AllPlayersCache.getUUIDs().stream()
+                .filter(uuid -> team == null || !team.hasMember(uuid))
+                .map(uuid -> new TeamMember(uuid, ResearchTeamRole.NOT_MEMBER))
+                .toList();
     }
 
     public static void removeTeamMemberSynced(TeamMember memberProfile) {
@@ -110,7 +111,9 @@ public final class ResearchTeamHelperClient {
 
         team.removeMember(id);
         PacketDistributor.sendToServer(new ManageMemberPayload(id, true));
-        Researchd.LOGGER.debug("Remove player {}", PlayerUtils.getPlayerNameFromUUID(Minecraft.getInstance().level, memberProfile.player()));
+        Researchd.LOGGER.debug(
+                "Remove player {}",
+                PlayerUtils.getPlayerNameFromUUID(Minecraft.getInstance().level, memberProfile.player()));
     }
 
     public static void sendTeamInviteSynced(TeamMember profileToInvite) {
@@ -137,7 +140,9 @@ public final class ResearchTeamHelperClient {
             team.setRole(member.player(), ResearchTeamRole.MODERATOR);
             PacketDistributor.sendToServer(new ManageModeratorPayload(member.player(), false));
         }
-        Researchd.LOGGER.debug("Promoted player {}", PlayerUtils.getPlayerNameFromUUID(Minecraft.getInstance().level, member.player()));
+        Researchd.LOGGER.debug(
+                "Promoted player {}",
+                PlayerUtils.getPlayerNameFromUUID(Minecraft.getInstance().level, member.player()));
     }
 
     public static void demoteTeamMemberSynced(TeamMember memberProfile) {
@@ -165,7 +170,8 @@ public final class ResearchTeamHelperClient {
         Map<ResourceKey<Research>, ResearchInstance> researches = team.getResearches();
 
         for (Map.Entry<ResourceKey<Research>, ResearchInstance> entry : researches.entrySet()) {
-            ResearchRelations researchRelations = ResearchdApi.getResearchManager().getRelationsForResearch(entry.getKey());
+            ResearchRelations researchRelations =
+                    ResearchdApi.getResearchManager().getRelationsForResearch(entry.getKey());
             if (researchRelations != null) {
                 entry.setValue(entry.getValue().withResearch(entry.getKey()));
             }
@@ -178,7 +184,8 @@ public final class ResearchTeamHelperClient {
             if (graph != null) graph.nodes().forEach((key, node) -> node.fetchInstanceFromTeam());
         }
 
-	    ResearchGraphCache.getAll().forEach(graph -> graph.nodes().forEach((key, node) -> node.fetchInstanceFromTeam()));
+        ResearchGraphCache.getAll()
+                .forEach(graph -> graph.nodes().forEach((key, node) -> node.fetchInstanceFromTeam()));
     }
 
     public static void refreshTechListData() {
@@ -188,56 +195,77 @@ public final class ResearchTeamHelperClient {
         }
     }
 
-	public static void refreshResearchQueueData() {
-		if (Minecraft.getInstance().screen instanceof ResearchScreen screen) {
-			ResearchTeam team = getTeam();
-			if (team == null) return;
+    public static void refreshResearchQueueData() {
+        if (Minecraft.getInstance().screen instanceof ResearchScreen screen) {
+            ResearchTeam team = getTeam();
+            if (team == null) return;
 
-			screen.getResearchQueueWidget().setQueue(team.getQueue());
-		}
-	}
+            screen.getResearchQueueWidget().setQueue(team.getQueue());
+        }
+    }
 
     public static void refreshResearchScreenData() {
         refreshGraphData();
         refreshTechListData();
-		refreshResearchQueueData();
+        refreshResearchQueueData();
     }
 
-	public static void refreshTeamScreenData() {
-		if (Minecraft.getInstance().screen instanceof ResearchTeamScreen screen) {
-			PlayerManagementDraggableWidget inviteWidget = screen.getInviteWidget();
-			if (inviteWidget != null && !inviteWidget.getManagementList().getItems().isEmpty()) {
-				List<PlayerManagementList.Entry> entries = new ArrayList<>();
-				ResearchTeamHelperClient.getPlayersNotInTeam().forEach(member -> entries.add(new PlayerManagementList.Entry(member, inviteWidget.getManagementList().getItems().stream().findFirst().get().buttonSettings())));
-				inviteWidget.getManagementList().refreshEntries(entries);
-			}
-			TeamMembersList teamMembersList = screen.getTeamMembersList();
-			teamMembersList.getItems().clear();
-			teamMembersList.getItems().addAll(ResearchTeamHelperClient.getTeamMembers());
-			teamMembersList.resort();
+    public static void refreshTeamScreenData() {
+        if (Minecraft.getInstance().screen instanceof ResearchTeamScreen screen) {
+            PlayerManagementDraggableWidget inviteWidget = screen.getInviteWidget();
+            if (inviteWidget != null
+                    && !inviteWidget.getManagementList().getItems().isEmpty()) {
+                List<PlayerManagementList.Entry> entries = new ArrayList<>();
+                ResearchTeamHelperClient.getPlayersNotInTeam()
+                        .forEach(member -> entries.add(new PlayerManagementList.Entry(
+                                member,
+                                inviteWidget.getManagementList().getItems().stream()
+                                        .findFirst()
+                                        .get()
+                                        .buttonSettings())));
+                inviteWidget.getManagementList().refreshEntries(entries);
+            }
+            TeamMembersList teamMembersList = screen.getTeamMembersList();
+            teamMembersList.getItems().clear();
+            teamMembersList.getItems().addAll(ResearchTeamHelperClient.getTeamMembers());
+            teamMembersList.resort();
             System.out.println(teamMembersList.getItems().size());
-		}
-	}
+        }
+    }
 
-	public static void refreshTeamSettingsScreenData() {
-		if (Minecraft.getInstance().screen instanceof ResearchTeamSettingsScreen screen) {
-			PlayerManagementDraggableWidget playerManagementWindow = screen.getPlayerManagementWindow();
-			if (playerManagementWindow != null && !playerManagementWindow.getManagementList().getItems().isEmpty()) {
-				List<PlayerManagementList.Entry> entries = new ArrayList<>();
-				ResearchTeamHelperClient.getTeamMembers().forEach(member -> entries.add(new PlayerManagementList.Entry(member, playerManagementWindow.getManagementList().getItems().stream().findFirst().get().buttonSettings())));
-				playerManagementWindow.getManagementList().refreshEntries(entries);
-			}
-			PlayerManagementDraggableWidget transferOwnershipWindow = screen.getTransferOwnershipWindow();
-			if (transferOwnershipWindow != null && !transferOwnershipWindow.getManagementList().getItems().isEmpty()) {
-				List<PlayerManagementList.Entry> entries = new ArrayList<>();
-				ResearchTeamHelperClient.getTeamMembers().forEach(member -> entries.add(new PlayerManagementList.Entry(member, transferOwnershipWindow.getManagementList().getItems().stream().findFirst().get().buttonSettings())));
-				transferOwnershipWindow.getManagementList().refreshEntries(entries);
-			}
-		}
-	}
+    public static void refreshTeamSettingsScreenData() {
+        if (Minecraft.getInstance().screen instanceof ResearchTeamSettingsScreen screen) {
+            PlayerManagementDraggableWidget playerManagementWindow = screen.getPlayerManagementWindow();
+            if (playerManagementWindow != null
+                    && !playerManagementWindow.getManagementList().getItems().isEmpty()) {
+                List<PlayerManagementList.Entry> entries = new ArrayList<>();
+                ResearchTeamHelperClient.getTeamMembers()
+                        .forEach(member -> entries.add(new PlayerManagementList.Entry(
+                                member,
+                                playerManagementWindow.getManagementList().getItems().stream()
+                                        .findFirst()
+                                        .get()
+                                        .buttonSettings())));
+                playerManagementWindow.getManagementList().refreshEntries(entries);
+            }
+            PlayerManagementDraggableWidget transferOwnershipWindow = screen.getTransferOwnershipWindow();
+            if (transferOwnershipWindow != null
+                    && !transferOwnershipWindow.getManagementList().getItems().isEmpty()) {
+                List<PlayerManagementList.Entry> entries = new ArrayList<>();
+                ResearchTeamHelperClient.getTeamMembers()
+                        .forEach(member -> entries.add(new PlayerManagementList.Entry(
+                                member,
+                                transferOwnershipWindow.getManagementList().getItems().stream()
+                                        .findFirst()
+                                        .get()
+                                        .buttonSettings())));
+                transferOwnershipWindow.getManagementList().refreshEntries(entries);
+            }
+        }
+    }
 
-	public static void refreshResearchTeamScreenData() {
-		refreshTeamScreenData();
-		refreshTeamSettingsScreenData();
-	}
+    public static void refreshResearchTeamScreenData() {
+        refreshTeamScreenData();
+        refreshTeamSettingsScreenData();
+    }
 }

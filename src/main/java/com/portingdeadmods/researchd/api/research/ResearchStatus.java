@@ -17,7 +17,8 @@ public enum ResearchStatus implements StringRepresentable {
     LOCKED("locked", "entry_red", 3);
 
     public static final Codec<ResearchStatus> CODEC = StringRepresentable.fromEnum(ResearchStatus::values);
-    public static final StreamCodec<? super RegistryFriendlyByteBuf, ResearchStatus> STREAM_CODEC = CodecUtils.enumStreamCodec(ResearchStatus.class);
+    public static final StreamCodec<? super RegistryFriendlyByteBuf, ResearchStatus> STREAM_CODEC =
+            CodecUtils.enumStreamCodec(ResearchStatus.class);
 
     private final String name;
     private final ResourceLocation spriteSmallTexture;

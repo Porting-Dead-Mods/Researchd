@@ -7,12 +7,11 @@ import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
 import com.portingdeadmods.researchd.client.screens.research.graph.lines.ResearchHead;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
+import java.util.Collection;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.CommonComponents;
-
-import java.util.Collection;
 
 /**
  * Drawable widget for completedResearches <br>
@@ -25,7 +24,8 @@ public class ResearchNode extends AbstractWidget {
 
     private int layer = -1;
 
-    private ResearchInstance instance; // TODO: Figure out why th there's a desync between Graph and TechList. (then remake this final)
+    private ResearchInstance
+            instance; // TODO: Figure out why th there's a desync between Graph and TechList. (then remake this final)
 
     public void fetchInstanceFromTeam() {
         ResearchTeam team = ResearchTeamHelperClient.getTeam();
@@ -56,7 +56,11 @@ public class ResearchNode extends AbstractWidget {
     }
 
     public void setHovered(GuiGraphics guiGraphics, int x, int y, int width, int height, int mouseX, int mouseY) {
-        this.isHovered = guiGraphics.containsPointInScissor(mouseX, mouseY) && mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
+        this.isHovered = guiGraphics.containsPointInScissor(mouseX, mouseY)
+                && mouseX >= x
+                && mouseY >= y
+                && mouseX < x + width
+                && mouseY < y + height;
     }
 
     public void addChild(ResearchNode child) {
@@ -117,7 +121,7 @@ public class ResearchNode extends AbstractWidget {
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
-        ResearchScreenWidget.renderResearchPanel(guiGraphics, instance,  getX(), getY(), mouseX, mouseY);
+        ResearchScreenWidget.renderResearchPanel(guiGraphics, instance, getX(), getY(), mouseX, mouseY);
         // FIXME: Can probably be removed
         refreshHeads();
 
@@ -131,15 +135,11 @@ public class ResearchNode extends AbstractWidget {
 
     @Override
     public String toString() {
-        return "ResearchNode{" +
-                "next=" + children +
-                '}';
+        return "ResearchNode{" + "next=" + children + '}';
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-
-    }
+    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 
     /**
      * Extension of {@link #setX(int)} for more logic. Please call this method. <br>
@@ -167,5 +167,4 @@ public class ResearchNode extends AbstractWidget {
 
         refreshHeads();
     }
-
 }

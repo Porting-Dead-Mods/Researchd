@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.networking.team;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperServer;
+import java.util.UUID;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -11,15 +12,10 @@ import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.UUID;
-
 public record IgnoreTeamPayload(UUID memberOfTeam) implements CustomPacketPayload {
     public static final Type<IgnoreTeamPayload> TYPE = new Type<>(Researchd.rl("ignore_team_payload"));
-    public static final StreamCodec<RegistryFriendlyByteBuf, IgnoreTeamPayload> STREAM_CODEC = StreamCodec.composite(
-            UUIDUtil.STREAM_CODEC,
-            IgnoreTeamPayload::memberOfTeam,
-            IgnoreTeamPayload::new
-    );
+    public static final StreamCodec<RegistryFriendlyByteBuf, IgnoreTeamPayload> STREAM_CODEC =
+            StreamCodec.composite(UUIDUtil.STREAM_CODEC, IgnoreTeamPayload::memberOfTeam, IgnoreTeamPayload::new);
 
     @Override
     public @NotNull Type<? extends CustomPacketPayload> type() {
@@ -28,13 +24,13 @@ public record IgnoreTeamPayload(UUID memberOfTeam) implements CustomPacketPayloa
 
     public void handle(IPayloadContext context) {
         context.enqueueWork(() -> {
-            if (context.player() instanceof ServerPlayer sp)
-                ResearchTeamHelperServer.handleIgnoreTeam(sp, this.memberOfTeam());
-        }).exceptionally(e -> {
-            Researchd.LOGGER.error("Failed to handle IgnoreTeamPayload", e);
-            context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
-            return null;
-        });
-
+                    if (context.player() instanceof ServerPlayer sp)
+                        ResearchTeamHelperServer.handleIgnoreTeam(sp, this.memberOfTeam());
+                })
+                .exceptionally(e -> {
+                    Researchd.LOGGER.error("Failed to handle IgnoreTeamPayload", e);
+                    context.disconnect(Component.literal("Action Failed:  " + e.getMessage()));
+                    return null;
+                });
     }
 }

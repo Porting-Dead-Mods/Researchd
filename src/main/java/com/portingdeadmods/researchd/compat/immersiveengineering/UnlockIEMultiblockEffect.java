@@ -14,6 +14,7 @@ import com.portingdeadmods.researchd.data.saved.TeamResearchEffectSavedData;
 import com.portingdeadmods.researchd.impl.TeamResearchEffectDataMap;
 import com.portingdeadmods.researchd.registries.ResearchEffectTypes;
 import com.portingdeadmods.researchd.registries.ResearchdEffectDataTypes;
+import java.util.Optional;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -23,26 +24,29 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
-import java.util.Optional;
+public record UnlockIEMultiblockEffect(Optional<ItemStack> icon, Optional<String> name, ResourceLocation multiblock)
+        implements ResearchEffect {
+    private static final MapCodec<UnlockIEMultiblockEffect> CODEC =
+            RecordCodecBuilder.mapCodec(instance -> instance.group(
+                            ItemStack.CODEC.optionalFieldOf("icon").forGetter(UnlockIEMultiblockEffect::icon),
+                            Codec.STRING.optionalFieldOf("name").forGetter(UnlockIEMultiblockEffect::name),
+                            ResourceLocation.CODEC
+                                    .fieldOf("multiblock")
+                                    .forGetter(UnlockIEMultiblockEffect::multiblock))
+                    .apply(instance, UnlockIEMultiblockEffect::new));
 
-public record UnlockIEMultiblockEffect(Optional<ItemStack> icon, Optional<String> name, ResourceLocation multiblock) implements ResearchEffect {
-    private static final MapCodec<UnlockIEMultiblockEffect> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            ItemStack.CODEC.optionalFieldOf("icon").forGetter(UnlockIEMultiblockEffect::icon),
-            Codec.STRING.optionalFieldOf("name").forGetter(UnlockIEMultiblockEffect::name),
-            ResourceLocation.CODEC.fieldOf("multiblock").forGetter(UnlockIEMultiblockEffect::multiblock)
-    ).apply(instance, UnlockIEMultiblockEffect::new));
+    private static final StreamCodec<RegistryFriendlyByteBuf, UnlockIEMultiblockEffect> STREAM_CODEC =
+            StreamCodec.composite(
+                    ByteBufCodecs.optional(ItemStack.STREAM_CODEC),
+                    UnlockIEMultiblockEffect::icon,
+                    ByteBufCodecs.optional(ByteBufCodecs.STRING_UTF8),
+                    UnlockIEMultiblockEffect::name,
+                    ResourceLocation.STREAM_CODEC,
+                    UnlockIEMultiblockEffect::multiblock,
+                    UnlockIEMultiblockEffect::new);
 
-    private static final StreamCodec<RegistryFriendlyByteBuf, UnlockIEMultiblockEffect> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.optional(ItemStack.STREAM_CODEC),
-            UnlockIEMultiblockEffect::icon,
-            ByteBufCodecs.optional(ByteBufCodecs.STRING_UTF8),
-            UnlockIEMultiblockEffect::name,
-            ResourceLocation.STREAM_CODEC,
-            UnlockIEMultiblockEffect::multiblock,
-            UnlockIEMultiblockEffect::new
-    );
-
-    public static final ResearchEffectSerializer<UnlockIEMultiblockEffect> SERIALIZER = ResearchEffectSerializer.simple(CODEC, STREAM_CODEC);
+    public static final ResearchEffectSerializer<UnlockIEMultiblockEffect> SERIALIZER =
+            ResearchEffectSerializer.simple(CODEC, STREAM_CODEC);
     public static final ResourceLocation ID = Researchd.rl("unlock_ie_multiblock");
 
     public UnlockIEMultiblockEffect(ItemStack icon, String name, ResourceLocation multiblock) {
@@ -57,7 +61,8 @@ public record UnlockIEMultiblockEffect(Optional<ItemStack> icon, Optional<String
     public void onUnlock(Level level, ResearchTeam team, ResourceKey<Research> research) {
         if (!level.isClientSide()) {
             TeamResearchEffectDataMap map = TeamResearchEffectSavedData.getData((ServerLevel) level);
-            UnlockIEMultiblockEffectData data = map.computeIfAbsent(team.getId(), ResearchdEffectDataTypes.IE_MULTIBLOCK_UNLOCK, level);
+            UnlockIEMultiblockEffectData data =
+                    map.computeIfAbsent(team.getId(), ResearchdEffectDataTypes.IE_MULTIBLOCK_UNLOCK, level);
             data.remove(this, level);
             map.setChanged();
             map.sync(team.getId(), data.type());
@@ -68,7 +73,8 @@ public record UnlockIEMultiblockEffect(Optional<ItemStack> icon, Optional<String
     public void onLock(Level level, ResearchTeam team, ResourceKey<Research> research) {
         if (!level.isClientSide()) {
             TeamResearchEffectDataMap map = TeamResearchEffectSavedData.getData((ServerLevel) level);
-            UnlockIEMultiblockEffectData data = map.computeIfAbsent(team.getId(), ResearchdEffectDataTypes.IE_MULTIBLOCK_UNLOCK, level);
+            UnlockIEMultiblockEffectData data =
+                    map.computeIfAbsent(team.getId(), ResearchdEffectDataTypes.IE_MULTIBLOCK_UNLOCK, level);
             data.add(this, level);
             map.setChanged();
             map.sync(team.getId(), data.type());
@@ -86,7 +92,8 @@ public record UnlockIEMultiblockEffect(Optional<ItemStack> icon, Optional<String
     }
 
     public ItemStack getDisplayStack() {
-        return this.icon().map(ItemStack::copy)
+        return this.icon()
+                .map(ItemStack::copy)
                 .orElseGet(() -> new ItemStack(IEBlocks.MetalDecoration.ENGINEERING_LIGHT.asItem()));
     }
 

@@ -16,6 +16,5 @@ public class EmptyResearchEffectWidget extends AbstractResearchInfoWidget<EmptyR
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
-    }
+    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {}
 }

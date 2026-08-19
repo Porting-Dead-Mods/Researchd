@@ -14,10 +14,10 @@ import com.portingdeadmods.researchd.api.research.ResearchInteractionType;
 import com.portingdeadmods.researchd.api.research.ResearchManager;
 import com.portingdeadmods.researchd.api.research.ResearchPage;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
-import com.portingdeadmods.researchd.client.screens.editor.widgets.dropdowns.GraphDropDownWidget;
-import com.portingdeadmods.researchd.client.screens.editor.widgets.EditorSideBarWidget;
-import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.SelectPackPopupWidget;
 import com.portingdeadmods.researchd.client.screens.RdZIndex;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.EditorSideBarWidget;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.dropdowns.GraphDropDownWidget;
+import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.SelectPackPopupWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLImageButton;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
@@ -25,6 +25,7 @@ import com.portingdeadmods.researchd.client.screens.research.widgets.*;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import com.portingdeadmods.researchd.utils.researches.ResearchEditorHelperClient;
+import java.util.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
@@ -34,19 +35,22 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.*;
-
 public class ResearchScreen extends AbstractResearchScreen {
-    public static final ResourceLocation TOP_RIGHT_EDGE = Researchd.rl("textures/gui/research_screen/edges/top_right.png");
-    public static final ResourceLocation BOTTOM_RIGHT_EDGE = Researchd.rl("textures/gui/research_screen/edges/bottom_right.png");
+    public static final ResourceLocation TOP_RIGHT_EDGE =
+            Researchd.rl("textures/gui/research_screen/edges/top_right.png");
+    public static final ResourceLocation BOTTOM_RIGHT_EDGE =
+            Researchd.rl("textures/gui/research_screen/edges/bottom_right.png");
     public static final ResourceLocation TOP_BAR = Researchd.rl("textures/gui/research_screen/bars/top.png");
     public static final ResourceLocation BOTTOM_BAR = Researchd.rl("textures/gui/research_screen/bars/bottom.png");
     public static final ResourceLocation RIGHT_BAR = Researchd.rl("textures/gui/research_screen/bars/right.png");
-    public static final ResourceLocation EDIT_BUTTON_CORNER = Researchd.rl("textures/gui/research_screen/edit_button_corner.png");
+    public static final ResourceLocation EDIT_BUTTON_CORNER =
+            Researchd.rl("textures/gui/research_screen/edit_button_corner.png");
 
-    public static final WidgetSprites EDITOR_BUTTON_SPRITES = new WidgetSprites(Researchd.rl("editor_open_button"), Researchd.rl("editor_open_button_highlighted"));
+    public static final WidgetSprites EDITOR_BUTTON_SPRITES =
+            new WidgetSprites(Researchd.rl("editor_open_button"), Researchd.rl("editor_open_button_highlighted"));
 
-    public static final ResourceLocation RESEARCH_PAGES_LIST_BACKGROUND = Researchd.rl("textures/gui/research_screen/research_pages_list.png");
+    public static final ResourceLocation RESEARCH_PAGES_LIST_BACKGROUND =
+            Researchd.rl("textures/gui/research_screen/research_pages_list.png");
 
     // Singleton since whole client is a singleton
     public static final Map<ResourceLocation, ClientResearchIcon<?>> CLIENT_ICONS = new HashMap<>();
@@ -76,7 +80,8 @@ public class ResearchScreen extends AbstractResearchScreen {
         this.researchQueueWidget = new ResearchQueueWidget(this, 0, 0);
 
         // THIS NEEDS TO BE BEFORE THE GRAPH
-        this.selectedResearchWidget = new SelectedResearchWidget(this, 0, 40, SelectedResearchWidget.BACKGROUND_WIDTH, SelectedResearchWidget.BACKGROUND_HEIGHT);
+        this.selectedResearchWidget = new SelectedResearchWidget(
+                this, 0, 40, SelectedResearchWidget.BACKGROUND_WIDTH, SelectedResearchWidget.BACKGROUND_HEIGHT);
 
         // RESEARCH PAGES LIST
         int x = 174;
@@ -115,14 +120,16 @@ public class ResearchScreen extends AbstractResearchScreen {
         this.techListWidget.setTechList(TechList.getClientTechList());
         this.techListWidget.getTechList().sortTechList();
         // TODO: Proper sorting of techlist
-        UniqueArray<ResearchInstance> entries = this.techListWidget.getTechList().entries();
+        UniqueArray<ResearchInstance> entries =
+                this.techListWidget.getTechList().entries();
         ResearchInstance firstResearch = !entries.isEmpty() ? entries.getFirst() : null;
 
         // Anything still pointing at the previous state is dropped, a reload may have removed it
         this.selectedResearchWidget.clearSelectedResearch();
 
         if (firstResearch == null) {
-            this.researchGraphWidget.setGraph(ResearchGraphCache.computeIfAbsentForPage(this.researchPagesList.getSelectedPage()));
+            this.researchGraphWidget.setGraph(
+                    ResearchGraphCache.computeIfAbsentForPage(this.researchPagesList.getSelectedPage()));
         } else {
             this.selectedResearchWidget.setSelectedResearch(firstResearch.getResearch());
             this.researchGraphWidget.setGraph(ResearchGraphCache.computeIfAbsent(firstResearch.getResearch()));
@@ -147,9 +154,7 @@ public class ResearchScreen extends AbstractResearchScreen {
         }
     }
 
-    private void editSelectedResearch(PDLImageButton button) {
-
-    }
+    private void editSelectedResearch(PDLImageButton button) {}
 
     private void openEditor(PDLImageButton button) {
         if (!this.editorOpen) {
@@ -193,7 +198,8 @@ public class ResearchScreen extends AbstractResearchScreen {
     }
 
     @Override
-    protected void renderTooltip(GuiGraphics guiGraphics, PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+    protected void renderTooltip(
+            GuiGraphics guiGraphics, PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         poseStack.translate(0, 0, RdZIndex.TOOLTIP);
 
         if (this.dropDownWidget instanceof GraphDropDownWidget graphDrowDown && graphDrowDown.isVisible()) {
@@ -201,7 +207,6 @@ public class ResearchScreen extends AbstractResearchScreen {
         } else {
             super.renderTooltip(guiGraphics, poseStack, mouseX, mouseY, partialTick);
         }
-
     }
 
     @Override
@@ -232,19 +237,26 @@ public class ResearchScreen extends AbstractResearchScreen {
             guiGraphics.blit(EDIT_BUTTON_CORNER, width - 24 - 4, height - 24 - 4, 0, 0, 24, 24, 24, 24);
             this.openEditorButton.render(guiGraphics, mouseX, mouseY, partialTick);
         }
-
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (this.editorModeActive()) {
-            if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && this.researchGraphWidget.isHovered() && (this.openEditorButton == null || !this.openEditorButton.isHovered()) && this.isEditorConfigured()) {
+            if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT
+                    && this.researchGraphWidget.isHovered()
+                    && (this.openEditorButton == null || !this.openEditorButton.isHovered())
+                    && this.isEditorConfigured()) {
                 boolean clickedNode = false;
                 ResearchGraph currentGraph = this.researchGraphWidget.getCurrentGraph();
                 if (currentGraph != null) {
-                    for (ResearchNode node :currentGraph.nodes().values()){
+                    for (ResearchNode node : currentGraph.nodes().values()) {
                         if (node.isHovered()) {
-                            this.setDropDown(new GraphDropDownWidget(node.getInstance().lookup(Minecraft.getInstance().level), node.getInstance().getResearch().location(), this, (int) mouseX, (int) mouseY));
+                            this.setDropDown(new GraphDropDownWidget(
+                                    node.getInstance().lookup(Minecraft.getInstance().level),
+                                    node.getInstance().getResearch().location(),
+                                    this,
+                                    (int) mouseX,
+                                    (int) mouseY));
                             clickedNode = true;
                             break;
                         }
@@ -253,7 +265,9 @@ public class ResearchScreen extends AbstractResearchScreen {
                 if (!clickedNode) {
                     this.setDropDown(new GraphDropDownWidget(this, (int) mouseX, (int) mouseY));
                 }
-            } else if (this.dropDownWidget != null && this.dropDownWidget.isHovered() && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+            } else if (this.dropDownWidget != null
+                    && this.dropDownWidget.isHovered()
+                    && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
                 this.dropDownWidget.mouseClicked(mouseX, mouseY, button);
             } else {
                 this.setDropDown(null);

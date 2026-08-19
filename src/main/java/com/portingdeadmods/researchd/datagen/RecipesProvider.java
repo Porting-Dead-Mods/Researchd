@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.datagen;
 
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.registries.ResearchdItems;
+import java.util.concurrent.CompletableFuture;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -10,8 +11,6 @@ import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.concurrent.CompletableFuture;
 
 public class RecipesProvider extends RecipeProvider {
     public RecipesProvider(PackOutput pOutput, CompletableFuture<HolderLookup.Provider> pRegistries) {
@@ -29,6 +28,5 @@ public class RecipesProvider extends RecipeProvider {
                 .define('C', Items.COPPER_INGOT)
                 .unlockedBy("has_item", has(Items.COPPER_INGOT))
                 .save(pRecipeOutput, Researchd.rl("research_lab"));
-
     }
 }

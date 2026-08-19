@@ -6,11 +6,10 @@ import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchManager;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
-import net.minecraft.world.level.Level;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import net.minecraft.world.level.Level;
 
 public record TechList(UniqueArray<ResearchInstance> entries) {
     public TechList(Set<ResearchInstance> entries) {
@@ -25,7 +24,8 @@ public record TechList(UniqueArray<ResearchInstance> entries) {
         ResearchManager researchManager = ResearchdApi.getResearchManager();
         Set<ResearchInstance> entries = new HashSet<>();
         for (ResearchInstance instance : team.getResearches().values()) {
-            if (researchManager != null && researchManager.getRelationsForResearch(instance.getResearch()) == null) continue;
+            if (researchManager != null && researchManager.getRelationsForResearch(instance.getResearch()) == null)
+                continue;
 
             entries.add(instance);
         }
@@ -33,12 +33,18 @@ public record TechList(UniqueArray<ResearchInstance> entries) {
     }
 
     public void sortTechList() {
-        List<ResearchInstance> sorted = this.entries.stream().sorted((a, b) -> {
-            if (a.getResearchStatus() == b.getResearchStatus()) {
-                return a.getResearch().location().toString().compareTo(b.getResearch().location().toString());
-            }
-            return a.getResearchStatus().getSortingValue() - b.getResearchStatus().getSortingValue();
-        }).toList();
+        List<ResearchInstance> sorted = this.entries.stream()
+                .sorted((a, b) -> {
+                    if (a.getResearchStatus() == b.getResearchStatus()) {
+                        return a.getResearch()
+                                .location()
+                                .toString()
+                                .compareTo(b.getResearch().location().toString());
+                    }
+                    return a.getResearchStatus().getSortingValue()
+                            - b.getResearchStatus().getSortingValue();
+                })
+                .toList();
 
         this.entries.clear();
         this.entries.addAll(sorted);
@@ -58,13 +64,12 @@ public record TechList(UniqueArray<ResearchInstance> entries) {
             // Search by localized desc
             String description = entry.getDescription(level).getString().toLowerCase();
 
-            if (resourceLocation.contains(searchLower) ||
-                displayName.contains(searchLower) ||
-                description.contains(searchLower)) {
+            if (resourceLocation.contains(searchLower)
+                    || displayName.contains(searchLower)
+                    || description.contains(searchLower)) {
                 entries.add(entry);
             }
         }
         return new TechList(entries);
     }
-
 }

@@ -9,5 +9,4 @@ public interface ResearchSerializer<T extends Research> {
     MapCodec<T> codec();
 
     StreamCodec<? super RegistryFriendlyByteBuf, T> streamCodec();
-
 }

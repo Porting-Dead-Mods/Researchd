@@ -10,6 +10,7 @@ import com.portingdeadmods.researchd.api.team.ResearchTeamRole;
 import com.portingdeadmods.researchd.data.saved.SavedDataMap;
 import com.portingdeadmods.researchd.data.saved.TeamSavedData;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperServer;
+import java.util.*;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -20,36 +21,33 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-
 public final class ResearchTeamMap implements ResearchTeamManager, SavedDataMap {
     public static final ResearchTeamMap EMPTY = new ResearchTeamMap();
-    public static final Codec<ResearchTeamMap> CODEC = RecordCodecBuilder.create(builder -> builder.group(
-            Codec.unboundedMap(UUIDUtil.STRING_CODEC, ResearchTeamImpl.CODEC).fieldOf("research_teams").forGetter(t -> t.researchTeams)
-    ).apply(builder, ResearchTeamMap::new));
+    public static final Codec<ResearchTeamMap> CODEC = RecordCodecBuilder.create(
+            builder -> builder.group(Codec.unboundedMap(UUIDUtil.STRING_CODEC, ResearchTeamImpl.CODEC)
+                            .fieldOf("research_teams")
+                            .forGetter(t -> t.researchTeams))
+                    .apply(builder, ResearchTeamMap::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, ResearchTeamMap> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.map(
-                    HashMap::new,
-                    UUIDUtil.STREAM_CODEC,
-                    ResearchTeamImpl.STREAM_CODEC
-            ),
+            ByteBufCodecs.map(HashMap::new, UUIDUtil.STREAM_CODEC, ResearchTeamImpl.STREAM_CODEC),
             t -> t.researchTeams,
-            ResearchTeamMap::new
-    );
+            ResearchTeamMap::new);
     private final @NotNull Map<UUID, ResearchTeamImpl> researchTeams;
     private final @NotNull List<UUID> teamIds;
     private Runnable onChangedFunction;
 
-	/**
-	 * Declared as nullable just to declare null safety. This shouldn't be called with a null map (usually)
-	 * <br>
-	 * Constructor for codec. Shouldn't really be used outside of that
-	 */
+    /**
+     * Declared as nullable just to declare null safety. This shouldn't be called with a null map (usually)
+     * <br>
+     * Constructor for codec. Shouldn't really be used outside of that
+     */
     public ResearchTeamMap(@Nullable Map<UUID, ResearchTeamImpl> researchTeams) {
-		if (researchTeams == null) {
-			Researchd.debug("Research Team Map", "Received null researchTeams map, initializing with empty map. Beware as this might not be intentional.");
-			researchTeams = new HashMap<>();
-		}
+        if (researchTeams == null) {
+            Researchd.debug(
+                    "Research Team Map",
+                    "Received null researchTeams map, initializing with empty map. Beware as this might not be intentional.");
+            researchTeams = new HashMap<>();
+        }
 
         this.researchTeams = new HashMap<>(researchTeams); // Ensure Mutability
         this.teamIds = new ArrayList<>(researchTeams.keySet());
@@ -84,7 +82,8 @@ public final class ResearchTeamMap implements ResearchTeamManager, SavedDataMap 
 
             this.setChanged();
         } else {
-            throw new UnsupportedOperationException("Cannot add team of type" + team.getClass().getName() + " to " + this.getClass().getName());
+            throw new UnsupportedOperationException("Cannot add team of type"
+                    + team.getClass().getName() + " to " + this.getClass().getName());
         }
     }
 
@@ -180,48 +179,48 @@ public final class ResearchTeamMap implements ResearchTeamManager, SavedDataMap 
 
     public static void initServer(ServerLevel level) {
         ResearchTeamMap map = TeamSavedData.getData(level);
-        //ResearchHelperCommon.refreshResearches(map, ull);
+        // ResearchHelperCommon.refreshResearches(map, ull);
     }
 
     public static void afterSync(Player player) {
-//        Level level = player.level();
-//        if (level.isClientSide) {
-//            ResearchHelperClient.refreshResearches(player);
-//            ClientResearchTeamHelper.resolveInstances(ClientResearchTeamHelper.getTeam());
-//        } else {
-//            ResearchHelperCommon.refreshResearches((ServerPlayer) player);
-//        }
+        //        Level level = player.level();
+        //        if (level.isClientSide) {
+        //            ResearchHelperClient.refreshResearches(player);
+        //            ClientResearchTeamHelper.resolveInstances(ClientResearchTeamHelper.getTeam());
+        //        } else {
+        //            ResearchHelperCommon.refreshResearches((ServerPlayer) player);
+        //        }
 
         // TODO: Can probably remove this in the future
         // Resolve Map pointers to single team objects for all members
-//        ResearchTeamMap data = TeamSavedData.getData(level);
-//        Map<UUID, ResearchTeamImpl> temp = new HashMap<>();
-//        Map<UUID, ResearchTeamImpl> memberToTeam = new HashMap<>();
-//
-//        for (Map.Entry<UUID, ResearchTeamImpl> entry : data.researchTeams().entrySet()) {
-//            UUID uuid = entry.getKey();
-//            ResearchTeamImpl team = entry.getValue();
-//
-//            // Check if this UUID is already associated with a team
-//            ResearchTeamImpl existingTeam = memberToTeam.get(uuid);
-//            if (existingTeam != null) {
-//                temp.put(uuid, existingTeam);
-//                continue;
-//            }
-//
-//            // Otherwise, this is a new unique team
-//            temp.put(uuid, team);
-//            for (TeamMember member : team.getMembers()) {
-//                memberToTeam.put(member.player(), team);
-//            }
-//        }
-//
-//        if (temp.equals(data.researchTeams()))
-//            return;
+        //        ResearchTeamMap data = TeamSavedData.getData(level);
+        //        Map<UUID, ResearchTeamImpl> temp = new HashMap<>();
+        //        Map<UUID, ResearchTeamImpl> memberToTeam = new HashMap<>();
+        //
+        //        for (Map.Entry<UUID, ResearchTeamImpl> entry : data.researchTeams().entrySet()) {
+        //            UUID uuid = entry.getKey();
+        //            ResearchTeamImpl team = entry.getValue();
+        //
+        //            // Check if this UUID is already associated with a team
+        //            ResearchTeamImpl existingTeam = memberToTeam.get(uuid);
+        //            if (existingTeam != null) {
+        //                temp.put(uuid, existingTeam);
+        //                continue;
+        //            }
+        //
+        //            // Otherwise, this is a new unique team
+        //            temp.put(uuid, team);
+        //            for (TeamMember member : team.getMembers()) {
+        //                memberToTeam.put(member.player(), team);
+        //            }
+        //        }
+        //
+        //        if (temp.equals(data.researchTeams()))
+        //            return;
 
-//        data.researchTeams().clear();
-//        data.researchTeams().putAll(temp);
-//        ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
+        //        data.researchTeams().clear();
+        //        data.researchTeams().putAll(temp);
+        //        ResearchdSavedData.TEAM_RESEARCH.get().setData(level, data);
     }
 
     @Override
@@ -239,8 +238,6 @@ public final class ResearchTeamMap implements ResearchTeamManager, SavedDataMap 
 
     @Override
     public String toString() {
-        return "ResearchTeamMap[" +
-                "researchTeams=" + researchTeams + ']';
+        return "ResearchTeamMap[" + "researchTeams=" + researchTeams + ']';
     }
-
 }

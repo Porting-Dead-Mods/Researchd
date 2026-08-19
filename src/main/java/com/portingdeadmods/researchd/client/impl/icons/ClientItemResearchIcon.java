@@ -5,11 +5,9 @@ import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
 import com.portingdeadmods.researchd.api.client.renderers.CycledItemRenderer;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
 import com.portingdeadmods.researchd.impl.research.icons.ItemResearchIcon;
+import java.util.List;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
-
-import java.util.List;
-import java.util.Objects;
 
 public class ClientItemResearchIcon implements ClientResearchIcon<ItemResearchIcon> {
     private final ItemResearchIcon icon;
@@ -23,7 +21,14 @@ public class ClientItemResearchIcon implements ClientResearchIcon<ItemResearchIc
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int panelLeft, int panelTop, int mouseX, int mouseY, float scale, float partialTicks) {
+    public void render(
+            GuiGraphics guiGraphics,
+            int panelLeft,
+            int panelTop,
+            int mouseX,
+            int mouseY,
+            float scale,
+            float partialTicks) {
         if (scale != 1) {
             PoseStack poseStack = guiGraphics.pose();
 
@@ -32,8 +37,8 @@ public class ClientItemResearchIcon implements ClientResearchIcon<ItemResearchIc
                 poseStack.translate(panelLeft, panelTop, 0);
                 poseStack.scale(scale, scale, scale);
 
-                int itemX = (ResearchScreenWidget.PANEL_WIDTH - 16) / 2;       // center item horizontally
-                int itemY = (ResearchScreenWidget.PANEL_HEIGHT - 18) / 2;      // center item vertically
+                int itemX = (ResearchScreenWidget.PANEL_WIDTH - 16) / 2; // center item horizontally
+                int itemY = (ResearchScreenWidget.PANEL_HEIGHT - 18) / 2; // center item vertically
                 renderer.render(guiGraphics, itemX, itemY);
             }
             poseStack.popPose();
@@ -46,5 +51,4 @@ public class ClientItemResearchIcon implements ClientResearchIcon<ItemResearchIc
     public ItemResearchIcon icon() {
         return icon;
     }
-
 }

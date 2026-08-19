@@ -29,8 +29,14 @@ public class ResearchdLang implements ResearchdLangProvider {
         addResearchPackName(ResearchdResearchPacks.NETHER_PACK_LOC, "Nether Research Pack");
         addResearchPackName(ResearchdResearchPacks.OVERWORLD_PACK_LOC, "Overworld Research Pack");
 
-		addResearchPage(ResearchdResearchPages.DEFAULT, "Welcome to Researchd", "This page contains example researches to showcase what the mod is capable of!");
-		addResearchPage(ResearchdResearchPages.END_CRYSTAL, "Another Research Page", "Researches can be split into separate pages for organization!");
+        addResearchPage(
+                ResearchdResearchPages.DEFAULT,
+                "Welcome to Researchd",
+                "This page contains example researches to showcase what the mod is capable of!");
+        addResearchPage(
+                ResearchdResearchPages.END_CRYSTAL,
+                "Another Research Page",
+                "Researches can be split into separate pages for organization!");
     }
 
     public Map<String, String> getContents() {

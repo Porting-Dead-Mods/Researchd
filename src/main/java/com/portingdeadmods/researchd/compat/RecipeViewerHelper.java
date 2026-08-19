@@ -1,9 +1,8 @@
 package com.portingdeadmods.researchd.compat;
 
+import java.util.List;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
-
-import java.util.List;
 
 public final class RecipeViewerHelper {
     public static void openRecipe(RecipeHolder<?> recipe) {
@@ -21,5 +20,4 @@ public final class RecipeViewerHelper {
             JEICompat.openRecipesFor(List.of(result));
         }
     }
-
 }

@@ -2,17 +2,16 @@ package com.portingdeadmods.researchd.api;
 
 import com.portingdeadmods.researchd.impl.research.effect.data.ItemUnlockEffectData;
 import com.portingdeadmods.researchd.registries.ResearchdEffectDataTypes;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Objects;
+import java.util.UUID;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.Objects;
-import java.util.UUID;
 
 /**
  * Thread-local stack of who called frames pushed around code paths that
@@ -67,8 +66,8 @@ public final class RecipeFilterContext {
         Level level = frame.level();
         if (ResearchdApi.isRecipeBlocked(level, frame.teamId(), holder)) return true;
 
-        ItemUnlockEffectData itemData = ResearchdApi.getEffectDataForTeam(
-                level, frame.teamId(), ResearchdEffectDataTypes.ITEM_UNLOCK);
+        ItemUnlockEffectData itemData =
+                ResearchdApi.getEffectDataForTeam(level, frame.teamId(), ResearchdEffectDataTypes.ITEM_UNLOCK);
         if (itemData == null || itemData.blockedItems().isEmpty()) return false;
 
         Recipe<?> recipe = holder.value();

@@ -3,16 +3,15 @@ package com.portingdeadmods.researchd.resources.editor;
 import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.resources.PackWriter;
 import com.portingdeadmods.researchd.resources.ResearchdDatagenProvider;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.PackType;
-import net.minecraft.util.Unit;
-
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nullable;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.util.Unit;
 
 public class EditorDatapackWriter implements PackWriter {
     private final Map<ResourceLocation, ResearchdDatagenProvider<?>> providers;
@@ -44,7 +43,8 @@ public class EditorDatapackWriter implements PackWriter {
 
         for (ResearchdDatagenProvider<?> provider : this.providers.values()) {
             provider.build();
-            Path path = packResearchdRegistriesDir.resolve(provider.registry().location().getPath());
+            Path path = packResearchdRegistriesDir.resolve(
+                    provider.registry().location().getPath());
             tryCreateDirectory(path);
             Result<Unit, Exception> result = provider.write(path);
             if (result instanceof Result.Err<Unit, Exception>(Exception error)) {
@@ -74,5 +74,4 @@ public class EditorDatapackWriter implements PackWriter {
             return false;
         }
     }
-
 }

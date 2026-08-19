@@ -11,7 +11,8 @@ import com.portingdeadmods.researchd.impl.research.method.OrResearchMethod;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class ResearchMethodSerializers {
-    public static final DeferredRegister<ResearchMethodSerializer<?>> SERIALIZERS = DeferredRegister.create(ResearchdRegistries.RESEARCH_METHOD_SERIALIZER, Researchd.MODID);
+    public static final DeferredRegister<ResearchMethodSerializer<?>> SERIALIZERS =
+            DeferredRegister.create(ResearchdRegistries.RESEARCH_METHOD_SERIALIZER, Researchd.MODID);
 
     static {
         SERIALIZERS.register("consume_item", () -> ConsumeItemResearchMethod.Serializer.INSTANCE);

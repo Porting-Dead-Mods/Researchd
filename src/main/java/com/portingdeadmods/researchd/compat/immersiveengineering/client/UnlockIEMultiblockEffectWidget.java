@@ -27,11 +27,13 @@ public class UnlockIEMultiblockEffectWidget extends AbstractResearchInfoWidget<U
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        guiGraphics.fill(this.getX(), this.getY(), this.getX() + 16, this.getY() + 16, FastColor.ARGB32.color(69, 69, 69));
+        guiGraphics.fill(
+                this.getX(), this.getY(), this.getX() + 16, this.getY() + 16, FastColor.ARGB32.color(69, 69, 69));
         if (!this.icon.isEmpty()) {
             guiGraphics.renderItem(this.icon, this.getX(), this.getY());
         } else {
-            guiGraphics.drawString(this.font, Component.literal("MB"), this.getX() + 2, this.getY() + 4, 0xFFFFFF, false);
+            guiGraphics.drawString(
+                    this.font, Component.literal("MB"), this.getX() + 2, this.getY() + 4, 0xFFFFFF, false);
         }
     }
 
@@ -41,16 +43,20 @@ public class UnlockIEMultiblockEffectWidget extends AbstractResearchInfoWidget<U
             Component displayName;
             MultiblockHandler.IMultiblock multiblock = MultiblockHandler.getByUniqueName(this.value.multiblock());
             if (multiblock != null) {
-                displayName = this.value.name()
+                displayName = this.value
+                        .name()
                         .map(Component::literal)
-                        .orElse(MutableComponent.create(multiblock.getDisplayName().getContents()));
+                        .orElse(MutableComponent.create(
+                                multiblock.getDisplayName().getContents()));
             } else {
-                displayName = this.value.name()
+                displayName = this.value
+                        .name()
                         .map(Component::literal)
                         .orElse(Component.literal(this.value.multiblock().toString()));
             }
 
-            MutableComponent message = ResearchdTranslations.component(ResearchdTranslations.Research.MULTIBLOCK_UNLOCK_EFFECT_TOOLTIP, displayName)
+            MutableComponent message = ResearchdTranslations.component(
+                            ResearchdTranslations.Research.MULTIBLOCK_UNLOCK_EFFECT_TOOLTIP, displayName)
                     .withStyle(ChatFormatting.GOLD);
             guiGraphics.renderTooltip(this.font, message, mouseX, mouseY);
         }

@@ -9,11 +9,13 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.level.Level;
 
-import java.util.function.Supplier;
-
 public interface ResearchEffectData<T extends ResearchEffect> {
-    Codec<ResearchEffectData<?>> CODEC = ResearchdRegistries.RESEARCH_EFFECT_DATA_TYPE.byNameCodec().dispatch(ResearchEffectData::type, ResearchEffectDataType::codec);
-    StreamCodec<? super RegistryFriendlyByteBuf, ResearchEffectData<?>> STREAM_CODEC = ByteBufCodecs.registry(ResearchdRegistries.RESEARCH_EFFECT_DATA_TYPE_KEY).dispatch(ResearchEffectData::type, ResearchEffectDataType::streamCodec);
+    Codec<ResearchEffectData<?>> CODEC = ResearchdRegistries.RESEARCH_EFFECT_DATA_TYPE
+            .byNameCodec()
+            .dispatch(ResearchEffectData::type, ResearchEffectDataType::codec);
+    StreamCodec<? super RegistryFriendlyByteBuf, ResearchEffectData<?>> STREAM_CODEC = ByteBufCodecs.registry(
+                    ResearchdRegistries.RESEARCH_EFFECT_DATA_TYPE_KEY)
+            .dispatch(ResearchEffectData::type, ResearchEffectDataType::streamCodec);
 
     // Storage methods
     void add(T effect, Level level);
@@ -23,5 +25,4 @@ public interface ResearchEffectData<T extends ResearchEffect> {
     UniqueArray<?> getAll();
 
     ResearchEffectDataType<? extends ResearchEffectData<T>> type();
-
 }

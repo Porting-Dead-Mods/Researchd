@@ -12,9 +12,13 @@ import net.neoforged.neoforge.registries.DeferredItem;
 public final class ResearchdItems {
     public static final PDLDeferredRegisterItems ITEMS = PDLDeferredRegisterItems.createItemsRegister(Researchd.MODID);
 
-    public static final DeferredItem<ResearchPackItem> RESEARCH_PACK = ITEMS.register("research_pack",
-            () -> new ResearchPackItem(new Item.Properties().component(ResearchdDataComponents.RESEARCH_PACK, ResearchPackComponent.EMPTY)));
-    public static final DeferredItem<Item> GREEN_RESEARCH_PACK_ICON = ITEMS.registerSimpleItemNoCreative("green_research_pack_icon");
-    public static final DeferredItem<ResearchLabItem> RESEARCH_LAB = ITEMS.register("research_lab",
+    public static final DeferredItem<ResearchPackItem> RESEARCH_PACK = ITEMS.register(
+            "research_pack",
+            () -> new ResearchPackItem(new Item.Properties()
+                    .component(ResearchdDataComponents.RESEARCH_PACK, ResearchPackComponent.EMPTY)));
+    public static final DeferredItem<Item> GREEN_RESEARCH_PACK_ICON =
+            ITEMS.registerSimpleItemNoCreative("green_research_pack_icon");
+    public static final DeferredItem<ResearchLabItem> RESEARCH_LAB = ITEMS.register(
+            "research_lab",
             () -> new ResearchLabItem(ResearchdBlocks.RESEARCH_LAB_CONTROLLER.get(), new Item.Properties()));
 }

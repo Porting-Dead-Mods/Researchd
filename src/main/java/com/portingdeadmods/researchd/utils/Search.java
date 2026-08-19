@@ -34,5 +34,4 @@ public record Search(boolean stripExcessWhitespaces, boolean caseSensitive) {
 
         return string;
     }
-
 }
