@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.utils;
 
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
+import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.Level;
 
@@ -33,6 +34,21 @@ public final class SpaghettiClient {
     public static Level getClientLevel() {
         return Minecraft.getInstance().level;
     }
+
+	/**
+	 * <span style="color:red">CLIENT SIDE ONLY</span>
+	 *
+	 * <br>
+	 * Echoes a message reported through {@link com.portingdeadmods.researchd.Researchd#error} into chat.
+	 */
+	public static void sendErrorToChat(String message) {
+		Minecraft mc = Minecraft.getInstance();
+		mc.execute(() -> {
+			if (mc.player != null) {
+				mc.player.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Errors.DATA_INCONSISTENCY, message));
+			}
+		});
+	}
 
 }
 

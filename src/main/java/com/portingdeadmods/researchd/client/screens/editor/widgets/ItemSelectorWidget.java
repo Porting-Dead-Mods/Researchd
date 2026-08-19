@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.client.screens.editor.widgets;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.client.screens.RdZIndex;
 import com.portingdeadmods.researchd.client.screens.editor.EditorSharedSprites;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.ItemSelectorPopupWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.category.DefaultItemSelectorCategory;
@@ -68,7 +69,7 @@ public class ItemSelectorWidget extends AbstractWidget {
             PoseStack poseStack  = guiGraphics.pose();
             poseStack.pushPose();
             {
-                poseStack.translate(0, 0, 160);
+                poseStack.translate(0, 0, RdZIndex.EDITOR_HOVER_OVERLAY);
                 guiGraphics.blitSprite(EDIT_ELEMENT_HOVER_SPRITE, this.getX() + (this.getWidth() - 14) / 2, this.getY() + (this.getHeight() - 14) / 2, 14, 14);
             }
             poseStack.popPose();

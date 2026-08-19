@@ -11,6 +11,7 @@ import com.portingdeadmods.researchd.registries.*;
 import com.portingdeadmods.researchd.registries.serializers.*;
 import com.portingdeadmods.researchd.resources.contents.ResearchdDynamicPackContents;
 import com.portingdeadmods.researchd.resources.example.ResearchdExamplesSource;
+import com.portingdeadmods.researchd.utils.SpaghettiClient;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
@@ -20,12 +21,16 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.event.AddPackFindersEvent;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
 import org.slf4j.Logger;
+
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Mod(Researchd.MODID)
 public final class Researchd {
@@ -62,6 +67,16 @@ public final class Researchd {
 
 		LOGGER.info(sb.toString());
 	}
+
+    public static void error(String category, String message, Object... args) {
+        String formatted = "[" + category + "] " + (args.length > 0 ? message.formatted(args) : message);
+
+        LOGGER.error(formatted);
+
+        if (FMLEnvironment.dist.isClient()) {
+            SpaghettiClient.sendErrorToChat(formatted);
+        }
+    }
 
     public Researchd(IEventBus modEventBus, ModContainer modContainer) {
         ResearchSerializers.SERIALIZERS.register(modEventBus);

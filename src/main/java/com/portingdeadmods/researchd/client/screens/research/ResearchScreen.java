@@ -4,17 +4,20 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;
 import com.portingdeadmods.researchd.api.client.TechList;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchInteractionType;
+import com.portingdeadmods.researchd.api.research.ResearchManager;
 import com.portingdeadmods.researchd.api.research.ResearchPage;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.dropdowns.GraphDropDownWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.EditorSideBarWidget;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.SelectPackPopupWidget;
+import com.portingdeadmods.researchd.client.screens.RdZIndex;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLImageButton;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
@@ -107,33 +110,23 @@ public class ResearchScreen extends AbstractResearchScreen {
     }
 
     public void initDefaultState() {
+        this.researchPagesList.refreshPages();
+
         this.techListWidget.setTechList(TechList.getClientTechList());
         this.techListWidget.getTechList().sortTechList();
         // TODO: Proper sorting of techlist
-        ResourceKey<Research> firstResearchKey = null;
         UniqueArray<ResearchInstance> entries = this.techListWidget.getTechList().entries();
         ResearchInstance firstResearch = !entries.isEmpty() ? entries.getFirst() : null;
+
+        // Anything still pointing at the previous state is dropped, a reload may have removed it
+        this.selectedResearchWidget.clearSelectedResearch();
+
         if (firstResearch == null) {
-            //firstResearchKey = ResearchManagerImpl.rootResearch.getResearchKey();
+            this.researchGraphWidget.setGraph(ResearchGraphCache.computeIfAbsentForPage(this.researchPagesList.getSelectedPage()));
         } else {
-            firstResearchKey = firstResearch.getResearch();
+            this.selectedResearchWidget.setSelectedResearch(firstResearch.getResearch());
+            this.researchGraphWidget.setGraph(ResearchGraphCache.computeIfAbsent(firstResearch.getResearch()));
         }
-
-        this.selectedResearchWidget.setSelectedResearch(firstResearchKey);
-
-        // Initialize graph with selected page (or default page)
-        if (firstResearch == null) {
-            ResearchPage selectedPage = this.researchPagesList.getSelectedPage();
-            if (selectedPage != null) {
-                ResearchGraph graph = ResearchGraphCache.computeIfAbsentForPage(selectedPage);
-                if (graph != null) {
-                    this.researchGraphWidget.setGraph(graph);
-                }
-            }
-        } else {
-            this.researchGraphWidget.setGraph(ResearchGraphCache.computeIfAbsent(firstResearchKey));
-        }
-
     }
 
     public boolean editorModeActive() {
@@ -173,6 +166,15 @@ public class ResearchScreen extends AbstractResearchScreen {
 
     public void setSelectedResearch(ResourceKey<Research> research) {
         this.selectedResearchWidget.setSelectedResearch(research);
+        this.showGraphForResearch(research);
+    }
+
+    public void showGraphForResearch(ResourceKey<Research> research) {
+        ResearchManager researchManager = ResearchdApi.getResearchManager();
+        if (researchManager != null) {
+            this.researchPagesList.setSelectedPage(researchManager.getPageByResearch(research));
+        }
+
         this.researchGraphWidget.setGraph(ResearchGraphCache.computeIfAbsent(research));
     }
 
@@ -192,7 +194,7 @@ public class ResearchScreen extends AbstractResearchScreen {
 
     @Override
     protected void renderTooltip(GuiGraphics guiGraphics, PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        poseStack.translate(0, 0, 10);
+        poseStack.translate(0, 0, RdZIndex.TOOLTIP);
 
         if (this.dropDownWidget instanceof GraphDropDownWidget graphDrowDown && graphDrowDown.isVisible()) {
             graphDrowDown.render(guiGraphics, mouseX, mouseY, partialTick);
@@ -217,7 +219,7 @@ public class ResearchScreen extends AbstractResearchScreen {
 
         poseStack.pushPose();
         {
-            poseStack.translate(0, 0, 400);
+            poseStack.translate(0, 0, RdZIndex.SELECTED_RESEARCH_TOOLTIP);
             this.selectedResearchWidget.renderTooltip(guiGraphics, mouseX, mouseY, partialTick);
         }
         poseStack.popPose();

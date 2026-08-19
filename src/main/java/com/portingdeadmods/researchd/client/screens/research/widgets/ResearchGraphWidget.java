@@ -1,10 +1,12 @@
 package com.portingdeadmods.researchd.client.screens.research.widgets;
 
-import com.portingdeadmods.researchd.api.ResearchdApi;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.api.client.ResearchGraph;
+import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchPage;
-import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
+import com.portingdeadmods.researchd.api.team.ResearchTeam;
+import com.portingdeadmods.researchd.client.screens.RdZIndex;
 import com.portingdeadmods.researchd.client.screens.research.AbstractResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
@@ -15,6 +17,7 @@ import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
 import com.portingdeadmods.researchd.client.screens.research.graph.lines.ResearchHead;
 import com.portingdeadmods.researchd.client.screens.research.graph.lines.ResearchLine;
 import com.portingdeadmods.researchd.utils.TextUtils;
+import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
@@ -23,6 +26,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,36 +57,37 @@ public class ResearchGraphWidget extends AbstractWidget {
     /**
      * Set the graph to be displayed, applying layout if needed and calculating connection lines
      */
-    public void setGraph(ResearchGraph graph) {
-        if (this.graph != graph) {
-            this.graph = graph;
-            this.researchScreen.getResearchPagesList().setSelectedPage(ResearchdApi.getResearchManager().getPageByResearch(graph.rootNode().getInstance().getResearch()));
-            this.researchLines.clear();
-            this.layoutResult = null;
+    public void setGraph(@Nullable ResearchGraph graph) {
+        if (this.graph == graph) return;
 
-            if (graph.nodes().isEmpty()) {
-                return;
-            }
+        this.graph = graph;
+        this.researchLines.clear();
+        this.layoutResult = null;
 
-            boolean layoutRestored = GraphStateManager.getInstance().tryRestoreLastSessionState(graph);
-
-            if (!layoutRestored) {
-                this.layoutResult = GraphLayoutManager.applyLayout(graph, 0, 0);
-            }
-
-            for (ResearchNode node : graph.nodes().values()) {
-                node.refreshHeads();
-            }
-
-            // Center the graph in the widget
-            int baseX = this.graph.rootNode().getX();
-            int baseY = this.graph.rootNode().getY();
-            int centerX = baseX + PANEL_WIDTH / 2;
-            int centerY = baseY + PANEL_HEIGHT / 2;
-            translate(this.getWidth() / 2 - centerX + LEFT_MARGIN_WIDTH, this.getHeight() / 2 - centerY);
-
-            calculateLines();
+        if (graph == null || graph.nodes().isEmpty()) {
+            return;
         }
+
+        this.researchScreen.getResearchPagesList().setSelectedPage(graph.page());
+
+        boolean layoutRestored = GraphStateManager.getInstance().tryRestoreLastSessionState(graph);
+
+        if (!layoutRestored) {
+            this.layoutResult = GraphLayoutManager.applyLayout(graph, 0, 0);
+        }
+
+        for (ResearchNode node : graph.nodes().values()) {
+            node.refreshHeads();
+        }
+
+        // Center the graph in the widget
+        int baseX = this.graph.rootNode().getX();
+        int baseY = this.graph.rootNode().getY();
+        int centerX = baseX + PANEL_WIDTH / 2;
+        int centerY = baseY + PANEL_HEIGHT / 2;
+        translate(this.getWidth() / 2 - centerX + LEFT_MARGIN_WIDTH, this.getHeight() / 2 - centerY);
+
+        calculateLines();
     }
 
     // =============================
@@ -270,10 +275,17 @@ public class ResearchGraphWidget extends AbstractWidget {
         ResourceLocation pageId = page != null ? page.id() : ResearchPage.DEFAULT_PAGE_ID;
 
         // Completion text pos is used to wrap title so it needs to be done before
-        int completed = (int) this.graph.nodes().values().stream()
-                .filter(node -> node.getInstance().isResearched())
-                .count();
-        int total = this.graph.nodes().size();
+        ResearchTeam team = ResearchTeamHelperClient.getTeam();
+        Map<ResourceKey<Research>, ResearchInstance> teamResearches = team != null ? team.getResearches() : Map.of();
+        int total = 0;
+        int completed = 0;
+        if (page != null) {
+            for (ResourceKey<Research> research : page.researches()) {
+                total++;
+                ResearchInstance instance = teamResearches.get(research);
+                if (instance != null && instance.isResearched()) completed++;
+            }
+        }
         Component completionText = Component.literal(completed + "/" + total).withStyle(ChatFormatting.GOLD);
         int completionTextWidth = font.width(completionText);
         int completionTextX = guiGraphics.guiWidth() - 8 - completionTextWidth - 5;
@@ -300,9 +312,6 @@ public class ResearchGraphWidget extends AbstractWidget {
         }
 
         int w = 174 + 13;
-
-        // title, description, completion count
-        renderHeader(guiGraphics, w + 5);
 
         guiGraphics.enableScissor(w, 8, guiGraphics.guiWidth() - 8, guiGraphics.guiHeight() - 8);
         {
@@ -343,6 +352,14 @@ public class ResearchGraphWidget extends AbstractWidget {
             }
         }
         guiGraphics.disableScissor();
+
+        PoseStack poseStack = guiGraphics.pose();
+        poseStack.pushPose();
+        {
+            poseStack.translate(0, 0, RdZIndex.GRAPH_HEADER);
+            renderHeader(guiGraphics, w + 5);
+        }
+        poseStack.popPose();
     }
 
     // TODO: Cache hovered node like the isHovered field
@@ -408,7 +425,7 @@ public class ResearchGraphWidget extends AbstractWidget {
 
         for (ResearchNode node : this.graph.nodes().values()) {
             if (node.isHovered()) {
-                this.setGraph(ResearchGraphCache.computeIfAbsent(node.getInstance().getResearch()));
+                this.researchScreen.showGraphForResearch(node.getInstance().getResearch());
                 List<ResearchInstance> entries = this.researchScreen.getTechList().entries();
                 int index = entries.indexOf(node.getInstance());
                 if (index != -1) {

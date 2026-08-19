@@ -30,8 +30,10 @@ public final class ResearchHelperCommon {
         Collection<T> effects = new UniqueArray<>();
 
         for (ResourceKey<Research> research : researchManager.getResearches()) {
-            ResearchEffect effect = researchManager.lookupResearch(research, level).researchEffect();
-            _collectEffects(clazz, effect, effects);
+            Research r = researchManager.lookupResearch(research, level);
+            if (r == null) continue;
+
+            _collectEffects(clazz, r.researchEffect(), effects);
         }
 
         return new ArrayList<>(effects.stream().filter(clazz::isInstance).toList());
@@ -39,14 +41,16 @@ public final class ResearchHelperCommon {
 
     public static List<ResourceKey<Research>> getAllChildrenForResearch(ResourceKey<Research> key, ResearchManager manager) {
         List<ResourceKey<Research>> list = new UniqueArray<>();
-        _collectChildren(manager.getRelationsForResearch(key), list);
+        ResearchRelations relations = manager.getRelationsForResearch(key);
+        if (relations != null) _collectChildren(relations, list);
 
         return list;
     }
 
     public static List<ResourceKey<Research>> getAllParentsForResearch(ResourceKey<Research> key, ResearchManager manager) {
         List<ResourceKey<Research>> list = new UniqueArray<>();
-        _collectParents(manager.getRelationsForResearch(key), list);
+        ResearchRelations relations = manager.getRelationsForResearch(key);
+        if (relations != null) _collectParents(relations, list);
 
         return list;
     }

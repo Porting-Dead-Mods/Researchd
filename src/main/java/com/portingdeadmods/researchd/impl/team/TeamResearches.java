@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.impl.team;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
@@ -45,7 +46,10 @@ public record TeamResearches(SimpleResearchQueue researchQueue,
 
     // Helper methods
     public boolean hasCompleted(ResourceKey<Research> research) {
-        return this.researches.get(research).getResearchStatus() == ResearchStatus.RESEARCHED;
+        ResearchInstance instance = this.researches.get(research);
+		if (instance == null) return false;
+
+        return instance.getResearchStatus() == ResearchStatus.RESEARCHED;
     }
 
     /**
@@ -64,6 +68,7 @@ public record TeamResearches(SimpleResearchQueue researchQueue,
             if (instance.getResearchStatus() == ResearchStatus.RESEARCHED) continue;
 
             ResearchRelations relations = ResearchdApi.getResearchManager().getRelationsForResearch(instance.getResearch());
+            if (relations == null) continue; // Research got removed, leave its instance alone until cleanup runs
 
             if (relations.getParents().stream().allMatch(parent -> this.hasCompleted(parent.getResearchKey()))) {
                 instance.setResearchStatus(ResearchStatus.RESEARCHABLE);
@@ -86,6 +91,10 @@ public record TeamResearches(SimpleResearchQueue researchQueue,
 
     public void setResearchFinished(ResourceKey<Research> research, long completionTime) {
         ResearchInstance instance = this.researches.get(research);
+        if (instance == null) {
+            Researchd.error("Team Researches", "Tried to complete %s, which this team has no entry for", research.location());
+            return;
+        }
 
         if (instance.isResearched()) return;
 

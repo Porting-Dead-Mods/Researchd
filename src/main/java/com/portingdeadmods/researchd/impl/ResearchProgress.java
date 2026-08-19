@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.impl;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.portingdeadlibs.utils.codec.CodecUtils;
+import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
@@ -59,8 +60,13 @@ public record ResearchProgress(List<Task> tasks, Type type) {
         return null;
     }
 
-    public static ResearchProgress forResearch(ResourceKey<Research> key, Level level) {
+    public static @Nullable ResearchProgress forResearch(ResourceKey<Research> key, Level level) {
         Research research = ResearchdApi.getResearchManager().lookupResearch(key, level);
+        if (research == null) {
+            Researchd.error("Research Progress", "No progress could be created for %s, it is not loaded", key.location());
+            return null;
+        }
+
         ResearchMethod method = research.researchMethod();
         return method.createProgress();
     }

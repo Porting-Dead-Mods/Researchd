@@ -3,6 +3,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'net.neoforged.moddev' version '1.0.23'
+    id 'com.diffplug.spotless' version '7.2.1'
 
     id 'net.darkhax.curseforgegradle' version '1.1.15'
     id "com.modrinth.minotaur" version "2.+"
@@ -197,6 +198,24 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+spotless {
+    enforceCheck = false // `build` formats the sources instead of failing on them
+
+    java {
+        target 'src/main/java/**/*.java'
+
+        palantirJavaFormat()
+        removeUnusedImports()
+        formatAnnotations()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
+
+tasks.named('compileJava').configure {
+    dependsOn tasks.named('spotlessApply')
 }
 
 java {

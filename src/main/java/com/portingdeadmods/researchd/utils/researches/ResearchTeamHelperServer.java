@@ -5,6 +5,7 @@ import com.portingdeadmods.portingdeadlibs.utils.PlayerUtils;
 import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.*;
 import com.portingdeadmods.researchd.api.research.effects.ResearchEffectManager;
+import com.portingdeadmods.researchd.api.team.ResearchQueue;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.api.team.ResearchTeamManager;
 import com.portingdeadmods.researchd.api.team.ValueEffectsHolder;
@@ -565,6 +566,13 @@ public final class ResearchTeamHelperServer {
             }
             researches.clear();
             researches.putAll(newResearches);
+
+            team.getResearchProgresses().keySet().retainAll(newResearches.keySet());
+
+            ResearchQueue queue = team.getQueue();
+            for (int i = queue.size() - 1; i >= 0; i--) {
+                if (!newResearches.containsKey(queue.get(i))) queue.remove(i, false);
+            }
         }
     }
 
@@ -661,34 +669,21 @@ public final class ResearchTeamHelperServer {
             for (ResourceKey<Research> research : allResearches) {
                 if (teamProgress.containsKey(research)) continue;
 
-                teamProgress.put(research, ResearchProgress.forResearch(research, level));
+                ResearchProgress progress = ResearchProgress.forResearch(research, level);
+                if (progress != null) teamProgress.put(research, progress);
             }
 
             // Set root researches as researchable
             teamResearches.values().stream().map(ResearchInstance::getResearch).forEach(allResearches::remove);
 
             for (ResearchInstance research : teamResearches.values()) {
-                Research r = researchManager.lookupResearch(research.getResearch(), level);
-                if (r == null) continue;
-
-                List<ResourceKey<Research>> pageRoots = researchManager.getRootsForPage(r.researchPage());
-
-                if (research.getResearchStatus() == ResearchStatus.RESEARCHABLE_AFTER_QUEUE && pageRoots.contains(research.getResearch())) {
+                if (research.getResearchStatus() == ResearchStatus.RESEARCHABLE_AFTER_QUEUE && researchManager.isPageRoot(research.getResearch())) {
                     research.setResearchStatus(ResearchStatus.RESEARCHABLE);
                 }
             }
 
             for (ResourceKey<Research> research : allResearches) {
-                Research r = researchManager.lookupResearch(research, level);
-                if (r == null) continue;
-
-                List<ResourceKey<Research>> pageRoots = researchManager.getRootsForPage(r.researchPage());
-                ResearchStatus status;
-                if (pageRoots.contains(research)) {
-                    status = ResearchStatus.RESEARCHABLE;
-                } else {
-                    status = ResearchStatus.LOCKED;
-                }
+                ResearchStatus status = researchManager.isPageRoot(research) ? ResearchStatus.RESEARCHABLE : ResearchStatus.LOCKED;
                 teamResearches.put(research, new ResearchInstance(research, status));
             }
         }

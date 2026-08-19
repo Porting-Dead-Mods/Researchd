@@ -7,6 +7,7 @@ package com.portingdeadmods.researchd.client.screens.research;
 
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.portingdeadmods.researchd.client.screens.RdZIndex;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.DropDownWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import net.minecraft.client.gui.GuiGraphics;
@@ -145,7 +146,7 @@ public abstract class AbstractResearchScreen extends Screen {
     }
 
     protected void renderTooltip(GuiGraphics guiGraphics, PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        poseStack.translate(0, 0, 10);
+        poseStack.translate(0, 0, RdZIndex.TOOLTIP);
 
         if (tooltip != null) {
             guiGraphics.renderComponentTooltip(com.portingdeadmods.researchd.utils.GuiUtils.getFont(), tooltip, mouseX, mouseY);
@@ -166,9 +167,9 @@ public abstract class AbstractResearchScreen extends Screen {
 
         poseStack.pushPose();
         {
-            poseStack.translate(0, 0, 300);
+            poseStack.translate(0, 0, RdZIndex.POPUP_BASE);
             for (PopupWidget popupWidget : this.popupWidgets) {
-                poseStack.translate(0, 0, 100);
+                poseStack.translate(0, 0, RdZIndex.POPUP_STEP);
 
                 popupWidget.render(guiGraphics, mouseX, mouseY, partialTick);
 

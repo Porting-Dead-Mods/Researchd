@@ -315,7 +315,7 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
     public void init(Level level) {
         ResearchManager researchManager = ResearchdApi.getResearchManager();
         Map<ResourceKey<Research>, ResearchInstance> researchInstances = researchManager.getResearches().stream()
-                .map(key -> new AbstractMap.SimpleEntry<>(key, new ResearchInstance(key, researchManager.getRootsForPage(researchManager.getPageByResearch(key).id()).contains(key)
+                .map(key -> new AbstractMap.SimpleEntry<>(key, new ResearchInstance(key, researchManager.isPageRoot(key)
                         ? ResearchStatus.RESEARCHABLE
                         : ResearchStatus.LOCKED)))
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
@@ -323,7 +323,8 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
 
         Map<ResourceKey<Research>, ResearchProgress> rps = new HashMap<>();
         for (ResourceKey<Research> key : researchManager.getResearches()) {
-            rps.put(key, ResearchProgress.forResearch(key, level));
+            ResearchProgress progress = ResearchProgress.forResearch(key, level);
+            if (progress != null) rps.put(key, progress);
         }
         this.getResearchProgresses().putAll(rps);
 

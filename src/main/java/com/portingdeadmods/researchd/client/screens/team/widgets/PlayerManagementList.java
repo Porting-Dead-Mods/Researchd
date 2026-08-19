@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.client.screens.team.widgets;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.client.screens.RdZIndex;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.ContainerWidget;
 import com.portingdeadmods.researchd.api.team.ResearchTeamRole;
 import com.portingdeadmods.researchd.api.team.TeamMember;
@@ -110,14 +111,14 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
         PoseStack poseStack = guiGraphics.pose();
         poseStack.pushPose();
         {
-            poseStack.translate(0, 0, PlayerManagementDraggableWidget.BACKGROUND_Z + 1);
+            poseStack.translate(0, 0, RdZIndex.DRAGGABLE_WINDOW_ROW);
             guiGraphics.blitSprite(PLAYER_ENTRY_TEXTURE, left, top, 84, 16);
         }
         poseStack.popPose();
 
         poseStack.pushPose();
         {
-            poseStack.translate(0, 0, PlayerManagementDraggableWidget.BACKGROUND_Z + 2);
+            poseStack.translate(0, 0, RdZIndex.DRAGGABLE_WINDOW_ROW_LABEL);
             PlayerFaceRenderer.draw(guiGraphics, AllPlayersCache.getSkin(item.teamMember.player()), left + 3, top + 3, 10);
             guiGraphics.drawScrollingString(Minecraft.getInstance().font, Component.literal(AllPlayersCache.getName(item.teamMember.player())).withStyle(ChatFormatting.WHITE), left + 3 + 12, left + 84 - this.buttonWidgets.get(item).size() * (12 + 2) - 2, top + 4, -1);
         }
@@ -126,7 +127,7 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
         int i = 0;
         poseStack.pushPose();
         {
-            poseStack.translate(0, 0, PlayerManagementDraggableWidget.BACKGROUND_Z + 3);
+            poseStack.translate(0, 0, RdZIndex.DRAGGABLE_WINDOW_ROW_BUTTONS);
             for (DraggableWidgetImageButton widget : this.buttonWidgets.get(item)) {
                 widget.setPosition(left + 84 - (i + 1) * (12 + 2), top + 2);
                 widget.render(guiGraphics, mouseX, mouseY, -1);

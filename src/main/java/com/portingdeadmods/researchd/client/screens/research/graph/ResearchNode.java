@@ -29,6 +29,8 @@ public class ResearchNode extends AbstractWidget {
 
     public void fetchInstanceFromTeam() {
         ResearchTeam team = ResearchTeamHelperClient.getTeam();
+        if (team == null) return;
+
         ResearchInstance updatedInstance = team.getResearches().get(this.instance.getResearch());
         if (updatedInstance != null) {
             this.instance = updatedInstance;

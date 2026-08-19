@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.client.screens.editor.widgets;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.editmode.PackLocation;
+import com.portingdeadmods.researchd.client.screens.RdZIndex;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLButton;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLImageButton;
 import net.minecraft.client.Minecraft;
@@ -85,7 +86,7 @@ public class SelectPackSearchBarWidget extends AbstractWidget {
         PoseStack poseStack = guiGraphics.pose();
         poseStack.pushPose();
         {
-            poseStack.translate(0, 0, 10);
+            poseStack.translate(0, 0, RdZIndex.DROP_DOWN);
 
             this.dropDownWidget.render(guiGraphics, this.getX(), this.getY() + this.getHeight(), mouseX, mouseY, partialTick);
         }

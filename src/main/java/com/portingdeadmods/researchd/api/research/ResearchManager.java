@@ -29,10 +29,18 @@ public interface ResearchManager {
         Collection<ResourceLocation> pageIds = this.getPageIds();
         for (ResourceLocation pageId : pageIds) {
             ResearchPage page = this.getPageForId(pageId);
-            if (page.containsResearch(research)) {
+            if (page != null && page.containsResearch(research)) {
                 return page;
             }
         }
         return null;
+    }
+
+    default boolean isPageRoot(ResourceKey<Research> research) {
+        ResearchPage page = this.getPageByResearch(research);
+        if (page == null) return false;
+
+        List<ResourceKey<Research>> roots = this.getRootsForPage(page.id());
+        return roots != null && roots.contains(research);
     }
 }

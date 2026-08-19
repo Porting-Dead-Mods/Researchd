@@ -1,6 +1,7 @@
 package com.portingdeadmods.researchd.client.screens.team.widgets;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.portingdeadmods.researchd.client.screens.RdZIndex;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.WidgetSprites;
@@ -18,7 +19,7 @@ public class DraggableWidgetImageButton extends ImageButton {
 
         poseStack.pushPose();
         {
-            poseStack.translate(0, 0, 500);
+            poseStack.translate(0, 0, RdZIndex.DRAGGABLE_WINDOW);
             guiGraphics.blitSprite(resourcelocation, this.getX(), this.getY(), this.width, this.height);
         }
         poseStack.popPose();

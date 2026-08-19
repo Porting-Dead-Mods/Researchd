@@ -1,7 +1,9 @@
 package com.portingdeadmods.researchd.api.client;
 
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
+import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
+import com.portingdeadmods.researchd.api.research.ResearchManager;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import net.minecraft.world.level.Level;
@@ -18,7 +20,16 @@ public record TechList(UniqueArray<ResearchInstance> entries) {
 
     public static TechList getClientTechList() {
         ResearchTeam team = ResearchTeamHelperClient.getTeam();
-        return new TechList(team != null ? new HashSet<>(team.getResearches().values()) : new HashSet<>());
+        if (team == null) return new TechList(new HashSet<>());
+
+        ResearchManager researchManager = ResearchdApi.getResearchManager();
+        Set<ResearchInstance> entries = new HashSet<>();
+        for (ResearchInstance instance : team.getResearches().values()) {
+            if (researchManager != null && researchManager.getRelationsForResearch(instance.getResearch()) == null) continue;
+
+            entries.add(instance);
+        }
+        return new TechList(entries);
     }
 
     public void sortTechList() {

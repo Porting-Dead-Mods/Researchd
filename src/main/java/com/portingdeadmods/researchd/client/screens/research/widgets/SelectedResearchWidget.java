@@ -29,7 +29,6 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 public class SelectedResearchWidget extends ResearchScreenWidget {
@@ -223,12 +222,24 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
             ResearchTeam team = ResearchTeamHelperClient.getTeam();
             if (team == null) return;
 
-            this.setSelectedResearch(Objects.requireNonNull(team.getResearches().get(research)));
+            ResearchInstance instance = team.getResearches().get(research);
+            if (instance == null) {
+                Researchd.error("Research Screen", "Cannot select %s, this team has no entry for it", research.location());
+                return;
+            }
+
+            this.setSelectedResearch(instance);
         }
     }
 
     public void setSelectedResearch(@NotNull ResearchInstance instance) {
         if (this.selectedInstance != instance) {
+            Research selected = instance.lookup(Minecraft.getInstance().level);
+            if (selected == null) {
+                Researchd.error("Research Screen", "Cannot select %s, it is not part of the loaded researches", instance.getResearch().location());
+                return;
+            }
+
             this.selectedInstance = instance;
 
             this.researchScreen.getTechListWidget().startResearchButton.active = this.selectedInstance.isResearchable()
@@ -246,8 +257,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
             Font font = mc.font;
 
             this.scrollOffset = 0;
-            Research research = this.selectedInstance.lookup(mc.level);
-            ResearchMethod method = research.researchMethod();
+            ResearchMethod method = selected.researchMethod();
             WidgetConstructor<? extends ResearchMethod> methodWidgetConstructor = ResearchdClient.RESEARCH_METHOD_WIDGETS.get(method.id());
             if (methodWidgetConstructor != null) {
                 this.methodWidget = methodWidgetConstructor.createMethod(53 + METHOD_WIDGET_PADDING, 60 + LABEL_PADDING_TOP_1 + font.lineHeight + LABEL_PADDING_BOTTOM_1, method);
@@ -258,7 +268,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
                 ((MultiLineTextWidget) this.methodWidget).setMaxWidth(108);
             }
 
-            ResearchEffect effect = research.researchEffect();
+            ResearchEffect effect = selected.researchEffect();
             WidgetConstructor<? extends ResearchEffect> effectWidgetConstructor = ResearchdClient.RESEARCH_EFFECT_WIDGETS.get(effect.id());
             if (effectWidgetConstructor != null) {
                 this.effectWidget = effectWidgetConstructor.createEffect(53 + METHOD_WIDGET_PADDING, 60 + LABEL_PADDING_TOP_1 + font.lineHeight + LABEL_PADDING_BOTTOM_1 + methodWidget.getHeight() + METHOD_WIDGET_PADDING_BOTTOM + LINE_HEIGHT + LABEL_PADDING_TOP_2 + font.lineHeight + LABEL_PADDING_BOTTOM_2, effect);
@@ -272,6 +282,16 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
             this.sideScroller.active = this.methodWidget.getWidth() > 106 || this.effectWidget.getWidth() > 106;
             this.sideScroller.visible = this.sideScroller.active;
         }
+    }
+
+    public void clearSelectedResearch() {
+        this.selectedInstance = null;
+        this.methodWidget = null;
+        this.effectWidget = null;
+        this.scrollOffset = 0;
+        this.sideScroller.active = false;
+        this.sideScroller.visible = false;
+        this.researchScreen.getTechListWidget().startResearchButton.active = false;
     }
 
     public @Nullable ResearchInstance getSelectedInstance() {

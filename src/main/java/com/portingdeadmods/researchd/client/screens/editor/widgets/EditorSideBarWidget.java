@@ -2,6 +2,7 @@ package com.portingdeadmods.researchd.client.screens.editor.widgets;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.client.screens.RdZIndex;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.AbstractLayoutWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PDLImageButton;
 import net.minecraft.client.Minecraft;
@@ -38,7 +39,7 @@ public class EditorSideBarWidget extends AbstractLayoutWidget<LinearLayout> {
         PoseStack poseStack = guiGraphics.pose();
         poseStack.pushPose();
         {
-            poseStack.translate(0, 0, -1000);
+            poseStack.translate(0, 0, RdZIndex.EDITOR_SIDEBAR);
             guiGraphics.blit(EDITOR_SIDE_BAR_TEXTURE, this.getX(), this.getY(), 0, 0, 0, 174, this.height, this.width, 16);
         }
         poseStack.popPose();

@@ -1,6 +1,7 @@
 package com.portingdeadmods.researchd.client.screens.lib.widgets;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.portingdeadmods.researchd.client.screens.RdZIndex;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.dropdowns.RegistrySuggestionDropDownWidget;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -26,7 +27,7 @@ public class SuggestionRegistryVerifyEditBox extends RegistryVerifyEditBox {
         PoseStack poseStack = guiGraphics.pose();
         poseStack.pushPose();
         {
-            poseStack.translate(0, 0, 10);
+            poseStack.translate(0, 0, RdZIndex.DROP_DOWN);
             this.dropDown.render(guiGraphics, mouseX, mouseY, partialTick);
         }
         poseStack.popPose();

@@ -177,6 +177,8 @@ public final class ResearchdClient {
             }
 
             ResearchPackComponent researchPackComponent = stack.get(ResearchdDataComponents.RESEARCH_PACK);
+            if (researchPackComponent == null) return -1;
+
             ClientLevel level = Minecraft.getInstance().level;
             if (layer == 1 && researchPackComponent.researchPackKey().isPresent()) {
                 ResearchPack researchPack = ResearchHelperCommon.getResearchPack(researchPackComponent.researchPackKey().get(), level);

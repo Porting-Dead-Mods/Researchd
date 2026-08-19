@@ -49,7 +49,9 @@ public final class ResearchGraphCache {
      * Computes or retrieves a cached ResearchGraph for the given ResearchPage.
      * Currently uses the first root node of the page for graph generation.
      */
-    public static @Nullable ResearchGraph computeIfAbsentForPage(ResearchPage page) {
+    public static @Nullable ResearchGraph computeIfAbsentForPage(@Nullable ResearchPage page) {
+        if (page == null) return null;
+
         ResearchTeam team = ResearchTeamHelperClient.getTeam();
         if (team == null || ResearchdApi.getResearchManager() == null) return PAGE_GRAPH_CACHE.get(page.id());
 

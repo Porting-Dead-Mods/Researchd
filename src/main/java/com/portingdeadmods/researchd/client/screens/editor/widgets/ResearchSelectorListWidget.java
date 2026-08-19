@@ -5,6 +5,7 @@ import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
+import com.portingdeadmods.researchd.client.screens.RdZIndex;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchManager;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.selection.ResearchSelectionPopupWidget;
@@ -135,7 +136,7 @@ public class ResearchSelectorListWidget extends ContainerWidget<ResearchSelector
                     PoseStack poseStack  = guiGraphics.pose();
                     poseStack.pushPose();
                     {
-                        poseStack.translate(0, 0, 160);
+                        poseStack.translate(0, 0, RdZIndex.EDITOR_HOVER_OVERLAY);
                         guiGraphics.blitSprite(REMOVE_ELEMENT_HOVER_SPRITE, x + 2, y + 2, 14, 14);
                     }
                     poseStack.popPose();

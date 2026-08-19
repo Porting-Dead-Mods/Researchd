@@ -33,8 +33,11 @@ public class ResearchLabMenu extends PDLAbstractContainerMenu<ResearchLabControl
 		super(ResearchdMenuTypes.RESEARCH_LAB_MENU.get(), containerId, inv, blockEntity);
 		Researchd.debug("Research Lab Menu", "Creating Research Lab Menu with ", ResearchHelperCommon.getResearchPacks(inv.player.level()).size(), " slots.");
 
-        this.researchPacks = this.getBlockEntity().researchPacks;
-        this.researchPackItems = researchPacks.stream().map(ResearchPackImpl::asStack).toList();
+        // The pack list is filled in on load, and the handler is resized to match it there. Both can lag
+        // behind a datapack change, so the slot count is the smaller of the two rather than either one.
+        List<ResourceKey<ResearchPack>> bePacks = this.getBlockEntity().researchPacks;
+        this.researchPacks = bePacks != null ? bePacks : List.of();
+        this.researchPackItems = this.researchPacks.stream().map(ResearchPackImpl::asStack).toList();
 
 		int slotsX = 8;
         int slotsY = 18;
@@ -42,7 +45,8 @@ public class ResearchLabMenu extends PDLAbstractContainerMenu<ResearchLabControl
 		var x = new ImmutableList.Builder<Integer>();
 		var s = new ImmutableList.Builder<Slot>();
 
-        for (int i = 0; i < this.researchPackItems.size(); i++) {
+        int slotCount = Math.min(this.researchPackItems.size(), this.getBlockEntity().getItemHandler().getSlots());
+        for (int i = 0; i < slotCount; i++) {
 			int slotX = slotsX + i * 18;
 			Slot slot = new SlotItemHandler(this.getBlockEntity().getItemHandler(), i, slotX, slotsY);
 			x.add(slotX);
@@ -68,7 +72,7 @@ public class ResearchLabMenu extends PDLAbstractContainerMenu<ResearchLabControl
 
     @Override
 	protected int getMergeableSlotCount() {
-		return ResearchHelperCommon.getResearchPacks(inv.player.level()).size(); // At menu creation time the LazyFinal should be initialized, so safe getOrThrow()
+		return this.labSlots.size();
 	}
 
 	// TODO: Move to PDL

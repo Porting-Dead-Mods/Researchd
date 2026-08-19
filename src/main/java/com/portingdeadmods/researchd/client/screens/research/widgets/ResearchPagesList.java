@@ -12,6 +12,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,20 +41,33 @@ public class ResearchPagesList extends AbstractWidget {
     }
 
     public void refreshPages() {
-        if (!this.pages.isEmpty()) {
-            this.pages.clear();
-        }
+        ResourceLocation previousId = this.selectedPage != null ? this.selectedPage.id() : null;
+
+        this.pages.clear();
+        this.selectedPage = null;
 
         ResearchManager researchManager = ResearchdApi.getResearchManager();
+        if (researchManager == null) return;
 
-        researchManager.getPageIds().stream().map(researchManager::getPageForId).forEach(this.pages::add);
-        if (!this.pages.isEmpty()) {
-            this.selectedPage = researchManager.getPageForId(ResearchPage.DEFAULT_PAGE_ID);
-            if (this.selectedPage == null) {
-                this.selectedPage = this.pages.getFirst();
-            }
+        for (ResourceLocation pageId : researchManager.getPageIds()) {
+            ResearchPage page = researchManager.getPageForId(pageId);
+            if (page != null) this.pages.add(page);
         }
 
+        if (this.pages.isEmpty()) return;
+
+        this.selectedPage = findPage(previousId);
+        if (this.selectedPage == null) this.selectedPage = findPage(ResearchPage.DEFAULT_PAGE_ID);
+        if (this.selectedPage == null) this.selectedPage = this.pages.getFirst();
+    }
+
+    private @Nullable ResearchPage findPage(@Nullable ResourceLocation pageId) {
+        if (pageId == null) return null;
+
+        for (ResearchPage page : this.pages) {
+            if (page.id().equals(pageId)) return page;
+        }
+        return null;
     }
 
     @Override
@@ -120,9 +134,17 @@ public class ResearchPagesList extends AbstractWidget {
         return this.selectedPage;
     }
 
-    public void setSelectedPage(ResearchPage page) {
-        if (this.pages.contains(page)) {
-            this.selectedPage = page;
+    public void setSelectedPage(@Nullable ResearchPage page) {
+        if (page == null) return;
+
+        ResearchPage known = findPage(page.id());
+        if (known == null) {
+            this.refreshPages();
+            known = findPage(page.id());
+        }
+
+        if (known != null) {
+            this.selectedPage = known;
         }
     }
 

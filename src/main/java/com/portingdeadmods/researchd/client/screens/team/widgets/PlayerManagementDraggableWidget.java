@@ -5,6 +5,7 @@ import com.portingdeadmods.portingdeadlibs.utils.PlayerUtils;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.team.TeamMember;
+import com.portingdeadmods.researchd.client.screens.RdZIndex;
 import com.portingdeadmods.researchd.client.screens.team.ResearchTeamScreen;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import net.minecraft.client.Minecraft;
@@ -30,8 +31,6 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
 
     public final WarningPopupWidget popupWidget;
 	public final BiConsumer<PlayerManagementList.Entry, PlayerManagementButtonType> refreshFunction;
-
-    public static final int BACKGROUND_Z = 500;
 
     public PlayerManagementDraggableWidget(int x, int y, Collection<TeamMember> members, PlayerManagementButtons buttonSettings, Component message) {
         super(x, y, 102, 128, message);
@@ -143,7 +142,7 @@ public class PlayerManagementDraggableWidget extends AbstractDraggableWidget {
 
         poseStack.pushPose();
         {
-            poseStack.translate(0, 0, BACKGROUND_Z);
+            poseStack.translate(0, 0, RdZIndex.DRAGGABLE_WINDOW);
             GuiUtils.drawImg(guiGraphics, WINDOW_TEXTURE, getX(), getY(), getWidth(), getHeight());
         }
         poseStack.popPose();

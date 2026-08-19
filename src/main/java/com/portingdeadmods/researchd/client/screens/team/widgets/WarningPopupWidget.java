@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.client.screens.team.widgets;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.client.screens.RdZIndex;
 import com.portingdeadmods.researchd.api.team.TeamMember;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -40,7 +41,7 @@ public class WarningPopupWidget extends AbstractWidget {
 
         poseStack.pushPose();
         {
-            poseStack.translate(0, 0, 1);
+            poseStack.translate(0, 0, RdZIndex.WARNING_POPUP);
 
             GuiUtils.drawImg(guiGraphics, TEXTURE, getX(), getY(), width, height);
 

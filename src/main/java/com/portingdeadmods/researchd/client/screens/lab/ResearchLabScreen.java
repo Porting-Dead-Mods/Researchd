@@ -9,6 +9,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
+import com.portingdeadmods.researchd.client.screens.RdZIndex;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import com.portingdeadmods.researchd.content.menus.ResearchLabMenu;
@@ -200,7 +201,8 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
         {
             for (int i = 0; i < this.menu.getResearchPackItems().size(); i++) {
                 guiGraphics.blitSprite(SLOT_SPRITE, startX + i * SLOT_WIDTH - this.scroller.getScrollOffset(), startY, SLOT_WIDTH, SLOT_HEIGHT);
-                int progress = (int) (this.menu.blockEntity.researchPackUsage.get(this.menu.getResearchPacks().get(i)) * 17);
+
+                int progress = (int) (this.menu.blockEntity.researchPackUsage.getOrDefault(this.menu.getResearchPacks().get(i), 0f) * 17);
                 guiGraphics.fill(startX + 1 + i * SLOT_WIDTH - this.scroller.getScrollOffset(), startY + SLOT_WIDTH, startX + 1 + i * SLOT_WIDTH + progress - this.scroller.getScrollOffset(), startY + SLOT_WIDTH + 1, PROGRESS_COLOR);
                 RenderSystem.enableBlend();
                 RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 60f / 255f);
@@ -227,7 +229,7 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
 
                 pose.pushPose();
                 {
-                    pose.translate(0, 0, 100);
+                    pose.translate(0, 0, RdZIndex.LAB_RESEARCH_TOOLTIP);
                     guiGraphics.renderTooltip(Minecraft.getInstance().font, Component.literal("Open Research in Research Screen"), mouseX, mouseY);
                 }
                 pose.popPose();

@@ -67,7 +67,7 @@ public final class ResearchManagerImpl implements ResearchManager {
                 ResearchRelations parentResearchRelations = globalResearchMap.get(parent);
 
 				if (parentResearchRelations == null) {
-					Researchd.log("Research Manager", "Research %s has a parent %s that does not exist in the global research map. This may be due to a missing or misconfigured research definition.", research.getResearchKey().location(), parent.location());
+					Researchd.error("Research Manager", "Research %s has a parent %s that does not exist. It will be treated as if it had no such parent.", research.getResearchKey().location(), parent.location());
 					continue;
 				}
 
@@ -86,7 +86,10 @@ public final class ResearchManagerImpl implements ResearchManager {
             }
 
             for (ResourceKey<Research> parent : parents) {
-                research.getParents().add(globalResearchMap.get(parent));
+                ResearchRelations parentRelations = globalResearchMap.get(parent);
+                if (parentRelations == null) continue;
+
+                research.getParents().add(parentRelations);
             }
         }
 
@@ -134,6 +137,8 @@ public final class ResearchManagerImpl implements ResearchManager {
 
     private static ResourceLocation resolvePage(ResearchRelations research, Map<ResourceKey<Research>, Research> lookup) {
         Research r = lookup.get(research.getResearchKey());
+        if (r == null) return ResearchPage.DEFAULT_PAGE_ID;
+
         ResourceLocation pageId = r.researchPage();
 
         // If this is not root and has default page, inherit from parent
@@ -142,10 +147,14 @@ public final class ResearchManagerImpl implements ResearchManager {
 			ResourceLocation page = resolvePage(firstParent, lookup);
 
 			for (ResearchRelations parent : research.getParents()) {
-				if (resolvePage(parent, lookup) != page) throw new RuntimeException("Research Parent is on a different page than child");
+				ResourceLocation parentPage = resolvePage(parent, lookup);
+				if (!parentPage.equals(page)) {
+					Researchd.error("Research Manager", "Research %s has parents on different pages (%s and %s), using %s.",
+							research.getResearchKey().location(), page, parentPage, page);
+				}
 			}
 
-            return resolvePage(firstParent, lookup);
+            return page;
         }
         return pageId;
     }

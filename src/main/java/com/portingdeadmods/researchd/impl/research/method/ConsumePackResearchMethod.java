@@ -59,7 +59,8 @@ public record ConsumePackResearchMethod(List<ResourceKey<ResearchPack>> packs, i
             blockEntity.decreaseNecessaryPackCount(packs);
 
             for (ResourceKey<ResearchPack> pack : packs) {
-                blockEntity.researchPackUsage.put(pack, Math.max(blockEntity.researchPackUsage.get(pack) - ((1f / blockEntity.currentResearchDuration) / team.getEffectValue(ResearchdValueEffects.RESEARCH_LAB_PRODUCTIVITY)), 0f));
+                float usage = blockEntity.researchPackUsage.getOrDefault(pack, 0f);
+                blockEntity.researchPackUsage.put(pack, Math.max(usage - ((1f / blockEntity.currentResearchDuration) / team.getEffectValue(ResearchdValueEffects.RESEARCH_LAB_PRODUCTIVITY)), 0f));
             }
             task.addProgress(1f / blockEntity.currentResearchDuration);
         }

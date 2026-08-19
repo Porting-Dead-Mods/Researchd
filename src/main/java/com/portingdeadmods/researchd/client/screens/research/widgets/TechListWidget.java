@@ -6,7 +6,6 @@ import com.portingdeadmods.researchd.api.client.TechList;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
-import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
@@ -253,13 +252,16 @@ public class TechListWidget extends ResearchScreenWidget {
 
     @Override
     protected boolean clicked(double mouseX, double mouseY) {
-        return super.clicked(mouseX, mouseY) && (this.hoveredResearch != null || this.canScroll(mouseX, mouseY));
+        return this.active && this.visible
+                && mouseX >= getX() && mouseX < getX() + BACKGROUND_WIDTH
+                && mouseY >= getY() && mouseY < getY() + BACKGROUND_HEIGHT_SPRITE + this.getTechListHeight()
+                && (this.hoveredResearch != null || this.canScroll(mouseX, mouseY));
     }
 
     @Override
     public void onClick(double mouseX, double mouseY, int button) {
         if (this.hoveredResearch != null) {
-            this.screen.getResearchGraphWidget().setGraph(ResearchGraphCache.computeIfAbsent(this.hoveredResearch.getResearch()));
+            this.screen.showGraphForResearch(this.hoveredResearch.getResearch());
             this.screen.getSelectedResearchWidget().setSelectedResearch(this.hoveredResearch);
         } else if (this.canScroll(mouseX, mouseY)) {
             int scrollableHeight = this.getContentHeight() - this.getTechListHeight();

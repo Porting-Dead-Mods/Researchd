@@ -3,13 +3,13 @@ package com.portingdeadmods.researchd.client.screens.research.widgets;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.api.ResearchdApi;
+import com.portingdeadmods.researchd.api.client.ClientResearchIcon;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.api.team.ResearchQueue;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
-import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
+import com.portingdeadmods.researchd.client.screens.RdZIndex;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
 import com.portingdeadmods.researchd.impl.research.SimpleResearchQueue;
@@ -99,9 +99,8 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
                 ResearchTeam team = ResearchTeamHelperClient.getTeam();
                 if (team == null) return false;
 
-                ResearchInstance instance = team.getResearches().get(researchKey);
-                this.screen.getSelectedResearchWidget().setSelectedResearch(instance);
-                this.screen.getResearchGraphWidget().setGraph(ResearchGraphCache.computeIfAbsent(researchKey));
+                this.screen.getSelectedResearchWidget().setSelectedResearch(researchKey);
+                this.screen.showGraphForResearch(researchKey);
                 return super.mouseClicked(mouseX, mouseY, button);
             }
         }
@@ -146,7 +145,7 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
 
             poseStack.pushPose();
             {
-                poseStack.translate(0, 0, 1000);
+                poseStack.translate(0, 0, RdZIndex.QUEUE_REMOVE_ICON);
                 guiGraphics.drawString(font, "x", x + 10 - (font.width("x") / 2), y + 16, -1, false);
             }
             poseStack.popPose();
@@ -164,7 +163,10 @@ public class ResearchQueueWidget extends ResearchScreenWidget {
 
         guiGraphics.blit(ResearchStatus.RESEARCHED.getSpriteTexture(spriteType), x, y, 0, 0, (int) (progress * PANEL_WIDTH), spriteType.getHeight(), PANEL_WIDTH, spriteType.getHeight());
 
-        ResearchScreen.CLIENT_ICONS.get(instance.getResearch().location()).render(guiGraphics, x + 2, y + 2, mouseX, mouseY, 1, 0);
+        ClientResearchIcon<?> icon = ResearchScreen.CLIENT_ICONS.get(instance.getResearch().location());
+        if (icon != null) {
+            icon.render(guiGraphics, x + 2, y + 2, mouseX, mouseY, 1, 0);
+        }
 
         if (isPanelHovered(guiGraphics, x, y, mouseX, mouseY) && hoverable) {
             int color = -2130706433;
