@@ -56,17 +56,16 @@ public record ClientResearchCompletedPayload(ResourceKey<Research> key, int time
                 first = queue.getFirst();
             }
 
-            if (!forced && queue.isEmpty()) {
-                context.disconnect(ResearchdTranslations.component(ResearchdTranslations.Errors.RESEARCH_QUEUE_DESYNC));
-            }
-
-            if (!forced && first != this.key()) {
-                context.disconnect(ResearchdTranslations.component(ResearchdTranslations.Errors.RESEARCH_QUEUE_DESYNC));
+            // Do not kick the player on a queue mismatch. A stale client-side queue head (the queue
+            // is only re-synced via SyncTeamPayload) used to force-disconnect everyone on completion.
+            boolean synced = forced || (first != null && first.equals(this.key()));
+            if (!synced) {
+                Researchd.LOGGER.warn("Client research queue out of sync on research finish (expected {}, queue head was {}). Completing locally without polling the queue.", this.key(), first);
             }
 
             team.setResearchCompleted(key, timeStamp);
 
-            if (first != null) {
+            if (synced && first != null) {
                 queue.remove(0, false);
             }
 

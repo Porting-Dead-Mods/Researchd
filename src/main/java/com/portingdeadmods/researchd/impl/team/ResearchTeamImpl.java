@@ -51,11 +51,16 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
             Codec.unboundedMap(Codec.STRING, TeamMember.CODEC).fieldOf("members").forGetter(t -> ResearchdCodecUtils.encodeMap(t.members)),
             TeamSocialManagerImpl.CODEC.fieldOf("sent_invites").forGetter(t -> t.socialManager),
             TeamResearches.CODEC.fieldOf("researchPacks").forGetter(t -> t.researches),
-            Codec.unboundedMap(Codec.STRING, Codec.FLOAT).fieldOf("effects").forGetter(t -> ResearchdCodecUtils.encodeMap(t.effects))
+            Codec.unboundedMap(Codec.STRING, Codec.FLOAT).fieldOf("effects").forGetter(t -> ResearchdCodecUtils.encodeMap(t.effects)),
+            Codec.LONG.optionalFieldOf("creation_time", 0L).forGetter(ResearchTeamImpl::getCreationTime)
     ).apply(builder, ResearchTeamImpl::newTeamStringMaps));
 
-    private static @NotNull ResearchTeamImpl newTeamStringMaps(String n, UUID i, Map<String, TeamMember> m, TeamSocialManagerImpl socialManager, TeamResearches tr, Map<String, Float> e) {
-        return new ResearchTeamImpl(n, i, ResearchdCodecUtils.decodeMap(m, UUID::fromString), socialManager, tr, ResearchdCodecUtils.decodeMap(e, ResourceLocation::parse));
+    private static @NotNull ResearchTeamImpl newTeamStringMaps(String n, UUID i, Map<String, TeamMember> m, TeamSocialManagerImpl socialManager, TeamResearches tr, Map<String, Float> e, long creationTime) {
+        ResearchTeamImpl team = new ResearchTeamImpl(n, i, ResearchdCodecUtils.decodeMap(m, UUID::fromString), socialManager, tr, ResearchdCodecUtils.decodeMap(e, ResourceLocation::parse));
+        if (creationTime > 0) {
+            team.setCreationTime(creationTime);
+        }
+        return team;
     }
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ResearchTeamImpl> STREAM_CODEC = StreamCodec.composite(
@@ -183,6 +188,17 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
             return;
         }
 
+        // Re-sync the queue to every member before announcing completion, otherwise a member's
+        // client may hold a stale queue head and get force-disconnected by
+        // ClientResearchCompletedPayload's desync check. Scope to online members only, not the
+        // whole server, so no team data leaks to unrelated clients.
+        for (TeamMember member : this.getMembers()) {
+            Player memberPlayer = playerGetter.apply(member.player());
+            if (memberPlayer instanceof ServerPlayer sp) {
+                PacketDistributor.sendToPlayer(sp, new SyncTeamPayload(this));
+            }
+        }
+
         Level level = null;
         Research research = null;
         for (TeamMember member : this.getMembers()) {
@@ -263,6 +279,7 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
     @Override
     public void setName(String name) {
         this.name = name;
+        this.setChanged();
     }
 
     @Override

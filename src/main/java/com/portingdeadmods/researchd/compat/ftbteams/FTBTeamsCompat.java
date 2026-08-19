@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.compat.ftbteams;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
+import com.portingdeadmods.researchd.api.team.ResearchTeamRole;
 import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import com.portingdeadmods.researchd.data.saved.TeamSavedData;
 import com.portingdeadmods.researchd.impl.team.ResearchTeamImpl;
@@ -29,12 +30,39 @@ public class FTBTeamsCompat {
             return;
         }
 
-        ResearchTeamHelperServer.handleLeaveTeam(player);
-        ResearchTeamHelperServer.handleSetName(player, event.getTeam().getName().getString());
+        ResearchTeamMap teams = (ResearchTeamMap) ResearchdApi.getTeamManager(player.level());
+        if (teams == null) return;
 
         UUID newTeamOwner = event.getTeam().getOwner();
-        if (!newTeamOwner.equals(player.getUUID())) /* If it's an actually different team, in rest it's just a leave team*/ {
-            ResearchTeamHelperServer.handleEnterTeamSynced(player, (ResearchTeamImpl) ResearchdApi.getTeamManager(player.level()).getTeamByPlayerId(newTeamOwner));
+
+        // Player is the FTB team owner: keep their own research team, just sync the name.
+        if (newTeamOwner.equals(player.getUUID())) {
+            ResearchTeam self = teams.getTeamByPlayerId(player.getUUID());
+            if (self != null) {
+                self.setName(event.getTeam().getName().getString());
+                teams.setChanged();
+            }
+            return;
+        }
+
+        // Player joined or switched to someone else's FTB team: move them into that owner's research team.
+        ResearchTeamImpl target = (ResearchTeamImpl) teams.getTeamByPlayerId(newTeamOwner);
+        if (target == null) {
+            Researchd.debug("FTBTeamsCompat", "FTB team owner has no research team yet: " + newTeamOwner);
+            return;
+        }
+
+        ResearchTeamHelperServer.handleEnterTeamSynced(player, target);
+
+        // Ensure the player is a member of exactly one research team, otherwise their progress
+        // ends up in a stray default team and is not shared with their FTB teammates.
+        for (ResearchTeam team : teams.getTeams()) {
+            if (team != target && team.getMember(player.getUUID()).role() != ResearchTeamRole.NOT_MEMBER) {
+                team.removeMember(player.getUUID());
+                if (team instanceof ResearchTeamImpl implTeam) {
+                    implTeam.setChanged();
+                }
+            }
         }
     }
 

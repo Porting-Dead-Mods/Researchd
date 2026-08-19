@@ -74,8 +74,13 @@ public final class ResearchTeamMap implements ResearchTeamManager, SavedDataMap 
     @Override
     public void addTeam(ResearchTeam team) {
         if (team instanceof ResearchTeamImpl teamImpl) {
-            this.researchTeams.put(team.getId(), teamImpl);
-            this.teamIds.add(team.getId());
+            UUID teamId = team.getId();
+            // Avoid duplicate ids in the iteration list when re-adding a team that is
+            // already registered (e.g. joining an existing team via handleEnterTeamSynced)
+            if (!this.teamIds.contains(teamId)) {
+                this.teamIds.add(teamId);
+            }
+            this.researchTeams.put(teamId, teamImpl);
 
             this.setChanged();
         } else {
@@ -85,8 +90,10 @@ public final class ResearchTeamMap implements ResearchTeamManager, SavedDataMap 
 
     @Override
     public void removeTeam(UUID teamId) {
-        this.researchTeams.remove(teamId);
-        this.teamIds.remove(teamId);
+        if (this.researchTeams.remove(teamId) != null) {
+            // Remove every occurrence so a stale duplicate can never dangle in the list
+            this.teamIds.removeIf(teamId::equals);
+        }
 
         this.setChanged();
     }

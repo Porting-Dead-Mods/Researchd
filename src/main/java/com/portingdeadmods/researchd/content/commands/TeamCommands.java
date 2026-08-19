@@ -157,7 +157,11 @@ public class TeamCommands {
 									ServerLevel level = source.getLevel();
 
 									if (player != null) {
-										ResearchTeamHelperServer.handleManageModerator(player, otherPlayer.getUUID(), false);
+										if (otherPlayer != null) {
+        ResearchTeamHelperServer.handleManageModerator(player, otherPlayer.getUUID(), false);
+    } else if (player != null) {
+        player.sendSystemMessage(ResearchTeamHelperServer.getIllegalMessage());
+    }
 									}
 
 									return 1;
@@ -199,7 +203,11 @@ public class TeamCommands {
 									ServerLevel level = source.getLevel();
 
 									if (player != null) {
-										ResearchTeamHelperServer.handleManageMember(player, otherPlayer.getUUID(), true);
+										if (otherPlayer != null) {
+        ResearchTeamHelperServer.handleManageMember(player, otherPlayer.getUUID(), true);
+    } else if (player != null) {
+        player.sendSystemMessage(ResearchTeamHelperServer.getIllegalMessage());
+    }
 									}
 
 									return 1;
