@@ -16,6 +16,23 @@ public final class ResearchdConfig {
         public static boolean loadDefaultDatapack = true;
 
         @ConfigValue(
+                name = "Research Lab Energy Usage",
+                comment =
+                        "Energy consumed per tick by a Research Lab while it is researching. Zero disables the feature.",
+                category = "energy",
+                key = "research_lab_energy_usage",
+                range = {0, Integer.MAX_VALUE})
+        public static int researchLabEnergyUsage = 0;
+
+        @ConfigValue(
+                name = "Research Lab Energy Capacity",
+                comment = "Size of a Research Lab's energy buffer. Also its per-tick transfer limit.",
+                category = "energy",
+                key = "research_lab_energy_capacity",
+                range = {1, Integer.MAX_VALUE})
+        public static int researchLabEnergyCapacity = 100000;
+
+        @ConfigValue(
                 name = "Console Debug",
                 comment = "Whether to enable console debug messages for Researchd",
                 category = "debug")

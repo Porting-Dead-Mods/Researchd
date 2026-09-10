@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.api.client.screens.PDLAbstractContainerScreen;
 import com.portingdeadmods.portingdeadlibs.api.client.screens.widgets.AbstractScroller;
+import com.portingdeadmods.portingdeadlibs.client.screens.widgets.EnergyBarWidget;
 import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.ResearchdApi;
@@ -11,6 +12,7 @@ import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import com.portingdeadmods.researchd.client.screens.RdZIndex;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
+import com.portingdeadmods.researchd.content.blockentities.ResearchLabControllerBE;
 import com.portingdeadmods.researchd.content.menus.ResearchLabMenu;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
@@ -45,6 +47,8 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
     public static final int SCROLLER_WIDTH = 7;
     public static final int SCROLLER_HEIGHT = 4;
     public static final int SCROLLER_TRACK_LENGTH = 154;
+    public static final int ENERGY_BAR_X_OFFSET = 4;
+    public static final int ENERGY_BAR_Y_OFFSET = 18;
 
     private final AbstractScroller scroller =
             new AbstractScroller(
@@ -82,6 +86,19 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
         this.inventoryLabelY = this.imageHeight - 93;
 
         this.addRenderableWidget(this.scroller);
+    }
+
+    @Override
+    protected void init() {
+        super.init();
+
+        if (ResearchLabControllerBE.getEnergyUsage() > 0) {
+            this.addRenderableWidget(new EnergyBarWidget(
+                    this.leftPos + this.imageWidth + ENERGY_BAR_X_OFFSET,
+                    this.topPos + ENERGY_BAR_Y_OFFSET,
+                    this.menu.getBlockEntity(),
+                    true));
+        }
     }
 
     @Override
