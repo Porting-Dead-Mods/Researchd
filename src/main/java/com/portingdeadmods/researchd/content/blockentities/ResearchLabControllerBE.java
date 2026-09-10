@@ -5,6 +5,7 @@ import com.portingdeadmods.portingdeadlibs.api.gui.menus.PDLAbstractContainerMen
 import com.portingdeadmods.portingdeadlibs.utils.LazyFinal;
 import com.portingdeadmods.portingdeadlibs.utils.capabilities.HandlerUtils;
 import com.portingdeadmods.researchd.Researchd;
+import com.portingdeadmods.researchd.ResearchdConfig;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.Research;
@@ -31,6 +32,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Contract;
@@ -46,6 +48,10 @@ public class ResearchLabControllerBE extends GhostMultiblockControllerBE impleme
     /** Stacks whose pack is gone, waiting to be popped out. See {@link #remapSlotsToPacks()}. */
     private final List<ItemStack> orphanedStacks = new ArrayList<>();
 
+    private static final int ENERGY_SYNC_INTERVAL = 10;
+
+    private int lastSyncedEnergy = -1;
+
     public ResearchLabControllerBE(BlockPos pos, BlockState blockState) {
         super(ResearchdBlockEntityTypes.RESEARCH_LAB_CONTROLLER.get(), pos, blockState);
         this.currentResearchDuration = -1;
@@ -57,6 +63,32 @@ public class ResearchLabControllerBE extends GhostMultiblockControllerBE impleme
                     }
                 })
                 .validator(this::isItemValid));
+
+        this.addEnergyStorage(HandlerUtils::newEnergystorage, builder -> builder.capacity(
+                        ResearchdConfig.Common.researchLabEnergyCapacity)
+                .maxTransfer(ResearchdConfig.Common.researchLabEnergyCapacity)
+                .onChange(this::setChanged));
+    }
+
+    /** The per-tick draw. Zero means the feature is off. */
+    public static int getEnergyUsage() {
+        return Math.max(ResearchdConfig.Common.researchLabEnergyUsage, 0);
+    }
+
+    /**
+     * Takes one tick's worth of energy, or nothing at all.
+     *
+     * @return true if the tick is paid for
+     */
+    public boolean tryConsumeEnergy() {
+        int usage = getEnergyUsage();
+        if (usage <= 0) return true;
+
+        IEnergyStorage energy = this.getEnergyStorage();
+        if (energy == null || energy.getEnergyStored() < usage) return false;
+
+        energy.extractEnergy(usage, false);
+        return true;
     }
 
     @Override
@@ -156,6 +188,8 @@ public class ResearchLabControllerBE extends GhostMultiblockControllerBE impleme
     public void tick() {
         super.tick();
 
+        this.syncEnergyToClient();
+
         if (!this.orphanedStacks.isEmpty()) {
             if (this.level != null && !this.level.isClientSide()) {
                 this.orphanedStacks.forEach(stack -> Block.popResource(this.level, this.getBlockPos(), stack));
@@ -174,6 +208,20 @@ public class ResearchLabControllerBE extends GhostMultiblockControllerBE impleme
         if (progress == null) return;
 
         progress.checkProgress(current, this.level, new ResearchMethod.SimpleMethodContext(team, this));
+    }
+
+    private void syncEnergyToClient() {
+        if (this.level == null || this.level.isClientSide() || getEnergyUsage() <= 0) return;
+
+        IEnergyStorage energy = this.getEnergyStorage();
+        if (energy == null) return;
+
+        int stored = energy.getEnergyStored();
+        if (stored == this.lastSyncedEnergy) return;
+        if (this.level.getGameTime() % ENERGY_SYNC_INTERVAL != 0) return;
+
+        this.lastSyncedEnergy = stored;
+        this.updateData();
     }
 
     @Override

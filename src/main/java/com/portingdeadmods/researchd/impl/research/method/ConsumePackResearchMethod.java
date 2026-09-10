@@ -58,6 +58,7 @@ public record ConsumePackResearchMethod(List<ResourceKey<ResearchPack>> packs, i
             blockEntity.currentResearchDuration = this.duration();
 
             if (!blockEntity.containsNecessaryPacks(packs)) return;
+            if (!blockEntity.tryConsumeEnergy()) return;
             blockEntity.decreaseNecessaryPackCount(packs);
 
             for (ResourceKey<ResearchPack> pack : packs) {

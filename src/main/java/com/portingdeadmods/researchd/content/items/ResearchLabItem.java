@@ -30,7 +30,7 @@ public class ResearchLabItem extends GhostControllerItem {
             .layer("AAA", "AAA", "AAA")
             .onPlaceOffset(0, 0, 1)
             .controllerChar('C')
-            .exposeHandlers('I', Capabilities.ItemHandler.BLOCK.name())
+            .exposeHandlers('I', Capabilities.ItemHandler.BLOCK.name(), Capabilities.EnergyStorage.BLOCK.name())
             .build();
 
     public ResearchLabItem(Block block, Properties properties) {

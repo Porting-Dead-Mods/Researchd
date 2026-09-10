@@ -1,8 +1,10 @@
 package com.portingdeadmods.researchd;
 
 import com.mojang.logging.LogUtils;
+import com.portingdeadmods.portingdeadlibs.api.capabilities.SidedEnergyStorage;
 import com.portingdeadmods.portingdeadlibs.api.config.PDLConfigHelper;
 import com.portingdeadmods.portingdeadlibs.api.resources.DynamicPack;
+import com.portingdeadmods.portingdeadlibs.api.utils.IOAction;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdDataComponents;
@@ -24,6 +26,7 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.event.AddPackFindersEvent;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
@@ -130,6 +133,11 @@ public final class Researchd {
                 Capabilities.ItemHandler.BLOCK,
                 ResearchdBlockEntityTypes.RESEARCH_LAB_PART.get(),
                 (be, dir) -> be.getControllerItemHandler());
+        event.registerBlockEntity(
+                Capabilities.EnergyStorage.BLOCK, ResearchdBlockEntityTypes.RESEARCH_LAB_PART.get(), (be, dir) -> {
+                    IEnergyStorage storage = be.getControllerEnergyStorage();
+                    return storage != null ? new SidedEnergyStorage(storage, IOAction.INSERT) : null;
+                });
     }
 
     private void registerRegistries(NewRegistryEvent event) {
