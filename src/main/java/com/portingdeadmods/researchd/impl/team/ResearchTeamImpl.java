@@ -3,6 +3,7 @@ package com.portingdeadmods.researchd.impl.team;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.portingdeadlibs.utils.LazyFinal;
+import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.ValueEffect;
@@ -13,6 +14,7 @@ import com.portingdeadmods.researchd.api.research.ResearchStatus;
 import com.portingdeadmods.researchd.api.team.*;
 import com.portingdeadmods.researchd.compat.KubeJSCompat;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
+import com.portingdeadmods.researchd.impl.research.SimpleResearchQueue;
 import com.portingdeadmods.researchd.networking.research.ClientResearchCompletedPayload;
 import com.portingdeadmods.researchd.networking.team.manager.SyncTeamPayload;
 import com.portingdeadmods.researchd.utils.ResearchdCodecUtils;
@@ -139,7 +141,14 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
     // }
 
     public ResearchTeamImpl(UUID teamId, String teamName) {
-        this(teamName, teamId, new HashMap<>(), TeamSocialManagerImpl.EMPTY, TeamResearches.EMPTY, new HashMap<>());
+        // Fresh instances: the EMPTY constants are mutable and would be shared by every new team
+        this(
+                teamName,
+                teamId,
+                new HashMap<>(),
+                new TeamSocialManagerImpl(new UniqueArray<>(), new UniqueArray<>(), new UniqueArray<>()),
+                new TeamResearches(new SimpleResearchQueue(), new HashMap<>(), new HashMap<>()),
+                new HashMap<>());
     }
 
     public void setOnChangedFunction(Runnable onChangedFunction) {
