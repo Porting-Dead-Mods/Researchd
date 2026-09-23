@@ -21,6 +21,7 @@ repositories {
     mavenCentral()
 
     maven { url 'https://jitpack.io' }
+    maven { url 'https://api.modrinth.com/maven' }
     maven { url "https://maven.latvian.dev/releases" }
     maven {
         name = "TerraformersMC"
@@ -143,6 +144,10 @@ dependencies {
     // EMI
     compileOnly "dev.emi:emi-neoforge:${emi_version}:api"
     runtimeOnly "dev.emi:emi-neoforge:${emi_version}" // Don't load both JEI and EMI
+
+    // JADE
+    compileOnly "maven.modrinth:jade:${jade_version}"
+    localRuntime "maven.modrinth:jade:${jade_version}"
 
     //runtimeOnly "curse.maven:ender-io-64578:7134432"
 

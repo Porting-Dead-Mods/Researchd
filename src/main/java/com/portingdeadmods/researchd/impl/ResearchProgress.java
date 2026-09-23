@@ -8,6 +8,7 @@ import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.methods.ResearchMethod;
 import it.unimi.dsi.fastutil.doubles.DoubleDoublePair;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -19,7 +20,6 @@ import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
-// TODO: Remove research progresses for removed researches
 public record ResearchProgress(List<Task> tasks, Type type) {
     public static final Codec<ResearchProgress> CODEC = RecordCodecBuilder.create(inst -> inst.group(
                     Task.CODEC.listOf().fieldOf("tasks").forGetter(ResearchProgress::tasks),
@@ -47,6 +47,45 @@ public record ResearchProgress(List<Task> tasks, Type type) {
 
     public void checkProgress(ResourceKey<Research> research, Level level, ResearchMethod.MethodContext context) {
         this.type.checkProgress(research, level, this.tasks, context);
+    }
+
+    /**
+     * Rebinds saved progress to a freshly loaded research definition.
+     *
+     * <p>Tasks with the same method id retain their accumulated numeric progress, clamped to the
+     * new maximum. A changed method type starts from zero. The returned tasks always hold the
+     * newly loaded method objects, so datapack edits take effect for existing teams.
+     */
+    public ResearchProgress rebindTo(ResearchProgress definition, boolean completed) {
+        List<Task> reboundTasks = new ArrayList<>(definition.tasks.size());
+        boolean[] claimedTasks = new boolean[this.tasks.size()];
+
+        for (Task definitionTask : definition.tasks) {
+            float progress = completed
+                    ? definitionTask.getMaxProgress()
+                    : this.findCompatibleProgress(definitionTask, claimedTasks);
+            reboundTasks.add(new Task(
+                    definitionTask.getMethod(),
+                    Math.max(0, Math.min(progress, definitionTask.getMaxProgress())),
+                    definitionTask.getMaxProgress()));
+        }
+
+        return new ResearchProgress(List.copyOf(reboundTasks), definition.type);
+    }
+
+    private float findCompatibleProgress(Task definitionTask, boolean[] claimedTasks) {
+        for (int i = 0; i < this.tasks.size(); i++) {
+            Task savedTask = this.tasks.get(i);
+            if (!claimedTasks[i]
+                    && savedTask
+                            .getMethod()
+                            .id()
+                            .equals(definitionTask.getMethod().id())) {
+                claimedTasks[i] = true;
+                return savedTask.getProgress();
+            }
+        }
+        return 0;
     }
 
     public @Nullable Task getTask(ResearchMethod method) {
@@ -156,7 +195,6 @@ public record ResearchProgress(List<Task> tasks, Type type) {
         }
     }
 
-    // TODO: Check if encoded method still exists
     public static class Task {
         public static final Codec<Task> CODEC = RecordCodecBuilder.create(inst -> inst.group(
                         ResearchMethod.CODEC.fieldOf("method").forGetter(Task::getMethod),

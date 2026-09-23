@@ -722,10 +722,14 @@ public final class ResearchTeamHelperServer {
                     new HashSet<>(ResearchdApi.getResearchManager().getResearches());
 
             for (ResourceKey<Research> research : allResearches) {
-                if (teamProgress.containsKey(research)) continue;
+                ResearchProgress definition = ResearchProgress.forResearch(research, level);
+                if (definition == null) continue;
 
-                ResearchProgress progress = ResearchProgress.forResearch(research, level);
-                if (progress != null) teamProgress.put(research, progress);
+                ResearchProgress savedProgress = teamProgress.get(research);
+                ResearchInstance instance = teamResearches.get(research);
+                boolean completed = instance != null && instance.isResearched();
+                teamProgress.put(
+                        research, savedProgress != null ? savedProgress.rebindTo(definition, completed) : definition);
             }
 
             // Set root researches as researchable
@@ -743,6 +747,9 @@ public final class ResearchTeamHelperServer {
                         researchManager.isPageRoot(research) ? ResearchStatus.RESEARCHABLE : ResearchStatus.LOCKED;
                 teamResearches.put(research, new ResearchInstance(research, status));
             }
+
+            // Parent edits can change the availability of existing researches as well as new ones.
+            team.refreshResearchStatus();
         }
     }
 

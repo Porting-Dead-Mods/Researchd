@@ -28,8 +28,7 @@ public final class ResearchHelperServer {
         // FIXME: Reenable this if its causing issues, otherwise remove it
         // ResearchTeamHelper.resolveGlobalResearches(teamMap);
 
-        // Add new researces to teams in case new ones were added
-        // TODO: Remove old researches from teams in cases ones were removed
+        // Remove deleted researches, add new ones, and rebind saved progress to edited definitions.
         ResearchTeamHelperServer.cleanupTeamResearches(teamMap, overworld);
         ResearchTeamHelperServer.initializeTeamResearches(teamMap, overworld);
         ResearchTeamHelperServer.reinitializeAllTeamEffects(teamMap, overworld);

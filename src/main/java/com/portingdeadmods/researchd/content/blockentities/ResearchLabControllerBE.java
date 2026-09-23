@@ -64,15 +64,15 @@ public class ResearchLabControllerBE extends GhostMultiblockControllerBE impleme
                 })
                 .validator(this::isItemValid));
 
-        this.addEnergyStorage(HandlerUtils::newEnergystorage, builder -> builder.capacity(
-                        ResearchdConfig.Common.researchLabEnergyCapacity)
-                .maxTransfer(ResearchdConfig.Common.researchLabEnergyCapacity)
+        this.addEnergyStorage(ResearchLabEnergyStorage::new, builder -> builder.capacity(
+                        ResearchdConfig.Server.getResearchLabEnergyCapacity())
+                .maxTransfer(ResearchdConfig.Server.getResearchLabEnergyCapacity())
                 .onChange(this::setChanged));
     }
 
     /** The per-tick draw. Zero means the feature is off. */
     public static int getEnergyUsage() {
-        return Math.max(ResearchdConfig.Common.researchLabEnergyUsage, 0);
+        return ResearchdConfig.Server.getResearchLabEnergyUsage();
     }
 
     /**
