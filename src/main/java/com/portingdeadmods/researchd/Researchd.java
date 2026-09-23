@@ -2,7 +2,9 @@ package com.portingdeadmods.researchd;
 
 import com.mojang.logging.LogUtils;
 import com.portingdeadmods.portingdeadlibs.api.capabilities.SidedEnergyStorage;
+import com.portingdeadmods.portingdeadlibs.api.config.PDLConfig;
 import com.portingdeadmods.portingdeadlibs.api.config.PDLConfigHelper;
+import com.portingdeadmods.portingdeadlibs.api.config.PDLConfigManager;
 import com.portingdeadmods.portingdeadlibs.api.resources.DynamicPack;
 import com.portingdeadmods.portingdeadlibs.api.utils.IOAction;
 import com.portingdeadmods.researchd.api.research.Research;
@@ -23,6 +25,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
@@ -105,6 +108,27 @@ public final class Researchd {
 
         PDLConfigHelper.registerConfig(ResearchdConfig.Common.class, ModConfig.Type.COMMON, modContainer);
         PDLConfigHelper.registerConfig(ResearchdConfig.Server.class, ModConfig.Type.SERVER, modContainer);
+        modEventBus.addListener(ModConfigEvent.Loading.class, Researchd::onConfigLoaded);
+        modEventBus.addListener(ModConfigEvent.Reloading.class, Researchd::onConfigLoaded);
+    }
+
+    /**
+     * Copies loaded config values into the {@code @ConfigValue} fields. PDL 1.1.8 only does this for configs
+     * owned by PDL itself: its listener sits on PDL's mod bus, while our config events fire on ours.
+     */
+    private static void onConfigLoaded(ModConfigEvent event) {
+        PDLConfig config = PDLConfigManager.CONFIGS.get(event.getConfig().getSpec());
+        if (config == null) return;
+
+        for (String path : config.getConfigPaths()) {
+            try {
+                config.getValue(path)
+                        .field()
+                        .set(null, config.getSpecValue(path).get());
+            } catch (IllegalAccessException e) {
+                LOGGER.error("Failed to apply config value {}", path, e);
+            }
+        }
     }
 
     private void addPackFinders(AddPackFindersEvent event) {
