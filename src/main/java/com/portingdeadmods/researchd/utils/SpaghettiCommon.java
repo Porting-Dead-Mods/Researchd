@@ -6,7 +6,7 @@ import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 public final class SpaghettiCommon {
     public static Level tryGetLevel() {
-        if (FMLEnvironment.dist.isClient()) {
+        if (FMLEnvironment.getDist().isClient()) {
             return SpaghettiClient.getClientLevel();
         } else {
             return ServerLifecycleHooks.getCurrentServer().overworld();

@@ -1,28 +1,28 @@
 package com.portingdeadmods.researchd.client.screens.lib.widgets;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
 import org.jetbrains.annotations.NotNull;
 
 public class PDLButton extends AbstractButton {
     public static final WidgetSprites SPRITES = new WidgetSprites(
-            ResourceLocation.withDefaultNamespace("widget/button"),
-            ResourceLocation.withDefaultNamespace("widget/button_disabled"),
-            ResourceLocation.withDefaultNamespace("widget/button_highlighted"));
+            Identifier.withDefaultNamespace("widget/button"),
+            Identifier.withDefaultNamespace("widget/button_disabled"),
+            Identifier.withDefaultNamespace("widget/button_highlighted"));
     protected static final Button.CreateNarration DEFAULT_NARRATION = Supplier::get;
     private final PDLButton.OnPress<PDLButton> onPress;
     private final Button.CreateNarration createNarration;
@@ -57,24 +57,20 @@ public class PDLButton extends AbstractButton {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        Minecraft minecraft = Minecraft.getInstance();
-        guiGraphics.setColor(1.0F, 1.0F, 1.0F, this.alpha);
-        RenderSystem.enableBlend();
-        RenderSystem.enableDepthTest();
+    protected void extractContents(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         guiGraphics.blitSprite(
+                RenderPipelines.GUI_TEXTURED,
                 this.sprites.get(this.active, this.isHoveredOrFocused()),
                 this.getX(),
                 this.getY(),
                 this.getWidth(),
-                this.getHeight());
-        guiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
-        int i = getFGColor();
-        this.renderString(guiGraphics, minecraft.font, i | Mth.ceil(this.alpha * 255.0F) << 24);
+                this.getHeight(),
+                ARGB.white(this.alpha));
+        this.extractDefaultLabel(guiGraphics.textRendererForWidget(this, GuiGraphicsExtractor.HoveredTextEffects.NONE));
     }
 
     @Override
-    public void onPress() {
+    public void onPress(InputWithModifiers input) {
         this.onPress.onPress(this);
     }
 

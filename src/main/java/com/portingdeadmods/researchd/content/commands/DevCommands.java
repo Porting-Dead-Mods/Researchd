@@ -3,7 +3,6 @@ package com.portingdeadmods.researchd.content.commands;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.api.research.ResearchInteractionType;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import java.util.List;
@@ -17,20 +16,21 @@ import net.minecraft.commands.arguments.item.ItemArgument;
 import net.minecraft.commands.arguments.item.ItemInput;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.*;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.context.ContextMap;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.display.SlotDisplayContext;
 import net.minecraft.world.level.Level;
 
 public class DevCommands {
     public static LiteralCommandNode<CommandSourceStack> build(CommandBuildContext context) {
         return Commands.literal("dev")
-                .requires(p -> p.hasPermission(2))
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("recipes-dump")
                         .then(Commands.literal("results")
                                 .then(Commands.argument("item", ItemArgument.item(context))
@@ -69,47 +69,43 @@ public class DevCommands {
 
     private static int dumpCurrentDimension(CommandContext<CommandSourceStack> ctx) {
         Level level = ctx.getSource().getLevel();
-        String dimensionId = level.dimension().location().toString();
+        String dimensionId = level.dimension().identifier().toString();
         ctx.getSource()
                 .sendSystemMessage(Component.literal("Current Dimension: ")
                         .append(Component.literal(dimensionId).withStyle(ChatFormatting.GREEN))
                         .withStyle(Style.EMPTY
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, dimensionId))
-                                .withHoverEvent(new HoverEvent(
-                                        HoverEvent.Action.SHOW_TEXT,
-                                        Component.literal("Click to copy dimension ID")))));
+                                .withClickEvent(new ClickEvent.CopyToClipboard(dimensionId))
+                                .withHoverEvent(
+                                        new HoverEvent.ShowText(Component.literal("Click to copy dimension ID")))));
         return 1;
     }
 
     private static int dumpAllDimensions(CommandContext<CommandSourceStack> ctx) {
-        List<ResourceLocation> levels =
-                ctx.getSource().levels().stream().map(ResourceKey::location).toList();
+        List<Identifier> levels =
+                ctx.getSource().levels().stream().map(ResourceKey::identifier).toList();
         ctx.getSource()
                 .sendSystemMessage(Component.literal("Found ")
                         .append(Component.literal(String.valueOf(levels.size())).withStyle(ChatFormatting.GREEN))
                         .append(Component.literal(" Dimension" + (levels.size() == 1 ? "" : "s") + ":"))
                         .withStyle(Style.EMPTY
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, levels.toString()))
-                                .withHoverEvent(new HoverEvent(
-                                        net.minecraft.network.chat.HoverEvent.Action.SHOW_TEXT,
+                                .withClickEvent(new ClickEvent.CopyToClipboard(levels.toString()))
+                                .withHoverEvent(new HoverEvent.ShowText(
                                         Component.literal("Click to copy all dimension IDs")))));
-        for (ResourceLocation dimensionId : levels) {
+        for (Identifier dimensionId : levels) {
             ctx.getSource()
                     .sendSystemMessage(Component.literal("- " + dimensionId)
                             .withStyle(ChatFormatting.GRAY)
                             .withStyle(Style.EMPTY
-                                    .withClickEvent(
-                                            new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, dimensionId.toString()))
-                                    .withHoverEvent(new HoverEvent(
-                                            net.minecraft.network.chat.HoverEvent.Action.SHOW_TEXT,
-                                            Component.literal("Click to copy dimension ID")))));
+                                    .withClickEvent(new ClickEvent.CopyToClipboard(dimensionId.toString()))
+                                    .withHoverEvent(
+                                            new HoverEvent.ShowText(Component.literal("Click to copy dimension ID")))));
         }
         return 1;
     }
 
     private static int dumpRecipes(CommandContext<CommandSourceStack> ctx, DumpRecipesMode mode) {
         ItemInput item = ctx.getArgument("item", ItemInput.class);
-        return findAndDisplayRecipes(ctx.getSource(), mode, item.getItem());
+        return findAndDisplayRecipes(ctx.getSource(), mode, item.item().value());
     }
 
     private static int findAndDisplayRecipes(CommandSourceStack source, DumpRecipesMode mode, Item item) {
@@ -119,7 +115,7 @@ public class DevCommands {
             return 0;
         }
 
-        RecipeManager recipeManager = source.getLevel().getRecipeManager();
+        RecipeManager recipeManager = source.getLevel().recipeAccess();
         List<RecipeHolder<?>> matchingRecipes = findRecipes(recipeManager, item, mode, source);
 
         if (matchingRecipes.isEmpty()) {
@@ -135,55 +131,28 @@ public class DevCommands {
     private static List<RecipeHolder<?>> findRecipes(
             RecipeManager recipeManager, Item item, DumpRecipesMode mode, CommandSourceStack source) {
 
+        ContextMap displayContext = SlotDisplayContext.fromLevel(source.getLevel());
         Predicate<RecipeHolder<?>> filter =
                 switch (mode) {
-                    case RESULTS ->
-                        recipeHolder -> {
-                            Recipe<?> recipe = recipeHolder.value();
-                            ItemStack result =
-                                    recipe.getResultItem(source.getLevel().registryAccess());
-                            return !result.isEmpty() && result.is(item);
-                        };
-                    case CONTAINS ->
-                        recipeHolder -> {
-                            Recipe<?> recipe = recipeHolder.value();
-                            UniqueArray<ItemStack> ingredients = new UniqueArray<>();
-                            recipe.getIngredients().forEach(ingredient -> {
-                                ingredients.addAll(ingredient.getItems());
-                            });
-
-                            for (ItemStack ingredient : ingredients) {
-                                if (ingredient.is(item)) {
-                                    return true;
-                                }
-                            }
-                            return false;
-                        };
+                    case RESULTS -> recipeHolder -> resultIs(recipeHolder.value(), item, displayContext);
+                    case CONTAINS -> recipeHolder -> ingredientsContain(recipeHolder.value(), item);
                     case ALL ->
-                        recipeHolder -> {
-                            Recipe<?> recipe = recipeHolder.value();
-                            ItemStack result =
-                                    recipe.getResultItem(source.getLevel().registryAccess());
-
-                            boolean resultMatches = !result.isEmpty() && result.is(item);
-
-                            if (resultMatches) return true;
-
-                            UniqueArray<ItemStack> ingredients = new UniqueArray<>();
-                            recipe.getIngredients().forEach(ingredient -> {
-                                ingredients.addAll(ingredient.getItems());
-                            });
-
-                            for (ItemStack ingredient : ingredients) {
-                                if (ingredient.is(item)) {
-                                    return true;
-                                }
-                            }
-                            return false;
-                        };
+                        recipeHolder -> resultIs(recipeHolder.value(), item, displayContext)
+                                || ingredientsContain(recipeHolder.value(), item);
                 };
 
         return recipeManager.getRecipes().stream().filter(filter).toList();
+    }
+
+    private static boolean resultIs(Recipe<?> recipe, Item item, ContextMap displayContext) {
+        return recipe.display().stream()
+                .flatMap(display -> display.result().resolveForStacks(displayContext).stream())
+                .anyMatch(result -> result.is(item));
+    }
+
+    private static boolean ingredientsContain(Recipe<?> recipe, Item item) {
+        return recipe.placementInfo().ingredients().stream()
+                .anyMatch(ingredient -> ingredient.items().anyMatch(holder -> holder.value() == item));
     }
 
     private static void displayRecipes(
@@ -208,7 +177,7 @@ public class DevCommands {
         builder.append("List.of(\n");
 
         for (RecipeHolder<?> recipeHolder : matchingRecipes) {
-            builder.append("new RecipeUnlockEffect(ResourceLocation.parse(");
+            builder.append("new RecipeUnlockEffect(Identifier.parse(");
             String recipeId = recipeHolder.id().toString();
             builder.append('"').append(recipeId).append('"');
             builder.append(matchingRecipes.indexOf(recipeHolder) == matchingRecipes.size() - 1 ? "))\n" : ")),\n");
@@ -231,10 +200,8 @@ public class DevCommands {
                                 item.getDefaultInstance().getHoverName().getString())
                         .withStyle(ChatFormatting.GREEN))
                 .setStyle(Style.EMPTY
-                        .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, builder.toString()))
-                        .withHoverEvent(new HoverEvent(
-                                net.minecraft.network.chat.HoverEvent.Action.SHOW_TEXT,
-                                Component.literal("Click to copy recipes ID"))));
+                        .withClickEvent(new ClickEvent.CopyToClipboard(builder.toString()))
+                        .withHoverEvent(new HoverEvent.ShowText(Component.literal("Click to copy recipes ID"))));
 
         sendMessageFunc.accept(recipeIdsComponent);
     }

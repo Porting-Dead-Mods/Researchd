@@ -2,8 +2,8 @@ plugins {
     id 'idea'
     id 'java-library'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version '1.0.23'
-    id 'com.diffplug.spotless' version '7.2.1'
+    id 'net.neoforged.moddev' version '2.0.147'
+    id 'com.diffplug.spotless' version '8.10.2'
 
     id 'net.darkhax.curseforgegradle' version '1.1.28'
     id "com.modrinth.minotaur" version "2.+"
@@ -20,27 +20,20 @@ repositories {
     mavenLocal()
     mavenCentral()
 
-    maven { url 'https://jitpack.io' }
-    maven { url 'https://api.modrinth.com/maven' }
-    maven { url "https://maven.latvian.dev/releases" }
-    maven {
-        name = "TerraformersMC"
-        url = "https://maven.terraformersmc.com/"
-    }
+    maven { url = 'https://jitpack.io' }
+    maven { url = 'https://api.modrinth.com/maven' }
+    maven { url = 'https://maven.latvian.dev/releases' }
 
+    // Jared's maven (JEI) and cursemaven (FTB) are kept for when those integrations come back.
     maven {
         name = "Jared's maven"
         url = "https://maven.blamejared.com/"
     }
 
-    // COMPAT //
-    maven { url = "https://maven.createmod.net/" } // Create
-    maven { url = "https://maven.ithundxr.dev/snapshots" } // Registrate
-
     exclusiveContent {
         forRepository {
             maven {
-                url "https://cursemaven.com"
+                url = "https://cursemaven.com"
             }
         }
         filter {
@@ -53,15 +46,31 @@ base {
     archivesName = mod_id
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+
+// Integrations left out of the 26.1 build. Their code stays in the tree:
+// - EMI, Immersive Engineering and Create have no 26.1.2 build yet
+// - JEI and FTB Teams / FTB Library come back once their compat is ported to 26.1
+sourceSets.main.java {
+    exclude 'com/portingdeadmods/researchd/compat/EMICompat.java'
+    exclude 'com/portingdeadmods/researchd/compat/JEICompat.java'
+    exclude 'com/portingdeadmods/researchd/compat/ftbteams/**'
+    exclude 'com/portingdeadmods/researchd/compat/immersiveengineering/**'
+    exclude 'com/portingdeadmods/researchd/compat/jei/**'
+    exclude 'com/portingdeadmods/researchd/mixins/create/**'
+    exclude 'com/portingdeadmods/researchd/mixins/immersiveengineering/**'
+}
+
+// GameTests live in their own source set so they never ship in the mod jar.
+sourceSets {
+    gametest {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+}
 
 neoForge {
     version = project.neo_version
-
-    parchment {
-        mappingsVersion = project.parchment_mappings_version
-        minecraftVersion = project.parchment_minecraft_version
-    }
 
     runs {
         client {
@@ -86,11 +95,14 @@ neoForge {
 
         gameTestServer {
             type = "gameTestServer"
+            sourceSet = sourceSets.gametest
+            // Its own game directory, so only the GameTest KubeJS scripts load, not the dev client's
+            gameDirectory = project.file('run/gametest')
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
         data {
-            data()
+            clientData()
 
             programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
         }
@@ -105,11 +117,21 @@ neoForge {
     mods {
         "${mod_id}" {
             sourceSet(sourceSets.main)
+            sourceSet(sourceSets.gametest)
         }
     }
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+var syncGameTestKubeJSScripts = tasks.register('syncGameTestKubeJSScripts', Sync) {
+    from 'src/gametest/kubejs/server_scripts'
+    into 'run/gametest/kubejs/server_scripts'
+}
+
+tasks.named('runGameTestServer').configure {
+    dependsOn syncGameTestKubeJSScripts
+}
 
 configurations {
     runtimeClasspath.extendsFrom localRuntime
@@ -119,44 +141,19 @@ dependencies {
     implementation "com.github.Porting-Dead-Mods:Porting-Dead-Libs:${pdl_version}"
     //implementation files("pdl_cicd/portingdeadlibs-${pdl_version}-1.21.1.jar") // Local Deploy
 
-    compileOnly "curse.maven:ftb-teams-forge-404468:7209616"
-    compileOnly "curse.maven:architectury-api-419699:5786327"
-    compileOnly "curse.maven:ftb-library-forge-404465:7182154"
+    // Integration dependencies are out for now; see the source set excludes above.
+    // JEI runs in the dev client without Researchd's compat, which comes back once it's ported to 26.1.
+    localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
 
-    if (enable_ftb.toBoolean()) {
-        // FTB Teams n Dependencies
-        localRuntime "curse.maven:ftb-teams-forge-404468:7209616"
-        localRuntime "curse.maven:architectury-api-419699:5786327"
-        localRuntime "curse.maven:ftb-library-forge-404465:7182154"
-    }
-
-    // KUBEJS
+    // KubeJS stays optional: compat code only touches its classes once it's loaded.
     compileOnly "dev.latvian.mods:kubejs-neoforge:${kubejs_version}"
-    compileOnly "dev.latvian.mods:rhino-neoforge:${rhino_version}"
+    compileOnly "dev.latvian.mods:rhino:${rhino_version}"
     localRuntime "dev.latvian.mods:kubejs-neoforge:${kubejs_version}"
-    localRuntime "dev.latvian.mods:rhino-neoforge:${rhino_version}"
-
-    // JEI
-    compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
-    compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
-    //localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}" // Don't load both JEI and EMI
-
-    // EMI
-    compileOnly "dev.emi:emi-neoforge:${emi_version}:api"
-    runtimeOnly "dev.emi:emi-neoforge:${emi_version}" // Don't load both JEI and EMI
+    localRuntime "dev.latvian.mods:rhino:${rhino_version}"
 
     // JADE
     compileOnly "maven.modrinth:jade:${jade_version}"
     localRuntime "maven.modrinth:jade:${jade_version}"
-
-    //runtimeOnly "curse.maven:ender-io-64578:7134432"
-
-    // COMPAT //
-    compileOnly "blusunrize.immersiveengineering:ImmersiveEngineering:${ie_version}"
-    localRuntime "blusunrize.immersiveengineering:ImmersiveEngineering:${ie_version}"
-
-    compileOnly "com.simibubi.create:create-1.21.1:${create_version}"
-    localRuntime "com.simibubi.create:create-1.21.1:${create_version}"
 }
 
 def parts = pdl_version.tokenize('.')
@@ -168,7 +165,6 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             minecraft_version_range: minecraft_version_range,
             neo_version            : neo_version,
             neo_version_range      : neo_version_range,
-            loader_version_range   : loader_version_range,
             mod_id                 : mod_id,
             mod_name               : mod_name,
             mod_license            : mod_license,
@@ -196,7 +192,7 @@ publishing {
     }
     repositories {
         maven {
-            url "file://${project.projectDir}/repo"
+            url = "file://${project.projectDir}/repo"
         }
     }
 }
@@ -211,7 +207,7 @@ spotless {
     java {
         target 'src/main/java/**/*.java'
 
-        palantirJavaFormat()
+        palantirJavaFormat('2.75.0') // runs on Java 25; 2.80+ would reformat text blocks
         removeUnusedImports()
         formatAnnotations()
         trimTrailingWhitespace()
@@ -236,7 +232,7 @@ idea {
 }
 
 if (System.getenv('CURSEFORGE_TOKEN')) {
-    task curseforge(type: net.darkhax.curseforgegradle.TaskPublishCurseForge) {
+    tasks.register('curseforge', net.darkhax.curseforgegradle.TaskPublishCurseForge) {
 
         apiToken = System.getenv('CURSEFORGE_TOKEN')
         disableVersionDetection()

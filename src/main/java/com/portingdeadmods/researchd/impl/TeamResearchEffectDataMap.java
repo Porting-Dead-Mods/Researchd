@@ -54,6 +54,7 @@ public class TeamResearchEffectDataMap implements ResearchEffectManager, SavedDa
 
     @Override
     public void setChanged() {
+        FilteredRecipeLists.effectDataChanged();
         if (this.onChangedFunction != null) {
             this.onChangedFunction.run();
         }
@@ -64,7 +65,7 @@ public class TeamResearchEffectDataMap implements ResearchEffectManager, SavedDa
     public <T extends ResearchEffectData<?>> void sync(UUID teamId, ResearchEffectDataType<T> type) {
         T effectData = this.getEffectData(teamId, type);
         if (effectData != null) {
-            PacketDistributor.sendToAllPlayers(new SyncEffectDataPayload(teamId, effectData));
+            PacketDistributor.sendToAllPlayers(SyncEffectDataPayload.snapshot(teamId, effectData));
         }
     }
 
@@ -85,10 +86,12 @@ public class TeamResearchEffectDataMap implements ResearchEffectManager, SavedDa
 
     public void setEffectData(UUID teamId, ResearchEffectData<?> effectData) {
         this.map.computeIfAbsent(teamId, k -> new HashMap<>()).put(effectData.type(), effectData);
+        FilteredRecipeLists.effectDataChanged();
     }
 
     @Override
     public void clearTeam(UUID teamId) {
         this.map.remove(teamId);
+        FilteredRecipeLists.effectDataChanged();
     }
 }

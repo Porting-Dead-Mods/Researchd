@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.WidgetSprites;
@@ -20,8 +20,9 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
@@ -46,8 +47,9 @@ public class TagCreationWidget extends AbstractLayoutWidget<Layout> {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+    protected void extractWidgetRenderState(
+            GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.extractWidgetRenderState(guiGraphics, mouseX, mouseY, partialTick);
 
         this.itemRenderer.render(guiGraphics, this.getX() + 20, this.getY() + 20);
         this.itemRenderer.tick(partialTick);
@@ -61,9 +63,9 @@ public class TagCreationWidget extends AbstractLayoutWidget<Layout> {
             this.tagEditBox.setValue("#" + newVal);
         }
         Optional<HolderSet.Named<Item>> _tag =
-                BuiltInRegistries.ITEM.getTag(TagKey.create(Registries.ITEM, ResourceLocation.parse(newVal)));
+                BuiltInRegistries.ITEM.get(TagKey.create(Registries.ITEM, Identifier.parse(newVal)));
         if (_tag.isEmpty()) {
-            this.tagEditBox.setTextColor(ChatFormatting.RED.getColor());
+            this.tagEditBox.setTextColor(ARGB.opaque(ChatFormatting.RED.getColor()));
             this.itemRenderer.setItems(List.of());
             this.valid = false;
             this.parentPopupWidget.doneButton.active = false;
@@ -97,8 +99,7 @@ public class TagCreationWidget extends AbstractLayoutWidget<Layout> {
     public TagKey<Item> createTag() {
         if (this.valid) {
             return TagKey.create(
-                    Registries.ITEM,
-                    ResourceLocation.parse(this.tagEditBox.getValue().substring(1)));
+                    Registries.ITEM, Identifier.parse(this.tagEditBox.getValue().substring(1)));
         }
         return null;
     }

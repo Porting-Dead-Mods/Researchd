@@ -9,19 +9,19 @@ import com.portingdeadmods.researchd.registries.ResearchdItems;
 import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 
 public class ResearchdResearches implements ResearchdResearchProvider {
-    public static final ResourceLocation COBBLESTONE_LOC = Researchd.rl("cobblestone");
-    public static final ResourceLocation OVERWORLD_PACK_LOC = Researchd.rl("overworld_pack");
-    public static final ResourceLocation NETHER_LOC = Researchd.rl("nether");
-    public static final ResourceLocation END_LOC = Researchd.rl("the_end");
-    public static final ResourceLocation END_CRYSTAL_LOC = Researchd.rl("end_crystal");
-    public static final ResourceLocation BEACON_LOC = Researchd.rl("beacon");
-    public static final ResourceLocation STONE_LOC = Researchd.rl("stone");
-    public static final ResourceLocation DIFFERENT_ROCKS_LOC = Researchd.rl("different_rocks");
+    public static final Identifier COBBLESTONE_LOC = Researchd.rl("cobblestone");
+    public static final Identifier OVERWORLD_PACK_LOC = Researchd.rl("overworld_pack");
+    public static final Identifier NETHER_LOC = Researchd.rl("nether");
+    public static final Identifier END_LOC = Researchd.rl("the_end");
+    public static final Identifier END_CRYSTAL_LOC = Researchd.rl("end_crystal");
+    public static final Identifier BEACON_LOC = Researchd.rl("beacon");
+    public static final Identifier STONE_LOC = Researchd.rl("stone");
+    public static final Identifier DIFFERENT_ROCKS_LOC = Researchd.rl("different_rocks");
 
     private final String modid;
     private final Map<ResourceKey<Research>, Research> researches;

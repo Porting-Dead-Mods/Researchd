@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.client.screens.research.graph.lines;
 
 import com.portingdeadmods.researchd.Researchd;
 import java.awt.*;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Renderable;
 
 /**
@@ -51,16 +51,16 @@ public class LineSegment implements Renderable {
         return start.y == end.y;
     }
 
-    public void render(GuiGraphics guiGraphics, int color) {
+    public void render(GuiGraphicsExtractor guiGraphics, int color) {
         if (isVertical()) {
-            guiGraphics.vLine(start.x, Math.min(start.y, end.y), Math.max(start.y, end.y), color);
+            guiGraphics.verticalLine(start.x, Math.min(start.y, end.y), Math.max(start.y, end.y), color);
         } else if (isHorizontal()) {
-            guiGraphics.hLine(Math.min(start.x, end.x), Math.max(start.x, end.x), start.y, color);
+            guiGraphics.horizontalLine(Math.min(start.x, end.x), Math.max(start.x, end.x), start.y, color);
         }
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int i1, float v) {
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int i, int i1, float v) {
         render(guiGraphics, -1);
     }
 }

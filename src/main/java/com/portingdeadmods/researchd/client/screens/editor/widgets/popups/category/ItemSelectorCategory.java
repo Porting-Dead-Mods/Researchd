@@ -7,7 +7,6 @@ import java.util.function.Consumer;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
 
 public interface ItemSelectorCategory {
     boolean exists();
@@ -28,14 +27,15 @@ public interface ItemSelectorCategory {
         }
     }
 
-    default Ingredient getSelected(AbstractWidget widget) {
+    /** The stacks picked in the body widget, or an empty list if none were */
+    default List<ItemStack> getSelected(AbstractWidget widget) {
         if (widget instanceof ItemSelectorPopupWidget.SelectorContainerWidget containerWidget) {
             List<ItemStack> selectedItems = containerWidget.getSelectedItems();
             if (selectedItems != null) {
-                return Ingredient.of(selectedItems.stream());
+                return selectedItems;
             }
         }
-        return Ingredient.EMPTY;
+        return List.of();
     }
 
     default void setItems(AbstractWidget widget, Collection<ItemStack> items) {

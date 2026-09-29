@@ -163,7 +163,7 @@ public final class ResearchTeamHelperServer {
             team.getSocialManager().removeSentInvite(requesterId);
             team.setChanged();
 
-            PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
+            PacketDistributor.sendToAllPlayers(SyncTeamPayload.snapshot(team));
 
             refreshPlayerManagement(team, level);
             // PacketDistributor.sendToPlayer(requester, new RefreshResearchesPayload());
@@ -183,12 +183,12 @@ public final class ResearchTeamHelperServer {
                 requester.sendSystemMessage(
                         ResearchdTranslations.component(ResearchdTranslations.Team.IGNORE, team.getName()));
 
-            PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
+            PacketDistributor.sendToAllPlayers(SyncTeamPayload.snapshot(team));
         }
     }
 
     public static void handleLeaveTeam(@NotNull ServerPlayer requester, @Nullable UUID nextToLead) {
-        MinecraftServer server = requester.getServer();
+        MinecraftServer server = requester.level().getServer();
         ServerLevel level = server.overworld();
         UUID requesterId = requester.getUUID();
 
@@ -242,7 +242,7 @@ public final class ResearchTeamHelperServer {
     }
 
     public static void handleManageMember(@NotNull ServerPlayer requester, UUID member, boolean remove) {
-        MinecraftServer server = requester.getServer();
+        MinecraftServer server = requester.level().getServer();
         ServerLevel level = server.overworld();
         ResearchTeamMap teamManager = (ResearchTeamMap) ResearchdApi.getTeamManager(level);
 
@@ -265,7 +265,7 @@ public final class ResearchTeamHelperServer {
                 // Remove member and put them into a default team with a status message
 
                 team.removeMember(member);
-                PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
+                PacketDistributor.sendToAllPlayers(SyncTeamPayload.snapshot(team));
 
                 if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                     requester.sendSystemMessage(ResearchdTranslations.component(
@@ -283,7 +283,7 @@ public final class ResearchTeamHelperServer {
                 // Invite Member
 
                 team.getSocialManager().addSentInvite(member);
-                PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
+                PacketDistributor.sendToAllPlayers(SyncTeamPayload.snapshot(team));
             }
 
             refreshPlayerManagement(team, level);
@@ -296,11 +296,11 @@ public final class ResearchTeamHelperServer {
     private static void createTeamForPlayerSynced(Level level, UUID member, ResearchTeamManager teamManager) {
         ResearchTeamImpl newTeam = (ResearchTeamImpl) teamManager.createDefaultTeam(member, level);
         teamManager.addTeam(newTeam);
-        PacketDistributor.sendToAllPlayers(new AddTeamPayload(newTeam));
+        PacketDistributor.sendToAllPlayers(AddTeamPayload.snapshot(newTeam));
     }
 
     public static void handleManageModerator(@NotNull ServerPlayer requester, UUID moderator, boolean remove) {
-        MinecraftServer server = requester.getServer();
+        MinecraftServer server = requester.level().getServer();
         ServerLevel level = server.overworld();
 
         // Error Safety (handling yourself)
@@ -327,7 +327,7 @@ public final class ResearchTeamHelperServer {
                                 ResearchdTranslations.Team.PROMOTED,
                                 PlayerUtils.getPlayerNameFromUUID(level, moderator)));
                 }
-                PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
+                PacketDistributor.sendToAllPlayers(SyncTeamPayload.snapshot(team));
 
                 refreshPlayerManagement(team, level);
             } else {
@@ -342,7 +342,7 @@ public final class ResearchTeamHelperServer {
 
     public static void handleSetName(@NotNull ServerPlayer requester, String name) {
         UUID requesterId = requester.getUUID();
-        MinecraftServer server = requester.getServer();
+        MinecraftServer server = requester.level().getServer();
         ServerLevel level = server.overworld();
         ResearchTeamMap teamManager = (ResearchTeamMap) ResearchdApi.getTeamManager(level);
 
@@ -362,7 +362,7 @@ public final class ResearchTeamHelperServer {
                 requester.sendSystemMessage(
                         ResearchdTranslations.component(ResearchdTranslations.Team.NEW_TEAM_NAME, oldname, name));
 
-            PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
+            PacketDistributor.sendToAllPlayers(SyncTeamPayload.snapshot(team));
             refreshPlayerManagement(team, level);
         } else {
             if (!ResearchdCompatHandler.isFTBTeamsEnabled())
@@ -371,7 +371,7 @@ public final class ResearchTeamHelperServer {
     }
 
     public static void handleTransferOwnership(@NotNull ServerPlayer requester, UUID nextToLead) {
-        MinecraftServer server = requester.getServer();
+        MinecraftServer server = requester.level().getServer();
         ServerLevel level = server.overworld();
         UUID requesterId = requester.getUUID();
         ResearchTeamMap teamManager = (ResearchTeamMap) ResearchdApi.getTeamManager(level);
@@ -387,7 +387,7 @@ public final class ResearchTeamHelperServer {
                 // Set the old leader as moderator
                 team.setRole(requesterId, ResearchTeamRole.MODERATOR);
 
-                PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
+                PacketDistributor.sendToAllPlayers(SyncTeamPayload.snapshot(team));
 
                 if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                     requester.sendSystemMessage(ResearchdTranslations.component(
@@ -428,7 +428,7 @@ public final class ResearchTeamHelperServer {
         ResearchTeamImpl team = (ResearchTeamImpl) getTeamByMember(requester);
         if (team == null) return;
 
-        ServerLevel level = requester.serverLevel();
+        ServerLevel level = requester.level();
 
         // Error Safety (inviting yourself)
         if (requester.getUUID().equals(invited)) {
@@ -442,7 +442,7 @@ public final class ResearchTeamHelperServer {
                 requester.sendSystemMessage(ResearchdTranslations.component(
                         ResearchdTranslations.Team.REMOVED_INVITE, AllPlayersCache.getName(invited)));
             team.setChanged();
-            PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
+            PacketDistributor.sendToAllPlayers(SyncTeamPayload.snapshot(team));
         } else {
             team.getSocialManager().addSentInvite(invited);
             team.setChanged();
@@ -455,20 +455,18 @@ public final class ResearchTeamHelperServer {
                         .append(Component.literal("\n"))
                         .append("     ")
                         .append(ResearchdTranslations.component(ResearchdTranslations.Team.ACCEPT)
-                                .withStyle(style -> style.withClickEvent(new net.minecraft.network.chat.ClickEvent(
-                                        ClickEvent.Action.RUN_COMMAND,
+                                .withStyle(style -> style.withClickEvent(new ClickEvent.RunCommand(
                                         "/researchd team join " + AllPlayersCache.getName(requester.getUUID())))))
                         .append("     ")
                         .append(ResearchdTranslations.component(ResearchdTranslations.Team.DECLINE)
-                                .withStyle(style -> style.withClickEvent(new net.minecraft.network.chat.ClickEvent(
-                                        ClickEvent.Action.RUN_COMMAND,
+                                .withStyle(style -> style.withClickEvent(new ClickEvent.RunCommand(
                                         "/researchd team ignore " + AllPlayersCache.getName(requester.getUUID()))))));
             }
             if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                 requester.sendSystemMessage(ResearchdTranslations.component(
                         ResearchdTranslations.Team.SENT_INVITE, AllPlayersCache.getName(invited), team.getName()));
 
-            PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
+            PacketDistributor.sendToAllPlayers(SyncTeamPayload.snapshot(team));
         }
 
         refreshPlayerManagement(team, level);
@@ -483,7 +481,7 @@ public final class ResearchTeamHelperServer {
                     : " [no progress]";
             dump.add(Component.literal("┣ Current: ")
                     .withStyle(ChatFormatting.GRAY)
-                    .append(Component.literal(current.location().toString()).withStyle(ChatFormatting.AQUA))
+                    .append(Component.literal(current.identifier().toString()).withStyle(ChatFormatting.AQUA))
                     .append(Component.literal(progressStr).withStyle(ChatFormatting.YELLOW)));
         } else {
             dump.add(Component.literal("┣ Current: ")
@@ -498,7 +496,7 @@ public final class ResearchTeamHelperServer {
             for (int i = 1; i < queueSize; i++) {
                 if (i > 1) queueLine.append(Component.literal(", ").withStyle(ChatFormatting.DARK_GRAY));
                 queueLine.append(
-                        Component.literal(team.getQueue().get(i).location().toString())
+                        Component.literal(team.getQueue().get(i).identifier().toString())
                                 .withStyle(ChatFormatting.AQUA));
             }
             dump.add(queueLine);
@@ -506,14 +504,14 @@ public final class ResearchTeamHelperServer {
 
         List<Map.Entry<ResourceKey<Research>, ResearchInstance>> sorted =
                 new ArrayList<>(team.getResearches().entrySet());
-        sorted.sort(Comparator.comparing(e -> e.getKey().location().toString()));
+        sorted.sort(Comparator.comparing(e -> e.getKey().identifier().toString()));
         dump.add(
                 Component.literal("┣ Researches (%d):".formatted(sorted.size())).withStyle(ChatFormatting.GRAY));
         for (Map.Entry<ResourceKey<Research>, ResearchInstance> entry : sorted) {
             ResearchStatus status = entry.getValue().getResearchStatus();
             dump.add(Component.literal("┣  ")
                     .withStyle(ChatFormatting.GRAY)
-                    .append(Component.literal(entry.getKey().location().toString())
+                    .append(Component.literal(entry.getKey().identifier().toString())
                             .withStyle(ChatFormatting.AQUA))
                     .append(Component.literal(" — ").withStyle(ChatFormatting.DARK_GRAY))
                     .append(Component.literal(status.getSerializedName()).withStyle(statusColor(status))));

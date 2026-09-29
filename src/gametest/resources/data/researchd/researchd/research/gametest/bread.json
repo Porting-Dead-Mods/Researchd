@@ -1,0 +1,7 @@
+{
+  "type": "researchd:simple",
+  "icon": { "type": "researchd:item_research_icon", "items": [{ "id": "minecraft:bread" }] },
+  "method": { "type": "researchd:consume_item", "items": "minecraft:wheat", "count": 1 },
+  "effect": { "type": "researchd:unlock_recipe", "recipes": ["minecraft:bread"] },
+  "requires_parent": false
+}

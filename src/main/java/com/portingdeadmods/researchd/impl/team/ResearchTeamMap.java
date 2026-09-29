@@ -184,7 +184,7 @@ public final class ResearchTeamMap implements ResearchTeamManager, SavedDataMap 
 
     public static void afterSync(Player player) {
         //        Level level = player.level();
-        //        if (level.isClientSide) {
+        //        if (level.isClientSide()) {
         //            ResearchHelperClient.refreshResearches(player);
         //            ClientResearchTeamHelper.resolveInstances(ClientResearchTeamHelper.getTeam());
         //        } else {

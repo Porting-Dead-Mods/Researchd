@@ -1,0 +1,15 @@
+{
+  "type": "researchd:simple",
+  "icon": { "type": "researchd:item_research_icon", "items": [{ "id": "minecraft:white_carpet" }] },
+  "method": { "type": "researchd:consume_item", "items": "minecraft:white_wool", "count": 1 },
+  "effect": {
+    "type": "researchd:and",
+    "effects": [
+      { "type": "researchd:unlock_item", "item": "minecraft:white_carpet" },
+      { "type": "researchd:unlock_item", "item": "minecraft:bamboo_planks" },
+      { "type": "researchd:unlock_item", "item": "minecraft:red_shulker_box" },
+      { "type": "researchd:unlock_item", "item": "minecraft:firework_rocket" }
+    ]
+  },
+  "requires_parent": false
+}

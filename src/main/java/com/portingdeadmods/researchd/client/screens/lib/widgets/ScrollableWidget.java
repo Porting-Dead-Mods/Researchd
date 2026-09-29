@@ -1,11 +1,11 @@
 package com.portingdeadmods.researchd.client.screens.lib.widgets;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.layouts.Layout;
 import net.minecraft.client.gui.layouts.LayoutElement;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
 public class ScrollableWidget<L extends Layout> extends AbstractLayoutWidget<L> {
@@ -52,22 +52,17 @@ public class ScrollableWidget<L extends Layout> extends AbstractLayoutWidget<L> 
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        return super.mouseClicked(mouseX, mouseY, button);
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void extractWidgetRenderState(
+            GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         guiGraphics.enableScissor(
                 this.getX(), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight());
         {
-            PoseStack poseStack = guiGraphics.pose();
-            poseStack.pushPose();
-            {
-                // poseStack.translate(0, -this.scrollOffset, 0);
-                super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
-            }
-            poseStack.popPose();
+            super.extractWidgetRenderState(guiGraphics, mouseX, mouseY, partialTick);
         }
         guiGraphics.disableScissor();
     }

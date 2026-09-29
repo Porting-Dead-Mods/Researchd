@@ -10,8 +10,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.fml.ModList;
 
@@ -108,7 +108,7 @@ public final class KubeJSCompat {
         }
     }
 
-    public static Map<ResourceLocation, Research> getKubeJSResearches() {
+    public static Map<Identifier, Research> getKubeJSResearches() {
         if (!isKubeJSLoaded()) {
             return Map.of();
         }
@@ -120,7 +120,7 @@ public final class KubeJSCompat {
         }
     }
 
-    public static Map<ResourceLocation, ResearchPackImpl> getKubeJSResearchPacks() {
+    public static Map<Identifier, ResearchPackImpl> getKubeJSResearchPacks() {
         if (!isKubeJSLoaded()) {
             return Map.of();
         }

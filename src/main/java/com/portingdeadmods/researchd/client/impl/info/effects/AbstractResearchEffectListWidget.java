@@ -10,9 +10,10 @@ import java.util.List;
 import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.util.FastColor;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.util.ARGB;
 import net.neoforged.neoforge.common.util.Size2i;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,22 +49,22 @@ public abstract class AbstractResearchEffectListWidget<T extends ResearchEffectL
     }
 
     @Override
-    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void extractWidgetRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
         int x = getX();
         int y = getY();
         Size2i firstSize = getSizeFor(1, false);
-        guiGraphics.fill(x, y, x + this.width, y + firstSize.height, FastColor.ARGB32.color(92, 92, 92));
+        guiGraphics.fill(x, y, x + this.width, y + firstSize.height, ARGB.color(92, 92, 92));
 
         List<? extends ResearchEffect> effects = value.effects();
         for (int i = 0; i < effects.size(); i++) {
             if (i < this.effects.size()) {
-                this.effects.get(i).render(guiGraphics, mouseX, mouseY, partialTicks);
+                this.effects.get(i).extractRenderState(guiGraphics, mouseX, mouseY, partialTicks);
             }
             float padding = getPadding();
             if (i > 0 && i - 1 != effects.size()) {
                 int xSize1 = (int) (getSizeFor(i, false).width + (i - 1) * padding);
                 int ySize = (this.height - Minecraft.getInstance().font.lineHeight) / 2;
-                guiGraphics.drawCenteredString(
+                guiGraphics.centeredText(
                         Minecraft.getInstance().font,
                         getSeparatorText(),
                         (int) (x + xSize1 + getPadding() / 2),
@@ -74,7 +75,7 @@ public abstract class AbstractResearchEffectListWidget<T extends ResearchEffectL
     }
 
     @Override
-    public void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void renderTooltip(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
         for (AbstractResearchInfoWidget<? extends ResearchEffect> researchEffect : this.effects) {
             researchEffect.renderTooltip(guiGraphics, mouseX, mouseY, partialTicks);
         }
@@ -147,10 +148,10 @@ public abstract class AbstractResearchEffectListWidget<T extends ResearchEffectL
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         for (AbstractResearchInfoWidget<? extends ResearchEffect> effect : this.effects) {
             if (effect.isHovered()) {
-                return effect.mouseClicked(mouseX, mouseY, button);
+                return effect.mouseClicked(event, doubleClick);
             }
         }
         return false;

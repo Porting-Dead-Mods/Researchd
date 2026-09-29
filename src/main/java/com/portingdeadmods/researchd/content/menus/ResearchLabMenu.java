@@ -1,6 +1,7 @@
 package com.portingdeadmods.researchd.content.menus;
 
 import com.google.common.collect.ImmutableList;
+import com.portingdeadmods.portingdeadlibs.api.data.transfer.PDLItemStacksHandler;
 import com.portingdeadmods.portingdeadlibs.api.gui.menus.PDLAbstractContainerMenu;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
@@ -13,7 +14,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.SlotItemHandler;
+import net.neoforged.neoforge.transfer.item.ResourceHandlerSlot;
 import org.jetbrains.annotations.NotNull;
 
 public class ResearchLabMenu extends PDLAbstractContainerMenu<ResearchLabControllerBE> {
@@ -32,7 +33,7 @@ public class ResearchLabMenu extends PDLAbstractContainerMenu<ResearchLabControl
         Researchd.debug(
                 "Research Lab Menu",
                 "Creating Research Lab Menu with ",
-                blockEntity.getItemHandler().getSlots(),
+                blockEntity.getItemHandler().size(),
                 " slots.");
 
         // The pack list is filled in on load, and the handler is resized to match it there. Both can lag
@@ -50,10 +51,11 @@ public class ResearchLabMenu extends PDLAbstractContainerMenu<ResearchLabControl
 
         int slotCount = Math.min(
                 this.researchPackItems.size(),
-                this.getBlockEntity().getItemHandler().getSlots());
+                this.getBlockEntity().getItemHandler().size());
         for (int i = 0; i < slotCount; i++) {
             int slotX = slotsX + i * 18;
-            Slot slot = new SlotItemHandler(this.getBlockEntity().getItemHandler(), i, slotX, slotsY);
+            PDLItemStacksHandler handler = this.getBlockEntity().getItemHandler();
+            Slot slot = new ResourceHandlerSlot(handler, handler::set, i, slotX, slotsY);
             x.add(slotX);
             s.add(slot);
 

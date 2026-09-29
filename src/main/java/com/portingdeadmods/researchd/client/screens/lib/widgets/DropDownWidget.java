@@ -7,15 +7,17 @@ import java.util.List;
 import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.layouts.LayoutElement;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 
 public abstract class DropDownWidget<P extends LayoutElement> implements GuiEventListener {
     private P parent;
@@ -39,7 +41,7 @@ public abstract class DropDownWidget<P extends LayoutElement> implements GuiEven
 
     protected abstract void buildOptions();
 
-    protected ResourceLocation getBackgroundTexture() {
+    protected Identifier getBackgroundTexture() {
         return Researchd.rl("dropdown_background");
     }
 
@@ -60,7 +62,7 @@ public abstract class DropDownWidget<P extends LayoutElement> implements GuiEven
         return hovered;
     }
 
-    public void render(GuiGraphics guiGraphics, int x, int y, int mouseX, int mouseY, float partialTicks) {
+    public void render(GuiGraphicsExtractor guiGraphics, int x, int y, int mouseX, int mouseY, float partialTicks) {
         if (!this.visible || this.options == null || this.options.isEmpty()) return;
 
         int width = 4;
@@ -72,7 +74,7 @@ public abstract class DropDownWidget<P extends LayoutElement> implements GuiEven
             height += option.height() + 2;
         }
 
-        guiGraphics.blitSprite(this.getBackgroundTexture(), x, y, width, height);
+        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, this.getBackgroundTexture(), x, y, width, height);
 
         // render background
         int curHeight = 0;
@@ -89,9 +91,9 @@ public abstract class DropDownWidget<P extends LayoutElement> implements GuiEven
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         if (hoveredOption != null && !this.options.isEmpty()) {
-            optionClicked(hoveredOption, (int) mouseX, (int) mouseY);
+            optionClicked(hoveredOption, (int) event.x(), (int) event.y());
             this.playDownSound(Minecraft.getInstance().getSoundManager());
         }
         return false;
@@ -139,7 +141,7 @@ public abstract class DropDownWidget<P extends LayoutElement> implements GuiEven
         default void clicked(int mouseX, int mouseY) {}
 
         void render(
-                GuiGraphics guiGraphics,
+                GuiGraphicsExtractor guiGraphics,
                 int x,
                 int y,
                 int mouseX,
@@ -172,7 +174,7 @@ public abstract class DropDownWidget<P extends LayoutElement> implements GuiEven
 
         @Override
         public void render(
-                GuiGraphics guiGraphics,
+                GuiGraphicsExtractor guiGraphics,
                 int x,
                 int y,
                 int mouseX,
@@ -181,14 +183,10 @@ public abstract class DropDownWidget<P extends LayoutElement> implements GuiEven
                 OptionContext context) {
             if (this.isHovered(x, y, mouseX, mouseY, context)) {
                 guiGraphics.fill(
-                        x - 1,
-                        y - 1,
-                        x + context.maxWidth() - 1,
-                        y + this.height() + 1,
-                        FastColor.ARGB32.color(120, 120, 120));
+                        x - 1, y - 1, x + context.maxWidth() - 1, y + this.height() + 1, ARGB.color(120, 120, 120));
             }
 
-            guiGraphics.drawString(this.font(), this.value(), x, y, -1);
+            guiGraphics.text(this.font(), this.value(), x, y, -1);
         }
     }
 }

@@ -5,6 +5,7 @@ import com.portingdeadmods.researchd.ResearchdConfig;
 import com.portingdeadmods.researchd.client.cache.ResearchGraphCache;
 import com.portingdeadmods.researchd.client.cache.ResearchTeamCache;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
+import java.net.URI;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.ClickEvent;
@@ -29,20 +30,17 @@ public class ResearchdLifecycleHandler {
                     .append(ResearchdTranslations.Game.GITHUB
                             .component(Researchd.MODID)
                             .withStyle(Style.EMPTY
-                                    .withClickEvent(new ClickEvent(
-                                            ClickEvent.Action.OPEN_URL,
-                                            "https://github.com/Porting-Dead-Mods/Researchd"))
-                                    .withHoverEvent(new HoverEvent(
-                                            HoverEvent.Action.SHOW_TEXT, Component.literal("Go to the GitHub page")))))
+                                    .withClickEvent(new ClickEvent.OpenUrl(
+                                            URI.create("https://github.com/Porting-Dead-Mods/Researchd")))
+                                    .withHoverEvent(
+                                            new HoverEvent.ShowText(Component.literal("Go to the GitHub page")))))
                     .append(Component.literal("\n> ").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.BOLD))
                     .append(ResearchdTranslations.Game.WIKI
                             .component(Researchd.MODID)
                             .withStyle(Style.EMPTY
-                                    .withClickEvent(new ClickEvent(
-                                            ClickEvent.Action.OPEN_URL,
-                                            "https://porting-dead-mods.github.io/Researchd/"))
-                                    .withHoverEvent(new HoverEvent(
-                                            HoverEvent.Action.SHOW_TEXT, Component.literal("Go to the Wiki"))))));
+                                    .withClickEvent(new ClickEvent.OpenUrl(
+                                            URI.create("https://porting-dead-mods.github.io/Researchd/")))
+                                    .withHoverEvent(new HoverEvent.ShowText(Component.literal("Go to the Wiki"))))));
         }
     }
 

@@ -25,8 +25,8 @@ import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -42,7 +42,7 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
     private final TeamSocialManagerImpl socialManager;
 
     private final TeamResearches researches;
-    private final Map<ResourceLocation, Float> effects;
+    private final Map<Identifier, Float> effects;
 
     private Runnable onChangedFunction;
 
@@ -71,7 +71,7 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
             t -> t.socialManager,
             TeamResearches.STREAM_CODEC,
             t -> t.researches,
-            ByteBufCodecs.map(HashMap::new, ResourceLocation.STREAM_CODEC, ByteBufCodecs.FLOAT),
+            ByteBufCodecs.map(HashMap::new, Identifier.STREAM_CODEC, ByteBufCodecs.FLOAT),
             t -> t.effects,
             ResearchTeamImpl::new);
 
@@ -89,7 +89,7 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
                 ResearchdCodecUtils.decodeMap(m, UUID::fromString),
                 socialManager,
                 tr,
-                ResearchdCodecUtils.decodeMap(e, ResourceLocation::parse),
+                ResearchdCodecUtils.decodeMap(e, Identifier::parse),
                 creationTime);
     }
 
@@ -99,7 +99,7 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
             Map<UUID, TeamMember> members,
             TeamSocialManagerImpl socialManager,
             TeamResearches teamResearches,
-            Map<ResourceLocation, Float> effects,
+            Map<Identifier, Float> effects,
             Long creationTime) {
         this.name = name;
         this.id = id;
@@ -119,7 +119,7 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
             Map<UUID, TeamMember> members,
             TeamSocialManagerImpl socialManager,
             TeamResearches teamResearches,
-            Map<ResourceLocation, Float> effects) {
+            Map<Identifier, Float> effects) {
         this.name = name;
         this.id = id;
         this.creationTime = LazyFinal.create();
@@ -245,7 +245,7 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
         for (TeamMember member : this.getMembers()) {
             Player memberPlayer = playerGetter.apply(member.player());
             if (memberPlayer instanceof ServerPlayer sp) {
-                PacketDistributor.sendToPlayer(sp, new SyncTeamPayload(this));
+                PacketDistributor.sendToPlayer(sp, SyncTeamPayload.snapshot(this));
             }
         }
 
@@ -297,7 +297,7 @@ public class ResearchTeamImpl implements ResearchTeam, ValueEffectsHolder {
         if (level == null || research == null) return;
 
         research.researchEffect().onLock(level, this, researchKey);
-        PacketDistributor.sendToAllPlayers(new SyncTeamPayload(this));
+        PacketDistributor.sendToAllPlayers(SyncTeamPayload.snapshot(this));
     }
 
     @Override

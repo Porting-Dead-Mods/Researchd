@@ -9,9 +9,10 @@ import java.util.List;
 import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.util.FastColor;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.util.ARGB;
 import net.neoforged.neoforge.common.util.Size2i;
 import org.jetbrains.annotations.NotNull;
 
@@ -45,20 +46,20 @@ public abstract class AbstractResearchMethodListWidget<T extends ResearchMethodL
     }
 
     @Override
-    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void extractWidgetRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
         int x = getX();
         int y = getY();
         Size2i firstSize = getSizeFor(1, false);
-        guiGraphics.fill(x, y, x + this.width, y + firstSize.height, FastColor.ARGB32.color(109, 109, 109));
+        guiGraphics.fill(x, y, x + this.width, y + firstSize.height, ARGB.color(109, 109, 109));
 
         List<? extends ResearchMethod> methods = value.methods();
         for (int i = 0; i < methods.size(); i++) {
-            this.methods.get(i).render(guiGraphics, mouseX, mouseY, partialTicks);
+            this.methods.get(i).extractRenderState(guiGraphics, mouseX, mouseY, partialTicks);
             float padding = getPadding();
             if (i > 0 && i - 1 != methods.size()) {
                 int xSize1 = (int) (getSizeFor(i, false).width + (i - 1) * padding);
                 int ySize = (this.height - Minecraft.getInstance().font.lineHeight) / 2 + 1;
-                guiGraphics.drawCenteredString(
+                guiGraphics.centeredText(
                         Minecraft.getInstance().font,
                         getSeparatorText(),
                         (int) (x + xSize1 + getPadding() / 2),
@@ -69,7 +70,7 @@ public abstract class AbstractResearchMethodListWidget<T extends ResearchMethodL
     }
 
     @Override
-    public void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void renderTooltip(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
         for (AbstractResearchInfoWidget<? extends ResearchMethod> researchMethod : this.methods) {
             researchMethod.renderTooltip(guiGraphics, mouseX, mouseY, partialTicks);
         }
@@ -139,10 +140,10 @@ public abstract class AbstractResearchMethodListWidget<T extends ResearchMethodL
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         for (AbstractResearchInfoWidget<? extends ResearchMethod> method : this.methods) {
             if (method.isHovered()) {
-                return method.mouseClicked(mouseX, mouseY, button);
+                return method.mouseClicked(event, doubleClick);
             }
         }
         return false;

@@ -19,10 +19,13 @@ public interface PackWriter {
                     "description": {
                       "text": "%s"
                     },
-                    "pack_format": %d
+                    "min_format": %2$d,
+                    "max_format": %2$d
                   }
                 }
                 """
-                .formatted(desc, SharedConstants.getCurrentVersion().getPackVersion(type));
+                .formatted(
+                        desc,
+                        SharedConstants.getCurrentVersion().packVersion(type).major());
     }
 }

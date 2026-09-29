@@ -14,8 +14,8 @@ import java.util.List;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 
 public record AndResearchEffect(List<ResearchEffect> effects) implements ResearchEffectList {
@@ -30,7 +30,7 @@ public record AndResearchEffect(List<ResearchEffect> effects) implements Researc
 
     public static final ResearchEffectSerializer<AndResearchEffect> SERIALIZER =
             ResearchEffectSerializer.simple(CODEC, STREAM_CODEC);
-    public static final ResourceLocation ID = Researchd.rl("and");
+    public static final Identifier ID = Researchd.rl("and");
 
     @Override
     public void onUnlock(Level level, ResearchTeam team, ResourceKey<Research> research) {
@@ -47,7 +47,7 @@ public record AndResearchEffect(List<ResearchEffect> effects) implements Researc
     }
 
     @Override
-    public ResourceLocation id() {
+    public Identifier id() {
         return ID;
     }
 

@@ -1,7 +1,7 @@
 package com.portingdeadmods.researchd.client.screens.lib.widgets;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ImageButton;
 
 public class PDLImageButton extends ImageButton {
@@ -11,11 +11,11 @@ public class PDLImageButton extends ImageButton {
     }
 
     @Override
-    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+    public void extractContents(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.extractContents(guiGraphics, mouseX, mouseY, partialTick);
 
         if (this.isHovered() && !this.getMessage().getString().isEmpty()) {
-            guiGraphics.renderTooltip(Minecraft.getInstance().font, this.getMessage(), mouseX, mouseY);
+            guiGraphics.setTooltipForNextFrame(Minecraft.getInstance().font, this.getMessage(), mouseX, mouseY);
         }
     }
 

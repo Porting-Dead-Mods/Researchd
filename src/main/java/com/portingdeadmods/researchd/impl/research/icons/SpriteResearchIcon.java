@@ -5,21 +5,21 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.research.ResearchIcon;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchIconSerializer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
-public record SpriteResearchIcon(ResourceLocation sprite, int width, int height) implements ResearchIcon {
+public record SpriteResearchIcon(Identifier sprite, int width, int height) implements ResearchIcon {
     public static final ResearchIconSerializer<SpriteResearchIcon> SERIALIZER =
             ResearchIconSerializer.simple(RecordCodecBuilder.mapCodec(inst -> inst.group(
-                            ResourceLocation.CODEC.fieldOf("sprite").forGetter(SpriteResearchIcon::sprite),
+                            Identifier.CODEC.fieldOf("sprite").forGetter(SpriteResearchIcon::sprite),
                             Codec.INT.fieldOf("width").forGetter(SpriteResearchIcon::width),
                             Codec.INT.fieldOf("height").forGetter(SpriteResearchIcon::height))
                     .apply(inst, SpriteResearchIcon::new)));
-    public static final ResourceLocation ID = Researchd.rl("sprite_research_icon");
+    public static final Identifier ID = Researchd.rl("sprite_research_icon");
     public static final SpriteResearchIcon EMPTY =
             SpriteResearchIcon.spriteIcon(Researchd.MODID, "missing_sprite", 16, 16);
 
     @Override
-    public ResourceLocation id() {
+    public Identifier id() {
         return ID;
     }
 
@@ -30,7 +30,7 @@ public record SpriteResearchIcon(ResourceLocation sprite, int width, int height)
 
     public static SpriteResearchIcon spriteIcon(String namespace, String path, int width, int height) {
         return new SpriteResearchIcon(
-                ResourceLocation.fromNamespaceAndPath(namespace, "textures/gui/sprites/icon_sprites/" + path + ".png"),
+                Identifier.fromNamespaceAndPath(namespace, "textures/gui/sprites/icon_sprites/" + path + ".png"),
                 width,
                 height);
     }

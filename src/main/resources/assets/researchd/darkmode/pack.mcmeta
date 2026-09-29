@@ -1,6 +1,7 @@
 {
   "pack": {
     "description": "Dark Mode for Researchd's UI",
-    "pack_format": 48
+    "min_format": 84,
+    "max_format": 84
   }
 }

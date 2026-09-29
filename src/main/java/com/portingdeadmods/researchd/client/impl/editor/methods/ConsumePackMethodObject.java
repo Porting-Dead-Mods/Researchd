@@ -29,7 +29,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Unit;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
 
@@ -69,7 +68,7 @@ public class ConsumePackMethodObject implements TypedEditorObject<ConsumePackRes
                         0,
                         25,
                         24,
-                        Ingredient.of(defaultSelectedPack),
+                        List.of(defaultSelectedPack),
                         this::createItemSelectorPopup),
                 LayoutSettings::alignHorizontallyCenter);
         packSelector.setResponder(i -> this.update(layout, context));
@@ -137,11 +136,11 @@ public class ConsumePackMethodObject implements TypedEditorObject<ConsumePackRes
     @Override
     public ConsumePackResearchMethod create(RememberingLinearLayout layout) {
         String time = layout.getChild("time", EditBox.class).getValue();
-        Ingredient selectedPack =
-                layout.getChild("pack_selector", ItemSelectorWidget.class).getSelected();
+        ItemStack selectedPack = layout.getChild("pack_selector", ItemSelectorWidget.class)
+                .getSelectedStacks()
+                .getFirst();
         return new ConsumePackResearchMethod(
                 List.of(selectedPack
-                        .getItems()[0]
                         .get(ResearchdDataComponents.RESEARCH_PACK)
                         .researchPackKey()
                         .get()),
@@ -151,12 +150,12 @@ public class ConsumePackMethodObject implements TypedEditorObject<ConsumePackRes
 
     @Override
     public Result<Unit, Exception> valid(RememberingLinearLayout layout) {
-        Ingredient selectedPack =
-                layout.getChild("pack_selector", ItemSelectorWidget.class).getSelected();
-        if (selectedPack.isEmpty()
-                || !selectedPack.getItems()[0].has(ResearchdDataComponents.RESEARCH_PACK)
-                || selectedPack
-                        .getItems()[0]
+        List<ItemStack> selectedPacks =
+                layout.getChild("pack_selector", ItemSelectorWidget.class).getSelectedStacks();
+        if (selectedPacks.isEmpty()
+                || !selectedPacks.getFirst().has(ResearchdDataComponents.RESEARCH_PACK)
+                || selectedPacks
+                        .getFirst()
                         .get(ResearchdDataComponents.RESEARCH_PACK)
                         .researchPackKey()
                         .isEmpty()) {

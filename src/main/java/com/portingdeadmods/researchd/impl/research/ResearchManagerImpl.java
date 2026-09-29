@@ -13,8 +13,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -23,14 +23,14 @@ public final class ResearchManagerImpl implements ResearchManager {
     private static ResearchManagerImpl instance;
 
     private List<ResourceKey<Research>> researches = ImmutableList.of();
-    private List<ResourceLocation> pageIds = ImmutableList.of();
+    private List<Identifier> pageIds = ImmutableList.of();
     private Map<ResourceKey<Research>, ResearchRelations> researchRelations = ImmutableMap.of();
-    private Map<ResourceLocation, ResearchPage> researchPages = ImmutableMap.of();
+    private Map<Identifier, ResearchPage> researchPages = ImmutableMap.of();
 
     /**
      * Map of ResearchPage id to list of root nodes (GlobalResearches with no parents within that page)
      */
-    private Map<ResourceLocation, List<ResourceKey<Research>>> pageRoots;
+    private Map<Identifier, List<ResourceKey<Research>>> pageRoots;
 
     @Deprecated
     private @Nullable ResearchRelations rootResearch;
@@ -70,8 +70,8 @@ public final class ResearchManagerImpl implements ResearchManager {
                     Researchd.error(
                             "Research Manager",
                             "Research %s has a parent %s that does not exist. It will be treated as if it had no such parent.",
-                            research.getResearchKey().location(),
-                            parent.location());
+                            research.getResearchKey().identifier(),
+                            parent.identifier());
                     continue;
                 }
 
@@ -105,18 +105,18 @@ public final class ResearchManagerImpl implements ResearchManager {
         researchRelations = ImmutableMap.copyOf(globalResearchMap);
 
         // Build research pages
-        Map<ResourceLocation, UniqueArray<ResearchRelations>> pageGroups = new LinkedHashMap<>();
+        Map<Identifier, UniqueArray<ResearchRelations>> pageGroups = new LinkedHashMap<>();
         for (ResearchRelations research : globalResearchMap.values()) {
-            ResourceLocation pageId = resolvePage(research, researchLookup);
+            Identifier pageId = resolvePage(research, researchLookup);
             pageGroups.computeIfAbsent(pageId, k -> new UniqueArray<>()).add(research);
         }
 
         // Build page roots map and convert page groups to ResearchPage objects
-        Map<ResourceLocation, ResearchPage> pagesMap = new LinkedHashMap<>();
-        Map<ResourceLocation, List<ResourceKey<Research>>> pageRootsMap = new LinkedHashMap<>();
+        Map<Identifier, ResearchPage> pagesMap = new LinkedHashMap<>();
+        Map<Identifier, List<ResourceKey<Research>>> pageRootsMap = new LinkedHashMap<>();
 
-        for (Map.Entry<ResourceLocation, UniqueArray<ResearchRelations>> entry : pageGroups.entrySet()) {
-            ResourceLocation pageId = entry.getKey();
+        for (Map.Entry<Identifier, UniqueArray<ResearchRelations>> entry : pageGroups.entrySet()) {
+            Identifier pageId = entry.getKey();
             UniqueArray<ResearchRelations> researches = entry.getValue();
 
             // Find all root nodes for this page (researches with no parents within this page)
@@ -141,26 +141,25 @@ public final class ResearchManagerImpl implements ResearchManager {
         this.pageRoots = ImmutableMap.copyOf(pageRootsMap);
     }
 
-    private static ResourceLocation resolvePage(
-            ResearchRelations research, Map<ResourceKey<Research>, Research> lookup) {
+    private static Identifier resolvePage(ResearchRelations research, Map<ResourceKey<Research>, Research> lookup) {
         Research r = lookup.get(research.getResearchKey());
         if (r == null) return ResearchPage.DEFAULT_PAGE_ID;
 
-        ResourceLocation pageId = r.researchPage();
+        Identifier pageId = r.researchPage();
 
         // If this is not root and has default page, inherit from parent
         if (!research.getParents().isEmpty() && pageId.equals(ResearchPage.DEFAULT_PAGE_ID)) {
             ResearchRelations firstParent =
                     research.getParents().stream().findFirst().get();
-            ResourceLocation page = resolvePage(firstParent, lookup);
+            Identifier page = resolvePage(firstParent, lookup);
 
             for (ResearchRelations parent : research.getParents()) {
-                ResourceLocation parentPage = resolvePage(parent, lookup);
+                Identifier parentPage = resolvePage(parent, lookup);
                 if (!parentPage.equals(page)) {
                     Researchd.error(
                             "Research Manager",
                             "Research %s has parents on different pages (%s and %s), using %s.",
-                            research.getResearchKey().location(),
+                            research.getResearchKey().identifier(),
                             page,
                             parentPage,
                             page);
@@ -194,17 +193,17 @@ public final class ResearchManagerImpl implements ResearchManager {
     /* Research Pages */
 
     @Override
-    public List<ResourceLocation> getPageIds() {
+    public List<Identifier> getPageIds() {
         return pageIds;
     }
 
     @Override
-    public List<ResourceKey<Research>> getRootsForPage(ResourceLocation pageId) {
+    public List<ResourceKey<Research>> getRootsForPage(Identifier pageId) {
         return this.pageRoots.get(pageId);
     }
 
     @Override
-    public ResearchPage getPageForId(ResourceLocation pageId) {
+    public ResearchPage getPageForId(Identifier pageId) {
         return this.researchPages.get(pageId);
     }
 

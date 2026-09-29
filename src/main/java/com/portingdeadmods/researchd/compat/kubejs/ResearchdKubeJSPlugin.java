@@ -1,7 +1,5 @@
 package com.portingdeadmods.researchd.compat.kubejs;
 
-import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
-import com.portingdeadmods.researchd.compat.immersiveengineering.RdImmersiveEngineering;
 import com.portingdeadmods.researchd.compat.kubejs.helpers.ResearchEffectHelper;
 import com.portingdeadmods.researchd.compat.kubejs.helpers.ResearchMethodHelper;
 import dev.latvian.mods.kubejs.event.EventGroupRegistry;
@@ -19,9 +17,6 @@ public final class ResearchdKubeJSPlugin implements KubeJSPlugin {
         bindings.add("ResearchEffectHelper", ResearchEffectHelper.class);
         bindings.add("ResearchMethodHelper", ResearchMethodHelper.class);
 
-        // COMPAT //
-
-        // Immersive Engineering
-        if (ResearchdCompatHandler.isIELoaded()) bindings.add("RdImmersiveEngineering", RdImmersiveEngineering.class);
+        // TODO(26.1 port, Immersive Engineering): bind RdImmersiveEngineering again once IE has a 26.1.2 build
     }
 }

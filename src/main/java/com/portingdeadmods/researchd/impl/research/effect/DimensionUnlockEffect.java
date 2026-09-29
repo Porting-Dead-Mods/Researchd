@@ -16,33 +16,32 @@ import com.portingdeadmods.researchd.registries.ResearchdEffectDataTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
 
-public record DimensionUnlockEffect(ResourceLocation dimension, ResourceLocation dimensionIconSprite)
-        implements ResearchEffect {
-    public static final ResourceLocation ID = Researchd.rl("dimension_unlock");
+public record DimensionUnlockEffect(Identifier dimension, Identifier dimensionIconSprite) implements ResearchEffect {
+    public static final Identifier ID = Researchd.rl("dimension_unlock");
 
-    public static final ResourceLocation DEFAULT_SPRITE = Researchd.rl("dimension_icons/default");
-    public static final ResourceLocation OVERWORLD_SPRITE = Researchd.rl("dimension_icons/overworld");
-    public static final ResourceLocation NETHER_SPRITE = Researchd.rl("dimension_icons/nether");
-    public static final ResourceLocation END_SPRITE = Researchd.rl("dimension_icons/end");
+    public static final Identifier DEFAULT_SPRITE = Researchd.rl("dimension_icons/default");
+    public static final Identifier OVERWORLD_SPRITE = Researchd.rl("dimension_icons/overworld");
+    public static final Identifier NETHER_SPRITE = Researchd.rl("dimension_icons/nether");
+    public static final Identifier END_SPRITE = Researchd.rl("dimension_icons/end");
 
     private static final MapCodec<DimensionUnlockEffect> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                    ResourceLocation.CODEC.fieldOf("dimension").forGetter(DimensionUnlockEffect::dimension),
-                    ResourceLocation.CODEC
+                    Identifier.CODEC.fieldOf("dimension").forGetter(DimensionUnlockEffect::dimension),
+                    Identifier.CODEC
                             .optionalFieldOf("icon_sprite", DEFAULT_SPRITE)
                             .forGetter(DimensionUnlockEffect::dimensionIconSprite))
             .apply(instance, DimensionUnlockEffect::new));
 
     private static final StreamCodec<RegistryFriendlyByteBuf, DimensionUnlockEffect> STREAM_CODEC =
             StreamCodec.composite(
-                    ResourceLocation.STREAM_CODEC,
+                    Identifier.STREAM_CODEC,
                     DimensionUnlockEffect::dimension,
-                    ResourceLocation.STREAM_CODEC,
+                    Identifier.STREAM_CODEC,
                     DimensionUnlockEffect::dimensionIconSprite,
                     DimensionUnlockEffect::new);
 
@@ -74,7 +73,7 @@ public record DimensionUnlockEffect(ResourceLocation dimension, ResourceLocation
     }
 
     @Override
-    public ResourceLocation id() {
+    public Identifier id() {
         return ID;
     }
 

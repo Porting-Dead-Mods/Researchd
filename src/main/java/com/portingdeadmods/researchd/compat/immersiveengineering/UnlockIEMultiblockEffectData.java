@@ -6,7 +6,7 @@ import com.portingdeadmods.researchd.api.research.effects.SimpleStringEffectData
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectDataType;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class UnlockIEMultiblockEffectData extends SimpleStringEffectData<UnlockIEMultiblockEffect> {
     public static final MapCodec<UnlockIEMultiblockEffectData> CODEC =
@@ -31,7 +31,7 @@ public class UnlockIEMultiblockEffectData extends SimpleStringEffectData<UnlockI
         return effect.multiblock().toString();
     }
 
-    public boolean isBlocked(ResourceLocation multiblock) {
+    public boolean isBlocked(Identifier multiblock) {
         return contains(multiblock.toString());
     }
 

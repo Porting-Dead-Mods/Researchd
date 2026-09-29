@@ -1,44 +1,37 @@
 package com.portingdeadmods.researchd.client.screens.lab;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.api.client.screens.PDLAbstractContainerScreen;
 import com.portingdeadmods.portingdeadlibs.api.client.screens.widgets.AbstractScroller;
 import com.portingdeadmods.portingdeadlibs.client.screens.widgets.EnergyBarWidget;
-import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
+import com.portingdeadmods.portingdeadlibs.impl.wrappers.NeoEnergyHandlerWrapper;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.ResearchdApi;
 import com.portingdeadmods.researchd.api.research.ResearchInstance;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
-import com.portingdeadmods.researchd.client.screens.RdZIndex;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
 import com.portingdeadmods.researchd.content.blockentities.ResearchLabControllerBE;
 import com.portingdeadmods.researchd.content.menus.ResearchLabMenu;
 import com.portingdeadmods.researchd.impl.ResearchProgress;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperClient;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
-import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
-import net.minecraft.util.Mth;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.client.event.ContainerScreenEvent;
-import net.neoforged.neoforge.common.NeoForge;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
 public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMenu> {
-    public static final ResourceLocation BACKGROUND_TEXTURE = Researchd.rl("textures/gui/research_lab.png");
-    public static final ResourceLocation RESEARCH_PACK_TEXTURE = Researchd.rl("textures/item/research_pack_empty.png");
-    public static final ResourceLocation SLOT_SPRITE = Researchd.rl("slot_with_progress");
-    public static final int PROGRESS_COLOR = FastColor.ARGB32.color(0, 225, 100);
+    public static final Identifier BACKGROUND_TEXTURE = Researchd.rl("textures/gui/research_lab.png");
+    public static final int BACKGROUND_TEXTURE_SIZE = 256;
+    public static final Identifier RESEARCH_PACK_TEXTURE = Researchd.rl("textures/item/research_pack_empty.png");
+    public static final Identifier SLOT_SPRITE = Researchd.rl("slot_with_progress");
+    public static final int PROGRESS_COLOR = ARGB.color(0, 225, 100);
     public static final int PROGRESS_BAR_WIDTH = 105;
     public static final int SLOT_WIDTH = 18;
     public static final int SLOT_HEIGHT = 20;
@@ -49,6 +42,7 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
     public static final int SCROLLER_TRACK_LENGTH = 154;
     public static final int ENERGY_BAR_X_OFFSET = 4;
     public static final int ENERGY_BAR_Y_OFFSET = 18;
+    public static final int GHOST_PACK_OVERLAY_COLOR = ARGB.color(195, 139, 139, 139);
 
     private final AbstractScroller scroller =
             new AbstractScroller(
@@ -77,9 +71,7 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
             };
 
     public ResearchLabScreen(ResearchLabMenu menu, Inventory playerInventory, Component title) {
-        super(menu, playerInventory, title);
-        this.imageWidth = 176;
-        this.imageHeight = 198;
+        super(menu, playerInventory, title, 176, 198);
         this.titleLabelX = 8;
         this.titleLabelY = 6;
         this.inventoryLabelX = 8;
@@ -96,107 +88,49 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
             this.addRenderableWidget(new EnergyBarWidget(
                     this.leftPos + this.imageWidth + ENERGY_BAR_X_OFFSET,
                     this.topPos + ENERGY_BAR_Y_OFFSET,
-                    this.menu.getBlockEntity(),
+                    new NeoEnergyHandlerWrapper(this.menu.getBlockEntity().getEnergyHandler()),
+                    "FE",
                     true));
         }
     }
 
+    // The Research Pack slots scroll sideways, so they're clipped to the pack row as on 1.21.1
     @Override
-    public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-        renderBackground(pGuiGraphics, pMouseX, pMouseX, pPartialTick);
-        NeoForge.EVENT_BUS.post(new ContainerScreenEvent.Render.Background(this, pGuiGraphics, pMouseX, pMouseY));
-
-        for (Renderable renderable : this.renderables) {
-            renderable.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
-        }
-
-        renderItemsAndSlots(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
-
-        this.scroller.renderWidget(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
-        // Foreground
-        //        this.drawBars(pGuiGraphics);
-
-        renderTooltip(pGuiGraphics, pMouseX, pMouseY);
-    }
-
-    public boolean isHovering(GuiGraphics guiGraphics, Slot slot, double mouseX, double mouseY) {
-        return guiGraphics.containsPointInScissor((int) mouseX, (int) mouseY) && this.isHovering(slot, mouseX, mouseY);
-    }
-
-    private void renderItemsAndSlots(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        RenderSystem.disableDepthTest();
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate((float) this.leftPos, (float) this.topPos, 0.0F);
-        this.hoveredSlot = null;
-
-        int startX = this.leftPos + 7;
-        int startY = this.topPos + 17;
-        guiGraphics.enableScissor(startX, startY, startX + SLOT_WIDTH * 9, startY + this.imageHeight);
-        {
-            for (int k = 0; k < this.menu.slots.size(); ++k) {
-                Slot slot = this.menu.slots.get(k);
-                if (slot.isActive()) {
-                    this.renderSlot(guiGraphics, slot);
-                }
-
-                if (this.isHovering(guiGraphics, slot, mouseX, mouseY) && slot.isActive()) {
-                    this.hoveredSlot = slot;
-                    this.renderSlotHighlight(guiGraphics, slot, mouseX, mouseY, partialTick);
-                }
-            }
-        }
+    protected void extractSlots(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
+        guiGraphics.enableScissor(7, 17, 7 + SLOT_WIDTH * 9, 17 + this.imageHeight);
+        super.extractSlots(guiGraphics, mouseX, mouseY);
         guiGraphics.disableScissor();
+    }
 
-        this.renderLabels(guiGraphics, mouseX, mouseY);
-        NeoForge.EVENT_BUS.post(new ContainerScreenEvent.Render.Foreground(this, guiGraphics, mouseX, mouseY));
-        ItemStack itemstack = this.draggingItem.isEmpty() ? this.menu.getCarried() : this.draggingItem;
-        if (!itemstack.isEmpty()) {
-            int l1 = 8;
-            int i2 = this.draggingItem.isEmpty() ? 8 : 16;
-            String s = null;
-            if (!this.draggingItem.isEmpty() && this.isSplittingStack) {
-                itemstack = itemstack.copyWithCount(Mth.ceil((float) itemstack.getCount() / 2.0F));
-            } else if (this.isQuickCrafting && this.quickCraftSlots.size() > 1) {
-                itemstack = itemstack.copyWithCount(this.quickCraftingRemainder);
-                if (itemstack.isEmpty()) {
-                    s = ChatFormatting.YELLOW + "0";
-                }
-            }
-
-            this.renderFloatingItem(guiGraphics, itemstack, mouseX - this.leftPos - 8, mouseY - this.topPos - i2, s);
-        }
-
-        if (!this.snapbackItem.isEmpty()) {
-            float f = (float) (Util.getMillis() - this.snapbackTime) / 100.0F;
-            if (f >= 1.0F) {
-                f = 1.0F;
-                this.snapbackItem = ItemStack.EMPTY;
-            }
-
-            int j2 = this.snapbackEnd.x - this.snapbackStartX;
-            int k2 = this.snapbackEnd.y - this.snapbackStartY;
-            int j1 = this.snapbackStartX + (int) ((float) j2 * f);
-            int k1 = this.snapbackStartY + (int) ((float) k2 * f);
-            this.renderFloatingItem(guiGraphics, this.snapbackItem, j1, k1, null);
-        }
-
-        guiGraphics.pose().popPose();
-        RenderSystem.enableDepthTest();
+    // A Research Pack slot scrolled out of the pack row can't be hovered
+    @Override
+    public boolean isHovering(Slot slot, double mouseX, double mouseY) {
+        if (!super.isHovering(slot, mouseX, mouseY)) return false;
+        if (!this.menu.labSlots.contains(slot)) return true;
+        int startX = this.leftPos + 7;
+        return mouseX >= startX && mouseX < startX + SLOT_WIDTH * 9;
     }
 
     @Override
-    public void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        super.renderLabels(guiGraphics, mouseX, mouseY);
-    }
-
-    @Override
-    public @NotNull ResourceLocation getBackgroundTexture() {
+    public @NotNull Identifier getBackgroundTexture() {
         return BACKGROUND_TEXTURE;
     }
 
     @Override
-    protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
-        super.renderBg(guiGraphics, partialTick, mouseX, mouseY);
+    public void extractBackground(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+        // TODO(26.1 port, PDL): PDL 1.1.15's PDLAbstractContainerScreen blits the background with the image size as
+        // the texture size, squeezing the whole 256x256 sheet into the screen, so it's blitted here instead
+        guiGraphics.blit(
+                RenderPipelines.GUI_TEXTURED,
+                BACKGROUND_TEXTURE,
+                this.leftPos,
+                this.topPos,
+                0,
+                0,
+                this.imageWidth,
+                this.imageHeight,
+                BACKGROUND_TEXTURE_SIZE,
+                BACKGROUND_TEXTURE_SIZE);
         //
         //        this.botPos = this.topPos + getYSize();
         //        this.rightPos = this.leftPos + getXSize();
@@ -231,6 +165,7 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
         {
             for (int i = 0; i < this.menu.getResearchPackItems().size(); i++) {
                 guiGraphics.blitSprite(
+                        RenderPipelines.GUI_TEXTURED,
                         SLOT_SPRITE,
                         startX + i * SLOT_WIDTH - this.scroller.getScrollOffset(),
                         startY,
@@ -246,16 +181,11 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
                         startX + 1 + i * SLOT_WIDTH + progress - this.scroller.getScrollOffset(),
                         startY + SLOT_WIDTH + 1,
                         PROGRESS_COLOR);
-                RenderSystem.enableBlend();
-                RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 60f / 255f);
-                {
-                    guiGraphics.renderFakeItem(
-                            this.menu.getResearchPackItems().get(i),
-                            startX + i * SLOT_WIDTH + 1 - this.scroller.getScrollOffset(),
-                            startY + 1);
-                }
-                RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-                RenderSystem.disableBlend();
+                // 26.1 GUI items take no tint, so the ghost pack is faded with a slot-coloured overlay instead
+                // of being drawn at 60/255 alpha
+                int itemX = startX + i * SLOT_WIDTH + 1 - this.scroller.getScrollOffset();
+                guiGraphics.fakeItem(this.menu.getResearchPackItems().get(i), itemX, startY + 1);
+                guiGraphics.fill(itemX, startY + 1, itemX + 16, startY + 17, GHOST_PACK_OVERLAY_COLOR);
             }
         }
         guiGraphics.disableScissor();
@@ -269,18 +199,11 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
                     guiGraphics, instance, this.leftPos + 123, this.topPos + 51, mouseX, mouseY, 2, false, false);
 
             if (ResearchScreenWidget.isPanelHovered(this.leftPos + 123, this.topPos + 51, mouseX, mouseY, 2)) {
-                PoseStack pose = guiGraphics.pose();
-
-                pose.pushPose();
-                {
-                    pose.translate(0, 0, RdZIndex.LAB_RESEARCH_TOOLTIP);
-                    guiGraphics.renderTooltip(
-                            Minecraft.getInstance().font,
-                            Component.literal("Open Research in Research Screen"),
-                            mouseX,
-                            mouseY);
-                }
-                pose.popPose();
+                guiGraphics.setTooltipForNextFrame(
+                        Minecraft.getInstance().font,
+                        Component.literal("Open Research in Research Screen"),
+                        mouseX,
+                        mouseY);
             }
         }
 
@@ -291,22 +214,25 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
         int width = (int) (progress * PROGRESS_BAR_WIDTH);
         guiGraphics.fill(x, y, x + width, y + 6, PROGRESS_COLOR);
 
-        guiGraphics.drawCenteredString(
+        guiGraphics.centeredText(
                 Minecraft.getInstance().font,
                 String.valueOf((int) (progress * 100)) + '%',
                 x + 1 + PROGRESS_BAR_WIDTH / 2,
                 y + 9,
-                0xF8F8F8);
+                0xFFF8F8F8);
     }
 
     private int getContentWidth() {
         return SLOT_WIDTH * ResearchHelperClient.getResearchPacks().size();
     }
 
-    private void drawSlot(GuiGraphics guiGraphics, int x, int y) {}
+    private void drawSlot(GuiGraphicsExtractor guiGraphics, int x, int y) {}
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        double mouseX = event.x();
+        double mouseY = event.y();
+        int button = event.button();
         if (ResearchScreenWidget.isPanelHovered(this.leftPos + 123, this.topPos + 51, (int) mouseX, (int) mouseY, 2)) {
             if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
                 ResearchTeam team = ResearchTeamHelperClient.getTeam();
@@ -316,12 +242,12 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
                 }
             }
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+    public boolean mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
+        return super.mouseDragged(event, dragX, dragY);
         // return this.mouseClicked(mouseX, mouseY, 0);
     }
 
@@ -329,18 +255,5 @@ public class ResearchLabScreen extends PDLAbstractContainerScreen<ResearchLabMen
         for (int i = 0; i < this.menu.labSlots.size(); i++) {
             this.menu.labSlots.get(i).x = this.menu.labSlotsX.get(i) - this.scroller.getScrollOffset();
         }
-    }
-
-    private void drawPackSlot(GuiGraphics guiGraphics, int x, int y) {
-        GuiUtils.ShaderChain.create()
-                .grayscale()
-                .drawTo(
-                        guiGraphics,
-                        RESEARCH_PACK_TEXTURE,
-                        this.getGuiLeft() + x,
-                        this.getGuiTop() + y,
-                        16,
-                        16,
-                        GuiUtils.BlendMode.DARKEN);
     }
 }

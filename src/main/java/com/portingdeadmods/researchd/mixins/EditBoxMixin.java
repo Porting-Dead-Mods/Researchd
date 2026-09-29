@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(EditBox.class)
 public class EditBoxMixin implements EditBoxExtension {
     @ModifyExpressionValue(
-            method = "renderWidget",
+            method = "extractWidgetRenderState",
             at =
                     @At(
                             value = "FIELD",

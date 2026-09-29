@@ -37,7 +37,7 @@ public record RequestToJoinPayload(UUID toJoin, boolean remove) implements Custo
     public void handle(IPayloadContext context) {
         context.enqueueWork(() -> {
                     if (context.player() instanceof ServerPlayer sp) {
-                        MinecraftServer server = sp.getServer();
+                        MinecraftServer server = sp.level().getServer();
                         ServerLevel level = server.overworld();
                         Player teamMemberPlayer = level.getPlayerByUUID(this.toJoin());
                         if (teamMemberPlayer != null) {
@@ -51,7 +51,7 @@ public record RequestToJoinPayload(UUID toJoin, boolean remove) implements Custo
                                 team.getSocialManager().addSentInvite(sp.getUUID());
                             }
                             team.setChanged();
-                            PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
+                            PacketDistributor.sendToAllPlayers(SyncTeamPayload.snapshot(team));
                             ResearchTeamHelperServer.refreshPlayerManagement(team, level);
                         } else {
                             sp.sendSystemMessage(Component.literal("The player you're trying to join does not exist!")

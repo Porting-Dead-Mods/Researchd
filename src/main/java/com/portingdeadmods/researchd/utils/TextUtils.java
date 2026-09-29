@@ -5,16 +5,16 @@ import java.util.List;
 import java.util.function.Predicate;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 
 public final class TextUtils {
     /**
      * Draws text wrapped to fit within a maximum width.
      *
-     * @param guiGraphics The GuiGraphics context
+     * @param guiGraphics The GuiGraphicsExtractor context
      * @param component   The text component to draw
      * @param x           X position
      * @param y           Y position
@@ -24,7 +24,13 @@ public final class TextUtils {
      * @return The total height of the rendered text
      */
     public static int drawWrappedText(
-            GuiGraphics guiGraphics, Component component, int x, int y, int maxWidth, int color, boolean dropShadow) {
+            GuiGraphicsExtractor guiGraphics,
+            Component component,
+            int x,
+            int y,
+            int maxWidth,
+            int color,
+            boolean dropShadow) {
         Font font = Minecraft.getInstance().font;
         List<FormattedCharSequence> lines = font.split(component, maxWidth);
 
@@ -32,7 +38,7 @@ public final class TextUtils {
         int currentY = y;
 
         for (FormattedCharSequence line : lines) {
-            guiGraphics.drawString(font, line, x, currentY, color, dropShadow);
+            guiGraphics.text(font, line, x, currentY, color, dropShadow);
             currentY += lineHeight;
         }
 
@@ -42,7 +48,7 @@ public final class TextUtils {
     /**
      * Draws text wrapped to fit within a maximum width with default line height.
      *
-     * @param guiGraphics The GuiGraphics context
+     * @param guiGraphics The GuiGraphicsExtractor context
      * @param component   The text component to draw
      * @param x           X position
      * @param y           Y position
@@ -53,7 +59,7 @@ public final class TextUtils {
      * @return The total height of the rendered text
      */
     public static int drawWrappedText(
-            GuiGraphics guiGraphics,
+            GuiGraphicsExtractor guiGraphics,
             Component component,
             int x,
             int y,
@@ -68,7 +74,7 @@ public final class TextUtils {
         int currentY = y;
 
         for (FormattedCharSequence line : lines) {
-            guiGraphics.drawString(font, line, x, currentY, color, dropShadow);
+            guiGraphics.text(font, line, x, currentY, color, dropShadow);
             currentY += lineHeight;
         }
 
@@ -144,7 +150,7 @@ public final class TextUtils {
     }
 
     public static boolean isValidResourceLocation(String s) {
-        return ResourceLocation.tryBySeparator(s, ':') != null;
+        return Identifier.tryBySeparator(s, ':') != null;
     }
 
     public static String trimSpecialCharacterAndConvertToSnake(String input) {

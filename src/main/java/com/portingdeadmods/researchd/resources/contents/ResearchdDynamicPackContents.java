@@ -12,8 +12,8 @@ import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.resources.ResearchdDatagenProvider;
 import java.util.Map;
 import java.util.function.Function;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Recipe;
 
 public class ResearchdDynamicPackContents {
@@ -44,11 +44,12 @@ public class ResearchdDynamicPackContents {
         ResearchdRecipes provider = providerFactory.apply(Researchd.MODID);
         provider.build();
 
-        for (Map.Entry<ResourceLocation, Recipe<?>> entry :
-                provider.getContents().entrySet()) {
+        for (Map.Entry<Identifier, Recipe<?>> entry : provider.getContents().entrySet()) {
             Recipe<?> recipe = entry.getValue();
             DataResult<JsonElement> result = codec.encodeStart(JsonOps.INSTANCE, recipe);
-            result.ifSuccess(json -> pack.put(entry.getKey().withPrefix(path + "/"), json));
+            result.ifSuccess(json -> pack.put(entry.getKey().withPrefix(path + "/"), json))
+                    .ifError(error -> Researchd.LOGGER.error(
+                            "Failed to encode default {} {}: {}", path, entry.getKey(), error.message()));
         }
     }
 
@@ -60,7 +61,9 @@ public class ResearchdDynamicPackContents {
         for (Map.Entry<ResourceKey<T>, T> entry : provider.contents().entrySet()) {
             T research = entry.getValue();
             DataResult<JsonElement> result = codec.encodeStart(JsonOps.INSTANCE, research);
-            result.ifSuccess(json -> pack.put(entry.getKey().location().withPrefix("researchd/" + path + "/"), json));
+            result.ifSuccess(json -> pack.put(entry.getKey().identifier().withPrefix("researchd/" + path + "/"), json))
+                    .ifError(error -> Researchd.LOGGER.error(
+                            "Failed to encode default {} {}: {}", path, entry.getKey(), error.message()));
         }
     }
 }

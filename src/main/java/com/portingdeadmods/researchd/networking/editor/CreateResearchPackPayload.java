@@ -57,18 +57,22 @@ public record CreateResearchPackPayload(ResourceKey<ResearchPack> key, ResearchP
                             case Result.Ok<Path, ? extends Exception> ignored ->
                                 Researchd.LOGGER.info(
                                         "Successfully wrote researchPack pack {} to datapack {}",
-                                        key.location(),
+                                        key.identifier(),
                                         datapacksDirectoryPath);
                         }
 
                         if (this.reloadData) {
                             ResearchdManagers.getResearchPacksManager(serverPlayer.level())
-                                    .mergeContents(Collections.singletonMap(key.location(), researchPack));
+                                    .mergeContents(Collections.singletonMap(key.identifier(), researchPack));
                             // Reload researches on the server
                             ResearchHelperServer.onReloadResearches(
-                                    serverPlayer.server,
+                                    serverPlayer.level().getServer(),
                                     null,
-                                    serverPlayer.server.getPlayerList().getPlayers());
+                                    serverPlayer
+                                            .level()
+                                            .getServer()
+                                            .getPlayerList()
+                                            .getPlayers());
                             // Reload researches on the client
                             PacketDistributor.sendToPlayer(serverPlayer, new ResearchReloadPayload());
                         }

@@ -35,13 +35,13 @@ public final class ResearchRelations {
 
     public void lock() {
         if (this.children == null) {
-            Researchd.log("Research Relations", "Children set is null for research: " + this.research.location());
+            Researchd.log("Research Relations", "Children set is null for research: " + this.research.identifier());
             this.children = ImmutableSet.of();
         }
         this.children = ImmutableSet.copyOf(this.children);
 
         if (this.parents == null) {
-            Researchd.log("Research Relations", "Parents set is null for research: " + this.research.location());
+            Researchd.log("Research Relations", "Parents set is null for research: " + this.research.identifier());
             this.children = ImmutableSet.of();
         }
         this.parents = ImmutableSet.copyOf(this.parents);

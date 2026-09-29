@@ -15,8 +15,8 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 
 public record IncreaseValueEffect(ValueEffect value, float amount) implements ValueEffectModifierEffect {
@@ -34,7 +34,7 @@ public record IncreaseValueEffect(ValueEffect value, float amount) implements Va
 
     public static final ResearchEffectSerializer<IncreaseValueEffect> SERIALIZER =
             ResearchEffectSerializer.simple(CODEC, STREAM_CODEC);
-    public static final ResourceLocation ID = Researchd.rl("increase_value");
+    public static final Identifier ID = Researchd.rl("increase_value");
 
     @Override
     public String operator() {
@@ -63,7 +63,7 @@ public record IncreaseValueEffect(ValueEffect value, float amount) implements Va
     }
 
     @Override
-    public ResourceLocation id() {
+    public Identifier id() {
         return ID;
     }
 

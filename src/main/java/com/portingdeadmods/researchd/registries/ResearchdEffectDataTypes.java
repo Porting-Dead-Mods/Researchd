@@ -3,7 +3,6 @@ package com.portingdeadmods.researchd.registries;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectDataType;
-import com.portingdeadmods.researchd.compat.immersiveengineering.UnlockIEMultiblockEffectData;
 import com.portingdeadmods.researchd.impl.research.effect.data.DimensionUnlockEffectData;
 import com.portingdeadmods.researchd.impl.research.effect.data.ItemUnlockEffectData;
 import com.portingdeadmods.researchd.impl.research.effect.data.RecipeUnlockEffectData;
@@ -23,7 +22,5 @@ public final class ResearchdEffectDataTypes {
 
     // COMPAT //
 
-    // Immersive Engineering - data only stores ResourceLocations (no IE classes), safe to register unconditionally.
-    public static final Supplier<ResearchEffectDataType<UnlockIEMultiblockEffectData>> IE_MULTIBLOCK_UNLOCK =
-            TYPES.register("ie_multiblock_unlock", () -> UnlockIEMultiblockEffectData.TYPE);
+    // Immersive Engineering ("ie_multiblock_unlock") is out of the 26.1 build until IE has a 26.1.2 release.
 }

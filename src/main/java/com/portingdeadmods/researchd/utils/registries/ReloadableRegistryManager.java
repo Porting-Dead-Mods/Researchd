@@ -3,10 +3,8 @@ package com.portingdeadmods.researchd.utils.registries;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
@@ -18,90 +16,76 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.FileToIdConverter;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import org.jetbrains.annotations.Nullable;
 
-public class ReloadableRegistryManager<T> extends SimpleJsonResourceReloadListener {
+public class ReloadableRegistryManager<T> extends SimpleJsonResourceReloadListener<T> {
     public static final Gson GSON =
             new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     private final HolderLookup.Provider lookup;
     private final ResourceKey<Registry<T>> registry;
-    private final Codec<T> codec;
     private @Nullable Map<ResourceKey<T>, T> byName;
     private boolean failed;
 
     public ReloadableRegistryManager(HolderLookup.Provider lookup, ResourceKey<Registry<T>> registry, Codec<T> codec) {
-        super(GSON, Registries.elementsDirPath(registry));
+        super(codec, FileToIdConverter.registry(registry));
         this.lookup = lookup;
         this.registry = registry;
-        this.codec = codec;
     }
 
     // TODO: Replace with linked hashmap and sort it
+    @SuppressWarnings("unchecked")
     @Override
     protected void apply(
-            Map<ResourceLocation, JsonElement> registryEntries,
-            ResourceManager resourceManager,
-            ProfilerFiller profilerFiller) {
+            Map<Identifier, T> registryEntries, ResourceManager resourceManager, ProfilerFiller profilerFiller) {
         ImmutableMap.Builder<ResourceKey<T>, T> builder = ImmutableMap.builder();
 
-        for (Map.Entry<ResourceLocation, JsonElement> entry : registryEntries.entrySet()) {
-            ResourceLocation location = entry.getKey();
+        for (Map.Entry<Identifier, T> entry : registryEntries.entrySet()) {
+            Identifier location = entry.getKey();
             if (!location.getPath().startsWith("_")) {
-                try {
-                    DataResult<Pair<T, JsonElement>> result =
-                            this.codec.decode(this.makeConditionalOps(), entry.getValue());
-                    ResourceKey<T> key = ResourceKey.create(this.registry, location);
-                    result.ifSuccess(pair -> {
-                        builder.put(key, pair.getFirst());
-                    });
-                } catch (Exception e) {
-                    Researchd.LOGGER.error("Parsing error loading registry entry {}", location, e);
-                }
+                builder.put(ResourceKey.create(this.registry, location), entry.getValue());
             }
         }
 
         if (this.registry.equals(ResearchdRegistries.RESEARCH_KEY)) {
-            Map<ResourceLocation, Research> kubeJSResearches = KubeJSCompat.getKubeJSResearches();
-            for (Map.Entry<ResourceLocation, Research> entry : kubeJSResearches.entrySet()) {
-                ResourceKey<T> key = ResourceKey.create(this.registry, entry.getKey());
-                builder.put(key, (T) entry.getValue());
+            Map<Identifier, Research> kubeJSResearches = KubeJSCompat.getKubeJSResearches();
+            for (Map.Entry<Identifier, Research> entry : kubeJSResearches.entrySet()) {
+                builder.put(ResourceKey.create(this.registry, entry.getKey()), (T) entry.getValue());
             }
             Researchd.LOGGER.info("Loaded {} KubeJS researches", kubeJSResearches.size());
         } else if (this.registry.equals(ResearchdRegistries.RESEARCH_PACK_KEY)) {
-            Map<ResourceLocation, ResearchPackImpl> kubeJSPacks = KubeJSCompat.getKubeJSResearchPacks();
-            for (Map.Entry<ResourceLocation, ResearchPackImpl> entry : kubeJSPacks.entrySet()) {
-                ResourceKey<T> key = ResourceKey.create(this.registry, entry.getKey());
-                builder.put(key, (T) entry.getValue());
+            Map<Identifier, ResearchPackImpl> kubeJSPacks = KubeJSCompat.getKubeJSResearchPacks();
+            for (Map.Entry<Identifier, ResearchPackImpl> entry : kubeJSPacks.entrySet()) {
+                builder.put(ResourceKey.create(this.registry, entry.getKey()), (T) entry.getValue());
             }
-            Researchd.LOGGER.info("Loaded {} KubeJS researchPack packs", kubeJSPacks.size());
+            Researchd.LOGGER.info("Loaded {} KubeJS Research Packs", kubeJSPacks.size());
         }
 
         this.byName = builder.build();
-        Researchd.LOGGER.info("Loaded {} entries for registry {}", this.byName.size(), this.registry.location());
+        Researchd.LOGGER.info("Loaded {} entries for registry {}", this.byName.size(), this.registry.identifier());
     }
 
-    public void replaceContents(Map<ResourceLocation, T> contents) {
+    public void replaceContents(Map<Identifier, T> contents) {
         ImmutableMap.Builder<ResourceKey<T>, T> builder = ImmutableMap.builder();
-        for (Map.Entry<ResourceLocation, T> entry : contents.entrySet()) {
+        for (Map.Entry<Identifier, T> entry : contents.entrySet()) {
             builder.put(ResourceKey.create(this.registry, entry.getKey()), entry.getValue());
         }
         this.byName = builder.build();
     }
 
     // TODO: Fire an event when this happens
-    public void mergeContents(Map<ResourceLocation, T> contents) {
+    public void mergeContents(Map<Identifier, T> contents) {
         Map<ResourceKey<T>, T> newByName = new HashMap<>();
         if (this.byName != null) {
             newByName.putAll(this.byName);
         }
-        for (Map.Entry<ResourceLocation, T> entry : contents.entrySet()) {
+        for (Map.Entry<Identifier, T> entry : contents.entrySet()) {
             newByName.put(ResourceKey.create(this.registry, entry.getKey()), entry.getValue());
         }
         this.byName = ImmutableMap.copyOf(newByName);
@@ -116,9 +100,9 @@ public class ReloadableRegistryManager<T> extends SimpleJsonResourceReloadListen
         return this.byName;
     }
 
-    public Map<ResourceLocation, T> getByName() {
+    public Map<Identifier, T> getByName() {
         return this.getLookup().entrySet().stream()
-                .map(e -> Pair.of(e.getKey().location(), e.getValue()))
+                .map(e -> Pair.of(e.getKey().identifier(), e.getValue()))
                 .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
     }
 

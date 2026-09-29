@@ -20,19 +20,19 @@ public final class ResearchdAttachments {
     public static final Supplier<AttachmentType<UUID>> PLACED_BY_UUID =
             ATTACHMENTS.register("placed_by_uuid", () -> AttachmentType.builder(
                             () -> UUID.fromString("00000000-0000-0000-0000-000000000000"))
-                    .serialize(UUIDUtil.CODEC)
+                    .serialize(UUIDUtil.CODEC.fieldOf("placed_by"))
                     .build());
 
     public static final Supplier<AttachmentType<ResearchInteractionType>> RESEARCH_INTERACTION_TYPE =
             ATTACHMENTS.register(
                     "research_interaction_type", () -> AttachmentType.builder(() -> ResearchInteractionType.DEFAULT)
-                            .serialize(ResearchInteractionType.CODEC)
+                            .serialize(ResearchInteractionType.CODEC.fieldOf("type"))
                             .sync(ResearchInteractionType.STREAM_CODEC)
                             .build());
 
     public static final Supplier<AttachmentType<EditModeSettingsImpl>> EDIT_MODE_SETTINGS =
             ATTACHMENTS.register("edit_mode_settings", () -> AttachmentType.builder(() -> EditModeSettingsImpl.EMPTY)
-                    .serialize(EditModeSettingsImpl.CODEC)
+                    .serialize(EditModeSettingsImpl.CODEC.fieldOf("settings"))
                     .sync(EditModeSettingsImpl.STREAM_CODEC)
                     .build());
 }

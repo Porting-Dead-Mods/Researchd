@@ -65,12 +65,12 @@ public final class ResearchHelperClient {
                 Researchd.error(
                         "Research Icons",
                         "Research %s uses icon type %s, which has no client renderer",
-                        k.location(),
+                        k.identifier(),
                         icon.id());
                 return;
             }
 
-            ResearchScreen.CLIENT_ICONS.put(k.location(), factory.apply(icon));
+            ResearchScreen.CLIENT_ICONS.put(k.identifier(), factory.apply(icon));
         });
     }
 }

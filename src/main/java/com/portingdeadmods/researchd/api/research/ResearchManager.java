@@ -2,8 +2,8 @@ package com.portingdeadmods.researchd.api.research;
 
 import java.util.Collection;
 import java.util.List;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 
 public interface ResearchManager {
@@ -18,15 +18,15 @@ public interface ResearchManager {
 
     /* Research Pages */
 
-    List<ResourceLocation> getPageIds();
+    List<Identifier> getPageIds();
 
-    List<ResourceKey<Research>> getRootsForPage(ResourceLocation pageId);
+    List<ResourceKey<Research>> getRootsForPage(Identifier pageId);
 
-    ResearchPage getPageForId(ResourceLocation pageId);
+    ResearchPage getPageForId(Identifier pageId);
 
     default ResearchPage getPageByResearch(ResourceKey<Research> research) {
-        Collection<ResourceLocation> pageIds = this.getPageIds();
-        for (ResourceLocation pageId : pageIds) {
+        Collection<Identifier> pageIds = this.getPageIds();
+        for (Identifier pageId : pageIds) {
             ResearchPage page = this.getPageForId(pageId);
             if (page != null && page.containsResearch(research)) {
                 return page;

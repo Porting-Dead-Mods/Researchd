@@ -8,21 +8,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class RegisterResearchesKubeEvent implements KubeEvent {
-    private final Map<ResourceLocation, Research> researches = new HashMap<>();
+    private final Map<Identifier, Research> researches = new HashMap<>();
     private final List<ResearchBuilder> builders = new ArrayList<>();
 
     public ResearchBuilder create(String id) {
-        ResourceLocation location = ResourceLocation.parse(id);
+        Identifier location = Identifier.parse(id);
         ResearchBuilder builder = new ResearchBuilder(location);
         builder.sourceLine = SourceLine.UNKNOWN;
         builders.add(builder);
         return builder;
     }
 
-    public Map<ResourceLocation, Research> getResearches() {
+    public Map<Identifier, Research> getResearches() {
         for (ResearchBuilder builder : builders) {
             try {
                 Research research = builder.createObject();

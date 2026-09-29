@@ -1,8 +1,6 @@
 package com.portingdeadmods.researchd.events.common;
 
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
-import com.portingdeadmods.researchd.compat.ftbteams.FTBTeamsCompat;
 import com.portingdeadmods.researchd.data.saved.TeamResearchEffectSavedData;
 import com.portingdeadmods.researchd.data.saved.TeamSavedData;
 import com.portingdeadmods.researchd.impl.research.ResearchManagerImpl;
@@ -12,6 +10,7 @@ import com.portingdeadmods.researchd.networking.research.ResearchReloadPayload;
 import com.portingdeadmods.researchd.networking.team.manager.AddTeamPayload;
 import com.portingdeadmods.researchd.networking.team.manager.SyncTeamDataPayload;
 import com.portingdeadmods.researchd.networking.team.manager.SyncTeamEffectDataPayload;
+import com.portingdeadmods.researchd.utils.registries.RegistryManagersGetter;
 import com.portingdeadmods.researchd.utils.researches.ResearchHelperServer;
 import java.util.List;
 import net.minecraft.server.MinecraftServer;
@@ -19,21 +18,24 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
-import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 @EventBusSubscriber(modid = Researchd.MODID)
 public final class ResearchdLifecycleHandler {
-    // Server starts -> server config is now loaded; wire up FTB Teams compat if enabled
+    // TODO(26.1 port, FTB Teams): on server start, wire up FTB Teams compat if enabled (FTBTeamsCompat.init()).
+    // The FTB Teams compat package is out of the source set until then.
+
+    // Server resources created -> hand our reloadable registries to the resource manager
     @SubscribeEvent
-    private static void onServerStarting(ServerStartingEvent event) {
-        if (ResearchdCompatHandler.isFTBTeamsEnabled()) {
-            FTBTeamsCompat.init();
-        }
+    private static void onAddReloadListeners(AddServerReloadListenersEvent event) {
+        RegistryManagersGetter managers = (RegistryManagersGetter) event.getServerResources();
+        event.addListener(Researchd.rl("researches"), managers.researchd$getResearchesManager());
+        event.addListener(Researchd.rl("research_packs"), managers.researchd$getResearchPackManager());
     }
 
     // World loads -> Get researches for static research manager
@@ -78,17 +80,17 @@ public final class ResearchdLifecycleHandler {
     @SubscribeEvent
     private static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
-            ResearchTeamMap map = TeamSavedData.getData(player.serverLevel());
-            PacketDistributor.sendToPlayer(player, new SyncTeamDataPayload(map));
+            ResearchTeamMap map = TeamSavedData.getData(player.level());
+            PacketDistributor.sendToPlayer(player, SyncTeamDataPayload.snapshot(map));
             PacketDistributor.sendToPlayer(
-                    player, new SyncTeamEffectDataPayload(TeamResearchEffectSavedData.getData(player.serverLevel())));
+                    player, SyncTeamEffectDataPayload.snapshot(TeamResearchEffectSavedData.getData(player.level())));
 
             // Create default team if player isn't in a team
             if (map.getTeamByPlayer(player) == null) {
                 ResearchTeamImpl newTeam = (ResearchTeamImpl) map.createDefaultTeam(player);
                 map.addTeam(newTeam);
 
-                PacketDistributor.sendToAllPlayers(new AddTeamPayload(newTeam));
+                PacketDistributor.sendToAllPlayers(AddTeamPayload.snapshot(newTeam));
             }
         }
     }

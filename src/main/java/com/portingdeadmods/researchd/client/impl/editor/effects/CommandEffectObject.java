@@ -9,12 +9,12 @@ import com.portingdeadmods.researchd.client.screens.lib.widgets.BackgroundEditBo
 import com.portingdeadmods.researchd.impl.research.effect.CommandResearchEffect;
 import com.portingdeadmods.researchd.registries.ResearchEffectTypes;
 import com.portingdeadmods.researchd.utils.GuiUtils;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Unit;
 import org.jetbrains.annotations.Nullable;
 
 public class CommandEffectObject implements TypedEditorObject<CommandResearchEffect, ResearchEffectType> {
-    public static final ResourceLocation ID = CommandResearchEffect.ID;
+    public static final Identifier ID = CommandResearchEffect.ID;
     public static final CommandEffectObject INSTANCE = new CommandEffectObject();
 
     private static final int MAX_COMMAND_LENGTH = 32500;

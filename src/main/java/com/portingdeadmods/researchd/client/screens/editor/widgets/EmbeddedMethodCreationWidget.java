@@ -8,9 +8,11 @@ import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.select
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.SpaghettiClient;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
@@ -47,28 +49,31 @@ public class EmbeddedMethodCreationWidget extends AbstractWidget {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void extractWidgetRenderState(
+            GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         guiGraphics.blitSprite(
+                RenderPipelines.GUI_TEXTURED,
                 EditorSharedSprites.EDITOR_BACKGROUND_INVERTED_SPRITE,
                 this.getX(),
                 this.getY(),
                 this.getWidth(),
                 this.getHeight());
         if (this.createdMethod == null) {
-            guiGraphics.drawCenteredString(
+            guiGraphics.centeredText(
                     GuiUtils.getFont(),
                     "Create Method",
                     this.getX() + this.getWidth() / 2,
                     this.getY() + (this.getHeight() - GuiUtils.getFont().lineHeight) / 2,
                     -1);
         } else {
-            this.createdMethodInfoWidget.render(guiGraphics, mouseX, mouseY, partialTick);
+            this.createdMethodInfoWidget.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
             this.createdMethodInfoWidget.renderTooltip(guiGraphics, mouseX, mouseY, partialTick);
         }
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        int button = event.button();
         if (this.isHovered() && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             if (this.parentPopupWidget != null) {
                 SpaghettiClient.tryGetResearchScreen().closePopup(this.parentPopupWidget);
@@ -77,7 +82,7 @@ public class EmbeddedMethodCreationWidget extends AbstractWidget {
                     .openPopupCentered(new ResearchMethodParentSelectionPopupWidget(
                             this.parentPopupWidget, this, CommonComponents.EMPTY));
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override

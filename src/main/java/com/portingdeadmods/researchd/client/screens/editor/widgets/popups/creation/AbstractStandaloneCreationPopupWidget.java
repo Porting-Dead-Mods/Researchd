@@ -13,33 +13,34 @@ import com.portingdeadmods.researchd.utils.SpaghettiClient;
 import com.portingdeadmods.researchd.utils.researches.ResearchEditorHelperClient;
 import java.util.Objects;
 import java.util.function.Function;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.layouts.Layout;
 import net.minecraft.client.gui.layouts.LinearLayout;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class AbstractStandaloneCreationPopupWidget<O> extends PopupWidget {
     private final RememberingLinearLayout layout;
     private final StandaloneEditorObject<? extends O> clientObject;
     private final ResearchScreen screen;
-    private final Function<ResourceLocation, StandaloneEditorObject<? extends O>> editorObjectGetterFunction;
+    private final Function<Identifier, StandaloneEditorObject<? extends O>> editorObjectGetterFunction;
 
     @Nullable protected final O previous;
 
-    @Nullable protected final ResourceLocation previousId;
+    @Nullable protected final Identifier previousId;
 
     private PDLButton createButton;
     private final ScrollableWidget<LinearLayout> scrollableWidget;
-    private final ResourceLocation defaultId;
+    private final Identifier defaultId;
 
     public AbstractStandaloneCreationPopupWidget(
-            ResourceLocation defaultId,
-            Function<ResourceLocation, StandaloneEditorObject<? extends O>> editorObjectGetterFunction,
+            Identifier defaultId,
+            Function<Identifier, StandaloneEditorObject<? extends O>> editorObjectGetterFunction,
             @Nullable O previous,
-            @Nullable ResourceLocation previousId,
+            @Nullable Identifier previousId,
             int x,
             int y,
             int width,
@@ -102,7 +103,7 @@ public abstract class AbstractStandaloneCreationPopupWidget<O> extends PopupWidg
 
     private void onCreatePressed(PDLButton ignored) {
         O object = this.clientObject.create(this.layout);
-        ResourceLocation id;
+        Identifier id;
         if (this.previous == null) {
             id = this.clientObject.createId(
                     this.layout,
@@ -116,7 +117,7 @@ public abstract class AbstractStandaloneCreationPopupWidget<O> extends PopupWidg
         this.screen.closePopup(this);
     }
 
-    protected abstract void insertObjectToData(ResourceLocation id, O object);
+    protected abstract void insertObjectToData(Identifier id, O object);
 
     protected abstract Component getTitle();
 
@@ -143,23 +144,25 @@ public abstract class AbstractStandaloneCreationPopupWidget<O> extends PopupWidg
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void extractWidgetRenderState(
+            GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         guiGraphics.blitSprite(
+                RenderPipelines.GUI_TEXTURED,
                 ResearchMethodCreationPopupWidget.BACKGROUND_SPRITE,
                 this.getX(),
                 this.getY(),
                 this.getWidth(),
                 this.getHeight());
 
-        super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+        super.extractWidgetRenderState(guiGraphics, mouseX, mouseY, partialTick);
 
         guiGraphics.drawScrollingString(
+                guiGraphics.textRenderer(),
                 GuiUtils.getFont(),
                 this.getTitle(),
                 this.getX() + 5,
                 this.getX() + this.getWidth() - 5,
-                this.getY() + 8,
-                -1);
+                this.getY() + 8);
     }
 
     @Override

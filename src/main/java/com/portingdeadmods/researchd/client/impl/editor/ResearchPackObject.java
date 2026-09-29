@@ -1,6 +1,6 @@
 package com.portingdeadmods.researchd.client.impl.editor;
 
-import com.portingdeadmods.portingdeadlibs.api.utils.RGBAColor;
+import com.portingdeadmods.portingdeadlibs.api.misc.RGBAColor;
 import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.api.client.RememberingLinearLayout;
 import com.portingdeadmods.researchd.api.client.editor.EditorContext;
@@ -17,7 +17,7 @@ import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.layouts.LayoutSettings;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Unit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -134,8 +134,8 @@ public class ResearchPackObject implements StandaloneEditorObject<ResearchPackIm
                 .getValue());
         String customTextureLoc = layout.getChild("custom_texture_edit_box", BackgroundEditBox.class)
                 .getValue();
-        Optional<ResourceLocation> customTexture =
-                customTextureLoc.isBlank() ? Optional.empty() : Optional.of(ResourceLocation.parse(customTextureLoc));
+        Optional<Identifier> customTexture =
+                customTextureLoc.isBlank() ? Optional.empty() : Optional.of(Identifier.parse(customTextureLoc));
         DisplayImpl display = ResearchEditorHelperClient.createDisplay(
                 layout.getChild("name_edit_box", BackgroundEditBox.class),
                 layout.getChild("desc_edit_box", BackgroundEditBox.class));
@@ -143,10 +143,10 @@ public class ResearchPackObject implements StandaloneEditorObject<ResearchPackIm
     }
 
     @Override
-    public ResourceLocation createId(RememberingLinearLayout layout, String namespace) {
+    public Identifier createId(RememberingLinearLayout layout, String namespace) {
         String nameEditBox = TextUtils.camelToSnake(
                 layout.getChild("name_edit_box", BackgroundEditBox.class).getValue());
-        return ResourceLocation.fromNamespaceAndPath(namespace, nameEditBox);
+        return Identifier.fromNamespaceAndPath(namespace, nameEditBox);
     }
 
     @Override

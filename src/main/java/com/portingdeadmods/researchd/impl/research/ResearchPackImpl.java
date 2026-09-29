@@ -3,7 +3,7 @@ package com.portingdeadmods.researchd.impl.research;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.portingdeadmods.portingdeadlibs.api.utils.RGBAColor;
+import com.portingdeadmods.portingdeadlibs.api.misc.RGBAColor;
 import com.portingdeadmods.researchd.api.research.RegistryDisplay;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchPackSerializer;
@@ -12,43 +12,51 @@ import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
 import com.portingdeadmods.researchd.impl.utils.DisplayImpl;
 import com.portingdeadmods.researchd.registries.ResearchdItems;
 import java.util.Optional;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 
-public record ResearchPackImpl(
-        int color, int sortingValue, Optional<ResourceLocation> customTexture, DisplayImpl display)
+public record ResearchPackImpl(int color, int sortingValue, Optional<Identifier> customTexture, DisplayImpl display)
         implements ResearchPack, RegistryDisplay<ResearchPack> {
 
     public static final ResearchPackImpl EMPTY = new ResearchPackImpl(-1, -1, Optional.empty(), DisplayImpl.EMPTY);
     public static final String ID = "simple";
 
-    public ResearchPackImpl(ResourceLocation customTexture) {
+    public ResearchPackImpl(Identifier customTexture) {
         this(-1, -1, Optional.of(customTexture), DisplayImpl.EMPTY);
     }
 
     public ResearchPackImpl(
-            RGBAColor color, int sortingValue, Optional<ResourceLocation> customTexture, DisplayImpl display) {
+            RGBAColor color, int sortingValue, Optional<Identifier> customTexture, DisplayImpl display) {
         this(color.toARGB(), sortingValue, customTexture, display);
     }
 
     public RGBAColor colorAsRgba() {
-        int red = FastColor.ARGB32.red(this.color);
-        int green = FastColor.ARGB32.green(this.color);
-        int blue = FastColor.ARGB32.blue(this.color);
-        int alpha = FastColor.ARGB32.alpha(this.color);
+        int red = ARGB.red(this.color);
+        int green = ARGB.green(this.color);
+        int blue = ARGB.blue(this.color);
+        int alpha = ARGB.alpha(this.color);
         return new RGBAColor(red, green, blue, alpha);
     }
 
     public static ItemStack asStack(ResourceKey<ResearchPack> key) {
-        ItemStack stack = ResearchdItems.RESEARCH_PACK.toStack();
-        stack.set(ResearchdDataComponents.RESEARCH_PACK, new ResearchPackComponent(Optional.of(key)));
-        return stack;
+        return asTemplate(key).create();
+    }
+
+    // Safe before item components are bound, unlike asStack; the default datapack is built that early
+    public static ItemStackTemplate asTemplate(ResourceKey<ResearchPack> key) {
+        return new ItemStackTemplate(
+                ResearchdItems.RESEARCH_PACK.get(),
+                DataComponentPatch.builder()
+                        .set(ResearchdDataComponents.RESEARCH_PACK.get(), new ResearchPackComponent(Optional.of(key)))
+                        .build());
     }
 
     public static Builder builder() {
@@ -75,9 +83,7 @@ public record ResearchPackImpl(
         public static final MapCodec<ResearchPackImpl> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
                         RGBAColor.CODEC.fieldOf("color").forGetter(ResearchPackImpl::colorAsRgba),
                         Codec.INT.fieldOf("sorting_value").forGetter(ResearchPackImpl::sortingValue),
-                        ResourceLocation.CODEC
-                                .optionalFieldOf("custom_texture")
-                                .forGetter(ResearchPackImpl::customTexture),
+                        Identifier.CODEC.optionalFieldOf("custom_texture").forGetter(ResearchPackImpl::customTexture),
                         DisplayImpl.CODEC
                                 .optionalFieldOf("display", DisplayImpl.EMPTY)
                                 .forGetter(ResearchPackImpl::display))
@@ -88,7 +94,7 @@ public record ResearchPackImpl(
                         ResearchPackImpl::color,
                         ByteBufCodecs.INT,
                         ResearchPackImpl::sortingValue,
-                        ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
+                        ByteBufCodecs.optional(Identifier.STREAM_CODEC),
                         ResearchPackImpl::customTexture,
                         DisplayImpl.STREAM_CODEC,
                         ResearchPackImpl::display,
@@ -110,18 +116,18 @@ public record ResearchPackImpl(
     public static final class Builder {
         private int color = -1;
         private int sorting_value = -1;
-        private ResourceLocation customTexture;
+        private Identifier customTexture;
         private Component literalName;
         private Component literalDescription;
 
         private Builder() {}
 
         public Builder color(int r, int g, int b) {
-            this.color = FastColor.ARGB32.color(r, g, b);
+            this.color = ARGB.color(r, g, b);
             return this;
         }
 
-        public Builder customTexture(ResourceLocation customTexture) {
+        public Builder customTexture(Identifier customTexture) {
             this.customTexture = customTexture;
             return this;
         }

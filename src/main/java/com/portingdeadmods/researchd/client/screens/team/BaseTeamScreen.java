@@ -1,8 +1,10 @@
 package com.portingdeadmods.researchd.client.screens.team;
 
 import com.mojang.blaze3d.platform.Window;
+import com.portingdeadmods.researchd.client.screens.lib.ClickDispatch;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
 public abstract class BaseTeamScreen extends Screen {
@@ -19,6 +21,11 @@ public abstract class BaseTeamScreen extends Screen {
         this.textureHeight = textureHeight;
         this.width = width;
         this.height = height;
+    }
+
+    @Override
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        return ClickDispatch.mouseClicked(this, event, doubleClick);
     }
 
     @Override

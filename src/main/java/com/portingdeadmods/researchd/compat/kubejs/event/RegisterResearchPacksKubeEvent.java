@@ -9,16 +9,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 public class RegisterResearchPacksKubeEvent implements KubeEvent {
-    private final Map<ResourceLocation, ResearchPackImpl> researchPacks = new HashMap<>();
+    private final Map<Identifier, ResearchPackImpl> researchPacks = new HashMap<>();
     private final List<ResearchPackBuilder> builders = new ArrayList<>();
 
     public ResearchPackBuilder create(String id) {
-        ResourceLocation location = ResourceLocation.parse(id);
+        Identifier location = Identifier.parse(id);
         ResearchPackBuilder builder = new ResearchPackBuilder(location);
         builder.sourceLine = SourceLine.UNKNOWN;
         builders.add(builder);
@@ -26,13 +26,13 @@ public class RegisterResearchPacksKubeEvent implements KubeEvent {
     }
 
     public ItemStack createItem(String packId) {
-        ResourceLocation location = ResourceLocation.parse(packId);
+        Identifier location = Identifier.parse(packId);
         ResourceKey<ResearchPack> key =
                 ResourceKey.create(com.portingdeadmods.researchd.ResearchdRegistries.RESEARCH_PACK_KEY, location);
         return ResearchPackImpl.asStack(key);
     }
 
-    public Map<ResourceLocation, ResearchPackImpl> getResearchPacks() {
+    public Map<Identifier, ResearchPackImpl> getResearchPacks() {
         for (ResearchPackBuilder builder : builders) {
             try {
                 ResearchPackImpl pack = builder.createObject();

@@ -5,15 +5,15 @@
  */
 package com.portingdeadmods.researchd.client.screens.research;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.portingdeadmods.researchd.client.screens.RdZIndex;
+import com.portingdeadmods.researchd.client.screens.lib.ClickDispatch;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.DropDownWidget;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.PopupWidget;
 import java.util.*;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ArrayListDeque;
 import org.jetbrains.annotations.Nullable;
@@ -109,11 +109,12 @@ public abstract class AbstractResearchScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        int button = event.button();
         List<PopupWidget> reversed = new ArrayList<>(this.popupWidgets.reversed());
         for (PopupWidget popupWidget : reversed) {
             for (AbstractWidget widget : popupWidget.getWidgets()) {
-                if (widget.mouseClicked(mouseX, mouseY, button)) {
+                if (widget.mouseClicked(event, doubleClick)) {
                     this.setFocused(widget);
                     if (button == 0) {
                         this.setDragging(true);
@@ -123,7 +124,7 @@ public abstract class AbstractResearchScreen extends Screen {
                 }
             }
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return ClickDispatch.mouseClicked(this, event, doubleClick);
     }
 
     @Override
@@ -137,52 +138,45 @@ public abstract class AbstractResearchScreen extends Screen {
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+    public boolean mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
+        double mouseX = event.x();
+        double mouseY = event.y();
         if (this.getPopupChildAt(mouseX, mouseY)
-                .filter(widget -> widget.mouseDragged(mouseX, mouseY, button, dragX, dragY))
+                .filter(widget -> widget.mouseDragged(event, dragX, dragY))
                 .isPresent()) {
             return true;
         }
-        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+        return super.mouseDragged(event, dragX, dragY);
     }
 
-    protected void renderTooltip(
-            GuiGraphics guiGraphics, PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        poseStack.translate(0, 0, RdZIndex.TOOLTIP);
-
+    protected void renderTooltip(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         if (tooltip != null) {
-            guiGraphics.renderComponentTooltip(
+            guiGraphics.setComponentTooltipForNextFrame(
                     com.portingdeadmods.researchd.utils.GuiUtils.getFont(), tooltip, mouseX, mouseY);
         }
     }
 
-    protected abstract void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick);
+    protected abstract void renderContents(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick);
 
     @Override
-    public final void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public final void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         setTooltip(null);
 
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        super.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
 
         this.renderContents(guiGraphics, mouseX, mouseY, partialTick);
 
-        PoseStack poseStack = guiGraphics.pose();
+        // Each popup goes on its own stratum so it covers the screen and the popups opened before it
+        for (PopupWidget popupWidget : this.popupWidgets) {
+            guiGraphics.nextStratum();
 
-        poseStack.pushPose();
-        {
-            poseStack.translate(0, 0, RdZIndex.POPUP_BASE);
-            for (PopupWidget popupWidget : this.popupWidgets) {
-                poseStack.translate(0, 0, RdZIndex.POPUP_STEP);
+            popupWidget.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
 
-                popupWidget.render(guiGraphics, mouseX, mouseY, partialTick);
-
-                for (AbstractWidget widget : popupWidget.getWidgets()) {
-                    widget.render(guiGraphics, mouseX, mouseY, partialTick);
-                }
+            for (AbstractWidget widget : popupWidget.getWidgets()) {
+                widget.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
             }
-
-            this.renderTooltip(guiGraphics, poseStack, mouseX, mouseY, partialTick);
         }
-        poseStack.popPose();
+
+        this.renderTooltip(guiGraphics, mouseX, mouseY, partialTick);
     }
 }

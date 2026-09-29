@@ -16,8 +16,8 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
@@ -26,7 +26,7 @@ import net.minecraft.world.level.Level;
  * Executes commands when a research is unlocked/locked.
  */
 public record CommandResearchEffect(String onUnlockCommand, String onLockCommand) implements ResearchEffect {
-    public static final ResourceLocation ID = Researchd.rl("command");
+    public static final Identifier ID = Researchd.rl("command");
 
     public static final String PLAYER_NAME_PLACEHOLDER = "{{RESEARCH_PLAYER_NAME}}";
     public static final String TEAM_NAME_PLACEHOLDER = "{{RESEARCH_TEAM_NAME}}";
@@ -64,7 +64,7 @@ public record CommandResearchEffect(String onUnlockCommand, String onLockCommand
 
         MinecraftServer server = level.getServer();
         String parsed = command.replace(TEAM_NAME_PLACEHOLDER, team.getName())
-                .replace(RESEARCH_ID_PLACEHOLDER, research.location().toString());
+                .replace(RESEARCH_ID_PLACEHOLDER, research.identifier().toString());
         CommandSourceStack source = server.createCommandSourceStack().withSuppressedOutput();
         if (parsed.contains(PLAYER_NAME_PLACEHOLDER)) {
             for (TeamMember member : team.getMembers()) {
@@ -75,7 +75,7 @@ public record CommandResearchEffect(String onUnlockCommand, String onLockCommand
                                     source,
                                     parsed.replace(
                                             PLAYER_NAME_PLACEHOLDER,
-                                            player.getGameProfile().getName()));
+                                            player.getGameProfile().name()));
                 }
             }
         } else {
@@ -84,7 +84,7 @@ public record CommandResearchEffect(String onUnlockCommand, String onLockCommand
     }
 
     @Override
-    public ResourceLocation id() {
+    public Identifier id() {
         return ID;
     }
 

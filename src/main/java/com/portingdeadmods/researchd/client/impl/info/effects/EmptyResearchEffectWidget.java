@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.client.impl.info.effects;
 
 import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidget;
 import com.portingdeadmods.researchd.impl.research.effect.EmptyResearchEffect;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.neoforged.neoforge.common.util.Size2i;
 
 public class EmptyResearchEffectWidget extends AbstractResearchInfoWidget<EmptyResearchEffect> {
@@ -16,5 +16,5 @@ public class EmptyResearchEffectWidget extends AbstractResearchInfoWidget<EmptyR
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {}
+    protected void extractWidgetRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float v) {}
 }

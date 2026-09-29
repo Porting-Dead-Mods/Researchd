@@ -9,8 +9,8 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 
 public interface ResearchPack {
     Codec<ResourceKey<ResearchPack>> RESOURCE_KEY_CODEC = ResourceKey.codec(ResearchdRegistries.RESEARCH_PACK_KEY);
@@ -22,27 +22,27 @@ public interface ResearchPack {
             .dispatch(ResearchPack::getSerializer, ResearchPackSerializer::codec);
 
     StreamCodec<RegistryFriendlyByteBuf, ResearchPack> STREAM_CODEC =
-            ByteBufCodecs.fromCodecTrusted(CODEC).cast();
+            ByteBufCodecs.fromCodecWithRegistriesTrusted(CODEC);
 
     int color();
 
     int sortingValue();
 
-    Optional<ResourceLocation> customTexture();
+    Optional<Identifier> customTexture();
 
     ResearchPackSerializer<?> getSerializer();
 
     static Component getLangName(ResourceKey<ResearchPack> key) {
-        String registryPath = ResearchdRegistries.RESEARCH_PACK_KEY.location().getPath();
-        String keyNamespace = key.location().getNamespace();
-        String keyPath = key.location().getPath();
+        String registryPath = ResearchdRegistries.RESEARCH_PACK_KEY.identifier().getPath();
+        String keyNamespace = key.identifier().getNamespace();
+        String keyPath = key.identifier().getPath();
         return Component.translatable(String.format("%s.%s.%s_name", registryPath, keyNamespace, keyPath));
     }
 
     static Component getLangDesc(ResourceKey<ResearchPack> key) {
-        String registryPath = ResearchdRegistries.RESEARCH_PACK_KEY.location().getPath();
-        String keyNamespace = key.location().getNamespace();
-        String keyPath = key.location().getPath();
+        String registryPath = ResearchdRegistries.RESEARCH_PACK_KEY.identifier().getPath();
+        String keyNamespace = key.identifier().getNamespace();
+        String keyPath = key.identifier().getPath();
         return Component.translatable(String.format("%s.%s.%s_desc", registryPath, keyNamespace, keyPath));
     }
 }

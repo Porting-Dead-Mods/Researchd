@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.stream.Stream;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.level.storage.LevelResource;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 public class SelectPackDropDownWidget extends DropDownWidget<SelectPackSearchBarWidget> {
     private final SelectPackSearchBarWidget packSearchBarWidget;
@@ -71,7 +71,7 @@ public class SelectPackDropDownWidget extends DropDownWidget<SelectPackSearchBar
         super.optionClicked(option, mouseX, mouseY);
 
         if (option instanceof PackOption packOption) {
-            PacketDistributor.sendToServer(new SetPackPayload(packOption.packLocation));
+            ClientPacketDistributor.sendToServer(new SetPackPayload(packOption.packLocation));
         }
     }
 
@@ -95,7 +95,7 @@ public class SelectPackDropDownWidget extends DropDownWidget<SelectPackSearchBar
 
         @Override
         public void render(
-                GuiGraphics guiGraphics,
+                GuiGraphicsExtractor guiGraphics,
                 int x,
                 int y,
                 int mouseX,
@@ -104,14 +104,10 @@ public class SelectPackDropDownWidget extends DropDownWidget<SelectPackSearchBar
                 OptionContext context) {
             if (this.isHovered(x, y, mouseX, mouseY, context)) {
                 guiGraphics.fill(
-                        x - 1,
-                        y - 1,
-                        x + context.maxWidth() - 1,
-                        y + this.height() + 1,
-                        FastColor.ARGB32.color(120, 120, 120));
+                        x - 1, y - 1, x + context.maxWidth() - 1, y + this.height() + 1, ARGB.color(120, 120, 120));
             }
 
-            guiGraphics.drawString(this.font(), this.display, x, y, -1);
+            guiGraphics.text(this.font(), this.display, x, y, -1);
         }
     }
 }

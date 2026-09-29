@@ -5,7 +5,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.portingdeadmods.portingdeadlibs.utils.Result;
 import com.portingdeadmods.researchd.Researchd;
-import com.portingdeadmods.researchd.compat.KubeJSCompat;
 import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import com.portingdeadmods.researchd.compat.kubejs.example.KubeJSExample;
 import com.portingdeadmods.researchd.resources.example.ExampleDatapackWriter;
@@ -26,7 +25,7 @@ public class ExampleCommands {
     public static LiteralCommandNode<CommandSourceStack> build() {
         return Commands.literal("example")
                 .then(Commands.literal("kubejs")
-                        .requires(p -> KubeJSCompat.isKubeJSLoaded())
+                        .requires(p -> ResearchdCompatHandler.isKubeJSLoaded())
                         .executes(ExampleCommands::createKubeJSExample))
                 .then(Commands.literal("datapack")
                         .executes(ExampleCommands::createDatapackExample)
@@ -57,9 +56,9 @@ public class ExampleCommands {
                                     .withStyle(Style.EMPTY
                                             .withColor(ChatFormatting.GOLD)
                                             .withUnderlined(true)
-                                            .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, filePath))
-                                            .withHoverEvent(new HoverEvent(
-                                                    HoverEvent.Action.SHOW_TEXT, Component.literal("Open directory")))))
+                                            .withClickEvent(new ClickEvent.OpenFile(filePath))
+                                            .withHoverEvent(
+                                                    new HoverEvent.ShowText(Component.literal("Open directory")))))
                             .append(Component.literal(
                                             " - (run '/datapack enable \"file/%s\"' to enable pack".formatted(name))
                                     .withStyle(ChatFormatting.GRAY)),
@@ -78,38 +77,28 @@ public class ExampleCommands {
 
     private static int createKubeJSExample(CommandContext<CommandSourceStack> ctx) {
         CommandSourceStack source = ctx.getSource();
-        if (ResearchdCompatHandler.isKubeJSLoaded()) {
-            Result<Path, Exception> result = KubeJSExample.createExample();
-            if (result instanceof Result.Ok(Path value)) {
-                String filePath = value.toString();
-                String gameDirPath =
-                        FMLPaths.GAMEDIR.get().normalize().toAbsolutePath().toString();
-                StringBuilder shortPath = new StringBuilder(filePath.substring(gameDirPath.length()));
-                shortPath.insert(0, "...");
-                source.sendSuccess(
-                        () -> Component.literal("Successfully created KubeJS example file at ")
-                                .append(Component.literal(shortPath.toString())
-                                        .withStyle(Style.EMPTY
-                                                .withColor(ChatFormatting.GOLD)
-                                                .withUnderlined(true)
-                                                .withClickEvent(new ClickEvent(
-                                                        ClickEvent.Action.OPEN_FILE,
-                                                        filePath.substring(
-                                                                0,
-                                                                filePath.length() - "research_examples.js".length())))
-                                                .withHoverEvent(new HoverEvent(
-                                                        HoverEvent.Action.SHOW_TEXT,
-                                                        Component.literal("Open containing directory")))))
-                                .append(Component.literal(" - (run '/reload' for the example to work)")
-                                        .withStyle(ChatFormatting.GRAY)),
-                        true);
-                return 1;
-            } else {
-                Exception error = result.error();
-                source.sendFailure(Component.literal("Failed to create KubeJS example file: ")
-                        .append(error.getMessage())
-                        .withStyle(ChatFormatting.RED));
-            }
+        Result<Path, Exception> result = KubeJSExample.createExample();
+        if (result instanceof Result.Ok(Path value)) {
+            String filePath = value.toString();
+            String directory = value.getParent().toString();
+            source.sendSuccess(
+                    () -> Component.literal("Successfully created KubeJS example file at ")
+                            .append(Component.literal(filePath)
+                                    .withStyle(Style.EMPTY
+                                            .withColor(ChatFormatting.GOLD)
+                                            .withUnderlined(true)
+                                            .withClickEvent(new ClickEvent.OpenFile(directory))
+                                            .withHoverEvent(new HoverEvent.ShowText(
+                                                    Component.literal("Open containing directory")))))
+                            .append(Component.literal(" - (run '/reload' for the example to work)")
+                                    .withStyle(ChatFormatting.GRAY)),
+                    true);
+            return 1;
+        } else {
+            Exception error = result.error();
+            source.sendFailure(Component.literal("Failed to create KubeJS example file: ")
+                    .append(error.getMessage())
+                    .withStyle(ChatFormatting.RED));
         }
         return 0;
     }

@@ -8,8 +8,8 @@ import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 
 /**
@@ -33,12 +33,12 @@ public interface ResearchEffect {
      */
     void onLock(Level level, ResearchTeam team, ResourceKey<Research> research);
 
-    ResourceLocation id();
+    Identifier id();
 
     ResearchEffectType type();
 
     default Component getTranslation() {
-        ResourceLocation id = id();
+        Identifier id = id();
         return Component.translatable("research_method." + id.getNamespace() + "." + id.getPath());
     }
 

@@ -13,20 +13,22 @@ import com.portingdeadmods.researchd.utils.researches.ResearchEditorHelperClient
 import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.layouts.*;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class SelectPackPopupWidget extends PopupWidget {
-    public static final ResourceLocation SPRITE = Researchd.rl("widget/editor_popup");
+    public static final Identifier SPRITE = Researchd.rl("widget/editor_popup");
     public static final WidgetSprites EDITOR_BUTTON_SPRITES = new WidgetSprites(
             Researchd.rl("editor_button"),
             Researchd.rl("editor_button_disabled"),
@@ -64,7 +66,7 @@ public class SelectPackPopupWidget extends PopupWidget {
             contents.spacing(2);
             Font font = GuiUtils.getFont();
             MultiLineTextWidget introductionTextWidget = contents.addChild(new MultiLineTextWidget(
-                    Component.literal(INTRODUCTION_TEXT).withColor(FastColor.ARGB32.color(125, 110, 77)), font));
+                    Component.literal(INTRODUCTION_TEXT).withColor(ARGB.color(125, 110, 77)), font));
             introductionTextWidget.setMaxWidth(192);
             introductionTextWidget.setMaxRows(5);
             contents.addChild(new SpacerElement(0, 4));
@@ -148,10 +150,12 @@ public class SelectPackPopupWidget extends PopupWidget {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        guiGraphics.blitSprite(SPRITE, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+    protected void extractWidgetRenderState(
+            GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+        guiGraphics.blitSprite(
+                RenderPipelines.GUI_TEXTURED, SPRITE, this.getX(), this.getY(), this.getWidth(), this.getHeight());
 
-        super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+        super.extractWidgetRenderState(guiGraphics, mouseX, mouseY, partialTick);
 
         this.selectDatapackWidget.updateSelectedPack(
                 ResearchEditorHelperClient.getEditModeSettings().currentDatapack());
@@ -167,7 +171,7 @@ public class SelectPackPopupWidget extends PopupWidget {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         return false;
     }
 

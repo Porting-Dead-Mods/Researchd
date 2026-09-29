@@ -21,11 +21,11 @@ import com.portingdeadmods.researchd.registries.ResearchdEffectDataTypes;
 import java.util.UUID;
 import java.util.function.Supplier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
@@ -37,19 +37,19 @@ import org.jetbrains.annotations.Nullable;
 public final class ResearchdApi {
     /* Research Screen Api */
     public static void openScreen() {
-        if (FMLEnvironment.dist.isClient()) {
+        if (FMLEnvironment.getDist().isClient()) {
             ClientResearchdApi.openResearchScreen();
         }
     }
 
     public static void openTeamScreen() {
-        if (FMLEnvironment.dist.isClient()) {
+        if (FMLEnvironment.getDist().isClient()) {
             ClientResearchdApi.openTeamScreen();
         }
     }
 
     public static void openScreenForResearch(ResourceKey<Research> research) {
-        if (FMLEnvironment.dist.isClient()) {
+        if (FMLEnvironment.getDist().isClient()) {
             ClientResearchdApi.openScreenForResearch(research);
         }
     }
@@ -139,7 +139,7 @@ public final class ResearchdApi {
         return data != null && data.blockedItems().contains(itemKey);
     }
 
-    public static boolean isRecipeBlocked(Player player, ResourceLocation recipeId) {
+    public static boolean isRecipeBlocked(Player player, ResourceKey<Recipe<?>> recipeId) {
         RecipeUnlockEffectData data = getEffectDataForPlayer(player, ResearchdEffectDataTypes.RECIPE_UNLOCK);
         return data != null && data.contains(recipeId);
     }
@@ -148,7 +148,7 @@ public final class ResearchdApi {
         return isRecipeBlocked(player, holder.id());
     }
 
-    public static boolean isRecipeBlocked(Level level, UUID teamId, ResourceLocation recipeId) {
+    public static boolean isRecipeBlocked(Level level, UUID teamId, ResourceKey<Recipe<?>> recipeId) {
         RecipeUnlockEffectData data = getEffectDataForTeam(level, teamId, ResearchdEffectDataTypes.RECIPE_UNLOCK);
         return data != null && data.contains(recipeId);
     }

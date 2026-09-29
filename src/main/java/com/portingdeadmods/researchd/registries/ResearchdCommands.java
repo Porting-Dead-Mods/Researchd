@@ -19,7 +19,7 @@ public final class ResearchdCommands {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context) {
         List<LiteralCommandNode<CommandSourceStack>> rootCommands = ALIASES.stream()
                 .map(alias -> Commands.literal(alias)
-                        .requires(source -> source.hasPermission(2))
+                        .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .build())
                 .toList();
 

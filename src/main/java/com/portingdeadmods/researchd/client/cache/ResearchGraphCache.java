@@ -10,13 +10,13 @@ import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 public final class ResearchGraphCache {
     private static final Map<ResourceKey<Research>, ResearchGraph> GRAPH_CACHE = new LinkedHashMap<>();
-    private static final Map<ResourceLocation, ResearchGraph> PAGE_GRAPH_CACHE = new LinkedHashMap<>();
+    private static final Map<Identifier, ResearchGraph> PAGE_GRAPH_CACHE = new LinkedHashMap<>();
 
     public static void add(ResourceKey<Research> key, ResearchGraph graph) {
         GRAPH_CACHE.put(key, graph);
@@ -26,7 +26,7 @@ public final class ResearchGraphCache {
         return GRAPH_CACHE.get(key);
     }
 
-    public static @Nullable ResearchGraph getForPage(ResourceLocation pageId) {
+    public static @Nullable ResearchGraph getForPage(Identifier pageId) {
         return PAGE_GRAPH_CACHE.get(pageId);
     }
 

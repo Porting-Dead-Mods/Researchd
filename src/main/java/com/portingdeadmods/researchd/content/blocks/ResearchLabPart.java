@@ -15,7 +15,6 @@ import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,8 +35,15 @@ public class ResearchLabPart extends SimpleGhostMultiblockPart {
 
     @Override
     public boolean onDestroyedByPlayer(
-            BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
-        if (level.isClientSide) return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+            BlockState state,
+            Level level,
+            BlockPos pos,
+            Player player,
+            ItemStack toolStack,
+            boolean willHarvest,
+            FluidState fluid) {
+        if (level.isClientSide())
+            return super.onDestroyedByPlayer(state, level, pos, player, toolStack, willHarvest, fluid);
 
         if (level.getBlockEntity(pos) instanceof SimpleGhostMultiblockPartBE partBE) {
             BlockPos controllerPos = partBE.getControllerPos();
@@ -45,12 +51,12 @@ public class ResearchLabPart extends SimpleGhostMultiblockPart {
                 level.destroyBlock(controllerPos, true, player);
             }
         }
-        return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+        return super.onDestroyedByPlayer(state, level, pos, player, toolStack, willHarvest, fluid);
     }
 
     @Override
     public @NotNull ItemStack getCloneItemStack(
-            BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
+            LevelReader level, BlockPos pos, BlockState state, boolean includeData, Player player) {
         return ResearchdItems.RESEARCH_LAB.toStack();
     }
 }

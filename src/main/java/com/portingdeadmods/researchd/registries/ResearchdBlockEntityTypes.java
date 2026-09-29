@@ -12,12 +12,12 @@ public final class ResearchdBlockEntityTypes {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES =
             DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, Researchd.MODID);
 
-    public static final Supplier<BlockEntityType<ResearchLabPartBE>> RESEARCH_LAB_PART =
-            BLOCK_ENTITY_TYPES.register("research_lab_part", () -> BlockEntityType.Builder.of(
-                            ResearchLabPartBE::new, ResearchdBlocks.RESEARCH_LAB_PART.get())
-                    .build(null));
+    public static final Supplier<BlockEntityType<ResearchLabPartBE>> RESEARCH_LAB_PART = BLOCK_ENTITY_TYPES.register(
+            "research_lab_part",
+            () -> new BlockEntityType<>(ResearchLabPartBE::new, ResearchdBlocks.RESEARCH_LAB_PART.get()));
     public static final Supplier<BlockEntityType<ResearchLabControllerBE>> RESEARCH_LAB_CONTROLLER =
-            BLOCK_ENTITY_TYPES.register("research_lab_controller", () -> BlockEntityType.Builder.of(
-                            ResearchLabControllerBE::new, ResearchdBlocks.RESEARCH_LAB_CONTROLLER.get())
-                    .build(null));
+            BLOCK_ENTITY_TYPES.register(
+                    "research_lab_controller",
+                    () -> new BlockEntityType<>(
+                            ResearchLabControllerBE::new, ResearchdBlocks.RESEARCH_LAB_CONTROLLER.get()));
 }
