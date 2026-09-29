@@ -143,7 +143,7 @@ public final class ResearchTeamHelperServer {
         if (team != null
                 && ((team.getSocialManager().containsSentInvite(requesterId))
                         || ResearchdCompatHandler.isFTBTeamsEnabled())) {
-            ResearchTeamHelperServer.handleLeaveTeam(requester);
+            detachFromPreviousTeams(requester, team, teamManager);
 
             teamManager.addTeam(team);
             if (!ResearchdCompatHandler.isFTBTeamsEnabled())
@@ -168,6 +168,27 @@ public final class ResearchTeamHelperServer {
             refreshPlayerManagement(team, level);
             // PacketDistributor.sendToPlayer(requester, new RefreshResearchesPayload());
         }
+    }
+
+    /** Detach the requester from whatever research team they were in before joining {@code target}.
+     *  Unlike {@code handleLeaveTeam}, this never auto-creates a fresh solo team: joining another
+     *  team's member list must not leave the player registered in two teams at once. */
+    private static void detachFromPreviousTeams(
+            @NotNull ServerPlayer requester, ResearchTeam target, ResearchTeamManager teamManager) {
+        UUID requesterId = requester.getUUID();
+        ResearchTeam oldTeam = getTeamByMember(requester);
+        if (oldTeam == null || oldTeam.getId().equals(target.getId())) return;
+
+        if (oldTeam.isOwner(requesterId) && oldTeam.getMembers().size() <= 1) {
+            // Own solo team -> drop it entirely; the player is now joining someone else's team.
+            teamManager.removeTeam(oldTeam.getId());
+            PacketDistributor.sendToAllPlayers(new RemoveTeamPayload(oldTeam.getId()));
+        } else if (!oldTeam.isOwner(requesterId) && oldTeam instanceof ResearchTeamImpl oldImpl) {
+            oldImpl.removeMember(requesterId);
+            PacketDistributor.sendToAllPlayers(new SyncTeamPayload(oldImpl));
+        }
+        // Owner of a multi-member team can't be detached silently here; the normal leave/transfer
+        // flow handles that case explicitly.
     }
 
     public static void handleIgnoreTeam(@NotNull ServerPlayer requester, UUID memberOfTeam) {
@@ -224,10 +245,31 @@ public final class ResearchTeamHelperServer {
 
                 // Team Leader Specified
                 handleTransferOwnership(requester, nextToLead);
+
+                // Handing over leadership is not the same as leaving: actually remove ourselves
+                // from the team now, otherwise the former leader is only demoted to moderator
+                // and can never leave the team through this path.
+                team.removeMember(requesterId);
+                if (team instanceof ResearchTeamImpl teamImpl) {
+                    PacketDistributor.sendToAllPlayers(new SyncTeamPayload(teamImpl));
+                }
+
+                if (!ResearchdCompatHandler.isFTBTeamsEnabled())
+                    requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.LEFT_TEAM));
+
+                createTeamForPlayerSynced(level, requesterId, teamManager);
+                PacketDistributor.sendToPlayer(requester, ClearGraphCachePayload.INSTANCE);
+
+                refreshPlayerManagement(team, level);
             }
         } else {
             // Is not Owner -> Just remove member out of the team and create a default one.
             removeMember(requester);
+            // Broadcast the removal so teammates' clients drop the leaving player, otherwise
+            // they keep showing the member until a restart (incomplete leave).
+            if (team instanceof ResearchTeamImpl teamImpl) {
+                PacketDistributor.sendToAllPlayers(new SyncTeamPayload(teamImpl));
+            }
             if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                 requester.sendSystemMessage(ResearchdTranslations.component(ResearchdTranslations.Team.LEFT_TEAM));
             createTeamForPlayerSynced(level, requesterId, teamManager);
@@ -410,15 +452,16 @@ public final class ResearchTeamHelperServer {
 
     public static @NotNull Component formatMembers(@NotNull ResearchTeam team, @NotNull Level level) {
         MutableComponent formattedTeam = Component.literal(team.getName()).withStyle(ChatFormatting.AQUA);
-        formattedTeam.append(Component.literal(" has %d member%s: "
-                        .formatted(team.getMembers().size(), team.getMembers().size() == 1 ? "" : "s"))
+        long memberCount = team.getMembers().size();
+        formattedTeam.append(Component.literal(" has %d member%s: ".formatted(memberCount, memberCount == 1 ? "" : "s"))
                 .withStyle(ChatFormatting.WHITE));
 
         for (TeamMember member : team.getMembers()) {
-            Player player = level.getPlayerByUUID(member.player());
-            if (player != null)
-                formattedTeam.append(
-                        Component.literal(player.getName().getString() + " ").withStyle(ChatFormatting.AQUA));
+            // Use the name cache so offline members are still listed instead of silently dropped.
+            String name = AllPlayersCache.getName(member.player());
+            formattedTeam.append(
+                    Component.literal((name != null ? name : member.player().toString()) + " ")
+                            .withStyle(ChatFormatting.AQUA));
         }
 
         return formattedTeam;
