@@ -14,8 +14,8 @@ import com.portingdeadmods.researchd.registries.ResearchMethodTypes;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -26,14 +26,12 @@ import org.jetbrains.annotations.NotNull;
  * Research method that completes once the team collectively holds the required amount of the item ingredient.
  */
 public record CheckItemPresenceResearchMethod(Ingredient item, int count) implements ItemResearchMethod {
-    public static final CheckItemPresenceResearchMethod EMPTY =
-            new CheckItemPresenceResearchMethod(Ingredient.EMPTY, 0);
-    public static final ResourceLocation ID = Researchd.rl("check_item_presence");
+    public static final Identifier ID = Researchd.rl("check_item_presence");
 
     @Override
     public void checkProgress(
             Level level, ResourceKey<Research> research, ResearchProgress.Task task, MethodContext context) {
-        if (this.count <= 0 || this.item == Ingredient.EMPTY) {
+        if (this.count <= 0) {
             task.addProgress(this.getMaxProgress() - task.getProgress());
             return;
         }
@@ -81,7 +79,7 @@ public record CheckItemPresenceResearchMethod(Ingredient item, int count) implem
     }
 
     @Override
-    public ResourceLocation id() {
+    public Identifier id() {
         return ID;
     }
 

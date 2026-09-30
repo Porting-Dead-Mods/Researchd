@@ -14,12 +14,13 @@ import com.portingdeadmods.researchd.utils.GuiUtils;
 import java.util.List;
 import net.minecraft.client.gui.layouts.LayoutSettings;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Unit;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class ItemUnlockEffectObject implements TypedEditorObject<ItemUnlockEffect, ResearchEffectType> {
-    public static final ResourceLocation ID = Researchd.rl("item_unlock");
+    public static final Identifier ID = Researchd.rl("item_unlock");
     public static final ItemUnlockEffectObject INSTANCE = new ItemUnlockEffectObject();
 
     @Override
@@ -37,15 +38,14 @@ public class ItemUnlockEffectObject implements TypedEditorObject<ItemUnlockEffec
         RegistryVerifyEditBox idEditBox =
                 RegistryVerifyEditBox.forRegistry(BuiltInRegistries.ITEM, context.innerWidth() - 8, 16);
         idEditBox.setResponder(newVal -> {
-            ResourceLocation id = ResourceLocation.parse(newVal);
+            Identifier id = Identifier.parse(newVal);
             if (idEditBox.isValid(id)) {
-                itemSelector.setSelected(List.of(BuiltInRegistries.ITEM.get(id).getDefaultInstance()), false);
+                itemSelector.setSelected(List.of(new ItemStack(BuiltInRegistries.ITEM.getValue(id))), false);
             }
             this.update(layout, context);
         });
-        itemSelector.setResponder(ingredient -> idEditBox.setValue(BuiltInRegistries.ITEM
-                .getKey(itemSelector.getSelected().getItems()[0].getItem())
-                .toString()));
+        itemSelector.setResponder(stacks -> idEditBox.setValue(
+                BuiltInRegistries.ITEM.getKey(stacks.getFirst().getItem()).toString()));
 
         layout.addWidget(null, GuiUtils.stringWidget("Unlocks Item:"));
         layout.addWidget("item_selector", itemSelector, LayoutSettings::alignHorizontallyCenter);

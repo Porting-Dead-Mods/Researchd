@@ -1,10 +1,10 @@
 package com.portingdeadmods.researchd;
 
 import com.mojang.logging.LogUtils;
-import com.portingdeadmods.portingdeadlibs.api.capabilities.SidedEnergyStorage;
+import com.portingdeadmods.portingdeadlibs.api.config.PDLConfig;
 import com.portingdeadmods.portingdeadlibs.api.config.PDLConfigHelper;
+import com.portingdeadmods.portingdeadlibs.api.config.PDLConfigManager;
 import com.portingdeadmods.portingdeadlibs.api.resources.DynamicPack;
-import com.portingdeadmods.portingdeadlibs.api.utils.IOAction;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.data.ResearchdAttachments;
 import com.portingdeadmods.researchd.data.ResearchdDataComponents;
@@ -15,7 +15,7 @@ import com.portingdeadmods.researchd.resources.contents.ResearchdDynamicPackCont
 import com.portingdeadmods.researchd.resources.example.ResearchdExamplesSource;
 import com.portingdeadmods.researchd.utils.SpaghettiClient;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
@@ -23,13 +23,15 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.event.AddPackFindersEvent;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.energy.LimitingEnergyHandler;
 import org.slf4j.Logger;
 
 @Mod(Researchd.MODID)
@@ -73,7 +75,7 @@ public final class Researchd {
 
         LOGGER.error(formatted);
 
-        if (FMLEnvironment.dist.isClient()) {
+        if (FMLEnvironment.getDist().isClient()) {
             SpaghettiClient.sendErrorToChat(formatted);
         }
     }
@@ -105,6 +107,26 @@ public final class Researchd {
 
         PDLConfigHelper.registerConfig(ResearchdConfig.Common.class, ModConfig.Type.COMMON, modContainer);
         PDLConfigHelper.registerConfig(ResearchdConfig.Server.class, ModConfig.Type.SERVER, modContainer);
+        modEventBus.addListener(ModConfigEvent.Loading.class, Researchd::onConfigLoaded);
+        modEventBus.addListener(ModConfigEvent.Reloading.class, Researchd::onConfigLoaded);
+    }
+
+    /**
+     * Copies loaded config values into the {@code @ConfigValue} fields. PDL 1.1.15 has no listener that does this.
+     */
+    private static void onConfigLoaded(ModConfigEvent event) {
+        PDLConfig config = PDLConfigManager.CONFIGS.get(event.getConfig().getSpec());
+        if (config == null) return;
+
+        for (String path : config.getConfigPaths()) {
+            try {
+                config.getValue(path)
+                        .field()
+                        .set(null, config.getSpecValue(path).get());
+            } catch (IllegalAccessException e) {
+                LOGGER.error("Failed to apply config value {}", path, e);
+            }
+        }
     }
 
     private void addPackFinders(AddPackFindersEvent event) {
@@ -129,14 +151,15 @@ public final class Researchd {
     }
 
     private void registerCapabilities(RegisterCapabilitiesEvent event) {
+        // Only the Lab Parts the shape exposes answer, on every side; the Lab Controller exposes nothing
         event.registerBlockEntity(
-                Capabilities.ItemHandler.BLOCK,
+                Capabilities.Item.BLOCK,
                 ResearchdBlockEntityTypes.RESEARCH_LAB_PART.get(),
                 (be, dir) -> be.getControllerItemHandler());
         event.registerBlockEntity(
-                Capabilities.EnergyStorage.BLOCK, ResearchdBlockEntityTypes.RESEARCH_LAB_PART.get(), (be, dir) -> {
-                    IEnergyStorage storage = be.getControllerEnergyStorage();
-                    return storage != null ? new SidedEnergyStorage(storage, IOAction.INSERT) : null;
+                Capabilities.Energy.BLOCK, ResearchdBlockEntityTypes.RESEARCH_LAB_PART.get(), (be, dir) -> {
+                    EnergyHandler energy = be.getControllerEnergyStorage();
+                    return energy != null ? new LimitingEnergyHandler(energy, Integer.MAX_VALUE, 0) : null;
                 });
     }
 
@@ -158,7 +181,7 @@ public final class Researchd {
         event.dataPackRegistry(ResearchdRegistries.RESEARCH_PACK_KEY, ResearchPackImpl.CODEC, ResearchPackImpl.CODEC);
     }
 
-    public static ResourceLocation rl(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MODID, path);
+    public static Identifier rl(String path) {
+        return Identifier.fromNamespaceAndPath(MODID, path);
     }
 }

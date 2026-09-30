@@ -26,6 +26,10 @@ public interface ResearchEffectManager {
     /** Removes all effect data entries for the given team. Used when reinitializing on reload. */
     void clearTeam(UUID teamId);
 
+    /**
+     * Call after changing a team's effect data in place (such as data returned by {@link #computeIfAbsent}). Besides
+     * saving it, this drops the recipe lists filtered for each team, which would otherwise go stale.
+     */
     void setChanged();
 
     <T extends ResearchEffectData<?>> void sync(UUID teamId, ResearchEffectDataType<T> type);

@@ -21,8 +21,8 @@ import java.util.List;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
@@ -37,10 +37,10 @@ import org.jetbrains.annotations.NotNull;
  */
 public record ConsumePackResearchMethod(List<ResourceKey<ResearchPack>> packs, int count, int duration)
         implements ResearchMethod {
-    public static final ResourceLocation ID = Researchd.rl("consume_pack");
+    public static final Identifier ID = Researchd.rl("consume_pack");
 
     @Override
-    public ResourceLocation id() {
+    public Identifier id() {
         return ID;
     }
 

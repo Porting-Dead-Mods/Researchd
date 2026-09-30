@@ -11,8 +11,8 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 
 /**
  * Most basic researchPack, providing functionality and data for both displaying and researchPack logic
@@ -24,8 +24,7 @@ public interface Research {
     Codec<Research> CODEC = ResearchdRegistries.RESEARCH_SERIALIZER
             .byNameCodec()
             .dispatch(Research::getSerializer, ResearchSerializer::codec);
-    StreamCodec<RegistryFriendlyByteBuf, Research> STREAM_CODEC =
-            ByteBufCodecs.fromCodecTrusted(CODEC).cast();
+    StreamCodec<RegistryFriendlyByteBuf, Research> STREAM_CODEC = ByteBufCodecs.fromCodecWithRegistriesTrusted(CODEC);
     Codec<ResourceKey<Research>> RESOURCE_KEY_CODEC = ResourceKey.codec(ResearchdRegistries.RESEARCH_KEY);
     StreamCodec<ByteBuf, ResourceKey<Research>> RESOURCE_KEY_STREAM_CODEC =
             ResourceKey.streamCodec(ResearchdRegistries.RESEARCH_KEY);
@@ -59,12 +58,12 @@ public interface Research {
     boolean requiresParent();
 
     /**
-     * @return The {@link ResourceLocation} id of the researchPack page this researchPack belongs to.
+     * @return The {@link Identifier} id of the researchPack page this researchPack belongs to.
      * Only root researches (without parents) should explicitly define this.
      * Child researches inherit the page from their parents.
      * Defaults to {@link ResearchPage#DEFAULT_PAGE_ID}
      */
-    default ResourceLocation researchPage() {
+    default Identifier researchPage() {
         return ResearchPage.DEFAULT_PAGE_ID;
     }
 
@@ -74,16 +73,16 @@ public interface Research {
     ResearchSerializer<?> getSerializer();
 
     static Component getLangName(ResourceKey<Research> key) {
-        String registryPath = ResearchdRegistries.RESEARCH_KEY.location().getPath();
-        String keyNamespace = key.location().getNamespace();
-        String keyPath = key.location().getPath();
+        String registryPath = ResearchdRegistries.RESEARCH_KEY.identifier().getPath();
+        String keyNamespace = key.identifier().getNamespace();
+        String keyPath = key.identifier().getPath();
         return Component.translatable(String.format("%s.%s.%s_name", registryPath, keyNamespace, keyPath));
     }
 
     static Component getLangDesc(ResourceKey<Research> key) {
-        String registryPath = ResearchdRegistries.RESEARCH_KEY.location().getPath();
-        String keyNamespace = key.location().getNamespace();
-        String keyPath = key.location().getPath();
+        String registryPath = ResearchdRegistries.RESEARCH_KEY.identifier().getPath();
+        String keyNamespace = key.identifier().getNamespace();
+        String keyPath = key.identifier().getPath();
         return Component.translatable(String.format("%s.%s.%s_desc", registryPath, keyNamespace, keyPath));
     }
 }

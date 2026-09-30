@@ -3,9 +3,9 @@ package com.portingdeadmods.researchd.client.screens.research.graph.lines;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Renderable;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,7 +13,7 @@ public class ResearchLine implements Renderable {
     private final LinkedList<Point> points;
     private @Nullable ResearchHead startHead;
     private @Nullable ResearchHead endHead;
-    private int color = FastColor.ARGB32.color(255, 255, 255, 255);
+    private int color = ARGB.color(255, 255, 255, 255);
 
     private ResearchLine() {
         this.points = new LinkedList<>();
@@ -297,7 +297,7 @@ public class ResearchLine implements Renderable {
         return createLConnection(outputPoint, inputPoint, verticalFirst);
     }
 
-    public void render(@NotNull GuiGraphics guiGraphics) {
+    public void render(@NotNull GuiGraphicsExtractor guiGraphics) {
         if (points.size() < 2) return;
 
         Point prev = points.getFirst();
@@ -308,7 +308,7 @@ public class ResearchLine implements Renderable {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int i1, float v) {
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int i, int i1, float v) {
         render(guiGraphics);
     }
 

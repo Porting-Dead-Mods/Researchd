@@ -10,24 +10,24 @@ import com.portingdeadmods.researchd.utils.registries.ResearchdManagers;
 import java.util.Collections;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 public class ResearchCreationPopupWidget extends AbstractStandaloneCreationPopupWidget<Research> {
-    public static final ResourceLocation DEFAULT_ID = Researchd.rl(SimpleResearch.ID);
+    public static final Identifier DEFAULT_ID = Researchd.rl(SimpleResearch.ID);
 
     public ResearchCreationPopupWidget(
-            @Nullable Research previous, @Nullable ResourceLocation previousId, int x, int y, int width, int height) {
+            @Nullable Research previous, @Nullable Identifier previousId, int x, int y, int width, int height) {
         super(DEFAULT_ID, ResearchdClient.CLIENT_RESEARCHES::get, previous, previousId, x, y, width, height);
     }
 
     @Override
-    protected void insertObjectToData(ResourceLocation id, Research object) {
+    protected void insertObjectToData(Identifier id, Research object) {
         ResearchdManagers.getResearchesManager(Minecraft.getInstance().level)
                 .mergeContents(Collections.singletonMap(id, object));
-        PacketDistributor.sendToServer(
+        ClientPacketDistributor.sendToServer(
                 new CreateResearchPayload(ResourceKey.create(ResearchdRegistries.RESEARCH_KEY, id), object, true));
     }
 

@@ -94,7 +94,7 @@ public record TeamResearches(
         ResearchInstance instance = this.researches.get(research);
         if (instance == null) {
             Researchd.error(
-                    "Team Researches", "Tried to complete %s, which this team has no entry for", research.location());
+                    "Team Researches", "Tried to complete %s, which this team has no entry for", research.identifier());
             return;
         }
 

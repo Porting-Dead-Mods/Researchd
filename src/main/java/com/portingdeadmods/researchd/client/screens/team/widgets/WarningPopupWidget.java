@@ -1,22 +1,21 @@
 package com.portingdeadmods.researchd.client.screens.team.widgets;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.team.TeamMember;
-import com.portingdeadmods.researchd.client.screens.RdZIndex;
+import com.portingdeadmods.researchd.utils.GuiUtils;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class WarningPopupWidget extends AbstractWidget {
-    public static final ResourceLocation TEXTURE = Researchd.rl("textures/gui/popup_window.png");
+    public static final Identifier TEXTURE = Researchd.rl("textures/gui/popup_window.png");
     private Component title;
     private List<Component> bodyText;
     private final Button acceptButton;
@@ -35,40 +34,29 @@ public class WarningPopupWidget extends AbstractWidget {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        PoseStack poseStack = guiGraphics.pose();
+    protected void extractWidgetRenderState(
+            GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        GuiUtils.drawImg(guiGraphics, TEXTURE, getX(), getY(), width, height);
 
-        poseStack.pushPose();
-        {
-            poseStack.translate(0, 0, RdZIndex.WARNING_POPUP);
-
-            GuiUtils.drawImg(guiGraphics, TEXTURE, getX(), getY(), width, height);
-
-            Font font = Minecraft.getInstance().font;
-            guiGraphics.drawCenteredString(font, this.title, getX() + width / 2, getY() + 4, -1);
-            for (int i = 0; i < this.bodyText.size(); i++) {
-                guiGraphics.drawCenteredString(
-                        font,
-                        this.bodyText.get(i),
-                        getX() + width / 2,
-                        getY() + 8 + ((i + 1) * font.lineHeight + 2),
-                        -1);
-            }
-
-            this.acceptButton.render(guiGraphics, mouseX, mouseY, partialTicks);
-            this.cancelButton.render(guiGraphics, mouseX, mouseY, partialTicks);
+        Font font = Minecraft.getInstance().font;
+        guiGraphics.centeredText(font, this.title, getX() + width / 2, getY() + 4, -1);
+        for (int i = 0; i < this.bodyText.size(); i++) {
+            guiGraphics.centeredText(
+                    font, this.bodyText.get(i), getX() + width / 2, getY() + 8 + ((i + 1) * font.lineHeight + 2), -1);
         }
-        poseStack.popPose();
+
+        this.acceptButton.extractRenderState(guiGraphics, mouseX, mouseY, partialTicks);
+        this.cancelButton.extractRenderState(guiGraphics, mouseX, mouseY, partialTicks);
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         if (this.acceptButton.isHovered()) {
-            this.acceptButton.mouseClicked(mouseX, mouseY, button);
+            this.acceptButton.mouseClicked(event, doubleClick);
         } else if (this.cancelButton.isHovered()) {
-            this.cancelButton.mouseClicked(mouseX, mouseY, button);
+            this.cancelButton.mouseClicked(event, doubleClick);
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override

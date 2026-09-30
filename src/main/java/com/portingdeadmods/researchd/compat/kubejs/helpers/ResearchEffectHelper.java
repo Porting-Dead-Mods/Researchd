@@ -5,7 +5,7 @@ import com.portingdeadmods.researchd.impl.research.effect.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 
 public class ResearchEffectHelper {
@@ -15,7 +15,7 @@ public class ResearchEffectHelper {
     }
 
     public static ResearchEffect unlockRecipe(String recipeId) {
-        return new RecipeUnlockEffect(ResourceLocation.parse(recipeId));
+        return new RecipeUnlockEffect(Identifier.parse(recipeId));
     }
 
     public static ResearchEffect unlockRecipes(String... recipeIds) {
@@ -33,7 +33,7 @@ public class ResearchEffectHelper {
     }
 
     public static ResearchEffect unlockItem(String itemId) {
-        return new ItemUnlockEffect(ResourceLocation.parse(itemId));
+        return new ItemUnlockEffect(Identifier.parse(itemId));
     }
 
     public static ResearchEffect unlockItems(String... itemIds) {
@@ -51,7 +51,7 @@ public class ResearchEffectHelper {
     }
 
     public static ResearchEffect unlockDimension(String dimension) {
-        return new DimensionUnlockEffect(ResourceLocation.parse(dimension), DimensionUnlockEffect.DEFAULT_SPRITE);
+        return new DimensionUnlockEffect(Identifier.parse(dimension), DimensionUnlockEffect.DEFAULT_SPRITE);
     }
 
     public static ResearchEffect unlockDimensions(String... dimensions) {
@@ -69,11 +69,11 @@ public class ResearchEffectHelper {
     }
 
     public static ResearchEffect unlockNether() {
-        return new DimensionUnlockEffect(Level.NETHER.location(), DimensionUnlockEffect.NETHER_SPRITE);
+        return new DimensionUnlockEffect(Level.NETHER.identifier(), DimensionUnlockEffect.NETHER_SPRITE);
     }
 
     public static ResearchEffect unlockEnd() {
-        return new DimensionUnlockEffect(Level.END.location(), DimensionUnlockEffect.END_SPRITE);
+        return new DimensionUnlockEffect(Level.END.identifier(), DimensionUnlockEffect.END_SPRITE);
     }
 
     /**

@@ -41,17 +41,18 @@ public final class ResearchdServerTickHandler {
 
                         // If progress has changed, we sync
                         if (oldProgress != currentProgress.getProgress()) {
+                            ResearchProgressSyncPayload payload =
+                                    ResearchProgressSyncPayload.snapshot(currentResearch, currentProgress);
                             for (TeamMember member : team.getMembers()) {
                                 ServerPlayer player = server.getPlayerList().getPlayer(member.player());
                                 if (player == null) continue; // skip offline members
-                                PacketDistributor.sendToPlayer(
-                                        player, new ResearchProgressSyncPayload(currentResearch, currentProgress));
+                                PacketDistributor.sendToPlayer(player, payload);
                             }
                         }
 
                         if (currentProgress.isComplete()) {
                             // Research Complete Logic
-                            long completionTime = server.overworld().getDayTime() * 50L;
+                            long completionTime = server.overworld().getOverworldClockTime() * 50L;
                             team.setResearchCompleted(currentResearch, completionTime);
                             team.onCompleteResearch(currentResearch, completionTime, server.getPlayerList()::getPlayer);
 
@@ -59,7 +60,7 @@ public final class ResearchdServerTickHandler {
                         }
                     } else {
                         Researchd.LOGGER.error(
-                                "Current research progress for research {} is null", currentResearch.location());
+                                "Current research progress for research {} is null", currentResearch.identifier());
                     }
                 }
             }

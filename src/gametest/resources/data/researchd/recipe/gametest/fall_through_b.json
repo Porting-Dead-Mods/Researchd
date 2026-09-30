@@ -1,0 +1,6 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": ["minecraft:dead_bush"],
+  "result": { "id": "minecraft:emerald" }
+}

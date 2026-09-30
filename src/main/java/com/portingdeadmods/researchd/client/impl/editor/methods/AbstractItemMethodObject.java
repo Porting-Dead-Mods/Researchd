@@ -68,6 +68,11 @@ public abstract class AbstractItemMethodObject<T extends ItemResearchMethod>
 
     @Override
     public Result<Unit, Exception> valid(RememberingLinearLayout layout) {
+        if (layout.getChild("item_selector", ItemSelectorWidget.class)
+                .getSelected()
+                .isEmpty()) {
+            return Result.err("Cannot create item research method, no item is selected");
+        }
         return Result.ok(Unit.INSTANCE);
     }
 }

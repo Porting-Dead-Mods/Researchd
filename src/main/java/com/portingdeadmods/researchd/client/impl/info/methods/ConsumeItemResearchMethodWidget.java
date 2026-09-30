@@ -10,10 +10,11 @@ import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.util.Size2i;
@@ -27,21 +28,21 @@ public class ConsumeItemResearchMethodWidget extends AbstractResearchInfoWidget<
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int i, int i1, float v) {
+    protected void extractWidgetRenderState(GuiGraphicsExtractor guiGraphics, int i, int i1, float v) {
         int x = getX();
         int y = getY();
-        guiGraphics.fill(x, y, x + this.width, y + this.height, FastColor.ARGB32.color(69, 69, 69));
+        guiGraphics.fill(x, y, x + this.width, y + this.height, ARGB.color(69, 69, 69));
         this.itemRenderer.render(guiGraphics, x, y);
         this.itemRenderer.tick(v);
     }
 
     @Override
-    public void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void renderTooltip(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
         Font font = Minecraft.getInstance().font;
         if (this.isHovered()) {
             Ingredient consume = value.item();
             if (!consume.isEmpty()) {
-                ItemStack stack = new ItemStack(consume.getItems()[0].getItem(), value.count());
+                ItemStack stack = new ItemStack(consume.items().findFirst().orElseThrow(), value.count());
                 List<Component> tooltip = new ArrayList<>(Screen.getTooltipFromItem(Minecraft.getInstance(), stack));
                 tooltip.addFirst(Component.literal("Consume ")
                         .withStyle(ChatFormatting.WHITE)
@@ -54,7 +55,7 @@ public class ConsumeItemResearchMethodWidget extends AbstractResearchInfoWidget<
     }
 
     @Override
-    public void onClick(double mouseX, double mouseY, int button) {
+    public void onClick(MouseButtonEvent event, boolean doubleClick) {
         if (this.isHovered()) {
             RecipeViewerHelper.openRecipesByResult(this.itemRenderer.getItem());
         }

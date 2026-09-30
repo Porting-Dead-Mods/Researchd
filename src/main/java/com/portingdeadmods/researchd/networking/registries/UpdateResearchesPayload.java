@@ -8,12 +8,12 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public record UpdateResearchesPayload(HashMap<ResourceLocation, Research> researches) implements CustomPacketPayload {
+public record UpdateResearchesPayload(HashMap<Identifier, Research> researches) implements CustomPacketPayload {
     public static final StreamCodec<? super RegistryFriendlyByteBuf, UpdateResearchesPayload> STREAM_CODEC =
-            ByteBufCodecs.map(HashMap::new, ResourceLocation.STREAM_CODEC, Research.STREAM_CODEC)
+            ByteBufCodecs.map(HashMap::new, Identifier.STREAM_CODEC, Research.STREAM_CODEC)
                     .map(UpdateResearchesPayload::new, UpdateResearchesPayload::researches);
     public static final Type<UpdateResearchesPayload> TYPE = new Type<>(Researchd.rl("update_researches"));
 

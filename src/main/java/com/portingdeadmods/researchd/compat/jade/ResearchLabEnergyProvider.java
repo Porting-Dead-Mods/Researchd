@@ -4,10 +4,9 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.content.blockentities.ResearchLabControllerBE;
 import com.portingdeadmods.researchd.content.blockentities.ResearchLabPartBE;
 import java.util.List;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import org.jetbrains.annotations.Nullable;
 import snownee.jade.api.Accessor;
 import snownee.jade.api.BlockAccessor;
@@ -18,39 +17,40 @@ import snownee.jade.api.view.IServerExtensionProvider;
 import snownee.jade.api.view.ViewGroup;
 
 public enum ResearchLabEnergyProvider
-        implements IServerExtensionProvider<CompoundTag>, IClientExtensionProvider<CompoundTag, EnergyView> {
+        implements IServerExtensionProvider<EnergyView.Data>, IClientExtensionProvider<EnergyView.Data, EnergyView> {
     INSTANCE;
 
-    private static final ResourceLocation UID = Researchd.rl("research_lab_energy");
+    private static final Identifier UID = Researchd.rl("research_lab_energy");
 
     @Override
-    public ResourceLocation getUid() {
+    public Identifier getUid() {
         return UID;
     }
 
     @Override
-    public List<ViewGroup<CompoundTag>> getGroups(Accessor<?> accessor) {
+    public List<ViewGroup<EnergyView.Data>> getGroups(Accessor<?> accessor) {
         if (ResearchLabControllerBE.getEnergyUsage() <= 0) return List.of();
 
-        IEnergyStorage energyStorage = getEnergyStorage(accessor);
-        if (energyStorage == null) return List.of();
+        EnergyHandler energyHandler = getEnergyHandler(accessor);
+        if (energyHandler == null) return List.of();
 
-        CompoundTag energy = EnergyView.of(energyStorage.getEnergyStored(), energyStorage.getMaxEnergyStored());
+        EnergyView.Data energy =
+                new EnergyView.Data(energyHandler.getAmountAsLong(), energyHandler.getCapacityAsLong());
         return List.of(new ViewGroup<>(List.of(energy)));
     }
 
     @Override
     public List<ClientViewGroup<EnergyView>> getClientGroups(
-            Accessor<?> accessor, List<ViewGroup<CompoundTag>> groups) {
-        return ClientViewGroup.map(groups, tag -> EnergyView.read(tag, "FE"), null);
+            Accessor<?> accessor, List<ViewGroup<EnergyView.Data>> groups) {
+        return ClientViewGroup.map(groups, data -> EnergyView.read(data, "FE"), null);
     }
 
-    private static @Nullable IEnergyStorage getEnergyStorage(Accessor<?> accessor) {
+    private static @Nullable EnergyHandler getEnergyHandler(Accessor<?> accessor) {
         if (!(accessor instanceof BlockAccessor blockAccessor)) return null;
 
         BlockEntity blockEntity = blockAccessor.getBlockEntity();
         if (blockEntity instanceof ResearchLabControllerBE controller) {
-            return controller.getEnergyStorage();
+            return controller.getEnergyHandler();
         }
         if (blockEntity instanceof ResearchLabPartBE part) {
             return part.getControllerEnergyStorage();

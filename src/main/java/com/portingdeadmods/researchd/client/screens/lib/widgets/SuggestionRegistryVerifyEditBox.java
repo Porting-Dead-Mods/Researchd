@@ -1,11 +1,10 @@
 package com.portingdeadmods.researchd.client.screens.lib.widgets;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.portingdeadmods.researchd.client.screens.RdZIndex;
 import com.portingdeadmods.researchd.client.screens.editor.widgets.dropdowns.RegistrySuggestionDropDownWidget;
 import java.util.List;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.CommonComponents;
 import org.jetbrains.annotations.Nullable;
@@ -21,16 +20,12 @@ public class SuggestionRegistryVerifyEditBox extends RegistryVerifyEditBox {
     }
 
     @Override
-    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+    public void extractWidgetRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.extractWidgetRenderState(guiGraphics, mouseX, mouseY, partialTick);
 
-        PoseStack poseStack = guiGraphics.pose();
-        poseStack.pushPose();
-        {
-            poseStack.translate(0, 0, RdZIndex.DROP_DOWN);
-            this.dropDown.render(guiGraphics, mouseX, mouseY, partialTick);
-        }
-        poseStack.popPose();
+        // TODO(26.1 port, GUI parity): 26.1 GUI layering follows draw order, so the drop-down no longer sits above
+        // widgets drawn after it; checked in the client visual parity pass
+        this.dropDown.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     @Override
@@ -43,13 +38,11 @@ public class SuggestionRegistryVerifyEditBox extends RegistryVerifyEditBox {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (this.dropDown.isHovered()
-                && this.dropDown.isVisible()
-                && this.dropDown.mouseClicked(mouseX, mouseY, button)) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        if (this.dropDown.isHovered() && this.dropDown.isVisible() && this.dropDown.mouseClicked(event, doubleClick)) {
             return true;
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override

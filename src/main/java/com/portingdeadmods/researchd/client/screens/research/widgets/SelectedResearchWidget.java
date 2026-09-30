@@ -1,7 +1,6 @@
 package com.portingdeadmods.researchd.client.screens.research.widgets;
 
 import com.portingdeadmods.portingdeadlibs.api.client.screens.widgets.AbstractScroller;
-import com.portingdeadmods.portingdeadlibs.utils.renderers.GuiUtils;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdClient;
 import com.portingdeadmods.researchd.ResearchdConfig;
@@ -15,26 +14,29 @@ import com.portingdeadmods.researchd.client.screens.lib.widgets.WidgetConstructo
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
+import com.portingdeadmods.researchd.utils.GuiUtils;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.MultiLineTextWidget;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
 public class SelectedResearchWidget extends ResearchScreenWidget {
-    private static final ResourceLocation BACKGROUND_TEXTURE = Researchd.rl("textures/gui/selected_research.png");
-    private static final ResourceLocation BACKGROUND_TEXTURE_HORIZONTAL_SCROLLBAR =
+    private static final Identifier BACKGROUND_TEXTURE = Researchd.rl("textures/gui/selected_research.png");
+    private static final Identifier BACKGROUND_TEXTURE_HORIZONTAL_SCROLLBAR =
             Researchd.rl("textures/gui/selected_research_horizontal_scrollbar.png");
-    private static final ResourceLocation SMALL_SCROLLER_SPRITE = Researchd.rl("scroller_small");
+    private static final Identifier SMALL_SCROLLER_SPRITE = Researchd.rl("scroller_small");
     // For calculating height
     public static final int LABEL_PADDING_TOP_1 = 2;
     public static final int LABEL_PADDING_BOTTOM_1 = 4;
@@ -104,7 +106,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
+    protected void extractWidgetRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float v) {
         GuiUtils.drawImg(
                 guiGraphics,
                 this.sideScroller.visible ? BACKGROUND_TEXTURE_HORIZONTAL_SCROLLBAR : BACKGROUND_TEXTURE,
@@ -114,6 +116,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
                 height);
         float percentage = (float) this.scrollOffset / (this.getInfoHeight() - 47f);
         guiGraphics.blitSprite(
+                RenderPipelines.GUI_TEXTURED,
                 SMALL_SCROLLER_SPRITE,
                 getX() + getWidth() - 9,
                 (int) (getY() + PADDING_Y + (41 * percentage)),
@@ -127,7 +130,8 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
             Font font = mc.font;
             int startY = 60;
 
-            guiGraphics.drawScrollingString(font, this.selectedInstance.getDisplayName(mc.level), 11, 169, 49, -1);
+            guiGraphics.drawScrollingString(
+                    guiGraphics.textRenderer(), font, this.selectedInstance.getDisplayName(mc.level), 11, 169, 49);
             renderResearchPanel(guiGraphics, this.selectedInstance, 12, 60, mouseX, mouseY, 2, false);
 
             int horizontalScrollerArea = this.sideScroller.visible ? 5 : 0;
@@ -135,14 +139,14 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
                     53, startY, 53 + DESCRIPTION_WIDTH, startY + DESCRIPTION_HEIGHT - horizontalScrollerArea);
             {
                 int yPosMethodLabel = startY + LABEL_PADDING_TOP_1;
-                guiGraphics.drawString(
+                guiGraphics.text(
                         font,
                         ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_LABEL_RESEARCH_METHODS),
                         53 + METHOD_WIDGET_PADDING - this.sideScroller.getScrollOffset(),
                         offsetY + yPosMethodLabel,
                         -1);
 
-                this.methodWidget.render(guiGraphics, mouseX, mouseY, v);
+                this.methodWidget.extractRenderState(guiGraphics, mouseX, mouseY, v);
 
                 int yPosLine = startY
                         + LABEL_PADDING_TOP_1
@@ -153,21 +157,21 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
                 guiGraphics.fill(53, offsetY + yPosLine, 53 + DESCRIPTION_WIDTH, offsetY + yPosLine + LINE_HEIGHT, -1);
 
                 int yPosEffectsLabel = yPosLine + LINE_HEIGHT + LABEL_PADDING_TOP_2;
-                guiGraphics.drawString(
+                guiGraphics.text(
                         font,
                         ResearchdTranslations.component(ResearchdTranslations.Research.SCREEN_LABEL_RESEARCH_EFFECTS),
                         53 + METHOD_WIDGET_PADDING - this.sideScroller.getScrollOffset(),
                         offsetY + yPosEffectsLabel,
                         -1);
 
-                this.effectWidget.render(guiGraphics, mouseX, mouseY, v);
+                this.effectWidget.extractRenderState(guiGraphics, mouseX, mouseY, v);
                 // guiGraphics.fill(53, startY + offsetY, 53 + DESCRIPTION_WIDTH, startY + offsetY +
-                // this.getInfoHeight(), FastColor.ARGB32.color(100, 0, 0, 155));
+                // this.getInfoHeight(), ARGB.color(100, 0, 0, 155));
             }
             guiGraphics.disableScissor();
 
             if (this.sideScroller.visible)
-                guiGraphics.hLine(
+                guiGraphics.horizontalLine(
                         HORIZONTAL_SCROLLER_X,
                         HORIZONTAL_SCROLLER_X + DESCRIPTION_WIDTH,
                         HORIZONTAL_SCROLLER_Y - 1,
@@ -177,7 +181,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
         }
     }
 
-    public void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
+    public void renderTooltip(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float v) {
         if (this.methodWidget instanceof AbstractResearchInfoWidget<?> infoWidget) {
             infoWidget.renderTooltip(guiGraphics, mouseX, mouseY, v);
         }
@@ -238,13 +242,15 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        double mouseX = event.x();
+        double mouseY = event.y();
         if (this.effectWidget != null && this.effectWidget.isHovered()) {
-            return this.effectWidget.mouseClicked(mouseX, mouseY, button);
+            return this.effectWidget.mouseClicked(event, doubleClick);
         }
 
         if (this.methodWidget != null && this.methodWidget.isHovered()) {
-            return this.methodWidget.mouseClicked(mouseX, mouseY, button);
+            return this.methodWidget.mouseClicked(event, doubleClick);
         }
 
         int scrollerX = getX() + getWidth() - 9;
@@ -268,8 +274,8 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
     }
 
     @Override
-    public void onDrag(double mouseX, double mouseY, double dragX, double dragY) {
-        this.mouseClicked(mouseX, mouseY, 0);
+    public void onDrag(MouseButtonEvent event, double dragX, double dragY) {
+        this.mouseClicked(event, false);
     }
 
     public void setSelectedResearch(@Nullable ResourceKey<Research> research) {
@@ -280,7 +286,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
             ResearchInstance instance = team.getResearches().get(research);
             if (instance == null) {
                 Researchd.error(
-                        "Research Screen", "Cannot select %s, this team has no entry for it", research.location());
+                        "Research Screen", "Cannot select %s, this team has no entry for it", research.identifier());
                 return;
             }
 
@@ -295,7 +301,7 @@ public class SelectedResearchWidget extends ResearchScreenWidget {
                 Researchd.error(
                         "Research Screen",
                         "Cannot select %s, it is not part of the loaded researches",
-                        instance.getResearch().location());
+                        instance.getResearch().identifier());
                 return;
             }
 

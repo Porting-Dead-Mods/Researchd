@@ -1,0 +1,6 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": ["minecraft:written_book", "minecraft:writable_book"],
+  "result": { "id": "minecraft:paper" }
+}

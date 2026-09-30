@@ -2,17 +2,19 @@ package com.portingdeadmods.researchd.client.screens.lib.widgets;
 
 import com.portingdeadmods.researchd.Researchd;
 import java.util.Collection;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 // TODO: Move to pdl
 public abstract class ContainerWidget<E> extends AbstractWidget {
-    public static final ResourceLocation SCROLLER_SMALL_SPRITE = Researchd.rl("scroller_small");
-    public static final ResourceLocation SCROLLER_SMALL_HORIZONTAL_SPRITE = Researchd.rl("scroller_small_horizontal");
+    public static final Identifier SCROLLER_SMALL_SPRITE = Researchd.rl("scroller_small");
+    public static final Identifier SCROLLER_SMALL_HORIZONTAL_SPRITE = Researchd.rl("scroller_small_horizontal");
     private final int itemWidth;
     private final int itemHeight;
     private final Orientation orientation;
@@ -61,7 +63,7 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
+    protected void extractWidgetRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float v) {
         this.hoveredItem = null;
         this.hoveredXIndex = -1;
         this.hoveredYIndex = -1;
@@ -83,16 +85,22 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
         renderTooltips(guiGraphics, mouseX, mouseY, v);
     }
 
-    protected void renderTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {}
+    protected void renderTooltips(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float v) {}
 
-    protected void renderScroller(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderScroller(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         float percentage = (float) this.scrollOffset / getMaxScrollDistance();
         if (Float.isNaN(percentage)) {
             percentage = 0;
         }
         int x = this.getScrollerX(percentage);
         int y = this.getScrollerY(percentage);
-        guiGraphics.blitSprite(orientation.scrollerSprite, x, y, orientation.spriteWidth, orientation.spriteHeight);
+        guiGraphics.blitSprite(
+                RenderPipelines.GUI_TEXTURED,
+                orientation.scrollerSprite,
+                x,
+                y,
+                orientation.spriteWidth,
+                orientation.spriteHeight);
     }
 
     private int getMaxScrollDistance() {
@@ -153,7 +161,9 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        double mouseX = event.x();
+        double mouseY = event.y();
         if (this.isHovered() && !this.isScrollbarHovered((int) mouseX, (int) mouseY)) {
             int left = this.getLeft() + (this.hoveredXIndex * this.getItemWidth());
             int top = this.getTop() + (this.hoveredYIndex * this.getItemHeight());
@@ -161,7 +171,7 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
                 this.clickedItem(
                         this.hoveredItem, this.hoveredXIndex, this.hoveredYIndex, left, top, (int) mouseX, (int)
                                 mouseY);
-                return super.mouseClicked(mouseX, mouseY, button);
+                return super.mouseClicked(event, doubleClick);
             }
         } else if (this.isHovered() && this.isScrollbarHovered((int) mouseX, (int) mouseY) && this.renderScroller) {
             int scrollableDistance = this.getMaxScrollDistance();
@@ -180,9 +190,9 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
     }
 
     @Override
-    protected void onDrag(double mouseX, double mouseY, double dragX, double dragY) {
-        if (this.isScrollbarHovered((int) mouseX, (int) mouseY)) {
-            this.mouseClicked(mouseX, mouseY, 0);
+    protected void onDrag(MouseButtonEvent event, double dragX, double dragY) {
+        if (this.isScrollbarHovered((int) event.x(), (int) event.y())) {
+            this.mouseClicked(event, false);
         }
     }
 
@@ -218,7 +228,7 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
         return this.getX() + 1;
     }
 
-    protected void renderContainer(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+    protected void renderContainer(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
         int xIndex = 0;
         int yIndex = 0;
         boolean isAnyHovered = false;
@@ -280,12 +290,19 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
     public abstract void clickedItem(E item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY);
 
     public final void renderItem(
-            GuiGraphics guiGraphics, E item, int index, int left, int top, int mouseX, int mouseY) {
+            GuiGraphicsExtractor guiGraphics, E item, int index, int left, int top, int mouseX, int mouseY) {
         this.renderItem(guiGraphics, item, 0, index, left, top, mouseX, mouseY);
     }
 
     public final void renderItem(
-            GuiGraphics guiGraphics, E item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {
+            GuiGraphicsExtractor guiGraphics,
+            E item,
+            int xIndex,
+            int yIndex,
+            int left,
+            int top,
+            int mouseX,
+            int mouseY) {
         if (guiGraphics.containsPointInScissor(mouseX, mouseY) && this.isItemHovered(xIndex, yIndex, mouseX, mouseY)) {
             this.hoveredItem = item;
             this.hoveredXIndex = xIndex;
@@ -295,7 +312,14 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
     }
 
     protected abstract void internalRenderItem(
-            GuiGraphics guiGraphics, E item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY);
+            GuiGraphicsExtractor guiGraphics,
+            E item,
+            int xIndex,
+            int yIndex,
+            int left,
+            int top,
+            int mouseX,
+            int mouseY);
 
     @Override
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
@@ -304,11 +328,11 @@ public abstract class ContainerWidget<E> extends AbstractWidget {
         HORIZONTAL(SCROLLER_SMALL_HORIZONTAL_SPRITE, 7, 4),
         VERTICAL(SCROLLER_SMALL_SPRITE, 4, 7);
 
-        private final ResourceLocation scrollerSprite;
+        private final Identifier scrollerSprite;
         private final int spriteWidth;
         private final int spriteHeight;
 
-        Orientation(ResourceLocation scrollerSprite, int spriteWidth, int spriteHeight) {
+        Orientation(Identifier scrollerSprite, int spriteWidth, int spriteHeight) {
             this.scrollerSprite = scrollerSprite;
             this.spriteWidth = spriteWidth;
             this.spriteHeight = spriteHeight;

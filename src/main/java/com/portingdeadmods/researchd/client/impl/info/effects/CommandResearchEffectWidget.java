@@ -11,19 +11,20 @@ import java.util.List;
 import java.util.regex.Matcher;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.data.AtlasIds;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.common.util.Size2i;
 
 public class CommandResearchEffectWidget extends AbstractResearchInfoWidget<CommandResearchEffect> {
     public static final Size2i SPRITE_SIZE = new Size2i(14, 14);
-    private static final ResourceLocation COMMAND_BLOCK_FRONT =
-            ResourceLocation.withDefaultNamespace("block/command_block_front");
+    private static final Identifier COMMAND_BLOCK_FRONT = Identifier.withDefaultNamespace("block/command_block_front");
 
     public CommandResearchEffectWidget(int x, int y, CommandResearchEffect effect) {
         super(x, y, effect);
@@ -35,7 +36,7 @@ public class CommandResearchEffectWidget extends AbstractResearchInfoWidget<Comm
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
+    protected void extractWidgetRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float v) {
         guiGraphics.fill(
                 this.getX(),
                 this.getY(),
@@ -43,15 +44,21 @@ public class CommandResearchEffectWidget extends AbstractResearchInfoWidget<Comm
                 this.getY() + this.getSize().height,
                 BACKGROUND_COLOR);
         TextureAtlasSprite sprite = Minecraft.getInstance()
-                .getTextureAtlas(TextureAtlas.LOCATION_BLOCKS)
-                .apply(COMMAND_BLOCK_FRONT);
+                .getAtlasManager()
+                .getAtlasOrThrow(AtlasIds.BLOCKS)
+                .getSprite(COMMAND_BLOCK_FRONT);
 
-        guiGraphics.blit(
-                (int) ((this.getX() + 1)), (int) ((this.getY() + 1)), 0, SPRITE_SIZE.width, SPRITE_SIZE.height, sprite);
+        guiGraphics.blitSprite(
+                RenderPipelines.GUI_TEXTURED,
+                sprite,
+                this.getX() + 1,
+                this.getY() + 1,
+                SPRITE_SIZE.width,
+                SPRITE_SIZE.height);
     }
 
     @Override
-    public void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void renderTooltip(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
         if (this.isHovered()) {
             List<Component> tooltip = new ArrayList<>();
             if (!this.value.onUnlockCommand().isBlank()) {
@@ -91,7 +98,7 @@ public class CommandResearchEffectWidget extends AbstractResearchInfoWidget<Comm
         switch (placeholder) {
             case CommandResearchEffect.PLAYER_NAME_PLACEHOLDER -> {
                 LocalPlayer player = Minecraft.getInstance().player;
-                if (player != null) return player.getGameProfile().getName();
+                if (player != null) return player.getGameProfile().name();
             }
             case CommandResearchEffect.TEAM_NAME_PLACEHOLDER -> {
                 ResearchTeam team = ResearchTeamHelperClient.getTeam();
@@ -103,12 +110,12 @@ public class CommandResearchEffectWidget extends AbstractResearchInfoWidget<Comm
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         return false;
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+    public boolean mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
         return false;
     }
 }

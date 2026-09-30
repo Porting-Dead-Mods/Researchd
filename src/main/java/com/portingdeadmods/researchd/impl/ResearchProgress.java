@@ -101,7 +101,7 @@ public record ResearchProgress(List<Task> tasks, Type type) {
         Research research = ResearchdApi.getResearchManager().lookupResearch(key, level);
         if (research == null) {
             Researchd.error(
-                    "Research Progress", "No progress could be created for %s, it is not loaded", key.location());
+                    "Research Progress", "No progress could be created for %s, it is not loaded", key.identifier());
             return null;
         }
 

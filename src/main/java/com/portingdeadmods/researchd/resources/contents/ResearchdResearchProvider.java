@@ -19,26 +19,26 @@ import com.portingdeadmods.researchd.resources.ResearchdDatagenProvider;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.UnaryOperator;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.NotNull;
 
 public interface ResearchdResearchProvider extends ResearchdDatagenProvider<Research> {
-    default @NotNull ResourceLocation mcLoc(String path) {
-        return ResourceLocation.withDefaultNamespace(path);
+    default @NotNull Identifier mcLoc(String path) {
+        return Identifier.withDefaultNamespace(path);
     }
 
-    default @NotNull ResourceLocation modLoc(String path) {
-        return ResourceLocation.fromNamespaceAndPath(this.modid(), path);
+    default @NotNull Identifier modLoc(String path) {
+        return Identifier.fromNamespaceAndPath(this.modid(), path);
     }
 
-    default @NotNull ResourceLocation loc(String namespace, String path) {
-        return ResourceLocation.fromNamespaceAndPath(namespace, path);
+    default @NotNull Identifier loc(String namespace, String path) {
+        return Identifier.fromNamespaceAndPath(namespace, path);
     }
 
-    default @NotNull DimensionUnlockEffect unlockDimension(ResourceLocation location, ResourceLocation sprite) {
+    default @NotNull DimensionUnlockEffect unlockDimension(Identifier location, Identifier sprite) {
         return new DimensionUnlockEffect(location, sprite);
     }
 
@@ -51,7 +51,7 @@ public interface ResearchdResearchProvider extends ResearchdDatagenProvider<Rese
         return new ConsumePackResearchMethod(Arrays.asList(packs), count, duration);
     }
 
-    default @NotNull RecipeUnlockEffect unlockRecipe(ResourceLocation location) {
+    default @NotNull RecipeUnlockEffect unlockRecipe(Identifier location) {
         return new RecipeUnlockEffect(location);
     }
 
@@ -67,7 +67,7 @@ public interface ResearchdResearchProvider extends ResearchdDatagenProvider<Rese
         return ResourceKey.create(ResearchdRegistries.RESEARCH_KEY, modLoc(name));
     }
 
-    default ResourceKey<ResearchPack> pack(ResourceLocation location) {
+    default ResourceKey<ResearchPack> pack(Identifier location) {
         return ResourceKey.create(ResearchdRegistries.RESEARCH_PACK_KEY, location);
     }
 

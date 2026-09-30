@@ -1,8 +1,9 @@
 package com.portingdeadmods.researchd.client.screens.team.widgets;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
 public abstract class AbstractDraggableWidget extends AbstractWidget {
@@ -14,7 +15,7 @@ public abstract class AbstractDraggableWidget extends AbstractWidget {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int i, int i1, float v) {
+    protected void extractWidgetRenderState(GuiGraphicsExtractor guiGraphics, int i, int i1, float v) {
         if (this.updateIsHovered) {
             this.isHovered = this.isRectHovered(guiGraphics, i, i1, this.getWidth(), 12);
         }
@@ -24,8 +25,8 @@ public abstract class AbstractDraggableWidget extends AbstractWidget {
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 
     @Override
-    protected void onDrag(double mouseX, double mouseY, double dragX, double dragY) {
-        super.onDrag(mouseX, mouseY, dragX, dragY);
+    protected void onDrag(MouseButtonEvent event, double dragX, double dragY) {
+        super.onDrag(event, dragX, dragY);
 
         this.updateIsHovered = false;
 
@@ -38,8 +39,8 @@ public abstract class AbstractDraggableWidget extends AbstractWidget {
     protected void onMoved() {}
 
     @Override
-    public void onRelease(double mouseX, double mouseY) {
-        super.onRelease(mouseX, mouseY);
+    public void onRelease(MouseButtonEvent event) {
+        super.onRelease(event);
 
         this.updateIsHovered = true;
         this.isHovered = false;
@@ -49,7 +50,7 @@ public abstract class AbstractDraggableWidget extends AbstractWidget {
         return this.isHovered;
     }
 
-    protected boolean isRectHovered(GuiGraphics guiGraphics, int mouseX, int mouseY, int width, int height) {
+    protected boolean isRectHovered(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, int width, int height) {
         return guiGraphics.containsPointInScissor(mouseX, mouseY)
                 && mouseX >= this.getX()
                 && mouseY >= this.getY()

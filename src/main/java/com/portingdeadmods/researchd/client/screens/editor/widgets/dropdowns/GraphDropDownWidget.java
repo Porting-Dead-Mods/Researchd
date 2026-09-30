@@ -6,10 +6,10 @@ import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.creati
 import com.portingdeadmods.researchd.client.screens.lib.widgets.DropDownWidget;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreen;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 public class GraphDropDownWidget extends DropDownWidget<LayoutElement> {
@@ -17,7 +17,7 @@ public class GraphDropDownWidget extends DropDownWidget<LayoutElement> {
     private final int x;
     private final int y;
     private final @Nullable Research previousResearch;
-    private final @Nullable ResourceLocation previousResearchdId;
+    private final @Nullable Identifier previousResearchdId;
 
     public GraphDropDownWidget(ResearchScreen screen, int x, int y) {
         this(null, null, screen, x, y);
@@ -25,7 +25,7 @@ public class GraphDropDownWidget extends DropDownWidget<LayoutElement> {
 
     public GraphDropDownWidget(
             @Nullable Research previousResearch,
-            @Nullable ResourceLocation previousResearchdId,
+            @Nullable Identifier previousResearchdId,
             ResearchScreen screen,
             int x,
             int y) {
@@ -36,7 +36,7 @@ public class GraphDropDownWidget extends DropDownWidget<LayoutElement> {
         this.y = y;
     }
 
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void render(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
         super.render(guiGraphics, this.x, this.y, mouseX, mouseY, partialTicks);
     }
 

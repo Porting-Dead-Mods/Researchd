@@ -1,13 +1,13 @@
 package com.portingdeadmods.researchd.content.blocks;
 
 import com.mojang.serialization.MapCodec;
-import com.portingdeadmods.portingdeadlibs.api.blockentities.ContainerBlockEntity;
+import com.portingdeadmods.portingdeadlibs.api.blockentities.PDLBlockEntity;
 import com.portingdeadmods.portingdeadlibs.api.ghost.GhostMultiblockController;
 import com.portingdeadmods.researchd.registries.ResearchdBlockEntityTypes;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -21,7 +21,7 @@ public class ResearchLabController extends GhostMultiblockController {
 
     @Override
     public @NotNull RenderShape getRenderShape(BlockState p_49232_) {
-        return RenderShape.ENTITYBLOCK_ANIMATED;
+        return RenderShape.INVISIBLE; // Drawn by its block entity renderer
     }
 
     // The lab slot count is derived on both sides from the block entity's item handler size, which is
@@ -46,12 +46,17 @@ public class ResearchLabController extends GhostMultiblockController {
     }
 
     @Override
-    public BlockEntityType<? extends ContainerBlockEntity> getBlockEntityType() {
+    public BlockEntityType<? extends PDLBlockEntity> getBlockEntityType() {
         return ResearchdBlockEntityTypes.RESEARCH_LAB_CONTROLLER.get();
     }
 
     @Override
-    public @NotNull MapCodec<? extends BaseEntityBlock> codec() {
+    protected RotationType getRotationType() {
+        return RotationType.NONE;
+    }
+
+    @Override
+    public @NotNull MapCodec<? extends Block> codec() {
         return simpleCodec(ResearchLabController::new);
     }
 }

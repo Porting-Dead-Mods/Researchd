@@ -3,8 +3,8 @@ package com.portingdeadmods.researchd.api.research;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.impl.research.icons.ItemResearchIcon;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 
@@ -17,27 +17,27 @@ import net.minecraft.world.level.ItemLike;
  * @param researches All researches belonging to this page
  */
 public record ResearchPage(
-        ResourceLocation id,
+        Identifier id,
         ResearchIcon icon,
         ResourceKey<Research> iconResearchKey,
         UniqueArray<ResourceKey<Research>> researches) {
-    public static final ResourceLocation DEFAULT_PAGE_ID = Researchd.rl("default");
+    public static final Identifier DEFAULT_PAGE_ID = Researchd.rl("default");
 
     public boolean containsResearch(ResourceKey<Research> res) {
         return researches.contains(res);
     }
 
-    public static Builder builder(ResourceLocation id) {
+    public static Builder builder(Identifier id) {
         return new Builder(id);
     }
 
     public static class Builder {
-        private final ResourceLocation id;
+        private final Identifier id;
         private ResearchIcon icon = ItemResearchIcon.EMPTY;
         private ResourceKey<Research> iconResearchKey;
         private final UniqueArray<ResourceKey<Research>> researches = new UniqueArray<>();
 
-        private Builder(ResourceLocation id) {
+        private Builder(Identifier id) {
             this.id = id;
         }
 

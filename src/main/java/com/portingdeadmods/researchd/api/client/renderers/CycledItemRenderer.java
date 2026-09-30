@@ -3,9 +3,10 @@ package com.portingdeadmods.researchd.api.client.renderers;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.display.SlotDisplayContext;
 
 public class CycledItemRenderer {
     public static final float CYCLE_INTERVAL = 50.0f;
@@ -34,7 +35,9 @@ public class CycledItemRenderer {
 
     public void setItems(Ingredient ingredient) {
         this.items.clear();
-        for (ItemStack item : ingredient.getItems()) {
+        List<ItemStack> stacks =
+                ingredient.display().resolveForStacks(SlotDisplayContext.fromLevel(Minecraft.getInstance().level));
+        for (ItemStack item : stacks) {
             this.items.add(item.copyWithCount(this.count));
         }
     }
@@ -47,10 +50,10 @@ public class CycledItemRenderer {
         this.items = items;
     }
 
-    public void render(GuiGraphics guiGraphics, int x, int y) {
+    public void render(GuiGraphicsExtractor guiGraphics, int x, int y) {
         if (!this.items.isEmpty()) {
-            guiGraphics.renderFakeItem(getItem(), x, y);
-            guiGraphics.renderItemDecorations(Minecraft.getInstance().font, getItem(), x, y);
+            guiGraphics.fakeItem(getItem(), x, y);
+            guiGraphics.itemDecorations(Minecraft.getInstance().font, getItem(), x, y);
         }
     }
 

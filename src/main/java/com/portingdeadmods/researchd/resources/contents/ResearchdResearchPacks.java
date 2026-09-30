@@ -7,13 +7,13 @@ import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 
 public class ResearchdResearchPacks implements ResearchdResearchPackProvider {
-    public static final ResourceLocation OVERWORLD_PACK_LOC = Researchd.rl("overworld");
-    public static final ResourceLocation NETHER_PACK_LOC = Researchd.rl("nether");
-    public static final ResourceLocation END_PACK_LOC = Researchd.rl("end");
+    public static final Identifier OVERWORLD_PACK_LOC = Researchd.rl("overworld");
+    public static final Identifier NETHER_PACK_LOC = Researchd.rl("nether");
+    public static final Identifier END_PACK_LOC = Researchd.rl("end");
 
     private final String modid;
     private final Map<ResourceKey<ResearchPack>, ResearchPack> researchPacks;

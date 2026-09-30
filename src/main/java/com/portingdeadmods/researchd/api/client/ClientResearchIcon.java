@@ -2,7 +2,7 @@ package com.portingdeadmods.researchd.api.client;
 
 import com.portingdeadmods.researchd.ResearchdClient;
 import com.portingdeadmods.researchd.api.research.ResearchIcon;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 /**
  * Client-side version of {@link ResearchIcon} used for rendering the icon.
@@ -24,7 +24,7 @@ public interface ClientResearchIcon<I extends ResearchIcon> {
      * @param panelTop Top start position of the current panel the icon is rendered on
      */
     void render(
-            GuiGraphics guiGraphics,
+            GuiGraphicsExtractor guiGraphics,
             int panelLeft,
             int panelTop,
             int mouseX,
@@ -33,7 +33,7 @@ public interface ClientResearchIcon<I extends ResearchIcon> {
             float partialTicks);
 
     default void render(
-            GuiGraphics guiGraphics,
+            GuiGraphicsExtractor guiGraphics,
             int panelLeft,
             int panelTop,
             int mouseX,

@@ -126,7 +126,7 @@ public record ResearchGraph(ResearchNode rootNode, Map<ResourceKey<Research>, Re
             Researchd.error(
                     "Research Graph",
                     "Cannot build a graph rooted at %s, it is not part of the loaded researches",
-                    root.location());
+                    root.identifier());
             return null;
         }
 

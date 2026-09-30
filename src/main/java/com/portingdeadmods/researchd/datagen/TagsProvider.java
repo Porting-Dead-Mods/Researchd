@@ -8,25 +8,16 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraft.tags.BlockTags;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
-import org.jetbrains.annotations.Nullable;
 
 public class TagsProvider {
     public static void createTagProviders(
-            DataGenerator generator,
-            PackOutput packOutput,
-            CompletableFuture<HolderLookup.Provider> lookupProvider,
-            ExistingFileHelper existingFileHelper,
-            boolean isServer) {
-        generator.addProvider(isServer, new BlocksProvider(packOutput, lookupProvider, existingFileHelper));
+            DataGenerator generator, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+        generator.addProvider(true, new BlocksProvider(packOutput, lookupProvider));
     }
 
     protected static class BlocksProvider extends BlockTagsProvider {
-        public BlocksProvider(
-                PackOutput output,
-                CompletableFuture<HolderLookup.Provider> lookupProvider,
-                @Nullable ExistingFileHelper existingFileHelper) {
-            super(output, lookupProvider, Researchd.MODID, existingFileHelper);
+        public BlocksProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+            super(output, lookupProvider, Researchd.MODID);
         }
 
         @Override

@@ -21,7 +21,9 @@ public class ConsumeItemMethodObject extends AbstractItemMethodObject<ConsumeIte
     @Override
     public ConsumeItemResearchMethod create(RememberingLinearLayout layout) {
         return new ConsumeItemResearchMethod(
-                layout.getChild("item_selector", ItemSelectorWidget.class).getSelected(),
+                layout.getChild("item_selector", ItemSelectorWidget.class)
+                        .getSelected()
+                        .orElseThrow(),
                 NumberUtils.parseIntOr(layout.getChild("count", EditBox.class).getValue(), 1));
     }
 }

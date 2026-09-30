@@ -4,10 +4,11 @@ import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidg
 import com.portingdeadmods.researchd.compat.RecipeViewerHelper;
 import com.portingdeadmods.researchd.impl.research.effect.ItemUnlockEffect;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.util.Size2i;
 
@@ -25,31 +26,30 @@ public class UnlockItemEffectWidget extends AbstractResearchInfoWidget<ItemUnloc
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        guiGraphics.fill(
-                this.getX(), this.getY(), this.getX() + 16, this.getY() + 16, FastColor.ARGB32.color(69, 69, 69));
+    protected void extractWidgetRenderState(
+            GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+        guiGraphics.fill(this.getX(), this.getY(), this.getX() + 16, this.getY() + 16, ARGB.color(69, 69, 69));
         if (!this.icon.isEmpty()) {
-            guiGraphics.renderItem(this.icon, this.getX(), this.getY());
+            guiGraphics.item(this.icon, this.getX(), this.getY());
         } else {
-            guiGraphics.drawString(
-                    this.font, Component.literal("?"), this.getX() + 5, this.getY() + 4, 0xFFFFFF, false);
+            guiGraphics.text(this.font, Component.literal("?"), this.getX() + 5, this.getY() + 4, 0xFFFFFFFF, false);
         }
     }
 
     @Override
-    public void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void renderTooltip(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         if (this.isHovered()) {
             MutableComponent defaultName =
                     Component.translatable(this.value.getItem().getDescriptionId());
             Component displayName = this.value.name().map(Component::literal).orElse(defaultName);
             MutableComponent message = ResearchdTranslations.component(
                     ResearchdTranslations.Research.ITEM_UNLOCK_EFFECT_TOOLTIP, displayName);
-            guiGraphics.renderTooltip(this.font, message, mouseX, mouseY);
+            guiGraphics.setTooltipForNextFrame(this.font, message, mouseX, mouseY);
         }
     }
 
     @Override
-    public void onClick(double mouseX, double mouseY, int button) {
+    public void onClick(MouseButtonEvent event, boolean doubleClick) {
         if (this.isHovered()) {
             RecipeViewerHelper.openRecipesByResult(this.value.getItem().getDefaultInstance());
         }

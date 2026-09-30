@@ -38,7 +38,7 @@ public record CreateDatapackPayload(String name, String description, String name
 
     public void handle(IPayloadContext context) {
         context.enqueueWork(() -> {
-                    Path datapackDir = context.player().getServer().getWorldPath(LevelResource.DATAPACK_DIR);
+                    Path datapackDir = context.player().level().getServer().getWorldPath(LevelResource.DATAPACK_DIR);
 
                     ExampleDatapackWriter writer = new ExampleDatapackWriter(this.generateExamples());
                     String namespace1 = TextUtils.camelToSnake(this.name());

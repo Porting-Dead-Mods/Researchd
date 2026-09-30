@@ -10,8 +10,8 @@ import com.portingdeadmods.researchd.impl.ResearchProgress;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,7 +23,7 @@ public interface ResearchMethod {
     StreamCodec<RegistryFriendlyByteBuf, ResearchMethod> STREAM_CODEC = ResearchMethodSerializer.STREAM_CODEC.dispatch(
             ResearchMethod::getSerializer, ResearchMethodSerializer::streamCodec);
 
-    ResourceLocation id();
+    Identifier id();
 
     ResearchMethodType type();
 
@@ -38,7 +38,7 @@ public interface ResearchMethod {
     }
 
     default Component getTranslation() {
-        ResourceLocation id = id();
+        Identifier id = id();
         return Component.translatable("research_method." + id.getNamespace() + "." + id.getPath());
     }
 

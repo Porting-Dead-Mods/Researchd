@@ -27,7 +27,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,7 +48,7 @@ public final class ResearchTeamHelperClient {
         ResearchTeam clientTeam = getTeam();
         if (clientTeam != null && !clientTeam.getName().equals(name)) {
             clientTeam.setName(name);
-            PacketDistributor.sendToServer(new TeamSetNamePayload(name));
+            ClientPacketDistributor.sendToServer(new TeamSetNamePayload(name));
         }
     }
 
@@ -110,7 +110,7 @@ public final class ResearchTeamHelperClient {
         if (team == null) return;
 
         team.removeMember(id);
-        PacketDistributor.sendToServer(new ManageMemberPayload(id, true));
+        ClientPacketDistributor.sendToServer(new ManageMemberPayload(id, true));
         Researchd.LOGGER.debug(
                 "Remove player {}",
                 PlayerUtils.getPlayerNameFromUUID(Minecraft.getInstance().level, memberProfile.player()));
@@ -129,7 +129,7 @@ public final class ResearchTeamHelperClient {
         }
         team.setChanged();
 
-        PacketDistributor.sendToServer(new InvitePlayerPayload(invited, remove));
+        ClientPacketDistributor.sendToServer(new InvitePlayerPayload(invited, remove));
     }
 
     public static void promoteTeamMemberSynced(TeamMember member) {
@@ -138,7 +138,7 @@ public final class ResearchTeamHelperClient {
             if (team == null) return;
 
             team.setRole(member.player(), ResearchTeamRole.MODERATOR);
-            PacketDistributor.sendToServer(new ManageModeratorPayload(member.player(), false));
+            ClientPacketDistributor.sendToServer(new ManageModeratorPayload(member.player(), false));
         }
         Researchd.LOGGER.debug(
                 "Promoted player {}",
@@ -151,7 +151,7 @@ public final class ResearchTeamHelperClient {
             if (team == null) return;
 
             team.setRole(memberProfile.player(), ResearchTeamRole.MEMBER);
-            PacketDistributor.sendToServer(new ManageModeratorPayload(memberProfile.player(), true));
+            ClientPacketDistributor.sendToServer(new ManageModeratorPayload(memberProfile.player(), true));
         }
         Researchd.LOGGER.debug("Demoted player {}", memberProfile.player());
     }
@@ -161,7 +161,7 @@ public final class ResearchTeamHelperClient {
         if (team == null) return;
 
         team.setRole(nextOwner.player(), ResearchTeamRole.OWNER);
-        PacketDistributor.sendToServer(new TransferOwnershipPayload(nextOwner.player()));
+        ClientPacketDistributor.sendToServer(new TransferOwnershipPayload(nextOwner.player()));
     }
 
     public static void resolveInstances(@Nullable ResearchTeam team) {

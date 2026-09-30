@@ -1,17 +1,14 @@
 {
   "required": true,
   "package": "com.portingdeadmods.researchd.mixins",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_25",
   "mixins": [
     "BoundTickingBlockEntityMixin",
     "CraftingMenuMixin",
-    "PlayerMixin",
     "RecipeManagerMixin",
+    "RecipeMapMixin",
     "ReloadableServerResourcesMixin",
-    "create.RecipeFinderMixin",
-    "create.RecipeTrieFinderMixin",
-    "immersiveengineering.CachedRecipeListMixin",
-    "immersiveengineering.HammerItemMixin"
+    "ResultSlotMixin"
   ],
   "client": [
     "ClientLevelMixin",

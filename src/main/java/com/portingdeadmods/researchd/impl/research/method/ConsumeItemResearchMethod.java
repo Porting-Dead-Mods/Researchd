@@ -17,8 +17,8 @@ import java.util.List;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -26,8 +26,7 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
 public record ConsumeItemResearchMethod(Ingredient item, int count) implements ItemResearchMethod {
-    public static final ConsumeItemResearchMethod EMPTY = new ConsumeItemResearchMethod(Ingredient.EMPTY, 0);
-    public static final ResourceLocation ID = Researchd.rl("consume_item");
+    public static final Identifier ID = Researchd.rl("consume_item");
 
     @Override
     public void checkProgress(
@@ -80,7 +79,7 @@ public record ConsumeItemResearchMethod(Ingredient item, int count) implements I
     }
 
     @Override
-    public ResourceLocation id() {
+    public Identifier id() {
         return ID;
     }
 

@@ -10,18 +10,15 @@ import com.portingdeadmods.researchd.client.impl.editor.widgets.EditableIdListWi
 import com.portingdeadmods.researchd.impl.research.effect.RecipeUnlockEffect;
 import com.portingdeadmods.researchd.registries.ResearchEffectTypes;
 import com.portingdeadmods.researchd.utils.GuiUtils;
-import java.util.Collection;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Unit;
-import net.minecraft.world.item.crafting.RecipeManager;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
 
 public class RecipeUnlockEffectObject implements TypedEditorObject<RecipeUnlockEffect, ResearchEffectType> {
-    public static final ResourceLocation ID = Researchd.rl("recipe_unlock");
+    public static final Identifier ID = Researchd.rl("recipe_unlock");
     public static final RecipeUnlockEffectObject INSTANCE = new RecipeUnlockEffectObject();
 
     @Override
@@ -37,23 +34,19 @@ public class RecipeUnlockEffectObject implements TypedEditorObject<RecipeUnlockE
         layout.addWidget(null, new StringWidget(Component.literal("By id:"), GuiUtils.getFont()));
         // RegistryVerifyEditBox idEditBox = layout.addWidget("id_edit_box", RegistryVerifyEditBox.forIds(this.getIds(),
         // context.innerWidth() - 8, 16));
+        // TODO(26.1 port, recipe picker): 26.1 clients don't receive recipes, so any well-formed id is accepted for
+        // now. Offer (and check against) every recipe in the game once the client can ask the server for them
         layout.addWidget(
                 "id_edit_boxes",
-                new EditableIdListWidget(
-                        context.innerWidth() - 8, 60, this.getIds(), newVal -> this.update(layout, context)));
+                new EditableIdListWidget(context.innerWidth() - 8, 60, null, newVal -> this.update(layout, context)));
         // idEditBox.setResponder(newVal -> this.update(layout, context));
-    }
-
-    private Collection<ResourceLocation> getIds() {
-        RecipeManager manager = Minecraft.getInstance().level.getRecipeManager();
-        return manager.getRecipeIds().toList();
     }
 
     @Override
     public RecipeUnlockEffect create(RememberingLinearLayout layout) {
         EditableIdListWidget idEditBoxes = layout.getChild("id_edit_boxes", EditableIdListWidget.class);
         return new RecipeUnlockEffect(
-                idEditBoxes.getIds().map(ResourceLocation::parse).toArray(ResourceLocation[]::new));
+                idEditBoxes.getIds().map(Identifier::parse).toArray(Identifier[]::new));
     }
 
     @Override

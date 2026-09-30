@@ -5,10 +5,10 @@ import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidg
 import com.portingdeadmods.researchd.compat.immersiveengineering.UnlockIEMultiblockEffect;
 import com.portingdeadmods.researchd.translations.ResearchdTranslations;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.util.Size2i;
 
@@ -26,9 +26,8 @@ public class UnlockIEMultiblockEffectWidget extends AbstractResearchInfoWidget<U
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        guiGraphics.fill(
-                this.getX(), this.getY(), this.getX() + 16, this.getY() + 16, FastColor.ARGB32.color(69, 69, 69));
+    protected void renderWidget(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+        guiGraphics.fill(this.getX(), this.getY(), this.getX() + 16, this.getY() + 16, ARGB.color(69, 69, 69));
         if (!this.icon.isEmpty()) {
             guiGraphics.renderItem(this.icon, this.getX(), this.getY());
         } else {
@@ -38,7 +37,7 @@ public class UnlockIEMultiblockEffectWidget extends AbstractResearchInfoWidget<U
     }
 
     @Override
-    public void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void renderTooltip(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         if (this.isHovered()) {
             Component displayName;
             MultiblockHandler.IMultiblock multiblock = MultiblockHandler.getByUniqueName(this.value.multiblock());

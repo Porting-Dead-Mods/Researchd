@@ -38,9 +38,7 @@ public final class ResearchEffectTypes {
 
     // COMPAT //
 
-    // Immersive Engineering
-    public static final Supplier<ResearchEffectType> IE_MULTIBLOCK_UNLOCK =
-            registerEffectType("ie_multiblock_unlock", new TextResearchIcon(Component.literal("MB")));
+    // Immersive Engineering ("ie_multiblock_unlock") is out of the 26.1 build until IE has a 26.1.2 release.
 
     private static @NotNull DeferredHolder<ResearchEffectType, ResearchEffectType> registerEffectType(
             String id, ResearchIcon icon) {

@@ -24,6 +24,6 @@ public class ResearchCompletedKubeEvent implements KubePlayerEvent {
     }
 
     public String getResearchId() {
-        return research.location().toString();
+        return research.identifier().toString();
     }
 }

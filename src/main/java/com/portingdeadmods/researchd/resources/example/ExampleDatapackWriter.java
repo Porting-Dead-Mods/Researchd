@@ -17,8 +17,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 
 /*
@@ -85,7 +85,7 @@ public class ExampleDatapackWriter implements PackWriter {
             writeToFile(
                     researchDir,
                     codec.encodeStart(JsonOps.INSTANCE, entry.getValue()),
-                    entry.getKey().location());
+                    entry.getKey().identifier());
         }
     }
 
@@ -99,11 +99,11 @@ public class ExampleDatapackWriter implements PackWriter {
             writeToFile(
                     researchDir,
                     codec.encodeStart(JsonOps.INSTANCE, entry.getValue()),
-                    entry.getKey().location());
+                    entry.getKey().identifier());
         }
     }
 
-    private static void writeToFile(Path researchDir, DataResult<JsonElement> result, ResourceLocation location) {
+    private static void writeToFile(Path researchDir, DataResult<JsonElement> result, Identifier location) {
         result.ifSuccess(json -> {
             try (FileWriter writer = new FileWriter(
                     researchDir.resolve(location.getPath() + ".json").toFile())) {

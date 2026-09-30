@@ -4,10 +4,10 @@ import com.portingdeadmods.researchd.api.client.widgets.AbstractResearchInfoWidg
 import com.portingdeadmods.researchd.impl.research.effect.ValueEffectModifierEffect;
 import com.portingdeadmods.researchd.utils.GuiUtils;
 import java.util.List;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.neoforged.neoforge.common.util.Size2i;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,14 +34,14 @@ public class ValueEffectModifierEffectWidget<T extends ValueEffectModifierEffect
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
+    protected void extractWidgetRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float v) {
         guiGraphics.fill(
                 this.getX(),
                 this.getY(),
                 this.getX() + this.getWidth(),
                 this.getY() + this.getHeight(),
-                FastColor.ARGB32.color(69, 69, 69));
-        guiGraphics.drawCenteredString(
+                ARGB.color(69, 69, 69));
+        guiGraphics.centeredText(
                 this.font,
                 this.getText(),
                 this.getX() + this.getWidth() / 2,

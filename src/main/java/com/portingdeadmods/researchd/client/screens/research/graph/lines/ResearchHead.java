@@ -5,14 +5,14 @@ import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidge
 import com.portingdeadmods.researchd.client.screens.research.graph.ResearchNode;
 import java.awt.*;
 import java.util.Collection;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.util.FastColor;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.util.ARGB;
 
 public class ResearchHead {
     private int x;
     private int y;
     private final boolean isInput;
-    private int color = FastColor.ARGB32.color(255, 255, 255, 255); // Default color is white
+    private int color = ARGB.color(255, 255, 255, 255); // Default color is white
 
     /**
      *
@@ -58,9 +58,9 @@ public class ResearchHead {
         this.y += dy;
     }
 
-    public void render(GuiGraphics graphics) {
-        if (this.isInput) graphics.vLine(this.x, this.y - 4, this.y, this.getColor());
-        else graphics.vLine(this.x, this.y, this.y + 4, this.getColor());
+    public void render(GuiGraphicsExtractor graphics) {
+        if (this.isInput) graphics.verticalLine(this.x, this.y - 4, this.y, this.getColor());
+        else graphics.verticalLine(this.x, this.y, this.y + 4, this.getColor());
     }
 
     /**

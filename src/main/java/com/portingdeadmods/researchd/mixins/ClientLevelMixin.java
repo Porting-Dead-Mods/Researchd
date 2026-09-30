@@ -5,13 +5,11 @@ import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.utils.registries.RegistryManagersGetter;
 import com.portingdeadmods.researchd.utils.registries.ReloadableRegistryManager;
-import java.util.function.Supplier;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
 import org.spongepowered.asm.mixin.Mixin;
@@ -32,12 +30,12 @@ public class ClientLevelMixin implements RegistryManagersGetter {
             ClientLevel.ClientLevelData clientLevelData,
             ResourceKey<Level> dimension,
             Holder<DimensionType> dimensionType,
-            int viewDistance,
+            int serverChunkRadius,
             int serverSimulationDistance,
-            Supplier<ProfilerFiller> profiler,
             LevelRenderer levelRenderer,
             boolean isDebug,
             long biomeZoomSeed,
+            int seaLevel,
             CallbackInfo ci) {
         this.researchd$researchesManager = new ReloadableRegistryManager<>(
                 connection.registryAccess(), ResearchdRegistries.RESEARCH_KEY, Research.CODEC);

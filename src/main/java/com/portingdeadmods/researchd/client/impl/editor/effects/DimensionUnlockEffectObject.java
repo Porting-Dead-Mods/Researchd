@@ -15,13 +15,13 @@ import java.util.Optional;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Unit;
 import net.minecraft.world.level.dimension.DimensionType;
 import org.jetbrains.annotations.Nullable;
 
 public class DimensionUnlockEffectObject implements TypedEditorObject<DimensionUnlockEffect, ResearchEffectType> {
-    public static final ResourceLocation ID = Researchd.rl("dimension_unlock");
+    public static final Identifier ID = Researchd.rl("dimension_unlock");
     public static final DimensionUnlockEffectObject INSTANCE = new DimensionUnlockEffectObject();
 
     @Override
@@ -34,7 +34,7 @@ public class DimensionUnlockEffectObject implements TypedEditorObject<DimensionU
             RememberingLinearLayout layout, @Nullable DimensionUnlockEffect previous, EditorContext context) {
         layout.addWidget(null, GuiUtils.stringWidget("Unlocks Dimension:"));
         Optional<Registry<DimensionType>> registry =
-                Minecraft.getInstance().level.registryAccess().registry(Registries.DIMENSION_TYPE);
+                Minecraft.getInstance().level.registryAccess().lookup(Registries.DIMENSION_TYPE);
         registry.ifPresent(dimensionTypes -> {
             RegistryVerifyEditBox idEditBox = layout.addWidget(
                     "id_edit_box", RegistryVerifyEditBox.forRegistry(dimensionTypes, context.innerWidth() - 8, 16));
@@ -48,9 +48,9 @@ public class DimensionUnlockEffectObject implements TypedEditorObject<DimensionU
     @Override
     public DimensionUnlockEffect create(RememberingLinearLayout layout) {
         return new DimensionUnlockEffect(
-                ResourceLocation.parse(
+                Identifier.parse(
                         layout.getChild("id_edit_box", BackgroundEditBox.class).getValue()),
-                ResourceLocation.withDefaultNamespace(""));
+                Identifier.withDefaultNamespace(""));
     }
 
     @Override

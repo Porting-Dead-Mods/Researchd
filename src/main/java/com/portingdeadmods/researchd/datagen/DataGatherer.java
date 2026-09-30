@@ -9,25 +9,26 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
-@EventBusSubscriber(modid = Researchd.MODID)
+// The data run is a client data run, which generates client assets and server data together.
+@EventBusSubscriber(modid = Researchd.MODID, value = Dist.CLIENT)
 public class DataGatherer {
     @SubscribeEvent
-    public static void onGatherData(GatherDataEvent event) {
+    public static void onGatherData(GatherDataEvent.Client event) {
         DataGenerator generator = event.getGenerator();
         PackOutput output = generator.getPackOutput();
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
 
-        generator.addProvider(event.includeClient(), new EnUsLangProvider(output));
-        generator.addProvider(event.includeClient(), new BlockModelProvider(output, event.getExistingFileHelper()));
-        generator.addProvider(event.includeServer(), new RecipesProvider(output, lookupProvider));
-        TagsProvider.createTagProviders(
-                generator, output, lookupProvider, event.getExistingFileHelper(), event.includeServer());
+        generator.addProvider(true, new EnUsLangProvider(output));
+        generator.addProvider(true, new ModelsProvider(output));
+        generator.addProvider(true, new RecipesProvider.Runner(output, lookupProvider));
+        TagsProvider.createTagProviders(generator, output, lookupProvider);
         generator.addProvider(
-                event.includeServer(),
+                true,
                 new LootTableProvider(
                         output,
                         Collections.emptySet(),

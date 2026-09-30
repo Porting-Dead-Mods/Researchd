@@ -5,30 +5,30 @@ import com.portingdeadmods.researchd.impl.utils.DisplayImpl;
 import dev.latvian.mods.kubejs.script.SourceLine;
 import java.util.Optional;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
 
 public class ResearchPackBuilder {
-    public final ResourceLocation id;
+    public final Identifier id;
     public SourceLine sourceLine;
     private int color = -1;
-    private ResourceLocation customTexture;
+    private Identifier customTexture;
     private int sortingValue = 0;
     private Component literalName;
     private Component literalDescription;
 
-    public ResearchPackBuilder(ResourceLocation id) {
+    public ResearchPackBuilder(Identifier id) {
         this.id = id;
         this.sourceLine = SourceLine.UNKNOWN;
     }
 
     public ResearchPackBuilder color(int r, int g, int b) {
-        this.color = FastColor.ARGB32.color(r, g, b);
+        this.color = ARGB.color(r, g, b);
         return this;
     }
 
     public ResearchPackBuilder customTexture(String texture) {
-        this.customTexture = ResourceLocation.parse(texture);
+        this.customTexture = Identifier.parse(texture);
         return this;
     }
 

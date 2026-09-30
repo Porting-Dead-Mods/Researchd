@@ -13,7 +13,7 @@ import java.util.List;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public record AndResearchMethod(List<ResearchMethod> methods) implements ResearchMethodList {
     private static final MapCodec<AndResearchMethod> CODEC = RecordCodecBuilder.mapCodec(
@@ -25,7 +25,7 @@ public record AndResearchMethod(List<ResearchMethod> methods) implements Researc
             AndResearchMethod::new);
     public static final ResearchMethodSerializer<AndResearchMethod> SERIALIZER =
             ResearchMethodSerializer.simple(CODEC, STREAM_CODEC);
-    public static final ResourceLocation ID = Researchd.rl("and");
+    public static final Identifier ID = Researchd.rl("and");
 
     @Override
     public float getMaxProgress() {
@@ -42,7 +42,7 @@ public record AndResearchMethod(List<ResearchMethod> methods) implements Researc
     }
 
     @Override
-    public ResourceLocation id() {
+    public Identifier id() {
         return ID;
     }
 

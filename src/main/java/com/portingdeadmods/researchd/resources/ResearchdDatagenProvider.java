@@ -44,7 +44,7 @@ public interface ResearchdDatagenProvider<T> {
                 JsonElement json = result.getOrThrow();
                 String jsonString = ReloadableRegistryManager.GSON.toJson(json);
                 try {
-                    Files.writeString(dataDir.resolve(key.location().getPath() + ".json"), jsonString);
+                    Files.writeString(dataDir.resolve(key.identifier().getPath() + ".json"), jsonString);
                 } catch (IOException e) {
                     return Result.err("Failed to write contents to file: " + e.getMessage());
                 }

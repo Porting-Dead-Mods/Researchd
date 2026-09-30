@@ -8,7 +8,7 @@ import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidge
 import com.portingdeadmods.researchd.client.screens.research.graph.lines.ResearchHead;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import java.util.Collection;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.CommonComponents;
@@ -55,7 +55,8 @@ public class ResearchNode extends AbstractWidget {
         this.rootNode = false;
     }
 
-    public void setHovered(GuiGraphics guiGraphics, int x, int y, int width, int height, int mouseX, int mouseY) {
+    public void setHovered(
+            GuiGraphicsExtractor guiGraphics, int x, int y, int width, int height, int mouseX, int mouseY) {
         this.isHovered = guiGraphics.containsPointInScissor(mouseX, mouseY)
                 && mouseX >= x
                 && mouseY >= y
@@ -120,7 +121,7 @@ public class ResearchNode extends AbstractWidget {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
+    protected void extractWidgetRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float v) {
         ResearchScreenWidget.renderResearchPanel(guiGraphics, instance, getX(), getY(), mouseX, mouseY);
         // FIXME: Can probably be removed
         refreshHeads();

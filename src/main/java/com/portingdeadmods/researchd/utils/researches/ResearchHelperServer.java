@@ -33,9 +33,9 @@ public final class ResearchHelperServer {
         ResearchTeamHelperServer.initializeTeamResearches(teamMap, overworld);
         ResearchTeamHelperServer.reinitializeAllTeamEffects(teamMap, overworld);
         teamMap.setChanged();
-        PacketDistributor.sendToAllPlayers(new SyncTeamDataPayload(teamMap));
+        PacketDistributor.sendToAllPlayers(SyncTeamDataPayload.snapshot(teamMap));
         PacketDistributor.sendToAllPlayers(
-                new SyncTeamEffectDataPayload(TeamResearchEffectSavedData.getData(overworld)));
+                SyncTeamEffectDataPayload.snapshot(TeamResearchEffectSavedData.getData(overworld)));
 
         if (player != null) {
             syncReloadableRegistries(player);

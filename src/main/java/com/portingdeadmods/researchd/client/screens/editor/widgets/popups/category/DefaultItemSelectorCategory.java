@@ -1,8 +1,6 @@
 package com.portingdeadmods.researchd.client.screens.editor.widgets.popups.category;
 
 import com.google.common.base.Suppliers;
-import com.portingdeadmods.researchd.compat.JEICompat;
-import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
 import com.portingdeadmods.researchd.utils.researches.ResearchEditorHelperClient;
 import java.util.Collection;
 import java.util.function.BooleanSupplier;
@@ -12,12 +10,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
+// TODO(26.1 port, JEI): bring back the JEI category (JEICompat::getItems, Items.APPLE icon, "Jei"), the default
+// when JEI is loaded, once the JEI integration is back in the source set
 public enum DefaultItemSelectorCategory implements ItemSelectorCategory {
-    JEI(
-            ResearchdCompatHandler::isJeiLoaded,
-            JEICompat::getItems,
-            Items.APPLE::getDefaultInstance,
-            () -> Component.literal("Jei")),
     ALL(
             () -> true,
             () -> BuiltInRegistries.ITEM.stream().map(ItemStack::new).toList(),
@@ -25,7 +20,7 @@ public enum DefaultItemSelectorCategory implements ItemSelectorCategory {
             () -> Component.literal("All Items")),
     INV(
             () -> true,
-            () -> ResearchEditorHelperClient.getPlayerInventory().items,
+            () -> ResearchEditorHelperClient.getPlayerInventory().getNonEquipmentItems(),
             Items.CHEST::getDefaultInstance,
             () -> Component.literal("Inventory"));
 
@@ -66,8 +61,6 @@ public enum DefaultItemSelectorCategory implements ItemSelectorCategory {
     }
 
     public static DefaultItemSelectorCategory getDefault() {
-        return DefaultItemSelectorCategory.JEI.exists()
-                ? DefaultItemSelectorCategory.JEI
-                : DefaultItemSelectorCategory.ALL;
+        return DefaultItemSelectorCategory.ALL;
     }
 }

@@ -1,17 +1,19 @@
 package com.portingdeadmods.researchd.mixins;
 
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.Research;
 import com.portingdeadmods.researchd.api.research.packs.ResearchPack;
 import com.portingdeadmods.researchd.utils.registries.RegistryManagersGetter;
 import com.portingdeadmods.researchd.utils.registries.ReloadableRegistryManager;
-import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.commands.Commands;
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.LayeredRegistryAccess;
+import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentInitializers;
+import net.minecraft.server.RegistryLayer;
 import net.minecraft.server.ReloadableServerResources;
-import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.server.permissions.PermissionSet;
 import net.minecraft.world.flag.FeatureFlagSet;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,25 +33,22 @@ public class ReloadableServerResourcesMixin implements RegistryManagersGetter {
     @Mutable
     private ReloadableRegistryManager<ResearchPack> researchd$researchPacksManager;
 
+    // The managers are handed to the resource manager in ResearchdLifecycleHandler#onAddReloadListeners:
+    // NeoForge rejects mod listeners added to the vanilla listener list by mixin.
     @Inject(method = "<init>", at = @At("TAIL"))
     private void researchd$init(
-            RegistryAccess.Frozen registryAccess,
+            LayeredRegistryAccess<RegistryLayer> fullLayers,
+            HolderLookup.Provider loadingContext,
             FeatureFlagSet enabledFeatures,
             Commands.CommandSelection commandSelection,
-            int functionCompilationLevel,
+            List<Registry.PendingTags<?>> postponedTags,
+            PermissionSet functionCompilationPermissions,
+            List<DataComponentInitializers.PendingComponents<?>> newComponents,
             CallbackInfo ci) {
         this.researchd$researchesManager =
-                new ReloadableRegistryManager<>(registryAccess, ResearchdRegistries.RESEARCH_KEY, Research.CODEC);
+                new ReloadableRegistryManager<>(loadingContext, ResearchdRegistries.RESEARCH_KEY, Research.CODEC);
         this.researchd$researchPacksManager = new ReloadableRegistryManager<>(
-                registryAccess, ResearchdRegistries.RESEARCH_PACK_KEY, ResearchPack.CODEC);
-    }
-
-    @ModifyReturnValue(method = "listeners", at = @At("RETURN"))
-    private List<PreparableReloadListener> researchd$listeners(List<PreparableReloadListener> original) {
-        List<PreparableReloadListener> copy = new ArrayList<>(original);
-        copy.add(this.researchd$researchesManager);
-        copy.add(this.researchd$researchPacksManager);
-        return List.copyOf(copy);
+                loadingContext, ResearchdRegistries.RESEARCH_PACK_KEY, ResearchPack.CODEC);
     }
 
     @Override

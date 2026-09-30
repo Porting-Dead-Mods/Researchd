@@ -7,9 +7,10 @@ import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.util.Size2i;
 
@@ -43,17 +44,17 @@ public class ConsumePackResearchMethodWidget extends AbstractResearchInfoWidget<
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int i, int i1, float v) {
+    protected void extractWidgetRenderState(GuiGraphicsExtractor guiGraphics, int i, int i1, float v) {
         int x = getX();
         int y = getY();
-        guiGraphics.fill(x, y, x + this.width, y + this.height, FastColor.ARGB32.color(69, 69, 69));
+        guiGraphics.fill(x, y, x + this.width, y + this.height, ARGB.color(69, 69, 69));
 
         for (int idx = 0; idx < stacks.size(); idx++) {
             ItemStack stack = stacks.get(idx);
             int xPos = x + idx * GAP_BETWEEN_PACKS;
-            guiGraphics.renderItem(stack, xPos, y);
+            guiGraphics.item(stack, xPos, y);
 
-            if (idx == stacks.size() - 1) guiGraphics.renderItemDecorations(this.font, stack, xPos, y);
+            if (idx == stacks.size() - 1) guiGraphics.itemDecorations(this.font, stack, xPos, y);
 
             //            guiGraphics.pose().pushPose();
             //            guiGraphics.pose().translate(0.0F, 0.0F, 200.0F);
@@ -70,20 +71,20 @@ public class ConsumePackResearchMethodWidget extends AbstractResearchInfoWidget<
             //            guiGraphics.pose().popPose();
         }
 
-        guiGraphics.drawString(
+        guiGraphics.text(
                 Minecraft.getInstance().font,
                 " x %dt".formatted(duration),
                 x + 14 + GAP_BETWEEN_PACKS * stacks.size(),
                 y + (int) ((16f - font.lineHeight) / 2f) + 2,
-                16777215,
+                0xFFFFFFFF,
                 true);
     }
 
     @Override
-    public void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void renderTooltip(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
         Font font = Minecraft.getInstance().font;
         if (this.isHovered()) {
-            guiGraphics.renderTooltip(
+            guiGraphics.setTooltipForNextFrame(
                     font,
                     Component.literal("Consume ")
                             .append(Component.literal("%d".formatted(count)).withStyle(ChatFormatting.GOLD))
@@ -97,12 +98,12 @@ public class ConsumePackResearchMethodWidget extends AbstractResearchInfoWidget<
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         return false;
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+    public boolean mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
         return false;
     }
 

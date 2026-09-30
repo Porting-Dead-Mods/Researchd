@@ -1,0 +1,7 @@
+{
+  "type": "researchd:simple",
+  "icon": { "type": "researchd:item_research_icon", "items": [{ "id": "minecraft:glowstone_dust" }] },
+  "method": { "type": "researchd:consume_item", "items": "minecraft:flint", "count": 1 },
+  "effect": { "type": "researchd:unlock_recipe", "recipes": ["researchd:gametest/quick_smelting"] },
+  "requires_parent": false
+}

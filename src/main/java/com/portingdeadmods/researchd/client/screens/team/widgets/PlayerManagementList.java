@@ -1,25 +1,25 @@
 package com.portingdeadmods.researchd.client.screens.team.widgets;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.portingdeadmods.portingdeadlibs.cache.AllPlayersCache;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.api.team.ResearchTeamRole;
 import com.portingdeadmods.researchd.api.team.TeamMember;
-import com.portingdeadmods.researchd.client.screens.RdZIndex;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.ContainerWidget;
 import com.portingdeadmods.researchd.utils.researches.ResearchTeamHelperClient;
 import java.util.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.PlayerFaceRenderer;
+import net.minecraft.client.gui.components.PlayerFaceExtractor;
 import net.minecraft.client.gui.components.WidgetSprites;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class PlayerManagementList extends ContainerWidget<PlayerManagementList.Entry> {
-    public static final ResourceLocation PLAYER_ENTRY_TEXTURE = Researchd.rl("player");
+    public static final Identifier PLAYER_ENTRY_TEXTURE = Researchd.rl("player");
     private final Map<Entry, List<DraggableWidgetImageButton>> buttonWidgets;
     private final AbstractWidget parent;
 
@@ -92,7 +92,7 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
             PlayerManagementList.Entry item, int xIndex, int yIndex, int left, int top, int mouseX, int mouseY) {}
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         int index = 0;
         for (Entry item : this.getItems()) {
             int top = this.getY() + 1 + index * this.getItemHeight() - this.scrollOffset;
@@ -104,7 +104,7 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
                     int i = 0;
                     for (DraggableWidgetImageButton widget : buttons) {
                         widget.setPosition(left + 84 - (i + 1) * (12 + 2), top + 2);
-                        if (widget.mouseClicked(mouseX, mouseY, button)) {
+                        if (widget.mouseClicked(event, doubleClick)) {
                             return true;
                         }
                         i++;
@@ -114,12 +114,12 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
             index++;
         }
 
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override
     public void internalRenderItem(
-            GuiGraphics guiGraphics,
+            GuiGraphicsExtractor guiGraphics,
             PlayerManagementList.Entry item,
             int xIndex,
             int index,
@@ -127,41 +127,25 @@ public class PlayerManagementList extends ContainerWidget<PlayerManagementList.E
             int top,
             int mouseX,
             int mouseY) {
-        PoseStack poseStack = guiGraphics.pose();
-        poseStack.pushPose();
-        {
-            poseStack.translate(0, 0, RdZIndex.DRAGGABLE_WINDOW_ROW);
-            guiGraphics.blitSprite(PLAYER_ENTRY_TEXTURE, left, top, 84, 16);
-        }
-        poseStack.popPose();
+        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, PLAYER_ENTRY_TEXTURE, left, top, 84, 16);
 
-        poseStack.pushPose();
-        {
-            poseStack.translate(0, 0, RdZIndex.DRAGGABLE_WINDOW_ROW_LABEL);
-            PlayerFaceRenderer.draw(
-                    guiGraphics, AllPlayersCache.getSkin(item.teamMember.player()), left + 3, top + 3, 10);
-            guiGraphics.drawScrollingString(
-                    Minecraft.getInstance().font,
-                    Component.literal(AllPlayersCache.getName(item.teamMember.player()))
-                            .withStyle(ChatFormatting.WHITE),
-                    left + 3 + 12,
-                    left + 84 - this.buttonWidgets.get(item).size() * (12 + 2) - 2,
-                    top + 4,
-                    -1);
-        }
-        poseStack.popPose();
+        PlayerFaceExtractor.extractRenderState(
+                guiGraphics, AllPlayersCache.getSkin(item.teamMember.player()), left + 3, top + 3, 10);
+        guiGraphics.drawScrollingString(
+                guiGraphics.textRenderer(),
+                Minecraft.getInstance().font,
+                Component.literal(AllPlayersCache.getName(item.teamMember.player()))
+                        .withStyle(ChatFormatting.WHITE),
+                left + 3 + 12,
+                left + 84 - this.buttonWidgets.get(item).size() * (12 + 2) - 2,
+                top + 4);
 
         int i = 0;
-        poseStack.pushPose();
-        {
-            poseStack.translate(0, 0, RdZIndex.DRAGGABLE_WINDOW_ROW_BUTTONS);
-            for (DraggableWidgetImageButton widget : this.buttonWidgets.get(item)) {
-                widget.setPosition(left + 84 - (i + 1) * (12 + 2), top + 2);
-                widget.render(guiGraphics, mouseX, mouseY, -1);
-                i++;
-            }
+        for (DraggableWidgetImageButton widget : this.buttonWidgets.get(item)) {
+            widget.setPosition(left + 84 - (i + 1) * (12 + 2), top + 2);
+            widget.extractRenderState(guiGraphics, mouseX, mouseY, -1);
+            i++;
         }
-        poseStack.popPose();
     }
 
     private void resort() {

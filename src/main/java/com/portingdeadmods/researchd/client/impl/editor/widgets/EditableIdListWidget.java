@@ -1,5 +1,6 @@
 package com.portingdeadmods.researchd.client.impl.editor.widgets;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.portingdeadmods.portingdeadlibs.utils.UniqueArray;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.BackgroundEditBox;
@@ -10,20 +11,37 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.WidgetSprites;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import org.jetbrains.annotations.Nullable;
 
 public class EditableIdListWidget extends ContainerWidget<EditableIdListWidget.Element> {
     private Element focusedElement;
     private UniqueArray<Element> items;
-    private final Collection<ResourceLocation> ids;
+    /** The valid ids, or null to accept any well-formed id */
+    private final @Nullable Collection<Identifier> ids;
+
     private final Consumer<String> editBoxResponder;
 
     public EditableIdListWidget(
-            int width, int height, Collection<ResourceLocation> ids, Consumer<String> editBoxResponder) {
-        super(width, height, 72, 16, Orientation.VERTICAL, 1, ids.size(), List.of(), false);
+            int width, int height, @Nullable Collection<Identifier> ids, Consumer<String> editBoxResponder) {
+        super(
+                width,
+                height,
+                72,
+                16,
+                Orientation.VERTICAL,
+                1,
+                ids != null ? ids.size() : Math.ceilDiv(height, 16),
+                List.of(),
+                false);
         this.ids = ids;
         this.editBoxResponder = editBoxResponder;
         // setItems(List.of(new Element.SimpleElement(this, ids, 72, 16), new Element.SelectorElement()));
@@ -71,7 +89,7 @@ public class EditableIdListWidget extends ContainerWidget<EditableIdListWidget.E
 
     @Override
     protected void internalRenderItem(
-            GuiGraphics guiGraphics,
+            GuiGraphicsExtractor guiGraphics,
             EditableIdListWidget.Element item,
             int xIndex,
             int yIndex,
@@ -92,19 +110,19 @@ public class EditableIdListWidget extends ContainerWidget<EditableIdListWidget.E
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    public boolean keyPressed(KeyEvent event) {
         if (this.focusedElement != null) {
-            this.focusedElement.keyPressed(keyCode, scanCode, modifiers);
+            this.focusedElement.keyPressed(event);
         }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return super.keyPressed(event);
     }
 
     @Override
-    public boolean charTyped(char codePoint, int modifiers) {
+    public boolean charTyped(CharacterEvent event) {
         if (this.focusedElement != null) {
-            this.focusedElement.charTyped(codePoint, modifiers);
+            this.focusedElement.charTyped(event);
         }
-        return super.charTyped(codePoint, modifiers);
+        return super.charTyped(event);
     }
 
     public sealed interface Element
@@ -113,7 +131,7 @@ public class EditableIdListWidget extends ContainerWidget<EditableIdListWidget.E
                 new WidgetSprites(Researchd.rl("editor_background"), Researchd.rl("editor_background_highlighted"));
 
         void render(
-                GuiGraphics guiGraphics,
+                GuiGraphicsExtractor guiGraphics,
                 int x,
                 int y,
                 int width,
@@ -127,18 +145,18 @@ public class EditableIdListWidget extends ContainerWidget<EditableIdListWidget.E
 
         boolean isValid();
 
-        default void keyPressed(int keyCode, int scanCode, int modifiers) {}
+        default void keyPressed(KeyEvent event) {}
 
-        default void charTyped(char codePoint, int modifiers) {}
+        default void charTyped(CharacterEvent event) {}
 
         final class SimpleElement implements Element {
-            public static final ResourceLocation REMOVE_ELEMENT_HOVER_SPRITE = Researchd.rl("remove_element_hover");
+            public static final Identifier REMOVE_ELEMENT_HOVER_SPRITE = Researchd.rl("remove_element_hover");
             private final RegistryVerifyEditBox idEditBox;
             private EditableIdListWidget parentWidget;
 
             public SimpleElement(
                     EditableIdListWidget parentWidget,
-                    Collection<ResourceLocation> ids,
+                    @Nullable Collection<Identifier> ids,
                     int itemWidth,
                     int itemHeight) {
                 this.parentWidget = parentWidget;
@@ -159,7 +177,7 @@ public class EditableIdListWidget extends ContainerWidget<EditableIdListWidget.E
 
             @Override
             public void render(
-                    GuiGraphics guiGraphics,
+                    GuiGraphicsExtractor guiGraphics,
                     int x,
                     int y,
                     int width,
@@ -169,7 +187,7 @@ public class EditableIdListWidget extends ContainerWidget<EditableIdListWidget.E
                     int mouseY,
                     float partialTick) {
                 this.idEditBox.setPosition(x, y);
-                this.idEditBox.render(guiGraphics, mouseX, mouseY, partialTick);
+                this.idEditBox.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
 
                 //                if (hovered) {
                 //                    PoseStack poseStack = guiGraphics.pose();
@@ -190,17 +208,19 @@ public class EditableIdListWidget extends ContainerWidget<EditableIdListWidget.E
             @Override
             public void clicked(int mouseX, int mouseY) {
                 this.parentWidget.setFocusedElement(this);
-                this.idEditBox.mouseClicked(mouseX, mouseY, 0);
+                this.idEditBox.mouseClicked(
+                        new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, 0)),
+                        false);
             }
 
             @Override
-            public void keyPressed(int keyCode, int scanCode, int modifiers) {
-                this.idEditBox.keyPressed(keyCode, scanCode, modifiers);
+            public void keyPressed(KeyEvent event) {
+                this.idEditBox.keyPressed(event);
             }
 
             @Override
-            public void charTyped(char codePoint, int modifiers) {
-                this.idEditBox.charTyped(codePoint, modifiers);
+            public void charTyped(CharacterEvent event) {
+                this.idEditBox.charTyped(event);
             }
         }
 
@@ -218,7 +238,7 @@ public class EditableIdListWidget extends ContainerWidget<EditableIdListWidget.E
 
             @Override
             public void render(
-                    GuiGraphics guiGraphics,
+                    GuiGraphicsExtractor guiGraphics,
                     int x,
                     int y,
                     int width,
@@ -227,7 +247,7 @@ public class EditableIdListWidget extends ContainerWidget<EditableIdListWidget.E
                     int mouseX,
                     int mouseY,
                     float partialTick) {
-                guiGraphics.blitSprite(SPRITES.get(true, hovered), x, y, width, height);
+                guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, SPRITES.get(true, hovered), x, y, width, height);
             }
 
             @Override

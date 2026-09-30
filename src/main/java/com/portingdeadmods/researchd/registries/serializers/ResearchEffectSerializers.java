@@ -3,8 +3,6 @@ package com.portingdeadmods.researchd.registries.serializers;
 import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.research.serializers.ResearchEffectSerializer;
-import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
-import com.portingdeadmods.researchd.compat.immersiveengineering.UnlockIEMultiblockEffect;
 import com.portingdeadmods.researchd.impl.research.effect.AndResearchEffect;
 import com.portingdeadmods.researchd.impl.research.effect.CommandResearchEffect;
 import com.portingdeadmods.researchd.impl.research.effect.DecreaseValueEffect;
@@ -35,8 +33,6 @@ public final class ResearchEffectSerializers {
 
         // COMPAT //
 
-        // Immersive Engineering
-        if (ResearchdCompatHandler.isIELoaded())
-            SERIALIZERS.register("unlock_ie_multiblock", () -> UnlockIEMultiblockEffect.SERIALIZER);
+        // Immersive Engineering ("unlock_ie_multiblock") is out of the 26.1 build until IE has a 26.1.2 release.
     }
 }

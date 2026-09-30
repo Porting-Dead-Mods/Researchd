@@ -5,7 +5,7 @@ import com.portingdeadmods.researchd.utils.Search;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
@@ -45,7 +45,7 @@ public class RegistrySuggestionDropDownWidget extends DropDownWidget<LayoutEleme
     //        super.optionClicked(option, mouseX, mouseY);
     //    }
 
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void render(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
         super.render(guiGraphics, this.x, this.y, mouseX, mouseY, partialTicks);
     }
 

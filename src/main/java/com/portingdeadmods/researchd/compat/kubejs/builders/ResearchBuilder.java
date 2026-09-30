@@ -17,15 +17,15 @@ import java.util.List;
 import java.util.stream.Stream;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 
 public class ResearchBuilder {
-    public final ResourceLocation id;
+    public final Identifier id;
     public SourceLine sourceLine;
     private ItemResearchIcon icon = ItemResearchIcon.EMPTY;
     private ResearchMethod researchMethod;
@@ -35,27 +35,28 @@ public class ResearchBuilder {
     private Component literalName = null;
     private Component literalDescription = null;
 
-    public ResearchBuilder(ResourceLocation id) {
+    public ResearchBuilder(Identifier id) {
         this.id = id;
         this.sourceLine = SourceLine.UNKNOWN;
         this.researchMethod = new ConsumeItemResearchMethod(Ingredient.of(Items.BOOK), 1);
     }
 
     public ResearchBuilder icon(String... itemId) {
-        return this.iconStacks(Stream.of(itemId)
-                .map(ResourceLocation::parse)
-                .map(BuiltInRegistries.ITEM::get)
-                .map(Item::getDefaultInstance)
-                .toArray(ItemStack[]::new));
-    }
-
-    public ResearchBuilder iconStacks(ItemStack... stacks) {
-        this.icon = new ItemResearchIcon(Arrays.asList(stacks));
+        this.icon = new ItemResearchIcon(Stream.of(itemId)
+                .map(Identifier::parse)
+                .map(BuiltInRegistries.ITEM::getValue)
+                .map(ItemStackTemplate::new)
+                .toList());
         return this;
     }
 
-    public ResearchBuilder iconPack(ResourceLocation key) {
-        this.icon = new ItemResearchIcon(List.of(ResearchdResearchPackProvider.asStack(key)));
+    public ResearchBuilder iconStacks(ItemStack... stacks) {
+        this.icon = ItemResearchIcon.ofStacks(Arrays.asList(stacks));
+        return this;
+    }
+
+    public ResearchBuilder iconPack(Identifier key) {
+        this.icon = new ItemResearchIcon(List.of(ResearchdResearchPackProvider.asTemplate(key)));
         return this;
     }
 
@@ -90,7 +91,7 @@ public class ResearchBuilder {
     }
 
     public ResearchBuilder parent(String parent) {
-        ResourceLocation location = ResourceLocation.parse(parent);
+        Identifier location = Identifier.parse(parent);
         this.parents.add(ResourceKey.create(ResearchdRegistries.RESEARCH_KEY, location));
         return this;
     }

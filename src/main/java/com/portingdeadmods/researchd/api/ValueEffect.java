@@ -6,7 +6,7 @@ import com.portingdeadmods.researchd.ResearchdRegistries;
 import com.portingdeadmods.researchd.api.team.ResearchTeam;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 
 public interface ValueEffect {
@@ -14,7 +14,7 @@ public interface ValueEffect {
     StreamCodec<? super RegistryFriendlyByteBuf, ValueEffect> STREAM_CODEC =
             CodecUtils.registryStreamCodec(ResearchdRegistries.VALUE_EFFECT);
 
-    default ResourceLocation getKey() {
+    default Identifier getKey() {
         return ResearchdRegistries.VALUE_EFFECT.getKey(this);
     }
 

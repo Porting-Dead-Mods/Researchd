@@ -4,11 +4,13 @@ import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.ItemSe
 import com.portingdeadmods.researchd.client.screens.editor.widgets.popups.TagCreationWidget;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.Ingredient;
 
 public class TagItemSelectorCategory implements ItemSelectorCategory {
     public static final TagItemSelectorCategory INSTANCE = new TagItemSelectorCategory();
@@ -25,9 +27,12 @@ public class TagItemSelectorCategory implements ItemSelectorCategory {
     }
 
     @Override
-    public Ingredient getSelected(AbstractWidget widget) {
+    public List<ItemStack> getSelected(AbstractWidget widget) {
         if (widget instanceof TagCreationWidget tagCreationWidget) {
-            return Ingredient.of(tagCreationWidget.createTag());
+            return BuiltInRegistries.ITEM.get(tagCreationWidget.createTag()).stream()
+                    .flatMap(HolderSet::stream)
+                    .map(ItemStack::new)
+                    .toList();
         }
         return ItemSelectorCategory.super.getSelected(widget);
     }

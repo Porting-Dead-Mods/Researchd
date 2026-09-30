@@ -28,13 +28,9 @@ import com.portingdeadmods.researchd.client.impl.icons.ClientTextResearchIcon;
 import com.portingdeadmods.researchd.client.impl.info.effects.*;
 import com.portingdeadmods.researchd.client.impl.info.methods.*;
 import com.portingdeadmods.researchd.client.renderers.ResearchLabBER;
+import com.portingdeadmods.researchd.client.renderers.ResearchPackTintSource;
 import com.portingdeadmods.researchd.client.screens.lab.ResearchLabScreen;
 import com.portingdeadmods.researchd.client.screens.lib.widgets.WidgetConstructor;
-import com.portingdeadmods.researchd.compat.ResearchdCompatHandler;
-import com.portingdeadmods.researchd.compat.immersiveengineering.UnlockIEMultiblockEffect;
-import com.portingdeadmods.researchd.compat.immersiveengineering.client.UnlockIEMultiblockEffectWidget;
-import com.portingdeadmods.researchd.data.ResearchdDataComponents;
-import com.portingdeadmods.researchd.data.components.ResearchPackComponent;
 import com.portingdeadmods.researchd.impl.research.ResearchPackImpl;
 import com.portingdeadmods.researchd.impl.research.SimpleResearch;
 import com.portingdeadmods.researchd.impl.research.effect.*;
@@ -43,16 +39,10 @@ import com.portingdeadmods.researchd.impl.research.icons.SpriteResearchIcon;
 import com.portingdeadmods.researchd.impl.research.icons.TextResearchIcon;
 import com.portingdeadmods.researchd.impl.research.method.*;
 import com.portingdeadmods.researchd.registries.*;
-import com.portingdeadmods.researchd.utils.researches.ResearchHelperCommon;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -65,31 +55,26 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
 @Mod(value = Researchd.MODID, dist = Dist.CLIENT)
 public final class ResearchdClient {
-    public static final Map<ResourceLocation, WidgetConstructor<? extends ResearchMethod>> RESEARCH_METHOD_WIDGETS =
+    public static final Map<Identifier, WidgetConstructor<? extends ResearchMethod>> RESEARCH_METHOD_WIDGETS =
             new HashMap<>();
-    public static final Map<ResourceLocation, WidgetConstructor<? extends ResearchEffect>> RESEARCH_EFFECT_WIDGETS =
+    public static final Map<Identifier, WidgetConstructor<? extends ResearchEffect>> RESEARCH_EFFECT_WIDGETS =
             new HashMap<>();
-    public static final Map<ResourceLocation, Function<ResearchIcon, ClientResearchIcon<?>>> RESEARCH_ICONS =
+    public static final Map<Identifier, Function<ResearchIcon, ClientResearchIcon<?>>> RESEARCH_ICONS = new HashMap<>();
+    public static final Map<Identifier, StandaloneEditorObject<? extends Research>> CLIENT_RESEARCHES = new HashMap<>();
+    public static final Map<Identifier, StandaloneEditorObject<? extends ResearchPack>> CLIENT_RESEARCH_PACKS =
             new HashMap<>();
-    public static final Map<ResourceLocation, StandaloneEditorObject<? extends Research>> CLIENT_RESEARCHES =
-            new HashMap<>();
-    public static final Map<ResourceLocation, StandaloneEditorObject<? extends ResearchPack>> CLIENT_RESEARCH_PACKS =
-            new HashMap<>();
-    public static final Map<ResourceLocation, TypedEditorObject<? extends ResearchMethod, ResearchMethodType>>
+    public static final Map<Identifier, TypedEditorObject<? extends ResearchMethod, ResearchMethodType>>
             CLIENT_RESEARCH_METHOD_TYPES = new HashMap<>();
-    public static final ModelResourceLocation RESEARCH_LAB_MODEL =
-            ModelResourceLocation.standalone(Researchd.rl("block/research_lab"));
-    public static final Map<ResourceLocation, TypedEditorObject<? extends ResearchEffect, ResearchEffectType>>
+    public static final Map<Identifier, TypedEditorObject<? extends ResearchEffect, ResearchEffectType>>
             CLIENT_RESEARCH_EFFECT_TYPES = new HashMap<>();
 
     public static int previewRendererResearchPackColor = -1;
 
     public ResearchdClient(IEventBus eventBus, ModContainer modContainer) {
         eventBus.addListener(this::registerKeybinds);
-        eventBus.addListener(this::registerColorHandlers);
+        eventBus.addListener(this::registerItemTintSources);
         eventBus.addListener(this::registerMenus);
         eventBus.addListener(this::clientSetup);
-        eventBus.addListener(this::registerAdditionalModels);
         eventBus.addListener(this::registerBER);
 
         PDLConfigHelper.registerConfig(ResearchdConfig.Client.class, ModConfig.Type.CLIENT, modContainer);
@@ -158,71 +143,42 @@ public final class ResearchdClient {
                     MultiplyValueEffect.ID,
                     new ValueEffectModifierObject(ResearchEffectTypes.MULTIPLE_VALUE.get(), MultiplyValueEffect::new));
 
-            ItemBlockRenderTypes.setRenderLayer(
-                    ResearchdBlocks.RESEARCH_LAB_CONTROLLER.get(),
-                    RenderType.solid()); // Should fiddle with render types till it works ngl
-
             // COMPAT //
 
-            // Immersive Engineering
-            if (ResearchdCompatHandler.isIELoaded())
-                addEffectWidget(UnlockIEMultiblockEffect.ID, UnlockIEMultiblockEffectWidget::new);
+            // TODO(26.1 port, Immersive Engineering): register UnlockIEMultiblockEffectWidget for
+            // UnlockIEMultiblockEffect.ID again (if IE is loaded) once IE has a 26.1.2 build
         });
     }
 
     private static <I extends ResearchIcon> void addClientResearchIcon(
-            ResourceLocation id, Function<I, ClientResearchIcon<?>> factory) {
+            Identifier id, Function<I, ClientResearchIcon<?>> factory) {
         RESEARCH_ICONS.put(id, (Function<ResearchIcon, ClientResearchIcon<?>>) factory);
     }
 
-    private static <T extends ResearchMethod> void addMethodWidget(
-            ResourceLocation id, WidgetConstructor<T> constructor) {
+    private static <T extends ResearchMethod> void addMethodWidget(Identifier id, WidgetConstructor<T> constructor) {
         RESEARCH_METHOD_WIDGETS.put(id, constructor);
     }
 
-    private static void addEffectWidgetUnsafe(ResourceLocation id, WidgetConstructor constructor) {
+    private static void addEffectWidgetUnsafe(Identifier id, WidgetConstructor constructor) {
         RESEARCH_EFFECT_WIDGETS.put(id, constructor);
     }
 
-    private static <T extends ResearchEffect> void addEffectWidget(
-            ResourceLocation id, WidgetConstructor<T> constructor) {
+    private static <T extends ResearchEffect> void addEffectWidget(Identifier id, WidgetConstructor<T> constructor) {
         RESEARCH_EFFECT_WIDGETS.put(id, constructor);
     }
 
     private void registerKeybinds(RegisterKeyMappingsEvent event) {
+        event.registerCategory(ResearchdKeybinds.CATEGORY);
         event.register(ResearchdKeybinds.OPEN_RESEARCH_SCREEN.get());
         event.register(ResearchdKeybinds.OPEN_RESEARCH_TEAM_SCREEN.get());
     }
 
-    private void registerColorHandlers(RegisterColorHandlersEvent.Item event) {
-        event.register(
-                (stack, layer) -> {
-                    if (layer == 1 && previewRendererResearchPackColor != -1) {
-                        return previewRendererResearchPackColor;
-                    }
-
-                    ResearchPackComponent researchPackComponent = stack.get(ResearchdDataComponents.RESEARCH_PACK);
-                    if (researchPackComponent == null) return -1;
-
-                    ClientLevel level = Minecraft.getInstance().level;
-                    if (layer == 1 && researchPackComponent.researchPackKey().isPresent()) {
-                        ResearchPack researchPack = ResearchHelperCommon.getResearchPack(
-                                researchPackComponent.researchPackKey().get(), level);
-                        if (researchPack != null) {
-                            return researchPack.color();
-                        }
-                    }
-                    return -1;
-                },
-                ResearchdItems.RESEARCH_PACK);
+    private void registerItemTintSources(RegisterColorHandlersEvent.ItemTintSources event) {
+        event.register(ResearchPackTintSource.ID, ResearchPackTintSource.MAP_CODEC);
     }
 
     private void registerMenus(RegisterMenuScreensEvent event) {
         event.register(ResearchdMenuTypes.RESEARCH_LAB_MENU.get(), ResearchLabScreen::new);
-    }
-
-    private void registerAdditionalModels(ModelEvent.RegisterAdditional event) {
-        event.register(RESEARCH_LAB_MODEL);
     }
 
     private void registerBER(EntityRenderersEvent.RegisterRenderers event) {

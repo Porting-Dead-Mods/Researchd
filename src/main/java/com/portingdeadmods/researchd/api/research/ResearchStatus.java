@@ -6,7 +6,7 @@ import com.portingdeadmods.researchd.Researchd;
 import com.portingdeadmods.researchd.client.screens.research.ResearchScreenWidget;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,9 +21,9 @@ public enum ResearchStatus implements StringRepresentable {
             CodecUtils.enumStreamCodec(ResearchStatus.class);
 
     private final String name;
-    private final ResourceLocation spriteSmallTexture;
-    private final ResourceLocation spriteTexture;
-    private final ResourceLocation spriteTallTexture;
+    private final Identifier spriteSmallTexture;
+    private final Identifier spriteTexture;
+    private final Identifier spriteTallTexture;
     private final int sortingValue;
 
     /**
@@ -38,11 +38,11 @@ public enum ResearchStatus implements StringRepresentable {
         this.sortingValue = sortingValue;
     }
 
-    public ResourceLocation getSpriteTexture() {
+    public Identifier getSpriteTexture() {
         return spriteTexture;
     }
 
-    public ResourceLocation getSpriteTexture(ResearchScreenWidget.PanelSpriteType spriteType) {
+    public Identifier getSpriteTexture(ResearchScreenWidget.PanelSpriteType spriteType) {
         return switch (spriteType) {
             case TALL -> this.spriteTallTexture;
             case NORMAL -> this.spriteTexture;

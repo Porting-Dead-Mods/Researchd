@@ -1,10 +1,10 @@
 package com.portingdeadmods.researchd.client.screens.editor.widgets;
 
-import com.portingdeadmods.portingdeadlibs.api.utils.RGBAColor;
+import com.portingdeadmods.portingdeadlibs.api.misc.RGBAColor;
 import com.portingdeadmods.researchd.ResearchdClient;
 import com.portingdeadmods.researchd.registries.ResearchdItems;
 import java.util.function.Supplier;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.CommonComponents;
@@ -27,11 +27,11 @@ public class ResearchPackPreviewWidget extends AbstractWidget {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int i, int i1, float v) {
+    protected void extractWidgetRenderState(GuiGraphicsExtractor guiGraphics, int i, int i1, float v) {
         ItemStack stack = ResearchdItems.RESEARCH_PACK.toStack();
 
         ResearchdClient.previewRendererResearchPackColor = this.getColor().toARGB();
-        guiGraphics.renderItem(stack, this.getX(), this.getY());
+        guiGraphics.item(stack, this.getX(), this.getY());
         ResearchdClient.previewRendererResearchPackColor = -1;
     }
 

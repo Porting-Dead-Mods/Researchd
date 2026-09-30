@@ -1,6 +1,5 @@
 package com.portingdeadmods.researchd.content.commands.arguments;
 
-import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -22,6 +21,7 @@ import net.minecraft.commands.arguments.selector.EntitySelector;
 import net.minecraft.commands.arguments.selector.EntitySelectorParser;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.NameAndId;
 
 public class ResearchdTeamArgument implements ArgumentType<ResearchdTeamArgumentProvider> {
     private static final DynamicCommandExceptionType TEAM_NOT_FOUND =
@@ -105,7 +105,7 @@ public class ResearchdTeamArgument implements ArgumentType<ResearchdTeamArgument
             ServerPlayer player = this.selector.findSinglePlayer(source);
             ResearchTeam team = ResearchdApi.getTeamManager(source.getLevel()).getTeamByPlayer(player);
             if (team == null) {
-                throw TEAM_NOT_FOUND.create(player.getGameProfile().getName());
+                throw TEAM_NOT_FOUND.create(player.getGameProfile().name());
             }
             return team;
         }
@@ -122,8 +122,11 @@ public class ResearchdTeamArgument implements ArgumentType<ResearchdTeamArgument
             if (team != null) {
                 return team;
             } else {
-                Optional<UUID> playerUUID =
-                        source.getServer().getProfileCache().get(this.id).map(GameProfile::getId);
+                Optional<UUID> playerUUID = source.getServer()
+                        .services()
+                        .nameToIdCache()
+                        .get(this.id)
+                        .map(NameAndId::id);
                 ResearchTeam playerTeam =
                         playerUUID.map(teamManager::getTeamByPlayerId).orElseThrow(this::error);
                 if (playerTeam == null) {

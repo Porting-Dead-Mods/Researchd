@@ -10,8 +10,8 @@ import dev.latvian.mods.kubejs.event.EventGroup;
 import dev.latvian.mods.kubejs.event.EventHandler;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import java.util.Map;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 
 public final class ResearchdKJSEvents {
@@ -29,13 +29,13 @@ public final class ResearchdKJSEvents {
     public static final EventHandler RESEARCH_PROGRESS =
             GROUP.server("researchProgress", () -> ResearchProgressKubeEvent.class);
 
-    public static Map<ResourceLocation, Research> fireRegisterResearchesEvent() {
+    public static Map<Identifier, Research> fireRegisterResearchesEvent() {
         RegisterResearchesKubeEvent event = new RegisterResearchesKubeEvent();
         ResearchdKJSEvents.REGISTER_RESEARCHES.post(ScriptType.SERVER, event);
         return event.getResearches();
     }
 
-    public static Map<ResourceLocation, ResearchPackImpl> fireRegisterResearchPacksEvent() {
+    public static Map<Identifier, ResearchPackImpl> fireRegisterResearchPacksEvent() {
         RegisterResearchPacksKubeEvent event = new RegisterResearchPacksKubeEvent();
         ResearchdKJSEvents.REGISTER_RESEARCH_PACKS.post(ScriptType.SERVER, event);
         return event.getResearchPacks();

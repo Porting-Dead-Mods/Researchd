@@ -37,9 +37,9 @@ public record TechList(UniqueArray<ResearchInstance> entries) {
                 .sorted((a, b) -> {
                     if (a.getResearchStatus() == b.getResearchStatus()) {
                         return a.getResearch()
-                                .location()
+                                .identifier()
                                 .toString()
-                                .compareTo(b.getResearch().location().toString());
+                                .compareTo(b.getResearch().identifier().toString());
                     }
                     return a.getResearchStatus().getSortingValue()
                             - b.getResearchStatus().getSortingValue();
@@ -56,7 +56,8 @@ public record TechList(UniqueArray<ResearchInstance> entries) {
 
         for (ResearchInstance entry : this.entries()) {
             // Search by resource location
-            String resourceLocation = entry.getResearch().location().toString().toLowerCase();
+            String resourceLocation =
+                    entry.getResearch().identifier().toString().toLowerCase();
 
             // Search by localized display name
             String displayName = entry.getDisplayName(level).getString().toLowerCase();

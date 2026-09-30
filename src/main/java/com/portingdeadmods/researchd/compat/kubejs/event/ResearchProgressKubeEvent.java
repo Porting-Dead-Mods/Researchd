@@ -26,7 +26,7 @@ public class ResearchProgressKubeEvent implements KubePlayerEvent {
     }
 
     public String getResearchId() {
-        return research.location().toString();
+        return research.identifier().toString();
     }
 
     public double getProgress() {

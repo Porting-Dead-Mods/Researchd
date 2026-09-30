@@ -7,12 +7,12 @@ import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.registration.ISubtypeRegistration;
 import mezz.jei.api.runtime.IJeiRuntime;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 @JeiPlugin
 public final class ResearchdJeiPlugin implements IModPlugin {
-    public static final ResourceLocation UID = Researchd.rl("researchd_jei_plugin");
+    public static final Identifier UID = Researchd.rl("researchd_jei_plugin");
 
     @Override
     public void onRuntimeAvailable(@NotNull IJeiRuntime jeiRuntime) {
@@ -25,7 +25,7 @@ public final class ResearchdJeiPlugin implements IModPlugin {
     }
 
     @Override
-    public @NotNull ResourceLocation getPluginUid() {
+    public @NotNull Identifier getPluginUid() {
         return UID;
     }
 

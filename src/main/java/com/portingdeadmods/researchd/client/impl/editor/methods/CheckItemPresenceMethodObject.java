@@ -19,7 +19,9 @@ public class CheckItemPresenceMethodObject extends AbstractItemMethodObject<Chec
     @Override
     public CheckItemPresenceResearchMethod create(RememberingLinearLayout layout) {
         return new CheckItemPresenceResearchMethod(
-                layout.getChild("item_selector", ItemSelectorWidget.class).getSelected(),
+                layout.getChild("item_selector", ItemSelectorWidget.class)
+                        .getSelected()
+                        .orElseThrow(),
                 NumberUtils.parseIntOr(layout.getChild("count", EditBox.class).getValue(), 1));
     }
 }

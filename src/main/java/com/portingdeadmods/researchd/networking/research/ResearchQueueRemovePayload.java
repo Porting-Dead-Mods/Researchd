@@ -31,7 +31,7 @@ public record ResearchQueueRemovePayload(ResourceKey<Research> researchKey) impl
     public void handle(IPayloadContext context) {
         context.enqueueWork(() -> {
                     if (context.player() instanceof ServerPlayer serverPlayer) {
-                        ServerLevel level = serverPlayer.serverLevel();
+                        ServerLevel level = serverPlayer.level();
                         ResearchTeamMap data = TeamSavedData.getData(level);
 
                         ResearchTeamImpl team = (ResearchTeamImpl) data.getTeamByPlayer(serverPlayer);

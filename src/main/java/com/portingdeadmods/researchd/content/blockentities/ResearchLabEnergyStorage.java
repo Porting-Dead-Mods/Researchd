@@ -1,80 +1,60 @@
 package com.portingdeadmods.researchd.content.blockentities;
 
+import com.portingdeadmods.portingdeadlibs.api.data.transfer.PDLSimpleEnergyHandler;
 import com.portingdeadmods.researchd.ResearchdConfig;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.Tag;
-import net.neoforged.neoforge.energy.EnergyStorage;
+import net.minecraft.world.level.storage.ValueInput;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
-/** Energy storage with the server config rules */
-public final class ResearchLabEnergyStorage extends EnergyStorage {
-    private final Runnable onChanged;
-
-    ResearchLabEnergyStorage(int capacity, int maxReceive, int maxExtract, Runnable onChanged) {
-        super(capacity, maxReceive, maxExtract);
-        this.onChanged = onChanged;
-        this.refreshLimits();
+/**
+ * Energy storage with the server config rules: the buffer and its per-tick transfer limit follow the configured
+ * capacity while the game runs.
+ * <p>
+ * Inserts and extracts go through {@link net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler}, whose journal
+ * snapshots the stored amount before each change, so an aborted transaction puts it back. Inside a transaction only
+ * the limits are refreshed. Energy above a lowered capacity is trimmed by {@link #clampToCapacity()}, which runs
+ * outside any transaction; until then the storage accepts nothing and still gives out what it holds.
+ */
+public final class ResearchLabEnergyStorage extends PDLSimpleEnergyHandler {
+    ResearchLabEnergyStorage() {
+        super(ResearchdConfig.Server.getResearchLabEnergyCapacity());
     }
 
     @Override
-    public int receiveEnergy(int toReceive, boolean simulate) {
+    public int insert(int amount, TransactionContext transaction) {
         this.refreshLimits();
-        int received = super.receiveEnergy(toReceive, simulate);
-        if (received > 0 && !simulate) {
-            this.onChanged.run();
+        return super.insert(amount, transaction);
+    }
+
+    @Override
+    public int extract(int amount, TransactionContext transaction) {
+        this.refreshLimits();
+        return super.extract(amount, transaction);
+    }
+
+    @Override
+    public long getCapacityAsLong() {
+        this.refreshLimits();
+        return super.getCapacityAsLong();
+    }
+
+    @Override
+    public void deserialize(ValueInput input) {
+        super.deserialize(input);
+        this.clampToCapacity();
+    }
+
+    /** Trims stored energy down to the configured capacity. Must not be called inside a transaction. */
+    void clampToCapacity() {
+        this.refreshLimits();
+        if (this.energy > this.capacity) {
+            this.set(this.capacity);
         }
-        return received;
-    }
-
-    @Override
-    public int extractEnergy(int toExtract, boolean simulate) {
-        this.refreshLimits();
-        int extracted = super.extractEnergy(toExtract, simulate);
-        if (extracted > 0 && !simulate) {
-            this.onChanged.run();
-        }
-        return extracted;
-    }
-
-    @Override
-    public int getEnergyStored() {
-        this.refreshLimits();
-        return super.getEnergyStored();
-    }
-
-    @Override
-    public int getMaxEnergyStored() {
-        this.refreshLimits();
-        return super.getMaxEnergyStored();
-    }
-
-    @Override
-    public boolean canExtract() {
-        this.refreshLimits();
-        return super.canExtract();
-    }
-
-    @Override
-    public boolean canReceive() {
-        this.refreshLimits();
-        return super.canReceive();
-    }
-
-    @Override
-    public void deserializeNBT(HolderLookup.Provider provider, Tag nbt) {
-        super.deserializeNBT(provider, nbt);
-        this.refreshLimits();
     }
 
     private void refreshLimits() {
         int configuredCapacity = ResearchdConfig.Server.getResearchLabEnergyCapacity();
         this.capacity = configuredCapacity;
-        this.maxReceive = configuredCapacity;
+        this.maxInsert = configuredCapacity;
         this.maxExtract = configuredCapacity;
-
-        int clampedEnergy = Math.max(0, Math.min(this.energy, configuredCapacity));
-        if (this.energy != clampedEnergy) {
-            this.energy = clampedEnergy;
-            this.onChanged.run();
-        }
     }
 }

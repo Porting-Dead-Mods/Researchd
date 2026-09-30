@@ -4,13 +4,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractContainerWidget;
+import net.minecraft.client.gui.components.AbstractScrollArea;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.layouts.Layout;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,7 +24,7 @@ public abstract class PopupWidget extends AbstractContainerWidget implements Lay
     private boolean updateHovered = true;
 
     public PopupWidget(int x, int y, int width, int height, boolean draggable, Component message) {
-        super(x, y, width, height, message);
+        super(x, y, width, height, message, AbstractScrollArea.defaultSettings(10));
         this.dropDownWidgets = new HashMap<>();
         this.widgets = new ArrayList<>();
         this.draggable = draggable;
@@ -42,7 +44,8 @@ public abstract class PopupWidget extends AbstractContainerWidget implements Lay
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void extractWidgetRenderState(
+            GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         if (this.updateHovered) {
             this.hovered = this.isRectHovered(guiGraphics, mouseX, mouseY, this.getWidth(), 12);
         }
@@ -50,12 +53,26 @@ public abstract class PopupWidget extends AbstractContainerWidget implements Lay
         LayoutWidget.super.renderElements(guiGraphics, mouseX, mouseY, partialTick);
     }
 
-    public void renderTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {}
+    public void renderTooltips(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {}
+
+    // AbstractContainerWidget is a scroll area on 26.1. Keep it unscrollable and hand
+    // scrolling to the children, as the plain container did on 1.21.1.
+    @Override
+    protected int contentHeight() {
+        return this.getHeight();
+    }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        if (this.isValidClickButton(button)) {
-            this.onDrag(mouseX, mouseY, dragX, dragY);
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        return this.getChildAt(mouseX, mouseY)
+                .filter(child -> child.mouseScrolled(mouseX, mouseY, scrollX, scrollY))
+                .isPresent();
+    }
+
+    @Override
+    public boolean mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
+        if (this.isValidClickButton(event.buttonInfo())) {
+            this.onDrag(event, dragX, dragY);
             return true;
         } else {
             return false;
@@ -63,8 +80,8 @@ public abstract class PopupWidget extends AbstractContainerWidget implements Lay
     }
 
     @Override
-    protected void onDrag(double mouseX, double mouseY, double dragX, double dragY) {
-        super.onDrag(mouseX, mouseY, dragX, dragY);
+    protected void onDrag(MouseButtonEvent event, double dragX, double dragY) {
+        super.onDrag(event, dragX, dragY);
 
         if (this.isDraggable()) {
             this.updateHovered = false;
@@ -77,8 +94,8 @@ public abstract class PopupWidget extends AbstractContainerWidget implements Lay
     }
 
     @Override
-    public void onRelease(double mouseX, double mouseY) {
-        super.onRelease(mouseX, mouseY);
+    public void onRelease(MouseButtonEvent event) {
+        super.onRelease(event);
 
         this.updateHovered = true;
         this.hovered = false;
@@ -146,7 +163,7 @@ public abstract class PopupWidget extends AbstractContainerWidget implements Lay
         return this.hovered;
     }
 
-    protected boolean isRectHovered(GuiGraphics guiGraphics, int mouseX, int mouseY, int width, int height) {
+    protected boolean isRectHovered(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, int width, int height) {
         return guiGraphics.containsPointInScissor(mouseX, mouseY)
                 && mouseX >= this.getX()
                 && mouseY >= this.getY()
