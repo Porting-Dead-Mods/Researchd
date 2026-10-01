@@ -51,7 +51,7 @@ public record RequestToJoinPayload(UUID toJoin, boolean remove) implements Custo
                                 team.getSocialManager().addSentInvite(sp.getUUID());
                             }
                             team.setChanged();
-                            PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
+                            PacketDistributor.sendToAllPlayers(SyncTeamPayload.snapshot(team));
                             ResearchTeamHelperServer.refreshPlayerManagement(team, level);
                         } else {
                             sp.sendSystemMessage(Component.literal("The player you're trying to join does not exist!")

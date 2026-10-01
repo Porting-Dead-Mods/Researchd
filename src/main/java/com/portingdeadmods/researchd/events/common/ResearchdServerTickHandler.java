@@ -41,11 +41,12 @@ public final class ResearchdServerTickHandler {
 
                         // If progress has changed, we sync
                         if (oldProgress != currentProgress.getProgress()) {
+                            ResearchProgressSyncPayload payload =
+                                    ResearchProgressSyncPayload.snapshot(currentResearch, currentProgress);
                             for (TeamMember member : team.getMembers()) {
                                 ServerPlayer player = server.getPlayerList().getPlayer(member.player());
                                 if (player == null) continue; // skip offline members
-                                PacketDistributor.sendToPlayer(
-                                        player, new ResearchProgressSyncPayload(currentResearch, currentProgress));
+                                PacketDistributor.sendToPlayer(player, payload);
                             }
                         }
 
