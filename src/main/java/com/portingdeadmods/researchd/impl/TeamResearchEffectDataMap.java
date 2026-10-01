@@ -64,7 +64,7 @@ public class TeamResearchEffectDataMap implements ResearchEffectManager, SavedDa
     public <T extends ResearchEffectData<?>> void sync(UUID teamId, ResearchEffectDataType<T> type) {
         T effectData = this.getEffectData(teamId, type);
         if (effectData != null) {
-            PacketDistributor.sendToAllPlayers(new SyncEffectDataPayload(teamId, effectData));
+            PacketDistributor.sendToAllPlayers(SyncEffectDataPayload.snapshot(teamId, effectData));
         }
     }
 

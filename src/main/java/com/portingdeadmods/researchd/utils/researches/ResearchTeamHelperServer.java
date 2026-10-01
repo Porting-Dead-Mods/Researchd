@@ -163,7 +163,7 @@ public final class ResearchTeamHelperServer {
             team.getSocialManager().removeSentInvite(requesterId);
             team.setChanged();
 
-            PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
+            PacketDistributor.sendToAllPlayers(SyncTeamPayload.snapshot(team));
 
             refreshPlayerManagement(team, level);
             // PacketDistributor.sendToPlayer(requester, new RefreshResearchesPayload());
@@ -183,7 +183,7 @@ public final class ResearchTeamHelperServer {
                 requester.sendSystemMessage(
                         ResearchdTranslations.component(ResearchdTranslations.Team.IGNORE, team.getName()));
 
-            PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
+            PacketDistributor.sendToAllPlayers(SyncTeamPayload.snapshot(team));
         }
     }
 
@@ -265,7 +265,7 @@ public final class ResearchTeamHelperServer {
                 // Remove member and put them into a default team with a status message
 
                 team.removeMember(member);
-                PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
+                PacketDistributor.sendToAllPlayers(SyncTeamPayload.snapshot(team));
 
                 if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                     requester.sendSystemMessage(ResearchdTranslations.component(
@@ -283,7 +283,7 @@ public final class ResearchTeamHelperServer {
                 // Invite Member
 
                 team.getSocialManager().addSentInvite(member);
-                PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
+                PacketDistributor.sendToAllPlayers(SyncTeamPayload.snapshot(team));
             }
 
             refreshPlayerManagement(team, level);
@@ -296,7 +296,7 @@ public final class ResearchTeamHelperServer {
     private static void createTeamForPlayerSynced(Level level, UUID member, ResearchTeamManager teamManager) {
         ResearchTeamImpl newTeam = (ResearchTeamImpl) teamManager.createDefaultTeam(member, level);
         teamManager.addTeam(newTeam);
-        PacketDistributor.sendToAllPlayers(new AddTeamPayload(newTeam));
+        PacketDistributor.sendToAllPlayers(AddTeamPayload.snapshot(newTeam));
     }
 
     public static void handleManageModerator(@NotNull ServerPlayer requester, UUID moderator, boolean remove) {
@@ -327,7 +327,7 @@ public final class ResearchTeamHelperServer {
                                 ResearchdTranslations.Team.PROMOTED,
                                 PlayerUtils.getPlayerNameFromUUID(level, moderator)));
                 }
-                PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
+                PacketDistributor.sendToAllPlayers(SyncTeamPayload.snapshot(team));
 
                 refreshPlayerManagement(team, level);
             } else {
@@ -362,7 +362,7 @@ public final class ResearchTeamHelperServer {
                 requester.sendSystemMessage(
                         ResearchdTranslations.component(ResearchdTranslations.Team.NEW_TEAM_NAME, oldname, name));
 
-            PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
+            PacketDistributor.sendToAllPlayers(SyncTeamPayload.snapshot(team));
             refreshPlayerManagement(team, level);
         } else {
             if (!ResearchdCompatHandler.isFTBTeamsEnabled())
@@ -387,7 +387,7 @@ public final class ResearchTeamHelperServer {
                 // Set the old leader as moderator
                 team.setRole(requesterId, ResearchTeamRole.MODERATOR);
 
-                PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
+                PacketDistributor.sendToAllPlayers(SyncTeamPayload.snapshot(team));
 
                 if (!ResearchdCompatHandler.isFTBTeamsEnabled())
                     requester.sendSystemMessage(ResearchdTranslations.component(
@@ -442,7 +442,7 @@ public final class ResearchTeamHelperServer {
                 requester.sendSystemMessage(ResearchdTranslations.component(
                         ResearchdTranslations.Team.REMOVED_INVITE, AllPlayersCache.getName(invited)));
             team.setChanged();
-            PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
+            PacketDistributor.sendToAllPlayers(SyncTeamPayload.snapshot(team));
         } else {
             team.getSocialManager().addSentInvite(invited);
             team.setChanged();
@@ -468,7 +468,7 @@ public final class ResearchTeamHelperServer {
                 requester.sendSystemMessage(ResearchdTranslations.component(
                         ResearchdTranslations.Team.SENT_INVITE, AllPlayersCache.getName(invited), team.getName()));
 
-            PacketDistributor.sendToAllPlayers(new SyncTeamPayload(team));
+            PacketDistributor.sendToAllPlayers(SyncTeamPayload.snapshot(team));
         }
 
         refreshPlayerManagement(team, level);
